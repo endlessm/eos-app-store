@@ -1,5 +1,5 @@
 # -*- mode: python -*-
-a = Analysis([os.path.join(HOMEPATH,'support/_mountzlib.py'), os.path.join(HOMEPATH,'support/useUnicode.py'), '/home/dev1/checkout/endless-os-desktop-widget/src/endless_os_desktop.py'],
+a = Analysis([os.path.join(HOMEPATH,'support/_mountzlib.py'), os.path.join(HOMEPATH,'support/useUnicode.py'), '/home/dev1/checkout/eos-desktop/src/endless_os_desktop.py'],
              pathex=['/home/dev1/apps/pyinstaller-1.5.1'])
 pyz = PYZ(a.pure)
 exe = EXE( pyz,

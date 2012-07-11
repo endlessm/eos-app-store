@@ -34,7 +34,7 @@ pushd `dirname $0`
     ./convert.sh
   popd &> /dev/null
 
-  pushd ../desktop* &> /dev/null
+  pushd ../eos-installer &> /dev/null
   INSTALL_DIR=$(pwd)
   export GNUPGHOME=${INSTALL_DIR}/gnupg
   popd &> /dev/null
