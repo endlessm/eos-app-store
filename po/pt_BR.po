@@ -1,0 +1,87 @@
+# Translations for the Endless OS Browser
+# Copyright (C) 2012
+# This file is distributed under the same license as the Endless OS Desktop package.
+#
+# Endless Mobile <m@endlessm.com>, 2012
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: dev 1\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2012-06-22 08:39-0500\n"
+"PO-Revision-Date: 2012-05-31 11:54-0500\n"
+"Last-Translator: Automatically generated\n"
+"Language-Team: none\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n > 1);\n"
+
+#: src/desktop/endless_desktop_view.py:86
+msgid "Add new"
+msgstr "Adicionar Novo"
+
+#: src/desktop/endless_desktop_view.py:99
+msgid "Apps"
+msgstr "Aplicativos"
+
+#: ui/bugs_and_feedback.glade:76
+msgid "Bugbuffer1"
+msgstr ""
+
+#: ui/bugs_and_feedback.glade:10 src/desktop/endless_desktop_view.py:90
+msgid "Feedback"
+msgstr "Feedback"
+
+#: src/shortcut/add_remove_shortcut.py:43
+msgid "Delete"
+msgstr "Excluir"
+
+#: src/search/search_box.py:18
+msgid "Enter Search or URL..."
+msgstr "Digite pesquisa ou um URL..."
+
+#: src/desktop/endless_desktop_view.py:112
+msgid "Folder"
+msgstr "Diretórios"
+
+#: ui/bugs_and_feedback.glade:42
+msgid "Give us feedback"
+msgstr "Deixe seu comentário."
+
+#: ui/bugs_and_feedback.glade:30
+msgid "Report a Bug"
+msgstr "Relatar um bug"
+
+#: ui/bugs_and_feedback.glade:94
+msgid "SUBMIT"
+msgstr "ENVIAR"
+
+msgid "CANCEL"
+msgstr "CANCELAR"
+
+#: ui/bugs_and_feedback.glade:6
+msgid ""
+"Please let us know how the problem occured "
+"and we will resolve it as soon as possible."
+msgstr ""
+"Por favor, deixe-nos saber como o problema "
+"ocorreu e vamos resolvê-lo como mais rapidamente possível."
+
+#: src/feedback_module/feedback_response_dialog_view.py:9
+msgid "Thank You"
+msgstr "Obrigado"
+
+#: ui/feedback_response_dialog.glade:25
+#: src/feedback_module/feedback_response_dialog_view.py:8
+msgid "Thank you for your feedback."
+msgstr "Obrigado pelo seu feedback."
+
+#: src/desktop/endless_desktop_view.py:111
+msgid "Websites"
+msgstr "Páginas Web"
+
+#: ui/feedback_response_dialog.glade:33
+msgid "button"
+msgstr ""
