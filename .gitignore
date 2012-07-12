@@ -1,7 +1,5 @@
 .metadata
 *.pyc
-.project
-.pydevproject
 dist
 build
 debian/endless-os-desktop-widget/
