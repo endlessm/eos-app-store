@@ -15,41 +15,6 @@ class TestEndlessDesktopPresenter(unittest.TestCase):
         
         refresh_view.assert_called_once_with()
     
-    @patch.object(DesktopPresenter, 'refresh_view')
-    def test_add_item_adds_the_item_and_refreshes_the_view(self, refresh_view):
-        shortcut = Mock()
-        
-        self.testObject.add_item(shortcut)
-
-        self.mock_model.add_item.assert_called_once_with(shortcut)
-        refresh_view.assert_called_once_with()
-
-    @patch.object(DesktopPresenter, 'refresh_view')
-    def test_remove_item_removes_item_refreshes_view(self, refresh_view):
-        shortcut = Mock()
-        
-        self.testObject.remove_item(shortcut)
-        
-        self.mock_model.remove_item.assert_called_once_with(shortcut)
-        refresh_view.assert_called_once_with()
-        
-    @patch.object(DesktopPresenter, 'refresh_view')
-    def test_move_item_moves_item_and_refreshes_view(self, refresh_view):
-        indexes = Mock()
-        
-        self.testObject.move_item(indexes)
-        
-        self.mock_model.reorder_shortcuts.assert_called_once_with(indexes)
-        refresh_view.assert_called_once_with()
-
-    def test_rename_item_updates_model(self):
-        shortcut = Mock()
-        name = "name"
-        
-        self.testObject.rename_item(shortcut, name)
-        
-        self.mock_model.rename_item.assert_called_once_with(shortcut, name)
-    
     def test_activate_item_invokes_process(self):
         shortcut = Mock()
         
@@ -68,7 +33,6 @@ class TestEndlessDesktopPresenter(unittest.TestCase):
         self.testObject.refresh_view()
         
         self.mock_view.refresh.assert_called_once_with(mock_shortcuts)
-        self.mock_view.populate_popups.assert_called_once_with(mock_menus)
         
     def test_submit_feedback_updates_model(self):
         message = "some text"

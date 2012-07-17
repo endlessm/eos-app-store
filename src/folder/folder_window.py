@@ -35,7 +35,6 @@ class OpenFolderWindow():
         
         self._container = gtk.HBox(False)
         
-        print "children", shortcut.get_children_ids()
         folder_icons = FolderIcons(shortcut.get_children())
         self._container.pack_start(folder_icons, False, False, 0)
         folder_icons.connect("application-shortcut-activate", lambda w, app_id: callback(app_id))

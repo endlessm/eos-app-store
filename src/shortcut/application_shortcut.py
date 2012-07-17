@@ -22,7 +22,6 @@ class ApplicationShortcut(DesktopShortcut):
     }
     
     def __init__(self, shortcut, show_background=True):
-        print "$$$ "+repr(shortcut)
         image_name = shortcut.icon() 
         label_text = shortcut.display_name()
         self._image_name = image_name
