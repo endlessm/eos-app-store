@@ -43,6 +43,11 @@ class EndlessDesktopModel(object):
     
     def execute_app_with_id(self, app_id):
         self._app_util.launch_app(int(app_id))
+        
+    def load_children(self, shortcut):
+        for child_id in shortcut.get_children_ids():
+            shortcut.add_child(self._app_util._get_app_by_id(child_id))
+        return shortcut
     
     def submit_feedback(self, message, bug):
         data = {"message":message, "timestamp":self._time_provider.get_current_time(), "bug":bug}

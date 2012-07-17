@@ -5,7 +5,7 @@ from util import image_util, screen_util
 class TransparentWindow(gtk.Window):
 
     def __init__(self):
-        gtk.Window.__init__(self)
+        gtk.Window.__init__(self, gtk.WINDOW_POPUP)
         self.connect("expose-event", self._handle_event)
         self.connect("configure-event", self._handle_event)
         self._background = image_util.load_pixbuf("background.png")

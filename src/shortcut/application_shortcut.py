@@ -21,10 +21,12 @@ class ApplicationShortcut(DesktopShortcut):
                        (gobject.TYPE_BOOLEAN,)),    
     }
     
-    def __init__(self, shortcut):
+    def __init__(self, shortcut, show_background=True):
+        print "$$$ "+repr(shortcut)
         image_name = shortcut.icon() 
         label_text = shortcut.display_name()
         self._image_name = image_name
+        self._show_background = show_background
         
         super(ApplicationShortcut, self).__init__(label_text)
         self._shortcut = shortcut
@@ -46,7 +48,7 @@ class ApplicationShortcut(DesktopShortcut):
         self.show_all()
         self.set_moving(False)
         
-        self.add_rename_entry(label_text)
+#        self.add_rename_entry(label_text)
 
     def drag_data_received_callback(self, widget, context, x, y, selection, targetType, time):
         if targetType == self.DND_TARGET_TYPE_TEXT:
@@ -56,7 +58,10 @@ class ApplicationShortcut(DesktopShortcut):
         return kill_animation
        
     def get_images(self):
-        return (image_util.image_path("endless-shortcut-well.png"), image_util.image_path("endless-shortcut-background.png"), self._image_name, image_util.image_path("endless-shortcut-foreground.png"))
+        if self._show_background:
+            return (image_util.image_path("endless-shortcut-well.png"), image_util.image_path("endless-shortcut-background.png"), self._image_name, image_util.image_path("endless-shortcut-foreground.png"))
+        else:
+            return (self._image_name,)
          
     def get_shortcut(self):
         return self._shortcut
@@ -86,8 +91,8 @@ class ApplicationShortcut(DesktopShortcut):
         self.text_buffer = self.text_view.get_buffer()
         self.text_view.set_wrap_mode(gtk.WRAP_WORD_CHAR)
         self.text_view.set_justification(gtk.JUSTIFY_CENTER)
-        self.text_view.modify_text(gtk.STATE_NORMAL, gtk.gdk.Color(0, 0, 0))
-        self.text_view.modify_base(gtk.STATE_NORMAL, gtk.gdk.Color(45000, 45000, 45000)) 
+        self.text_view.modify_text(gtk.STATE_NORMAL, gtk.gdk.Color('#000000'))
+        self.text_view.modify_base(gtk.STATE_NORMAL, gtk.gdk.Color('#cccccc')) 
         self.text_view.set_left_margin(5)
         self.text_view.set_right_margin(5)
         self.text_view.hide()
@@ -170,5 +175,7 @@ class ApplicationShortcut(DesktopShortcut):
         return False
     
     def get_depressed_images(self):
-        return (image_util.image_path("endless-shortcut-well.png"),self._image_name,image_util.image_path("endless-shortcut-foreground.png"))
-    
+        if self._show_background:
+            return (image_util.image_path("endless-shortcut-well.png"),self._image_name,image_util.image_path("endless-shortcut-foreground.png"))
+        else:
+            return (image_util.image_path("endless-shortcut-well.png"),self._image_name,)
