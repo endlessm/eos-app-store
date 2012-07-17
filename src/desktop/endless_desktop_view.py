@@ -107,17 +107,11 @@ class EndlessDesktopView(gtk.Window):
         self.popup.add(website_menu) 
         self.popup.add(folder_menu)
         
-    def hide_folder_window(self):
-        if hasattr(self, '_folder_window') and self._folder_window:
-            self._folder_window.destroy()
-            self._folder_window = None
-        
     def refresh(self, shortcuts):
         self._folder_shortcuts = {}
         for shortcut in shortcuts:
             if shortcut.id() not in self._app_shortcuts:
                 if shortcut.has_children():
-                    print "children-2", shortcut.get_children()
                     app_shortcut = FolderShortcut(shortcut, self._folder_icon_clicked_callback)
                 else:
                     app_shortcut = ApplicationShortcut(shortcut)
@@ -175,9 +169,14 @@ class EndlessDesktopView(gtk.Window):
         self._feedback_popup = BugsAndFeedbackPopupWindow(self._feedback_submitted)
         self._feedback_popup.show()
         
+    def hide_folder_window(self):
+        if hasattr(self, '_folder_window') and self._folder_window:
+            self._folder_window.destroy()
+            self._folder_window = None
+                
     # Show folder content
     def _folder_icon_clicked_callback(self, widget, event, shortcut):
-        self._presenter.load_children(shortcut)
+        self.hide_folder_window()
         self._folder_window = OpenFolderWindow(self.window, self._presenter.activate_item, shortcut) 
         self._folder_window.show()
         

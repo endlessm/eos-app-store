@@ -15,7 +15,6 @@ class FolderShortcut(DesktopShortcut):
         
         self._callback = callback
         
-        print "### children", shortcut.get_children_ids()
         self._shortcut = shortcut
         self._normal_text = shortcut.display_name()
         
