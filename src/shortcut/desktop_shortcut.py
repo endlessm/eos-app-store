@@ -82,7 +82,6 @@ class DesktopShortcut(gtk.VBox):
         return event_box
     
     def _create_icon(self, images):
-        
         icon = ImageEventBox(images)
         icon.set_size_request(64,64)
         icon.set_visible_window(False)

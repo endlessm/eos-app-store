@@ -67,6 +67,7 @@ class EndlessDesktopView(gtk.Window):
     
     def unfocus_widget(self, widget, event):
         widget.set_focus(None)
+        self.hide_folder_window()
 
     def set_presenter(self, presenter):
         self._presenter = presenter

@@ -60,7 +60,13 @@ class ApplicationShortcut(DesktopShortcut):
         if self._show_background:
             return (image_util.image_path("endless-shortcut-well.png"), image_util.image_path("endless-shortcut-background.png"), self._image_name, image_util.image_path("endless-shortcut-foreground.png"))
         else:
-            return (self._image_name,)
+            return (image_util.image_path("endless-shortcut-well.png"), self._image_name,)
+
+    def get_depressed_images(self):
+        if self._show_background:
+            return (image_util.image_path("endless-shortcut-well.png"),self._image_name,image_util.image_path("endless-shortcut-foreground.png"))
+        else:
+            return (image_util.image_path("endless-shortcut-well.png"), self._image_name, image_util.image_path("endless-shortcut-foreground.png"))
          
     def get_shortcut(self):
         return self._shortcut
@@ -172,9 +178,3 @@ class ApplicationShortcut(DesktopShortcut):
             self._event_box.show()
             return True
         return False
-    
-    def get_depressed_images(self):
-        if self._show_background:
-            return (image_util.image_path("endless-shortcut-well.png"),self._image_name,image_util.image_path("endless-shortcut-foreground.png"))
-        else:
-            return (image_util.image_path("endless-shortcut-well.png"),self._image_name,)

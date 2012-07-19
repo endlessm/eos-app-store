@@ -33,4 +33,4 @@ class FolderShortcut(DesktopShortcut):
             self.parent.remove(self)
     
     def get_images(self):
-        return (image_util.image_path("endless-shortcut-well.png"),image_util.image_path("endless-folder.png"),image_util.image_path("endless-shortcut-foreground.png"))
+        return (image_util.image_path("endless-shortcut-well.png"),image_util.image_path("folder.png"),image_util.image_path("endless-shortcut-foreground.png"))

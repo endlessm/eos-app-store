@@ -12,7 +12,6 @@ class ImageEventBox(gtk.EventBox):
         self.set_visible_window(False)
 
     def do_expose_event(self, widget, event):
-
         cr = widget.window.cairo_create()
                 
         self.draw(cr)
@@ -24,7 +23,7 @@ class ImageEventBox(gtk.EventBox):
         x = area.x
         y = area.y
         w, h = self.size_request()
-        
+                        
         for image in self._images:
             image = image_util.scrub_image_path(image)
             if self._width > 0:
