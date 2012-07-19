@@ -24,6 +24,11 @@ class DesktopShortcut(gtk.VBox):
         self._event_box = self._create_icon(self.get_images())
         
         self._label = gtk.Label(label_text)
+
+        new_style = self._label.get_style().copy()
+        new_style.fg[gtk.STATE_NORMAL] = self._label.get_colormap().alloc('#f0f0f0')
+        self._label.set_style(new_style)
+        
         text = string.strip(label_text) 
         self._label.set_text(label_util.wrap_text(self._label, text))
         
@@ -33,8 +38,8 @@ class DesktopShortcut(gtk.VBox):
         self._label_event_box.add(self._label)
         self._label_event_box.set_visible_window(False)
         
-        self.pack_start(self._event_box, False, False)
-        self.pack_start(self._label_event_box, False, False)
+        self.pack_start(self._event_box, False, False, 3)
+        self.pack_start(self._label_event_box, False, False, 3)
         
         self._event_box.drag_dest_set(gtk.DEST_DEFAULT_MOTION | gtk.DEST_DEFAULT_DROP,
                                      self.DND_TRANSFER_TYPE, 
@@ -77,7 +82,6 @@ class DesktopShortcut(gtk.VBox):
         return event_box
     
     def _create_icon(self, images):
-        
         icon = ImageEventBox(images)
         icon.set_size_request(64,64)
         icon.set_visible_window(False)

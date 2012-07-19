@@ -10,6 +10,8 @@ from feedback_module.feedback_response_dialog_view import FeedbackResponseDialog
 import sys
 from search.search_box import SearchBox
 from feedback_module.bugs_and_feedback_popup_window import BugsAndFeedbackPopupWindow
+from shortcut.folder_shortcut import FolderShortcut
+from folder.folder_window import OpenFolderWindow
 
 gettext.install('endless_desktop', '/usr/share/locale', unicode=True, names=['ngettext'])
 
@@ -65,6 +67,7 @@ class EndlessDesktopView(gtk.Window):
     
     def unfocus_widget(self, widget, event):
         widget.set_focus(None)
+        self.hide_folder_window()
 
     def set_presenter(self, presenter):
         self._presenter = presenter
@@ -106,13 +109,17 @@ class EndlessDesktopView(gtk.Window):
         self.popup.add(folder_menu)
         
     def refresh(self, shortcuts):
+        self._folder_shortcuts = {}
         for shortcut in shortcuts:
             if shortcut.id() not in self._app_shortcuts:
-                app_shortcut = ApplicationShortcut(shortcut)
+                if shortcut.has_children():
+                    app_shortcut = FolderShortcut(shortcut, self._folder_icon_clicked_callback)
+                else:
+                    app_shortcut = ApplicationShortcut(shortcut)
+                
                 self._app_shortcuts[shortcut.id()] = app_shortcut
         self._shorcuts_buffer = [shortcut.id() for shortcut in shortcuts]
         self._redraw(self._shorcuts_buffer)
-        
 
         self.align.show()
     
@@ -158,16 +165,26 @@ class EndlessDesktopView(gtk.Window):
         self._feedback_thank_you_dialog.destroy()
         return False
     
+    # Show popup
     def _feedback_icon_clicked_callback(self, widget, event):
-        ## show popup
-        
         self._feedback_popup = BugsAndFeedbackPopupWindow(self._feedback_submitted)
         self._feedback_popup.show()
+        
+    def hide_folder_window(self):
+        if hasattr(self, '_folder_window') and self._folder_window:
+            self._folder_window.destroy()
+            self._folder_window = None
+                
+    # Show folder content
+    def _folder_icon_clicked_callback(self, widget, event, shortcut):
+        self.hide_folder_window()
+        self._folder_window = OpenFolderWindow(self.window, self._presenter.activate_item, shortcut) 
+        self._folder_window.show()
         
     def _remove_all(self):
         for item in self._app_shortcuts.values():
             item.remove_shortcut()
-        
+            
 #        self._add_icon.remove_shortcut()
         self._feedback_icon.remove_shortcut()
         
@@ -185,11 +202,14 @@ class EndlessDesktopView(gtk.Window):
                 
                 item.show()
                 
+            elif isinstance(item, FolderShortcut):
+                item.connect("application-shortcut-activate", lambda w, app_id: self._presenter.activate_item(app_id))
+                
+                item.show()
+                
             if item.parent != None:
                 print >> sys.stderr, "Item has parent!", item
             row.pack_start(item, False, False, 30)
-            
-
             
         return row
     
