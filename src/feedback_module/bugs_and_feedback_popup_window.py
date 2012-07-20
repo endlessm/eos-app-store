@@ -43,7 +43,7 @@ class BugsAndFeedbackPopupWindow():
         self._set_widget_text(self._bug_button, _("Report a Bug"))
         self._bug_button.set_mode(False)
         
-        self._feedback_button = gtk.RadioButton(None, '')
+        self._feedback_button = gtk.RadioButton(self._bug_button, '')
         self._set_widget_text(self._feedback_button, _("Give us feedback"))
         self._feedback_button.set_mode(False)
         
