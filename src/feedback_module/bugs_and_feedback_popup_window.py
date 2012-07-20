@@ -24,7 +24,7 @@ class BugsAndFeedbackPopupWindow():
 #        self._fancy_container.set_visible_window(False)
         self._center = gtk.Alignment(.5,.5,0,0)
         
-        self._close = ImageEventBox((image_util.image_path("endless-close.png"),))
+        self._close = ImageEventBox((image_util.image_path("close.png"),))
         self._close.set_size_request(24,24)
         self._close.connect("button-release-event", lambda w, e: self.destroy())
         
