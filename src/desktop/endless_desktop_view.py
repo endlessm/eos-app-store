@@ -1,17 +1,20 @@
-import gtk
-from gtk import gdk
-from util import image_util, screen_util
 import math
+import sys
+import gettext
+
+import gtk
+import gobject
+from gtk import gdk
+
+from util import image_util, screen_util
 from shortcut.bugs_and_feedback_shortcut import BugsAndFeedbackShortcut
 from shortcut.application_shortcut import ApplicationShortcut
-import gettext
-import gobject
 from feedback_module.feedback_response_dialog_view import FeedbackResponseDialogView
-import sys
 from search.search_box import SearchBox
 from feedback_module.bugs_and_feedback_popup_window import BugsAndFeedbackPopupWindow
 from shortcut.folder_shortcut import FolderShortcut
 from folder.folder_window import OpenFolderWindow
+from notification_panel.notification_panel import NotificationPanel
 
 gettext.install('endless_desktop', '/usr/share/locale', unicode=True, names=['ngettext'])
 
@@ -48,16 +51,19 @@ class EndlessDesktopView(gtk.Window):
         
         self.window.invalidate_rect((0, 0, width, height), False)
         
-        self._vbox = gtk.VBox(False,2)
         self.align = gtk.Alignment(0.5, 0.5, 0, 0)
         
         self.panel = gtk.HBox(False,2)
         width, height = self._get_net_work_area()
         self._textbox = SearchBox(width, height, self)
-        
         self.panel.pack_start(self._textbox, False, True, 0)
 
-        self._vbox.add(self.align)
+        self.notification_panel = NotificationPanel()
+        
+        # Main window layout
+        self._vbox = gtk.VBox(False,2)
+        self._vbox.pack_start(self.notification_panel, False, True, 0)
+        self._vbox.pack_start(self.align, True, False, 0)
         self._vbox.pack_end(self.panel, False, True, 0)
         
         self.add(self._vbox)
