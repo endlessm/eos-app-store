@@ -36,20 +36,7 @@ class EndlessDesktopView(gtk.Window):
         self.show()
         self.set_app_paintable(True)
         
-        pixbuf = image_util.load_pixbuf("background.png")
-        width = screen_util.get_width()
-        
-        sized_pixbuf = pixbuf.scale_simple(width, height, gtk.gdk.INTERP_BILINEAR) #@UndefinedVariable
-        pixmap, mask = sized_pixbuf.render_pixmap_and_mask()
-        
-        del sized_pixbuf
-        del pixbuf
-        
-        self.window.set_back_pixmap(pixmap, False)
-        del pixmap
-        del mask
-        
-        self.window.invalidate_rect((0, 0, width, height), False)
+        self._set_background()
         
         self.align = gtk.Alignment(0.5, 0.5, 0, 0)
         
@@ -71,6 +58,9 @@ class EndlessDesktopView(gtk.Window):
         
         self._max_icons_in_row = self._calculate_max_icons()
     
+        screen = gtk.gdk.Screen() #@UndefinedVariable
+        screen.connect("size-changed", lambda s: self._set_background())
+    
     def unfocus_widget(self, widget, event):
         widget.set_focus(None)
         self.hide_folder_window()
@@ -84,6 +74,22 @@ class EndlessDesktopView(gtk.Window):
         
         self._feedback_icon = BugsAndFeedbackShortcut(_("Feedback"), self._feedback_icon_clicked_callback)
         self._textbox.connect("launch-search", lambda w, s: self._presenter.launch_search(s))
+
+    def _set_background(self):
+        width, height = self._get_net_work_area()
+        pixbuf = image_util.load_pixbuf("background.png")
+        
+        sized_pixbuf = pixbuf.scale_simple(width, height, gtk.gdk.INTERP_BILINEAR) #@UndefinedVariable
+        pixmap, mask = sized_pixbuf.render_pixmap_and_mask()
+        
+        del sized_pixbuf
+        del pixbuf
+        
+        self.window.set_back_pixmap(pixmap, False)
+        del pixmap
+        del mask
+        
+        self.window.invalidate_rect((0, 0, width, height), False)
 
     def _remove_icon(self, w, app_id):
         app_shortcut = self._app_shortcuts.pop(int(app_id))
