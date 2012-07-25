@@ -5,8 +5,10 @@ from util import image_util, screen_util
 
 class TransparentWindow(gtk.Window):
     def __init__(self):
-        gtk.Window.__init__(self, gtk.WINDOW_TOPLEVEL)
+        gtk.Window.__init__(self, gtk.WINDOW_POPUP)
+        self.set_wmclass("endless_os_desktop", "modal")
         self.set_type_hint(gdk.WINDOW_TYPE_HINT_DESKTOP) #@UndefinedVariable
+
         self.connect("expose-event", self._handle_event)
         self.connect("configure-event", self._handle_event)
         self._background = image_util.load_pixbuf("background.png")
