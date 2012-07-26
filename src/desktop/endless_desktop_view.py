@@ -72,7 +72,7 @@ class EndlessDesktopView(gtk.Window):
 #        self._add_icon.connect("application-shortcut-remove", lambda w, e: self._add_icon.toggle_drag(False))
 #        self._add_icon.connect("application-shortcut-remove", self._remove_icon)
         
-        self._feedback_icon = BugsAndFeedbackShortcut(_("Feedback"), self._feedback_icon_clicked_callback)
+#        self._feedback_icon = BugsAndFeedbackShortcut(_("Feedback"), self._feedback_icon_clicked_callback)
         self._textbox.connect("launch-search", lambda w, s: self._presenter.launch_search(s))
 
     def _set_background(self):
@@ -146,7 +146,7 @@ class EndlessDesktopView(gtk.Window):
         icon_container.show()
         icon_container.set_spacing(30)
                 
-        items = [self._app_shortcuts[item_id] for item_id in icon_data] + [self._feedback_icon] # + [self._add_icon]
+        items = [self._app_shortcuts[item_id] for item_id in icon_data] # + [self._feedback_icon] # + [self._add_icon]
         index = 0
         step = int(self._max_icons_in_row)
         while index < len(items) + 1:
@@ -198,7 +198,7 @@ class EndlessDesktopView(gtk.Window):
             item.remove_shortcut()
             
 #        self._add_icon.remove_shortcut()
-        self._feedback_icon.remove_shortcut()
+#        self._feedback_icon.remove_shortcut()
         
     def _create_row(self, items):
         row = gtk.HBox()
