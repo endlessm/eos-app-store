@@ -8,6 +8,6 @@ Homepage: http://www.endlessm.com
 
 Package: endless-os-desktop-widget
 Architecture: any
-Depends: ${shlibs:Depends}, ${misc:Depends}, python(>=2.6), python-gtk2, python-setuptools, beatbox, openoffice.org, evolution, eog, gcalctool, gnome-utils, vlc, pidgin, endless-os-browser(>=1.0-8), shotwell, minitube, gwibber, nixnote, contacts
+Depends: ${shlibs:Depends}, ${misc:Depends}, python(>=2.6), python-gtk2, python-setuptools, pcmanfm, beatbox, openoffice.org, evolution, eog, gcalctool, gnome-utils, vlc, pidgin, endless-os-browser(>=1.0-8), shotwell, minitube, gwibber, nixnote, contacts
 Description: Endless OS desktop widgets installation package
  This package will install the Endless OS desktop widgets
