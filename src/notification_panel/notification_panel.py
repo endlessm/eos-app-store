@@ -8,7 +8,6 @@ from osapps.app_launcher import AppLauncher
 from network_plugin import NetworkSettingsPlugin
 from time_display_plugin import TimeDisplayPlugin
 from bluetooth_plugin import BluetoothSettingsPlugin
-from feedback_plugin import FeedbackPlugin
 
 class NotificationPanel(gtk.HBox):
     ICON_SIZE = 20
@@ -19,13 +18,6 @@ class NotificationPanel(gtk.HBox):
                 TimeDisplayPlugin 
               ]
     
-    __gsignals__ = {
-        "feedback-launched": (gobject.SIGNAL_RUN_FIRST, #@UndefinedVariable
-                   gobject.TYPE_NONE,
-                   ())
-    }
-
-        
     def __init__(self):
         super(NotificationPanel, self).__init__(False,2)
         
@@ -35,10 +27,6 @@ class NotificationPanel(gtk.HBox):
         notification_panel_items = gtk.HBox(False)
         self.notification_panel.add(notification_panel_items)
 
-        # Feedback plugin
-        plugin = self._register_plugin(notification_panel_items, FeedbackPlugin)
-        plugin.connect('button-press-event', lambda w, e: self.emit("feedback-launched"))
-                    
         #Other plugins                    
         for clazz in self.PLUGINS:
             plugin = self._register_plugin(notification_panel_items, clazz)

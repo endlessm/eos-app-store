@@ -16,7 +16,3 @@ class FeedbackPlugin(gtk.EventBox):
         
         self.set_visible_window(False)
         self.add(feedback_icon)
-        
-    @staticmethod
-    def get_launch_command():
-        return None
