@@ -46,7 +46,7 @@ class EndlessDesktopView(gtk.Window):
         self.panel.pack_start(self._textbox, False, True, 0)
 
         self.notification_panel = NotificationPanel()
-        
+        self.notification_panel.connect("feedback-launched", self._feedback_icon_clicked_callback)
         # Main window layout
         self._vbox = gtk.VBox(False,2)
         self._vbox.pack_start(self.notification_panel, False, True, 0)
@@ -178,7 +178,7 @@ class EndlessDesktopView(gtk.Window):
         return False
     
     # Show popup
-    def _feedback_icon_clicked_callback(self, widget, event):
+    def _feedback_icon_clicked_callback(self, widget):
         self._feedback_popup = BugsAndFeedbackPopupWindow(self._feedback_submitted)
         self._feedback_popup.show()
         
