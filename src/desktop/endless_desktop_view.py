@@ -15,6 +15,7 @@ from feedback_module.bugs_and_feedback_popup_window import BugsAndFeedbackPopupW
 from shortcut.folder_shortcut import FolderShortcut
 from folder.folder_window import OpenFolderWindow
 from notification_panel.notification_panel import NotificationPanel
+from notification_panel.feedback_plugin import FeedbackPlugin
 
 gettext.install('endless_desktop', '/usr/share/locale', unicode=True, names=['ngettext'])
 
@@ -44,9 +45,13 @@ class EndlessDesktopView(gtk.Window):
         width, height = self._get_net_work_area()
         self._textbox = SearchBox(width, height, self)
         self.panel.pack_start(self._textbox, False, True, 0)
-
+        
+        plugin = FeedbackPlugin(24)
+        self.panel.pack_end(plugin, False, False, 10)
+        plugin.connect('button-press-event', lambda w, e: self._feedback_icon_clicked_callback())
+                    
         self.notification_panel = NotificationPanel()
-        self.notification_panel.connect("feedback-launched", self._feedback_icon_clicked_callback)
+
         # Main window layout
         self._vbox = gtk.VBox(False,2)
         self._vbox.pack_start(self.notification_panel, False, True, 0)
@@ -178,7 +183,7 @@ class EndlessDesktopView(gtk.Window):
         return False
     
     # Show popup
-    def _feedback_icon_clicked_callback(self, widget):
+    def _feedback_icon_clicked_callback(self):
         self._feedback_popup = BugsAndFeedbackPopupWindow(self._feedback_submitted)
         self._feedback_popup.show()
         
