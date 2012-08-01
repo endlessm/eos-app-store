@@ -7,7 +7,7 @@ class FolderShortcut(DesktopShortcut):
     __gsignals__ = {
         "application-shortcut-activate": (gobject.SIGNAL_RUN_FIRST, #@UndefinedVariable
                    gobject.TYPE_NONE,
-                   (gobject.TYPE_STRING,)),
+                   (gobject.TYPE_STRING,gobject.TYPE_PYOBJECT)),
     }
 
     def __init__(self, shortcut, callback):

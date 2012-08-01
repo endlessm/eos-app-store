@@ -15,7 +15,7 @@ class ApplicationShortcut(DesktopShortcut):
                        ()),
     "application-shortcut-activate": (gobject.SIGNAL_RUN_FIRST, #@UndefinedVariable
                        gobject.TYPE_NONE,
-                       (gobject.TYPE_STRING,)),
+                       (gobject.TYPE_STRING,gobject.TYPE_PYOBJECT,)),
     "application-shortcut-drag": (gobject.SIGNAL_RUN_FIRST, #@UndefinedVariable
                        gobject.TYPE_NONE,
                        (gobject.TYPE_BOOLEAN,)),    
@@ -174,7 +174,7 @@ class ApplicationShortcut(DesktopShortcut):
     
     def mouse_press_callback(self, widget, event):
         if event.button == 1: # and event.type == gtk.gdk._2BUTTON_PRESS:
-            self.emit("application-shortcut-activate", self._shortcut.key())
+            self.emit("application-shortcut-activate", self._shortcut.key(), self._shortcut.params())
             self._event_box.set_images(self.get_depressed_images())
             self._event_box.hide()
             self._event_box.show()

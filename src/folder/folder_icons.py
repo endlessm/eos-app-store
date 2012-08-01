@@ -6,7 +6,7 @@ class FolderIcons(gtk.HBox):
     __gsignals__ = {
         "application-shortcut-activate": (gobject.SIGNAL_RUN_FIRST, #@UndefinedVariable
                    gobject.TYPE_NONE,
-                   (gobject.TYPE_STRING,)),
+                   (gobject.TYPE_STRING,gobject.TYPE_PYOBJECT,)),
     }
     
     def __init__(self, shortcuts):
@@ -15,4 +15,4 @@ class FolderIcons(gtk.HBox):
         for shortcut in shortcuts:
             app_shortcut = ApplicationShortcut(shortcut, False)
             self.pack_start(app_shortcut, False, False, 30) 
-            app_shortcut.connect("application-shortcut-activate", lambda w, app_id: self.emit("application-shortcut-activate", app_id))
+            app_shortcut.connect("application-shortcut-activate", lambda w, app_id, params: self.emit("application-shortcut-activate", app_id, params))

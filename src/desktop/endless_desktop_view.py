@@ -213,7 +213,7 @@ class EndlessDesktopView(gtk.Window):
         for item in items:
             if isinstance(item, ApplicationShortcut):
                 item.connect("application-shortcut-rename", lambda w, shortcut, new_name: self._presenter.rename_item(shortcut, new_name))
-                item.connect("application-shortcut-activate", lambda w, app_key: self._presenter.activate_item(app_key))
+                item.connect("application-shortcut-activate", lambda w, app_key, params: self._presenter.activate_item(app_key, params))
                 item.connect("application-shortcut-dragging-over", lambda w, s: self._insert_placeholder(s))
                 item.connect("application-shortcut-drag", lambda w, state: self._add_icon.toggle_drag(state))
                 item.connect("application-shortcut-move", lambda w: self._presenter.move_item(self._shorcuts_buffer))
@@ -221,7 +221,7 @@ class EndlessDesktopView(gtk.Window):
                 item.show()
                 
             elif isinstance(item, FolderShortcut):
-                item.connect("application-shortcut-activate", lambda w, app_id: self._presenter.activate_item(app_id))
+                item.connect("application-shortcut-activate", lambda w, app_id, params: self._presenter.activate_item(app_id, params))
                 
                 item.show()
                 

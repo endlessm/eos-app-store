@@ -17,10 +17,10 @@ class EndlessDesktopModel(object):
     def get_shortcuts(self):
         return self._app_desktop_datastore.get_all_shortcuts()
     
-    def execute_app(self, app_key):
+    def execute_app(self, app_key, params):
         app = self._app_datastore.get_app_by_key(app_key)
-        self._app_launcher.launch(app.executable())
-#        self._app_util.launch_app(int(app_id))
+
+        self._app_launcher.launch(app.executable(), params)
         
         
     def submit_feedback(self, message, bug):

@@ -37,7 +37,7 @@ class OpenFolderWindow():
         
         folder_icons = FolderIcons(shortcut.children())
         self._container.pack_start(folder_icons, False, False, 0)
-        folder_icons.connect("application-shortcut-activate", lambda w, app_id: callback(app_id))
+        folder_icons.connect("application-shortcut-activate", lambda w, app_id, params: callback(app_id, params))
         
         self._center.add(self._container)
         self._fancy_container.add(self._center)
