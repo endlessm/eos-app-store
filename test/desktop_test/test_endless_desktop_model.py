@@ -4,7 +4,7 @@ from mock import Mock
 from osapps.app_launcher import AppLauncher
 from osapps.app import App
 from desktop_locale_datastore import DesktopLocaleDatastore
-from app_locale_datastore import AppLocaleDatastore
+from app_datastore import AppDatastore
 from launchable_app import LaunchableApp
 
 class DesktopModelTestCase(unittest.TestCase):
@@ -19,7 +19,7 @@ class DesktopModelTestCase(unittest.TestCase):
                                ]
         self.mock_desktop_locale_datastore = Mock(DesktopLocaleDatastore)
         self.mock_desktop_locale_datastore.get_all_shortcuts = Mock(return_value=self.available_apps)
-        self.mock_app_datastore = Mock(AppLocaleDatastore)
+        self.mock_app_datastore = Mock(AppDatastore)
         self.app_mock = Mock(LaunchableApp)
         self.app_mock.executable = Mock(return_value="eog")
         self.mock_app_datastore.get_app_by_key = Mock(return_value=self.app_mock)

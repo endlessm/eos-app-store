@@ -3,10 +3,10 @@ from osapps.app_launcher import AppLauncher
 from util.feedback_manager import FeedbackManager
 from metrics.time_provider import TimeProvider
 from desktop_locale_datastore import DesktopLocaleDatastore
-from app_locale_datastore import AppLocaleDatastore
+from app_datastore import AppDatastore
 
 class EndlessDesktopModel(object):
-    def __init__(self, app_desktop_datastore=DesktopLocaleDatastore(), app_datastore=AppLocaleDatastore(), app_launcher=AppLauncher(), feedback_manager=FeedbackManager(), time_provider=TimeProvider()):
+    def __init__(self, app_desktop_datastore=DesktopLocaleDatastore(), app_datastore=AppDatastore(), app_launcher=AppLauncher(), feedback_manager=FeedbackManager(), time_provider=TimeProvider()):
         self._app_launcher = app_launcher
         self._feedback_manager = feedback_manager
         self._time_provider = time_provider
