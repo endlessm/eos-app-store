@@ -90,11 +90,7 @@ class EndlessDesktopView(gtk.Window):
         del mask
         
         self.window.invalidate_rect((0, 0, width, height), False)
-
-    def _remove_icon(self, w, app_id):
-        app_shortcut = self._app_shortcuts.pop(int(app_id))
-        app_shortcut.remove_shortcut()
-        self._presenter.remove_item(app_id)        
+ 
 
     def populate_popups(self, all_applications):
         self.popup = gtk.Menu()
@@ -123,18 +119,27 @@ class EndlessDesktopView(gtk.Window):
     def refresh(self, shortcuts):
         self._folder_shortcuts = {}
         for shortcut in shortcuts:
-            if shortcut.id() not in self._app_shortcuts:
+#            if shortcut.id() not in self._app_shortcuts:
+            if shortcut.key() not in self._app_shortcuts:
                 if shortcut.has_children():
                     app_shortcut = FolderShortcut(shortcut, self._folder_icon_clicked_callback)
                 else:
                     app_shortcut = ApplicationShortcut(shortcut)
                 
-                self._app_shortcuts[shortcut.id()] = app_shortcut
-        self._shorcuts_buffer = [shortcut.id() for shortcut in shortcuts]
+                self._app_shortcuts[shortcut.key()] = app_shortcut
+        self._shorcuts_buffer = [shortcut.key() for shortcut in shortcuts]
         self._redraw(self._shorcuts_buffer)
+                
+#                self._app_shortcuts[shortcut.id()] = app_shortcut
+#        self._shorcuts_buffer = [shortcut.id() for shortcut in shortcuts]
+#        self._redraw(self._shorcuts_buffer)
 
         self.align.show()
-    
+
+#    def _redraw(self, icon_data):
+#        pass
+
+#TODO FIX ME ***************************************************************************************************
     def _redraw(self, icon_data):
         self._remove_all()
         
@@ -146,7 +151,8 @@ class EndlessDesktopView(gtk.Window):
         icon_container.show()
         icon_container.set_spacing(30)
                 
-        items = [self._app_shortcuts[item_id] for item_id in icon_data] # + [self._feedback_icon] # + [self._add_icon]
+        items = [self._app_shortcuts[key] for key in icon_data] # + [self._feedback_icon] # + [self._add_icon]
+#        items = [self._app_shortcuts[item_id] for item_id in icon_data] # + [self._feedback_icon] # + [self._add_icon]
         index = 0
         step = int(self._max_icons_in_row)
         while index < len(items) + 1:
@@ -207,7 +213,7 @@ class EndlessDesktopView(gtk.Window):
         for item in items:
             if isinstance(item, ApplicationShortcut):
                 item.connect("application-shortcut-rename", lambda w, shortcut, new_name: self._presenter.rename_item(shortcut, new_name))
-                item.connect("application-shortcut-activate", lambda w, app_id: self._presenter.activate_item(app_id))
+                item.connect("application-shortcut-activate", lambda w, app_key: self._presenter.activate_item(app_key))
                 item.connect("application-shortcut-dragging-over", lambda w, s: self._insert_placeholder(s))
                 item.connect("application-shortcut-drag", lambda w, state: self._add_icon.toggle_drag(state))
                 item.connect("application-shortcut-move", lambda w: self._presenter.move_item(self._shorcuts_buffer))
