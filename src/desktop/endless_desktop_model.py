@@ -9,7 +9,6 @@ class EndlessDesktopModel(object):
     def __init__(self, app_desktop_datastore=DesktopLocaleDatastore(), app_datastore=AppLocaleDatastore(), app_launcher=AppLauncher(), feedback_manager=FeedbackManager(), time_provider=TimeProvider()):
         self._app_launcher = app_launcher
         self._feedback_manager = feedback_manager
-#        self._installed_apps = self._app_util.get_apps()
         self._time_provider = time_provider
         self._app_desktop_datastore = app_desktop_datastore
         self._app_datastore = app_datastore

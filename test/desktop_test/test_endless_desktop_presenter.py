@@ -17,10 +17,11 @@ class TestEndlessDesktopPresenter(unittest.TestCase):
     
     def test_activate_item_invokes_process(self):
         shortcut = Mock()
+        params = []
         
-        self.testObject.activate_item(shortcut)
+        self.testObject.activate_item(shortcut, params)
         
-        self.mock_model.execute_app_with_id.assert_called_once_with(shortcut)
+        self.mock_model.execute_app.assert_called_once_with(shortcut, params)
         
     def test_refresh_view_updates_view(self):
         mock_shortcuts = [Mock(), Mock()]
