@@ -2,8 +2,8 @@ from osapps.app_launcher import AppLauncher
 
 from util.feedback_manager import FeedbackManager
 from metrics.time_provider import TimeProvider
-from desktop_locale_datastore import DesktopLocaleDatastore
-from app_datastore import AppDatastore
+from osapps.desktop_locale_datastore import DesktopLocaleDatastore
+from osapps.app_datastore import AppDatastore
 import sys
 
 class EndlessDesktopModel(object):

@@ -4,8 +4,8 @@ from mock import Mock
 from osapps.app_launcher import AppLauncher
 from osapps.app import App
 from osapps.desktop_locale_datastore import DesktopLocaleDatastore
-from app_datastore import AppDatastore
-from launchable_app import LaunchableApp
+from osapps.app_datastore import AppDatastore
+from osapps.launchable_app import LaunchableApp
 
 class DesktopModelTestCase(unittest.TestCase):
     def setUp(self):
