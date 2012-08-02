@@ -19,4 +19,4 @@ class PrinterSettingsPlugin(gtk.EventBox):
         
     @staticmethod
     def get_launch_command():
-        return 'gnome-control-center --class=eos-printers printers'
+        return 'system-config-printer --class=eos-printers'
