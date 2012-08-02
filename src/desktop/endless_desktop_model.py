@@ -4,6 +4,7 @@ from util.feedback_manager import FeedbackManager
 from metrics.time_provider import TimeProvider
 from desktop_locale_datastore import DesktopLocaleDatastore
 from app_datastore import AppDatastore
+import sys
 
 class EndlessDesktopModel(object):
     def __init__(self, app_desktop_datastore=DesktopLocaleDatastore(), app_datastore=AppDatastore(), app_launcher=AppLauncher(), feedback_manager=FeedbackManager(), time_provider=TimeProvider()):
@@ -19,7 +20,10 @@ class EndlessDesktopModel(object):
     def execute_app(self, app_key, params):
         app = self._app_datastore.get_app_by_key(app_key)
 
-        self._app_launcher.launch(app.executable(), params)
+        if app:
+            self._app_launcher.launch(app.executable(), params)
+        else:
+            print >> sys.stderr, "could not find app: "+app_key
         
         
     def submit_feedback(self, message, bug):

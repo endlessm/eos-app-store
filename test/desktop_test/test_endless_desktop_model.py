@@ -36,6 +36,16 @@ class DesktopModelTestCase(unittest.TestCase):
         
         self.mock_app_launcher.launch.assert_called_once_with("eog", params)
         
+    def test_execute_app_with_cannot_find_app_no_exception(self):
+        self.mock_app_datastore = Mock(AppDatastore)
+        self.mock_app_datastore.get_app_by_key = Mock(return_value=None)
+        self.testObject = EndlessDesktopModel(self.mock_desktop_locale_datastore, self.mock_app_datastore, self.mock_app_launcher)
+        
+        params = []
+        self.testObject.execute_app('123', params)
+        
+        self.assertFalse(self.mock_app_launcher.launch.called)
+        
     def test_launch_search_launches_browser_with_search_string(self):
         search_string = "foo"
         

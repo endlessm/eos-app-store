@@ -126,8 +126,8 @@ class EndlessDesktopView(gtk.Window):
                 else:
                     app_shortcut = ApplicationShortcut(shortcut)
                 
-                self._app_shortcuts[shortcut.key()] = app_shortcut
-        self._shorcuts_buffer = [shortcut.key() for shortcut in shortcuts]
+                self._app_shortcuts[shortcut.name()] = app_shortcut
+        self._shorcuts_buffer = [shortcut.name() for shortcut in shortcuts]
         self._redraw(self._shorcuts_buffer)
                 
         self.align.show()
