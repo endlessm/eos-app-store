@@ -3,7 +3,7 @@ from desktop.endless_desktop_model import EndlessDesktopModel
 from mock import Mock
 from osapps.app_launcher import AppLauncher
 from osapps.app import App
-from desktop_locale_datastore import DesktopLocaleDatastore
+from osapps.desktop_locale_datastore import DesktopLocaleDatastore
 from app_datastore import AppDatastore
 from launchable_app import LaunchableApp
 
