@@ -11,9 +11,9 @@ class DesktopPresenter(object):
         
         self.refresh_view()
 
-    def activate_item(self, app_id):
+    def activate_item(self, app_key, params):
         self._view.hide_folder_window()
-        self._model.execute_app_with_id(app_id)
+        self._model.execute_app(app_key, params)
     
     def refresh_view(self):
         if not self._is_refreshing:

@@ -1,22 +1,30 @@
-from osapps.app_util import AppUtil
 from osapps.app_launcher import AppLauncher
 
 from util.feedback_manager import FeedbackManager
 from metrics.time_provider import TimeProvider
+from desktop_locale_datastore import DesktopLocaleDatastore
+from app_datastore import AppDatastore
+import sys
 
 class EndlessDesktopModel(object):
-    def __init__(self, app_util=AppUtil(), app_launcher=AppLauncher(), feedback_manager=FeedbackManager(), time_provider=TimeProvider()):
-        self._app_util = app_util
+    def __init__(self, app_desktop_datastore=DesktopLocaleDatastore(), app_datastore=AppDatastore(), app_launcher=AppLauncher(), feedback_manager=FeedbackManager(), time_provider=TimeProvider()):
         self._app_launcher = app_launcher
         self._feedback_manager = feedback_manager
-        self._installed_apps = self._app_util.get_apps()
         self._time_provider = time_provider
+        self._app_desktop_datastore = app_desktop_datastore
+        self._app_datastore = app_datastore
         
     def get_shortcuts(self):
-        return self._installed_apps
+        return self._app_desktop_datastore.get_all_shortcuts()
     
-    def execute_app_with_id(self, app_id):
-        self._app_util.launch_app(int(app_id))
+    def execute_app(self, app_key, params):
+        app = self._app_datastore.get_app_by_key(app_key)
+
+        if app:
+            self._app_launcher.launch(app.executable(), params)
+        else:
+            print >> sys.stderr, "could not find app: "+app_key
+        
         
     def submit_feedback(self, message, bug):
         data = {"message":message, "timestamp":self._time_provider.get_current_time(), "bug":bug}

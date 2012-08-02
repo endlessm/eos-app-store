@@ -15,7 +15,7 @@ class ApplicationShortcut(DesktopShortcut):
                        ()),
     "application-shortcut-activate": (gobject.SIGNAL_RUN_FIRST, #@UndefinedVariable
                        gobject.TYPE_NONE,
-                       (gobject.TYPE_STRING,)),
+                       (gobject.TYPE_STRING,gobject.TYPE_PYOBJECT,)),
     "application-shortcut-drag": (gobject.SIGNAL_RUN_FIRST, #@UndefinedVariable
                        gobject.TYPE_NONE,
                        (gobject.TYPE_BOOLEAN,)),    
@@ -23,7 +23,8 @@ class ApplicationShortcut(DesktopShortcut):
     
     def __init__(self, shortcut, show_background=True):
         image_name = shortcut.icon() 
-        label_text = shortcut.display_name()
+#        label_text = shortcut.display_name()
+        label_text = shortcut.name()
         self._image_name = image_name
         self._show_background = show_background
         
@@ -33,7 +34,8 @@ class ApplicationShortcut(DesktopShortcut):
         self._event_box.connect("button-press-event", self.mouse_press_callback)
         self._event_box.connect("button-release-event", self.mouse_release_callback)
         
-        self._event_box.set_data('id', self._shortcut.id())
+        self._event_box.set_data('id', self._shortcut.key())
+        self._event_box.set_data('params', self._shortcut.params())
         
 #        self._event_box.connect("drag_begin", lambda c, d: self._drag_begin())
 #        self._event_box.connect("drag_end", lambda c, d: self._drag_end())
@@ -172,7 +174,7 @@ class ApplicationShortcut(DesktopShortcut):
     
     def mouse_press_callback(self, widget, event):
         if event.button == 1: # and event.type == gtk.gdk._2BUTTON_PRESS:
-            self.emit("application-shortcut-activate", self._shortcut.id())
+            self.emit("application-shortcut-activate", self._shortcut.key(), self._shortcut.params())
             self._event_box.set_images(self.get_depressed_images())
             self._event_box.hide()
             self._event_box.show()
