@@ -8,12 +8,14 @@ from osapps.app_launcher import AppLauncher
 from network_plugin import NetworkSettingsPlugin
 from time_display_plugin import TimeDisplayPlugin
 from bluetooth_plugin import BluetoothSettingsPlugin
+from printer_plugin import PrinterSettingsPlugin
 
 class NotificationPanel(gtk.HBox):
     ICON_SIZE = 20
     
     # Add plugins for notification panel here
-    PLUGINS = [ BluetoothSettingsPlugin,
+    PLUGINS = [ PrinterSettingsPlugin,
+                BluetoothSettingsPlugin,
                 NetworkSettingsPlugin, 
                 TimeDisplayPlugin 
               ]
