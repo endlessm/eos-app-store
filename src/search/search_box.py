@@ -21,7 +21,7 @@ class SearchBox(gtk.EventBox):
                                     gobject.TYPE_NONE,
                                     (gobject.TYPE_PYOBJECT,)), 
     }
-    def __init__(self, width, height, window):
+    def __init__(self):
         gtk.EventBox.__init__(self)
         self.set_size_request(self.WIDTH, self.HEIGHT)
         self.set_visible_window(False)
@@ -40,8 +40,8 @@ class SearchBox(gtk.EventBox):
         self._text_view = gtk.TextView()
         self._text_buffer = self._text_view.get_buffer()
         self._text_view.set_wrap_mode(gtk.WRAP_NONE)
-        self._text_view.modify_text(gtk.STATE_NORMAL, gtk.gdk.Color('#ffffff'))
-        self._text_view.modify_base(gtk.STATE_NORMAL, gtk.gdk.Color('#362b1d')) 
+        self._text_view.modify_text(gtk.STATE_NORMAL, gtk.gdk.Color('#303030'))
+        self._text_view.modify_base(gtk.STATE_NORMAL, gtk.gdk.Color('#ffffff')) 
 
         self._text_view.set_size_request(self.WIDTH-self.RIGHT_MARGIN, self.HEIGHT-self.BOTTOM_MARGIN)
         
@@ -109,7 +109,7 @@ class SearchBoxLabel(gtk.Fixed):
         self._label = gtk.Label()
         self._label.set_text(default_text)
         self._label.set_justify(gtk.JUSTIFY_LEFT)
-        self._label.modify_fg(gtk.STATE_NORMAL, gtk.gdk.Color(65025, 65025, 65025))
+        self._label.modify_fg(gtk.STATE_NORMAL, gtk.gdk.Color('#303030'))
         alignment = gtk.Alignment(0.0, 0.5, 0.0, 0.0)
         alignment.add(self._label)
         
