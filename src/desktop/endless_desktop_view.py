@@ -15,7 +15,7 @@ from feedback_module.bugs_and_feedback_popup_window import BugsAndFeedbackPopupW
 from shortcut.folder_shortcut import FolderShortcut
 from folder.folder_window import OpenFolderWindow
 from notification_panel.notification_panel import NotificationPanel
-from notification_panel.feedback_plugin import FeedbackPlugin
+from taskbar_panel.taskbar_panel import TaskbarPanel
 
 gettext.install('endless_desktop', '/usr/share/locale', unicode=True, names=['ngettext'])
 
@@ -39,32 +39,27 @@ class EndlessDesktopView(gtk.Window):
         
         self._set_background()
         
-        self.align = gtk.Alignment(0.5, 0.5, 0, 0)
+        self._align = gtk.Alignment(0.5, 0.5, 0, 0)
         
-        self.panel = gtk.HBox(False,2)
-        width, height = self._get_net_work_area()
-        self._textbox = SearchBox(width, height, self)
-        self.panel.pack_start(self._textbox, False, True, 0)
         
-        plugin = FeedbackPlugin(24)
-        self.panel.pack_end(plugin, False, False, 10)
-        plugin.connect('button-press-event', lambda w, e: self._feedback_icon_clicked_callback())
+        self._taskbar_panel = TaskbarPanel(width)
+        self._taskbar_panel.connect('feedback-clicked', lambda w: self._feedback_icon_clicked_callback())
                     
-        self.notification_panel = NotificationPanel()
+        self._notification_panel = NotificationPanel()
 
         # Main window layout
-        self._vbox = gtk.VBox(False,2)
-        self._vbox.pack_start(self.notification_panel, False, True, 0)
-        self._vbox.pack_start(self.align, True, False, 0)
-        self._vbox.pack_end(self.panel, False, True, 0)
+        self._desktop = gtk.VBox(False,2)
+        self._desktop.pack_start(self._notification_panel, False, True, 0)
+        self._desktop.pack_start(self._align, True, False, 0)
+        self._desktop.pack_end(self._taskbar_panel, False, True, 0)
         
-        self.add(self._vbox)
+        self.add(self._desktop)
         self.show_all()
         
         self._max_icons_in_row = self._calculate_max_icons()
     
         screen = gtk.gdk.Screen() #@UndefinedVariable
-        screen.connect("size-changed", lambda s: self._set_background())
+        screen.connect('size-changed', lambda s: self._set_background())
     
     def unfocus_widget(self, widget, event):
         widget.set_focus(None)
@@ -77,8 +72,7 @@ class EndlessDesktopView(gtk.Window):
 #        self._add_icon.connect("application-shortcut-remove", lambda w, e: self._add_icon.toggle_drag(False))
 #        self._add_icon.connect("application-shortcut-remove", self._remove_icon)
         
-#        self._feedback_icon = BugsAndFeedbackShortcut(_("Feedback"), self._feedback_icon_clicked_callback)
-        self._textbox.connect("launch-search", lambda w, s: self._presenter.launch_search(s))
+        self._taskbar_panel.connect('launch-search', lambda w, s: self._presenter.launch_search(s))
 
     def _set_background(self):
         width, height = self._get_net_work_area()
@@ -135,12 +129,12 @@ class EndlessDesktopView(gtk.Window):
         self._shorcuts_buffer = [shortcut.name() for shortcut in shortcuts]
         self._redraw(self._shorcuts_buffer)
                 
-        self.align.show()
+        self._align.show()
 
     def _redraw(self, icon_data):
         self._remove_all()
         
-        child = self.align.get_child()
+        child = self._align.get_child()
         if child:
             child.parent.remove(child)
             
@@ -156,8 +150,8 @@ class EndlessDesktopView(gtk.Window):
             icon_container.add(row)
             index += step
             
-        self.align.add(icon_container)        
-        self.align.show()
+        self._align.add(icon_container)        
+        self._align.show()
         
     def _add_icon_clicked_callback(self, widget, event):
         self.popup.show_all()
@@ -200,7 +194,6 @@ class EndlessDesktopView(gtk.Window):
             item.remove_shortcut()
             
 #        self._add_icon.remove_shortcut()
-#        self._feedback_icon.remove_shortcut()
         
     def _create_row(self, items):
         row = gtk.HBox()
