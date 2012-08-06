@@ -26,6 +26,7 @@ class EndlessDesktopView(gtk.Window):
 
     def __init__(self):
         gtk.Window.__init__(self)
+        self.set_can_focus(False)
         #setting up screen and background
         width, height = self._get_net_work_area()
         self.resize(width, height)

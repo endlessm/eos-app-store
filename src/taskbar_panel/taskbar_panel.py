@@ -40,7 +40,6 @@ class TaskbarPanel(gtk.EventBox):
         
         application_list_plugin = ApplicationListPlugin(self.ICON_SIZE)
         
-        
         feedback_plugin = FeedbackPlugin(self.ICON_SIZE)
         feedback_plugin.connect('button-press-event', lambda w, e: self.emit('feedback-clicked'))
         
@@ -49,7 +48,7 @@ class TaskbarPanel(gtk.EventBox):
         del self._raw_taskbar_bg_pixbuf
          
         taskbar_panel_items.pack_start(self._textbox, False, False, 10)
-        taskbar_panel_items.pack_start(application_list_plugin, False, False, 10)
+        taskbar_panel_items.pack_start(application_list_plugin, False, True, 10)
         taskbar_panel_items.pack_end(feedback_plugin, False, False, 10)
         
         self.add(self._taskbar_panel)
