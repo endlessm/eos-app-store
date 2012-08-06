@@ -49,11 +49,14 @@ class EndlessDesktopView(gtk.Window):
                     
         self._notification_panel = NotificationPanel()
 
+        taskbar_alignment = gtk.Alignment(0.5, 0.5, 1.0, 1.0)
+        taskbar_alignment.add(self._taskbar_panel)
+        
         # Main window layout
         self._desktop = gtk.VBox(False,2)
         self._desktop.pack_start(self._notification_panel, False, True, 0)
         self._desktop.pack_start(self._align, True, False, 0)
-        self._desktop.pack_end(self._taskbar_panel, False, True, 0)
+        self._desktop.pack_end(taskbar_alignment, False, True, 0)
         
         self.add(self._desktop)
         self.show_all()

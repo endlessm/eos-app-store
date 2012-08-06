@@ -6,7 +6,7 @@ from util import image_util
 class TaskbarIcon(gtk.EventBox):
     def __init__(self, task, name, pixbuf, is_selected):
         selected_overlay = image_util.load_pixbuf('endless-shortcut-well.png')
-        self._scaled_selected_overlay = selected_overlay.scale_simple(pixbuf.get_width()+ 4, pixbuf.get_height() + 4, gdk.INTERP_BILINEAR) 
+        self._scaled_selected_overlay = selected_overlay.scale_simple(pixbuf.get_width(), pixbuf.get_height(), gdk.INTERP_BILINEAR) 
         
         super(TaskbarIcon, self).__init__()
         self.set_visible_window(False)
@@ -40,7 +40,7 @@ class TaskbarIcon(gtk.EventBox):
                                  0, 0,
                                  pixbuf.get_width(), pixbuf.get_height(),
                                  2, 2,
-                                 0.9, 0.9,
+                                 0.8, 0.8,
                                  gdk.INTERP_BILINEAR,
                                  255)
             

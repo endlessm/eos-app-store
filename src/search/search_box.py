@@ -9,7 +9,7 @@ gettext.install('endless_desktop', '/usr/share/locale', unicode = True, names=['
 
 class SearchBox(gtk.EventBox):
     HEIGHT = 30
-    WIDTH = 230
+    WIDTH = 440
     LEFT_PADDING = 10
     RIGHT_MARGIN = 33
     BOTTOM_MARGIN = 13
@@ -43,7 +43,7 @@ class SearchBox(gtk.EventBox):
         self._text_view.modify_text(gtk.STATE_NORMAL, gtk.gdk.Color('#303030'))
         self._text_view.modify_base(gtk.STATE_NORMAL, gtk.gdk.Color('#ffffff')) 
 
-        self._text_view.set_size_request(self.WIDTH-self.RIGHT_MARGIN, self.HEIGHT-self.BOTTOM_MARGIN)
+        self._text_view.set_size_request(self.WIDTH-self.RIGHT_MARGIN - SearchBoxLabel.LEFT_MARGIN, self.HEIGHT-self.BOTTOM_MARGIN)
         
         self._text_view.hide()
 
@@ -93,7 +93,7 @@ class SearchBox(gtk.EventBox):
 
 class SearchBoxLabel(gtk.Fixed):
     TOP_MARGIN = 5
-    LEFT_MARGIN = 10
+    LEFT_MARGIN = 40
     RIGHT_PADDING = 16
     RIGHT_MARGIN = 10
     
