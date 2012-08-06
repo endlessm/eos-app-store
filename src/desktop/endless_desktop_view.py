@@ -18,6 +18,7 @@ from notification_panel.notification_panel import NotificationPanel
 from taskbar_panel.taskbar_panel import TaskbarPanel
 
 gettext.install('endless_desktop', '/usr/share/locale', unicode=True, names=['ngettext'])
+gtk.gdk.threads_init()
 
 class EndlessDesktopView(gtk.Window):
     _padding = 100
@@ -25,6 +26,7 @@ class EndlessDesktopView(gtk.Window):
 
     def __init__(self):
         gtk.Window.__init__(self)
+        self.set_can_focus(False)
         #setting up screen and background
         width, height = self._get_net_work_area()
         self.resize(width, height)
@@ -250,4 +252,6 @@ class EndlessDesktopView(gtk.Window):
         return width, height
     
     def main(self):
+        gobject.threads_init()
+        gtk.threads_init()
         gtk.main()

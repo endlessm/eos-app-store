@@ -1,4 +1,6 @@
 import gtk
+import cairo
+from gtk import gdk
 import gobject
 
 from osapps.app_launcher import AppLauncher
@@ -6,8 +8,7 @@ from notification_panel.feedback_plugin import FeedbackPlugin
 from search.search_box import SearchBox
 from util import image_util
 from util.image_util import load_pixbuf
-from gtk import gdk
-import cairo
+from application_list_plugin import ApplicationListPlugin
 
 class TaskbarPanel(gtk.EventBox):
     __gsignals__ = {
@@ -36,16 +37,20 @@ class TaskbarPanel(gtk.EventBox):
 
         self._textbox = SearchBox()
         self._textbox.connect('launch-search', lambda w, s: self.emit('launch-search', s))
-        taskbar_panel_items.pack_start(self._textbox, False, False, 10)
+        
+        application_list_plugin = ApplicationListPlugin(self.ICON_SIZE)
         
         feedback_plugin = FeedbackPlugin(self.ICON_SIZE)
-        taskbar_panel_items.pack_end(feedback_plugin, False, False, 10)
         feedback_plugin.connect('button-press-event', lambda w, e: self.emit('feedback-clicked'))
         
         self._raw_taskbar_bg_pixbuf = load_pixbuf(image_util.image_path('taskbar.png'))
         self._taskbar_bg_pixbuf = self._raw_taskbar_bg_pixbuf.scale_simple(width, 38, gdk.INTERP_TILES)
         del self._raw_taskbar_bg_pixbuf
          
+        taskbar_panel_items.pack_start(self._textbox, False, False, 10)
+        taskbar_panel_items.pack_start(application_list_plugin, False, True, 10)
+        taskbar_panel_items.pack_end(feedback_plugin, False, False, 10)
+        
         self.add(self._taskbar_panel)
 
     def _redraw(self, widget, event):
