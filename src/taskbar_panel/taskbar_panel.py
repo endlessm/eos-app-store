@@ -26,8 +26,8 @@ class TaskbarPanel(gtk.EventBox):
         super(TaskbarPanel, self).__init__()
         self.set_visible_window(False)
         self.set_app_paintable(True)
-        self.connect('expose-event', self._redraw)
-        self.connect('configure-event', self._redraw)
+#        self.connect('expose-event', self._redraw)
+#        self.connect('configure-event', self._redraw)
         
         taskbar_panel_items = self._align_taskbar()
 
