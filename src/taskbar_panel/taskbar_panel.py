@@ -73,8 +73,8 @@ class TaskbarPanel(gtk.EventBox):
     def _setup_apps_on_taskbar(self):
         application_list_plugin_holder = gtk.Alignment(0.5, 0.5, 0, 1.0)
         application_list_plugin_holder.set_padding(0, 0, 2, 0)
-        application_list_plugin = ApplicationListPlugin(self.ICON_SIZE)
-        application_list_plugin_holder.add(application_list_plugin)
+#        application_list_plugin = ApplicationListPlugin(self.ICON_SIZE)
+#        application_list_plugin_holder.add(application_list_plugin)
         return application_list_plugin_holder
 
 
