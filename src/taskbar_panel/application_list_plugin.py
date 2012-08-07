@@ -115,7 +115,9 @@ class ApplicationListPlugin(gtk.HBox):
         
     def toggle_state(self, widget, event):
         window = self._local_display.create_resource_object('window', widget.task())
+        print "selected: ", widget.is_selected()
         if (Xutil.IconicState != window.get_wm_state()['state']) & widget.is_selected():
+            print "minimizing"
             clientmessage = Xlib.protocol.event.ClientMessage(
                 client_type=self._WM_CHANGE_STATE_ATOM_ID,
                 window=window,
@@ -123,6 +125,7 @@ class ApplicationListPlugin(gtk.HBox):
             )
             self._screen.root.send_event(clientmessage, (X.SubstructureRedirectMask|X.SubstructureNotifyMask))
         else:
+            print "focusing"
             clientmessage = Xlib.protocol.event.ClientMessage(
                 client_type=self._NET_ACTIVE_WINDOW_ATOM_ID, 
                 window=window,

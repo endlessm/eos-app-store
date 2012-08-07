@@ -34,9 +34,12 @@ class TaskbarIcon(gtk.EventBox):
         return self._is_selected
 
     def update_task(self, window_name, pixbuf, is_selected):
+        self._is_selected = is_selected
+        
         self.set_tooltip_text(window_name)
-        overlay = self._scaled_selected_overlay.copy()
+        
         if is_selected:
+            overlay = self._scaled_selected_overlay.copy()
             scaled_pixbuf = pixbuf.scale_simple(pixbuf.get_width()-(self.SELECTED_ICON_PADDING*2), 
                                                 pixbuf.get_height()-(self.SELECTED_ICON_PADDING*2),
                                                 gdk.INTERP_BILINEAR)
@@ -49,7 +52,6 @@ class TaskbarIcon(gtk.EventBox):
                                  gdk.INTERP_BILINEAR,
                                  255)
             
-            del pixbuf
             pixbuf = overlay
             
         self._icon.set_from_pixbuf(pixbuf)
