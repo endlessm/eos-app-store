@@ -1,16 +1,21 @@
 import gtk
+import sys
+import time
+import Xlib
+import array
+import threading
 from gtk import gdk
-
 from Xlib import Xatom, display, Xutil, X
 
-import Xlib
 from taskbar_icon import TaskbarIcon
-import array
-import time
 from threading import Thread
-import threading
 from util.image_util import load_pixbuf
-import sys
+
+# DO NOT REMOVE!!! PyInstaller cannot know that these are imported
+# on its own so we have to manually import them
+from Xlib.support import unix_connect
+from Xlib.ext import xtest, shape, xinerama, record, composite, randr
+# *****************
 
 class ApplicationListPlugin(gtk.HBox):
     def __init__(self, icon_size):
@@ -155,7 +160,5 @@ class UpdateTasksThread(Thread):
                 self._draw_tasks_callback(tasks, selected_window)
             except:
                 print >> sys.stderr, "Could not retrieve tasks. Continuing" 
-#                else:
-#                    print "nope"
             
             time.sleep(0.5)
