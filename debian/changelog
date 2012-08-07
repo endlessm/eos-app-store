@@ -1,3 +1,9 @@
+endless-os-desktop-widget (1.0-9-rc6) unstable; urgency=low
+
+  * Updating version to 1.0-9-rc6
+
+ -- dev1 <dev1@em-vm-build>  Tue, 07 Aug 2012 12:37:29 -0500
+
 endless-os-desktop-widget (1.0-9-rc5) unstable; urgency=low
 
   * Updating version to 1.0-9-rc5
