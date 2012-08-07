@@ -26,10 +26,10 @@ class EndlessDesktopView(gtk.Window):
 
     def __init__(self):
         gtk.Window.__init__(self)
-        self.set_can_focus(False)
-        #setting up screen and background
+        
         width, height = self._get_net_work_area()
         self.resize(width, height)
+        self.set_can_focus(False)
         self.set_type_hint(gdk.WINDOW_TYPE_HINT_DESKTOP) #@UndefinedVariable
         self.set_decorated(False)
         self.add_events(gtk.gdk.BUTTON_PRESS_MASK)
@@ -180,7 +180,7 @@ class EndlessDesktopView(gtk.Window):
     
     # Show popup
     def _feedback_icon_clicked_callback(self):
-        self._feedback_popup = BugsAndFeedbackPopupWindow(self._feedback_submitted)
+        self._feedback_popup = BugsAndFeedbackPopupWindow(self, self._feedback_submitted)
         self._feedback_popup.show()
         
     def hide_folder_window(self):
@@ -191,7 +191,7 @@ class EndlessDesktopView(gtk.Window):
     # Show folder content
     def _folder_icon_clicked_callback(self, widget, event, shortcut):
         self.hide_folder_window()
-        self._folder_window = OpenFolderWindow(self.window, self._presenter.activate_item, shortcut) 
+        self._folder_window = OpenFolderWindow(self, self._presenter.activate_item, shortcut) 
         self._folder_window.show()
         
     def _remove_all(self):

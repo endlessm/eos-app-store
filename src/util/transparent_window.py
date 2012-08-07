@@ -4,10 +4,19 @@ from gtk import gdk
 from util import image_util, screen_util
 
 class TransparentWindow(gtk.Window):
-    def __init__(self):
-        gtk.Window.__init__(self, gtk.WINDOW_POPUP)
+    def __init__(self, parent):
+        gtk.Window.__init__(self, gtk.WINDOW_TOPLEVEL)
         self.set_wmclass("endless_os_desktop", "modal")
         self.set_type_hint(gdk.WINDOW_TYPE_HINT_DESKTOP) #@UndefinedVariable
+
+        self.set_property("accept-focus", True)
+        self.set_property("destroy-with-parent", True)
+        self.set_property("focus-on-map", True)
+        
+        self.set_transient_for(parent)
+        
+        self.set_can_focus(True)
+        self.set_can_default(True)
 
         self.connect("expose-event", self._handle_event)
         self.connect("configure-event", self._handle_event)

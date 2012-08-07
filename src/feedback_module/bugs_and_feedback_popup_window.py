@@ -3,25 +3,21 @@ import gettext
 from util.image_eventbox import ImageEventBox
 from util import image_util
 from util.transparent_window import TransparentWindow
-import pango
 
 gettext.install('endless_desktop', '/usr/share/locale', unicode = True, names=['ngettext'])
 
 class BugsAndFeedbackPopupWindow():
-    def __init__(self, callback):
+    def __init__(self, parent, callback):
         self._width = 256
         self._height = 225
         
-        self._window = TransparentWindow()
+        self._window = TransparentWindow(parent)
         self._window.set_size_request(self._width,self._height)
         self._window.set_title(_("Bugs And Feedback"))
         self._window.set_position(gtk.WIN_POS_CENTER_ALWAYS)
 
         self._fancy_container = ImageEventBox((image_util.image_path("feedback-background.png"),))
-#        self._fancy_container = gtk.EventBox()
-#        self._fancy_container.set_visible_window(False)
         self._fancy_container.set_size_request(self._width,self._height)
-#        self._fancy_container.set_visible_window(False)
         self._center = gtk.Alignment(.5,.3,0,0)
         
         self._close = ImageEventBox((image_util.image_path("close.png"),))
@@ -29,7 +25,6 @@ class BugsAndFeedbackPopupWindow():
         self._close.connect("button-release-event", lambda w, e: self.destroy())
         
         self._container = gtk.VBox(False)
-#        self._container.set_size_request(350,00)
         
         self._close_box = gtk.HBox(False)
         self._close_box.pack_end(self._close, False, False, 0)
@@ -55,6 +50,7 @@ class BugsAndFeedbackPopupWindow():
         self._text = gtk.TextView()
         self._text.set_wrap_mode(gtk.WRAP_WORD)
         self._text.set_size_request(200,80)
+        self._text.set_editable(True)
         self._text_buffer = gtk.TextBuffer()
         self._text_buffer.set_text(_("Please let us know how the problem occured and we will resolve it as soon as possible."))
         self._text.set_buffer(self._text_buffer)
@@ -75,7 +71,7 @@ class BugsAndFeedbackPopupWindow():
 
         self._window.add(self._fancy_container)
         self._window.show_all()
-
+        
     def _set_widget_text(self, widget, text):
         widget.get_children()[0].set_markup('<span foreground="#505050" size="x-small">' + text + '</span>')
         

@@ -10,15 +10,14 @@ gettext.install('endless_desktop', '/usr/share/locale', unicode = True, names=['
 class OpenFolderWindow():
     TASKBAR_HEIGHT = 40
     
-    def __init__(self, parent_window, callback, shortcut):
+    def __init__(self, parent, callback, shortcut):
         self._width = screen_util.get_width()
         # TODO fix this
         self._height = 116
         
-        self._window = TransparentWindow()
+        self._window = TransparentWindow(parent)
         self._window.set_title(_("Folder"))
         
-        self._window.set_parent_window(parent_window)
 #        self._window.set_gravity(gtk.gdk.GRAVITY_SOUTH_WEST)
 #        self._window.move(0, 0)
         self._window.move(0, screen_util.get_height() - self._height - self.TASKBAR_HEIGHT)
