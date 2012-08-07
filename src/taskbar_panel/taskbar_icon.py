@@ -4,6 +4,8 @@ from gtk import gdk
 from util import image_util
 
 class TaskbarIcon(gtk.EventBox):
+    SELECTED_ICON_PADDING = 3
+    
     def __init__(self, task, name, pixbuf, is_selected):
         selected_overlay = image_util.load_pixbuf('endless-shortcut-well.png')
         self._scaled_selected_overlay = selected_overlay.scale_simple(pixbuf.get_width(), pixbuf.get_height(), gdk.INTERP_BILINEAR) 
@@ -35,12 +37,15 @@ class TaskbarIcon(gtk.EventBox):
         self.set_tooltip_text(window_name)
         overlay = self._scaled_selected_overlay.copy()
         if is_selected:
-            pixbuf.composite(
+            scaled_pixbuf = pixbuf.scale_simple(pixbuf.get_width()-(self.SELECTED_ICON_PADDING*2), 
+                                                pixbuf.get_height()-(self.SELECTED_ICON_PADDING*2),
+                                                gdk.INTERP_BILINEAR)
+            scaled_pixbuf.composite(
                                  overlay,
-                                 0, 0,
-                                 pixbuf.get_width(), pixbuf.get_height(),
-                                 2, 2,
-                                 0.8, 0.8,
+                                 self.SELECTED_ICON_PADDING, self.SELECTED_ICON_PADDING,
+                                 scaled_pixbuf.get_width(), scaled_pixbuf.get_height(),
+                                 self.SELECTED_ICON_PADDING, self.SELECTED_ICON_PADDING,
+                                 1, 1,
                                  gdk.INTERP_BILINEAR,
                                  255)
             
