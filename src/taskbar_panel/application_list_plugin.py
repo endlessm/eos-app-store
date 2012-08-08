@@ -26,6 +26,8 @@ class ApplicationListPlugin(gtk.HBox):
         self._default_icon = pixbuf.scale_simple(icon_size, icon_size, gdk.INTERP_BILINEAR)
         del pixbuf
         
+        self._taskbar_icons = {}
+        
         self._local_display = display.Display()
         self._screen = self._local_display.screen()
 
@@ -36,10 +38,20 @@ class ApplicationListPlugin(gtk.HBox):
         self._WM_CHANGE_STATE_ATOM_ID       = self._local_display.intern_atom('WM_CHANGE_STATE')
         self._NET_WM_STATE_HIDDEN_ATOM_ID   = self._local_display.intern_atom('_NET_WM_STATE_HIDDEN')
         self._NET_ACTIVE_WINDOW_ATOM_ID     = self._local_display.intern_atom('_NET_ACTIVE_WINDOW')
-
-        self._taskbar_icons = {}
+        self._NET_WM_NAME_ATOM_ID           = self._local_display.intern_atom('_NET_WM_NAME')
         
-        update_thread = UpdateTasksThread(self._local_display, self._screen, self._NET_CLIENT_LIST_ATOM_ID, self._NET_ACTIVE_WINDOW_ATOM_ID, self._draw_tasks)
+        
+        watched_atom_ids = [self._NET_CLIENT_LIST_ATOM_ID, 
+                            self._NET_ACTIVE_WINDOW_ATOM_ID, 
+                            self._NET_WM_STATE_ATOM_ID,
+                            self._NET_WM_ICON_ATOM_ID,
+                            self._NET_WM_NAME_ATOM_ID]
+        
+        
+        
+        update_thread = UpdateTasksThread(self._local_display, self._screen, 
+                                          self._NET_CLIENT_LIST_ATOM_ID, self._NET_ACTIVE_WINDOW_ATOM_ID,
+                                          watched_atom_ids, self._draw_tasks)
         update_thread.start()
 
         self.show_all()
@@ -56,11 +68,8 @@ class ApplicationListPlugin(gtk.HBox):
                 del self._taskbar_icons[taskbar_icon]
         
         for task in tasks:
-                
             # Get window object from ID
             window = self._local_display.create_resource_object('window', task)
-            window.change_attributes(event_mask=(
-                    X.PropertyChangeMask|X.FocusChangeMask|X.StructureNotifyMask))
             
             # Check if the app is requesting not to be in taskbar
             try:
@@ -77,7 +86,7 @@ class ApplicationListPlugin(gtk.HBox):
                 print "Failed to get app name"
                 pass
 
-            scaled_pixbuf=self._default_icon
+            scaled_pixbuf = self._default_icon
             # Get window's icons
             try:            
                 icon = window.get_full_property(self._NET_WM_ICON_ATOM_ID, Xatom.CARDINAL)
@@ -87,7 +96,7 @@ class ApplicationListPlugin(gtk.HBox):
                 # Extract icon data. We should also check other icons
                 width = icon.value[0]
                 height = icon.value[1]
-                data = icon.value[2:width*height+2]
+                data = icon.value[2:width * height + 2]
                 data_array = array.array('I', data)
                 
                 # Convert ARGB to ABRG
@@ -119,46 +128,80 @@ class ApplicationListPlugin(gtk.HBox):
         gtk.threads_leave()
         
     def toggle_state(self, widget, event):
-        window = self._local_display.create_resource_object('window', widget.task())
-        if (Xutil.IconicState != window.get_wm_state()['state']) & widget.is_selected():
-            clientmessage = Xlib.protocol.event.ClientMessage(
-                client_type=self._WM_CHANGE_STATE_ATOM_ID,
-                window=window,
-                data=(32, ([Xutil.IconicState, 0, 0, 0, 0]))
-            )
-            self._screen.root.send_event(clientmessage, (X.SubstructureRedirectMask|X.SubstructureNotifyMask))
-        else:
-            clientmessage = Xlib.protocol.event.ClientMessage(
-                client_type=self._NET_ACTIVE_WINDOW_ATOM_ID, 
-                window=window,
-                data=(32, (2, X.CurrentTime, 0, 0, 0))
-            )
-            self._screen.root.send_event(clientmessage, (X.SubstructureRedirectMask|X.SubstructureNotifyMask))
+        try:
+            window = self._local_display.create_resource_object('window', widget.task())
+            if (Xutil.IconicState != window.get_wm_state()['state']) & widget.is_selected():
+                clientmessage = Xlib.protocol.event.ClientMessage(
+                    client_type=self._WM_CHANGE_STATE_ATOM_ID,
+                    window=window,
+                    data=(32, ([Xutil.IconicState, 0, 0, 0, 0]))
+                )
+                self._screen.root.send_event(clientmessage, (X.SubstructureRedirectMask | X.SubstructureNotifyMask))
+            else:
+                clientmessage = Xlib.protocol.event.ClientMessage(
+                    client_type=self._NET_ACTIVE_WINDOW_ATOM_ID,
+                    window=window,
+                    data=(32, (2, X.CurrentTime, 0, 0, 0))
+                )
+                self._screen.root.send_event(clientmessage, (X.SubstructureRedirectMask | X.SubstructureNotifyMask))
+        except:
+            print "Error toggling the task", sys.exc_info()
 
         try:
             self._local_display.flush()
         except:
             print "Error flushing the display"
-            pass
 
 class UpdateTasksThread(Thread):
-    def __init__(self, display, screen, client_list_atom_id, active_window_atom_id, callback):
+    def __init__(self, display, screen, client_list_atom_id, active_window_atom_id, watched_atom_ids, callback):
         super(UpdateTasksThread, self).__init__()
         
         self._screen = screen   
         self._display = display   
         self._client_list_atom_id = client_list_atom_id
         self._active_window_atom_id = active_window_atom_id
+        self._watched_atom_ids = watched_atom_ids
         
         self._draw_tasks_callback = callback
         
     def run(self):
+        # Attach  to root screen property changes
+        self._screen.root.change_attributes(event_mask=(
+            X.PropertyChangeMask | X.FocusChangeMask | X.StructureNotifyMask))
+
+        # Force the first update on start
+        needs_update = True
+        
+        # Main loop
         while True :
-            try:
-                tasks = self._screen.root.get_full_property(self._client_list_atom_id, Xatom.WINDOW).value
-                selected_window = self._screen.root.get_full_property(self._active_window_atom_id, Xatom.WINDOW).value
-                self._draw_tasks_callback(tasks, selected_window)
-            except:
-                print >> sys.stderr, "Could not retrieve tasks. Continuing" 
+            # Are there pending events waiting for us
+            while self._display.pending_events():
+                event = self._display.next_event()
+
+                # If we haven't set the update flag yet, check if it matches our watched list
+                if not needs_update:
+                    try:
+                        if event.type == X.PropertyNotify and hasattr(event, 'atom') and event.atom in self._watched_atom_ids:
+                            # Set needs update flag since it is something we care about
+                            needs_update = True
+                    except:
+                        print >> sys.stderr, "Could not retrieve change atom IDs. Continuing"
+
+            # Taskbar needs updating
+            if needs_update:         
+                try:
+                    tasks = self._screen.root.get_full_property(self._client_list_atom_id, Xatom.WINDOW).value
+                    selected_window = self._screen.root.get_full_property(self._active_window_atom_id, Xatom.WINDOW).value
+                    self._draw_tasks_callback(tasks, selected_window)
+                except:
+                    print >> sys.stderr, "Could not retrieve tasks. Continuing"
+                    
+            needs_update = False
             
-            time.sleep(0.5)
+            # Sleep so that we don't waste CPU cycles
+            time.sleep(0.25)
+
+
+
+
+

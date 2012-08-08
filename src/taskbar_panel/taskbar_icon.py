@@ -7,7 +7,7 @@ class TaskbarIcon(gtk.EventBox):
     SELECTED_ICON_PADDING = 3
     
     def __init__(self, task, name, pixbuf, is_selected):
-        selected_overlay = image_util.load_pixbuf('endless-shortcut-well.png')
+        selected_overlay = image_util.load_pixbuf('taskbar-well.png')
         self._scaled_selected_overlay = selected_overlay.scale_simple(pixbuf.get_width(), pixbuf.get_height(), gdk.INTERP_BILINEAR) 
         
         super(TaskbarIcon, self).__init__()
