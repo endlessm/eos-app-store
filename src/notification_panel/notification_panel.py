@@ -9,6 +9,7 @@ from network_plugin import NetworkSettingsPlugin
 from time_display_plugin import TimeDisplayPlugin
 from bluetooth_plugin import BluetoothSettingsPlugin
 from printer_plugin import PrinterSettingsPlugin
+from all_settings_plugin import AllSettingsPlugin
 
 class NotificationPanel(gtk.HBox):
     ICON_SIZE = 20
@@ -17,7 +18,8 @@ class NotificationPanel(gtk.HBox):
     PLUGINS = [ PrinterSettingsPlugin,
                 BluetoothSettingsPlugin,
                 NetworkSettingsPlugin, 
-                TimeDisplayPlugin 
+                TimeDisplayPlugin,
+                AllSettingsPlugin 
               ]
     
     def __init__(self):
