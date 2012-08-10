@@ -1,3 +1,9 @@
+endless-os-desktop-widget (1.0-9) unstable; urgency=low
+
+  * Updating version to 1.0-9
+
+ -- Asynchrony <srdjan.grubor@asolutions.com>  Fri, 10 Aug 2012 14:14:01 -0500
+
 endless-os-desktop-widget (1.0-9-rc6) unstable; urgency=low
 
   * Updating version to 1.0-9-rc6
