@@ -1,22 +1,8 @@
-import gtk
-from gtk import gdk
+from icon_plugin import IconPlugin
 
-from util.image_util import load_pixbuf
-
-class NetworkSettingsPlugin(gtk.EventBox):
+class NetworkSettingsPlugin(IconPlugin):
+    COMMAND = 'gnome-control-center --class=eos-network-manager network'
+    ICON_NAME = 'network.png'
+    
     def __init__(self, icon_size):
-        super(NetworkSettingsPlugin, self).__init__()
-        network_configuration_icon = gtk.Image()
-        pixbuf = load_pixbuf('network.png')
-        scaled_pixbuf = pixbuf.scale_simple(icon_size, icon_size, gdk.INTERP_BILINEAR)
-        network_configuration_icon.set_from_pixbuf(scaled_pixbuf)
-        
-        del pixbuf
-        del scaled_pixbuf
-        
-        self.set_visible_window(False)
-        self.add(network_configuration_icon)
-        
-    @staticmethod
-    def get_launch_command():
-        return 'gnome-control-center --class=eos-network-manager network'
+        super(NetworkSettingsPlugin, self).__init__(icon_size, self.ICON_NAME, self.COMMAND)
