@@ -102,15 +102,26 @@ class SearchBoxLabel(gtk.Fixed):
         
         self._search_bg_pixbuf = load_pixbuf(image_util.image_path("text_frame_normal.png"))
         self._internet_pixbuf = load_pixbuf(image_util.image_path("button_browser_normal.png"))
+        self._internet_pixbuf_hover = load_pixbuf(image_util.image_path("button_browser_over.png"))
+        self._internet_pixbuf_down = load_pixbuf(image_util.image_path("button_browser_down.png"))
         
         self._image = gtk.Image()
         self._image.set_from_pixbuf(self._search_bg_pixbuf)
         self.put(self._image, 0, 0)
-        
-        self._internet_image = gtk.Image()
-        self._internet_image.set_from_pixbuf(self._internet_pixbuf)
-        self.put(self._internet_image, 5, 2)
 
+
+        self._internet_event_box = gtk.EventBox()
+        self._internet_event_box.set_visible_window(False)
+        self._internet_image = gtk.Image()
+        self._internet_event_box.add(self._internet_image)
+        self._internet_image.set_from_pixbuf(self._internet_pixbuf)
+        self.put(self._internet_event_box, 5, 2)
+        
+        self._internet_event_box.connect("enter-notify-event", lambda w, e: self.toggle_image(self._internet_image, self._internet_pixbuf_hover))
+        self._internet_event_box.connect("leave-notify-event", lambda w, e: self.toggle_image(self._internet_image, self._internet_pixbuf))
+        self._internet_event_box.connect('button-press-event', lambda w, e: self.toggle_image(self._internet_image, self._internet_pixbuf_down))
+        self._internet_event_box.connect('button-release-event',lambda w, e: self.toggle_image(self._internet_image, self._internet_pixbuf))
+    
         self._label = gtk.Label()
         self._label.set_text(default_text)
         self._label.set_justify(gtk.JUSTIFY_LEFT)
@@ -119,6 +130,9 @@ class SearchBoxLabel(gtk.Fixed):
         alignment.add(self._label)
         
         self.put(alignment, self.LEFT_MARGIN, self.TOP_MARGIN)
+
+    def toggle_image(self, image, pixbuf):
+        image.set_from_pixbuf(pixbuf) 
         
     def set_text(self, text):
         max_width = self._search_bg_pixbuf.get_width() - (self.LEFT_MARGIN + self.RIGHT_MARGIN)
