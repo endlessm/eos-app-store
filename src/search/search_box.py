@@ -9,7 +9,7 @@ gettext.install('endless_desktop', '/usr/share/locale', unicode = True, names=['
 
 class SearchBox(gtk.EventBox):
     HEIGHT = 30
-    WIDTH = 440
+    WIDTH = 234
     LEFT_PADDING = 10
     RIGHT_MARGIN = 33
     BOTTOM_MARGIN = 13
@@ -100,7 +100,7 @@ class SearchBoxLabel(gtk.Fixed):
     def __init__(self, default_text):
         gtk.Fixed.__init__(self)
         
-        self._search_bg_pixbuf = load_pixbuf(image_util.image_path("search_bar_shadow.png"))
+        self._search_bg_pixbuf = load_pixbuf(image_util.image_path("text_frame_normal.png"))
         
         self._image = gtk.Image()
         self._image.set_from_pixbuf(self._search_bg_pixbuf)
