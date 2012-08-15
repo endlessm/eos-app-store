@@ -29,7 +29,7 @@ class SearchBox(gtk.EventBox):
         self.connect('button-press-event', self.gain_focus)
         self._content = gtk.Fixed()
         
-        self._label = SearchBoxLabel(self.DEFAULT_TEXT)
+        self._label = SearchBoxLabel(self.DEFAULT_TEXT, self._emit_browser_signal)
         self._label.set_size_request(self.WIDTH, self.HEIGHT)
         self._content.put(self._label, self.LEFT_PADDING, 0)
         
@@ -77,7 +77,9 @@ class SearchBox(gtk.EventBox):
         self._text_buffer.set_text("")
         self._text_view.hide()
         self._set_label_text(self.DEFAULT_TEXT)
-        
+        self._emit_browser_signal(search_text)
+  
+    def _emit_browser_signal(self, search_text):      
         self.emit("launch-search", search_text)
     
     def handle_keystrokes(self, widget, event):
@@ -97,8 +99,10 @@ class SearchBoxLabel(gtk.Fixed):
     RIGHT_PADDING = 16
     RIGHT_MARGIN = 10
     
-    def __init__(self, default_text):
+    def __init__(self, default_text, callback):
         gtk.Fixed.__init__(self)
+        
+        self._internet_button_callback = callback
         
         self._search_bg_pixbuf = load_pixbuf(image_util.image_path("text_frame_normal.png"))
         self._internet_pixbuf = load_pixbuf(image_util.image_path("button_browser_normal.png"))
@@ -119,7 +123,7 @@ class SearchBoxLabel(gtk.Fixed):
         
         self._internet_event_box.connect("enter-notify-event", lambda w, e: self.toggle_image(self._internet_image, self._internet_pixbuf_hover))
         self._internet_event_box.connect("leave-notify-event", lambda w, e: self.toggle_image(self._internet_image, self._internet_pixbuf))
-        self._internet_event_box.connect('button-press-event', lambda w, e: self.toggle_image(self._internet_image, self._internet_pixbuf_down))
+        self._internet_event_box.connect('button-press-event', self.internet_button_pressed)
         self._internet_event_box.connect('button-release-event',lambda w, e: self.toggle_image(self._internet_image, self._internet_pixbuf))
     
         self._label = gtk.Label()
@@ -130,6 +134,11 @@ class SearchBoxLabel(gtk.Fixed):
         alignment.add(self._label)
         
         self.put(alignment, self.LEFT_MARGIN, self.TOP_MARGIN)
+        
+    def internet_button_pressed(self, widget, event):
+        self.toggle_image(self._internet_image, self._internet_pixbuf_down)
+        self._internet_button_callback("")
+        return True
 
     def toggle_image(self, image, pixbuf):
         image.set_from_pixbuf(pixbuf) 
