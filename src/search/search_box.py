@@ -101,11 +101,16 @@ class SearchBoxLabel(gtk.Fixed):
         gtk.Fixed.__init__(self)
         
         self._search_bg_pixbuf = load_pixbuf(image_util.image_path("text_frame_normal.png"))
+        self._internet_pixbuf = load_pixbuf(image_util.image_path("button_browser_normal.png"))
         
         self._image = gtk.Image()
         self._image.set_from_pixbuf(self._search_bg_pixbuf)
         self.put(self._image, 0, 0)
         
+        self._internet_image = gtk.Image()
+        self._internet_image.set_from_pixbuf(self._internet_pixbuf)
+        self.put(self._internet_image, 5, 2)
+
         self._label = gtk.Label()
         self._label.set_text(default_text)
         self._label.set_justify(gtk.JUSTIFY_LEFT)
