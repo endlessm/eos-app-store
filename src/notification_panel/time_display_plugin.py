@@ -23,7 +23,7 @@ class TimeDisplayPlugin(gtk.EventBox):
     def _update_time(self):
         try:
             date = datetime.datetime.now().strftime('%b %d | %H:%M %p').upper()
-            formatted_date = '<span size="medium" weight="bold">' + date + '</span>'
+            formatted_date = '<span size="large" weight="bold">' + date + '</span>'
             self._time_label.set_markup(formatted_date)
         except:
             pass
