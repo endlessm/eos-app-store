@@ -13,6 +13,11 @@ class SearchBox(gtk.EventBox):
     LEFT_PADDING = 10
     RIGHT_MARGIN = 33
     BOTTOM_MARGIN = 13
+    
+    TOP_MARGIN = 5
+    LEFT_MARGIN = 40
+    RIGHT_PADDING = 16
+    RIGHT_MARGIN_LABEL = 30
 
     DEFAULT_TEXT = _("Enter Search or URL...")
     
@@ -29,13 +34,13 @@ class SearchBox(gtk.EventBox):
         self.connect('button-press-event', self.gain_focus)
         self._content = gtk.Fixed()
         
-        self._label = SearchBoxLabel(self.DEFAULT_TEXT)
+        self._label = SearchBoxLabel(self.DEFAULT_TEXT, self.WIDTH, self.LEFT_MARGIN, self.RIGHT_PADDING, self.RIGHT_MARGIN_LABEL)
         self._button = SearchBoxButton(self._emit_browser_signal)
         self._frame = SearchBoxFrame()
         
         self._button.connect('button-press-event', self.browser_button_pressed)
         
-        self._container = SearchBoxContainer(self._button, self._label, self._frame)
+        self._container = SearchBoxContainer(self._button, self._label, self._frame, self.LEFT_MARGIN, self.TOP_MARGIN)
         
         self._container.set_size_request(self.WIDTH, self.HEIGHT)
         self._content.put(self._container, self.LEFT_PADDING, 0)
@@ -50,14 +55,14 @@ class SearchBox(gtk.EventBox):
         self._text_view.modify_text(gtk.STATE_NORMAL, gtk.gdk.Color('#303030'))
         self._text_view.modify_base(gtk.STATE_NORMAL, gtk.gdk.Color('#f2f1f1')) 
 
-        self._text_view.set_size_request(self.WIDTH-self.RIGHT_MARGIN - SearchBoxContainer.LEFT_MARGIN, self.HEIGHT-self.BOTTOM_MARGIN)
+        self._text_view.set_size_request(self.WIDTH-self.RIGHT_MARGIN - self.LEFT_MARGIN, self.HEIGHT-self.BOTTOM_MARGIN)
         
         self._text_view.hide()
 
         self._text_view.connect("focus-out-event", lambda w, e: self._update_label(w))
         self._text_view.connect("key-press-event", self.handle_keystrokes)
         
-        self._content.put(self._text_view, self._label._LEFT_MARGIN + self.LEFT_PADDING, SearchBoxContainer.TOP_MARGIN)
+        self._content.put(self._text_view, self._label._LEFT_MARGIN + self.LEFT_PADDING, self.TOP_MARGIN)
         
     def gain_focus(self, widget, event):
         if not(hasattr(self, "_text_view")):
@@ -114,7 +119,7 @@ class SearchBoxFrame(gtk.Image):
         
 class SearchBoxLabel(gtk.Label):
 
-    def __init__(self, default_text, width=255, left_margin=40, right_padding=16, right_margin=10):
+    def __init__(self, default_text, width, left_margin, right_padding, right_margin):
         gtk.Label.__init__(self)
         
         self._LEFT_MARGIN = left_margin
@@ -166,12 +171,9 @@ class SearchBoxButton(gtk.EventBox):
         image.set_from_pixbuf(pixbuf) 
         
 class SearchBoxContainer(gtk.Fixed):
-    TOP_MARGIN = 5
-    LEFT_MARGIN = 40
-    RIGHT_PADDING = 16
-    RIGHT_MARGIN = 10
+
     
-    def __init__(self, button, label, frame):
+    def __init__(self, button, label, frame, left_margin, top_margin):
         gtk.Fixed.__init__(self)
         
         self.put(frame, 0, 1)
@@ -180,5 +182,5 @@ class SearchBoxContainer(gtk.Fixed):
         alignment = gtk.Alignment(0.0, 0.5, 0.0, 0.0)
         alignment.add(label)
         
-        self.put(alignment, self.LEFT_MARGIN, self.TOP_MARGIN)
+        self.put(alignment, left_margin, top_margin)
         
