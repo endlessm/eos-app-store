@@ -174,8 +174,8 @@ class SearchBoxContainer(gtk.Fixed):
     def __init__(self, button, label, frame):
         gtk.Fixed.__init__(self)
         
-        self.put(frame, 0, 0)
-        self.put(button, 5, 2)
+        self.put(frame, 0, 1)
+        self.put(button, 5, 3)
 
         alignment = gtk.Alignment(0.0, 0.5, 0.0, 0.0)
         alignment.add(label)
