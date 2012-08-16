@@ -40,7 +40,7 @@ class TaskbarPanel(gtk.EventBox):
         self.add(self._taskbar_panel)
 
     def _draw_taskbar(self, width, taskbar_panel_items, application_list_plugin_holder, searchbox_holder, feedback_plugin):
-        self._raw_taskbar_bg_pixbuf = load_pixbuf(image_util.image_path('taskbar.png'))
+        self._raw_taskbar_bg_pixbuf = load_pixbuf(image_util.image_path('glass_taskbar.png'))
         self._taskbar_bg_pixbuf = self._raw_taskbar_bg_pixbuf.scale_simple(width, 38, gdk.INTERP_TILES)
         del self._raw_taskbar_bg_pixbuf
         taskbar_panel_items.pack_start(searchbox_holder, False, False, 0)
