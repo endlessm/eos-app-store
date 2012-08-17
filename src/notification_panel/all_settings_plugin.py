@@ -1,7 +1,7 @@
 from icon_plugin import IconPlugin
 
 class AllSettingsPlugin(IconPlugin):
-    COMMAND = 'gnome-control-center --class=eos-network-manager'
+    COMMAND = 'sudo gnome-control-center --class=eos-network-manager'
     ICON_NAME = 'settings.png'
     
     def __init__(self, icon_size):

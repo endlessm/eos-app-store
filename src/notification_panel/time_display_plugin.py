@@ -32,4 +32,4 @@ class TimeDisplayPlugin(gtk.EventBox):
         
     @staticmethod
     def get_launch_command():
-        return 'gnome-control-center --class=eos-network-manager datetime'
+        return 'sudo gnome-control-center --class=eos-network-manager datetime'
