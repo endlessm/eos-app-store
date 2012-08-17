@@ -36,6 +36,8 @@ class TimeDisplayPlugin(gtk.EventBox):
 
             text_size_x, text_size_y = self._text_layout.get_pixel_size()
             self.set_size_request(text_size_x + self.SHADOW_OFFSET + self.LEFT_MARGIN + self.RIGHT_MARGIN, text_size_y + self.SHADOW_OFFSET)
+            
+            self.queue_draw()
         except:
             pass
         
