@@ -19,7 +19,6 @@ class TransparentWindow(gtk.Window):
         self.set_can_default(True)
 
         self.connect("expose-event", self._handle_event)
-        self.connect("configure-event", self._handle_event)
         self._background = image_util.load_pixbuf("background.png")
         
         self._background = self._background.scale_simple(screen_util.get_width(), screen_util.get_height(),gtk.gdk.INTERP_BILINEAR)

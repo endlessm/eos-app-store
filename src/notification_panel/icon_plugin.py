@@ -22,13 +22,13 @@ class IconPlugin(gtk.EventBox):
         del pixbuf
         
         self.connect("expose-event", self._draw)
-        self.connect("configure-event", self._draw)
         
     def get_launch_command(self):
         return self._command
     
     def _draw(self, widget, event):
         cr = widget.window.cairo_create()
+        cr.save()
         
         # clip to dimensions of widget
         cr.rectangle(event.area.x, event.area.y,
@@ -45,6 +45,7 @@ class IconPlugin(gtk.EventBox):
         cr.set_operator(cairo.OPERATOR_ATOP);
         cr.paint()
         
+        cr.restore()
         return False
     
     
