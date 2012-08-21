@@ -1,7 +1,7 @@
 from icon_plugin import IconPlugin
 
 class BluetoothSettingsPlugin(IconPlugin):
-    COMMAND = 'gnome-control-center --class=eos-network-manager bluetooth'
+    COMMAND = 'sudo gnome-control-center --class=eos-network-manager bluetooth'
     ICON_NAME = 'bluetooth.png'
     
     def __init__(self, icon_size):
