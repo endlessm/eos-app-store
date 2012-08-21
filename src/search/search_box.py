@@ -35,10 +35,10 @@ class SearchBox(gtk.EventBox):
         self._content = gtk.Fixed()
         
         self._label = SearchBoxLabel(self.DEFAULT_TEXT, self.WIDTH, self.LEFT_MARGIN, self.RIGHT_PADDING, self.RIGHT_MARGIN_LABEL)
-        self._button = SearchBoxButton(self._emit_browser_signal)
+        self._button = SearchBoxButton()
         self._frame = SearchBoxFrame()
         
-        self._button.connect('button-press-event', self.browser_button_pressed)
+        self._button.connect('button-press-event', lambda w, e : self._launch_browser(w))
         
         self._container = SearchBoxContainer(self._button, self._label, self._frame, self.LEFT_MARGIN, self.TOP_MARGIN)
         
@@ -88,13 +88,7 @@ class SearchBox(gtk.EventBox):
         search_text = self._text_buffer.get_text(self._text_buffer.get_start_iter(), self._text_buffer.get_end_iter(), False)
         self._text_buffer.set_text("")
         self._text_view.hide()
-        self._set_label_text(self.DEFAULT_TEXT)
-        self._emit_browser_signal(search_text)
-        
-    def browser_button_pressed(self, widget, event):
-        self._emit_browser_signal("")
-  
-    def _emit_browser_signal(self, search_text):      
+        self._set_label_text(self.DEFAULT_TEXT)      
         self.emit("launch-search", search_text)
     
     def handle_keystrokes(self, widget, event):
@@ -148,10 +142,9 @@ class SearchBoxLabel(gtk.Label):
         
 class SearchBoxButton(gtk.EventBox):
 
-    def __init__(self, callback):
+    def __init__(self):
         gtk.EventBox.__init__(self)
         
-        self._internet_button_callback = callback
         self.set_visible_window(False)
         
         self._internet_pixbuf = load_pixbuf(image_util.image_path("button_browser_normal.png"))
