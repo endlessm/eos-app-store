@@ -1,10 +1,11 @@
 import gtk
-from gtk import gdk
 
 import datetime
 import gobject
 import pango
 import cairo
+
+from notification_panel_config import NotificationPanelConfig
 
 class TimeDisplayPlugin(gtk.EventBox):
     SHADOW_OFFSET = 1
@@ -55,14 +56,12 @@ class TimeDisplayPlugin(gtk.EventBox):
                     event.area.width, event.area.height)
         cr.clip()
         
-        cr.set_source_rgba(0.0, 0.0, 0.0, 0.25);
+        cr.set_source_rgba(0.0, 0.0, 0.0, NotificationPanelConfig.SHADOW_ALPHA);
         cr.move_to(event.area.x + self.SHADOW_OFFSET + self.LEFT_MARGIN, event.area.y + self.SHADOW_OFFSET)
         
         cr.set_operator(cairo.OPERATOR_DEST_OUT);
-        cr.layout_path(self._shadow_layout)
         cr.show_layout(self._shadow_layout)
 
-        cr.layout_path(self._text_layout)
         cr.move_to(event.area.x + self.LEFT_MARGIN, event.area.y)
         cr.set_operator(cairo.OPERATOR_ATOP);
         cr.show_layout(self._text_layout)

@@ -1,8 +1,9 @@
 import gtk
+import cairo
 from gtk import gdk
 
 from util.image_util import load_pixbuf
-import cairo
+from notification_panel_config import NotificationPanelConfig
 
 class IconPlugin(gtk.EventBox):
     SHADOW_OFFSET = 1
@@ -38,7 +39,7 @@ class IconPlugin(gtk.EventBox):
         # Draw shadow
         cr.set_source_pixbuf(self._scaled_pixbuf, event.area.x + self.SHADOW_OFFSET, event.area.y + self.SHADOW_OFFSET)
         cr.set_operator(cairo.OPERATOR_DEST_OUT);
-        cr.paint_with_alpha(0.3)
+        cr.paint_with_alpha(NotificationPanelConfig.SHADOW_ALPHA)
 
         # Draw icon
         cr.set_source_pixbuf(self._scaled_pixbuf, event.area.x, event.area.y)
