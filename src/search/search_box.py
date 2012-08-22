@@ -49,6 +49,9 @@ class SearchBox(gtk.EventBox):
         self._content.show_all()
 
     def add_text_entry(self, text):
+        if hasattr(self, "_text_view"):
+            return
+        
         self._text_view = gtk.TextView()
         self._text_buffer = self._text_view.get_buffer()
         self._text_view.set_wrap_mode(gtk.WRAP_NONE)
@@ -65,8 +68,8 @@ class SearchBox(gtk.EventBox):
         self._content.put(self._text_view, self._label._LEFT_MARGIN + self.LEFT_PADDING, self.TOP_MARGIN)
         
     def gain_focus(self, widget, event):
-        if not(hasattr(self, "_text_view")):
-            self.add_text_entry("")
+
+        self.add_text_entry("")
             
         self._set_label_text("")
         self._text_view.show()
@@ -85,6 +88,8 @@ class SearchBox(gtk.EventBox):
             self._set_label_text(self.DEFAULT_TEXT)
         
     def _launch_browser(self, widget):
+        self.add_text_entry("")
+            
         search_text = self._text_buffer.get_text(self._text_buffer.get_start_iter(), self._text_buffer.get_end_iter(), False)
         self._text_buffer.set_text("")
         self._text_view.hide()
