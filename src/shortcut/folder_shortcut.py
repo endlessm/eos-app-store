@@ -59,19 +59,19 @@ class FolderShortcut(DesktopShortcut):
             self.parent.remove(self)
     
     def get_images(self):
-        image_name = self._shortcut.icon()[0]
+        image_name = self._shortcut.icon()['normal']
         if not image_name:
             image_name = image_util.image_path("folder.png")
         return (image_name, )
     
     def get_depressed_images(self):
-        image_name = self._shortcut.icon()[1]
+        image_name = self._shortcut.icon()['pressed']
         if not image_name:
             image_name = image_util.image_path("folder.png")
         return (image_name, )
     
     def get_mouse_over_images(self):
-        image_name = self._shortcut.icon()[2]
+        image_name = self._shortcut.icon()['mouseover']
         if not image_name:
             image_name = image_util.image_path("folder.png")
         return ( image_name,)

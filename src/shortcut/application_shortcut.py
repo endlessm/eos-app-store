@@ -22,7 +22,7 @@ class ApplicationShortcut(DesktopShortcut):
     }
     
     def __init__(self, shortcut, show_background=True):
-        image_name = shortcut.icon()[0] 
+        image_name = shortcut.icon()['normal'] 
 #        label_text = shortcut.display_name()
         label_text = shortcut.name()
         self._image_name = image_name
