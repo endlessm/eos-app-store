@@ -22,17 +22,16 @@ class ApplicationShortcut(DesktopShortcut):
     }
     
     def __init__(self, shortcut, show_background=True):
-        image_name = shortcut.icon()['normal'] 
-#        label_text = shortcut.display_name()
+        self._shortcut = shortcut
         label_text = shortcut.name()
-        self._image_name = image_name
         self._show_background = show_background
         
         super(ApplicationShortcut, self).__init__(label_text)
-        self._shortcut = shortcut
         
         self._event_box.connect("button-press-event", self.mouse_press_callback)
         self._event_box.connect("button-release-event", self.mouse_release_callback)
+        self._event_box.connect("enter-notify-event", self.mouse_over_callback)
+        self._event_box.connect("leave-notify-event", self.mouse_out_callback)
         
         self._event_box.set_data('id', self._shortcut.key())
         self._event_box.set_data('params', self._shortcut.params())
@@ -60,16 +59,30 @@ class ApplicationShortcut(DesktopShortcut):
        
     def get_images(self):
         if self._show_background:
-            return (image_util.image_path("endless-shortcut-well.png"), image_util.image_path("endless-shortcut-background.png"), self._image_name, image_util.image_path("endless-shortcut-foreground.png"))
+            return (image_util.image_path("endless-shortcut-well.png"), image_util.image_path("endless-shortcut-background.png"), self._shortcut.icon()['normal'], image_util.image_path("endless-shortcut-foreground.png"))
         else:
-            return (image_util.image_path("endless-shortcut-well.png"), self._image_name,)
+            return (image_util.image_path("endless-shortcut-well.png"), self._shortcut.icon()['normal'],)
 
     def get_depressed_images(self):
+        icon = self._shortcut.icon()['normal']
+        if {'pressed'}.issubset(self._shortcut.icon()):
+            icon = self._shortcut.icon()['pressed']
+            
         if self._show_background:
-            return (image_util.image_path("endless-shortcut-well.png"),self._image_name,image_util.image_path("endless-shortcut-foreground.png"))
+            return (image_util.image_path("endless-shortcut-well.png"),icon,image_util.image_path("endless-shortcut-foreground.png"))
         else:
-            return (image_util.image_path("endless-shortcut-well.png"), self._image_name, image_util.image_path("endless-shortcut-foreground.png"))
+            return (image_util.image_path("endless-shortcut-well.png"), icon, image_util.image_path("endless-shortcut-foreground.png"))
          
+    def get_mouse_over_images(self):
+        icon = self._shortcut.icon()['normal']
+        if {'mouseover'}.issubset(self._shortcut.icon()):
+            icon = self._shortcut.icon()['mouseover']
+
+        if self._show_background:
+            return (image_util.image_path("endless-shortcut-well.png"), image_util.image_path("endless-shortcut-background.png"), icon, image_util.image_path("endless-shortcut-foreground.png"))
+        else:
+            return (image_util.image_path("endless-shortcut-well.png"), icon,)
+
     def get_shortcut(self):
         return self._shortcut
         
@@ -180,3 +193,15 @@ class ApplicationShortcut(DesktopShortcut):
             self._event_box.show()
             return True
         return False
+    
+    def mouse_out_callback(self, widget, event):
+        self._event_box.set_images(self.get_images())
+        self._event_box.hide()
+        self._event_box.show()
+        return True
+        
+    def mouse_over_callback(self, widget, event):
+        self._event_box.set_images(self.get_mouse_over_images())
+        self._event_box.hide()
+        self._event_box.show()
+        return True
