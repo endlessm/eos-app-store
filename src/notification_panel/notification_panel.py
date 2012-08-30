@@ -10,16 +10,18 @@ from time_display_plugin import TimeDisplayPlugin
 from bluetooth_plugin import BluetoothSettingsPlugin
 from printer_plugin import PrinterSettingsPlugin
 from all_settings_plugin import AllSettingsPlugin
+from audio_plugin import AudioSettingsPlugin
 
 class NotificationPanel(gtk.HBox):
     ICON_SIZE = 20
     
     # Add plugins for notification panel here
     PLUGINS = [ PrinterSettingsPlugin,
+                AudioSettingsPlugin,
                 BluetoothSettingsPlugin,
                 NetworkSettingsPlugin, 
                 TimeDisplayPlugin,
-                AllSettingsPlugin 
+                AllSettingsPlugin
               ]
     
     def __init__(self):
