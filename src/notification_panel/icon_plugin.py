@@ -27,14 +27,14 @@ class IconPlugin(gtk.EventBox):
         
             del pixbuf
         
-        self.set_index(init_index)
+        self._set_index(init_index)
 
         self.connect("expose-event", self._draw)
         
     def get_launch_command(self):
         return self._command
 
-    def set_index(self, index):
+    def _set_index(self, index):
         self._index = index
     
     def _draw(self, widget, event):
@@ -58,5 +58,4 @@ class IconPlugin(gtk.EventBox):
         
         cr.restore()
         return False
-    
-    
+

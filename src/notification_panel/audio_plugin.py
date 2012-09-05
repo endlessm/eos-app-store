@@ -4,7 +4,7 @@ import time
 
 from icon_plugin import IconPlugin
 
-class AudioSettingsPlugin(IconPlugin):
+class AudioSettingsPlugin(IconPlugin, threading.Thread):
     COMMAND = 'sudo gnome-control-center --class=eos-audio-manager sound'
     ICON_NAMES = ['audio-volume-muted.png',
                   'audio-volume-low.png',
@@ -16,15 +16,35 @@ class AudioSettingsPlugin(IconPlugin):
     VOLUME_MED = 2
     VOLUME_HIGH = 3
     
+    VOLUME_THRESH_LOW = 55
+    VOLUME_THRESH_HIGH = 85
+    
     def __init__(self, icon_size):
-        super(AudioSettingsPlugin, self).__init__(icon_size, self.ICON_NAMES, self.COMMAND, self.VOLUME_MED)
-        self._volume_thread = UpdateVolumeThread()
-        self._volume_thread.start()
+        self._volume = self._get_volume()
+        super(AudioSettingsPlugin, self).__init__(icon_size, self.ICON_NAMES, self.COMMAND, self._volume)
+        threading.Thread.__init__(self)
+        self.start()
+        
+    def _get_volume(self):
+        master = alsaaudio.Mixer()
+        mute = min(master.getmute())
+        if mute > 0:
+            level = self.VOLUME_MUTED
+        else:
+            volume = max(master.getvolume())
+            if volume < self.VOLUME_THRESH_LOW:
+                level = self.VOLUME_LOW
+            elif volume < self.VOLUME_THRESH_HIGH:
+                level = self.VOLUME_MED
+            else:
+                level = self.VOLUME_HIGH
+        return level
 
-class UpdateVolumeThread(threading.Thread):
     def run(self):
         while True:
-            master = alsaaudio.mixer()
-            print master.getvolume()
-            time.sleep(1)
-        
+            volume = self._get_volume()
+            if volume != self._volume:
+                self._volume = volume
+                self._set_index(volume)
+                self.queue_draw()
+            time.sleep(0.1)
