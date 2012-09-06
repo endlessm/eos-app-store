@@ -5,4 +5,4 @@ class NetworkSettingsPlugin(IconPlugin):
     ICON_NAME = 'network.png'
     
     def __init__(self, icon_size):
-        super(NetworkSettingsPlugin, self).__init__(icon_size, self.ICON_NAME, self.COMMAND)
+        super(NetworkSettingsPlugin, self).__init__(icon_size, [self.ICON_NAME], self.COMMAND)
