@@ -20,9 +20,16 @@ class AudioSettingsPlugin(IconPlugin, threading.Thread):
     VOLUME_THRESH_HIGH = 85
     
     def __init__(self, icon_size):
-        self._volume = self._get_volume()
-        super(AudioSettingsPlugin, self).__init__(icon_size, self.ICON_NAMES, self.COMMAND, self._volume)
-        self._init_thread()
+        # Only display the audio settings if a sound card is installed
+        if AudioSettingsPlugin.is_sound_card_installed:
+            self._volume = self._get_volume()
+            super(AudioSettingsPlugin, self).__init__(icon_size, self.ICON_NAMES, self.COMMAND, self._volume)
+            self._init_thread()
+
+    @staticmethod
+    def is_sound_card_installed():
+        sound_cards = alsaaudio.cards()
+        return len(sound_cards) > 0
         
     def _init_thread(self):
         threading.Thread.__init__(self)

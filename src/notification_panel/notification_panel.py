@@ -35,8 +35,14 @@ class NotificationPanel(gtk.HBox):
 
         #Other plugins                    
         for clazz in self.PLUGINS:
-            plugin = self._register_plugin(notification_panel_items, clazz)
-            plugin.connect('button-press-event', lambda w, e: self._launch_command(w.get_launch_command()))
+            is_plugin_enabled = True
+            # Don't register the audio settings plugin
+            # if no sound card is installed
+            if clazz == AudioSettingsPlugin:
+                is_plugin_enabled = AudioSettingsPlugin.is_sound_card_installed()
+            if is_plugin_enabled:
+                plugin = self._register_plugin(notification_panel_items, clazz)
+                plugin.connect('button-press-event', lambda w, e: self._launch_command(w.get_launch_command()))
             
         self.pack_end(self.notification_panel, False, False, 30) 
 
