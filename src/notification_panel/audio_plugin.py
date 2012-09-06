@@ -22,6 +22,9 @@ class AudioSettingsPlugin(IconPlugin, threading.Thread):
     def __init__(self, icon_size):
         self._volume = self._get_volume()
         super(AudioSettingsPlugin, self).__init__(icon_size, self.ICON_NAMES, self.COMMAND, self._volume)
+        self._init_thread()
+        
+    def _init_thread(self):
         threading.Thread.__init__(self)
         self.start()
         
