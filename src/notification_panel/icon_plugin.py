@@ -4,16 +4,14 @@ from gtk import gdk
 
 from util.image_util import load_pixbuf
 from notification_panel_config import NotificationPanelConfig
+from notification_plugin import NotificationPlugin
 
-class IconPlugin(gtk.EventBox):
-    SHADOW_OFFSET = 1
+class IconPlugin(NotificationPlugin):
     
     def __init__(self, icon_size, icon_names, command, init_index = 0):
-        super(IconPlugin, self).__init__()
+        super(IconPlugin, self).__init__(command)
         
         self.set_visible_window(False)
-        
-        self._command = command
         
         self.set_size_request(icon_size, icon_size)
         
@@ -31,9 +29,6 @@ class IconPlugin(gtk.EventBox):
 
         self.connect("expose-event", self._draw)
         
-    def get_launch_command(self):
-        return self._command
-
     def _set_index(self, index):
         self._index = index
     
