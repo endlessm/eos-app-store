@@ -21,7 +21,7 @@ class AudioSettingsPlugin(IconPlugin, threading.Thread):
     
     def __init__(self, icon_size):
         # Only display the audio settings if a sound card is installed
-        if AudioSettingsPlugin.is_sound_card_installed:
+        if AudioSettingsPlugin.is_sound_card_installed():
             self._volume = self._get_volume()
             super(AudioSettingsPlugin, self).__init__(icon_size, self.ICON_NAMES, self.COMMAND, self._volume)
             self._init_thread()

@@ -19,13 +19,13 @@ class NotificationPanel(gtk.HBox):
     PLUGINS = [ PrinterSettingsPlugin,
                 AudioSettingsPlugin,
                 BluetoothSettingsPlugin,
-                NetworkSettingsPlugin, 
+                NetworkSettingsPlugin,
                 TimeDisplayPlugin,
                 AllSettingsPlugin
               ]
     
     def __init__(self):
-        super(NotificationPanel, self).__init__(False,2)
+        super(NotificationPanel, self).__init__(False, 2)
         
         self.notification_panel = gtk.Alignment(0.5, 0.5, 0, 0)
         self.notification_panel.set_padding(20, 0, 20, 0)
