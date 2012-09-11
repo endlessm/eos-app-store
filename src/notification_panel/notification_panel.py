@@ -10,16 +10,18 @@ from time_display_plugin import TimeDisplayPlugin
 from bluetooth_plugin import BluetoothSettingsPlugin
 from printer_plugin import PrinterSettingsPlugin
 from all_settings_plugin import AllSettingsPlugin
+from audio_plugin import AudioSettingsPlugin
 
 class NotificationPanel(gtk.HBox):
     ICON_SIZE = 20
     
     # Add plugins for notification panel here
     PLUGINS = [ PrinterSettingsPlugin,
+                AudioSettingsPlugin,
                 BluetoothSettingsPlugin,
                 NetworkSettingsPlugin, 
                 TimeDisplayPlugin,
-                AllSettingsPlugin 
+                AllSettingsPlugin
               ]
     
     def __init__(self):
@@ -33,8 +35,14 @@ class NotificationPanel(gtk.HBox):
 
         #Other plugins                    
         for clazz in self.PLUGINS:
-            plugin = self._register_plugin(notification_panel_items, clazz)
-            plugin.connect('button-press-event', lambda w, e: self._launch_command(w.get_launch_command()))
+            is_plugin_enabled = True
+            # Don't register the audio settings plugin
+            # if no sound card is installed
+            if clazz == AudioSettingsPlugin:
+                is_plugin_enabled = AudioSettingsPlugin.is_sound_card_installed()
+            if is_plugin_enabled:
+                plugin = self._register_plugin(notification_panel_items, clazz)
+                plugin.connect('button-press-event', lambda w, e: self._launch_command(w.get_launch_command()))
             
         self.pack_end(self.notification_panel, False, False, 30) 
 

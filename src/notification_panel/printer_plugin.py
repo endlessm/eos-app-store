@@ -5,4 +5,4 @@ class PrinterSettingsPlugin(IconPlugin):
     ICON_NAME = 'printer.png'
     
     def __init__(self, icon_size):
-        super(PrinterSettingsPlugin, self).__init__(icon_size, self.ICON_NAME, self.COMMAND)
+        super(PrinterSettingsPlugin, self).__init__(icon_size, [self.ICON_NAME], self.COMMAND)
