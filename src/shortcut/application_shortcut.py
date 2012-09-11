@@ -57,32 +57,16 @@ class ApplicationShortcut(DesktopShortcut):
     def show_drag_failed_animation(self, widget, context, result, kill_animation):
         return kill_animation
        
-    def get_images(self):
-        if self._show_background:
-            return (image_util.image_path("endless-shortcut-well.png"), image_util.image_path("endless-shortcut-background.png"), self._shortcut.icon()['normal'], image_util.image_path("endless-shortcut-foreground.png"))
-        else:
-            return (image_util.image_path("endless-shortcut-well.png"), self._shortcut.icon()['normal'],)
+    def get_images(self, event_state):
+        icon = self._shortcut.icon()[self.ICON_STATE_NORMAL]
+        if {event_state}.issubset(self._shortcut.icon()):
+            icon = self._shortcut.icon()[event_state]
 
-    def get_depressed_images(self):
-        icon = self._shortcut.icon()['normal']
-        if {'pressed'}.issubset(self._shortcut.icon()):
-            icon = self._shortcut.icon()['pressed']
-            
         if self._show_background:
             return (image_util.image_path("endless-shortcut-well.png"),icon,image_util.image_path("endless-shortcut-foreground.png"))
         else:
             return (image_util.image_path("endless-shortcut-well.png"), icon, image_util.image_path("endless-shortcut-foreground.png"))
          
-    def get_mouse_over_images(self):
-        icon = self._shortcut.icon()['normal']
-        if {'mouseover'}.issubset(self._shortcut.icon()):
-            icon = self._shortcut.icon()['mouseover']
-
-        if self._show_background:
-            return (image_util.image_path("endless-shortcut-well.png"), image_util.image_path("endless-shortcut-background.png"), icon, image_util.image_path("endless-shortcut-foreground.png"))
-        else:
-            return (image_util.image_path("endless-shortcut-well.png"), icon,)
-
     def get_shortcut(self):
         return self._shortcut
         
@@ -179,7 +163,7 @@ class ApplicationShortcut(DesktopShortcut):
     def mouse_release_callback(self, widget, event):
         if event.button == 1:
             self.emit("application-shortcut-activate", self._shortcut.key(), self._shortcut.params())
-            self._event_box.set_images(self.get_images())
+            self._event_box.set_images(self.get_images(self.ICON_STATE_NORMAL))
             self._event_box.hide()
             self._event_box.show()
             return True
@@ -188,20 +172,20 @@ class ApplicationShortcut(DesktopShortcut):
     
     def mouse_press_callback(self, widget, event):
         if event.button == 1: # and event.type == gtk.gdk._2BUTTON_PRESS:
-            self._event_box.set_images(self.get_depressed_images())
+            self._event_box.set_images(self.get_images(self.ICON_STATE_PRESSED))
             self._event_box.hide()
             self._event_box.show()
             return True
         return False
     
     def mouse_out_callback(self, widget, event):
-        self._event_box.set_images(self.get_images())
+        self._event_box.set_images(self.get_images(self.ICON_STATE_NORMAL))
         self._event_box.hide()
         self._event_box.show()
         return True
         
     def mouse_over_callback(self, widget, event):
-        self._event_box.set_images(self.get_mouse_over_images())
+        self._event_box.set_images(self.get_images(self.ICON_STATE_MOUSEOVER))
         self._event_box.hide()
         self._event_box.show()
         return True

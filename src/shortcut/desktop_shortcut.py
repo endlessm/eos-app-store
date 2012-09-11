@@ -7,6 +7,10 @@ import gtk
 class DesktopShortcut(gtk.VBox):
     DND_TARGET_TYPE_TEXT = 80
     DND_TRANSFER_TYPE = [( "text/plain", gtk.TARGET_SAME_APP, DND_TARGET_TYPE_TEXT )]
+    ICON_STATE_NORMAL = 'normal'
+    ICON_STATE_PRESSED = 'pressed'
+    ICON_STATE_MOUSEOVER = 'mouseover'
+    
     
     __gsignals__ = {
            "application-shortcut-dragging-over": (gobject.SIGNAL_RUN_FIRST, #@UndefinedVariable
@@ -21,7 +25,7 @@ class DesktopShortcut(gtk.VBox):
 #        self._event_box = self._create_event_box() 
 #        self._icon = self._create_icon(self.get_images())
 #        self._event_box.add(self._icon)
-        self._event_box = self._create_icon(self.get_images())
+        self._event_box = self._create_icon(self.get_images(self.ICON_STATE_NORMAL))
         
         self._label = gtk.Label(label_text)
 
@@ -54,7 +58,7 @@ class DesktopShortcut(gtk.VBox):
     def get_shortcut(self):
         return None
     
-    def get_images(self):
+    def get_images(self, event_state):
         return ()
     
     def remove_shortcut(self):
