@@ -34,7 +34,12 @@ class EndlessDesktopView(gtk.Window):
         self.set_decorated(False)
         self.add_events(gtk.gdk.BUTTON_PRESS_MASK)
         self.connect('button-press-event', self.unfocus_widget)
-        self.connect("destroy", lambda w: gtk.main_quit())
+        self.connect('destroy', lambda w: gtk.main_quit())
+
+        # The following prevents propagation of signals that close
+        # the dektop (<Alt>F4)
+        self.connect('delete-event', lambda w, e: True)
+
         self.maximize()
         self.show()
         self.set_app_paintable(True)
