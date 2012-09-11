@@ -9,3 +9,8 @@ class NotificationPlugin(gtk.EventBox):
         
     def get_launch_command(self):
         return self._command
+
+    @staticmethod
+    def is_plugin_enabled():
+        # Default to enabled unless overridden by specific class
+        return True
