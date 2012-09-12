@@ -7,6 +7,7 @@ import gobject
 from gtk import gdk
 
 from util import image_util, screen_util
+from background_chooser import BackgroundChooser
 from shortcut.bugs_and_feedback_shortcut import BugsAndFeedbackShortcut
 from shortcut.application_shortcut import ApplicationShortcut
 from feedback_module.feedback_response_dialog_view import FeedbackResponseDialogView
@@ -44,10 +45,12 @@ class EndlessDesktopView(gtk.Window):
         self.show()
         self.set_app_paintable(True)
         
-        self._set_background()
+        # -----------WORKSPACE-----------
+        background_name = 'background.png'
+        self._set_background(background_name)
+        BackgroundChooser(self)
         
         self._align = gtk.Alignment(0.5, 0.5, 0, 0)
-        
         
         self._taskbar_panel = TaskbarPanel(width)
         self._taskbar_panel.connect('feedback-clicked', lambda w: self._feedback_icon_clicked_callback())
@@ -58,7 +61,7 @@ class EndlessDesktopView(gtk.Window):
         taskbar_alignment.add(self._taskbar_panel)
         
         # Main window layout
-        self._desktop = gtk.VBox(False,2)
+        self._desktop = gtk.VBox(False, 2)
         self._desktop.pack_start(self._notification_panel, False, True, 0)
         self._desktop.pack_start(self._align, True, False, 0)
         self._desktop.pack_end(taskbar_alignment, False, True, 0)
@@ -84,9 +87,9 @@ class EndlessDesktopView(gtk.Window):
         
         self._taskbar_panel.connect('launch-search', lambda w, s: self._presenter.launch_search(s))
 
-    def _set_background(self):
+    def _set_background(self, background_name):
         width, height = self._get_net_work_area()
-        pixbuf = image_util.load_pixbuf("background.png")
+        pixbuf = image_util.load_pixbuf(background_name)
         
         sized_pixbuf = pixbuf.scale_simple(width, height, gtk.gdk.INTERP_BILINEAR) #@UndefinedVariable
         pixmap, mask = sized_pixbuf.render_pixmap_and_mask()
