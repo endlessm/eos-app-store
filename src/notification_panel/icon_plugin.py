@@ -8,8 +8,8 @@ from notification_plugin import NotificationPlugin
 
 class IconPlugin(NotificationPlugin):
     
-    def __init__(self, icon_size, icon_names, command, init_index = 0):
-        super(IconPlugin, self).__init__(command)
+    def __init__(self, icon_size, icon_names, command, init_index = 0, widget = None):
+        super(IconPlugin, self).__init__(command, widget)
         
         self.set_visible_window(False)
         
