@@ -37,7 +37,7 @@ class BackgroundChooser(gtk.FileChooserDialog):
 
     def warn_user(self):
         warning_window = gtk.Dialog("Incorrect File Type", None, gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT, (gtk.STOCK_OK, gtk.RESPONSE_REJECT))
-        warning_window.set_size_request(300, 150)
+        warning_window.set_size_request(275, 150)
         warning_window.connect('response', lambda r, d: warning_window.destroy())
 
         warning_text = gtk.Label("Please choose a valid image file.")
