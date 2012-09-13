@@ -1,3 +1,9 @@
+endless-os-desktop-widget (1.0.12~rc1) unstable; urgency=low
+
+  * Updating version to 1.0.12~rc1
+
+ -- Asynchrony <kamiller@asolutions.com>  Wed, 12 Sep 2012 04:35:25 -0500
+
 endless-os-desktop-widget (1.0.11) unstable; urgency=low
 
   * Updating version to 1.0.11
