@@ -8,6 +8,13 @@ class AllSettingsPluginTestCase(unittest.TestCase):
     def test_settings_does_not_directly_launch_command(self):
         self.assertIsNone(AllSettingsPlugin(1).get_launch_command())
         
+    def test_settings_update(self):
+        AppLauncher.launch = Mock()
+        plugin = AllSettingsPlugin(1)
+        plugin._confirm = Mock(return_value = True)
+        plugin._update_software(Mock(), Mock())
+        AppLauncher.launch.assert_called_once_with('sudo apt-get update; sudo apt-get upgrade -y')
+
     def test_settings_settings(self):
         AppLauncher.launch = Mock()
         plugin = AllSettingsPlugin(1)

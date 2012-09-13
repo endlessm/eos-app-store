@@ -5,6 +5,7 @@ from icon_plugin import IconPlugin
 from osapps.app_launcher import AppLauncher
 
 class AllSettingsPlugin(IconPlugin):
+    UPDATE_COMMAND = 'sudo apt-get update; sudo apt-get upgrade -y'
     SETTINGS_COMMAND = 'sudo gnome-control-center --class=eos-network-manager'
     LOGOUT_COMMAND = 'kill -9 -1'
     RESTART_COMMAND = 'sudo shutdown -r now'
@@ -14,6 +15,8 @@ class AllSettingsPlugin(IconPlugin):
     def __init__(self, icon_size):
         
         self._label_version = gtk.Label('EndlessOS ' + self._read_version())
+        self._button_update = gtk.Button('Update')
+        self._button_update.connect('button-press-event', self._update_software)
         self._button_settings = gtk.Button('Settings')
         self._button_settings.connect('button-press-event', self._launch_settings)
         self._button_logout = gtk.Button('Log Out')
@@ -26,12 +29,17 @@ class AllSettingsPlugin(IconPlugin):
         self._table = gtk.Table(5, 6, True)
         self._table.set_border_width(10)
         self._table.attach(self._label_version, 0, 3, 0, 1)
+        self._table.attach(self._button_update, 3, 6, 0, 1)
         self._table.attach(self._button_settings, 0, 6, 2, 3)
         self._table.attach(self._button_logout, 0, 2, 4, 5)
         self._table.attach(self._button_restart, 2, 4, 4, 5)
         self._table.attach(self._button_shutdown, 4, 6, 4, 5)
         
         super(AllSettingsPlugin, self).__init__(icon_size, [self.ICON_NAME], None, 0, self._table)
+
+    def _update_software(self, widget, event):
+        if self._confirm('Update EndlessOS?'):
+            AppLauncher().launch(self.UPDATE_COMMAND)
         
     def _launch_settings(self, widget, event):
         AppLauncher().launch(self.SETTINGS_COMMAND)
@@ -65,3 +73,9 @@ class AllSettingsPlugin(IconPlugin):
         version = pipe.readline()
         pipe.close()
         return version.strip()
+
+    def show_window(self, x, y, pointer):
+        # Re-read the version immediately prior to showing the window
+        # so that we have the latest, even if there was a recent upgrade
+        self._label_version.set_text('EndlessOS ' + self._read_version())
+        super(AllSettingsPlugin, self).show_window(x, y, pointer)
