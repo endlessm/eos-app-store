@@ -11,26 +11,26 @@ class AllSettingsPluginTestCase(unittest.TestCase):
     def test_settings_settings(self):
         AppLauncher.launch = Mock()
         plugin = AllSettingsPlugin(1)
-        plugin._button_settings.emit('button-press-event', None)
+        plugin._launch_settings(Mock(), Mock())
         AppLauncher.launch.assert_called_once_with('sudo gnome-control-center --class=eos-network-manager')
 
     def test_settings_logout(self):
         AppLauncher.launch = Mock()
         plugin = AllSettingsPlugin(1)
         plugin._confirm = Mock(return_value = True)
-        plugin._button_logout.emit('button-press-event', None)
+        plugin._logout(Mock(), Mock())
         AppLauncher.launch.assert_called_once_with('kill -9 -1')
 
     def test_settings_restart(self):
         AppLauncher.launch = Mock()
         plugin = AllSettingsPlugin(1)
         plugin._confirm = Mock(return_value = True)
-        plugin._button_restart.emit('button-press-event', None)
+        plugin._restart(Mock(), Mock())
         AppLauncher.launch.assert_called_once_with('sudo shutdown -r now')
 
     def test_settings_shutdown(self):
         AppLauncher.launch = Mock()
         plugin = AllSettingsPlugin(1)
         plugin._confirm = Mock(return_value = True)
-        plugin._button_shutdown.emit('button-press-event', None)
+        plugin._shutdown(Mock(), Mock())
         AppLauncher.launch.assert_called_once_with('sudo shutdown -h now')
