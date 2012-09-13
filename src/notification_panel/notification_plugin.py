@@ -55,21 +55,30 @@ class NotificationPlugin(gtk.EventBox):
 
     # To do: make the triangle position configurable
     def _expose(self, widget, event):
-        # Make the window background transparent
-        cr = widget.window.cairo_create()
-        cr.set_operator(cairo.OPERATOR_CLEAR)
-        cr.rectangle(0.0, 0.0, *widget.get_size())
-        cr.fill()
-        cr.set_operator(cairo.OPERATOR_OVER)
         
-        # Decorate the border with a triangle pointing up
-        # Use the same color as the default event box background
-        # To do: eliminate need for these "magic" numbers
-        cr.set_source_rgba(0xf2/255.0, 0xf1/255.0, 0xf0/255.0, 1.0)
-        cr.move_to(self._pointer, 0)
-        cr.line_to(self._pointer + 10, 10)
-        cr.line_to(self._pointer - 10, 10)
-        cr.fill()
+        # Temporarily disable the triangle decoration,
+        # as it requires a transparent background that
+        # requires a compositing window manager
+        # (and is not supported by fluxbox)
+        # To do: replace with the commented code below
+        # if we switch to compiz (or another compositing manager)
+        pass
+    
+#        # Make the window background transparent
+#        cr = widget.window.cairo_create()
+#        cr.set_operator(cairo.OPERATOR_CLEAR)
+#        cr.rectangle(0.0, 0.0, *widget.get_size())
+#        cr.fill()
+#        cr.set_operator(cairo.OPERATOR_OVER)
+#        
+#        # Decorate the border with a triangle pointing up
+#        # Use the same color as the default event box background
+#        # To do: eliminate need for these "magic" numbers
+#        cr.set_source_rgba(0xf2/255.0, 0xf1/255.0, 0xf0/255.0, 1.0)
+#        cr.move_to(self._pointer, 0)
+#        cr.line_to(self._pointer + 10, 10)
+#        cr.line_to(self._pointer - 10, 10)
+#        cr.fill()
         
     def show_window(self, x, y, pointer):
         self._pointer = pointer
