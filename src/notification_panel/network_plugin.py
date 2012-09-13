@@ -15,16 +15,12 @@ class NetworkSettingsPlugin(IconPlugin):
     def _set_icon(self, strength):
         print 'strength = ', strength
         if strength > 65:
-            print "Strength is high"
             self._set_index(3)
         elif strength > 32:
-            print "Strength is medium"
             self._set_index(2)
         elif strength > 0:
-            print "Strength is low"
             self._set_index(1)
         else:
-            print "No WIFI"
             self._set_index(0)
         self.queue_draw()
         
