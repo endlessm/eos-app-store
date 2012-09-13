@@ -56,10 +56,11 @@ class NotificationPanel(gtk.HBox):
             screen = gtk.gdk.Screen()
             monitor = screen.get_monitor_at_window(widget.get_parent_window())
             geometry = screen.get_monitor_geometry(monitor)
-            width = geometry.width
-            height = geometry.height
             x = geometry.x + geometry.width - NotificationPlugin.WINDOW_WIDTH
             # Add some space between the notification panel and the window
             extra_padding = 4
+            # To do: this does not properly account for the gnome shell top bar
             y = geometry.y + self.PADDING + self.ICON_SIZE + extra_padding
-            widget.show_window(x, y)
+            # Get the x location of the center of the widget (icon), relative to the settings window
+            pointer = widget.translate_coordinates(widget.get_toplevel(), self.ICON_SIZE / 2, 0)[0] - x
+            widget.show_window(x, y, pointer)

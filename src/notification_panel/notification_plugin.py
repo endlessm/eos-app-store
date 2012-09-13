@@ -7,7 +7,7 @@ class NotificationPlugin(gtk.EventBox):
     
     # In the current design, all the notification windows
     # have the same width, and the height will grow as needed
-    WINDOW_WIDTH = 300
+    WINDOW_WIDTH = 330
     WINDOW_HEIGHT = -1
     
     # The window border leaves room for the triangle
@@ -21,9 +21,6 @@ class NotificationPlugin(gtk.EventBox):
         if widget:
             
             self._window = gtk.Window()
-            self._window.set_gravity(gtk.gdk.GRAVITY_NORTH_EAST)
-            width= self._window.get_size()[0]
-            self._window.move(gtk.gdk.screen_width() - width, 0)
             self._window.set_default_size(self.WINDOW_WIDTH, self.WINDOW_HEIGHT)
             self._window.set_border_width(self.WINDOW_BORDER)
             self._window.set_decorated(False)
@@ -67,15 +64,18 @@ class NotificationPlugin(gtk.EventBox):
         
         # Decorate the border with a triangle pointing up
         # Use the same color as the default event box background
+        # To do: eliminate need for these "magic" numbers
         cr.set_source_rgba(0xf2/255.0, 0xf1/255.0, 0xf0/255.0, 1.0)
-        cr.move_to(258, 0)
-        cr.line_to(268, 10)
-        cr.line_to(248, 10)
+        cr.move_to(self._pointer, 0)
+        cr.line_to(self._pointer + 10, 10)
+        cr.line_to(self._pointer - 10, 10)
         cr.fill()
         
-    def show_window(self, x, y):
+    def show_window(self, x, y, pointer):
+        self._pointer = pointer
         self._window.move(x, y)
         self._window.show_all()
+        self._window.connect('focus-out-event', self._hide_window)
 
-    def hide_window(self):
+    def _hide_window(self, widget, event):
         self._window.hide_all()
