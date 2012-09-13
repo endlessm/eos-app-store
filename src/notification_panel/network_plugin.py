@@ -10,29 +10,28 @@ class NetworkSettingsPlugin(IconPlugin):
     
     def __init__(self, icon_size):
         super(NetworkSettingsPlugin, self).__init__(icon_size, self.ICON_NAMES, self.COMMAND, 0)
+        self._start_thread()
         
-        update_thread = UpdateTasksThread(self.set_icon)
-        update_thread.start()
-    
-    def set_icon(self, strength):
+    def _set_icon(self, strength):
         print 'strength = ', strength
-        if strength > 78:
+        if strength > 65:
             print "Strength is high"
             self._set_index(3)
-            self.queue_draw()
-        elif strength > 75:
+        elif strength > 32:
             print "Strength is medium"
             self._set_index(2)
-            self.queue_draw()
-        elif strength > 50:
+        elif strength > 0:
             print "Strength is low"
             self._set_index(1)
-            self.queue_draw()
         else:
             print "No WIFI"
             self._set_index(0)
-            self.queue_draw()
-            
+        self.queue_draw()
+        
+    def _start_thread(self):
+        update_thread = UpdateTasksThread(self._set_icon)
+        update_thread.start()
+
 class UpdateTasksThread(Thread):
     def __init__(self, callback):
         super(UpdateTasksThread, self).__init__()
@@ -42,8 +41,6 @@ class UpdateTasksThread(Thread):
         while True :
             self.set_icon_callback(WifiUtil.get_strength())
             # Sleep so that we don't waste CPU cycles
-            time.sleep(2)
-
-        
+            time.sleep(2)        
         
         

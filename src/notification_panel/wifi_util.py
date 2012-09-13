@@ -20,15 +20,11 @@ class WifiUtil(object):
         #       wi-fi is device active
                 if props['State'] == 100:
                     wifi_props = prop_iface.GetAll("org.freedesktop.NetworkManager.Device.Wireless")
-#                    print wifi_props
-#                    print "Access Point = ", wifi_props['ActiveAccessPoint']
                     access_point = bus.get_object("org.freedesktop.NetworkManager", wifi_props['ActiveAccessPoint'])
                     ap_props = access_point.GetAll("org.freedesktop.NetworkManager.AccessPoint")
-#                    print "The strength = ", int(ap_props['Strength'])
                     return int(ap_props['Strength'])
         #   not a wi-fi device
         return 0
-        print "Not using wifi boooo"        
             
         
         

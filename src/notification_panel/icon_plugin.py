@@ -45,7 +45,6 @@ class IconPlugin(gtk.EventBox):
         cr.rectangle(event.area.x, event.area.y,
                     event.area.width, event.area.height)
         cr.clip()
-        print "========== draw"
         # Draw shadow
         cr.set_source_pixbuf(self._scaled_pixbufs[self._index], event.area.x + self.SHADOW_OFFSET, event.area.y + self.SHADOW_OFFSET)
         cr.set_operator(cairo.OPERATOR_DEST_OUT);
