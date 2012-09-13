@@ -13,7 +13,6 @@ class NetworkSettingsPlugin(IconPlugin):
         self._start_thread()
         
     def _set_icon(self, strength):
-        print 'strength = ', strength
         if strength > 65:
             self._set_index(3)
         elif strength > 32:
