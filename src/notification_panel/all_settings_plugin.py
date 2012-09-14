@@ -2,8 +2,12 @@ import gtk
 
 from icon_plugin import IconPlugin
 from osapps.app_launcher import AppLauncher
+from util.transparent_window import TransparentWindow
+from panel_constants import PanelConstants
 
 class AllSettingsPlugin(IconPlugin):
+    X_OFFSET = 30
+    
     SETTINGS_COMMAND = 'sudo gnome-control-center --class=eos-network-manager'
     LOGOUT_COMMAND = 'kill -9 -1'
     RESTART_COMMAND = 'sudo shutdown -r now'
@@ -11,6 +15,7 @@ class AllSettingsPlugin(IconPlugin):
     ICON_NAME = 'settings.png'
     
     def __init__(self, icon_size):
+        super(AllSettingsPlugin, self).__init__(icon_size, [self.ICON_NAME], None, 0)
         
         self._button_settings = gtk.Button('Settings')
         self._button_settings.connect('button-press-event', self._launch_settings)
@@ -28,7 +33,55 @@ class AllSettingsPlugin(IconPlugin):
         self._table.attach(self._button_restart, 1, 2, 1, 2)
         self._table.attach(self._button_shutdown, 2, 3, 1, 2)
         
-        super(AllSettingsPlugin, self).__init__(icon_size, [self.ICON_NAME], None, 0, self._table)
+        
+        self.set_visible_window(False)
+        self._window = TransparentWindow(None)
+        self._window.set_default_size(self.WINDOW_WIDTH, self.WINDOW_HEIGHT)
+        self._window.set_border_width(self.WINDOW_BORDER)
+        self._window.set_decorated(False)
+        
+        # Set up the window so that it can be exposed
+        # with a transparent background and triangle decoration
+        self._window.set_app_paintable(True)
+        screen = self._window.get_screen()
+        rgba = screen.get_rgba_colormap()
+        self._window.set_colormap(rgba)
+        self._window.connect('expose-event', self._expose)
+        
+        # Place the widget in an event box within the window
+        # (which has a different background than the transparent window)
+        self._container = gtk.EventBox()
+        self._container.add(self._table)
+        self._window.add(self._container)
+        
+    def execute(self):
+        screen = gtk.gdk.Screen()
+        monitor = screen.get_monitor_at_window(self.get_parent_window())
+        geometry = screen.get_monitor_geometry(monitor)
+        x = geometry.x + geometry.width - self.WINDOW_WIDTH + self.X_OFFSET
+        # Add some space between the notification panel and the window
+        extra_padding = 4
+        # To do: this does not properly account for the gnome shell top bar
+        icon_size = self.size_request()[0]
+        y = geometry.y + PanelConstants.get_padding() + icon_size + extra_padding + 30 #Remove + 30
+        # Get the x location of the center of the widget (icon), relative to the settings window
+        self._pointer = self.translate_coordinates(self.get_toplevel(), icon_size / 2, 0)[0] - x
+        self._window.move(x, y)
+        self._window.show_all()
+        self._window.connect('focus-out-event', self._hide_window)
+        
+    # To do: make the triangle position configurable
+    def _expose(self, widget, event):
+        cr = widget.window.cairo_create()
+        
+        # Decorate the border with a triangle pointing up
+        # Use the same color as the default event box background
+        # To do: eliminate need for these "magic" numbers
+        cr.set_source_rgba(0xf2/255.0, 0xf1/255.0, 0xf0/255.0, 1.0)
+        cr.move_to(self._pointer, 0)
+        cr.line_to(self._pointer + 10, 10)
+        cr.line_to(self._pointer - 10, 10)
+        cr.fill()
         
     def _launch_settings(self, widget, event):
         AppLauncher().launch(self.SETTINGS_COMMAND)

@@ -6,11 +6,9 @@ import gtk
 import gobject
 from gtk import gdk
 
-from util import image_util, screen_util
-from shortcut.bugs_and_feedback_shortcut import BugsAndFeedbackShortcut
+from util import image_util
 from shortcut.application_shortcut import ApplicationShortcut
 from feedback_module.feedback_response_dialog_view import FeedbackResponseDialogView
-from search.search_box import SearchBox
 from feedback_module.bugs_and_feedback_popup_window import BugsAndFeedbackPopupWindow
 from shortcut.folder_shortcut import FolderShortcut
 from folder.folder_window import OpenFolderWindow
@@ -47,7 +45,6 @@ class EndlessDesktopView(gtk.Window):
         self._set_background()
         
         self._align = gtk.Alignment(0.5, 0.5, 0, 0)
-        
         
         self._taskbar_panel = TaskbarPanel(width)
         self._taskbar_panel.connect('feedback-clicked', lambda w: self._feedback_icon_clicked_callback())
