@@ -74,7 +74,7 @@ class EndlessDesktopView(gtk.Window):
         self._max_icons_in_row = self._calculate_max_icons()
     
         screen = gtk.gdk.Screen() #@UndefinedVariable
-        screen.connect('size-changed', lambda s: self._set_background())
+        screen.connect('size-changed', lambda s: self._set_background(self.BACKGROUND_NAME))
     
     def unfocus_widget(self, widget, event):
         widget.set_focus(None)
