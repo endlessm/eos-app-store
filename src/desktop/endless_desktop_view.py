@@ -7,6 +7,7 @@ import gobject
 from gtk import gdk
 
 from util import image_util, screen_util
+from osapps.os_util import OsUtil
 from background_chooser import BackgroundChooser
 from shortcut.bugs_and_feedback_shortcut import BugsAndFeedbackShortcut
 from shortcut.application_shortcut import ApplicationShortcut
@@ -24,11 +25,14 @@ gtk.gdk.threads_init()
 class EndlessDesktopView(gtk.Window):
     _padding = 100
     _app_shortcuts = {}
+    DEFAULT_BACKGROUND_NAME = 'default_background.png'
+    BACKGROUND_NAME = 'background.png'
 
     def __init__(self):
         gtk.Window.__init__(self)
         
         width, height = self._get_net_work_area()
+        self._os_util = OsUtil()
         self.resize(width, height)
         self.set_can_focus(False)
         self.set_type_hint(gdk.WINDOW_TYPE_HINT_DESKTOP) #@UndefinedVariable
@@ -46,8 +50,7 @@ class EndlessDesktopView(gtk.Window):
         self.set_app_paintable(True)
         
         # -----------WORKSPACE-----------
-        background_name = 'background.png'
-        self._set_background(background_name)
+        self._set_background(self.BACKGROUND_NAME)
         
         self._align = gtk.Alignment(0.5, 0.5, 0, 0)
         
@@ -86,6 +89,17 @@ class EndlessDesktopView(gtk.Window):
         
         self._taskbar_panel.connect('launch-search', lambda w, s: self._presenter.launch_search(s))
 
+    def revert_background(self):
+        self.change_background(self.DEFAULT_BACKGROUND_NAME)
+
+    def change_background(self, background_name):
+        default_image_path = image_util.image_path(self.BACKGROUND_NAME)
+        new_image_path = image_util.image_path(background_name)
+        
+        # Writing new background onto the default background file
+        self._os_util.execute(["sudo", "cp", new_image_path, default_image_path])
+        self._set_background(self.BACKGROUND_NAME)
+
     def _set_background(self, background_name):
         width, height = self._get_net_work_area()
         pixbuf = image_util.load_pixbuf(background_name)
@@ -101,7 +115,6 @@ class EndlessDesktopView(gtk.Window):
         del mask
         
         self.window.invalidate_rect((0, 0, width, height), False)
- 
 
     def populate_popups(self, all_applications):
         self.popup = gtk.Menu()

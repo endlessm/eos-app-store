@@ -26,7 +26,11 @@ class BackgroundChooser(gtk.FileChooserDialog):
         cancel_button = gtk.Button("Cancel")
         cancel_button.connect("button-release-event", lambda w,e: self.destroy())
 
+        revert_background_button = gtk.Button("Default Background")
+        revert_background_button.connect("button-release-event", self.revert_background_callback)
+
         button_container.add(confirm_button)
+        button_container.add(revert_background_button)
         button_container.add(cancel_button)
         self.set_extra_widget(button_container)
         
@@ -34,7 +38,14 @@ class BackgroundChooser(gtk.FileChooserDialog):
 
     def set_background_callback(self, widget, event):
         try:
-            self._desktop_view._set_background(self.get_filename())
+            self._desktop_view.change_background(self.get_filename())
+            self.destroy()
+        except:
+            self.warn_user()
+
+    def revert_background_callback(self, widget, event):
+        try:
+            self._desktop_view.revert_background()
             self.destroy()
         except:
             self.warn_user()
