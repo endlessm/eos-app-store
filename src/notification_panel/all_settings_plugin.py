@@ -43,7 +43,7 @@ class AllSettingsPlugin(IconPlugin):
         icon_size = self.size_request()[0]
         height = 120
         x = screen_util.get_width() - width + 10
-        y = screen_util.get_height() - height + 60
+        y = 60
 #        self._window.window.set_origin(x,y)
         # Get the x location of the center of the widget (icon), relative to the settings window
         self._window.move(x, y)
