@@ -1,8 +1,10 @@
 import unittest
-from mock import Mock
+from mock import Mock, patch
 
 from notification_panel.all_settings_plugin import AllSettingsPlugin
 from osapps.app_launcher import AppLauncher
+from desktop.endless_desktop_view import EndlessDesktopView
+from desktop.background_chooser import BackgroundChooser
 
 class AllSettingsPluginTestCase(unittest.TestCase):
     def test_settings_does_not_directly_launch_command(self):
@@ -21,13 +23,14 @@ class AllSettingsPluginTestCase(unittest.TestCase):
         plugin._launch_settings(Mock(), Mock())
         AppLauncher.launch.assert_called_once_with('sudo gnome-control-center --class=eos-network-manager')
 
-    # Not really sure how to test the BackgroundChooser as it uses a 
-    # callback hooking into a button-release-event to set the Endless
-    # DesktopView's background
+    @patch('desktop.background_chooser.BackgroundChooser.__init__', Mock(return_value=None))
     def test_settings_desktop(self):
-        AppLauncher.launch = Mock()
+        view = Mock()
+        AllSettingsPlugin.get_toplevel = Mock(return_value=view)
+        background_chooser = BackgroundChooser(view)
         plugin = AllSettingsPlugin(1)
         plugin._desktop_background(Mock(), Mock())
+        background_chooser.__init__.assert_called_once_with(view)
 
     def test_settings_logout(self):
         AppLauncher.launch = Mock()
