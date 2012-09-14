@@ -42,7 +42,8 @@ class AllSettingsPlugin(IconPlugin):
         # To do: this does not properly account for the gnome shell top bar
         icon_size = self.size_request()[0]
         height = 120
-        x = screen_util.get_width() - width + 10
+        x = screen_util.get_width() - width - 100
+    
         y = 60
 #        self._window.window.set_origin(x,y)
         # Get the x location of the center of the widget (icon), relative to the settings window
