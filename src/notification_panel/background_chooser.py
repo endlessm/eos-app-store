@@ -5,15 +5,19 @@ class BackgroundChooser(gtk.FileChooserDialog):
         super(BackgroundChooser, self).__init__()
         self._desktop_view = desktop_view
 
-        my_filter = gtk.FileFilter()
-        my_filter.add_mime_type('image/png')
-        my_filter.add_mime_type('image/jpeg')
-        my_filter.add_mime_type('image/gif')
-        my_filter.add_mime_type('image/bmp')
-        self.add_filter(my_filter)
+        image_filter = gtk.FileFilter()
+        image_filter.set_name("Image Files")
+        image_filter.add_mime_type('image/*')
+        self.add_filter(image_filter)
+
+        all_filter = gtk.FileFilter()
+        all_filter.set_name("All Files")
+        all_filter.add_pattern("*")
+        self.add_filter(all_filter)
 
         self.set_size_request(500, 300)
         self.set_action(gtk.FILE_CHOOSER_ACTION_OPEN)
+        self.set_title("Choose background image")
 
         button_container = gtk.HBox()
         confirm_button = gtk.Button("Ok")
