@@ -53,6 +53,7 @@ class AllSettingsPlugin(IconPlugin):
         self._container = gtk.EventBox()
         self._container.add(self._table)
         self._window.add(self._container)
+        self._is_active = False
         
     def execute(self):
         screen = gtk.gdk.Screen()
@@ -109,4 +110,12 @@ class AllSettingsPlugin(IconPlugin):
         answer = dialog.run()
         dialog.destroy()
         return (answer == gtk.RESPONSE_YES)
+
+    def _hide_window(self, widget):
+        if (not self._window.get_visible() or self._is_active):
+            self._window.hide_all()
+            self._is_active = False
+        else: 
+            self._is_active = self._window.get_visible()
+
         

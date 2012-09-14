@@ -24,7 +24,7 @@ class NotificationPanel(gtk.HBox):
         
         self.notification_panel = gtk.Alignment(0.5, 0.5, 0, 0)
         self.notification_panel.set_padding(PanelConstants.get_padding(), 0, PanelConstants.get_padding(), 0)
-        
+        self.plugins_list = []
         notification_panel_items = gtk.HBox(False)
         self.notification_panel.add(notification_panel_items)
 
@@ -33,6 +33,8 @@ class NotificationPanel(gtk.HBox):
             if clazz.is_plugin_enabled():
                 plugin = self._register_plugin(notification_panel_items, clazz)
                 plugin.connect('button-press-event', lambda w, e: self._launch_command(w))
+                plugin.connect('hide-window-event', plugin._hide_window)
+                self.plugins_list.append(plugin)
             
         self.pack_end(self.notification_panel, False, False, 30) 
 
@@ -43,4 +45,8 @@ class NotificationPanel(gtk.HBox):
 
     def _launch_command(self, widget):
         widget.execute()
-            
+        
+    def close_settings_plugin_window(self):
+        for plugin in self.plugins_list:
+            plugin.emit("hide-window-event")
+        

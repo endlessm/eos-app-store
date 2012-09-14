@@ -1,8 +1,15 @@
 import gtk
 
 from osapps.app_launcher import AppLauncher
+import gobject
 
 class NotificationPlugin(gtk.EventBox):
+    __gsignals__ = {
+                    'hide-window-event': (gobject.SIGNAL_RUN_FIRST, #@UndefinedVariable
+                                         gobject.TYPE_NONE,
+                                         ()),
+    }
+
     SHADOW_OFFSET = 1
     
     # In the current design, all the notification windows
@@ -27,8 +34,8 @@ class NotificationPlugin(gtk.EventBox):
         return True
 
 
-    def _hide_window(self, widget, event):
-        self._window.hide_all()
+    def _hide_window(self, widget):
+        pass
         
     def get_launch_command(self):
         return self._command
