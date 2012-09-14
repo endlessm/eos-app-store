@@ -38,14 +38,13 @@ class AllSettingsPlugin(IconPlugin):
         self._window = TransparentWindow(None)
         self._window.set_default_size(self.WINDOW_WIDTH, self.WINDOW_HEIGHT)
         self._window.set_border_width(self.WINDOW_BORDER)
-        self._window.set_decorated(False)
         
         # Set up the window so that it can be exposed
         # with a transparent background and triangle decoration
         self._window.set_app_paintable(True)
-        screen = self._window.get_screen()
-        rgba = screen.get_rgba_colormap()
-        self._window.set_colormap(rgba)
+#        screen = self._window.get_screen()
+#        rgba = screen.get_rgba_colormap()
+#        self._window.set_colormap(rgba)
         self._window.connect('expose-event', self._expose)
         
         # Place the widget in an event box within the window
@@ -64,7 +63,7 @@ class AllSettingsPlugin(IconPlugin):
         extra_padding = 4
         # To do: this does not properly account for the gnome shell top bar
         icon_size = self.size_request()[0]
-        y = geometry.y + PanelConstants.get_padding() + icon_size + extra_padding + 30 #Remove + 30
+        y = geometry.y + PanelConstants.get_padding() + icon_size + extra_padding
         # Get the x location of the center of the widget (icon), relative to the settings window
         self._pointer = self.translate_coordinates(self.get_toplevel(), icon_size / 2, 0)[0] - x
         self._window.move(x, y)
@@ -111,7 +110,7 @@ class AllSettingsPlugin(IconPlugin):
         dialog.destroy()
         return (answer == gtk.RESPONSE_YES)
 
-    def _hide_window(self, widget):
+    def _hide_window(self, widget, event=None):
         if (not self._window.get_visible() or self._is_active):
             self._window.hide_all()
             self._is_active = False
