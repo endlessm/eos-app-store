@@ -35,8 +35,20 @@ class AllSettingsPlugin(IconPlugin):
         
         
         self.set_visible_window(False)
-        self._window = TransparentWindow(None)
-        self._window.set_default_size(self.WINDOW_WIDTH, self.WINDOW_HEIGHT)
+        self._window = TransparentWindow(self.get_parent_window())
+
+        width = 330
+        # To do: this does not properly account for the gnome shell top bar
+        icon_size = self.size_request()[0]
+        height = 120
+        x = 1255
+        y = 65
+#        self._window.window.set_origin(x,y)
+        # Get the x location of the center of the widget (icon), relative to the settings window
+        self._window.move(x, y)
+        
+        self._window.set_size_request(width, height)
+#        self._window.set_default_size(self.WINDOW_WIDTH, self.WINDOW_HEIGHT)
         self._window.set_border_width(self.WINDOW_BORDER)
         
         # Set up the window so that it can be exposed
@@ -55,18 +67,19 @@ class AllSettingsPlugin(IconPlugin):
         self._is_active = False
         
     def execute(self):
-        screen = gtk.gdk.Screen()
-        monitor = screen.get_monitor_at_window(self.get_parent_window())
-        geometry = screen.get_monitor_geometry(monitor)
-        x = geometry.x + geometry.width - self.WINDOW_WIDTH + self.X_OFFSET
-        # Add some space between the notification panel and the window
-        extra_padding = 4
-        # To do: this does not properly account for the gnome shell top bar
-        icon_size = self.size_request()[0]
-        y = geometry.y + PanelConstants.get_padding() + icon_size + extra_padding
-        # Get the x location of the center of the widget (icon), relative to the settings window
-        self._pointer = self.translate_coordinates(self.get_toplevel(), icon_size / 2, 0)[0] - x
-        self._window.move(x, y)
+#        screen = gtk.gdk.Screen()
+#        monitor = screen.get_monitor_at_window(self.get_parent_window())
+#        geometry = screen.get_monitor_geometry(monitor)
+#        x = geometry.x + geometry.width - self.WINDOW_WIDTH + self.X_OFFSET
+#        # Add some space between the notification panel and the window
+#        extra_padding = 4
+#        # To do: this does not properly account for the gnome shell top bar
+#        icon_size = self.size_request()[0]
+#        y = geometry.y + PanelConstants.get_padding() + icon_size + extra_padding
+##        self._window.window.set_origin(x,y)
+#        # Get the x location of the center of the widget (icon), relative to the settings window
+#        self._pointer = self.translate_coordinates(self.get_toplevel(), icon_size / 2, 0)[0] - x
+#        self._window.move(x, y)
         self._window.show_all()
         self._window.connect('focus-out-event', self._hide_window)
         
@@ -78,6 +91,7 @@ class AllSettingsPlugin(IconPlugin):
         # Use the same color as the default event box background
         # To do: eliminate need for these "magic" numbers
         cr.set_source_rgba(0xf2/255.0, 0xf1/255.0, 0xf0/255.0, 1.0)
+        self._pointer = 300
         cr.move_to(self._pointer, 0)
         cr.line_to(self._pointer + 10, 10)
         cr.line_to(self._pointer - 10, 10)
