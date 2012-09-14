@@ -3,6 +3,7 @@ import os
 
 from icon_plugin import IconPlugin
 from osapps.app_launcher import AppLauncher
+from background_chooser import BackgroundChooser
 
 class AllSettingsPlugin(IconPlugin):
     UPDATE_COMMAND = 'sudo apt-get update; sudo apt-get upgrade -y'
@@ -13,7 +14,7 @@ class AllSettingsPlugin(IconPlugin):
     ICON_NAME = 'settings.png'
     
     def __init__(self, icon_size):
-        
+
         self._label_version = gtk.Label('EndlessOS ' + self._read_version())
         self._button_update = gtk.Button('Update')
         self._button_update.connect('button-press-event', self._update_software)
@@ -48,8 +49,7 @@ class AllSettingsPlugin(IconPlugin):
         AppLauncher().launch(self.SETTINGS_COMMAND)
         
     def _desktop_background(self, widget, event):
-        # to do: merge Patrick's code
-        pass
+        BackgroundChooser(self.get_toplevel())
         
     def _logout(self, widget, event):
         if self._confirm('Log out?'):

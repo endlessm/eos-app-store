@@ -48,7 +48,6 @@ class EndlessDesktopView(gtk.Window):
         # -----------WORKSPACE-----------
         background_name = 'background.png'
         self._set_background(background_name)
-        BackgroundChooser(self)
         
         self._align = gtk.Alignment(0.5, 0.5, 0, 0)
         

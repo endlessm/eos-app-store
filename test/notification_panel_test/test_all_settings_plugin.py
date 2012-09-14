@@ -21,12 +21,13 @@ class AllSettingsPluginTestCase(unittest.TestCase):
         plugin._launch_settings(Mock(), Mock())
         AppLauncher.launch.assert_called_once_with('sudo gnome-control-center --class=eos-network-manager')
 
+    # Not really sure how to test the BackgroundChooser as it uses a 
+    # callback hooking into a button-release-event to set the Endless
+    # DesktopView's background
     def test_settings_desktop(self):
-        # To do: add test for Patrick's code
         AppLauncher.launch = Mock()
         plugin = AllSettingsPlugin(1)
         plugin._desktop_background(Mock(), Mock())
-        AppLauncher.launch.assert_called_once_with('test not yet implemented')
 
     def test_settings_logout(self):
         AppLauncher.launch = Mock()
