@@ -4,6 +4,7 @@ from icon_plugin import IconPlugin
 from osapps.app_launcher import AppLauncher
 from util.transparent_window import TransparentWindow
 from panel_constants import PanelConstants
+from util import screen_util
 
 class AllSettingsPlugin(IconPlugin):
     X_OFFSET = 30
@@ -41,8 +42,8 @@ class AllSettingsPlugin(IconPlugin):
         # To do: this does not properly account for the gnome shell top bar
         icon_size = self.size_request()[0]
         height = 120
-        x = 1255
-        y = 65
+        x = screen_util.get_width() - width + 10
+        y = screen_util.get_height() - height + 60
 #        self._window.window.set_origin(x,y)
         # Get the x location of the center of the widget (icon), relative to the settings window
         self._window.move(x, y)
