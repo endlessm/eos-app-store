@@ -1,9 +1,10 @@
 import unittest
-from mock import Mock
+from mock import Mock, patch
 
 from notification_panel.all_settings_plugin import AllSettingsPlugin
 from osapps.app_launcher import AppLauncher
 from util import screen_util
+from desktop.background_chooser import BackgroundChooser
 
 class AllSettingsPluginTestCase(unittest.TestCase):
     def setUp(self):
@@ -18,6 +19,15 @@ class AllSettingsPluginTestCase(unittest.TestCase):
         plugin = AllSettingsPlugin(1)
         plugin._launch_settings(Mock(), Mock())
         AppLauncher.launch.assert_called_once_with('sudo gnome-control-center --class=eos-network-manager')
+
+    @patch('desktop.background_chooser.BackgroundChooser.__init__', Mock(return_value=None))
+    def test_settings_desktop(self):
+        view = Mock()
+        AllSettingsPlugin.get_toplevel = Mock(return_value=view)
+        background_chooser = BackgroundChooser(view)
+        plugin = AllSettingsPlugin(1)
+        plugin._desktop_background(Mock(), Mock())
+        background_chooser.__init__.assert_called_once_with(view)
 
     def test_settings_logout(self):
         AppLauncher.launch = Mock()

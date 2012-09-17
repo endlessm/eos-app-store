@@ -5,6 +5,7 @@ from icon_plugin import IconPlugin
 from osapps.app_launcher import AppLauncher
 from util.transparent_window import TransparentWindow
 from util import screen_util
+from background_chooser import BackgroundChooser
 
 class AllSettingsPlugin(IconPlugin):
     X_OFFSET = 13
@@ -15,7 +16,7 @@ class AllSettingsPlugin(IconPlugin):
     SHUTDOWN_COMMAND = 'sudo shutdown -h now'
     ICON_NAME = 'settings.png'
     WINDOW_WIDTH = 330
-    WINDOW_HEIGHT = 120
+    WINDOW_HEIGHT = 160
     WINDOW_BORDER = 10
     
     def __init__(self, icon_size):
@@ -24,6 +25,8 @@ class AllSettingsPlugin(IconPlugin):
         self._label_version = gtk.Label("EndessOS ...")
         self._button_settings = gtk.Button('Settings')
         self._button_settings.connect('button-press-event', self._launch_settings)
+        self._button_desktop = gtk.Button('Desktop')
+        self._button_desktop.connect('button-press-event', self._desktop_background)
         self._button_logout = gtk.Button('Log Out')
         self._button_logout.connect('button-press-event', self._logout)
         self._button_restart = gtk.Button('Restart')
@@ -31,13 +34,14 @@ class AllSettingsPlugin(IconPlugin):
         self._button_shutdown = gtk.Button('Shut Down')
         self._button_shutdown.connect('button-press-event', self._shutdown)
         
-        self._table = gtk.Table(3, 3, True)
+        self._table = gtk.Table(4, 3, True)
         self._table.set_border_width(10)
         self._table.attach(self._label_version, 0, 3, 0, 1)
         self._table.attach(self._button_settings, 0, 3, 1, 2)
-        self._table.attach(self._button_logout, 0, 1, 2, 3)
-        self._table.attach(self._button_restart, 1, 2, 2, 3)
-        self._table.attach(self._button_shutdown, 2, 3, 2, 3)
+        self._table.attach(self._button_desktop, 0, 3, 2, 3)
+        self._table.attach(self._button_logout, 0, 1, 3, 4)
+        self._table.attach(self._button_restart, 1, 2, 3, 4)
+        self._table.attach(self._button_shutdown, 2, 3, 3, 4)
         
         self.set_visible_window(False)
         self._window = TransparentWindow(self.get_parent_window())
@@ -94,6 +98,9 @@ class AllSettingsPlugin(IconPlugin):
     def _launch_settings(self, widget, event):
         AppLauncher().launch(self.SETTINGS_COMMAND)
         
+    def _desktop_background(self, widget, event):
+        BackgroundChooser(self.get_toplevel())
+        
     def _logout(self, widget, event):
         if self._confirm('Log out?'):
             AppLauncher().launch(self.LOGOUT_COMMAND)
@@ -124,5 +131,3 @@ class AllSettingsPlugin(IconPlugin):
             self._is_active = False
         else: 
             self._is_active = self._window.get_visible()
-
-        
