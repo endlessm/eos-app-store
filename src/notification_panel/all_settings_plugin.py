@@ -3,13 +3,11 @@ import gtk
 from icon_plugin import IconPlugin
 from osapps.app_launcher import AppLauncher
 from util.transparent_window import TransparentWindow
-from panel_constants import PanelConstants
 from util import screen_util
 
 class AllSettingsPlugin(IconPlugin):
     X_OFFSET = 13
     Y_LOCATION = 37
-    
     SETTINGS_COMMAND = 'sudo gnome-control-center --class=eos-network-manager'
     LOGOUT_COMMAND = 'kill -9 -1'
     RESTART_COMMAND = 'sudo shutdown -r now'
@@ -17,7 +15,7 @@ class AllSettingsPlugin(IconPlugin):
     ICON_NAME = 'settings.png'
     WINDOW_WIDTH = 330
     WINDOW_HEIGHT = 120
-    
+    WINDOW_BORDER = 10
     
     def __init__(self, icon_size):
         super(AllSettingsPlugin, self).__init__(icon_size, [self.ICON_NAME], None, 0)
@@ -38,7 +36,6 @@ class AllSettingsPlugin(IconPlugin):
         self._table.attach(self._button_restart, 1, 2, 1, 2)
         self._table.attach(self._button_shutdown, 2, 3, 1, 2)
         
-        
         self.set_visible_window(False)
         self._window = TransparentWindow(self.get_parent_window())
 
@@ -53,10 +50,6 @@ class AllSettingsPlugin(IconPlugin):
         
         # Set up the window so that it can be exposed
         # with a transparent background and triangle decoration
-        self._window.set_app_paintable(True)
-        screen = self._window.get_screen()
-        rgba = screen.get_rgba_colormap()
-        self._window.set_colormap(rgba)
         self._window.connect('expose-event', self._expose)
         
         # Place the widget in an event box within the window
@@ -67,19 +60,6 @@ class AllSettingsPlugin(IconPlugin):
         self._is_active = False
         
     def execute(self):
-#        screen = gtk.gdk.Screen()
-#        monitor = screen.get_monitor_at_window(self.get_parent_window())
-#        geometry = screen.get_monitor_geometry(monitor)
-#        x = geometry.x + geometry.width - self.WINDOW_WIDTH + self.X_OFFSET
-#        # Add some space between the notification panel and the window
-#        extra_padding = 4
-#        # To do: this does not properly account for the gnome shell top bar
-#        icon_size = self.size_request()[0]
-#        y = geometry.y + PanelConstants.get_padding() + icon_size + extra_padding
-##        self._window.window.set_origin(x,y)
-#        # Get the x location of the center of the widget (icon), relative to the settings window
-#        self._pointer = self.translate_coordinates(self.get_toplevel(), icon_size / 2, 0)[0] - x
-#        self._window.move(x, y)
         self._window.show_all()
         self._window.connect('focus-out-event', self._hide_window)
         
