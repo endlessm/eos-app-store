@@ -1,4 +1,5 @@
 import gtk
+import os
 
 from icon_plugin import IconPlugin
 from osapps.app_launcher import AppLauncher
@@ -20,6 +21,7 @@ class AllSettingsPlugin(IconPlugin):
     def __init__(self, icon_size):
         super(AllSettingsPlugin, self).__init__(icon_size, [self.ICON_NAME], None, 0)
         
+        self._label_version = gtk.Label("EndessOS ...")
         self._button_settings = gtk.Button('Settings')
         self._button_settings.connect('button-press-event', self._launch_settings)
         self._button_logout = gtk.Button('Log Out')
@@ -29,12 +31,13 @@ class AllSettingsPlugin(IconPlugin):
         self._button_shutdown = gtk.Button('Shut Down')
         self._button_shutdown.connect('button-press-event', self._shutdown)
         
-        self._table = gtk.Table(2, 3, True)
+        self._table = gtk.Table(3, 3, True)
         self._table.set_border_width(10)
-        self._table.attach(self._button_settings, 0, 3, 0, 1)
-        self._table.attach(self._button_logout, 0, 1, 1, 2)
-        self._table.attach(self._button_restart, 1, 2, 1, 2)
-        self._table.attach(self._button_shutdown, 2, 3, 1, 2)
+        self._table.attach(self._label_version, 0, 3, 0, 1)
+        self._table.attach(self._button_settings, 0, 3, 1, 2)
+        self._table.attach(self._button_logout, 0, 1, 2, 3)
+        self._table.attach(self._button_restart, 1, 2, 2, 3)
+        self._table.attach(self._button_shutdown, 2, 3, 2, 3)
         
         self.set_visible_window(False)
         self._window = TransparentWindow(self.get_parent_window())
@@ -62,9 +65,11 @@ class AllSettingsPlugin(IconPlugin):
     def execute(self):
         self._window.show_all()
         self._window.connect('focus-out-event', self._hide_window)
-        
+
     # To do: make the triangle position configurable
     def _expose(self, widget, event):
+        self._update_version_text()
+
         cr = widget.window.cairo_create()
         
         # Decorate the border with a triangle pointing up
@@ -77,6 +82,15 @@ class AllSettingsPlugin(IconPlugin):
         cr.line_to(self._pointer - 10, 10)
         cr.fill()
         
+    def _update_version_text(self):
+        self._label_version.set_text('EndlessOS ' + self._read_version())
+
+    def _read_version(self):
+        pipe = os.popen('dpkg -l endless-installer* | grep endless | awk \'{print $3}\'')
+        version = pipe.readline()
+        pipe.close()
+        return version.strip()
+
     def _launch_settings(self, widget, event):
         AppLauncher().launch(self.SETTINGS_COMMAND)
         
