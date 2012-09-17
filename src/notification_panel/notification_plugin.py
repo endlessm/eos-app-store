@@ -14,7 +14,6 @@ class NotificationPlugin(gtk.EventBox):
     
     # In the current design, all the notification windows
     # have the same width, and the height will grow as needed
-    WINDOW_WIDTH = 330
     WINDOW_HEIGHT = -1
     
     # The window border leaves room for the triangle

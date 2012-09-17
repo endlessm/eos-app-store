@@ -7,13 +7,17 @@ from panel_constants import PanelConstants
 from util import screen_util
 
 class AllSettingsPlugin(IconPlugin):
-    X_OFFSET = 30
+    X_OFFSET = 13
+    Y_LOCATION = 37
     
     SETTINGS_COMMAND = 'sudo gnome-control-center --class=eos-network-manager'
     LOGOUT_COMMAND = 'kill -9 -1'
     RESTART_COMMAND = 'sudo shutdown -r now'
     SHUTDOWN_COMMAND = 'sudo shutdown -h now'
     ICON_NAME = 'settings.png'
+    WINDOW_WIDTH = 330
+    WINDOW_HEIGHT = 120
+    
     
     def __init__(self, icon_size):
         super(AllSettingsPlugin, self).__init__(icon_size, [self.ICON_NAME], None, 0)
@@ -38,27 +42,21 @@ class AllSettingsPlugin(IconPlugin):
         self.set_visible_window(False)
         self._window = TransparentWindow(self.get_parent_window())
 
-        width = 330
-        # To do: this does not properly account for the gnome shell top bar
         icon_size = self.size_request()[0]
-        height = 120
-        x = screen_util.get_width() - width - 13
+        x = screen_util.get_width() - self.WINDOW_WIDTH - self.X_OFFSET
     
-        y = 37
-#        self._window.window.set_origin(x,y)
         # Get the x location of the center of the widget (icon), relative to the settings window
-        self._window.move(x, y)
+        self._window.move(x, self.Y_LOCATION)
         
-        self._window.set_size_request(width, height)
-#        self._window.set_default_size(self.WINDOW_WIDTH, self.WINDOW_HEIGHT)
+        self._window.set_size_request(self.WINDOW_WIDTH, self.WINDOW_HEIGHT)
         self._window.set_border_width(self.WINDOW_BORDER)
         
         # Set up the window so that it can be exposed
         # with a transparent background and triangle decoration
         self._window.set_app_paintable(True)
-#        screen = self._window.get_screen()
-#        rgba = screen.get_rgba_colormap()
-#        self._window.set_colormap(rgba)
+        screen = self._window.get_screen()
+        rgba = screen.get_rgba_colormap()
+        self._window.set_colormap(rgba)
         self._window.connect('expose-event', self._expose)
         
         # Place the widget in an event box within the window
