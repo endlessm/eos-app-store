@@ -1,9 +1,4 @@
 import gtk
-import gobject
-
-from osapps import app_util
-
-from osapps.app_launcher import AppLauncher
 
 from network_plugin import NetworkSettingsPlugin
 from time_display_plugin import TimeDisplayPlugin
@@ -12,45 +7,46 @@ from printer_plugin import PrinterSettingsPlugin
 from all_settings_plugin import AllSettingsPlugin
 from audio_plugin import AudioSettingsPlugin
 
+from panel_constants import PanelConstants
+
 class NotificationPanel(gtk.HBox):
-    ICON_SIZE = 20
-    
     # Add plugins for notification panel here
     PLUGINS = [ PrinterSettingsPlugin,
                 AudioSettingsPlugin,
                 BluetoothSettingsPlugin,
-                NetworkSettingsPlugin, 
+                NetworkSettingsPlugin,
                 TimeDisplayPlugin,
                 AllSettingsPlugin
               ]
     
     def __init__(self):
-        super(NotificationPanel, self).__init__(False,2)
+        super(NotificationPanel, self).__init__(False, 2)
         
         self.notification_panel = gtk.Alignment(0.5, 0.5, 0, 0)
-        self.notification_panel.set_padding(20, 0, 20, 0)
-        
+        self.notification_panel.set_padding(PanelConstants.get_padding(), 0, PanelConstants.get_padding(), 0)
+        self.plugins_list = []
         notification_panel_items = gtk.HBox(False)
         self.notification_panel.add(notification_panel_items)
 
         #Other plugins                    
         for clazz in self.PLUGINS:
-            is_plugin_enabled = True
-            # Don't register the audio settings plugin
-            # if no sound card is installed
-            if clazz == AudioSettingsPlugin:
-                is_plugin_enabled = AudioSettingsPlugin.is_sound_card_installed()
-            if is_plugin_enabled:
+            if clazz.is_plugin_enabled():
                 plugin = self._register_plugin(notification_panel_items, clazz)
-                plugin.connect('button-press-event', lambda w, e: self._launch_command(w.get_launch_command()))
+                plugin.connect('button-press-event', lambda w, e: self._launch_command(w))
+                plugin.connect('hide-window-event', plugin._hide_window)
+                self.plugins_list.append(plugin)
             
         self.pack_end(self.notification_panel, False, False, 30) 
 
     def _register_plugin(self, notification_panel_items, clazz):
-        plugin = clazz(self.ICON_SIZE)
+        plugin = clazz(PanelConstants.get_icon_size())
         notification_panel_items.pack_start(plugin, False, False, 2)
         return plugin
 
-    def _launch_command(self, command):
-        if command:
-            AppLauncher().launch(command)
+    def _launch_command(self, widget):
+        widget.execute()
+        
+    def close_settings_plugin_window(self):
+        for plugin in self.plugins_list:
+            plugin.emit("hide-window-event")
+        
