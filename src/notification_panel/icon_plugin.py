@@ -8,8 +8,8 @@ from notification_plugin import NotificationPlugin
 
 class IconPlugin(NotificationPlugin):
     
-    def __init__(self, icon_size, icon_names, command, init_index = 0, widget = None):
-        super(IconPlugin, self).__init__(command, widget)
+    def __init__(self, icon_size, icon_names, command, init_index = 0):
+        super(IconPlugin, self).__init__(command)
         
         self.set_visible_window(False)
         
@@ -40,7 +40,6 @@ class IconPlugin(NotificationPlugin):
         cr.rectangle(event.area.x, event.area.y,
                     event.area.width, event.area.height)
         cr.clip()
-        
         # Draw shadow
         cr.set_source_pixbuf(self._scaled_pixbufs[self._index], event.area.x + self.SHADOW_OFFSET, event.area.y + self.SHADOW_OFFSET)
         cr.set_operator(cairo.OPERATOR_DEST_OUT);
