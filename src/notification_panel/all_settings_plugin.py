@@ -5,7 +5,7 @@ from icon_plugin import IconPlugin
 from osapps.app_launcher import AppLauncher
 
 class AllSettingsPlugin(IconPlugin):
-    UPDATE_COMMAND = 'sudo apt-get update; sudo apt-get upgrade -y'
+    UPDATE_COMMAND = 'update-manager'
     SETTINGS_COMMAND = 'sudo gnome-control-center --class=eos-network-manager'
     LOGOUT_COMMAND = 'kill -9 -1'
     RESTART_COMMAND = 'sudo shutdown -r now'
