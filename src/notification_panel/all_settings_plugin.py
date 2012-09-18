@@ -87,7 +87,7 @@ class AllSettingsPlugin(IconPlugin):
         pipe = os.popen('dpkg -l endless-installer* | grep endless | awk \'{print $3}\'')
         version = pipe.readline()
         pipe.close()
-        return 'EndlessOS ' + version.strip()
+        return version.strip()
     
     def _launch_settings(self, widget, event):
         AppLauncher().launch(self.SETTINGS_COMMAND)
