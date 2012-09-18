@@ -3,8 +3,13 @@ from mock import Mock
 
 from notification_panel.all_settings_plugin import AllSettingsPlugin
 from osapps.app_launcher import AppLauncher
+from util import screen_util
 
 class AllSettingsPluginTestCase(unittest.TestCase):
+    def setUp(self):
+        screen_util.get_width = Mock(return_value=1)
+        screen_util.get_height = Mock(return_value=1)
+        
     def test_settings_does_not_directly_launch_command(self):
         self.assertIsNone(AllSettingsPlugin(1).get_launch_command())
         

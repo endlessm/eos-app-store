@@ -1,9 +1,4 @@
 import gtk
-import gobject
-
-from osapps import app_util
-
-from osapps.app_launcher import AppLauncher
 
 from network_plugin import NetworkSettingsPlugin
 from time_display_plugin import TimeDisplayPlugin
@@ -11,12 +6,10 @@ from bluetooth_plugin import BluetoothSettingsPlugin
 from printer_plugin import PrinterSettingsPlugin
 from all_settings_plugin import AllSettingsPlugin
 from audio_plugin import AudioSettingsPlugin
-from notification_plugin import NotificationPlugin
+
+from panel_constants import PanelConstants
 
 class NotificationPanel(gtk.HBox):
-    ICON_SIZE = 20
-    PADDING = 20
-    
     # Add plugins for notification panel here
     PLUGINS = [ PrinterSettingsPlugin,
                 AudioSettingsPlugin,
@@ -30,8 +23,8 @@ class NotificationPanel(gtk.HBox):
         super(NotificationPanel, self).__init__(False, 2)
         
         self.notification_panel = gtk.Alignment(0.5, 0.5, 0, 0)
-        self.notification_panel.set_padding(self.PADDING, 0, self.PADDING, 0)
-        
+        self.notification_panel.set_padding(PanelConstants.get_padding(), 0, PanelConstants.get_padding(), 0)
+        self.plugins_list = []
         notification_panel_items = gtk.HBox(False)
         self.notification_panel.add(notification_panel_items)
 
@@ -40,27 +33,20 @@ class NotificationPanel(gtk.HBox):
             if clazz.is_plugin_enabled():
                 plugin = self._register_plugin(notification_panel_items, clazz)
                 plugin.connect('button-press-event', lambda w, e: self._launch_command(w))
+                plugin.connect('hide-window-event', plugin._hide_window)
+                self.plugins_list.append(plugin)
             
         self.pack_end(self.notification_panel, False, False, 30) 
 
     def _register_plugin(self, notification_panel_items, clazz):
-        plugin = clazz(self.ICON_SIZE)
+        plugin = clazz(PanelConstants.get_icon_size())
         notification_panel_items.pack_start(plugin, False, False, 2)
         return plugin
 
     def _launch_command(self, widget):
-        command = widget.get_launch_command()
-        if command:
-            AppLauncher().launch(command)
-        else:
-            screen = gtk.gdk.Screen()
-            monitor = screen.get_monitor_at_window(widget.get_parent_window())
-            geometry = screen.get_monitor_geometry(monitor)
-            x = geometry.x + geometry.width - NotificationPlugin.WINDOW_WIDTH
-            # Add some space between the notification panel and the window
-            extra_padding = 4
-            # To do: this does not properly account for the gnome shell top bar
-            y = geometry.y + self.PADDING + self.ICON_SIZE + extra_padding
-            # Get the x location of the center of the widget (icon), relative to the settings window
-            pointer = widget.translate_coordinates(widget.get_toplevel(), self.ICON_SIZE / 2, 0)[0] - x
-            widget.show_window(x, y, pointer)
+        widget.execute()
+        
+    def close_settings_plugin_window(self):
+        for plugin in self.plugins_list:
+            plugin.emit("hide-window-event")
+        
