@@ -117,6 +117,7 @@ class AllSettingsPlugin(IconPlugin):
         dialog.set_decorated(False)
         dialog.set_border_width(10)
         dialog.add_buttons(gtk.STOCK_YES, gtk.RESPONSE_YES, gtk.STOCK_NO, gtk.RESPONSE_NO)
+        dialog.set_position(gtk.WIN_POS_CENTER)
         label = gtk.Label(message)
         label.show()
         dialog.vbox.pack_start(label)
