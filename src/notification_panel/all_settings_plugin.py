@@ -84,10 +84,10 @@ class AllSettingsPlugin(IconPlugin):
         cr.fill()
 
     def _read_version(self):
-        pipe = os.popen('dpkg -l endless-installer | grep endless | awk \'{print $3}\'')
+        pipe = os.popen('dpkg -l endless-installer* | grep endless | awk \'{print $3}\'')
         version = pipe.readline()
         pipe.close()
-        return version.strip()
+        return 'EndlessOS ' + version.strip()
     
     def _launch_settings(self, widget, event):
         AppLauncher().launch(self.SETTINGS_COMMAND)
@@ -115,6 +115,7 @@ class AllSettingsPlugin(IconPlugin):
         answer = dialog.run()
         dialog.destroy()
         return (answer == gtk.RESPONSE_YES)
+        
 
     def _hide_window(self, widget, event=None):
         if (not self._window.get_visible() or self._is_active):
