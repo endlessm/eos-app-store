@@ -7,6 +7,7 @@ from util.transparent_window import TransparentWindow
 from util import screen_util
 
 class AllSettingsPlugin(IconPlugin):
+    UPDATE_COMMAND = 'update-manager'
     X_OFFSET = 13
     Y_LOCATION = 37
     SETTINGS_COMMAND = 'sudo gnome-control-center --class=eos-network-manager'
@@ -15,13 +16,15 @@ class AllSettingsPlugin(IconPlugin):
     SHUTDOWN_COMMAND = 'sudo shutdown -h now'
     ICON_NAME = 'settings.png'
     WINDOW_WIDTH = 330
-    WINDOW_HEIGHT = 120
+    WINDOW_HEIGHT = 160
     WINDOW_BORDER = 10
     
     def __init__(self, icon_size):
         super(AllSettingsPlugin, self).__init__(icon_size, [self.ICON_NAME], None, 0)
         
         self._label_version = gtk.Label('EndlessOS ' + self._read_version())
+        self._button_update = gtk.Button('Update')
+        self._button_update.connect('button-press-event', self._update_software)
 
         self._button_settings = gtk.Button('Settings')
         self._button_settings.connect('button-press-event', self._launch_settings)
@@ -32,13 +35,14 @@ class AllSettingsPlugin(IconPlugin):
         self._button_shutdown = gtk.Button('Shut Down')
         self._button_shutdown.connect('button-press-event', self._shutdown)
         
-        self._table = gtk.Table(3, 3, True)
+        self._table = gtk.Table(4, 3, True)
         self._table.set_border_width(10)
         self._table.attach(self._label_version, 0, 3, 0, 1)
-        self._table.attach(self._button_settings, 0, 3, 1, 2)
-        self._table.attach(self._button_logout, 0, 1, 2, 3)
-        self._table.attach(self._button_restart, 1, 2, 2, 3)
-        self._table.attach(self._button_shutdown, 2, 3, 2, 3)
+        self._table.attach(self._button_update, 0, 3, 1, 2)
+        self._table.attach(self._button_settings, 0, 3, 2, 3)
+        self._table.attach(self._button_logout, 0, 1, 3, 4)
+        self._table.attach(self._button_restart, 1, 2, 3, 4)
+        self._table.attach(self._button_shutdown, 2, 3, 3, 4)
         
         self.set_visible_window(False)
         self._window = TransparentWindow(self.get_parent_window())
@@ -88,7 +92,11 @@ class AllSettingsPlugin(IconPlugin):
         version = pipe.readline()
         pipe.close()
         return version.strip()
-    
+
+    def _update_software(self, widget, event):
+        if self._confirm('Update EndlessOS?'):
+            AppLauncher().launch(self.UPDATE_COMMAND)
+
     def _launch_settings(self, widget, event):
         AppLauncher().launch(self.SETTINGS_COMMAND)
         
@@ -115,7 +123,6 @@ class AllSettingsPlugin(IconPlugin):
         answer = dialog.run()
         dialog.destroy()
         return (answer == gtk.RESPONSE_YES)
-        
 
     def _hide_window(self, widget, event=None):
         if (not self._window.get_visible() or self._is_active):
@@ -123,4 +130,3 @@ class AllSettingsPlugin(IconPlugin):
             self._is_active = False
         else: 
             self._is_active = self._window.get_visible()
-
