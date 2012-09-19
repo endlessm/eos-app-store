@@ -18,7 +18,7 @@ class AllSettingsPluginTestCase(unittest.TestCase):
         plugin = AllSettingsPlugin(1)
         plugin._confirm = Mock(return_value = True)
         plugin._update_software(Mock(), Mock())
-        AppLauncher.launch.assert_called_once_with('sudo apt-get update; sudo apt-get upgrade -y')
+        AppLauncher.launch.assert_called_once_with('update-manager')
 
     def test_settings_settings(self):
         AppLauncher.launch = Mock()

@@ -30,3 +30,6 @@ class NotificationPlugin(gtk.EventBox):
         
     def get_launch_command(self):
         return self._command
+
+    def set_parent(self, parent):
+       self._parent = parent

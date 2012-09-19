@@ -19,8 +19,9 @@ class NotificationPanel(gtk.HBox):
                 AllSettingsPlugin
               ]
     
-    def __init__(self):
+    def __init__(self, parent):
         super(NotificationPanel, self).__init__(False, 2)
+        self._parent = parent
         
         self.notification_panel = gtk.Alignment(0.5, 0.5, 0, 0)
         self.notification_panel.set_padding(PanelConstants.get_padding(), 0, PanelConstants.get_padding(), 0)
@@ -40,6 +41,7 @@ class NotificationPanel(gtk.HBox):
 
     def _register_plugin(self, notification_panel_items, clazz):
         plugin = clazz(PanelConstants.get_icon_size())
+        plugin.set_parent(self._parent)
         notification_panel_items.pack_start(plugin, False, False, 2)
         return plugin
 
