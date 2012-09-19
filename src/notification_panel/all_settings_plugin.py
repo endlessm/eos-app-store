@@ -24,19 +24,20 @@ class AllSettingsPlugin(IconPlugin):
         
         self._label_version = gtk.Label('EndlessOS ' + self._read_version())
         self._button_update = gtk.Button('Update')
-        self._button_update.connect('button-press-event', self._update_software)
+        self._button_update.connect('button-release-event', self._update_software)
 
         self._button_settings = gtk.Button('Settings')
-        self._button_settings.connect('button-press-event', self._launch_settings)
+        self._button_settings.connect('button-release-event', self._launch_settings)
         self._button_logout = gtk.Button('Log Out')
-        self._button_logout.connect('button-press-event', self._logout)
+        self._button_logout.connect('button-release-event', self._logout)
         self._button_restart = gtk.Button('Restart')
-        self._button_restart.connect('button-press-event', self._restart)
+        self._button_restart.connect('button-release-event', self._restart)
         self._button_shutdown = gtk.Button('Shut Down')
-        self._button_shutdown.connect('button-press-event', self._shutdown)
+        self._button_shutdown.connect('button-release-event', self._shutdown)
         
         self._table = gtk.Table(4, 3, True)
         self._table.set_border_width(10)
+        self._table.set_focus_chain([])
         self._table.attach(self._label_version, 0, 3, 0, 1)
         self._table.attach(self._button_update, 0, 3, 1, 2)
         self._table.attach(self._button_settings, 0, 3, 2, 3)
@@ -60,6 +61,8 @@ class AllSettingsPlugin(IconPlugin):
         # with a transparent background and triangle decoration
         self._window.connect('expose-event', self._expose)
         
+        self._window.connect('focus-out-event', self._hide_window)
+
         # Place the widget in an event box within the window
         # (which has a different background than the transparent window)
         self._container = gtk.EventBox()
@@ -69,12 +72,9 @@ class AllSettingsPlugin(IconPlugin):
         
     def execute(self):
         self._window.show_all()
-        self._window.connect('focus-out-event', self._hide_window)
 
     # To do: make the triangle position configurable
     def _expose(self, widget, event):
-#        self._update_version_text()
-
         cr = widget.window.cairo_create()
         
         # Decorate the border with a triangle pointing up
