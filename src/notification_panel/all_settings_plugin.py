@@ -22,7 +22,8 @@ class AllSettingsPlugin(IconPlugin):
     def __init__(self, icon_size):
         super(AllSettingsPlugin, self).__init__(icon_size, [self.ICON_NAME], None, 0)
         
-        self._label_version = gtk.Label("EndessOS ...")
+        self._label_version = gtk.Label('EndlessOS ' + self._read_version())
+
         self._button_settings = gtk.Button('Settings')
         self._button_settings.connect('button-press-event', self._launch_settings)
         self._button_desktop = gtk.Button('Desktop')
@@ -72,7 +73,7 @@ class AllSettingsPlugin(IconPlugin):
 
     # To do: make the triangle position configurable
     def _expose(self, widget, event):
-        self._update_version_text()
+#        self._update_version_text()
 
         cr = widget.window.cairo_create()
         
@@ -85,16 +86,13 @@ class AllSettingsPlugin(IconPlugin):
         cr.line_to(self._pointer + 10, 10)
         cr.line_to(self._pointer - 10, 10)
         cr.fill()
-        
-    def _update_version_text(self):
-        self._label_version.set_text('EndlessOS ' + self._read_version())
 
     def _read_version(self):
         pipe = os.popen('dpkg -l endless-installer* | grep endless | awk \'{print $3}\'')
         version = pipe.readline()
         pipe.close()
         return version.strip()
-
+    
     def _launch_settings(self, widget, event):
         AppLauncher().launch(self.SETTINGS_COMMAND)
         
