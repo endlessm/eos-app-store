@@ -94,26 +94,31 @@ class AllSettingsPlugin(IconPlugin):
         return version.strip()
 
     def _update_software(self, widget, event):
+        self._window.hide()
         if self._confirm('Update EndlessOS?'):
             AppLauncher().launch(self.UPDATE_COMMAND)
 
     def _launch_settings(self, widget, event):
+        self._window.hide()
         AppLauncher().launch(self.SETTINGS_COMMAND)
         
     def _logout(self, widget, event):
+        self._window.hide()
         if self._confirm('Log out?'):
             AppLauncher().launch(self.LOGOUT_COMMAND)
         
     def _restart(self, widget, event):
+        self._window.hide()
         if self._confirm('Restart?'):
             AppLauncher().launch(self.RESTART_COMMAND)
         
     def _shutdown(self, widget, event):
+        self._window.hide()
         if self._confirm('Shut down?'):
             AppLauncher().launch(self.SHUTDOWN_COMMAND)
         
     def _confirm(self, message):
-        dialog = gtk.Dialog()
+        dialog = gtk.Dialog("Confirmation", self._parent, gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT)
         dialog.set_decorated(False)
         dialog.set_border_width(10)
         dialog.add_buttons(gtk.STOCK_YES, gtk.RESPONSE_YES, gtk.STOCK_NO, gtk.RESPONSE_NO)
