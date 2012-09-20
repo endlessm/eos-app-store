@@ -8,7 +8,6 @@ from gtk import gdk
 
 from util import image_util
 from osapps.os_util import OsUtil
-from background_chooser import BackgroundChooser
 from shortcut.application_shortcut import ApplicationShortcut
 from feedback_module.feedback_response_dialog_view import FeedbackResponseDialogView
 from feedback_module.bugs_and_feedback_popup_window import BugsAndFeedbackPopupWindow
@@ -23,7 +22,6 @@ gtk.gdk.threads_init()
 class EndlessDesktopView(gtk.Window):
     _padding = 100
     _app_shortcuts = {}
-    DEFAULT_BACKGROUND_NAME = 'default_background.png'
     BACKGROUND_NAME = 'background.png'
 
     def __init__(self):
@@ -81,24 +79,11 @@ class EndlessDesktopView(gtk.Window):
 
     def set_presenter(self, presenter):
         self._presenter = presenter
-        
-#        self._add_icon = AddRemoveShortcut(_("Add new"), self._add_icon_clicked_callback)
-#        self._add_icon.connect("application-shortcut-remove", lambda w, e: self._add_icon.toggle_drag(False))
-#        self._add_icon.connect("application-shortcut-remove", self._remove_icon)
-        
         self._taskbar_panel.connect('launch-search', lambda w, s: self._presenter.launch_search(s))
 
-    def revert_background(self):
-        self.change_background(self.DEFAULT_BACKGROUND_NAME)
-
-    def change_background(self, background_name):
-        default_image_path = image_util.image_path(self.BACKGROUND_NAME)
-        new_image_path = image_util.image_path(background_name)
-        
-        # Writing new background onto the default background file
-        self._os_util.execute(["sudo", "cp", new_image_path, default_image_path])
-        self._set_background(self.BACKGROUND_NAME)
-
+    def get_presenter(self):
+        return self._presenter
+    
     def _set_background(self, background_name):
         width, height = self._get_net_work_area()
         pixbuf = image_util.load_pixbuf(background_name)
