@@ -5,6 +5,7 @@ from icon_plugin import IconPlugin
 from osapps.app_launcher import AppLauncher
 from util.transparent_window import TransparentWindow
 from util import screen_util
+from background_chooser import BackgroundChooser
 
 class AllSettingsPlugin(IconPlugin):
     UPDATE_COMMAND = 'sudo update-manager'
@@ -21,7 +22,11 @@ class AllSettingsPlugin(IconPlugin):
     
     def __init__(self, icon_size):
         super(AllSettingsPlugin, self).__init__(icon_size, [self.ICON_NAME], None, 0)
+        self._label_version_text = 'EndlessOS ' + self._read_version()
         
+    def execute(self):
+        self._button_desktop = gtk.Button('Desktop')
+        self._button_desktop.connect('button-press-event', self._desktop_background)
         self._label_version = gtk.Label('EndlessOS ' + self._read_version())
         self._button_update = gtk.Button('Update')
         self._button_update.connect('button-release-event', self._update_software)
@@ -35,20 +40,21 @@ class AllSettingsPlugin(IconPlugin):
         self._button_shutdown = gtk.Button('Shut Down')
         self._button_shutdown.connect('button-release-event', self._shutdown)
         
-        self._table = gtk.Table(4, 3, True)
+        self._table = gtk.Table(5, 3, True)
         self._table.set_border_width(10)
         self._table.set_focus_chain([])
         self._table.attach(self._label_version, 0, 3, 0, 1)
-        self._table.attach(self._button_update, 0, 3, 1, 2)
-        self._table.attach(self._button_settings, 0, 3, 2, 3)
-        self._table.attach(self._button_logout, 0, 1, 3, 4)
-        self._table.attach(self._button_restart, 1, 2, 3, 4)
-        self._table.attach(self._button_shutdown, 2, 3, 3, 4)
+        self._table.attach(self._button_settings, 0, 3, 1, 2)
+        self._table.attach(self._button_desktop, 0, 3, 2, 3)
+        self._table.attach(self._button_update, 0, 3, 3, 4)
+        self._table.attach(self._button_logout, 0, 1, 4, 5)
+        self._table.attach(self._button_restart, 1, 2, 4, 5)
+        self._table.attach(self._button_shutdown, 2, 3, 4, 5)
         
         self.set_visible_window(False)
-        self._window = TransparentWindow(self.get_parent_window())
+    
+        self._window = TransparentWindow(None)
 
-        icon_size = self.size_request()[0]
         x = screen_util.get_width() - self.WINDOW_WIDTH - self.X_OFFSET
     
         # Get the x location of the center of the widget (icon), relative to the settings window
@@ -69,10 +75,12 @@ class AllSettingsPlugin(IconPlugin):
         self._container.add(self._table)
         self._window.add(self._container)
         self._is_active = False
-        
-    def execute(self):
+
         self._window.show_all()
 
+    def setup_transparent_window(self):
+        pass
+    
     # To do: make the triangle position configurable
     def _expose(self, widget, event):
         cr = widget.window.cairo_create()
@@ -102,6 +110,10 @@ class AllSettingsPlugin(IconPlugin):
         self._window.hide()
         AppLauncher().launch(self.SETTINGS_COMMAND)
         
+    def _desktop_background(self, widget, event):
+        presenter = self.get_toplevel().get_presenter()
+        BackgroundChooser(presenter)
+        
     def _logout(self, widget, event):
         self._window.hide()
         if self._confirm('Log out?'):
@@ -118,6 +130,7 @@ class AllSettingsPlugin(IconPlugin):
             AppLauncher().launch(self.SHUTDOWN_COMMAND)
         
     def _confirm(self, message):
+        return True
         dialog = gtk.Dialog("Confirmation", self._parent, gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT)
         dialog.set_decorated(False)
         dialog.set_border_width(10)
@@ -131,6 +144,8 @@ class AllSettingsPlugin(IconPlugin):
         return (answer == gtk.RESPONSE_YES)
 
     def _hide_window(self, widget, event=None):
+        if not hasattr(self, "_window"):
+            return
         if (not self._window.get_visible() or self._is_active):
             self._window.hide_all()
             self._is_active = False

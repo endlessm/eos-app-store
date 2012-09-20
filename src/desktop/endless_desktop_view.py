@@ -42,7 +42,7 @@ class EndlessDesktopView(gtk.Window):
         self.show()
         self.set_app_paintable(True)
         
-        self._set_background()
+        # -----------WORKSPACE-----------
         
         self._align = gtk.Alignment(0.5, 0.5, 0, 0)
         
@@ -55,7 +55,7 @@ class EndlessDesktopView(gtk.Window):
         taskbar_alignment.add(self._taskbar_panel)
         
         # Main window layout
-        self._desktop = gtk.VBox(False,2)
+        self._desktop = gtk.VBox(False, 2)
         self._desktop.pack_start(self._notification_panel, False, True, 0)
         self._desktop.pack_start(self._align, True, False, 0)
         self._desktop.pack_end(taskbar_alignment, False, True, 0)
@@ -66,7 +66,7 @@ class EndlessDesktopView(gtk.Window):
         self._max_icons_in_row = self._calculate_max_icons()
     
         screen = gtk.gdk.Screen() #@UndefinedVariable
-        screen.connect('size-changed', lambda s: self._set_background())
+        screen.connect('size-changed', lambda s: self._set_background(self.BACKGROUND_NAME))
     
     def unfocus_widget(self, widget, event):
         widget.set_focus(None)
@@ -75,16 +75,14 @@ class EndlessDesktopView(gtk.Window):
 
     def set_presenter(self, presenter):
         self._presenter = presenter
-        
-#        self._add_icon = AddRemoveShortcut(_("Add new"), self._add_icon_clicked_callback)
-#        self._add_icon.connect("application-shortcut-remove", lambda w, e: self._add_icon.toggle_drag(False))
-#        self._add_icon.connect("application-shortcut-remove", self._remove_icon)
-        
         self._taskbar_panel.connect('launch-search', lambda w, s: self._presenter.launch_search(s))
 
-    def _set_background(self):
+    def get_presenter(self):
+        return self._presenter
+    
+    def set_background(self, background_name):
         width, height = self._get_net_work_area()
-        pixbuf = image_util.load_pixbuf("background.png")
+        pixbuf = image_util.load_pixbuf(background_name)
         
         sized_pixbuf = pixbuf.scale_simple(width, height, gtk.gdk.INTERP_BILINEAR) #@UndefinedVariable
         pixmap, mask = sized_pixbuf.render_pixmap_and_mask()
@@ -97,7 +95,6 @@ class EndlessDesktopView(gtk.Window):
         del mask
         
         self.window.invalidate_rect((0, 0, width, height), False)
- 
 
     def populate_popups(self, all_applications):
         self.popup = gtk.Menu()

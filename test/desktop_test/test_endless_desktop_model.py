@@ -1,11 +1,14 @@
 import unittest
 from desktop.endless_desktop_model import EndlessDesktopModel
-from mock import Mock
+from mock import Mock #@UnresolvedImport
 from osapps.app_launcher import AppLauncher
 from osapps.app import App
 from osapps.desktop_locale_datastore import DesktopLocaleDatastore
 from osapps.app_datastore import AppDatastore
 from osapps.launchable_app import LaunchableApp
+from osapps.desktop_preferences_datastore import DesktopPreferencesDatastore
+from util.feedback_manager import FeedbackManager
+from metrics.time_provider import TimeProvider
 
 class DesktopModelTestCase(unittest.TestCase):
     def setUp(self):
@@ -24,8 +27,15 @@ class DesktopModelTestCase(unittest.TestCase):
         self.app_mock.executable = Mock(return_value="eog")
         self.mock_app_datastore.get_app_by_key = Mock(return_value=self.app_mock)
         self.mock_app_launcher = Mock(AppLauncher)
-        
-        self.testObject = EndlessDesktopModel(self.mock_desktop_locale_datastore, self.mock_app_datastore, self.mock_app_launcher)
+        self.mock_feedback_manager = Mock(FeedbackManager)
+        self.mock_time_provider = Mock(TimeProvider)
+        self.mock_desktop_preferences = Mock(DesktopPreferencesDatastore)
+        self.testObject = EndlessDesktopModel(self.mock_desktop_locale_datastore, 
+                                              self.mock_app_datastore, 
+                                              self.mock_app_launcher,
+                                              self.mock_feedback_manager,
+                                              self.mock_time_provider, 
+                                              self.mock_desktop_preferences)
     
     def test_initially_shortcut_list_is_retrieved_from_app_util_manager(self):
         self.assertEqual(self.available_apps, self.testObject.get_shortcuts())
@@ -53,3 +63,18 @@ class DesktopModelTestCase(unittest.TestCase):
         
         self.mock_app_launcher.launch_browser.assert_called_once_with(search_string)
 
+    def test_get_background_delegates_to_preferences_datastore(self):
+        self.testObject.get_background()
+        
+        self.mock_desktop_preferences.get_background.assert_called()
+
+    def test_set_background_delegates_to_preferences_datastore(self):
+        expected = "/foo/whatever/blah"
+        self.testObject.set_background(expected)
+        
+        self.mock_desktop_preferences.set_background.assert_called_once_with(expected)
+        
+    def test_get_default_background_delegates_to_preferences_datastore(self):
+        self.testObject.get_default_background()
+        
+        self.mock_desktop_preferences.get_default_background.assert_called()
