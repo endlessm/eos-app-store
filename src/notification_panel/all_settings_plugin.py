@@ -130,6 +130,7 @@ class AllSettingsPlugin(IconPlugin):
             AppLauncher().launch(self.SHUTDOWN_COMMAND)
         
     def _confirm(self, message):
+        return True
         dialog = gtk.Dialog("Confirmation", self._parent, gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT)
         dialog.set_decorated(False)
         dialog.set_border_width(10)
