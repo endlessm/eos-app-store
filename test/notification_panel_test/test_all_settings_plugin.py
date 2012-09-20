@@ -18,7 +18,7 @@ class AllSettingsPluginTestCase(unittest.TestCase):
         plugin = AllSettingsPlugin(1)
         plugin._confirm = Mock(return_value = True)
         plugin._update_software(Mock(), Mock())
-        AppLauncher.launch.assert_called_once_with('update-manager')
+        AppLauncher.launch.assert_called_once_with('sudo update-manager')
 
     def test_settings_settings(self):
         AppLauncher.launch = Mock()
