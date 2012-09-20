@@ -49,7 +49,7 @@ class EndlessDesktopView(gtk.Window):
         self._taskbar_panel = TaskbarPanel(width)
         self._taskbar_panel.connect('feedback-clicked', lambda w: self._feedback_icon_clicked_callback())
                     
-        self._notification_panel = NotificationPanel()
+        self._notification_panel = NotificationPanel(self)
 
         taskbar_alignment = gtk.Alignment(0.5, 0.5, 1.0, 1.0)
         taskbar_alignment.add(self._taskbar_panel)

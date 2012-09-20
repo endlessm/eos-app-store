@@ -9,7 +9,6 @@ class TransparentWindow(gtk.Window):
         self.desktop_preferences = DesktopPreferencesDatastore()
         gtk.Window.__init__(self, gtk.WINDOW_TOPLEVEL)
         self.set_wmclass("endless_os_desktop", "modal")
-        self.set_type_hint(gdk.WINDOW_TYPE_HINT_DESKTOP) #@UndefinedVariable
 
         self.set_property("accept-focus", True)
         self.set_property("destroy-with-parent", True)
