@@ -45,6 +45,7 @@ class AllSettingsPlugin(IconPlugin):
         self._table.attach(self._button_shutdown, 2, 3, 3, 4)
         
         self.set_visible_window(False)
+    
         self._window = TransparentWindow(self.get_parent_window())
 
         icon_size = self.size_request()[0]
@@ -71,10 +72,12 @@ class AllSettingsPlugin(IconPlugin):
         self._window.show_all()
         self._window.connect('focus-out-event', self._hide_window)
 
+    def setup_transparent_window(self):
+        pass
+    
     # To do: make the triangle position configurable
     def _expose(self, widget, event):
-#        self._update_version_text()
-
+#        print repr(self.window.cairo_create)
         cr = widget.window.cairo_create()
         
         # Decorate the border with a triangle pointing up

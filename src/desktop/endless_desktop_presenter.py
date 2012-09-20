@@ -1,5 +1,4 @@
 from desktop.endless_desktop_model import EndlessDesktopModel
-import sys
 
 class DesktopPresenter(object):
     def __init__(self, view, model=EndlessDesktopModel()):
@@ -26,3 +25,10 @@ class DesktopPresenter(object):
         
     def launch_search(self, search_string):
         self._model.launch_search(search_string)
+    
+    def change_background(self, filename):
+        self._model.set_background(filename)
+        self._view._set_background(self._model.get_background())
+    
+    def revert_background(self):
+        self.change_background(self._model.get_default_background())
