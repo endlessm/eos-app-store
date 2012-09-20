@@ -7,7 +7,7 @@ from util.transparent_window import TransparentWindow
 from util import screen_util
 
 class AllSettingsPlugin(IconPlugin):
-    UPDATE_COMMAND = 'update-manager'
+    UPDATE_COMMAND = 'sudo update-manager'
     X_OFFSET = 13
     Y_LOCATION = 37
     SETTINGS_COMMAND = 'sudo gnome-control-center --class=eos-network-manager'
