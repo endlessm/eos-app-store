@@ -21,8 +21,10 @@ class AllSettingsPlugin(IconPlugin):
     
     def __init__(self, icon_size):
         super(AllSettingsPlugin, self).__init__(icon_size, [self.ICON_NAME], None, 0)
+        self._label_version_text = 'EndlessOS ' + self._read_version()
         
-        self._label_version = gtk.Label('EndlessOS ' + self._read_version())
+    def execute(self):
+        self._label_version = gtk.Label(self._label_version_text)
 
         self._button_settings = gtk.Button('Settings')
         self._button_settings.connect('button-press-event', self._launch_settings)
@@ -46,9 +48,8 @@ class AllSettingsPlugin(IconPlugin):
         
         self.set_visible_window(False)
     
-        self._window = TransparentWindow(self.get_parent_window())
+        self._window = TransparentWindow(None)
 
-        icon_size = self.size_request()[0]
         x = screen_util.get_width() - self.WINDOW_WIDTH - self.X_OFFSET
     
         # Get the x location of the center of the widget (icon), relative to the settings window
@@ -67,8 +68,7 @@ class AllSettingsPlugin(IconPlugin):
         self._container.add(self._table)
         self._window.add(self._container)
         self._is_active = False
-        
-    def execute(self):
+
         self._window.show_all()
         self._window.connect('focus-out-event', self._hide_window)
 
@@ -100,7 +100,8 @@ class AllSettingsPlugin(IconPlugin):
         AppLauncher().launch(self.SETTINGS_COMMAND)
         
     def _desktop_background(self, widget, event):
-        BackgroundChooser(self.get_toplevel())
+        presenter = self.get_toplevel().get_presenter()
+        BackgroundChooser(presenter)
         
     def _logout(self, widget, event):
         if self._confirm('Log out?'):
@@ -127,6 +128,8 @@ class AllSettingsPlugin(IconPlugin):
         return (answer == gtk.RESPONSE_YES)
 
     def _hide_window(self, widget, event=None):
+        if not hasattr(self, "_window"):
+            return
         if (not self._window.get_visible() or self._is_active):
             self._window.hide_all()
             self._is_active = False

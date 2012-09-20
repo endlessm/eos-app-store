@@ -1,9 +1,9 @@
 import gtk
 
 class BackgroundChooser(gtk.FileChooserDialog):
-    def __init__(self, desktop_view):
+    def __init__(self, desktop_presenter):
         super(BackgroundChooser, self).__init__()
-        self._desktop_presenter = desktop_view.get_presenter()
+        self._desktop_presenter = desktop_presenter
 
         image_filter = gtk.FileFilter()
         image_filter.set_name("Image Files")
@@ -40,7 +40,8 @@ class BackgroundChooser(gtk.FileChooserDialog):
         try:
             self._desktop_presenter.change_background(self.get_filename())
             self.destroy()
-        except:
+        except RuntimeError as e:
+            print repr(e)
             self.warn_user()
 
     def revert_background_callback(self, widget, event):

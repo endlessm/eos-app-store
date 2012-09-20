@@ -7,7 +7,6 @@ import gobject
 from gtk import gdk
 
 from util import image_util
-from osapps.os_util import OsUtil
 from shortcut.application_shortcut import ApplicationShortcut
 from feedback_module.feedback_response_dialog_view import FeedbackResponseDialogView
 from feedback_module.bugs_and_feedback_popup_window import BugsAndFeedbackPopupWindow
@@ -22,13 +21,11 @@ gtk.gdk.threads_init()
 class EndlessDesktopView(gtk.Window):
     _padding = 100
     _app_shortcuts = {}
-    BACKGROUND_NAME = 'background.png'
 
     def __init__(self):
         gtk.Window.__init__(self)
         
         width, height = self._get_net_work_area()
-        self._os_util = OsUtil()
         self.resize(width, height)
         self.set_can_focus(False)
         self.set_type_hint(gdk.WINDOW_TYPE_HINT_DESKTOP) #@UndefinedVariable
@@ -46,7 +43,6 @@ class EndlessDesktopView(gtk.Window):
         self.set_app_paintable(True)
         
         # -----------WORKSPACE-----------
-        self._set_background(self.BACKGROUND_NAME)
         
         self._align = gtk.Alignment(0.5, 0.5, 0, 0)
         
@@ -84,7 +80,7 @@ class EndlessDesktopView(gtk.Window):
     def get_presenter(self):
         return self._presenter
     
-    def _set_background(self, background_name):
+    def set_background(self, background_name):
         width, height = self._get_net_work_area()
         pixbuf = image_util.load_pixbuf(background_name)
         

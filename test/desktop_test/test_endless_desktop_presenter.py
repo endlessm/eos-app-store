@@ -3,11 +3,16 @@ from mock import Mock, patch
 from desktop.endless_desktop_presenter import DesktopPresenter
 
 class TestEndlessDesktopPresenter(unittest.TestCase):
+    
     def setUp(self):
         self.mock_model = Mock()
         self.mock_view = Mock()
         
         self.testObject = DesktopPresenter(self.mock_view, self.mock_model)
+    
+    def tearDown(self):
+        self.testObject._view.destroy()
+    
     
     @patch.object(DesktopPresenter, 'refresh_view')
     def test_initially_presenter_forces_a_refresh(self, refresh_view):
@@ -61,13 +66,16 @@ class TestEndlessDesktopPresenter(unittest.TestCase):
         self.mock_model.launch_search.assert_called_once_with(search_string)
         
     def test_change_background_sets_background(self):
+        self.mock_model.reset_mock()
+        self.mock_view.reset_mock()
+        
         filename = "filename"
         self.mock_model.get_background = Mock(return_value=filename)
         
         self.testObject.change_background(filename)
         
         self.mock_model.set_background.assert_called_once_with(filename)
-        self.mock_view._set_background.assert_called_once_with(filename)
+        self.mock_view.set_background.assert_called_once_with(filename)
         
     def test_revert_background_sets_background_to_default(self):
         filename = "default"
