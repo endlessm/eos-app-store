@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: dev 1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-06-22 08:39-0500\n"
+"POT-Creation-Date: 2012-09-26 11:46-0500\n"
 "PO-Revision-Date: 2012-05-31 11:54-0500\n"
 "Last-Translator: Automatically generated\n"
 "Language-Team: none\n"
@@ -18,11 +18,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
 
-#: src/desktop/endless_desktop_view.py:86
-msgid "Add new"
-msgstr "Adicionar Novo"
-
-#: src/desktop/endless_desktop_view.py:99
+#: src/desktop/endless_desktop_view.py:101
 msgid "Apps"
 msgstr "Aplicativos"
 
@@ -30,44 +26,67 @@ msgstr "Aplicativos"
 msgid "Bugbuffer1"
 msgstr ""
 
-#: ui/bugs_and_feedback.glade:10 src/desktop/endless_desktop_view.py:90
-msgid "Feedback"
+#: ui/bugs_and_feedback.glade:10
+#: src/feedback_module/bugs_and_feedback_popup_window.py:16
+#, fuzzy
+msgid "Bugs And Feedback"
 msgstr "Feedback"
 
-#: src/shortcut/add_remove_shortcut.py:43
+#: src/shortcut/add_remove_shortcut.py:50
 msgid "Delete"
 msgstr "Excluir"
 
-#: src/search/search_box.py:18
+#: src/notification_panel/all_settings_plugin.py:31
+msgid "Desktop"
+msgstr ""
+
+#: src/search/search_box.py:22
 msgid "Enter Search or URL..."
 msgstr "Digite pesquisa ou um URL..."
 
-#: src/desktop/endless_desktop_view.py:112
+#: src/desktop/endless_desktop_view.py:114 src/folder/folder_window.py:19
 msgid "Folder"
 msgstr "Diretórios"
 
 #: ui/bugs_and_feedback.glade:42
+#: src/feedback_module/bugs_and_feedback_popup_window.py:42
 msgid "Give us feedback"
 msgstr "Deixe seu comentário."
 
+#: src/notification_panel/all_settings_plugin.py:39
+msgid "Log Out"
+msgstr "Sair"
+
+#: ui/bugs_and_feedback.glade:6
+#: src/feedback_module/bugs_and_feedback_popup_window.py:55
+msgid ""
+"Please let us know how the problem occured and we will resolve it as soon as "
+"possible."
+msgstr ""
+"Por favor, deixe-nos saber como o problema ocorreu e vamos resolvê-lo como "
+"mais rapidamente possível."
+
 #: ui/bugs_and_feedback.glade:30
+#: src/feedback_module/bugs_and_feedback_popup_window.py:38
 msgid "Report a Bug"
 msgstr "Relatar um bug"
 
+#: src/notification_panel/all_settings_plugin.py:41
+msgid "Restart"
+msgstr "Reinicializar"
+
 #: ui/bugs_and_feedback.glade:94
+#: src/feedback_module/bugs_and_feedback_popup_window.py:65
 msgid "SUBMIT"
 msgstr "ENVIAR"
 
-msgid "CANCEL"
-msgstr "CANCELAR"
+#: src/notification_panel/all_settings_plugin.py:37
+msgid "Settings"
+msgstr "Definições"
 
-#: ui/bugs_and_feedback.glade:6
-msgid ""
-"Please let us know how the problem occured "
-"and we will resolve it as soon as possible."
-msgstr ""
-"Por favor, deixe-nos saber como o problema "
-"ocorreu e vamos resolvê-lo como mais rapidamente possível."
+#: src/notification_panel/all_settings_plugin.py:43
+msgid "Shut Down"
+msgstr "Desligar"
 
 #: src/feedback_module/feedback_response_dialog_view.py:9
 msgid "Thank You"
@@ -78,10 +97,20 @@ msgstr "Obrigado"
 msgid "Thank you for your feedback."
 msgstr "Obrigado pelo seu feedback."
 
-#: src/desktop/endless_desktop_view.py:111
+#: src/notification_panel/all_settings_plugin.py:34
+msgid "Update"
+msgstr "Atualizar"
+
+#: src/desktop/endless_desktop_view.py:113
 msgid "Websites"
 msgstr "Páginas Web"
 
 #: ui/feedback_response_dialog.glade:33
 msgid "button"
 msgstr ""
+
+#~ msgid "Add new"
+#~ msgstr "Adicionar Novo"
+
+#~ msgid "CANCEL"
+#~ msgstr "CANCELAR"

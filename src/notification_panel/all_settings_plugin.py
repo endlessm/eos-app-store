@@ -6,6 +6,9 @@ from osapps.app_launcher import AppLauncher
 from util.transparent_window import TransparentWindow
 from util import screen_util
 from background_chooser import BackgroundChooser
+import gettext
+
+gettext.install('endless_desktop', '/usr/share/locale', unicode = True, names=['ngettext'])
 
 class AllSettingsPlugin(IconPlugin):
     UPDATE_COMMAND = 'sudo update-manager'
@@ -25,19 +28,19 @@ class AllSettingsPlugin(IconPlugin):
         self._label_version_text = 'EndlessOS ' + self._read_version()
         
     def execute(self):
-        self._button_desktop = gtk.Button('Desktop')
+        self._button_desktop = gtk.Button(_('Desktop'))
         self._button_desktop.connect('button-press-event', self._desktop_background)
         self._label_version = gtk.Label('EndlessOS ' + self._read_version())
-        self._button_update = gtk.Button('Update')
+        self._button_update = gtk.Button(_('Update'))
         self._button_update.connect('button-release-event', self._update_software)
 
-        self._button_settings = gtk.Button('Settings')
+        self._button_settings = gtk.Button(_('Settings'))
         self._button_settings.connect('button-release-event', self._launch_settings)
-        self._button_logout = gtk.Button('Log Out')
+        self._button_logout = gtk.Button(_('Log Out'))
         self._button_logout.connect('button-release-event', self._logout)
-        self._button_restart = gtk.Button('Restart')
+        self._button_restart = gtk.Button(_('Restart'))
         self._button_restart.connect('button-release-event', self._restart)
-        self._button_shutdown = gtk.Button('Shut Down')
+        self._button_shutdown = gtk.Button(_('Shut Down'))
         self._button_shutdown.connect('button-release-event', self._shutdown)
         
         self._table = gtk.Table(5, 3, True)
@@ -103,7 +106,7 @@ class AllSettingsPlugin(IconPlugin):
 
     def _update_software(self, widget, event):
         self._window.hide()
-        if self._confirm('Update EndlessOS?'):
+        if self._confirm(_('Update') + ' EndlessOS?'):
             AppLauncher().launch(self.UPDATE_COMMAND)
 
     def _launch_settings(self, widget, event):
@@ -116,21 +119,20 @@ class AllSettingsPlugin(IconPlugin):
         
     def _logout(self, widget, event):
         self._window.hide()
-        if self._confirm('Log out?'):
+        if self._confirm(_('Log Out') + '?'):
             AppLauncher().launch(self.LOGOUT_COMMAND)
         
     def _restart(self, widget, event):
         self._window.hide()
-        if self._confirm('Restart?'):
+        if self._confirm(_('Restart') + '?'):
             AppLauncher().launch(self.RESTART_COMMAND)
         
     def _shutdown(self, widget, event):
         self._window.hide()
-        if self._confirm('Shut down?'):
+        if self._confirm(_('Shut Down') + '?'):
             AppLauncher().launch(self.SHUTDOWN_COMMAND)
         
     def _confirm(self, message):
-        return True
         dialog = gtk.Dialog("Confirmation", self._parent, gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT)
         dialog.set_decorated(False)
         dialog.set_border_width(10)
