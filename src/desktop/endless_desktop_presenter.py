@@ -14,6 +14,9 @@ class DesktopPresenter(object):
     def activate_item(self, app_key, params):
         self._view.hide_folder_window()
         self._model.execute_app(app_key, params)
+        
+    def move_item(self, shorcuts):
+        print 'TODO: permanently store shortcuts order', shorcuts
     
     def refresh_view(self):
         if not self._is_refreshing:
