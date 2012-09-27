@@ -221,7 +221,7 @@ class EndlessDesktopView(gtk.Window):
                 item.show()
                 
             elif isinstance(item, FolderShortcut):
-                item.connect("application-shortcut-activate", lambda w, app_id, params: self._presenter.activate_item(app_id, params))
+                item.connect("folder-shortcut-activate", self._folder_icon_clicked_callback)
                 
                 item.show()
                 

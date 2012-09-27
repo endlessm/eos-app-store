@@ -173,11 +173,12 @@ class ApplicationShortcut(DesktopShortcut):
         return False
     
     def mouse_release_callback(self, widget, event):
-        if event.button == 1:
-            self._event_box.set_images(self.get_images())
-            self._event_box.hide()
-            self._event_box.show()
-            return True
+        if not self.is_moving():
+            if event.button == 1:
+                self._event_box.set_images(self.get_images())
+                self._event_box.hide()
+                self._event_box.show()
+                return True
         
         return False
     

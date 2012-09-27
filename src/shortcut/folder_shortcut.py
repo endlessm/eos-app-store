@@ -5,7 +5,7 @@ import gobject
 
 class FolderShortcut(DesktopShortcut):
     __gsignals__ = {
-        "application-shortcut-activate": (gobject.SIGNAL_RUN_FIRST, #@UndefinedVariable
+        "folder-shortcut-activate": (gobject.SIGNAL_RUN_FIRST, #@UndefinedVariable
                    gobject.TYPE_NONE,
                    (gobject.TYPE_STRING,gobject.TYPE_PYOBJECT)),
     }
@@ -19,8 +19,10 @@ class FolderShortcut(DesktopShortcut):
         self._normal_text = shortcut.name()
         
         self._event_box.connect("button-press-event", self.mouse_press_callback)
+        self._event_box.connect("button-release-event", self.mouse_release_callback)
 
         self.show_all()
+        self.set_moving(False)
         
     # DND Callbacks    
     def _received_handler_callback(self, source, destination, x, y, data=None):
@@ -33,9 +35,21 @@ class FolderShortcut(DesktopShortcut):
         
     def mouse_press_callback(self, widget, event):
         if event.button == 1:# and event.type == gtk.gdk._2BUTTON_PRESS:
-            self._callback(widget, event, self._shortcut)
+            #self._callback(widget, event, self._shortcut)
+            pass
             # must propagate for DND to work
             #return True
+        return False
+        
+    def mouse_release_callback(self, widget, event):
+        if not self.is_moving():
+            if event.button == 1:
+                self.emit("folder-shortcut-activate", event, self._shortcut)
+                self._event_box.set_images(self.get_images())
+                self._event_box.hide()
+                self._event_box.show()
+                return True
+        
         return False
     
     def remove_shortcut(self):
