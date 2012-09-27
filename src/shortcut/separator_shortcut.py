@@ -23,7 +23,7 @@ class SeparatorShortcut(DesktopShortcut):
         self.h = height
         self.set_size_request(self.w, self.h)
         self.class_name = 'sch_sep'
-        self._sep_obj = self
+        self._event_box._sep_obj = self
         SeparatorShortcut._all_separators.add(self)
         self._image_name = ''
         self._show_background = True
@@ -43,22 +43,16 @@ class SeparatorShortcut(DesktopShortcut):
         print '    tdestination', destination
         print '    x:%s, y:%s' % (x, y)
         print '    data', data
-
-    def _motion_handler_callback(self, source, destination, x, y):
-        print 
-        print '-> SeparatorShortcut::_motion_handler_callback'
-        print '    source', source
-        print '    destination', destination
-        print '    x:%s, y:%s' % (x, y)
-    #
+        
     @classmethod
-    def _motion_broadcast_callback(cls, source, destination, x, y):
-        print 
-        print '-> [BC] SeparatorShortcut::_motion_broadcast_callback'
-        print '    source', source
-        print '    destination', destination
-        print '    x:%s, y:%s' % (x, y)
-    
+    def _motion_broadcast_callback(cls, source, destination, x, y):        
+        if hasattr(destination, '_sep_obj'):
+            if (y > 10) and (y < (destination._sep_obj.h-10)):
+                destination._sep_obj.expand()
+            else:
+                SeparatorShortcut._reset_all()
+        else:
+            SeparatorShortcut._reset_all()
             
     @classmethod
     def _reset_all(cls):

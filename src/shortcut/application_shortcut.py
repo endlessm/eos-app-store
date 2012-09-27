@@ -66,14 +66,6 @@ class ApplicationShortcut(DesktopShortcut):
         print '    x:%s, y:%s' % (x, y)
         print '    data', data
 
-    def _motion_handler_callback(self, source, destination, x, y):
-        print 
-        print '-> ApplicationShortcut::_motion_handler_callback'
-        print '    source', source
-        print '    destination', destination
-        print '    x:%s, y:%s' % (x, y)
-    #
-
     def drag_data_received_callback(self, widget, context, x, y, selection, targetType, time):
         if targetType == self.DND_TARGET_TYPE_TEXT:
             self.emit("application-shortcut-move")
