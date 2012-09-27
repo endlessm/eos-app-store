@@ -16,16 +16,24 @@ class DesktopShortcut(gtk.VBox):
     
     # this is for motion broadcast
     _motion_callbacks = []
+    _drag_end_callbacks = []
     @classmethod
     def _add_motion_broadcast_callback(cls, callback):
-        print '_add_motion_broadcast_callback'
         cls._motion_callbacks.append(callback)
+        
+    @classmethod
+    def _add_drag_end_broadcast_callback(cls, callback):
+        cls._drag_end_callbacks.append(callback)
     
     @classmethod
     def _motion_broadcast(cls, source, destination, x, y):
-        print 'BROADCAST::_motion_broadcast'
         for cb in cls._motion_callbacks:
             cb(source, destination, x, y)
+            
+    @classmethod
+    def _drag_end_broadcast(cls, source):
+        for cb in cls._drag_end_callbacks:
+            cb(source)
         
     def __init__(self, label_text="", draggable=True):
         super(DesktopShortcut, self).__init__()
@@ -67,6 +75,7 @@ class DesktopShortcut(gtk.VBox):
             # for button target
         self._event_box.connect("drag_data_received", self.dnd_receive_data)
         self._event_box.connect("drag_motion", self.dnd_motion_data)
+        self._event_box.connect("drag_end", self.dnd_drag_end)
         # do not use built in highlight
         self._event_box.drag_dest_set(
             #gtk.DEST_DEFAULT_HIGHLIGHT |
@@ -112,7 +121,10 @@ class DesktopShortcut(gtk.VBox):
             self._motion_handler_callback(source_widget, widget, x, y)
         context.drag_status(gtk.gdk.ACTION_MOVE, time)
         return True
-                                     
+        
+    def dnd_drag_end(self, widget, context):
+        # give data for broadcast
+        DesktopShortcut._drag_end_broadcast(widget)
    
     def set_moving(self, is_moving):
         self._is_moving = is_moving
