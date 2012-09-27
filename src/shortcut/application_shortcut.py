@@ -51,6 +51,26 @@ class ApplicationShortcut(DesktopShortcut):
         
 #        self.add_rename_entry(label_text)
 
+    # DND Callbacks
+    def _transmiter_handler_callback(self, source):
+        print 'ApplicationShortcut::_transmiter_handler_callback'
+        print 'source', source
+        return 'some random data'
+     
+    def _received_handler_callback(self, source, destination, x, y, data=None):
+        print 'ApplicationShortcut::_received_handler_callback'
+        print 'source', source
+        print 'destination', destination
+        print 'x:%s, y:%s' % (x, y)
+        print 'data', data
+
+    def _motion_handler_callback(self, source, destination, x, y):
+        print 'ApplicationShortcut::_motion_handler_callback'
+        print 'source', source
+        print 'destination', destination
+        print 'x:%s, y:%s' % (x, y)
+    #
+
     def drag_data_received_callback(self, widget, context, x, y, selection, targetType, time):
         if targetType == self.DND_TARGET_TYPE_TEXT:
             self.emit("application-shortcut-move")

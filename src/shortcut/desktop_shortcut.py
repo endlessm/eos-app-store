@@ -40,10 +40,59 @@ class DesktopShortcut(gtk.VBox):
         
         self.pack_start(self._event_box, False, False, 3)
         self.pack_start(self._label_event_box, False, False, 3)
+
+        # DND specific code
+            # for source
+        self._event_box.connect("drag_data_get", self.dnd_send_data)
+        self._event_box.drag_source_set(
+            gtk.gdk.BUTTON1_MASK, 
+            self.DND_TRANSFER_TYPE, 
+            gtk.gdk.ACTION_MOVE
+            )
+            # for button target
+        self._event_box.connect("drag_data_received", self.dnd_receive_data)
+        self._event_box.connect("drag_motion", self.dnd_motion_data)
+        # do not use built in highlight
+        self._event_box.drag_dest_set(
+            #gtk.DEST_DEFAULT_HIGHLIGHT |
+            gtk.DEST_DEFAULT_MOTION |
+            gtk.DEST_DEFAULT_DROP,
+            self.DND_TRANSFER_TYPE, 
+            gtk.gdk.ACTION_MOVE
+            )
+            
+    def dnd_send_data(self, widget, context, selection, targetType, eventTime):
+        # no destination widget is known, 'widget' is dragged one, and it sends data
+        if targetType == self.DND_TARGET_TYPE_TEXT:
+            # if there is callback, call it
+            if hasattr(self, '_transmiter_handler_callback'):
+                data = self._transmiter_handler_callback(widget)
+                selection.set(selection.target, 8, data)
         
-        self._event_box.drag_dest_set(gtk.DEST_DEFAULT_MOTION | gtk.DEST_DEFAULT_DROP,
-                                     self.DND_TRANSFER_TYPE, 
-                                     gtk.gdk.ACTION_MOVE)
+    def dnd_receive_data(self, widget, context, x, y, selection, targetType, time):
+        source_widget = context.get_source_widget()
+        if targetType == self.DND_TARGET_TYPE_TEXT:
+            # if there is callback, call it
+            if hasattr(self, '_received_handler_callback'):
+                self._received_handler_callback(
+                    source_widget, 
+                    widget, 
+                    x, 
+                    y, 
+                    selection.data
+                    )
+            
+    def dnd_motion_data(self, widget, context, x, y, time):
+        # source_widget is the dragged one
+        # widget is one under cursor
+        # x, y are relative to widget
+        source_widget = context.get_source_widget()
+        # if there is callback, call it
+        if hasattr(self, '_motion_handler_callback'):
+            self._motion_handler_callback(source_widget, widget, x, y)
+        context.drag_status(gtk.gdk.ACTION_MOVE, time)
+        return True
+                                     
    
     def set_moving(self, is_moving):
         self._is_moving = is_moving
