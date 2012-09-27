@@ -14,7 +14,7 @@ class SeparatorShortcut(DesktopShortcut):
     _all_separators = set()
     
     def __init__(self, width=30, height=64):
-        super(SeparatorShortcut, self).__init__('')
+        super(SeparatorShortcut, self).__init__('', draggable=False)
         # listen for motion on all widgets
         DesktopShortcut._add_motion_broadcast_callback(
             SeparatorShortcut._motion_broadcast_callback
@@ -29,13 +29,7 @@ class SeparatorShortcut(DesktopShortcut):
         self._show_background = True
         self.show_all()
         
-    # DND Callbacks
-    def _transmiter_handler_callback(self, source):
-        print 
-        print '-> SeparatorShortcut::_transmiter_handler_callback'
-        print '    source', source
-        return 'some random data'
-     
+    # DND Callbacks     
     def _received_handler_callback(self, source, destination, x, y, data=None):
         print 
         print '-> SeparatorShortcut::_received_handler_callback'

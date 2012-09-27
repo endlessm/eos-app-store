@@ -51,13 +51,7 @@ class ApplicationShortcut(DesktopShortcut):
         
 #        self.add_rename_entry(label_text)
 
-    # DND Callbacks
-    def _transmiter_handler_callback(self, source):
-        print 
-        print '-> ApplicationShortcut::_transmiter_handler_callback'
-        print '    source', source
-        return 'some random data'
-     
+    # DND Callbacks     
     def _received_handler_callback(self, source, destination, x, y, data=None):
         print 
         print '-> ApplicationShortcut::_received_handler_callback'

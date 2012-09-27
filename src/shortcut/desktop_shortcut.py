@@ -27,7 +27,7 @@ class DesktopShortcut(gtk.VBox):
         for cb in cls._motion_callbacks:
             cb(source, destination, x, y)
         
-    def __init__(self, label_text=""):
+    def __init__(self, label_text="", draggable=True):
         super(DesktopShortcut, self).__init__()
         self.set_size_request(64, 64)
         
@@ -37,6 +37,7 @@ class DesktopShortcut(gtk.VBox):
         self._event_box = self._create_icon(self.get_images())
         
         self._label = gtk.Label(label_text)
+        self._identifier = label_text
 
         new_style = self._label.get_style().copy()
         new_style.fg[gtk.STATE_NORMAL] = self._label.get_colormap().alloc('#f0f0f0')
@@ -56,12 +57,13 @@ class DesktopShortcut(gtk.VBox):
 
         # DND specific code
             # for source
-        self._event_box.connect("drag_data_get", self.dnd_send_data)
-        self._event_box.drag_source_set(
-            gtk.gdk.BUTTON1_MASK, 
-            self.DND_TRANSFER_TYPE, 
-            gtk.gdk.ACTION_MOVE
-            )
+        if draggable:
+            self._event_box.connect("drag_data_get", self.dnd_send_data)
+            self._event_box.drag_source_set(
+                gtk.gdk.BUTTON1_MASK, 
+                self.DND_TRANSFER_TYPE, 
+                gtk.gdk.ACTION_MOVE
+                )
             # for button target
         self._event_box.connect("drag_data_received", self.dnd_receive_data)
         self._event_box.connect("drag_motion", self.dnd_motion_data)
@@ -81,6 +83,9 @@ class DesktopShortcut(gtk.VBox):
             if hasattr(self, '_transmiter_handler_callback'):
                 data = self._transmiter_handler_callback(widget)
                 selection.set(selection.target, 8, data)
+            else:
+                # just do default, place widget identifier in selection
+                selection.set(selection.target, 8, self._identifier)
         
     def dnd_receive_data(self, widget, context, x, y, selection, targetType, time):
         source_widget = context.get_source_widget()

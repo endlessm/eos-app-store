@@ -22,13 +22,7 @@ class FolderShortcut(DesktopShortcut):
 
         self.show_all()
         
-    # DND Callbacks
-    def _transmiter_handler_callback(self, source):
-        print 
-        print '-> FolderShortcut::_transmiter_handler_callback'
-        print '    source', source
-        return 'some random data'
-     
+    # DND Callbacks    
     def _received_handler_callback(self, source, destination, x, y, data=None):
         print 
         print '-> FolderShortcut::_received_handler_callback'
