@@ -14,6 +14,14 @@ class DesktopShortcut(gtk.VBox):
                                                   (gobject.TYPE_PYOBJECT,)), 
     }
     
+    # this is for motion broadcast
+    _motion_callbacks = []
+    @classmethod
+    def _motion_broadcast(cls, source, destination, x, y):
+        print 'BROADCAST::_motion_broadcast'
+        # for cb in cls._motion_callbacks:
+            # cb(source, destination, x, y)
+        
     def __init__(self, label_text=""):
         super(DesktopShortcut, self).__init__()
         self.set_size_request(64, 64)
@@ -87,6 +95,8 @@ class DesktopShortcut(gtk.VBox):
         # widget is one under cursor
         # x, y are relative to widget
         source_widget = context.get_source_widget()
+        # give data for broadcast
+        DesktopShortcut._motion_broadcast(source_widget, widget, x, y)
         # if there is callback, call it
         if hasattr(self, '_motion_handler_callback'):
             self._motion_handler_callback(source_widget, widget, x, y)
