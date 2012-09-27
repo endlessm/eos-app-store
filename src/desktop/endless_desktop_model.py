@@ -16,6 +16,9 @@ class EndlessDesktopModel(object):
         
     def get_shortcuts(self):
         return self._app_desktop_datastore.get_all_shortcuts()
+
+    def set_shortcuts(self, shortcuts):
+        print 'TODO: permanently store shortcuts order', shortcuts
     
     def execute_app(self, app_key, params):
         app = self._app_datastore.get_app_by_key(app_key)
