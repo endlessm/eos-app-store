@@ -7,9 +7,16 @@ from shortcut.desktop_shortcut import DesktopShortcut
 
 
 class SeparatorShortcut(DesktopShortcut):
+    __gsignals__ = {
+        "application-shortcut-move": (gobject.SIGNAL_RUN_FIRST, #@UndefinedVariable
+                   gobject.TYPE_NONE,
+                   (gobject.TYPE_PYOBJECT, gobject.TYPE_PYOBJECT)),
+    }
 
     left = None
     right = None
+    left_widget = None
+    right_widget = None
     expanded = False
     _all_separators = set()
     
@@ -33,7 +40,7 @@ class SeparatorShortcut(DesktopShortcut):
         self._show_background = True
         self.show_all()
         
-    # DND Callbacks     
+    # DND Callbacks
     def _received_handler_callback(self, source, destination, x, y, data=None):
         print 
         print '-> SeparatorShortcut::_received_handler_callback'
@@ -41,9 +48,22 @@ class SeparatorShortcut(DesktopShortcut):
         print '    tdestination', destination
         print '    x:%s, y:%s' % (x, y)
         print '    data', data
+        if hasattr(destination, '_sep_obj'):
+            source_name = source._identifier
+            if destination._sep_obj.right_widget:
+                destination_name = destination._sep_obj.right_widget._identifier
+            else:
+                destination_name = ''
+        
+            self.emit(
+                "application-shortcut-move",
+                source_name, 
+                destination_name
+                )
+        
         
     @classmethod
-    def _motion_broadcast_callback(cls, source, destination, x, y):        
+    def _motion_broadcast_callback(cls, source, destination, x, y):
         if hasattr(destination, '_sep_obj'):
             if (y > 10) and (y < (destination._sep_obj.h-10)):
                 destination._sep_obj.expand()
@@ -61,11 +81,17 @@ class SeparatorShortcut(DesktopShortcut):
         for sep in cls._all_separators:
             sep.reset()
         
-    def SetLeft(self, separator=None):
+    def SetLeftSeparator(self, separator=None):
         self.left = separator
         
-    def SetRight(self, separator=None):
+    def SetLeftWidget(self, widget=None):
+        self.left_widget = widget
+        
+    def SetRightSeparator(self, separator=None):
         self.right = separator
+        
+    def SetRightWidget(self, widget=None):
+        self.right_widget = widget
         
     def expand(self):
         _w = 0

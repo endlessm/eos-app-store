@@ -10,9 +10,9 @@ class ApplicationShortcut(DesktopShortcut):
     "application-shortcut-rename": (gobject.SIGNAL_RUN_FIRST, #@UndefinedVariable
                        gobject.TYPE_NONE,
                        (gobject.TYPE_PYOBJECT, gobject.TYPE_STRING,)),
-    "application-shortcut-move": (gobject.SIGNAL_RUN_FIRST, #@UndefinedVariable
-                       gobject.TYPE_NONE,
-                       ()),
+    # "application-shortcut-move": (gobject.SIGNAL_RUN_FIRST, #@UndefinedVariable
+                       # gobject.TYPE_NONE,
+                       # ()),
     "application-shortcut-activate": (gobject.SIGNAL_RUN_FIRST, #@UndefinedVariable
                        gobject.TYPE_NONE,
                        (gobject.TYPE_STRING,gobject.TYPE_PYOBJECT,)),

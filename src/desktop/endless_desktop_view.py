@@ -209,14 +209,14 @@ class EndlessDesktopView(gtk.Window):
         row.show()
         
         sep_last = SeparatorShortcut()
+        sep_last.connect("application-shortcut-move", self._rearrange_shortcuts)
         row.pack_start(sep_last, False, False, 0)
         for item in items:
             if isinstance(item, ApplicationShortcut):
                 item.connect("application-shortcut-rename", lambda w, shortcut, new_name: self._presenter.rename_item(shortcut, new_name))
                 item.connect("application-shortcut-activate", lambda w, app_key, params: self._presenter.activate_item(app_key, params))
-                item.connect("application-shortcut-dragging-over", lambda w, s: self._insert_placeholder(s))
+                #item.connect("application-shortcut-dragging-over", lambda w, s: self._insert_placeholder(s))
                 #item.connect("application-shortcut-drag", lambda w, state: self._add_icon.toggle_drag(state))
-                item.connect("application-shortcut-move", lambda w: self._presenter.move_item(self._shorcuts_buffer))
                 
                 item.show()
                 
@@ -229,24 +229,44 @@ class EndlessDesktopView(gtk.Window):
                 print >> sys.stderr, "Item has parent!", item
             row.pack_start(item, False, False, 0)
             sep_new = SeparatorShortcut()
+            sep_new.connect("application-shortcut-move", self._rearrange_shortcuts)
             row.pack_start(sep_new, False, False, 0)
-            sep_last.SetRight(sep_new)
-            sep_new.SetLeft(sep_last)
+            sep_last.SetRightSeparator(sep_new)
+            sep_last.SetRightWidget(item)
+            #
+            sep_new.SetLeftSeparator(sep_last)
+            sep_last.SetLeftWidget(item)
             sep_last = sep_new
             
         return row
-    
-    def _insert_placeholder(self, s):
-        moving = [x for x in self._shorcuts_buffer if self._app_shortcuts[x].is_moving()]
         
-        if moving:
-            for item in moving:
-                new_index = self._shorcuts_buffer.index(s.id())
+    def _rearrange_shortcuts(self, widget, sc_moved, sc_to_move):
+        print '--- MOVE ---'
+        print '_rearrange_shortcuts'
+        print 'sc_moved', sc_moved
+        print 'sc_to_move', sc_to_move
+        print '---------------------'
+        
+        self._shorcuts_buffer.remove(sc_moved)
+        if sc_to_move != '':
+            new_index = self._shorcuts_buffer.index(sc_to_move)
+            self._shorcuts_buffer.insert(new_index, sc_moved)
+        else:
+            self._shorcuts_buffer.append(sc_moved)
+        self._redraw(self._shorcuts_buffer)
+        self._presenter.move_item(self._shorcuts_buffer)
+     
+    # def _insert_placeholder(self, s):
+        # moving = [x for x in self._shorcuts_buffer if self._app_shortcuts[x].is_moving()]
+        
+        # if moving:
+            # for item in moving:
+                # new_index = self._shorcuts_buffer.index(s.id())
                 
-                self._shorcuts_buffer.remove(item)
-                self._shorcuts_buffer.insert(new_index, item)
+                # self._shorcuts_buffer.remove(item)
+                # self._shorcuts_buffer.insert(new_index, item)
             
-            self._redraw(self._shorcuts_buffer)
+            # self._redraw(self._shorcuts_buffer)
         
     def _calculate_max_icons(self):
         width = self._get_net_work_area()[0]

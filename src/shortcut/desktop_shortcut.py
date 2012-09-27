@@ -8,11 +8,11 @@ class DesktopShortcut(gtk.VBox):
     DND_TARGET_TYPE_TEXT = 80
     DND_TRANSFER_TYPE = [( "text/plain", gtk.TARGET_SAME_APP, DND_TARGET_TYPE_TEXT )]
     
-    __gsignals__ = {
-           "application-shortcut-dragging-over": (gobject.SIGNAL_RUN_FIRST, #@UndefinedVariable
-                                                  gobject.TYPE_NONE,
-                                                  (gobject.TYPE_PYOBJECT,)), 
-    }
+    # __gsignals__ = {
+           # "application-shortcut-dragging-over": (gobject.SIGNAL_RUN_FIRST, #@UndefinedVariable
+                                                  # gobject.TYPE_NONE,
+                                                  # (gobject.TYPE_PYOBJECT,)),    
+    # }
     
     # this is for motion broadcast
     _motion_callbacks = []
@@ -46,6 +46,7 @@ class DesktopShortcut(gtk.VBox):
         
         self._label = gtk.Label(label_text)
         self._identifier = label_text
+        self._event_box._identifier = label_text
 
         new_style = self._label.get_style().copy()
         new_style.fg[gtk.STATE_NORMAL] = self._label.get_colormap().alloc('#f0f0f0')
@@ -128,12 +129,9 @@ class DesktopShortcut(gtk.VBox):
         self._label.show()
         self._event_box.show()
         self.set_moving(False)
-        # self.emit("application-shortcut-move")
         DesktopShortcut._drag_end_broadcast(widget)
         
-        
     def dnd_drag_begin(self, widget, context):
-        print 'DND::Begin dnd_drag_begin'
         self._label.hide()
         self._event_box.hide()
         self.set_moving(True)
