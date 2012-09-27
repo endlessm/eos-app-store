@@ -22,10 +22,34 @@ class FolderShortcut(DesktopShortcut):
 
         self.show_all()
         
+    # DND Callbacks
+    def _transmiter_handler_callback(self, source):
+        print 
+        print '-> FolderShortcut::_transmiter_handler_callback'
+        print '    source', source
+        return 'some random data'
+     
+    def _received_handler_callback(self, source, destination, x, y, data=None):
+        print 
+        print '-> FolderShortcut::_received_handler_callback'
+        print '    source', source
+        print '    tdestination', destination
+        print '    x:%s, y:%s' % (x, y)
+        print '    data', data
+
+    def _motion_handler_callback(self, source, destination, x, y):
+        print 
+        print '-> FolderShortcut::_motion_handler_callback'
+        print '    source', source
+        print '    destination', destination
+        print '    x:%s, y:%s' % (x, y)
+    #
+        
     def mouse_press_callback(self, widget, event):
         if event.button == 1:# and event.type == gtk.gdk._2BUTTON_PRESS:
             self._callback(widget, event, self._shortcut)
-            return True
+            # must propagate for DND to work
+            #return True
         return False
     
     def remove_shortcut(self):
