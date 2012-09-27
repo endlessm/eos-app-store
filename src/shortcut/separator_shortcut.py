@@ -15,6 +15,10 @@ class SeparatorShortcut(DesktopShortcut):
     
     def __init__(self, width=30, height=64):
         super(SeparatorShortcut, self).__init__('')
+        # listen for motion on all widgets
+        DesktopShortcut._add_motion_broadcast_callback(
+            SeparatorShortcut._motion_broadcast_callback
+            )
         self.w = width
         self.h = height
         self.set_size_request(self.w, self.h)
@@ -47,6 +51,14 @@ class SeparatorShortcut(DesktopShortcut):
         print '    destination', destination
         print '    x:%s, y:%s' % (x, y)
     #
+    @classmethod
+    def _motion_broadcast_callback(cls, source, destination, x, y):
+        print 
+        print '-> [BC] SeparatorShortcut::_motion_broadcast_callback'
+        print '    source', source
+        print '    destination', destination
+        print '    x:%s, y:%s' % (x, y)
+    
             
     @classmethod
     def _reset_all(cls):

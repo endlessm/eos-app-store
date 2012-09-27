@@ -17,10 +17,15 @@ class DesktopShortcut(gtk.VBox):
     # this is for motion broadcast
     _motion_callbacks = []
     @classmethod
+    def _add_motion_broadcast_callback(cls, callback):
+        print '_add_motion_broadcast_callback'
+        cls._motion_callbacks.append(callback)
+    
+    @classmethod
     def _motion_broadcast(cls, source, destination, x, y):
         print 'BROADCAST::_motion_broadcast'
-        # for cb in cls._motion_callbacks:
-            # cb(source, destination, x, y)
+        for cb in cls._motion_callbacks:
+            cb(source, destination, x, y)
         
     def __init__(self, label_text=""):
         super(DesktopShortcut, self).__init__()
