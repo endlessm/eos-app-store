@@ -125,20 +125,18 @@ class DesktopShortcut(gtk.VBox):
         
     def dnd_drag_end(self, widget, context):
         # give data for broadcast
-        # self._label.show()
-        # self._event_box.child.show()
-        # self.set_moving(False)
-        # self.emit("application-shortcut-drag", False)
+        self._label.show()
+        self._event_box.show()
+        self.set_moving(False)
         # self.emit("application-shortcut-move")
         DesktopShortcut._drag_end_broadcast(widget)
         
         
     def dnd_drag_begin(self, widget, context):
         print 'DND::Begin dnd_drag_begin'
-        # self._label.hide()
-        # self._event_box.child.hide()
-        # self.set_moving(True)
-        # self.emit("application-shortcut-drag", True)
+        self._label.hide()
+        self._event_box.hide()
+        self.set_moving(True)
    
     def set_moving(self, is_moving):
         self._is_moving = is_moving
@@ -182,4 +180,5 @@ class DesktopShortcut(gtk.VBox):
         icon.set_visible_window(False)
         icon.show()
         
-        return icon       
+        return icon
+

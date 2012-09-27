@@ -215,7 +215,7 @@ class EndlessDesktopView(gtk.Window):
                 item.connect("application-shortcut-rename", lambda w, shortcut, new_name: self._presenter.rename_item(shortcut, new_name))
                 item.connect("application-shortcut-activate", lambda w, app_key, params: self._presenter.activate_item(app_key, params))
                 item.connect("application-shortcut-dragging-over", lambda w, s: self._insert_placeholder(s))
-                item.connect("application-shortcut-drag", lambda w, state: self._add_icon.toggle_drag(state))
+                #item.connect("application-shortcut-drag", lambda w, state: self._add_icon.toggle_drag(state))
                 item.connect("application-shortcut-move", lambda w: self._presenter.move_item(self._shorcuts_buffer))
                 
                 item.show()
