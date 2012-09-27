@@ -76,6 +76,7 @@ class DesktopShortcut(gtk.VBox):
         self._event_box.connect("drag_data_received", self.dnd_receive_data)
         self._event_box.connect("drag_motion", self.dnd_motion_data)
         self._event_box.connect("drag_end", self.dnd_drag_end)
+        self._event_box.connect("drag_begin", self.dnd_drag_begin)
         # do not use built in highlight
         self._event_box.drag_dest_set(
             #gtk.DEST_DEFAULT_HIGHLIGHT |
@@ -124,7 +125,20 @@ class DesktopShortcut(gtk.VBox):
         
     def dnd_drag_end(self, widget, context):
         # give data for broadcast
+        # self._label.show()
+        # self._event_box.child.show()
+        # self.set_moving(False)
+        # self.emit("application-shortcut-drag", False)
+        # self.emit("application-shortcut-move")
         DesktopShortcut._drag_end_broadcast(widget)
+        
+        
+    def dnd_drag_begin(self, widget, context):
+        print 'DND::Begin dnd_drag_begin'
+        # self._label.hide()
+        # self._event_box.child.hide()
+        # self.set_moving(True)
+        # self.emit("application-shortcut-drag", True)
    
     def set_moving(self, is_moving):
         self._is_moving = is_moving

@@ -60,12 +60,12 @@ class ApplicationShortcut(DesktopShortcut):
         print '    x:%s, y:%s' % (x, y)
         print '    data', data
 
-    def drag_data_received_callback(self, widget, context, x, y, selection, targetType, time):
-        if targetType == self.DND_TARGET_TYPE_TEXT:
-            self.emit("application-shortcut-move")
+    # def drag_data_received_callback(self, widget, context, x, y, selection, targetType, time):
+        # if targetType == self.DND_TARGET_TYPE_TEXT:
+            # self.emit("application-shortcut-move")
             
-    def show_drag_failed_animation(self, widget, context, result, kill_animation):
-        return kill_animation
+    # def show_drag_failed_animation(self, widget, context, result, kill_animation):
+        # return kill_animation
        
     def get_images(self):
         if self._show_background:
@@ -82,25 +82,25 @@ class ApplicationShortcut(DesktopShortcut):
     def get_shortcut(self):
         return self._shortcut
         
-    def _dragged_over(self, app_id):
-        self.emit("application-shortcut-dragging-over", self._shortcut)
+    # def _dragged_over(self, app_id):
+        # self.emit("application-shortcut-dragging-over", self._shortcut)
         
-    def _drag_begin(self):
-        self._label.hide()
-        self._event_box.child.hide()
-        self.set_moving(True)
-        self.emit("application-shortcut-drag", True)
+    # def _drag_begin(self):
+        # self._label.hide()
+        # self._event_box.child.hide()
+        # self.set_moving(True)
+        # self.emit("application-shortcut-drag", True)
     
-    def _drag_end(self):
-        self._label.show()
-        self._event_box.child.show()
-        self.set_moving(False)
-        self.emit("application-shortcut-drag", False)
-        self.emit("application-shortcut-move")
+    # def _drag_end(self):
+        # self._label.show()
+        # self._event_box.child.show()
+        # self.set_moving(False)
+        # self.emit("application-shortcut-drag", False)
+        # self.emit("application-shortcut-move")
         
-    def _send_callback(self, widget, context, selection, targetType, eventTime):
-        if targetType == self.DND_TARGET_TYPE_TEXT:
-            selection.set(selection.target, 8, str(self._event_box.get_data('id')))
+    # def _send_callback(self, widget, context, selection, targetType, eventTime):
+        # if targetType == self.DND_TARGET_TYPE_TEXT:
+            # selection.set(selection.target, 8, str(self._event_box.get_data('id')))
         
     def add_rename_entry(self, text):
         self.text_view = gtk.TextView()
