@@ -11,6 +11,7 @@ from shortcut.application_shortcut import ApplicationShortcut
 from feedback_module.feedback_response_dialog_view import FeedbackResponseDialogView
 from feedback_module.bugs_and_feedback_popup_window import BugsAndFeedbackPopupWindow
 from shortcut.folder_shortcut import FolderShortcut
+from shortcut.separator_shortcut import SeparatorShortcut
 from folder.folder_window import OpenFolderWindow
 from notification_panel.notification_panel import NotificationPanel
 from taskbar_panel.taskbar_panel import TaskbarPanel
@@ -207,6 +208,8 @@ class EndlessDesktopView(gtk.Window):
         row = gtk.HBox()
         row.show()
         
+        sep_last = SeparatorShortcut()
+        row.pack_start(sep_last, False, False, 0)
         for item in items:
             if isinstance(item, ApplicationShortcut):
                 item.connect("application-shortcut-rename", lambda w, shortcut, new_name: self._presenter.rename_item(shortcut, new_name))
@@ -224,7 +227,12 @@ class EndlessDesktopView(gtk.Window):
                 
             if item.parent != None:
                 print >> sys.stderr, "Item has parent!", item
-            row.pack_start(item, False, False, 30)
+            row.pack_start(item, False, False, 0)
+            sep_new = SeparatorShortcut()
+            row.pack_start(sep_new, False, False, 0)
+            sep_last.SetRight(sep_new)
+            sep_new.SetLeft(sep_last)
+            sep_last = sep_new
             
         return row
     
