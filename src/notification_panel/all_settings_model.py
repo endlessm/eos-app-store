@@ -2,7 +2,7 @@ import os
 from osapps.os_util import OsUtil
 
 class AllSettingsModel():
-    VERSION_COMMAND = "dpkg -l endless-os-desktop-widget | grep endless | awk \"{print $3}\""
+    VERSION_COMMAND = "dpkg -p endless-os-desktop-widget | grep ^Version: | awk \"{print $2}\""
     DEFAULT_VERSION_FILE = "/usr/share/endlessm/version.txt"
 
     def __init__(self, os_util=OsUtil(), version_file=DEFAULT_VERSION_FILE):
