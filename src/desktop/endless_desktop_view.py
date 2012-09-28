@@ -75,12 +75,7 @@ class EndlessDesktopView(gtk.Window):
         self._notification_panel.close_settings_plugin_window()
 
     def set_presenter(self, presenter):
-        self._presenter = presenter
-        
-#        self._add_icon = AddRemoveShortcut(_("Add new"), self._add_icon_clicked_callback)
-#        self._add_icon.connect("application-shortcut-remove", lambda w, e: self._add_icon.toggle_drag(False))
-#        self._add_icon.connect("application-shortcut-remove", self._remove_icon)
-        
+        self._presenter = presenter        
         self._taskbar_panel.connect('launch-search', lambda w, s: self._presenter.launch_search(s))
 
     def _set_background(self):
@@ -201,8 +196,6 @@ class EndlessDesktopView(gtk.Window):
     def _remove_all(self):
         for item in self._app_shortcuts.values():
             item.remove_shortcut()
-            
-#        self._add_icon.remove_shortcut()
         
     def _create_row(self, items):
         row = gtk.HBox()
@@ -214,15 +207,11 @@ class EndlessDesktopView(gtk.Window):
         for item in items:
             if isinstance(item, ApplicationShortcut):
                 item.connect("application-shortcut-rename", lambda w, shortcut, new_name: self._presenter.rename_item(shortcut, new_name))
-                item.connect("application-shortcut-activate", lambda w, app_key, params: self._presenter.activate_item(app_key, params))
-                #item.connect("application-shortcut-dragging-over", lambda w, s: self._insert_placeholder(s))
-                #item.connect("application-shortcut-drag", lambda w, state: self._add_icon.toggle_drag(state))
-                
+                item.connect("application-shortcut-activate", lambda w, app_key, params: self._presenter.activate_item(app_key, params))                
                 item.show()
                 
             elif isinstance(item, FolderShortcut):
                 item.connect("folder-shortcut-activate", self._folder_icon_clicked_callback)
-                
                 item.show()
                 
             if item.parent != None:
@@ -240,13 +229,7 @@ class EndlessDesktopView(gtk.Window):
             
         return row
         
-    def _rearrange_shortcuts(self, widget, sc_moved, sc_to_move):
-        print '--- MOVE ---'
-        print '_rearrange_shortcuts'
-        print 'sc_moved', sc_moved
-        print 'sc_to_move', sc_to_move
-        print '---------------------'
-        
+    def _rearrange_shortcuts(self, widget, sc_moved, sc_to_move):        
         self._shorcuts_buffer.remove(sc_moved)
         if sc_to_move != '':
             new_index = self._shorcuts_buffer.index(sc_to_move)
@@ -255,18 +238,6 @@ class EndlessDesktopView(gtk.Window):
             self._shorcuts_buffer.append(sc_moved)
         self._redraw(self._shorcuts_buffer)
         self._presenter.move_item(self._shorcuts_buffer)
-     
-    # def _insert_placeholder(self, s):
-        # moving = [x for x in self._shorcuts_buffer if self._app_shortcuts[x].is_moving()]
-        
-        # if moving:
-            # for item in moving:
-                # new_index = self._shorcuts_buffer.index(s.id())
-                
-                # self._shorcuts_buffer.remove(item)
-                # self._shorcuts_buffer.insert(new_index, item)
-            
-            # self._redraw(self._shorcuts_buffer)
         
     def _calculate_max_icons(self):
         width = self._get_net_work_area()[0]

@@ -8,13 +8,6 @@ class DesktopShortcut(gtk.VBox):
     DND_TARGET_TYPE_TEXT = 80
     DND_TRANSFER_TYPE = [( "text/plain", gtk.TARGET_SAME_APP, DND_TARGET_TYPE_TEXT )]
     
-    # __gsignals__ = {
-           # "application-shortcut-dragging-over": (gobject.SIGNAL_RUN_FIRST, #@UndefinedVariable
-                                                  # gobject.TYPE_NONE,
-                                                  # (gobject.TYPE_PYOBJECT,)),    
-    # }
-    
-    # this is for motion broadcast
     _motion_callbacks = []
     _drag_end_callbacks = []
     @classmethod
@@ -38,10 +31,6 @@ class DesktopShortcut(gtk.VBox):
     def __init__(self, label_text="", draggable=True):
         super(DesktopShortcut, self).__init__()
         self.set_size_request(64, 64)
-        
-#        self._event_box = self._create_event_box() 
-#        self._icon = self._create_icon(self.get_images())
-#        self._event_box.add(self._icon)
         self._event_box = self._create_icon(self.get_images())
         
         self._label = gtk.Label(label_text)
@@ -64,8 +53,6 @@ class DesktopShortcut(gtk.VBox):
         self.pack_start(self._event_box, False, False, 3)
         self.pack_start(self._label_event_box, False, False, 3)
 
-        # DND specific code
-            # for source
         if draggable:
             self._event_box.connect("drag_data_get", self.dnd_send_data)
             self._event_box.drag_source_set(
@@ -73,12 +60,10 @@ class DesktopShortcut(gtk.VBox):
                 self.DND_TRANSFER_TYPE, 
                 gtk.gdk.ACTION_MOVE
                 )
-            # for button target
         self._event_box.connect("drag_data_received", self.dnd_receive_data)
         self._event_box.connect("drag_motion", self.dnd_motion_data)
         self._event_box.connect("drag_end", self.dnd_drag_end)
         self._event_box.connect("drag_begin", self.dnd_drag_begin)
-        # do not use built in highlight
         self._event_box.drag_dest_set(
             #gtk.DEST_DEFAULT_HIGHLIGHT |
             gtk.DEST_DEFAULT_MOTION |
@@ -88,20 +73,16 @@ class DesktopShortcut(gtk.VBox):
             )
             
     def dnd_send_data(self, widget, context, selection, targetType, eventTime):
-        # no destination widget is known, 'widget' is dragged one, and it sends data
         if targetType == self.DND_TARGET_TYPE_TEXT:
-            # if there is callback, call it
             if hasattr(self, '_transmiter_handler_callback'):
                 data = self._transmiter_handler_callback(widget)
                 selection.set(selection.target, 8, data)
             else:
-                # just do default, place widget identifier in selection
                 selection.set(selection.target, 8, self._identifier)
         
     def dnd_receive_data(self, widget, context, x, y, selection, targetType, time):
         source_widget = context.get_source_widget()
         if targetType == self.DND_TARGET_TYPE_TEXT:
-            # if there is callback, call it
             if hasattr(self, '_received_handler_callback'):
                 self._received_handler_callback(
                     source_widget, 
@@ -112,20 +93,14 @@ class DesktopShortcut(gtk.VBox):
                     )
             
     def dnd_motion_data(self, widget, context, x, y, time):
-        # source_widget is the dragged one
-        # widget is one under cursor
-        # x, y are relative to widget
         source_widget = context.get_source_widget()
-        # give data for broadcast
         DesktopShortcut._motion_broadcast(source_widget, widget, x, y)
-        # if there is callback, call it
         if hasattr(self, '_motion_handler_callback'):
             self._motion_handler_callback(source_widget, widget, x, y)
         context.drag_status(gtk.gdk.ACTION_MOVE, time)
         return True
         
     def dnd_drag_end(self, widget, context):
-        # give data for broadcast
         self._label.show()
         self._event_box.show()
         self.set_moving(False)

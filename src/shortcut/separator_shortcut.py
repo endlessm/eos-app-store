@@ -42,12 +42,6 @@ class SeparatorShortcut(DesktopShortcut):
         
     # DND Callbacks
     def _received_handler_callback(self, source, destination, x, y, data=None):
-        print 
-        print '-> SeparatorShortcut::_received_handler_callback'
-        print '    source', source
-        print '    tdestination', destination
-        print '    x:%s, y:%s' % (x, y)
-        print '    data', data
         if hasattr(destination, '_sep_obj'):
             source_name = source._identifier
             if destination._sep_obj.right_widget:
@@ -60,7 +54,6 @@ class SeparatorShortcut(DesktopShortcut):
                 source_name, 
                 destination_name
                 )
-        
         
     @classmethod
     def _motion_broadcast_callback(cls, source, destination, x, y):
