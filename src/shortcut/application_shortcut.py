@@ -175,6 +175,7 @@ class ApplicationShortcut(DesktopShortcut):
     def mouse_release_callback(self, widget, event):
         if not self.is_moving():
             if event.button == 1:
+                self.emit("application-shortcut-activate", self._shortcut.key(), self._shortcut.params())
                 self._event_box.set_images(self.get_images())
                 self._event_box.hide()
                 self._event_box.show()
@@ -184,7 +185,6 @@ class ApplicationShortcut(DesktopShortcut):
     
     def mouse_press_callback(self, widget, event):
         if event.button == 1: # and event.type == gtk.gdk._2BUTTON_PRESS:
-            self.emit("application-shortcut-activate", self._shortcut.key(), self._shortcut.params())
             self._event_box.set_images(self.get_depressed_images())
             self._event_box.hide()
             self._event_box.show()
