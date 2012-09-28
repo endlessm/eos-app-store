@@ -23,9 +23,10 @@ class AllSettingsPlugin(IconPlugin):
     WINDOW_HEIGHT = 160
     WINDOW_BORDER = 10
     
-    def __init__(self, icon_size):
+    def __init__(self, icon_size, desktop_preferences):
         super(AllSettingsPlugin, self).__init__(icon_size, [self.ICON_NAME], None, 0)
         self._label_version_text = 'EndlessOS ' + self._read_version()
+        self._desktop_preferences = desktop_preferences
         
     def execute(self):
         self._button_desktop = gtk.Button(_('Desktop'))
@@ -56,7 +57,7 @@ class AllSettingsPlugin(IconPlugin):
         
         self.set_visible_window(False)
     
-        self._window = TransparentWindow(None)
+        self._window = TransparentWindow(None, self._desktop_preferences)
 
         x = screen_util.get_width() - self.WINDOW_WIDTH - self.X_OFFSET
     

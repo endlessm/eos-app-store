@@ -44,4 +44,7 @@ class EndlessDesktopModel(object):
 
     def get_default_background(self):
         return self._preferences_provider.get_default_background()
+    
+    def get_preferences(self):
+        return self._preferences_provider
 

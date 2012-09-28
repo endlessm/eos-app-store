@@ -33,5 +33,8 @@ class DesktopPresenter(object):
     
     def revert_background(self):
         self.change_background(self._model.get_default_background())
+        
+    def get_preferences(self):
+        return self._model.get_preferences()
 
     

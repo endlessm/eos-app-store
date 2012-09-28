@@ -1,11 +1,10 @@
 import cairo
 import gtk
 from util import screen_util
-from osapps.desktop_preferences_datastore import DesktopPreferencesDatastore
 
 class TransparentWindow(gtk.Window):
-    def __init__(self, parent):
-        self.desktop_preferences = DesktopPreferencesDatastore()
+    def __init__(self, parent, desktop_preferences):
+        self.desktop_preferences = desktop_preferences
         gtk.Window.__init__(self, gtk.WINDOW_TOPLEVEL)
         self.set_wmclass("endless_os_desktop", "modal")
 
@@ -42,7 +41,9 @@ class TransparentWindow(gtk.Window):
         
     def draw(self, cr, x, y):
         w, h = self.size_request()
+        print self._background, x, y, w, h
         pixbuf = self._background.subpixbuf(x, y, w, h)
+        print pixbuf
         cr.set_source_pixbuf(pixbuf, 0, 0)
 
         cr.paint()

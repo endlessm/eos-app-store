@@ -22,8 +22,9 @@ class EndlessDesktopView(gtk.Window):
     _padding = 100
     _app_shortcuts = {}
 
-    def __init__(self):
+    def __init__(self, preferences_provider):
         gtk.Window.__init__(self)
+        self._desktop_preferences = preferences_provider
         
         width, height = self._get_net_work_area()
         self.resize(width, height)
@@ -33,7 +34,7 @@ class EndlessDesktopView(gtk.Window):
         self.add_events(gtk.gdk.BUTTON_PRESS_MASK)
         self.connect('button-press-event', self.unfocus_widget)
         self.connect('destroy', lambda w: gtk.main_quit())
-
+        
         # The following prevents propagation of signals that close
         # the dektop (<Alt>F4)
         self.connect('delete-event', lambda w, e: True)
@@ -48,8 +49,8 @@ class EndlessDesktopView(gtk.Window):
         
         self._taskbar_panel = TaskbarPanel(width)
         self._taskbar_panel.connect('feedback-clicked', lambda w: self._feedback_icon_clicked_callback())
-                    
-        self._notification_panel = NotificationPanel(self)
+        
+        self._notification_panel = NotificationPanel(self, self._desktop_preferences)
 
         taskbar_alignment = gtk.Alignment(0.5, 0.5, 1.0, 1.0)
         taskbar_alignment.add(self._taskbar_panel)
@@ -67,7 +68,7 @@ class EndlessDesktopView(gtk.Window):
     
         screen = gtk.gdk.Screen() #@UndefinedVariable
         screen.connect('size-changed', lambda s: self._set_background(self.BACKGROUND_NAME))
-    
+        
     def unfocus_widget(self, widget, event):
         widget.set_focus(None)
         self.hide_folder_window()
@@ -191,7 +192,7 @@ class EndlessDesktopView(gtk.Window):
     # Show folder content
     def _folder_icon_clicked_callback(self, widget, event, shortcut):
         self.hide_folder_window()
-        self._folder_window = OpenFolderWindow(self, self._presenter.activate_item, shortcut) 
+        self._folder_window = OpenFolderWindow(self, self._presenter.activate_item, shortcut, self._desktop_preferences) 
         self._folder_window.show()
         
     def _remove_all(self):
