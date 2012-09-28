@@ -28,6 +28,7 @@ class AllSettingsPlugin(IconPlugin):
     def __init__(self, icon_size):
         super(AllSettingsPlugin, self).__init__(icon_size, [self.ICON_NAME], None, 0)
 
+    def _setup_view(self):
         self._button_desktop = gtk.Button(_('Desktop'))
         self._button_desktop.connect('button-press-event', self._desktop_background)
         self._label_version = gtk.Label()
@@ -80,6 +81,7 @@ class AllSettingsPlugin(IconPlugin):
         self._is_active = False
         
     def execute(self):
+        self._setup_view()
         AllSettingsPresenter(self, AllSettingsModel())
 
     def display(self):
