@@ -7,6 +7,8 @@ from util.transparent_window import TransparentWindow
 from util import screen_util
 from background_chooser import BackgroundChooser
 import gettext
+from all_settings_presenter import AllSettingsPresenter
+from all_settings_model import AllSettingsModel
 
 gettext.install('endless_desktop', '/usr/share/locale', unicode = True, names=['ngettext'])
 
@@ -25,12 +27,10 @@ class AllSettingsPlugin(IconPlugin):
     
     def __init__(self, icon_size):
         super(AllSettingsPlugin, self).__init__(icon_size, [self.ICON_NAME], None, 0)
-        self._label_version_text = 'EndlessOS ' + self._read_version()
-        
-    def execute(self):
+
         self._button_desktop = gtk.Button(_('Desktop'))
         self._button_desktop.connect('button-press-event', self._desktop_background)
-        self._label_version = gtk.Label('EndlessOS ' + self._read_version())
+        self._label_version = gtk.Label()
         self._button_update = gtk.Button(_('Update'))
         self._button_update.connect('button-release-event', self._update_software)
 
@@ -78,12 +78,16 @@ class AllSettingsPlugin(IconPlugin):
         self._container.add(self._table)
         self._window.add(self._container)
         self._is_active = False
+        
+    def execute(self):
+        AllSettingsPresenter(self, AllSettingsModel())
 
+    def display(self):
         self._window.show_all()
 
-    def setup_transparent_window(self):
-        pass
-    
+    def set_current_version(self, version_text):
+        self._label_version.set_text(version_text)
+
     # To do: make the triangle position configurable
     def _expose(self, widget, event):
         cr = widget.window.cairo_create()
@@ -98,11 +102,6 @@ class AllSettingsPlugin(IconPlugin):
         cr.line_to(self._pointer - 10, 10)
         cr.fill()
 
-    def _read_version(self):
-        pipe = os.popen('dpkg -l endless-installer* | grep endless | awk \'{print $3}\'')
-        version = pipe.readline()
-        pipe.close()
-        return version.strip()
 
     def _update_software(self, widget, event):
         self._window.hide()
