@@ -34,8 +34,9 @@ class AllSettingsView(AbstractNotifier):
                     LOGOUT_MESSAGE:   _("Log Out?"),
                 }
 
-    def __init__(self, parent):
+    def __init__(self, parent, desktop_preferences):
         self._parent = parent
+        self._desktop_preferences = desktop_preferences
         self._button_desktop = gtk.Button(_('Desktop'))
         self._label_version = gtk.Label()
         self._button_update = gtk.Button(_('Update'))
@@ -70,7 +71,7 @@ class AllSettingsView(AbstractNotifier):
         
         self._parent.set_visible_window(False)
     
-        self._window = TransparentWindow(None)
+        self._window = TransparentWindow(None, self._desktop_preferences )
 
         x = screen_util.get_width() - self.WINDOW_WIDTH - self.X_OFFSET
     
