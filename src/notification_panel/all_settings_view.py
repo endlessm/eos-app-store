@@ -71,7 +71,7 @@ class AllSettingsView(AbstractNotifier):
         
         self._parent.set_visible_window(False)
     
-        self._window = TransparentWindow(None, self._desktop_preferences )
+        self._window = TransparentWindow(None, self._desktop_preferences)
 
         x = screen_util.get_width() - self.WINDOW_WIDTH - self.X_OFFSET
     

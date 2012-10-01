@@ -25,6 +25,7 @@ class EndlessDesktopView(gtk.Window):
     def __init__(self, preferences_provider):
         gtk.Window.__init__(self)
         self._desktop_preferences = preferences_provider
+        print "Preferences in VIEW: ", self._desktop_preferences
         
         width, height = self._get_net_work_area()
         self.resize(width, height)

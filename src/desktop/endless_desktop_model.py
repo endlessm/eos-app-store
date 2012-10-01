@@ -16,7 +16,7 @@ class EndlessDesktopModel(object):
         self._app_desktop_datastore = app_desktop_datastore
         self._app_datastore = app_datastore
         self._preferences_provider = preferences_provider
-        
+        print "Preferences in MODEL: ", self._preferences_provider
     def get_shortcuts(self):
         return self._app_desktop_datastore.get_all_shortcuts()
     

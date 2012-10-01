@@ -4,8 +4,8 @@ from util import screen_util
 
 class TransparentWindow(gtk.Window):
     def __init__(self, parent, desktop_preferences):
-        self.desktop_preferences = desktop_preferences
         gtk.Window.__init__(self, gtk.WINDOW_TOPLEVEL)
+        self._desktop_preferences = desktop_preferences
         self.set_wmclass("endless_os_desktop", "modal")
 
         self.set_property("accept-focus", True)
@@ -18,7 +18,7 @@ class TransparentWindow(gtk.Window):
         self.set_can_default(True)
 
         self.connect("expose-event", self._handle_event)
-        self._background = self.desktop_preferences.get_background_pixbuf()
+        self._background = self._desktop_preferences.get_background_pixbuf()
         
         self._background = self._background.scale_simple(screen_util.get_width(), screen_util.get_height(),gtk.gdk.INTERP_BILINEAR)
         self.set_app_paintable(True)
