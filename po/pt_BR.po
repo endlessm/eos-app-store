@@ -86,7 +86,7 @@ msgid "button"
 msgstr ""
 
 #: src/notification_panel/all_settings_view.py:39
-msgid "Desktop"
+msgid "Background"
 msgstr "Fundo"
 
 #: src/notification_panel/all_settings_view.py:43
@@ -111,11 +111,11 @@ msgstr "Definições"
 
 #: src/notification_panel/all_settings_view.py:45
 msgid "Shut Down"
-msgstr ""
+msgstr "Desligar"
 
 #: src/notification_panel/all_settings_view.py:32
 msgid "Shutdown?"
-msgstr "Desligar"
+msgstr "Desligar?"
 
 #: src/notification_panel/all_settings_view.py:41
 msgid "Update"
