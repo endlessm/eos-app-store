@@ -19,7 +19,9 @@ class AllSettingsModel():
         return self._version_provider.get_current_version()
 
     def update_software(self):
-        self._app_launcher.launch(self.UPDATE_COMMAND.format(self._version_provider.get_server_endpoint()))
+        self._app_launcher.launch(
+                          self.UPDATE_COMMAND.format(
+                                             self._version_provider.get_server_endpoint()))
 
     def open_settings(self):
         self._app_launcher.launch(self.SETTINGS_COMMAND)

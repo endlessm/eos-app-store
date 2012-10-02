@@ -1,19 +1,21 @@
 import unittest
-from subprocess import Popen
 from mock import Mock
 
 from notification_panel.all_settings_model import AllSettingsModel
 
 class TestAllSettingsModel(unittest.TestCase):
     def test_when_update_is_called_we_launch_updates(self):
-        mock_os_util = Mock()
         mock_app_launcher= Mock()
+        server_endpoint = "given server endpoint"
+        
         mock_version_provider = Mock()
+        mock_version_provider.get_server_endpoint = Mock(return_value=server_endpoint)
 
-        test_object = AllSettingsModel(mock_os_util, mock_version_provider, mock_app_launcher)
+        test_object = AllSettingsModel(None, mock_version_provider, mock_app_launcher)
         test_object.update_software()
 
-        mock_app_launcher.launch.assert_called_once_with(AllSettingsModel.UPDATE_COMMAND)
+        expected_command = AllSettingsModel.UPDATE_COMMAND.format(server_endpoint)
+        mock_app_launcher.launch.assert_called_once_with(expected_command)
 
     def test_when_restart_is_called_we_launch_restart(self):
         mock_os_util = Mock()

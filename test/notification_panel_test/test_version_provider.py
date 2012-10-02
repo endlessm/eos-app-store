@@ -41,7 +41,12 @@ class TestVersionProvider(unittest.TestCase):
     def test_get_server_endpoint_returns_server_endpoint_from_file(self):
         self.assertEquals(self._server_endpoint, self.test_object.get_server_endpoint())
 
-    def test_get_server_endpoint_returns_None_when_server_endpoint_is_not_in_file(self):
+    def test_get_server_endpoint_returns_default_when_file_does_not_exist(self):
+        self.test_object = VersionProvider("fictitious/file/location.txt")
+        
+        self.assertEquals(VersionProvider.DEFAULT_SERVER_ENDPOINT, self.test_object.get_server_endpoint())
+      
+    def test_get_server_endpoint_returns_default_when_server_endpoint_is_not_in_file(self):
         self.tearDown()
         file_data = {
                           "version":self._current_version
@@ -52,35 +57,5 @@ class TestVersionProvider(unittest.TestCase):
             f.write(file_content)
         self.test_object = VersionProvider(self._filename)
         
-        self.assertEquals(None, self.test_object.get_server_endpoint())
+        self.assertEquals(VersionProvider.DEFAULT_SERVER_ENDPOINT, self.test_object.get_server_endpoint())
         
-#    def test_get_current_version_uses_output_from_command_line_result(self):
-#        current_version = "version from browser"
-#
-#        mock_os_util = Mock()
-#        mock_os_util.execute = Mock(return_value=current_version)
-#
-#        test_object = AllSettingsModel(mock_os_util, "file_that_doesn't exist.txt")
-#
-#        self.assertEquals("EndlessOS " + current_version, test_object.get_current_version())
-#
-#    def test_when_using_command_line_ensure_that_the_correct_command_is_used(self):
-#        mock_os_util = Mock()
-#        mock_os_util.execute = Mock(return_value="")
-#
-#        test_object = AllSettingsModel(mock_os_util, "file_that_doesn't exist.txt")
-#
-#        test_object.get_current_version()
-#
-#        mock_os_util.execute.assert_called_once_with(AllSettingsModel.VERSION_COMMAND)
-#
-#    def test_when_using_command_line_and_an_error_occurs_then_just_display_endlessos(self):
-#        mock_os_util = Mock()
-#        mock_os_util.execute = Mock(side_effect=Exception("boom!"))
-#
-#        test_object = AllSettingsModel(mock_os_util, "file_that_doesn't exist.txt")
-#
-#        self.assertEquals("EndlessOS", test_object.get_current_version())
-
-
-    
