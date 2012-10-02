@@ -1,6 +1,7 @@
 import os
 from osapps.os_util import OsUtil
 from osapps.app_launcher import AppLauncher
+from endpoint_provider import EndpointProvider
 
 class AllSettingsModel():
     
@@ -10,27 +11,18 @@ class AllSettingsModel():
     RESTART_COMMAND = 'sudo shutdown -r now'
     SHUTDOWN_COMMAND = 'sudo shutdown -h now'
 
-    DEFAULT_VERSION_FILE = "/usr/share/endlessm/version.txt"
-
-    def __init__(self, os_util=OsUtil(), version_file=DEFAULT_VERSION_FILE, app_launcher=AppLauncher()):
-        self._version_file = version_file
+    def __init__(self, os_util=OsUtil(), endpoint_provider=EndpointProvider(), app_launcher=AppLauncher()):
+        self._endpoint_provider = endpoint_provider
         self._os_util = os_util
         self._app_launcher = app_launcher
 
     def get_current_version(self):
-        if os.path.exists(self._version_file):
-            with open(self._version_file, "r") as f:
-                version_text = f.read()
-        else:
-            try:
-                version_text = "EndlessOS " + self._os_util.get_version() 
-            except:
-                version_text = "EndlessOS"
-
-        return version_text
+        return self._os_util.get_version()
 
     def update_software(self):
-        self._app_launcher.launch(self.UPDATE_COMMAND)
+        self._app_launcher.launch(
+                          self.UPDATE_COMMAND.format(
+                                             self._endpoint_provider.get_server_endpoint()))
 
     def open_settings(self):
         self._app_launcher.launch(self.SETTINGS_COMMAND)
