@@ -1,6 +1,6 @@
 from osapps.os_util import OsUtil
 from osapps.app_launcher import AppLauncher
-from version_provider import VersionProvider
+from endpoint_provider import EndpointProvider
 
 class AllSettingsModel():
     VERSION_COMMAND = "dpkg -p endless-os-desktop-widget | grep ^Version: | awk \"{print $2}\""
@@ -10,18 +10,18 @@ class AllSettingsModel():
     RESTART_COMMAND = 'sudo shutdown -r now'
     SHUTDOWN_COMMAND = 'sudo shutdown -h now'
 
-    def __init__(self, os_util=OsUtil(), version_provider=VersionProvider(), app_launcher=AppLauncher()):
-        self._version_provider = version_provider
+    def __init__(self, os_util=OsUtil(), endpoint_provider=EndpointProvider(), app_launcher=AppLauncher()):
+        self._endpoint_provider = endpoint_provider
         self._os_util = os_util
         self._app_launcher = app_launcher
 
     def get_current_version(self):
-        return self._version_provider.get_current_version()
+        return self._os_util.get_version()
 
     def update_software(self):
         self._app_launcher.launch(
                           self.UPDATE_COMMAND.format(
-                                             self._version_provider.get_server_endpoint()))
+                                             self._endpoint_provider.get_server_endpoint()))
 
     def open_settings(self):
         self._app_launcher.launch(self.SETTINGS_COMMAND)
