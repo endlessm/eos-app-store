@@ -126,7 +126,7 @@ class AllSettingsView(AbstractNotifier):
         return (answer == gtk.RESPONSE_YES)
 
     def _get_confirm_message(self, message_id):
-        if self._messages.has_key(message_id):
+        if message_id in self._messages:
             return self._messages[message_id]
 
     def display(self):
