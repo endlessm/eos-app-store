@@ -36,7 +36,7 @@ class AllSettingsView(AbstractNotifier):
 
     def __init__(self, parent):
         self._parent = parent
-        self._button_desktop = gtk.Button(_('Desktop'))
+        self._button_desktop = gtk.Button(_('Background'))
         self._label_version = gtk.Label()
         self._button_update = gtk.Button(_('Update'))
         self._button_settings = gtk.Button(_('Settings'))
@@ -126,7 +126,7 @@ class AllSettingsView(AbstractNotifier):
         return (answer == gtk.RESPONSE_YES)
 
     def _get_confirm_message(self, message_id):
-        if self._messages.has_key(message_id):
+        if message_id in self._messages:
             return self._messages[message_id]
 
     def display(self):

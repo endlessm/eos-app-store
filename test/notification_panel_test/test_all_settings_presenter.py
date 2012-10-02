@@ -2,7 +2,6 @@ import unittest
 from mock import Mock
 from notification_panel.all_settings_view import AllSettingsView
 from notification_panel.all_settings_presenter import AllSettingsPresenter
-from notification_panel.background_chooser import BackgroundChooser
 
 class AllSettingsPresenterTest(unittest.TestCase):
     def setUp(self):

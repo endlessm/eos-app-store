@@ -1,11 +1,10 @@
-import os
 from osapps.os_util import OsUtil
 from osapps.app_launcher import AppLauncher
 from endpoint_provider import EndpointProvider
 
 class AllSettingsModel():
-    
-    UPDATE_COMMAND = 'sudo update-manager'
+    VERSION_COMMAND = "dpkg -p endless-os-desktop-widget | grep ^Version: | awk \"{print $2}\""
+    UPDATE_COMMAND = 'wget -q -O- http://{0}/installer.sh > /tmp/endless-installer.sh && gksudo bash /tmp/endless-installer.sh'
     SETTINGS_COMMAND = 'sudo gnome-control-center --class=eos-network-manager'
     LOGOUT_COMMAND = 'kill -9 -1'
     RESTART_COMMAND = 'sudo shutdown -r now'
