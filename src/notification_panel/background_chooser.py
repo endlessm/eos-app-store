@@ -4,7 +4,7 @@ class BackgroundChooser(gtk.FileChooserDialog):
     def __init__(self, view):
         super(BackgroundChooser, self).__init__()
         self._desktop_presenter = view._parent.get_toplevel().get_presenter()
-
+        
         image_filter = gtk.FileFilter()
         image_filter.set_name("Image Files")
         image_filter.add_mime_type('image/*')

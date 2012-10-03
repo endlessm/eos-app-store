@@ -36,10 +36,6 @@ msgstr "Feedback"
 msgid "Delete"
 msgstr "Excluir"
 
-#: src/notification_panel/all_settings_plugin.py:31
-msgid "Desktop"
-msgstr ""
-
 #: src/search/search_box.py:22
 msgid "Enter Search or URL..."
 msgstr "Digite pesquisa ou um URL..."
@@ -52,10 +48,6 @@ msgstr "Diretórios"
 #: src/feedback_module/bugs_and_feedback_popup_window.py:42
 msgid "Give us feedback"
 msgstr "Deixe seu comentário."
-
-#: src/notification_panel/all_settings_plugin.py:39
-msgid "Log Out"
-msgstr "Sair"
 
 #: ui/bugs_and_feedback.glade:6
 #: src/feedback_module/bugs_and_feedback_popup_window.py:55
@@ -71,22 +63,10 @@ msgstr ""
 msgid "Report a Bug"
 msgstr "Relatar um bug"
 
-#: src/notification_panel/all_settings_plugin.py:41
-msgid "Restart"
-msgstr "Reinicializar"
-
 #: ui/bugs_and_feedback.glade:94
 #: src/feedback_module/bugs_and_feedback_popup_window.py:65
 msgid "SUBMIT"
 msgstr "ENVIAR"
-
-#: src/notification_panel/all_settings_plugin.py:37
-msgid "Settings"
-msgstr "Definições"
-
-#: src/notification_panel/all_settings_plugin.py:43
-msgid "Shut Down"
-msgstr "Desligar"
 
 #: src/feedback_module/feedback_response_dialog_view.py:9
 msgid "Thank You"
@@ -97,10 +77,6 @@ msgstr "Obrigado"
 msgid "Thank you for your feedback."
 msgstr "Obrigado pelo seu feedback."
 
-#: src/notification_panel/all_settings_plugin.py:34
-msgid "Update"
-msgstr "Atualizar"
-
 #: src/desktop/endless_desktop_view.py:113
 msgid "Websites"
 msgstr "Páginas Web"
@@ -108,6 +84,46 @@ msgstr "Páginas Web"
 #: ui/feedback_response_dialog.glade:33
 msgid "button"
 msgstr ""
+
+#: src/notification_panel/all_settings_view.py:39
+msgid "Background"
+msgstr "Fundo"
+
+#: src/notification_panel/all_settings_view.py:43
+msgid "Log Out"
+msgstr "Sair"
+
+#: src/notification_panel/all_settings_view.py:34
+msgid "Log Out?"
+msgstr "Sair?"
+
+#: src/notification_panel/all_settings_view.py:44
+msgid "Restart"
+msgstr "Reinicializar"
+
+#: src/notification_panel/all_settings_view.py:31
+msgid "Restart?"
+msgstr "Reinicializar?"
+
+#: src/notification_panel/all_settings_view.py:42
+msgid "Settings"
+msgstr "Definições"
+
+#: src/notification_panel/all_settings_view.py:45
+msgid "Shut Down"
+msgstr "Desligar"
+
+#: src/notification_panel/all_settings_view.py:32
+msgid "Shutdown?"
+msgstr "Desligar?"
+
+#: src/notification_panel/all_settings_view.py:41
+msgid "Update"
+msgstr "Atualizar"
+
+#: src/notification_panel/all_settings_view.py:33
+msgid "Update EndlessOS?"
+msgstr "Atualizar EndlessOS?"
 
 #~ msgid "Add new"
 #~ msgstr "Adicionar Novo"
