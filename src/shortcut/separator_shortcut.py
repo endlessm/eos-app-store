@@ -1,10 +1,5 @@
 import gobject
-import string
-import gtk.keysyms
-import gtk
 from shortcut.desktop_shortcut import DesktopShortcut
-
-
 
 class SeparatorShortcut(DesktopShortcut):
     __gsignals__ = {
@@ -74,16 +69,16 @@ class SeparatorShortcut(DesktopShortcut):
         for sep in cls._all_separators:
             sep.reset()
         
-    def SetLeftSeparator(self, separator=None):
+    def set_left_separator(self, separator=None):
         self.left = separator
         
-    def SetLeftWidget(self, widget=None):
+    def set_left_widget(self, widget=None):
         self.left_widget = widget
         
-    def SetRightSeparator(self, separator=None):
+    def set_right_separator(self, separator=None):
         self.right = separator
         
-    def SetRightWidget(self, widget=None):
+    def set_right_widget(self, widget=None):
         self.right_widget = widget
         
     def expand(self):
