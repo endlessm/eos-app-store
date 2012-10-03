@@ -33,7 +33,7 @@ class EndlessDesktopView(gtk.Window):
         self.add_events(gtk.gdk.BUTTON_PRESS_MASK)
         self.connect('button-press-event', self.unfocus_widget)
         self.connect('destroy', lambda w: gtk.main_quit())
-
+        
         # The following prevents propagation of signals that close
         # the dektop (<Alt>F4)
         self.connect('delete-event', lambda w, e: True)
@@ -48,7 +48,7 @@ class EndlessDesktopView(gtk.Window):
         
         self._taskbar_panel = TaskbarPanel(width)
         self._taskbar_panel.connect('feedback-clicked', lambda w: self._feedback_icon_clicked_callback())
-                    
+        
         self._notification_panel = NotificationPanel(self)
 
         taskbar_alignment = gtk.Alignment(0.5, 0.5, 1.0, 1.0)
@@ -67,7 +67,7 @@ class EndlessDesktopView(gtk.Window):
     
         screen = gtk.gdk.Screen() #@UndefinedVariable
         screen.connect('size-changed', lambda s: self._set_background(self.BACKGROUND_NAME))
-    
+        
     def unfocus_widget(self, widget, event):
         widget.set_focus(None)
         self.hide_folder_window()
@@ -80,9 +80,9 @@ class EndlessDesktopView(gtk.Window):
     def get_presenter(self):
         return self._presenter
     
-    def set_background(self, background_name):
+    def set_background_pixbuf(self, pixbuf):
         width, height = self._get_net_work_area()
-        pixbuf = image_util.load_pixbuf(background_name)
+#        pixbuf = image_util.load_pixbuf(background_name)
         
         sized_pixbuf = pixbuf.scale_simple(width, height, gtk.gdk.INTERP_BILINEAR) #@UndefinedVariable
         pixmap, mask = sized_pixbuf.render_pixmap_and_mask()

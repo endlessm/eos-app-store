@@ -30,12 +30,13 @@ class DesktopModelTestCase(unittest.TestCase):
         self.mock_feedback_manager = Mock(FeedbackManager)
         self.mock_time_provider = Mock(TimeProvider)
         self.mock_desktop_preferences = Mock(DesktopPreferencesDatastore)
-        self.testObject = EndlessDesktopModel(self.mock_desktop_locale_datastore, 
+        self.testObject = EndlessDesktopModel(self.mock_desktop_locale_datastore,
+                                              self.mock_desktop_preferences, 
                                               self.mock_app_datastore, 
                                               self.mock_app_launcher,
                                               self.mock_feedback_manager,
                                               self.mock_time_provider, 
-                                              self.mock_desktop_preferences)
+                                              )
     
     def test_initially_shortcut_list_is_retrieved_from_app_util_manager(self):
         self.assertEqual(self.available_apps, self.testObject.get_shortcuts())
@@ -49,7 +50,13 @@ class DesktopModelTestCase(unittest.TestCase):
     def test_execute_app_with_cannot_find_app_no_exception(self):
         self.mock_app_datastore = Mock(AppDatastore)
         self.mock_app_datastore.get_app_by_key = Mock(return_value=None)
-        self.testObject = EndlessDesktopModel(self.mock_desktop_locale_datastore, self.mock_app_datastore, self.mock_app_launcher)
+        self.testObject = EndlessDesktopModel(self.mock_desktop_locale_datastore, 
+                                              self.mock_desktop_preferences, 
+                                              self.mock_app_datastore, 
+                                              self.mock_app_launcher,
+                                              self.mock_feedback_manager,
+                                              self.mock_time_provider,
+                                              )
         
         params = []
         self.testObject.execute_app('123', params)
@@ -64,9 +71,9 @@ class DesktopModelTestCase(unittest.TestCase):
         self.mock_app_launcher.launch_browser.assert_called_once_with(search_string)
 
     def test_get_background_delegates_to_preferences_datastore(self):
-        self.testObject.get_background()
+        self.testObject.get_background_pixbuf()
         
-        self.mock_desktop_preferences.get_background.assert_called()
+        self.mock_desktop_preferences.get_background_pixbuf.assert_called()
 
     def test_set_background_delegates_to_preferences_datastore(self):
         expected = "/foo/whatever/blah"
