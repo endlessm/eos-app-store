@@ -69,13 +69,13 @@ class TestEndlessDesktopPresenter(unittest.TestCase):
         self.mock_model.reset_mock()
         self.mock_view.reset_mock()
         
-        filename = "filename"
-        self.mock_model.get_background = Mock(return_value=filename)
+        pixbuf = "pixbuf"
+        self.mock_model.get_background_pixbuf = Mock(return_value=pixbuf)
         
-        self.testObject.change_background(filename)
+        self.testObject.change_background(pixbuf)
         
-        self.mock_model.set_background.assert_called_once_with(filename)
-        self.mock_view.set_background.assert_called_once_with(filename)
+        self.mock_model.set_background.assert_called_once_with(pixbuf)
+        self.mock_view.set_background_pixbuf.assert_called_once_with(pixbuf)
         
     def test_revert_background_sets_background_to_default(self):
         filename = "default"

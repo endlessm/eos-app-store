@@ -11,14 +11,16 @@ from osapps.app_datastore import AppDatastore
 from osapps.desktop_locale_datastore import DesktopLocaleDatastore
 
 if __name__ == "__main__":
-    preferences_provider = DesktopPreferencesDatastore()
-    presenter = DesktopPresenter(EndlessDesktopView(preferences_provider), 
-                                 EndlessDesktopModel(app_desktop_datastore=DesktopLocaleDatastore(), 
-                                                     app_datastore=AppDatastore(), 
-                                                     app_launcher=AppLauncher(), 
-                                                     feedback_manager=FeedbackManager(), 
-                                                     time_provider=TimeProvider(), 
-                                                     preferences_provider=preferences_provider))
+    preferences_provider = DesktopPreferencesDatastore.get_instance()
+    
+    presenter = DesktopPresenter(EndlessDesktopView(), 
+                                 EndlessDesktopModel(DesktopLocaleDatastore(),
+                                                     preferences_provider, 
+                                                     AppDatastore(), 
+                                                     AppLauncher(), 
+                                                     FeedbackManager(), 
+                                                     TimeProvider())
+                                                     )
     presenter._view.main()
         
     

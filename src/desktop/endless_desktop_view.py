@@ -22,10 +22,8 @@ class EndlessDesktopView(gtk.Window):
     _padding = 100
     _app_shortcuts = {}
 
-    def __init__(self, preferences_provider):
+    def __init__(self):
         gtk.Window.__init__(self)
-        self._desktop_preferences = preferences_provider
-        print "Preferences in VIEW: ", self._desktop_preferences
         
         width, height = self._get_net_work_area()
         self.resize(width, height)
@@ -51,7 +49,7 @@ class EndlessDesktopView(gtk.Window):
         self._taskbar_panel = TaskbarPanel(width)
         self._taskbar_panel.connect('feedback-clicked', lambda w: self._feedback_icon_clicked_callback())
         
-        self._notification_panel = NotificationPanel(self, self._desktop_preferences)
+        self._notification_panel = NotificationPanel(self)
 
         taskbar_alignment = gtk.Alignment(0.5, 0.5, 1.0, 1.0)
         taskbar_alignment.add(self._taskbar_panel)
@@ -82,9 +80,9 @@ class EndlessDesktopView(gtk.Window):
     def get_presenter(self):
         return self._presenter
     
-    def set_background(self, background_name):
+    def set_background_pixbuf(self, pixbuf):
         width, height = self._get_net_work_area()
-        pixbuf = image_util.load_pixbuf(background_name)
+#        pixbuf = image_util.load_pixbuf(background_name)
         
         sized_pixbuf = pixbuf.scale_simple(width, height, gtk.gdk.INTERP_BILINEAR) #@UndefinedVariable
         pixmap, mask = sized_pixbuf.render_pixmap_and_mask()
@@ -193,7 +191,7 @@ class EndlessDesktopView(gtk.Window):
     # Show folder content
     def _folder_icon_clicked_callback(self, widget, event, shortcut):
         self.hide_folder_window()
-        self._folder_window = OpenFolderWindow(self, self._presenter.activate_item, shortcut, self._desktop_preferences) 
+        self._folder_window = OpenFolderWindow(self, self._presenter.activate_item, shortcut) 
         self._folder_window.show()
         
     def _remove_all(self):

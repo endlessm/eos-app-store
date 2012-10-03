@@ -19,7 +19,7 @@ class NotificationPanel(gtk.HBox):
                 AllSettingsPlugin
               ]
     
-    def __init__(self, parent, desktop_preferences):
+    def __init__(self, parent):
         super(NotificationPanel, self).__init__(False, 2)
         self._parent = parent
         
@@ -28,7 +28,6 @@ class NotificationPanel(gtk.HBox):
         self.plugins_list = []
         notification_panel_items = gtk.HBox(False)
         self.notification_panel.add(notification_panel_items)
-        self._desktop_preferences = desktop_preferences
 
         #Other plugins                    
         for clazz in self.PLUGINS:
@@ -41,10 +40,7 @@ class NotificationPanel(gtk.HBox):
         self.pack_end(self.notification_panel, False, False, 30) 
 
     def _register_plugin(self, notification_panel_items, clazz):
-        if clazz is AllSettingsPlugin:
-            plugin = clazz(PanelConstants.get_icon_size(), self._desktop_preferences)
-        else:
-            plugin = clazz(PanelConstants.get_icon_size())
+        plugin = clazz(PanelConstants.get_icon_size())
         plugin.set_parent(self._parent)
         notification_panel_items.pack_start(plugin, False, False, 2)
         return plugin
