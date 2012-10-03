@@ -4,11 +4,14 @@ from endpoint_provider import EndpointProvider
 
 class AllSettingsModel():
     VERSION_COMMAND = "dpkg -p endless-os-desktop-widget | grep ^Version: | awk \"{print $2}\""
-    UPDATE_COMMAND = 'wget -q -O- http://{0}/installer.sh > /tmp/endless-installer.sh && gksudo bash /tmp/endless-installer.sh'
-    SETTINGS_COMMAND = 'sudo gnome-control-center --class=eos-network-manager'
-    LOGOUT_COMMAND = 'kill -9 -1'
-    RESTART_COMMAND = 'sudo shutdown -r now'
-    SHUTDOWN_COMMAND = 'sudo shutdown -h now'
+    UPDATE_COMMAND = (
+            "wget -q -O- http://{0}/installer.sh > /tmp/endless-update-installer.sh && "
+            "chmod +x /tmp/endless-update-installer.sh && "
+            " gksudo /tmp/endless-update-installer.sh")
+    SETTINGS_COMMAND = "sudo gnome-control-center --class=eos-network-manager"
+    LOGOUT_COMMAND = "kill -9 -1"
+    RESTART_COMMAND = "sudo shutdown -r now"
+    SHUTDOWN_COMMAND = "sudo shutdown -h now"
 
     def __init__(self, os_util=OsUtil(), endpoint_provider=EndpointProvider(), app_launcher=AppLauncher()):
         self._endpoint_provider = endpoint_provider

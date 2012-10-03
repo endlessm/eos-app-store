@@ -1,9 +1,10 @@
 import sys
+import re
 
 class EndpointProvider():
 
     DEFAULT_SERVER_ENDPOINT = "apt.endlessm.com"
-    DEFAULT_ENDPOINT_FILE = "/usr/share/endlessm/endpoint.json"
+    DEFAULT_ENDPOINT_FILE = "/usr/share/endlessm/endpoint.txt"
     
     def __init__(self, endpoint_file=DEFAULT_ENDPOINT_FILE):
         self._endpoint_file = endpoint_file
@@ -12,7 +13,7 @@ class EndpointProvider():
         if not hasattr(self, "_data"):
             try:
                 with open(self._endpoint_file, "r") as f:
-                    self._data = f.read()
+                    self._data = re.sub("/repository", "", f.read().strip())
             except:
                 print >> sys.stderr, "No file: " + self._endpoint_file
     

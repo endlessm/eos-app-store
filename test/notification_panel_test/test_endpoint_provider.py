@@ -4,11 +4,11 @@ from notification_panel.endpoint_provider import EndpointProvider
 
 class TestEndpointProvider(unittest.TestCase):
     _filename = "/tmp/endpoint_test_file.txt"
-    _server_endpoint = "server endpoint"
+    _server_endpoint = "server endpoint\n"
     
     def setUp(self):
         with open(self._filename, "w") as f:
-            f.write(self._server_endpoint)
+            f.write(self._server_endpoint + "/repository")
         self.test_object = EndpointProvider(self._filename)
 
     def tearDown(self):
