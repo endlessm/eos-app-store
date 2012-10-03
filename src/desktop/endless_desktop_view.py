@@ -222,11 +222,10 @@ class EndlessDesktopView(gtk.Window):
             sep_new = SeparatorShortcut()
             sep_new.connect("application-shortcut-move", self._rearrange_shortcuts)
             row.pack_start(sep_new, False, False, 0)
-            sep_last.SetRightSeparator(sep_new)
-            sep_last.SetRightWidget(item)
-            #
-            sep_new.SetLeftSeparator(sep_last)
-            sep_last.SetLeftWidget(item)
+            sep_last.set_right_separator(sep_new)
+            sep_last.set_right_widget(item)
+            sep_new.set_left_separator(sep_last)
+            sep_last.set_left_widget(item)
             sep_last = sep_new
             
         return row
