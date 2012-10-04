@@ -13,29 +13,28 @@ class SeparatorShortcut(DesktopShortcut):
     left_widget = None
     right_widget = None
     expanded = False
-    _all_separators = set()
     
     def __init__(self, width=30, height=64):
         super(SeparatorShortcut, self).__init__('', draggable=False)          
         self.w = width
         self.h = height
         self.set_size_request(self.w, self.h)
-        self.class_name = 'sch_sep'
-        self._event_box._sep_obj = self
-        SeparatorShortcut._all_separators.add(self)
         self._image_name = ''
         self._show_background = True
         self.show_all()
         
+        DesktopShortcut._add_drag_end_broadcast_callback(
+            self._drag_end_broadcast_callback
+            )
+        
     # DND Callbacks
     def _received_handler_callback(self, source, destination, x, y, data=None):
-        if hasattr(destination, '_sep_obj'):
+        if isinstance(destination.parent, SeparatorShortcut):
             source_name = source._identifier
-            if destination._sep_obj.right_widget:
-                destination_name = destination._sep_obj.right_widget._identifier
-            else:
-                destination_name = ''
-        
+            destination_name = ''
+            if destination.parent.right_widget:
+                destination_name = destination.parent.right_widget._identifier
+            print 'emit', "application-shortcut-move"
             self.emit(
                 "application-shortcut-move",
                 source_name, 
@@ -48,7 +47,7 @@ class SeparatorShortcut(DesktopShortcut):
     def _drag_enter_handler_callback(self, source, destination):
         self.expand()
         
-    def _drag_end_handler_callback(self, destination):
+    def _drag_end_broadcast_callback(self, source):
         self.reset()
         
     def set_left_separator(self, separator=None):
