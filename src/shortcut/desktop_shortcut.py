@@ -30,6 +30,7 @@ class DesktopShortcut(gtk.VBox):
         
     def __init__(self, label_text="", draggable=True):
         super(DesktopShortcut, self).__init__()
+        self.__dnd_enter_flag = False
         self.set_size_request(64, 64)
         self._event_box = self._create_icon(self.get_images())
         
@@ -64,6 +65,7 @@ class DesktopShortcut(gtk.VBox):
         self._event_box.connect("drag_motion", self.dnd_motion_data)
         self._event_box.connect("drag_end", self.dnd_drag_end)
         self._event_box.connect("drag_begin", self.dnd_drag_begin)
+        self._event_box.connect("drag_leave", self.dnd_drag_leave)
         self._event_box.drag_dest_set(
             #gtk.DEST_DEFAULT_HIGHLIGHT |
             gtk.DEST_DEFAULT_MOTION |
@@ -93,6 +95,9 @@ class DesktopShortcut(gtk.VBox):
                     )
             
     def dnd_motion_data(self, widget, context, x, y, time):
+        if not self.__dnd_enter_flag:
+            self.__dnd_enter_flag = True
+            self.dnd_drag_enter(widget, context, time)
         source_widget = context.get_source_widget()
         DesktopShortcut._motion_broadcast(source_widget, widget, x, y)
         if hasattr(self, '_motion_handler_callback'):
@@ -105,11 +110,27 @@ class DesktopShortcut(gtk.VBox):
         self._event_box.show()
         self.set_moving(False)
         DesktopShortcut._drag_end_broadcast(widget)
+        if hasattr(self, '_drag_end_handler_callback'):
+            self._drag_end_handler_callback(widget)
         
     def dnd_drag_begin(self, widget, context):
         self._label.hide()
         self._event_box.hide()
         self.set_moving(True)
+        source_widget = context.get_source_widget()
+        if hasattr(self, '_drag_begin_handler_callback'):
+            self._drag_begin_handler_callback(widget)
+        
+    def dnd_drag_leave(self, widget, context, time):
+        self.__dnd_enter_flag = False
+        source_widget = context.get_source_widget()
+        if hasattr(self, '_drag_leave_handler_callback'):
+            self._drag_leave_handler_callback(source_widget, widget)
+        
+    def dnd_drag_enter(self, widget, context, time):
+        source_widget = context.get_source_widget()
+        if hasattr(self, '_drag_enter_handler_callback'):
+            self._drag_enter_handler_callback(source_widget, widget)
    
     def set_moving(self, is_moving):
         self._is_moving = is_moving

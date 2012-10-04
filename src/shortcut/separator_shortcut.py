@@ -16,15 +16,7 @@ class SeparatorShortcut(DesktopShortcut):
     _all_separators = set()
     
     def __init__(self, width=30, height=64):
-        super(SeparatorShortcut, self).__init__('', draggable=False)
-        # listen for motion on all widgets
-        DesktopShortcut._add_motion_broadcast_callback(
-            SeparatorShortcut._motion_broadcast_callback
-            )
-        # listen for drag end on all widgets
-        DesktopShortcut._add_drag_end_broadcast_callback(
-            SeparatorShortcut._drag_end_broadcast_callback
-            )            
+        super(SeparatorShortcut, self).__init__('', draggable=False)          
         self.w = width
         self.h = height
         self.set_size_request(self.w, self.h)
@@ -50,24 +42,14 @@ class SeparatorShortcut(DesktopShortcut):
                 destination_name
                 )
         
-    @classmethod
-    def _motion_broadcast_callback(cls, source, destination, x, y):
-        if hasattr(destination, '_sep_obj'):
-            if (y > 10) and (y < (destination._sep_obj.h-10)):
-                destination._sep_obj.expand()
-            else:
-                SeparatorShortcut._reset_all()
-        else:
-            SeparatorShortcut._reset_all()
-            
-    @classmethod
-    def _drag_end_broadcast_callback(cls, source):
-        SeparatorShortcut._reset_all()
-            
-    @classmethod
-    def _reset_all(cls):
-        for sep in cls._all_separators:
-            sep.reset()
+    def _drag_leave_handler_callback(self, source, destination):
+        self.reset()
+        
+    def _drag_enter_handler_callback(self, source, destination):
+        self.expand()
+        
+    def _drag_end_handler_callback(self, destination):
+        self.reset()
         
     def set_left_separator(self, separator=None):
         self.left = separator
