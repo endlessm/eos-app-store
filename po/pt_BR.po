@@ -104,7 +104,7 @@ msgstr "Reinicializar?"
 
 #: src/search/search_box.py:22
 msgid "Search or Type Web Site"
-msgstr "Busque ou digite página"
+msgstr "Busque ou digite o site"
 
 #: src/notification_panel/all_settings_view.py:42
 msgid "Settings"
