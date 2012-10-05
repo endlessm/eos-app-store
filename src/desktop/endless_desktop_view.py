@@ -235,18 +235,15 @@ class EndlessDesktopView(gtk.Window):
         return row
         
     def _relocation_callback(self, widget, sc_moved, sc_folder):
-        if self._presenter.relocate_item(sc_moved, sc_folder):
-            self._shorcuts_buffer.remove(sc_moved)
-            self._redraw(self._shorcuts_buffer)
+        self._presenter.relocate_item(sc_moved, sc_folder)
         
-    def _rearrange_shortcuts(self, widget, sc_moved, sc_to_move):        
+    def _rearrange_shortcuts(self, widget, sc_moved, sc_to_move):
         self._shorcuts_buffer.remove(sc_moved)
         if sc_to_move != '':
             new_index = self._shorcuts_buffer.index(sc_to_move)
             self._shorcuts_buffer.insert(new_index, sc_moved)
         else:
             self._shorcuts_buffer.append(sc_moved)
-        self._redraw(self._shorcuts_buffer)
         self._presenter.move_item(self._shorcuts_buffer)
         
     def _calculate_max_icons(self):
