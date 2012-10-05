@@ -36,9 +36,6 @@ msgstr "Feedback"
 msgid "Delete"
 msgstr "Excluir"
 
-#: src/search/search_box.py:22
-msgid "Enter Search or URL..."
-msgstr "Digite pesquisa ou um URL..."
 
 #: src/desktop/endless_desktop_view.py:114 src/folder/folder_window.py:19
 msgid "Folder"
@@ -105,6 +102,10 @@ msgstr "Reinicializar"
 msgid "Restart?"
 msgstr "Reinicializar?"
 
+#: src/search/search_box.py:22
+msgid "Search or Type Web Site"
+msgstr "Busque ou digite o site"
+
 #: src/notification_panel/all_settings_view.py:42
 msgid "Settings"
 msgstr "Definições"
@@ -124,6 +125,9 @@ msgstr "Atualizar"
 #: src/notification_panel/all_settings_view.py:33
 msgid "Update EndlessOS?"
 msgstr "Atualizar EndlessOS?"
+
+#~ msgid "Enter Search or URL..."
+#~ msgstr "Digite pesquisa ou um URL..."
 
 #~ msgid "Add new"
 #~ msgstr "Adicionar Novo"

@@ -19,7 +19,7 @@ class SearchBox(gtk.EventBox):
     RIGHT_PADDING = 16
     RIGHT_MARGIN_LABEL = 30
 
-    DEFAULT_TEXT = _("Enter Search or URL...")
+    DEFAULT_TEXT = _("Search or Type Web Site")
     
     __gsignals__ = {
            "launch-search": (gobject.SIGNAL_RUN_FIRST, #@UndefinedVariable
@@ -134,12 +134,13 @@ class SearchBoxLabel(gtk.Label):
         max_width = self._WIDTH - (self._LEFT_MARGIN + self._RIGHT_MARGIN)
 
         shown_text = ""
-        for letter in text:
+        for index, letter in enumerate(text):
             shown_text += letter
             layout = self.create_pango_layout(shown_text)
             text_size = layout.get_pixel_size()[0] 
             if text_size + self._RIGHT_PADDING >= max_width:
-                shown_text += "..." 
+                if index < len(text) - 1:
+                    shown_text += "..." 
                 break
 
         super(SearchBoxLabel, self).set_text(shown_text)
