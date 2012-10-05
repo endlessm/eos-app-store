@@ -10,8 +10,10 @@ from util import image_util
 from shortcut.application_shortcut import ApplicationShortcut
 from feedback_module.feedback_response_dialog_view import FeedbackResponseDialogView
 from feedback_module.bugs_and_feedback_popup_window import BugsAndFeedbackPopupWindow
+from removal_module.removal_confirmation_popup_window import RemovalConfirmationPopupWindow
 from shortcut.folder_shortcut import FolderShortcut
 from shortcut.separator_shortcut import SeparatorShortcut
+from shortcut.add_remove_shortcut import AddRemoveShortcut
 from folder.folder_window import OpenFolderWindow
 from notification_panel.notification_panel import NotificationPanel
 from taskbar_panel.taskbar_panel import TaskbarPanel
@@ -34,7 +36,7 @@ class EndlessDesktopView(gtk.Window):
         self.add_events(gtk.gdk.BUTTON_PRESS_MASK)
         self.connect('button-press-event', self.unfocus_widget)
         self.connect('destroy', lambda w: gtk.main_quit())
-        
+
         # The following prevents propagation of signals that close
         # the dektop (<Alt>F4)
         self.connect('delete-event', lambda w, e: True)
@@ -49,14 +51,14 @@ class EndlessDesktopView(gtk.Window):
         
         self._taskbar_panel = TaskbarPanel(width)
         self._taskbar_panel.connect('feedback-clicked', lambda w: self._feedback_icon_clicked_callback())
-        
+                    
         self._notification_panel = NotificationPanel(self)
 
         taskbar_alignment = gtk.Alignment(0.5, 0.5, 1.0, 1.0)
         taskbar_alignment.add(self._taskbar_panel)
         
         # Main window layout
-        self._desktop = gtk.VBox(False, 2)
+        self._desktop = gtk.VBox(False,2)
         self._desktop.pack_start(self._notification_panel, False, True, 0)
         self._desktop.pack_start(self._align, True, False, 0)
         self._desktop.pack_end(taskbar_alignment, False, True, 0)
@@ -68,14 +70,14 @@ class EndlessDesktopView(gtk.Window):
     
         screen = gtk.gdk.Screen() #@UndefinedVariable
         screen.connect('size-changed', lambda s: self._set_background(self.BACKGROUND_NAME))
-        
+    
     def unfocus_widget(self, widget, event):
         widget.set_focus(None)
         self.hide_folder_window()
         self._notification_panel.close_settings_plugin_window()
 
     def set_presenter(self, presenter):
-        self._presenter = presenter
+        self._presenter = presenter        
         self._taskbar_panel.connect('launch-search', lambda w, s: self._presenter.launch_search(s))
 
     def get_presenter(self):
@@ -96,7 +98,7 @@ class EndlessDesktopView(gtk.Window):
         del mask
         
         self.window.invalidate_rect((0, 0, width, height), False)
-
+ 
     def populate_popups(self, all_applications):
         self.popup = gtk.Menu()
         apps_menu = gtk.MenuItem(_("Apps"))
@@ -227,7 +229,13 @@ class EndlessDesktopView(gtk.Window):
             sep_new.set_left_separator(sep_last)
             sep_last.set_left_widget(item)
             sep_last = sep_new
-            
+        
+        #Adding AddRemove icon at the end of row
+        add_remove = AddRemoveShortcut(callback=self.show_add_dialogue)
+        add_remove.connect("application-shortcut-remove", self._delete_shortcuts)
+        row.pack_start(add_remove, False, False, 0)
+        add_remove.show()
+        
         return row
         
     def _rearrange_shortcuts(self, widget, sc_moved, sc_to_move):        
@@ -256,6 +264,14 @@ class EndlessDesktopView(gtk.Window):
         height = geometry.height
                 
         return width, height
+    
+    def show_add_dialogue(self, event_box, event):
+        print "Should show add dialogue..."
+        
+    def _delete_shortcuts(self, widget, sc_deleted):
+        self._presenter.delete_shortcut(sc_deleted)
+        self._shorcuts_buffer.remove(sc_deleted)
+        self._redraw(self._shorcuts_buffer)
     
     def main(self):
         gobject.threads_init()
