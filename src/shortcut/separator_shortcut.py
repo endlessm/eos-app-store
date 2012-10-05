@@ -27,14 +27,12 @@ class SeparatorShortcut(DesktopShortcut):
             self._drag_end_broadcast_callback
             )
         
-    # DND Callbacks
     def _received_handler_callback(self, source, destination, x, y, data=None):
         if isinstance(destination.parent, SeparatorShortcut):
             source_name = source._identifier
             destination_name = ''
             if destination.parent.right_widget:
                 destination_name = destination.parent.right_widget._identifier
-            print 'emit', "application-shortcut-move"
             self.emit(
                 "application-shortcut-move",
                 source_name, 

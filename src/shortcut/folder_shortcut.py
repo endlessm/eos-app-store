@@ -35,7 +35,6 @@ class FolderShortcut(DesktopShortcut):
         if isinstance(source.parent, ApplicationShortcut):
             source_name = source._identifier
             destination_name = destination._identifier
-            print 'emit', 'folder-shortcut-relocation'
             self.emit(
                 "folder-shortcut-relocation",
                 source_name, 

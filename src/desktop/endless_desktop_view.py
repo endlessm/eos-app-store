@@ -235,12 +235,8 @@ class EndlessDesktopView(gtk.Window):
         return row
         
     def _relocation_callback(self, widget, sc_moved, sc_folder):
-        print '-->>', '_relocation_callback'
         if self._presenter.relocate_item(sc_moved, sc_folder):
-            print 'self._shorcuts_buffer', self._shorcuts_buffer
-            print 'sc_moved', sc_moved
             self._shorcuts_buffer.remove(sc_moved)
-            print 'self._shorcuts_buffer', self._shorcuts_buffer
             self._redraw(self._shorcuts_buffer)
         
     def _rearrange_shortcuts(self, widget, sc_moved, sc_to_move):        
