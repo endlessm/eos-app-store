@@ -16,6 +16,19 @@ class DesktopPresenter(object):
     def move_item(self, shortcuts):
         self._model.set_shortcuts(shortcuts)
     
+    def relocate_item(self, sc_moved, sc_folder):
+        source_path = '/%s' % sc_moved
+        destination_path = '/%s/' % (sc_folder)
+        destination_shortchut = self._model.relocate_shortcut(
+            source_path, 
+            destination_path
+            )
+        if destination_shortchut is not None:
+            self._view.hide_folder_window()
+            self._view.show_folder_window(destination_shortchut)
+            return True
+        return False
+    
     def refresh_view(self):
         if not self._is_refreshing:
             self._is_refreshing = True

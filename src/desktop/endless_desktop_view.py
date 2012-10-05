@@ -188,12 +188,15 @@ class EndlessDesktopView(gtk.Window):
         if hasattr(self, '_folder_window') and self._folder_window:
             self._folder_window.destroy()
             self._folder_window = None
-                
+            
+    def show_folder_window(self, shortcut):
+        self._folder_window = OpenFolderWindow(self, self._presenter.activate_item, shortcut) 
+        self._folder_window.show()
+        
     # Show folder content
     def _folder_icon_clicked_callback(self, widget, event, shortcut):
         self.hide_folder_window()
-        self._folder_window = OpenFolderWindow(self, self._presenter.activate_item, shortcut) 
-        self._folder_window.show()
+        self.show_folder_window(shortcut)
         
     def _remove_all(self):
         for item in self._app_shortcuts.values():
@@ -214,6 +217,7 @@ class EndlessDesktopView(gtk.Window):
                 
             elif isinstance(item, FolderShortcut):
                 item.connect("folder-shortcut-activate", self._folder_icon_clicked_callback)
+                item.connect("folder-shortcut-relocation", self._relocation_callback)
                 item.show()
                 
             if item.parent != None:
@@ -229,6 +233,15 @@ class EndlessDesktopView(gtk.Window):
             sep_last = sep_new
             
         return row
+        
+    def _relocation_callback(self, widget, sc_moved, sc_folder):
+        print '-->>', '_relocation_callback'
+        if self._presenter.relocate_item(sc_moved, sc_folder):
+            print 'self._shorcuts_buffer', self._shorcuts_buffer
+            print 'sc_moved', sc_moved
+            self._shorcuts_buffer.remove(sc_moved)
+            print 'self._shorcuts_buffer', self._shorcuts_buffer
+            self._redraw(self._shorcuts_buffer)
         
     def _rearrange_shortcuts(self, widget, sc_moved, sc_to_move):        
         self._shorcuts_buffer.remove(sc_moved)
