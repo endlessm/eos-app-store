@@ -117,7 +117,6 @@ class DesktopShortcut(gtk.VBox):
         self._label.hide()
         self._event_box.hide()
         self.set_moving(True)
-        source_widget = context.get_source_widget()
         if hasattr(self, '_drag_begin_handler_callback'):
             self._drag_begin_handler_callback(widget)
         
@@ -153,12 +152,17 @@ class DesktopShortcut(gtk.VBox):
 
             self._callbacks = []
             
-    def connect(self, signal, callback):
+    def connect(self, signal, callback, force=False):
         if not hasattr(self, "_callbacks"):
             self._callbacks = []
             
-        super(DesktopShortcut, self).connect(signal, callback)
-        self._callbacks.append(callback)
+        if not hasattr(self, "_signals"):
+            self._signals = {}
+        
+        if force or (not self._signals.has_key(signal)):
+            self._signals[signal] = callback            
+            super(DesktopShortcut, self).connect(signal, callback)
+            self._callbacks.append(callback)
     
     def _create_event_box(self):
         event_box = gtk.EventBox()
