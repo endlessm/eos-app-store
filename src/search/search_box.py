@@ -19,7 +19,7 @@ class SearchBox(gtk.EventBox):
     RIGHT_PADDING = 16
     RIGHT_MARGIN_LABEL = 30
 
-    DEFAULT_TEXT = _("Enter Search or URL...")
+    DEFAULT_TEXT = _("Search or Type Web Site")
     
     __gsignals__ = {
            "launch-search": (gobject.SIGNAL_RUN_FIRST, #@UndefinedVariable
