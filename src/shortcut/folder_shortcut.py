@@ -80,7 +80,7 @@ class FolderShortcut(DesktopShortcut):
         
     def get_images_hover(self):
         return (
-            image_util.image_path("endless-shortcut-hover.png"), 
+            image_util.image_path("icon_highlight.png"), 
             image_util.image_path("folder.png"), 
             image_util.image_path("endless-shortcut-foreground.png")
             )
