@@ -43,14 +43,12 @@ class FolderShortcut(DesktopShortcut):
                 
     def _drag_enter_handler_callback(self, source, destination):
         if isinstance(source.parent, ApplicationShortcut):
-            self._event_box.set_images(self.get_images_hover())
-            self.hide()
-            self.show()
+            self.set_is_highlightable(True)
+        else:
+            self.set_is_highlightable(False)
             
     def _drag_leave_handler_callback(self, source, destination):
-        self._event_box.set_images(self.get_images())
-        self.hide()
-        self.show()
+        self.set_is_highlightable(False)
             
     def _drag_end_broadcast_callback(self, source):
         self._event_box.set_images(self.get_images())
@@ -78,7 +76,7 @@ class FolderShortcut(DesktopShortcut):
             image_util.image_path("endless-shortcut-foreground.png")
             )
         
-    def get_images_hover(self):
+    def get_highlight_images(self):
         return (
             image_util.image_path("icon_highlight.png"), 
             image_util.image_path("folder.png"), 

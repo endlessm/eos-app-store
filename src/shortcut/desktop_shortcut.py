@@ -28,7 +28,7 @@ class DesktopShortcut(gtk.VBox):
         for cb in cls._drag_end_callbacks:
             cb(source)
         
-    def __init__(self, label_text="", draggable=True):
+    def __init__(self, label_text="", draggable=True, highlightable=True):
         super(DesktopShortcut, self).__init__()
         self.__dnd_enter_flag = False
         self.set_size_request(64, 64)
@@ -54,6 +54,7 @@ class DesktopShortcut(gtk.VBox):
         self.pack_start(self._event_box, False, False, 3)
         self.pack_start(self._label_event_box, False, False, 3)
 
+        self.highlightable = highlightable
         if draggable:
             self._event_box.connect("drag_data_get", self.dnd_send_data)
             self._event_box.drag_source_set(
@@ -73,6 +74,9 @@ class DesktopShortcut(gtk.VBox):
             self.DND_TRANSFER_TYPE, 
             gtk.gdk.ACTION_MOVE
             )
+            
+    def set_is_highlightable(self, value):
+        self.highlightable = value
             
     def dnd_send_data(self, widget, context, selection, targetType, eventTime):
         if targetType == self.DND_TARGET_TYPE_TEXT:
@@ -125,11 +129,18 @@ class DesktopShortcut(gtk.VBox):
         source_widget = context.get_source_widget()
         if hasattr(self, '_drag_leave_handler_callback'):
             self._drag_leave_handler_callback(source_widget, widget)
-        
-    def dnd_drag_enter(self, widget, context, time):
-        source_widget = context.get_source_widget()
+        self._event_box.set_images(self.get_images())
+        self.hide()
+        self.show()
+            
+    def dnd_drag_enter(self, widget, context, time):       
+        source_widget = context.get_source_widget()       
         if hasattr(self, '_drag_enter_handler_callback'):
             self._drag_enter_handler_callback(source_widget, widget)
+        if self.highlightable:
+            self._event_box.set_images(self.get_highlight_images())
+            self.hide()
+            self.show() 
    
     def set_moving(self, is_moving):
         self._is_moving = is_moving
