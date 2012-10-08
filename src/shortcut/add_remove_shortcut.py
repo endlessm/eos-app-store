@@ -36,9 +36,7 @@ class AddRemoveShortcut(DesktopShortcut):
         
         self._event_box.connect("drag_motion", lambda w, ctx, x, y, t: self._dragged_over())
         self._event_box.connect("button-press-event", self.mouse_press_callback)
-        #self._event_box.connect("drag_data_received", self.drag_data_received_callback)
         self._event_box.connect("drag_leave", self.dnd_drag_leave)
-        #self._event_box.connect("enter-notify-event", self.dnd_drag_enter)
         
         self._plus_images = ()
         self._empty_trash_images = ()
@@ -85,24 +83,6 @@ class AddRemoveShortcut(DesktopShortcut):
         self._event_box.set_images(images)
         self._event_box.hide()
         self._event_box.show()
-        
-#    def show_empty_trash(self):
-#        images = image_util.image_path("endless-shortcut-well.png"),image_util.image_path("endless-trash.png"),image_util.image_path("endless-shortcut-foreground.png"))
-#        self._event_box.set_images(images)
-#        self._event_box.hide()
-#        self._event_box.show()
-#        
-#    def show_full_trash(self):
-#        images = (image_util.image_path("endless-shortcut-well.png"),image_util.image_path("trash-full.png"),image_util.image_path("endless-shortcut-foreground.png"))
-#        self._event_box.set_images(images)
-#        self._event_box.hide()
-#        self._event_box.show()
-#    
-#    def show_add_icon(self):
-#        images = (image_util.image_path("endless-shortcut-well.png"),image_util.image_path("endless-add.png"),image_util.image_path("endless-shortcut-foreground.png"))
-#        self._event_box.set_images(images)
-#        self._event_box.hide()
-#        self._event_box.show()
         
     def _drag_begin_broadcast_callback(self, widget):
         self.change_icon(self.get_dragged_images())
