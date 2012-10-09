@@ -18,6 +18,8 @@ class EndlessDesktopModel(object):
         self._app_desktop_datastore.set_all_shortcuts_by_name(shortcuts_names)
     
     def relocate_shortcut(self, source_path, destination_path):
+        if (len(destination_path.strip()) == 0) or (len(source_path.strip()) == 0):
+            return None
         all_shortcuts = self._app_desktop_datastore.get_all_shortcuts()
         sc_cource = None
         sc_destination = None

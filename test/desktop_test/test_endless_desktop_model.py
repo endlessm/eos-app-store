@@ -3,6 +3,7 @@ from desktop.endless_desktop_model import EndlessDesktopModel
 from mock import Mock #@UnresolvedImport
 from osapps.app_launcher import AppLauncher
 from osapps.app import App
+from osapps.app_shortcut import AppShortcut
 from osapps.desktop_locale_datastore import DesktopLocaleDatastore
 from osapps.app_datastore import AppDatastore
 from osapps.launchable_app import LaunchableApp
@@ -85,3 +86,44 @@ class DesktopModelTestCase(unittest.TestCase):
         self.testObject.get_default_background()
         
         self.mock_desktop_preferences.get_default_background.assert_called()
+        
+    def test_relocate_shortcut_to_valid_destination(self):
+        old = self.mock_desktop_locale_datastore.get_all_shortcuts
+        app1 = AppShortcut('', 'app1', '')
+        app2 = AppShortcut('', 'app2', '')
+        apps = [app1, app2]
+        self.mock_desktop_locale_datastore.get_all_shortcuts = Mock(return_value=apps)
+        
+        ret = self.testObject.relocate_shortcut('/app1', '/app2/')
+        self.assertEqual(ret, app2)
+        self.assertEqual(app1.parent(), app2)
+        self.assertEqual(app2.parent(), None)
+        self.assertTrue(app1 in app2.children())
+        
+        self.mock_desktop_locale_datastore.get_all_shortcuts = old
+        
+    def test_relocate_shortcut_to_empty_destination(self):
+        old = self.mock_desktop_locale_datastore.get_all_shortcuts
+        app1 = AppShortcut('', 'app1', '')
+        app2 = AppShortcut('', 'app2', '')
+        apps = [app1, app2]
+        self.mock_desktop_locale_datastore.get_all_shortcuts = Mock(return_value=apps)
+        
+        ret = self.testObject.relocate_shortcut('/app1', '')
+        self.assertEqual(ret, None)
+        self.assertEqual(app1.parent(), None)
+        
+        self.mock_desktop_locale_datastore.get_all_shortcuts = old
+        
+    def test_relocate_shortcut_to_invalid_destination(self):
+        old = self.mock_desktop_locale_datastore.get_all_shortcuts
+        app1 = AppShortcut('', 'app1', '')
+        app2 = AppShortcut('', 'app2', '')
+        apps = [app1, app2]
+        self.mock_desktop_locale_datastore.get_all_shortcuts = Mock(return_value=apps)
+        
+        ret = self.testObject.relocate_shortcut('/app1', '/some/invalid/path')
+        self.assertEqual(ret, None)
+        self.assertEqual(app1.parent(), None)
+        
+        self.mock_desktop_locale_datastore.get_all_shortcuts = old
