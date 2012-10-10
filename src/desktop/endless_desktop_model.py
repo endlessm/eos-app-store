@@ -42,11 +42,11 @@ class EndlessDesktopModel(object):
         return self._preferences_provider.get_default_background()
     
     def delete_shortcut(self, what):
-        all_shortcuts = self._app_desktop_datastore.get_all_shortcuts()
+        #need to pass a list of shortcut names instead of a list ofshortcut objects
+        all_shortcuts = [item.name() for item in self._app_desktop_datastore.get_all_shortcuts()]
         for item in all_shortcuts:
-            if item.name() == what:
+            if item == what:
                 try:
-                    print 'found', what
                     all_shortcuts.remove(item)
                     self._app_desktop_datastore.set_all_shortcuts(all_shortcuts)
                 except:
