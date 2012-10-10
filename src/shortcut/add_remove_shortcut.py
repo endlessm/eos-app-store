@@ -50,13 +50,25 @@ class AddRemoveShortcut(DesktopShortcut):
             self.parent.remove(self)
             
     def get_images(self):
-        return (image_util.image_path("endless-shortcut-well.png"),image_util.image_path("endless-add.png"),image_util.image_path("endless-shortcut-foreground.png"))
+        return (
+            image_util.image_path("endless-shortcut-well.png"),
+            image_util.image_path("endless-add.png"),
+            image_util.image_path("endless-shortcut-foreground.png")
+            )
     
     def get_dragged_images(self):
-        return (image_util.image_path("endless-shortcut-well.png"),image_util.image_path("trash_empty_icon.png"),image_util.image_path("endless-shortcut-foreground.png"))
+        return (
+            image_util.image_path("endless-shortcut-well.png"),
+            image_util.image_path("trash_empty_icon.png"),
+            image_util.image_path("endless-shortcut-foreground.png")
+            )
 
     def get_trash_full_images(self):
-        return (image_util.image_path("endless-shortcut-well.png"),image_util.image_path("trash_full_icon.png"),image_util.image_path("endless-shortcut-foreground.png"))
+        return (
+            image_util.image_path("endless-shortcut-well.png"),
+            image_util.image_path("trash_full_icon.png"),
+            image_util.image_path("endless-shortcut-foreground.png")
+            )
     
     def mouse_press_callback(self, widget, event):
         if event.button == 1:
@@ -102,20 +114,14 @@ class AddRemoveShortcut(DesktopShortcut):
         lbl = context.get_source_widget().parent._label.get_text()
         
         super(AddRemoveShortcut, self).dnd_motion_data(widget, context, x, y, time)
-        if w._obj.class_name == 'sc_app':
+        if not w.parent._shortcut.has_children():
             self._confirmation_popup = RemovalConfirmationPopupWindow(self._confirmation_received, widget=w, label=lbl)
             self._confirmation_popup.show()
-            context.get_source_widget().parent._event_box.set_images(())
-            context.get_source_widget().parent._label.set_text('')
-        if w._obj.class_name == 'sc_fdr':
-            if not w.parent._shortcut.has_children():
-                self._confirmation_popup = RemovalConfirmationPopupWindow(self._confirmation_received, widget=w, label=lbl)
-                self._confirmation_popup.show()
-                context.get_source_widget().parent._event_box.set_images(())
-                context.get_source_widget().parent._label.set_text('')
-            else:
-                self._delete_not_possible_popup = DeleteNotPossiblePopupWindow()
-                self._delete_not_possible_popup.show()
+            w.parent._event_box.set_images(())
+            w.parent._label.set_text('')
+        else:
+            self._delete_not_possible_popup = DeleteNotPossiblePopupWindow()
+            self._delete_not_possible_popup.show()
 
     def _drag_motion_broadcast_callback(self, source, destination, x, y):
         self.change_icon(self.get_trash_full_images())

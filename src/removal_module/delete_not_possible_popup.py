@@ -14,10 +14,10 @@ class DeleteNotPossiblePopupWindow():
         self._window.set_size_request(self._width,self._height)
         self._window.set_title(_("WARNING!"))
         self._window.set_position(gtk.WIN_POS_CENTER_ALWAYS)
+        self._window.connect("focus-out-event", lambda w, e: self.destroy())
         
         self._fancy_container = ImageEventBox((image_util.image_path("feedback-background.png"),))
         self._fancy_container.set_size_request(self._width,self._height)
-        self._center = gtk.Alignment(.5,.3,0,0)
         
         self._close = ImageEventBox((image_util.image_path("close.png"),))
         self._close.set_size_request(24,24)
@@ -32,7 +32,8 @@ class DeleteNotPossiblePopupWindow():
         
         self._label_box = gtk.HBox(True)
         self._label = gtk.Label()
-        self._label.set_text('To delete a folder you have to remove all of the items inside of it first. We are just trying to keep you safe.')
+        text = 'To delete a folder you have to\n remove all of the items inside\n of it first.\n\n We are just trying to keep\n you safe.'
+        self._label.set_markup('<span color="white">' + text + '</span>')
         self._label_box.pack_start(self._label, False, False, 0)
         self._container.pack_start(self._label_box, True, False, 0)
         
