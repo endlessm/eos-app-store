@@ -12,7 +12,7 @@ class NotificationPlugin(gtk.EventBox):
 
     SHADOW_OFFSET = 1
 
-    def __init__(self, command = None):
+    def __init__(self, command):
         super(NotificationPlugin, self).__init__()
         self._command = command
 
