@@ -3,7 +3,7 @@ from osapps.app_launcher import AppLauncher
 
 class AllSettingsModel():
     VERSION_COMMAND = "dpkg -p endless-os-desktop-widget | grep ^Version: | awk \"{print $2}\""
-    UPDATE_COMMAND = "python /etc/endlessm/install/eos_install_launcher.pyc"
+    UPDATE_COMMAND = "sudo /etc/endlessm/install/launch.sh"
     SETTINGS_COMMAND = "sudo gnome-control-center --class=eos-network-manager"
     LOGOUT_COMMAND = "kill -9 -1"
     RESTART_COMMAND = "sudo shutdown -r now"
