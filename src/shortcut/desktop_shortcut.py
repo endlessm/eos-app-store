@@ -129,29 +129,33 @@ class DesktopShortcut(gtk.VBox):
         source_widget = context.get_source_widget()
         if hasattr(self, '_drag_leave_handler_callback'):
             self._drag_leave_handler_callback(source_widget, widget)
-        self._event_box.set_images(self.get_images())
-        self.hide()
-        self.show()
+        self._refresh()
             
     def dnd_drag_enter(self, widget, context, time):       
         source_widget = context.get_source_widget()       
         if hasattr(self, '_drag_enter_handler_callback'):
             self._drag_enter_handler_callback(source_widget, widget)
         if self.highlightable:
-            self._event_box.set_images(self.get_highlight_images())
-            self.hide()
-            self.show() 
-   
+            self._refresh(self.get_highlight_images())
+            
     def set_moving(self, is_moving):
         self._is_moving = is_moving
         
     def is_moving(self):
         return self._is_moving
     
+    def _refresh(self, images=None):
+        images = images or self.get_images()
+        self._event_box.set_images(images)
+        self._event_box.repaint()
+    
     def get_shortcut(self):
         return None
     
     def get_images(self):
+        return ()
+        
+    def get_highlight_images(self):
         return ()
     
     def remove_shortcut(self):
