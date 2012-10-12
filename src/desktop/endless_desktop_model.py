@@ -21,18 +21,18 @@ class EndlessDesktopModel(object):
         if (len(destination_path.strip()) == 0) or (len(source_path.strip()) == 0):
             return None
         all_shortcuts = self._app_desktop_datastore.get_all_shortcuts()
-        sc_cource = None
+        sc_source = None
         sc_destination = None
         for sc in all_shortcuts:
-            if sc_cource is None:
-                sc_cource = AppShortcut.traverse_path(sc, source_path)
+            if sc_source is None:
+                sc_source = AppShortcut.traverse_path(sc, source_path)
             if sc_destination is None:
                 sc_destination = AppShortcut.traverse_path(sc, destination_path)
-            if (sc_cource is not None) and (sc_destination is not None):
+            if (sc_source is not None) and (sc_destination is not None):
                 break
-        if (sc_cource is not None) and (sc_destination is not None):
-            sc_destination.add_child(sc_cource)
-            all_shortcuts.remove(sc_cource)
+        if (sc_source is not None) and (sc_destination is not None):
+            sc_destination.add_child(sc_source)
+            all_shortcuts.remove(sc_source)
             self._app_desktop_datastore.set_all_shortcuts(all_shortcuts)
             return sc_destination
         return None
