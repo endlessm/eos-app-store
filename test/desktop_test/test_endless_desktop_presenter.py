@@ -86,4 +86,24 @@ class TestEndlessDesktopPresenter(unittest.TestCase):
         
         self.testObject.change_background.assert_called_once_with(filename)
         
+    def test_relocate_item_invalid(self):
+        self.mock_model.relocate_shortcut = Mock(return_value=None)
+        ret = self.testObject.relocate_item('app1', 'folder1')
+        self.assertEqual(ret, False)
+        self.mock_model.relocate_shortcut.assert_called_once_with('/app1', '/folder1/')
+        
+    def test_relocate_item_valid(self):
+        destination_shortcut = Mock()
+        self.mock_model.get_shortcuts = Mock(return_value=[])
+        self.mock_view.hide_folder_window = Mock()
+        self.mock_view.show_folder_window = Mock()
+        self.mock_view.refresh = Mock()
+        
+        self.mock_model.relocate_shortcut = Mock(return_value=destination_shortcut)
+        ret = self.testObject.relocate_item('app1', 'folder1')
+        self.assertEqual(ret, True)
+        self.mock_model.relocate_shortcut.assert_called_once_with('/app1', '/folder1/')
+        self.mock_view.hide_folder_window.assert_called_once()
+        self.mock_view.show_folder_window.assert_called_once_with(destination_shortcut)
+        self.mock_view.refresh.assert_called_once_with([])
         
