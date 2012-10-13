@@ -27,8 +27,6 @@ class AddRemoveShortcut(DesktopShortcut):
             self._drag_motion_broadcast_callback
             )
         
-        self.class_name = 'sc_add'
-        self._event_box._obj = self
         
         self._callback = callback
         
@@ -105,9 +103,6 @@ class AddRemoveShortcut(DesktopShortcut):
     def dnd_drag_leave(self, widget, context, time):
         self.change_icon(self.get_dragged_images())
 
-    def dnd_drag_enter(self, *args, **kwargs):
-        self.change_icon(self.get_trash_full_images())
-
         
     def dnd_receive_data(self, widget, context, x, y, selection, targetType, time):
         w = context.get_source_widget()
@@ -124,7 +119,8 @@ class AddRemoveShortcut(DesktopShortcut):
             self._delete_not_possible_popup.show()
 
     def _drag_motion_broadcast_callback(self, source, destination, x, y):
-        self.change_icon(self.get_trash_full_images())
+        if isinstance(destination.parent, AddRemoveShortcut):
+            self.change_icon(self.get_trash_full_images())
     
     def _confirmation_received(self, result, widget, lbl):
         if result:
