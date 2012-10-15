@@ -41,16 +41,15 @@ class EndlessDesktopModel(object):
     def get_default_background(self):
         return self._preferences_provider.get_default_background()
     
-    def delete_shortcut(self, what):
+    def delete_shortcut(self, shortcut):
         all_shortcuts = [item.name() for item in self._app_desktop_datastore.get_all_shortcuts()]
         for item in all_shortcuts:
-            if item == what:
+            if item == shortcut:
                 try:
                     all_shortcuts.remove(item)
                     self._app_desktop_datastore.set_all_shortcuts(all_shortcuts)
                     return True
                 except:
                     print >> sys.stderr, "delete shortcut failed!"
-                    #Should we display notification to user that remove has failed?
                 break
         return False

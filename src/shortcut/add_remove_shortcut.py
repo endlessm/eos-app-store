@@ -105,15 +105,15 @@ class AddRemoveShortcut(DesktopShortcut):
 
         
     def dnd_receive_data(self, widget, context, x, y, selection, targetType, time):
-        w = context.get_source_widget()
-        lbl = context.get_source_widget().parent._label.get_text()
+        source_widget = context.get_source_widget()
+        label = context.get_source_widget().parent._label.get_text()
         
         super(AddRemoveShortcut, self).dnd_motion_data(widget, context, x, y, time)
-        if not w.parent._shortcut.has_children():
-            self._confirmation_popup = RemovalConfirmationPopupWindow(self._confirmation_received, widget=w, label=lbl)
+        if not source_widget.parent._shortcut.has_children():
+            self._confirmation_popup = RemovalConfirmationPopupWindow(self._confirmation_received, widget=source_widget, label=label)
             self._confirmation_popup.show()
-            w.parent._event_box.set_images(())
-            w.parent._label.set_text('')
+            source_widget.parent._event_box.set_images(())
+            source_widget.parent._label.set_text('')
         else:
             self._delete_not_possible_popup = DeleteNotPossiblePopupWindow()
             self._delete_not_possible_popup.show()
