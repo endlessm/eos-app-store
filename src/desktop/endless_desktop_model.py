@@ -48,7 +48,9 @@ class EndlessDesktopModel(object):
                 try:
                     all_shortcuts.remove(item)
                     self._app_desktop_datastore.set_all_shortcuts(all_shortcuts)
+                    return True
                 except:
                     print >> sys.stderr, "delete shortcut failed!"
                     #Should we display notification to user that remove has failed?
                 break
+        return False
