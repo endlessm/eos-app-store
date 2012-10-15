@@ -119,7 +119,7 @@ msgid ""
 "keep you safe."
 msgstr ""
 "Para apagar uma pasta que você\n"
-"tem que remover todos os itens\n
+"tem que remover todos os itens\n"
 "dentro do primeiro.\n"
 "\n"
 "Estamos apenas tentando mantê-lo\n"
