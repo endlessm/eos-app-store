@@ -6,6 +6,7 @@ from notification_plugin import NotificationPlugin
 from notification_panel_config import NotificationPanelConfig
 from panel_constants import PanelConstants
 import math
+import pango
 
 class BatteryPlugin(NotificationPlugin):
     COMMAND = "gksudo gnome-control-center power"
@@ -18,9 +19,12 @@ class BatteryPlugin(NotificationPlugin):
     GOLDEN_RATIO = 1.618
     
     BATTERY_FILL_MARGIN = 1
+    BATTERY_TEXT_MARGIN = 2
     ARC_OVERLAP = 0.3
     PLUG_VERTICAL_MARGIN = 3.3
     PRONG_SEPARATION_RATIO = 2.2
+    
+    FONT_SIZE = 9
     
     def __init__(self, icon_size, gobj = gobject):
         super(BatteryPlugin, self).__init__(self.COMMAND)
@@ -47,11 +51,8 @@ class BatteryPlugin(NotificationPlugin):
         
     def _update_battery_indicator(self):
         self._recalculate_battery_bounds()
-        
         self._battery_level, self._is_recharging = BatteryUtil.get_battery_level()
-        
         self.queue_draw()
-        
         return True
     
     def _recalculate_battery_bounds(self):
@@ -72,21 +73,28 @@ class BatteryPlugin(NotificationPlugin):
         
         cr.set_line_width(1);
 
-        vertical_midpoint = event.area.y +  event.area.height / 2
-        horizontal_midpoint = event.area.x +  event.area.width / 2
+        vertical_midpoint = event.area.y + event.area.height / 2
+        horizontal_midpoint = event.area.x + event.area.width / 2
         battery_position_x = event.area.x + self.LEFT_MARGIN
         
+        # Battery Level text
         self._draw_battery_with_shadow(cr, battery_position_x, vertical_midpoint)
 
         if self._battery_level:
             self._draw_battery_level(cr, battery_position_x, vertical_midpoint)
         
-        if self._is_recharging:
-            self._draw_outlet_cord_with_shadow(cr, horizontal_midpoint, vertical_midpoint, self._battery_base_height)        
-        
+#        if self._is_recharging:
+#            self._draw_outlet_cord_with_shadow(cr, horizontal_midpoint, vertical_midpoint, self._battery_base_height)        
+        self._show_battery_text(cr, battery_position_x, vertical_midpoint)
         cr.restore()
         
         return False
+    
+    def _show_battery_text(self, cairo_context, position_x, vertical_midpoint):
+        self._set_color(cairo_context, PanelConstants.DEFAULT_PLUGIN_FG_COLOR)
+        cairo_context.move_to(position_x + self.BATTERY_TEXT_MARGIN, vertical_midpoint + (self.FONT_SIZE/3.2))
+        cairo_context.set_font_size(self.FONT_SIZE)
+        cairo_context.show_text(str(self._battery_level))
     
     def _draw_battery_with_shadow(self, cairo_context, position_x, vertical_midpoint):
         cairo_context.set_line_width(1);

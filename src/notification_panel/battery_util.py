@@ -26,6 +26,8 @@ class BatteryUtil():
                 battery_object = bus.get_object(BatteryUtil.HAL_DBUS_PATH, batteries[0])
                 battery_interface = data_bus.Interface (battery_object, BatteryUtil.HAL_DBUS_DEVICE_PATH)
                 
+#                print "Remaining time: ", battery_interface.GetProperty('battery.remaining_time')
+                
                 is_recharging = False
                 if(battery_interface.GetProperty(BatteryUtil.BATTERY_DISCHARGING_PROPERTY) == 0):
                     is_recharging = True
