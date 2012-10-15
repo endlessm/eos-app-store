@@ -24,13 +24,11 @@ class AllSettingsView(AbstractNotifier):
 
     RESTART_MESSAGE = 1
     SHUTDOWN_MESSAGE = 2
-    UPDATE_MESSAGE = 3
     LOGOUT_MESSAGE = 4
 
     _messages = {
                     RESTART_MESSAGE:  _("Restart?"),
                     SHUTDOWN_MESSAGE: _("Shutdown?"),
-                    UPDATE_MESSAGE:   _("Update EndlessOS?"),
                     LOGOUT_MESSAGE:   _("Log Out?"),
                 }
 

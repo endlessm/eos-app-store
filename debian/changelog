@@ -1,3 +1,33 @@
+endless-os-desktop-widget (1.0.13.1) unstable; urgency=low
+
+  * Updating version to 1.0.13.1
+
+ -- Asynchrony <srdjan.grubor@asolutions.com>  Fri, 12 Oct 2012 04:22:24 -0500
+
+endless-os-desktop-widget (1.0.13) unstable; urgency=low
+
+  * Updating version to 1.0.13
+
+ -- Asynchrony <srdjan.grubor@asolutions.com>  Thu, 11 Oct 2012 11:45:03 -0500
+
+endless-os-desktop-widget (1.0-13~rc3) unstable; urgency=low
+
+  * Updating version to 1.0-13~rc3
+
+ -- Asynchrony <srdjan.grubor@asolutions.com>  Thu, 11 Oct 2012 11:38:53 -0500
+
+endless-os-desktop-widget (1.0.13~rc2) unstable; urgency=low
+
+  * Updating version to 1.0.13~rc2
+
+ -- Asynchrony <irwinmb@asolutions.com>  Tue, 09 Oct 2012 07:20:05 -0500
+
+endless-os-desktop-widget (1.0.13~rc2) unstable; urgency=low
+
+  * Updating version to 1.0.13~rc2
+
+ -- Asynchrony <irwinmb@asolutions.com>  Tue, 09 Oct 2012 07:06:39 -0500
+
 endless-os-desktop-widget (1.0.13~rc2) unstable; urgency=low
 
   * Updating version to 1.0.13~rc2
