@@ -17,25 +17,15 @@ class EndlessDesktopModel(object):
     def set_shortcuts_by_name(self, shortcuts_names):
         self._app_desktop_datastore.set_all_shortcuts_by_name(shortcuts_names)
     
-    def relocate_shortcut(self, source_path, destination_path):
-        if (len(destination_path.strip()) == 0) or (len(source_path.strip()) == 0):
-            return None
-        all_shortcuts = self._app_desktop_datastore.get_all_shortcuts()
-        sc_source = None
-        sc_destination = None
-        for sc in all_shortcuts:
-            if sc_source is None:
-                sc_source = AppShortcut.traverse_path(sc, source_path)
-            if sc_destination is None:
-                sc_destination = AppShortcut.traverse_path(sc, destination_path)
-            if (sc_source is not None) and (sc_destination is not None):
-                break
-        if (sc_source is not None) and (sc_destination is not None):
-            sc_destination.add_child(sc_source)
-            all_shortcuts.remove(sc_source)
+    def relocate_shortcut(self, source_shortcut, folder_shortcut):                
+        if (source_shortcut is not None) and (folder_shortcut is not None):
+            folder_shortcut.add_child(source_shortcut)
+            all_shortcuts = self._app_desktop_datastore.get_all_shortcuts()
+            if source_shortcut in all_shortcuts:
+                all_shortcuts.remove(source_shortcut)
             self._app_desktop_datastore.set_all_shortcuts(all_shortcuts)
-            return sc_destination
-        return None
+            return True
+        return False
     
     def execute_app(self, app_key, params):
         app = self._app_datastore.get_app_by_key(app_key)

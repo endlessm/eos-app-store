@@ -32,14 +32,16 @@ class FolderShortcut(DesktopShortcut):
         self.set_moving(False)
         
     def _received_handler_callback(self, source, destination, x, y, data=None):
-        if isinstance(source.parent, ApplicationShortcut):
-            source_name = source._identifier
-            destination_name = destination._identifier
-            self.emit(
-                "folder-shortcut-relocation",
-                source_name, 
-                destination_name
-                )
+        source_widget = source.parent
+
+        if isinstance(source_widget, ApplicationShortcut):
+            source_shortcut = source_widget.get_shortcut()
+            if source_shortcut is not None:
+                self.emit(
+                    "folder-shortcut-relocation",
+                    source_shortcut, 
+                    self.get_shortcut()
+                    )
                 
     def _drag_enter_handler_callback(self, source, destination):
         if isinstance(source.parent, ApplicationShortcut):
