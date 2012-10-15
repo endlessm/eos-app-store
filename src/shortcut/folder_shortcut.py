@@ -68,6 +68,9 @@ class FolderShortcut(DesktopShortcut):
     def remove_shortcut(self):
         if self.parent:
             self.parent.remove(self)
+            
+    def get_shortcut(self):
+        return self._shortcut
     
     def get_images(self):
         return (

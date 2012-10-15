@@ -3,10 +3,16 @@ from shortcut.desktop_shortcut import DesktopShortcut
 
 class SeparatorShortcut(DesktopShortcut):
     __gsignals__ = {
-        "application-shortcut-move": (gobject.SIGNAL_RUN_FIRST, #@UndefinedVariable
-                   gobject.TYPE_NONE,
-                   (gobject.TYPE_PYOBJECT, gobject.TYPE_PYOBJECT)),
-    }
+        "application-shortcut-move": (
+            gobject.SIGNAL_RUN_FIRST, #@UndefinedVariable
+            gobject.TYPE_NONE,
+                (
+                    gobject.TYPE_PYOBJECT, 
+                    gobject.TYPE_PYOBJECT, 
+                    gobject.TYPE_PYOBJECT
+                    )
+            ),
+        }
 
     left = None
     right = None
@@ -28,15 +34,26 @@ class SeparatorShortcut(DesktopShortcut):
             )
         
     def _received_handler_callback(self, source, destination, x, y, data=None):
-        if isinstance(destination.parent, SeparatorShortcut):
-            source_name = source._identifier
-            destination_name = ''
-            if destination.parent.right_widget:
-                destination_name = destination.parent.right_widget._identifier
+        dest_widget = destination.parent
+        source_widget = source.parent
+        
+        if isinstance(dest_widget, SeparatorShortcut):
+            source_shortcut = source_widget.get_shortcut()
+            if source_shortcut is None:
+                return
+            
+            left_shortcut = None
+            if dest_widget.left_widget is not None:
+                left_shortcut = dest_widget.left_widget.get_shortcut()
+            right_shortcut = None
+            if dest_widget.right_widget is not None:
+                right_shortcut = dest_widget.right_widget.get_shortcut()
+                
             self.emit(
                 "application-shortcut-move",
-                source_name, 
-                destination_name
+                source_shortcut, 
+                left_shortcut, 
+                right_shortcut
                 )
         
     def _drag_leave_handler_callback(self, source, destination):

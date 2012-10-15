@@ -229,7 +229,7 @@ class EndlessDesktopView(gtk.Window):
             sep_last.set_right_separator(sep_new)
             sep_last.set_right_widget(item)
             sep_new.set_left_separator(sep_last)
-            sep_last.set_left_widget(item)
+            sep_new.set_left_widget(item)
             sep_last = sep_new
             
         return row
@@ -237,14 +237,25 @@ class EndlessDesktopView(gtk.Window):
     def _relocation_callback(self, widget, sc_moved, sc_folder):
         self._presenter.relocate_item(sc_moved, sc_folder)
         
-    def _rearrange_shortcuts(self, widget, sc_moved, sc_to_move):
-        self._shorcuts_buffer.remove(sc_moved)
-        if sc_to_move != '':
-            new_index = self._shorcuts_buffer.index(sc_to_move)
-            self._shorcuts_buffer.insert(new_index, sc_moved)
-        else:
-            self._shorcuts_buffer.append(sc_moved)
-        self._presenter.move_item(self._shorcuts_buffer)
+    def _rearrange_shortcuts(self, widget, source_shortcut, left_shortcut, 
+            right_shortcut
+            ):
+            
+        if right_shortcut is not None:
+           self._shorcuts_buffer.remove(source_shortcut.name())
+           index = self._shorcuts_buffer.index(right_shortcut.name())
+           self._shorcuts_buffer.insert(index, source_shortcut.name())
+           self._presenter.move_item(self._shorcuts_buffer)
+           return
+           
+        if left_shortcut is not None:
+            self._shorcuts_buffer.remove(source_shortcut.name())
+            index = self._shorcuts_buffer.index(left_shortcut.name()) + 1
+            if index < len(self._shorcuts_buffer):
+                self._shorcuts_buffer.insert(index, source_shortcut.name())
+            else:
+                self._shorcuts_buffer.append(source_shortcut.name())
+            self._presenter.move_item(self._shorcuts_buffer)
         
     def _calculate_max_icons(self):
         width = self._get_net_work_area()[0]
