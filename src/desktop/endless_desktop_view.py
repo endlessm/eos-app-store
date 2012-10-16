@@ -201,6 +201,11 @@ class EndlessDesktopView(gtk.Window):
             self._dnd_begin
             ) 
         self._folder_window.show()
+    
+    def show_folder_window_by_name(self, shortcut_name):
+        shortcut = self._presenter.get_shortcut_by_name(shortcut_name)
+        if shortcut is not None:
+            self.show_folder_window(shortcut)
         
     # Show folder content
     def _folder_icon_clicked_callback(self, widget, event, shortcut):
@@ -254,6 +259,8 @@ class EndlessDesktopView(gtk.Window):
     def _rearrange_shortcuts(self, widget, source_shortcut, left_shortcut, 
             right_shortcut
             ):
+        if source_shortcut.parent() is not None:
+            self._relocation_callback(widget, source_shortcut, None)
             
         if right_shortcut is not None:
             if source_shortcut.name() in self._shorcuts_buffer:

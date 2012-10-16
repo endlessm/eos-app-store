@@ -9,6 +9,13 @@ class DesktopPresenter(object):
         
         self.refresh_view()
 
+    def get_shortcut_by_name(self, shortcut_name):
+        all_shortcuts = self._model.get_shortcuts()
+        for shortcut in all_shortcuts:
+            if shortcut_name == shortcut.name():
+                return shortcut
+        return None
+        
     def activate_item(self, app_key, params):
         self._view.hide_folder_window()
         self._model.execute_app(app_key, params)
@@ -18,14 +25,16 @@ class DesktopPresenter(object):
         self._view.refresh(self._model.get_shortcuts(force=True))
     
     def relocate_item(self, source_shortcut, folder_shortcut):
+        self._view.close_folder_window()
         success = self._model.relocate_shortcut(
             source_shortcut, 
             folder_shortcut
             )
+        all_shortcuts = self._model.get_shortcuts(force=True)
+        self._view.refresh(all_shortcuts)
         if success:
-            self._view.hide_folder_window()
-            self._view.show_folder_window(folder_shortcut)
-            self._view.refresh(self._model.get_shortcuts(force=True))
+            if folder_shortcut is not None:
+                self._view.show_folder_window_by_name(folder_shortcut.name())
             return True
         return False
     
