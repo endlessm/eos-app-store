@@ -71,7 +71,7 @@ class EndlessDesktopView(gtk.Window):
         
     def unfocus_widget(self, widget, event):
         widget.set_focus(None)
-        self.hide_folder_window()
+        self.close_folder_window()
         self._notification_panel.close_settings_plugin_window()
 
     def set_presenter(self, presenter):
@@ -186,16 +186,25 @@ class EndlessDesktopView(gtk.Window):
         
     def hide_folder_window(self):
         if hasattr(self, '_folder_window') and self._folder_window:
+            self._folder_window.hide()
+            
+    def close_folder_window(self):
+        if hasattr(self, '_folder_window') and self._folder_window:
             self._folder_window.destroy()
             self._folder_window = None
             
     def show_folder_window(self, shortcut):
-        self._folder_window = OpenFolderWindow(self, self._presenter.activate_item, shortcut) 
+        self._folder_window = OpenFolderWindow(
+            self, 
+            self._presenter.activate_item, 
+            shortcut, 
+            self._dnd_begin
+            ) 
         self._folder_window.show()
         
     # Show folder content
     def _folder_icon_clicked_callback(self, widget, event, shortcut):
-        self.hide_folder_window()
+        self.close_folder_window()
         self.show_folder_window(shortcut)
         
     def _remove_all(self):
@@ -212,12 +221,14 @@ class EndlessDesktopView(gtk.Window):
         for item in items:
             if isinstance(item, ApplicationShortcut):
                 item.connect("application-shortcut-rename", lambda w, shortcut, new_name: self._presenter.rename_item(shortcut, new_name))
-                item.connect("application-shortcut-activate", lambda w, app_key, params: self._presenter.activate_item(app_key, params))                
+                item.connect("application-shortcut-activate", lambda w, app_key, params: self._presenter.activate_item(app_key, params))
+                item.connect("desktop-shortcut-dnd-begin", self._dnd_begin)
                 item.show()
                 
             elif isinstance(item, FolderShortcut):
                 item.connect("folder-shortcut-activate", self._folder_icon_clicked_callback)
                 item.connect("folder-shortcut-relocation", self._relocation_callback)
+                item.connect("desktop-shortcut-dnd-begin", self._dnd_begin)
                 item.show()
                 
             if item.parent != None:
@@ -234,6 +245,9 @@ class EndlessDesktopView(gtk.Window):
             
         return row
         
+    def _dnd_begin(self, widget):
+        self.hide_folder_window()
+        
     def _relocation_callback(self, widget, source_shortcut, folder_shortcut):
         self._presenter.relocate_item(source_shortcut, folder_shortcut)
         
@@ -242,14 +256,16 @@ class EndlessDesktopView(gtk.Window):
             ):
             
         if right_shortcut is not None:
-           self._shorcuts_buffer.remove(source_shortcut.name())
-           index = self._shorcuts_buffer.index(right_shortcut.name())
-           self._shorcuts_buffer.insert(index, source_shortcut.name())
-           self._presenter.move_item(self._shorcuts_buffer)
-           return
-           
+            if source_shortcut.name() in self._shorcuts_buffer:
+                self._shorcuts_buffer.remove(source_shortcut.name())
+            index = self._shorcuts_buffer.index(right_shortcut.name())
+            self._shorcuts_buffer.insert(index, source_shortcut.name())
+            self._presenter.move_item(self._shorcuts_buffer)
+            return
+            
         if left_shortcut is not None:
-            self._shorcuts_buffer.remove(source_shortcut.name())
+            if source_shortcut.name() in self._shorcuts_buffer:
+                self._shorcuts_buffer.remove(source_shortcut.name())
             index = self._shorcuts_buffer.index(left_shortcut.name()) + 1
             if index < len(self._shorcuts_buffer):
                 self._shorcuts_buffer.insert(index, source_shortcut.name())

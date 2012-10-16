@@ -10,7 +10,7 @@ gettext.install('endless_desktop', '/usr/share/locale', unicode = True, names=['
 class OpenFolderWindow():
     TASKBAR_HEIGHT = 40
     
-    def __init__(self, parent, callback, shortcut):
+    def __init__(self, parent, callback, shortcut, hide_callback):
         self._width = screen_util.get_width()
         # TODO fix this
         self._height = 116
@@ -36,7 +36,14 @@ class OpenFolderWindow():
         
         folder_icons = FolderIcons(shortcut.children())
         self._container.pack_start(folder_icons, False, False, 0)
-        folder_icons.connect("application-shortcut-activate", lambda w, app_id, params: callback(app_id, params))
+        folder_icons.connect(
+            "application-shortcut-activate", 
+            lambda w, app_id, params: callback(app_id, params)
+            )
+        folder_icons.connect(
+            "desktop-shortcut-dnd-begin", 
+            lambda w: hide_callback(w)
+            )
         
         self._center.add(self._container)
         self._fancy_container.add(self._center)
@@ -47,6 +54,9 @@ class OpenFolderWindow():
 
     def show(self):
         self._window.show_all()
+        
+    def hide(self):
+        self._window.hide()
         
     def destroy(self):
         self._window.destroy()

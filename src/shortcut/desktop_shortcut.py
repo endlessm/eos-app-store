@@ -8,6 +8,14 @@ class DesktopShortcut(gtk.VBox):
     DND_TARGET_TYPE_TEXT = 80
     DND_TRANSFER_TYPE = [( "text/plain", gtk.TARGET_SAME_APP, DND_TARGET_TYPE_TEXT )]
     
+    __gsignals__ = {
+        "desktop-shortcut-dnd-begin": (
+            gobject.SIGNAL_RUN_FIRST, #@UndefinedVariable
+            gobject.TYPE_NONE, 
+            (), 
+            ),
+        }
+    
     _motion_callbacks = []
     _drag_end_callbacks = []
     @classmethod
@@ -121,6 +129,7 @@ class DesktopShortcut(gtk.VBox):
         self._label.hide()
         self._event_box.hide()
         self.set_moving(True)
+        self.emit("desktop-shortcut-dnd-begin")
         if hasattr(self, '_drag_begin_handler_callback'):
             self._drag_begin_handler_callback(widget)
         
