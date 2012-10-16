@@ -42,7 +42,10 @@ class ImageEventBox(gtk.EventBox):
     
     def set_images(self, images):
         self._images = images
+        #self.repaint()
+        self.parent.parent.queue_draw()
         
     def repaint(self):
-        self.do_expose_event(self, None)
+        #self.do_expose_event(self, None)
+        self.parent.parent.queue_draw()
         
