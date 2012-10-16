@@ -194,6 +194,7 @@ class EndlessDesktopView(gtk.Window):
             self._folder_window = None
             
     def show_folder_window(self, shortcut):
+        self.close_folder_window()
         self._folder_window = OpenFolderWindow(
             self, 
             self._presenter.activate_item, 
