@@ -1,0 +1,6 @@
+#!/bin/bash -e
+
+gsettings set org.yorba.shotwell.preferences.ui show-welcome-dialog false
+gsettings set org.yorba.shotwell.preferences.files auto-import true
+
+cp -r /usr/share/endlessm/default_images/* ~endlessm/$(gettext -d xdg-user-dirs Pictures)
