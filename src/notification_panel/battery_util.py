@@ -1,6 +1,7 @@
 import dbus
 import sys
 import gtk
+import gobject
 
 class BatteryUtil():
     HAL_DBUS_PATH = 'org.freedesktop.Hal'
@@ -54,35 +55,39 @@ class BatteryUtil():
         return battery
 
 class NoBattery():
-    
-    def init(self):
+    def init(self, gobj=gobject):
         pass
     
-    def draw(self):
+    def draw(self, presenter):
         pass
 
 class Battery(gtk.EventBox):
-    def __init__(self, batteries):
+    def __init__(self, batteries, gobj=gobject):
         super(Battery, self).__init__()
-        _data_bus = dbus
-        _system_bus = _data_bus.SystemBus()
+        self._data_bus = dbus
+        self._system_bus = self._data_bus.SystemBus()
         self._batteries = batteries
     
-    def draw(self):
-        print "level", self.level()
-        print "charging", self.charging()
+    def register(self, presenter):
+#        print "level", self.level()
+#        print "charging", self.charging()
+        try:
+            presenter._update_battery_indicator(self)
+        except:
+            presenter.battery_disconnected()
+        
     
     def charging(self):
-        return True #return not self.battery_interface.GetProperty(BatteryUtil.BATTERY_DISCHARGING_PROPERTY)
+        return not self._battery_interface().GetProperty(BatteryUtil.BATTERY_DISCHARGING_PROPERTY)
     
     def level(self):
-        return 0.1 #return self.battery_interface.GetProperty(BatteryUtil.BATTERY_PERCENTAGE_PROPERTY)
+        return self._battery_interface().GetProperty(BatteryUtil.BATTERY_PERCENTAGE_PROPERTY)
     
     def _battery_object(self):
         return self._system_bus.get_object(BatteryUtil.HAL_DBUS_PATH, self._batteries[0])
     
     def _battery_interface(self):
-        return self._data_bus.Interface (self._battery_object, BatteryUtil.HAL_DBUS_DEVICE_PATH)
+        return self._data_bus.Interface(self._battery_object(), BatteryUtil.HAL_DBUS_DEVICE_PATH)
         
         
         

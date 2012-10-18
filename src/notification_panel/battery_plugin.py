@@ -11,8 +11,8 @@ import gtk
 class BatteryPlugin(NotificationPlugin):
     COMMAND = "gksudo gnome-control-center power"
     
-    REFRESH_TIME = 5000
-    BATTERY_AVAILABILITY_REFRESH_TIME = 10000
+    REFRESH_TIME = 100
+    BATTERY_AVAILABILITY_REFRESH_TIME = 100
     
     LEFT_MARGIN = 3
     RIGHT_MARGIN = 3
@@ -31,7 +31,6 @@ class BatteryPlugin(NotificationPlugin):
         self.set_visible_window(False)
         
         self._poll_for_battery()
-        gobject.timeout_add(BatteryPlugin.BATTERY_AVAILABILITY_REFRESH_TIME, self._poll_for_battery)
     
     def execute(self):
 #        percentage = gtk.Label("86%")
@@ -62,11 +61,10 @@ class BatteryPlugin(NotificationPlugin):
 #        vbox.show()
         
     def _poll_for_battery(self):
-        BatteryUtil.get_battery().draw()
+        BatteryUtil.get_battery().draw(self)
 #        if BatteryUtil.get_battery_level()[0]:
 #        self._start_battery_polling()
-        
-#        return True
+        gobject.timeout_add(BatteryPlugin.REFRESH_TIME, self._poll_for_battery)
         
     def _start_battery_polling(self):
         self.set_size_request(self._icon_size + self.LEFT_MARGIN + self.RIGHT_MARGIN, self._icon_size)
@@ -77,14 +75,11 @@ class BatteryPlugin(NotificationPlugin):
         
         gobject.timeout_add(BatteryPlugin.REFRESH_TIME, self._update_battery_indicator)
         
-    def _update_battery_indicator(self):
+    def _update_battery_indicator(self, battery):
+        self.set_size_request(self._icon_size + self.LEFT_MARGIN + self.RIGHT_MARGIN, self._icon_size)
+        self.connect("expose-event", self._draw)
         self._recalculate_battery_bounds()
         self.battery = BatteryUtil.get_battery()
-        battery.level
-        battery.is_recharging
-        battery.depleation_time
-        battery.recharge_time
-        self._battery_level, self._is_recharging = BatteryUtil.get_battery_level()
         self.queue_draw()
 #        return True
     
@@ -112,9 +107,9 @@ class BatteryPlugin(NotificationPlugin):
         
         self._draw_battery_with_shadow(cr, battery_position_x, vertical_midpoint)
 
-        if self._is_recharging:
+        if self.battery.charging():
             self._draw_outlet_cord_with_shadow(cr, horizontal_midpoint, vertical_midpoint, self._battery_base_height)
-        elif self._battery_level:
+        else:
             self._draw_battery_level(cr, battery_position_x, vertical_midpoint)
             
         cr.restore()
@@ -132,7 +127,7 @@ class BatteryPlugin(NotificationPlugin):
         self._draw_battery(cairo_context, position_x, vertical_midpoint)
     
     def _draw_battery_level(self, cairo_context, position_x, vertical_midpoint):
-        battery_percentage = self._battery_level / 100.0
+        battery_percentage = self.battery.level() / 100.0
         self._set_color(cairo_context, PanelConstants.DEFAULT_PLUGIN_FG_COLOR)  
         if (battery_percentage < 0.10):
             self._set_color(cairo_context, PanelConstants.DEFAULT_PLUGIN_CAUTION_COLOR)
