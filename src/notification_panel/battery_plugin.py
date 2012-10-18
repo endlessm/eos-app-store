@@ -25,24 +25,48 @@ class BatteryPlugin(NotificationPlugin):
     
     FONT_SIZE = 9
     
-    def __init__(self, icon_size, gobj = gobject):
+    def __init__(self, icon_size, gobj=gobject):
         super(BatteryPlugin, self).__init__(self.COMMAND)
-        self._icon_size=icon_size
+        self._icon_size = icon_size
         self.set_visible_window(False)
         
         self._poll_for_battery()
         gobject.timeout_add(BatteryPlugin.BATTERY_AVAILABILITY_REFRESH_TIME, self._poll_for_battery)
     
-#    def execute(self):
-#        Override click event...
+    def execute(self):
+#        percentage = gtk.Label("86%")
+#        time_to_depletion= gtk.Label("2 Hours 33 Seconds")
+#        power_settings_button = gtk.Button(_('Power Settings'))
         
-
+        blah = BatteryPluginPopup()
+        blah.show_popup()
+        
+#        self.set_visible_window(False)
+#        self.get_parent_window.set_visible_window(False)
+#        self._window = TransparentWindow(None)
+        
+#        
+#        self._window = gtk.Window()
+#        self._window.set_decorated(gtk.WINDOW_POPUP)
+#        self._window.set_position(gtk.WIN_POS_MOUSE)
+#        print "pos", self._window.get_position()
+#        self._window.show()
+#        self._window.connect("destroy", gtk.mainquit)
+#        
+#        vbox = gtk.VBox(spacing=1)
+#        vbox.add(time_to_depletion)
+#        vbox.add(percentage)
+#        percentage.show()
+#        time_to_depletion.show()
+#        self._window.add(vbox)
+#        vbox.show()
         
     def _poll_for_battery(self):
-        if BatteryUtil.get_battery_level()[0]:
-            self._start_battery_polling()
+        BatteryUtil.get_battery().draw()
+#        if BatteryUtil.get_battery_level()[0]:
+#        self._start_battery_polling()
         
-        return True
+#        return True
         
     def _start_battery_polling(self):
         self.set_size_request(self._icon_size + self.LEFT_MARGIN + self.RIGHT_MARGIN, self._icon_size)
@@ -55,16 +79,21 @@ class BatteryPlugin(NotificationPlugin):
         
     def _update_battery_indicator(self):
         self._recalculate_battery_bounds()
+        self.battery = BatteryUtil.get_battery()
+        battery.level
+        battery.is_recharging
+        battery.depleation_time
+        battery.recharge_time
         self._battery_level, self._is_recharging = BatteryUtil.get_battery_level()
         self.queue_draw()
-        return True
+#        return True
     
     def _recalculate_battery_bounds(self):
         self._battery_base_width = self._icon_size * .85
         self._battery_base_height = self._battery_base_width * (1 / self.GOLDEN_RATIO)
         
         self._battery_top_width = self._icon_size - self._battery_base_width
-        self._battery_top_height= self._battery_base_height / self.GOLDEN_RATIO
+        self._battery_top_height = self._battery_base_height / self.GOLDEN_RATIO
 
     def _draw(self, widget, event):
         cr = widget.window.cairo_create()
@@ -90,7 +119,7 @@ class BatteryPlugin(NotificationPlugin):
             
         cr.restore()
         
-        return False
+#        return False
     
     def _draw_battery_with_shadow(self, cairo_context, position_x, vertical_midpoint):
         cairo_context.set_line_width(1);
@@ -154,9 +183,45 @@ class BatteryPlugin(NotificationPlugin):
         cairo_context.stroke()       
 
     def _set_color(self, cairo_context, color):
-        red =   int(color[1:3], 16) / 256.0
+        red = int(color[1:3], 16) / 256.0
         green = int(color[3:5], 16) / 256.0
-        blue =  int(color[5:7], 16) / 256.0
+        blue = int(color[5:7], 16) / 256.0
         
         cairo_context.set_source_rgb(red, green, blue);  
+
+class BatteryPluginPopup(gtk.EventBox):
+    def __init__(self):
+        super(BatteryPluginPopup, self).__init__()
+        self.set_visible_window(False)
+        self.set_size_request(400, 200)
         
+#        self.window = window
+        
+    def show_popup(self):        
+        self._draw()
+        
+    def _draw(self):
+        percentage = gtk.Label("86%")
+        time_to_depletion = gtk.Label("2 Hours 33 Seconds")
+        power_settings_button = gtk.Button(_('Power Settings'))
+        
+        self._window = gtk.Window()
+        
+#        self._window.set_decorated(gtk.WINDOW_POPUP)
+        self._window.set_position(gtk.WIN_POS_MOUSE)
+        
+        
+        self._window.show()
+        self._window.connect("destroy", gtk.mainquit)
+        
+        vbox = gtk.VBox(spacing=1)
+        vbox.add(time_to_depletion)
+        vbox.add(percentage)
+        percentage.show()
+        power_settings_button.show()
+        time_to_depletion.show()
+        self._window.add(vbox)
+        vbox.show()
+        
+        
+           
