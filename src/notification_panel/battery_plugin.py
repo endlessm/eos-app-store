@@ -6,6 +6,7 @@ from notification_plugin import NotificationPlugin
 from notification_panel_config import NotificationPanelConfig
 from panel_constants import PanelConstants
 import math
+import gtk
 
 class BatteryPlugin(NotificationPlugin):
     COMMAND = "gksudo gnome-control-center power"
@@ -31,6 +32,11 @@ class BatteryPlugin(NotificationPlugin):
         
         self._poll_for_battery()
         gobject.timeout_add(BatteryPlugin.BATTERY_AVAILABILITY_REFRESH_TIME, self._poll_for_battery)
+    
+#    def execute(self):
+#        Override click event...
+        
+
         
     def _poll_for_battery(self):
         if BatteryUtil.get_battery_level()[0]:
