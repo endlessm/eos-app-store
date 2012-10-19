@@ -14,17 +14,25 @@ class TasksTest(unittest.TestCase):
 
 		self._mock_home_path_provider = Mock()
 		self._test_object = Tasks(self._mock_home_path_provider)
+		shutil.rmtree("/tmp/default_image", True)
+		os.makedirs("/tmp/default_image")
+		open("/tmp/default_image/test.image", "w").close()
+		def default_images_stub():
+			return "/tmp/default_image/*"
+		self._test_object._default_images_directory = default_images_stub
 
-		self._orig_copytree = shutil.copytree
-		self._mock_copytree = Mock()
-		shutil.copytree = self._mock_copytree
+
+		self._orig_copy = shutil.copy2
+		self._mock_copy = Mock()
+		shutil.copy2 = self._mock_copy
 
 	def tearDown(self):
 		self._clean_up()
 
-		shutil.copytree = self._orig_copytree
+		shutil.copy2 = self._orig_copy
 
 	def _clean_up(self):
+		shutil.rmtree("/tmp/default_image", True)
 		shutil.rmtree(self.ENDLESS_DIR, True)
 
 	def test_correct_tasks_are_called_when_perform_startup_tasks_is_called(self):
@@ -67,7 +75,7 @@ class TasksTest(unittest.TestCase):
 				])
 
 	def test_get_pictures_directory_from_home_path_provider(self):
-		self._mock_home_path_provider.get_user_directory = Mock()
+		self._mock_home_path_provider.get_user_directory = Mock(return_value="")
 
 		self._test_object.copy_default_images()
 
@@ -79,5 +87,5 @@ class TasksTest(unittest.TestCase):
 
 		self._test_object.copy_default_images()
 
-		self._mock_copytree.assert_called_once_with("/usr/share/endlessm/default_images", pictures_directory)
+		self._mock_copy.assert_called_once_with("/tmp/default_image/test.image", os.path.join(pictures_directory, "test.image"))
 
