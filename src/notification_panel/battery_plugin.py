@@ -1,12 +1,15 @@
 import gobject
 import cairo
+import math
+import gtk
 
-from battery_util import BatteryUtil
+from battery_provider import BatteryProvider
 from notification_plugin import NotificationPlugin
 from notification_panel_config import NotificationPanelConfig
 from panel_constants import PanelConstants
-import math
-import gtk
+from battery_view import BatteryView
+from battery_model import BatteryModel
+from battery_presenter import BatteryPresenter
 
 class BatteryPlugin(NotificationPlugin):
     COMMAND = "gksudo gnome-control-center power"
@@ -25,20 +28,28 @@ class BatteryPlugin(NotificationPlugin):
     
     FONT_SIZE = 9
     
-    def __init__(self, icon_size, gobj=gobject):
-        super(BatteryPlugin, self).__init__(self.COMMAND)
+    def __init__(self, icon_size):
+        super(BatteryPlugin, self).__init__(20)
         self._icon_size = icon_size
         self.set_visible_window(False)
+        print "Making battery"
+        self._view = BatteryView(self)
+        BatteryPresenter(self._view, BatteryModel())
         
-        self._poll_for_battery()
+#        self.set_visible_window(False)
+        
+#        self._poll_for_battery()
     
     def execute(self):
+        print 'I was just pressed, lol'
+        self._view._display_menu(self)
+        
 #        percentage = gtk.Label("86%")
 #        time_to_depletion= gtk.Label("2 Hours 33 Seconds")
 #        power_settings_button = gtk.Button(_('Power Settings'))
         
-        blah = BatteryPluginPopup()
-        blah.show_popup()
+#        blah = BatteryPluginPopup()
+#        blah.show_popup()
         
 #        self.set_visible_window(False)
 #        self.get_parent_window.set_visible_window(False)
@@ -61,7 +72,7 @@ class BatteryPlugin(NotificationPlugin):
 #        vbox.show()
         
     def _poll_for_battery(self):
-        BatteryUtil.get_battery().draw(self)
+        BatteryProvider.get_battery().draw(self)
 #        if BatteryUtil.get_battery_level()[0]:
 #        self._start_battery_polling()
         gobject.timeout_add(BatteryPlugin.REFRESH_TIME, self._poll_for_battery)
@@ -79,9 +90,9 @@ class BatteryPlugin(NotificationPlugin):
         self.set_size_request(self._icon_size + self.LEFT_MARGIN + self.RIGHT_MARGIN, self._icon_size)
         self.connect("expose-event", self._draw)
         self._recalculate_battery_bounds()
-        self.battery = BatteryUtil.get_battery()
+        self.battery = BatteryProvider.get_battery()
         self.queue_draw()
-#        return True
+        return True
     
     def _recalculate_battery_bounds(self):
         self._battery_base_width = self._icon_size * .85

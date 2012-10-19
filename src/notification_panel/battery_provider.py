@@ -3,7 +3,7 @@ import sys
 import gtk
 import gobject
 
-class BatteryUtil():
+class BatteryProvider():
     HAL_DBUS_PATH = 'org.freedesktop.Hal'
     HAL_DBUS_MANAGER_URI = '/org/freedesktop/Hal/Manager'
     HAL_DBUS_MANAGER_PATH = HAL_DBUS_PATH + '.Manager'
@@ -19,19 +19,19 @@ class BatteryUtil():
 
         try:
             bus = data_bus.SystemBus()
-            hal_manager = bus.get_object(BatteryUtil.HAL_DBUS_PATH, BatteryUtil.HAL_DBUS_MANAGER_URI)
-            hal_manager_interface = data_bus.Interface (hal_manager, BatteryUtil.HAL_DBUS_MANAGER_PATH)
+            hal_manager = bus.get_object(BatteryProvider.HAL_DBUS_PATH, BatteryProvider.HAL_DBUS_MANAGER_URI)
+            hal_manager_interface = data_bus.Interface (hal_manager, BatteryProvider.HAL_DBUS_MANAGER_PATH)
             
-            batteries = hal_manager_interface.FindDeviceByCapability('battery', dbus_interface=BatteryUtil.HAL_DBUS_MANAGER_PATH)
+            batteries = hal_manager_interface.FindDeviceByCapability('battery', dbus_interface=BatteryProvider.HAL_DBUS_MANAGER_PATH)
             
             if len(batteries) > 0:
-                battery_object = bus.get_object(BatteryUtil.HAL_DBUS_PATH, batteries[0])
-                battery_interface = data_bus.Interface (battery_object, BatteryUtil.HAL_DBUS_DEVICE_PATH)
+                battery_object = bus.get_object(BatteryProvider.HAL_DBUS_PATH, batteries[0])
+                battery_interface = data_bus.Interface (battery_object, BatteryProvider.HAL_DBUS_DEVICE_PATH)
                 
 #                print "Remaining time: ", battery_interface.GetProperty('battery.remaining_time')
                 
-                is_recharging = not battery_interface.GetProperty(BatteryUtil.BATTERY_DISCHARGING_PROPERTY)
-                battery_level = battery_interface.GetProperty(BatteryUtil.BATTERY_PERCENTAGE_PROPERTY)
+                is_recharging = not battery_interface.GetProperty(BatteryProvider.BATTERY_DISCHARGING_PROPERTY)
+                battery_level = battery_interface.GetProperty(BatteryProvider.BATTERY_PERCENTAGE_PROPERTY)
         except:
             battery_level = None
             is_recharging = None
@@ -43,10 +43,10 @@ class BatteryUtil():
         battery = NoBattery()
         try:
             bus = data_bus.SystemBus()
-            hal_manager = bus.get_object(BatteryUtil.HAL_DBUS_PATH, BatteryUtil.HAL_DBUS_MANAGER_URI)
-            hal_manager_interface = data_bus.Interface (hal_manager, BatteryUtil.HAL_DBUS_MANAGER_PATH)
+            hal_manager = bus.get_object(BatteryProvider.HAL_DBUS_PATH, BatteryProvider.HAL_DBUS_MANAGER_URI)
+            hal_manager_interface = data_bus.Interface (hal_manager, BatteryProvider.HAL_DBUS_MANAGER_PATH)
             
-            batteries = hal_manager_interface.FindDeviceByCapability('battery', dbus_interface=BatteryUtil.HAL_DBUS_MANAGER_PATH)
+            batteries = hal_manager_interface.FindDeviceByCapability('battery', dbus_interface=BatteryProvider.HAL_DBUS_MANAGER_PATH)
             
             if len(batteries):
                 battery = Battery(batteries)
@@ -68,7 +68,7 @@ class Battery(gtk.EventBox):
         self._system_bus = self._data_bus.SystemBus()
         self._batteries = batteries
     
-    def register(self, presenter):
+    def draw(self, presenter):
 #        print "level", self.level()
 #        print "charging", self.charging()
         try:
@@ -78,16 +78,19 @@ class Battery(gtk.EventBox):
         
     
     def charging(self):
-        return not self._battery_interface().GetProperty(BatteryUtil.BATTERY_DISCHARGING_PROPERTY)
+        return not self._battery_interface().GetProperty(BatteryProvider.BATTERY_DISCHARGING_PROPERTY)
     
     def level(self):
-        return self._battery_interface().GetProperty(BatteryUtil.BATTERY_PERCENTAGE_PROPERTY)
+        return self._battery_interface().GetProperty(BatteryProvider.BATTERY_PERCENTAGE_PROPERTY)
+    
+    def time_to_depletion(self):
+        return 1800
     
     def _battery_object(self):
-        return self._system_bus.get_object(BatteryUtil.HAL_DBUS_PATH, self._batteries[0])
+        return self._system_bus.get_object(BatteryProvider.HAL_DBUS_PATH, self._batteries[0])
     
     def _battery_interface(self):
-        return self._data_bus.Interface(self._battery_object(), BatteryUtil.HAL_DBUS_DEVICE_PATH)
+        return self._data_bus.Interface(self._battery_object(), BatteryProvider.HAL_DBUS_DEVICE_PATH)
         
         
         
