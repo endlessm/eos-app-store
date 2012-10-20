@@ -95,18 +95,24 @@ class AddRemoveShortcut(DesktopShortcut):
         self._event_box.show()
         
     def _drag_begin_broadcast_callback(self, widget):
-        self.change_icon(self.get_dragged_images())
+        if widget._identifier != 'Files':
+            self.change_icon(self.get_dragged_images())
         
     def _drag_end_broadcast_callback(self, widget):
         self.change_icon(self.get_images())
     
     def dnd_drag_leave(self, widget, context, time):
-        self.change_icon(self.get_dragged_images())
+        source_widget = context.get_source_widget()
+        if source_widget._identifier != 'Files':
+            self.change_icon(self.get_dragged_images())
 
         
     def dnd_receive_data(self, widget, context, x, y, selection, targetType, time):
         source_widget = context.get_source_widget()
         label = context.get_source_widget().parent._label.get_text()
+        
+        if label == 'Files':
+            return
         
         super(AddRemoveShortcut, self).dnd_motion_data(widget, context, x, y, time)
         if not source_widget.parent._shortcut.has_children():
@@ -119,7 +125,7 @@ class AddRemoveShortcut(DesktopShortcut):
             self._delete_not_possible_popup.show()
 
     def _drag_motion_broadcast_callback(self, source, destination, x, y):
-        if isinstance(destination.parent, AddRemoveShortcut):
+        if isinstance(destination.parent, AddRemoveShortcut) and source._identifier != 'Files':
             self.change_icon(self.get_trash_full_images())
     
     def _confirmation_received(self, result, widget, lbl):
