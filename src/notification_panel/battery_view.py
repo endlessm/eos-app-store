@@ -33,20 +33,23 @@ class BatteryView(AbstractNotifier):
 
     def __init__(self, parent):
         self._parent = parent
-        self._display_battery();
+        self._percentage_label = gtk.Label()
+        self._time_to_depletion_label= gtk.Label()
         
-    def _display_battery(self):
+#        self.display_battery();
+        
+    def set_battery(self, battery):
+        self._battery = battery
+    
+    def display_battery(self):
         self._parent.set_visible_window(False)
         self._parent.set_size_request(PanelConstants.get_icon_size() + self.LEFT_MARGIN + self.RIGHT_MARGIN, PanelConstants.get_icon_size())
-        print "about to draw battery...."
         self._parent.connect("expose-event", self._draw)
         self._recalculate_battery_bounds()
-        self._battery = BatteryProvider.get_battery()
-        print "Battery level...", str(self._battery.level)
+#        self._battery = BatteryProvider.get_battery()
         self._parent.queue_draw()
         
     def _draw(self, widget, event):
-        print "drawing battery...."
         cr = widget.window.cairo_create()
         cr.save()
         
@@ -164,15 +167,15 @@ class BatteryView(AbstractNotifier):
         self._button_power_settings.connect('button-press-event', 
                 lambda w, e: self._notify(self.POWER_SETTINGS))
         
-        self._percentage = gtk.Label("86%")
-        self._time_to_depletion= gtk.Label("2 Hours 33 Seconds")
+        self._percentage_label.set_text(self._battery.level()+'%')
+        self._time_to_depletion_label.set_text(self._battery.time_to_depletion())
         
         self._vbox = gtk.VBox()
         self._vbox.set_border_width(10)
         self._vbox.set_focus_chain([])
         self._vbox.add(self._button_power_settings)
-        self._vbox.add(self._percentage)
-        self._vbox.add(self._time_to_depletion)
+        self._vbox.add(self._percentage_label)
+        self._vbox.add(self._time_to_depletion_label)
         
         self._parent.set_visible_window(False)
     
@@ -190,10 +193,11 @@ class BatteryView(AbstractNotifier):
         # with a transparent background and triangle decoration
         self._window.connect('expose-event', self._expose)
         self._window.connect('focus-out-event', lambda w, e: self.hide_window())
-
+        
         # Place the widget in an event box within the window
         # (which has a different background than the transparent window)
         self._container = gtk.EventBox()
+        
         self._vbox.show()
         self._container.add(self._vbox)
         self._window.add(self._container)
@@ -204,18 +208,17 @@ class BatteryView(AbstractNotifier):
     # To do: make the triangle position configurable
     def _expose(self, widget, event):
         cr = widget.window.cairo_create()
-        
-        x = self._battery_position_x 
-     
+
         # Decorate the border with a triangle pointing up
         # Use the same color as the default event box background
         # To do: eliminate need for these "magic" numbers
         cr.set_source_rgba(0xf2/255.0, 0xf1/255.0, 0xf0/255.0, 1.0)
-        self._pointer = 0
+        self._pointer = 110
         cr.move_to(self._pointer, 0)
         cr.line_to(self._pointer + 10, 10)
         cr.line_to(self._pointer - 10, 10)
         cr.fill()
+        return False
 
     def display(self):
         self._window.show_all()

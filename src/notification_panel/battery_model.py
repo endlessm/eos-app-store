@@ -1,18 +1,19 @@
 import gobject
 from battery_provider import BatteryProvider
+from osapps.app_launcher import AppLauncher
 
 class BatteryModel():
     
     SETTINGS_COMMAND = "gksudo gnome-control-center power"
-    REFRESH_TIME = 10000
     
     def __init__(self, gobj=gobject):
-        self._poll_for_battery()
+#        self._start_battery_polling()
+        self._app_launcher = AppLauncher()
         
-    def _poll_for_battery(self):
+    def get_battery(self):
         return BatteryProvider.get_battery()
         
-    def __start_battery_polling(self):
+    def _start_battery_polling(self):
         gobject.timeout_add(self.REFRESH_TIME, self._poll_for_battery)
     
     def open_settings(self):

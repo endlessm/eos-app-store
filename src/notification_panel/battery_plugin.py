@@ -41,36 +41,8 @@ class BatteryPlugin(NotificationPlugin):
 #        self._poll_for_battery()
     
     def execute(self):
-        print 'I was just pressed, lol'
         self._view._display_menu(self)
-        
-#        percentage = gtk.Label("86%")
-#        time_to_depletion= gtk.Label("2 Hours 33 Seconds")
-#        power_settings_button = gtk.Button(_('Power Settings'))
-        
-#        blah = BatteryPluginPopup()
-#        blah.show_popup()
-        
-#        self.set_visible_window(False)
-#        self.get_parent_window.set_visible_window(False)
-#        self._window = TransparentWindow(None)
-        
-#        
-#        self._window = gtk.Window()
-#        self._window.set_decorated(gtk.WINDOW_POPUP)
-#        self._window.set_position(gtk.WIN_POS_MOUSE)
-#        print "pos", self._window.get_position()
-#        self._window.show()
-#        self._window.connect("destroy", gtk.mainquit)
-#        
-#        vbox = gtk.VBox(spacing=1)
-#        vbox.add(time_to_depletion)
-#        vbox.add(percentage)
-#        percentage.show()
-#        time_to_depletion.show()
-#        self._window.add(vbox)
-#        vbox.show()
-        
+
     def _poll_for_battery(self):
         BatteryProvider.get_battery().draw(self)
 #        if BatteryUtil.get_battery_level()[0]:
