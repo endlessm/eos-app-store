@@ -35,18 +35,16 @@ class BatteryView(AbstractNotifier):
         self._parent = parent
         self._percentage_label = gtk.Label()
         self._time_to_depletion_label= gtk.Label()
+        self._vbox = None
+        self._parent.connect("expose-event", self._draw)
         
-#        self.display_battery();
-        
-    def set_battery(self, battery):
-        self._battery = battery
-    
-    def display_battery(self):
+    def display_battery(self, level, time_to_depletion, charging):
+        self._level = level
+        self._time_to_depletion = time_to_depletion 
+        self._charging = charging 
         self._parent.set_visible_window(False)
         self._parent.set_size_request(PanelConstants.get_icon_size() + self.LEFT_MARGIN + self.RIGHT_MARGIN, PanelConstants.get_icon_size())
-        self._parent.connect("expose-event", self._draw)
         self._recalculate_battery_bounds()
-#        self._battery = BatteryProvider.get_battery()
         self._parent.queue_draw()
         
     def _draw(self, widget, event):
@@ -66,7 +64,7 @@ class BatteryView(AbstractNotifier):
         
         self._draw_battery_with_shadow(cr, self._battery_position_x, self._vertical_midpoint)
 
-        if self._battery.charging():
+        if self._charging:
             print "charging...."
             self._draw_outlet_cord_with_shadow(cr, self._horizontal_midpoint, self._vertical_midpoint, self._battery_base_height)
         else:
@@ -88,13 +86,14 @@ class BatteryView(AbstractNotifier):
         self._draw_battery(cairo_context, position_x, vertical_midpoint)
     
     def _draw_battery_level(self, cairo_context, position_x, vertical_midpoint):
-        battery_percentage = self._battery.level() / 100.0
-        self._set_color(cairo_context, PanelConstants.DEFAULT_PLUGIN_FG_COLOR)  
-        if (battery_percentage < 0.10):
-            self._set_color(cairo_context, PanelConstants.DEFAULT_PLUGIN_CAUTION_COLOR)
-            
-        cairo_context.rectangle(position_x + self.BATTERY_FILL_MARGIN, vertical_midpoint - self._battery_base_height / 2 + self.BATTERY_FILL_MARGIN, (self._battery_base_width - 2 * self.BATTERY_FILL_MARGIN) * battery_percentage , self._battery_base_height - (self.BATTERY_FILL_MARGIN * 2))
-        cairo_context.fill()
+        if self._level:
+            battery_percentage = self._level / 100.0
+            self._set_color(cairo_context, PanelConstants.DEFAULT_PLUGIN_FG_COLOR)  
+            if (battery_percentage < 0.10):
+                self._set_color(cairo_context, PanelConstants.DEFAULT_PLUGIN_CAUTION_COLOR)
+                
+            cairo_context.rectangle(position_x + self.BATTERY_FILL_MARGIN, vertical_midpoint - self._battery_base_height / 2 + self.BATTERY_FILL_MARGIN, (self._battery_base_width - 2 * self.BATTERY_FILL_MARGIN) * battery_percentage , self._battery_base_height - (self.BATTERY_FILL_MARGIN * 2))
+            cairo_context.fill()
     
     def _draw_battery(self, cairo_context, position_x, vertical_midpoint):
         # Battery base
@@ -145,31 +144,18 @@ class BatteryView(AbstractNotifier):
         
         cairo_context.set_source_rgb(red, green, blue);    
     
-    def _update_battery_indicator(self, battery):
-        self.set_size_request(self._icon_size + self.LEFT_MARGIN + self.RIGHT_MARGIN, self._icon_size)
-        self.connect("expose-event", self._draw)
-        self._recalculate_battery_bounds()
-        self.battery = BatteryProvider.get_battery()
-        self.queue_draw()
-        return True
-    
     def _recalculate_battery_bounds(self):
         self._battery_base_width = PanelConstants.get_icon_size() * .85
         self._battery_base_height = self._battery_base_width * (1 / self.GOLDEN_RATIO)
         
         self._battery_top_width = PanelConstants.get_icon_size() - self._battery_base_width
         self._battery_top_height = self._battery_base_height / self.GOLDEN_RATIO
-        
-    def _display_menu(self, parent):
-        self._parent = parent
-        
+    
+    def _create_menu(self):
         self._button_power_settings = gtk.Button(_('Power Settings'))
         self._button_power_settings.connect('button-press-event', 
                 lambda w, e: self._notify(self.POWER_SETTINGS))
-        
-        self._percentage_label.set_text(self._battery.level()+'%')
-        self._time_to_depletion_label.set_text(self._battery.time_to_depletion())
-        
+
         self._vbox = gtk.VBox()
         self._vbox.set_border_width(10)
         self._vbox.set_focus_chain([])
@@ -202,6 +188,17 @@ class BatteryView(AbstractNotifier):
         self._container.add(self._vbox)
         self._window.add(self._container)
         self._is_active = False
+        
+    def display_menu(self, level, time):
+        if not self._vbox:
+            self._create_menu()
+            
+        self._percentage_label.set_text(str(level)+'%')
+        if self._charging:
+            suffix = ' To Charge'
+        else:  
+            suffix = ' Left'
+        self._time_to_depletion_label.set_text(time+suffix)
         
         self.display()
         

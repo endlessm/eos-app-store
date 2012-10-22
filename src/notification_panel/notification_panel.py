@@ -44,6 +44,7 @@ class NotificationPanel(gtk.HBox):
     def _register_plugin(self, notification_panel_items, clazz):
         plugin = clazz(PanelConstants.get_icon_size())
         plugin.set_parent(self._parent)
+        plugin.post_init()
         notification_panel_items.pack_start(plugin, False, False, 2)
         return plugin
 
