@@ -17,29 +17,46 @@ class EndlessDesktopModel(object):
     def set_shortcuts_by_name(self, shortcuts_names):
         self._app_desktop_datastore.set_all_shortcuts_by_name(shortcuts_names)
     
-    def relocate_shortcut(self, source_shortcut, folder_shortcut):
+    def _relocate_shortcut_to_root(self, source_shortcut):
+        source_parent = source_shortcut.parent()
+        source_parent.remove_child(source_shortcut)
+        
+        all_shortcuts = self._app_desktop_datastore.get_all_shortcuts()
+        all_shortcuts.append(source_shortcut)
+        self._app_desktop_datastore.set_all_shortcuts(all_shortcuts)
+        return True
+        
+    def _relocate_shortcut_to_folder(self, source_shortcut, folder_shortcut):
         source_parent = source_shortcut.parent()
         all_shortcuts = self._app_desktop_datastore.get_all_shortcuts()
-
+        
+        if (source_parent is None) and (source_shortcut in all_shortcuts):
+            all_shortcuts.remove(source_shortcut)
+            folder_shortcut.add_child(source_shortcut)
+            self._app_desktop_datastore.set_all_shortcuts(all_shortcuts)
+            return True
+        elif source_parent is not None:
+            source_parent.remove_child(source_shortcut)
+            folder_shortcut.add_child(source_shortcut)
+            self._app_desktop_datastore.set_all_shortcuts(all_shortcuts)
+            return True
+        else:
+            print >> sys.stderr, "unknown shortcut location"
+        return False
+    
+    def relocate_shortcut(self, source_shortcut, folder_shortcut):
         if source_shortcut is not None:
-            if (folder_shortcut is None) and (source_parent is not None):
-                source_parent.remove_child(source_shortcut)
-                all_shortcuts.append(source_shortcut)
-                self._app_desktop_datastore.set_all_shortcuts(all_shortcuts)
-                return True
+            source_parent = source_shortcut.parent()
+            all_shortcuts = self._app_desktop_datastore.get_all_shortcuts()
+
+            if folder_shortcut is None:
+                if source_parent is not None:
+                    return self._relocate_shortcut_to_root(source_shortcut)
             else:
-                if (source_parent is None) and (source_shortcut in all_shortcuts):
-                    all_shortcuts.remove(source_shortcut)
-                    folder_shortcut.add_child(source_shortcut)
-                    self._app_desktop_datastore.set_all_shortcuts(all_shortcuts)
-                    return True
-                elif source_parent is not None:
-                    source_parent.remove_child(source_shortcut)
-                    folder_shortcut.add_child(source_shortcut)
-                    self._app_desktop_datastore.set_all_shortcuts(all_shortcuts)
-                    return True
-                else:
-                    print >> sys.stderr, "unknown shortcut location"
+                return self._relocate_shortcut_to_folder(
+                    source_shortcut, 
+                    folder_shortcut
+                    )                
         return False
     
     def execute_app(self, app_key, params):
