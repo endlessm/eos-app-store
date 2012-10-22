@@ -4,6 +4,8 @@ sudo apt-get install git -y
 
 mkdir -p ~/checkout
 
+cd ~/checkout
+
 git clone http://github.com/endlessm/eos-desktop.git
 
 cd ~/checkout/eos-desktop
