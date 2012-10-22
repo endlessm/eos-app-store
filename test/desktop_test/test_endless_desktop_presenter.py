@@ -86,24 +86,37 @@ class TestEndlessDesktopPresenter(unittest.TestCase):
         
         self.testObject.change_background.assert_called_once_with(filename)
         
-    def test_relocate_item_invalid(self):
-        self.mock_model.relocate_shortcut = Mock(return_value=None)
-        ret = self.testObject.relocate_item('app1', 'folder1')
-        self.assertEqual(ret, False)
-        self.mock_model.relocate_shortcut.assert_called_once_with('/app1', '/folder1/')
+    def test_relocate_item(self):
+        self.mock_model.relocate_shortcut = Mock(return_value=True)
+        source_shortcut = Mock()
+        folder_shortcut = Mock()
         
-    def test_relocate_item_valid(self):
-        destination_shortcut = Mock()
-        self.mock_model.get_shortcuts = Mock(return_value=[])
-        self.mock_view.hide_folder_window = Mock()
-        self.mock_view.show_folder_window = Mock()
-        self.mock_view.refresh = Mock()
-        
-        self.mock_model.relocate_shortcut = Mock(return_value=destination_shortcut)
-        ret = self.testObject.relocate_item('app1', 'folder1')
+        ret = self.testObject.relocate_item(source_shortcut, folder_shortcut)
         self.assertEqual(ret, True)
-        self.mock_model.relocate_shortcut.assert_called_once_with('/app1', '/folder1/')
-        self.mock_view.hide_folder_window.assert_called_once()
-        self.mock_view.show_folder_window.assert_called_once_with(destination_shortcut)
-        self.mock_view.refresh.assert_called_once_with([])
+        
+        self.mock_model.relocate_shortcut.assert_called_once_with(
+            source_shortcut, 
+            folder_shortcut
+            )
+            
+    def test_get_shortcut_by_name(self):
+        app1 = Mock()
+        app1.name = Mock(return_value='app 1')
+        app2 = Mock()
+        app2.name = Mock(return_value='app 2')
+        app3 = Mock()
+        app3.name = Mock(return_value='app 3')
+        self.testObject._model.get_shortcuts = Mock(return_value=[app1, app2, app3])
+    
+        app_ret = self.testObject.get_shortcut_by_name('app 1')
+        self.assertEqual(app_ret, app1)
+        
+        app_ret = self.testObject.get_shortcut_by_name('app 2')
+        self.assertEqual(app_ret, app2)
+        
+        app_ret = self.testObject.get_shortcut_by_name('app 3')
+        self.assertEqual(app_ret, app3)
+        
+        app_ret = self.testObject.get_shortcut_by_name('app 4')
+        self.assertEqual(app_ret, None)
         
