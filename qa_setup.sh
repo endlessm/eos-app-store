@@ -1,15 +1,26 @@
 #!/bin/bash
 
+checkout_dir=/home/endlessm/checkout
+
 sudo apt-get install git -y
 
-mkdir -p ~/checkout
+sudo mkdir -p ${checkout_dir}
 
-cd ~/checkout
+pushd ${checkout_dir}
 
-git clone http://github.com/endlessm/eos-desktop.git
+sudo git clone http://github.com/endlessm/eos-desktop.git
 
-cd ~/checkout/eos-desktop
-
+pushd eos-desktop
 git status
 
-git checkout -b issues/439
+sudo git checkout issues/439
+
+popd
+
+echo "done with git.."
+
+popd
+
+echo "done with script.."
+
+sudo chown -R endlessm:endlessm ${checkout_dir}
