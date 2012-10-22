@@ -14,36 +14,28 @@ class BatteryProvider():
     BATTERY_REMAINING_TIME_PROPERTY = 'battery.remaining_time'
     
     def __init__(self, data_bus = dbus):
-        print "Hi Mom! :-)"
         self._data_bus = data_bus
         self._system_bus = self._data_bus.SystemBus()
         self._hal_manager = self._system_bus.get_object(BatteryProvider.HAL_DBUS_PATH, BatteryProvider.HAL_DBUS_MANAGER_URI)
         self._hal_manager_interface = data_bus.Interface (self._hal_manager, BatteryProvider.HAL_DBUS_MANAGER_PATH)
         
     def get_battery(self):
-        print "Go get it..."
         battery = Battery(None, None, None)
         try:
             batteries = self._hal_manager_interface.FindDeviceByCapability('battery', dbus_interface=BatteryProvider.HAL_DBUS_MANAGER_PATH)
             
             if len(batteries):
                 primary_battery = batteries[0]
-                print "1"
                 battery_interface = self._data_bus.Interface(self._system_bus.get_object(BatteryProvider.HAL_DBUS_PATH, primary_battery), BatteryProvider.HAL_DBUS_DEVICE_PATH)
-                print "2"
                 discharging = battery_interface.GetProperty(self.BATTERY_DISCHARGING_PROPERTY)
-                print "3"
                 level = battery_interface.GetProperty(self.BATTERY_PERCENTAGE_PROPERTY)
-                print "4"
-                try:
-                    remaining = battery_interface.GetProperty(self.BATTERY_REMAINING_TIME_PROPERTY)
-                except:
-                    remaining = 0
-                    print "Unexpected error:", sys.exc_info()[0]
-                print "5"
+#                We saw an interesting situation occur only one time after a few full days of testing:
+#                dbus could not find a 'remaining_time' property on the battery.  After restarting, 
+#                the property was present again
+                remaining = battery_interface.GetProperty(self.BATTERY_REMAINING_TIME_PROPERTY)
                 battery = Battery(not discharging, level, remaining)
         except:
-            print "Unexpected error:", sys.exc_info()[0]
+            pass
         return battery
 
 class Battery(gtk.EventBox):

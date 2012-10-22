@@ -5,19 +5,6 @@ from notification_panel.battery_model import BatteryModel
 from notification_panel.battery_provider import Battery
 
 class BatteryModelTestCase(unittest.TestCase):
-    def test_get_battery_returns_battery_from_battery_provider(self):
-        battery = "battery"
-        current_version = "version from desktop"
-        
-        mock_battery_provider = Mock()
-        mock_battery_provider.get_battery = Mock(return_value=battery)
-        mock_os_util = Mock()
-        mock_os_util.get_version = Mock(return_value=current_version)
-
-        test_object = BatteryModel(mock_battery_provider)
-
-        self.assertEquals(battery, test_object.get_battery())
-    
     def test_when_button_is_clicked_power_settings_are_opened(self):
         mock_battery_provider = Mock()
         mock_app_launcher= Mock()

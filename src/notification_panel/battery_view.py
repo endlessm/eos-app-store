@@ -35,7 +35,7 @@ class BatteryView(AbstractNotifier):
         self._parent = parent
         self._percentage_label = gtk.Label()
         self._time_to_depletion_label= gtk.Label()
-        self._vbox = None
+        self._window = None
         self._parent.connect("expose-event", self._draw)
         
     def display_battery(self, level, time_to_depletion, charging):
@@ -65,10 +65,8 @@ class BatteryView(AbstractNotifier):
         self._draw_battery_with_shadow(cr, self._battery_position_x, self._vertical_midpoint)
 
         if self._charging:
-            print "charging...."
             self._draw_outlet_cord_with_shadow(cr, self._horizontal_midpoint, self._vertical_midpoint, self._battery_base_height)
         else:
-            print "not charging..."
             self._draw_battery_level(cr, self._battery_position_x, self._vertical_midpoint)
             
         cr.restore()
@@ -152,6 +150,7 @@ class BatteryView(AbstractNotifier):
         self._battery_top_height = self._battery_base_height / self.GOLDEN_RATIO
     
     def _create_menu(self):
+        print "create menu..."
         self._button_power_settings = gtk.Button(_('Power Settings'))
         self._button_power_settings.connect('button-press-event', 
                 lambda w, e: self._notify(self.POWER_SETTINGS))
@@ -190,16 +189,20 @@ class BatteryView(AbstractNotifier):
         self._is_active = False
         
     def display_menu(self, level, time):
-        if not self._vbox:
+        if not self._window:
             self._create_menu()
-            
+        
+#        self.hide_window()
+        
+        print "display menu..."    
         self._percentage_label.set_text(str(level)+'%')
         if self._charging:
             suffix = ' To Charge'
         else:  
             suffix = ' Left'
         self._time_to_depletion_label.set_text(time+suffix)
-        
+
+        self._is_active = False
         self.display()
         
     # To do: make the triangle position configurable
@@ -218,8 +221,10 @@ class BatteryView(AbstractNotifier):
         return False
 
     def display(self):
+        print "display"
         self._window.show_all()
 
     def hide_window(self):
+        print "hide"
         self._window.hide_all()
 
