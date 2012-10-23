@@ -158,12 +158,12 @@ class DesktopModelTestCase(unittest.TestCase):
     def test_relocate_shortcut_to_folder_on_desk_no_parent(self):
         app1 = AppShortcut('', 'app1', '')
         app2 = AppShortcut('', 'app2', '')
-        self.mock_desktop_locale_datastore.get_all_shortcuts = Mock(return_value=[app1])
+        self.mock_desktop_locale_datastore.get_all_shortcuts = Mock(return_value=[app1, app2])
         self.mock_desktop_locale_datastore.set_all_shortcuts = Mock()
         
         ret = self.testObject._relocate_shortcut_to_folder(app1, app2)
         self.assertTrue(ret)
-        self.mock_desktop_locale_datastore.set_all_shortcuts.assert_called_once_with([])
+        self.mock_desktop_locale_datastore.set_all_shortcuts.assert_called_once_with([app2])
         self.assertEqual(app2.children(), [app1])
         
     def test_relocate_shortcut_to_folder_have_parent_to_folder(self):
