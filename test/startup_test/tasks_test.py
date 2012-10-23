@@ -2,8 +2,10 @@ import unittest
 from startup.tasks import Tasks
 from mock import Mock, call
 import shutil
-import os
 import os.path
+import sys
+
+from eos_log import log
 
 class TasksTest(unittest.TestCase):
 	ENDLESS_DIR = os.path.expanduser("~/.endlessm")
@@ -34,6 +36,40 @@ class TasksTest(unittest.TestCase):
 
 		self.assertTrue(mock_task1.execute.called)
 		self.assertTrue(mock_task2.execute.called)
+		
+	def test_if_there_are_errors_still_continue_executing_tasks(self):
+		mock_task = Mock()
+		mock_task.execute = Mock()
+		
+		error_class = Mock(side_effect=Exception())
+		error_class.__name__ = ""
+		
+		self._test_object.TASK_PLUGINS = [error_class, Mock(return_value=mock_task)]
+
+		self._test_object.perform_startup_tasks()
+
+		self.assertTrue(mock_task.execute.called)
+		
+	def test_if_there_are_errors_they_are_logged(self):
+		orig_eos_error = log.eos_error
+		log.eos_error = Mock()
+		
+		task_name = "this is the task name"
+		
+		mock_task_instance = Mock()
+		mock_task_instance.execute = Mock(side_effect=Exception())
+		
+		mock_task_class = Mock(return_value=mock_task_instance)
+		mock_task_class.__name__ = task_name
+		
+		
+		self._test_object.TASK_PLUGINS = [mock_task_class]
+
+		self._test_object.perform_startup_tasks()
+
+		log.eos_error.assert_called_once_with("An error ocurred while executing " + task_name)
+		
+		log.eos_error = orig_eos_error
 
 	def test_initialized_file_is_created_after_running_perform_startup_tasks(self):
 
