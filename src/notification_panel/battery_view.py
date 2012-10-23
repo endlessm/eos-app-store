@@ -62,12 +62,14 @@ class BatteryView(AbstractNotifier):
         self._horizontal_midpoint = event.area.x + event.area.width / 2
         self._battery_position_x = event.area.x + self.LEFT_MARGIN
         
-        self._draw_battery_with_shadow(cr, self._battery_position_x, self._vertical_midpoint)
-
-        if self._charging:
-            self._draw_outlet_cord_with_shadow(cr, self._horizontal_midpoint, self._vertical_midpoint, self._battery_base_height)
+        if self._level:
+            self._draw_battery_with_shadow(cr, self._battery_position_x, self._vertical_midpoint)
+            if self._charging:
+                self._draw_outlet_cord_with_shadow(cr, self._horizontal_midpoint, self._vertical_midpoint, self._battery_base_height)
+            else:
+                self._draw_battery_level(cr, self._battery_position_x, self._vertical_midpoint)
         else:
-            self._draw_battery_level(cr, self._battery_position_x, self._vertical_midpoint)
+            self._draw_outlet_cord_with_shadow(cr, self._horizontal_midpoint, self._vertical_midpoint, self._battery_base_height)
             
         cr.restore()
         
@@ -196,12 +198,15 @@ class BatteryView(AbstractNotifier):
         
         print "display menu..."    
         self._percentage_label.set_text(str(level)+'%')
-        if self._charging:
-            suffix = ' To Charge'
-        else:  
-            suffix = ' Left'
-        self._time_to_depletion_label.set_text(time+suffix)
-
+        if time:
+            if self._charging:
+                suffix = ' To Charge'
+            else:  
+                suffix = ' Left'
+            self._time_to_depletion_label.set_text(time+suffix)
+        else: 
+            self._time_to_depletion_label.hide()
+            
         self._is_active = False
         self.display()
         

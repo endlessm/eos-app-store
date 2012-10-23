@@ -2,6 +2,7 @@ import dbus
 import sys
 import gtk
 import gobject
+import traceback
 
 class BatteryProvider():
     HAL_DBUS_PATH = 'org.freedesktop.Hal'
@@ -18,7 +19,8 @@ class BatteryProvider():
         self._system_bus = self._data_bus.SystemBus()
         self._hal_manager = self._system_bus.get_object(BatteryProvider.HAL_DBUS_PATH, BatteryProvider.HAL_DBUS_MANAGER_URI)
         self._hal_manager_interface = data_bus.Interface (self._hal_manager, BatteryProvider.HAL_DBUS_MANAGER_PATH)
-        
+    
+#    TODO: We can connect to dbus updates a la http://code.google.com/p/batterymon/downloads/detail?name=batterymon-1.2.0.tar.gz&can=2&q=
     def get_battery(self):
         battery = Battery(None, None, None)
         try:
@@ -29,13 +31,15 @@ class BatteryProvider():
                 battery_interface = self._data_bus.Interface(self._system_bus.get_object(BatteryProvider.HAL_DBUS_PATH, primary_battery), BatteryProvider.HAL_DBUS_DEVICE_PATH)
                 discharging = battery_interface.GetProperty(self.BATTERY_DISCHARGING_PROPERTY)
                 level = battery_interface.GetProperty(self.BATTERY_PERCENTAGE_PROPERTY)
-#                We saw an interesting situation occur only one time after a few full days of testing:
-#                dbus could not find a 'remaining_time' property on the battery.  After restarting, 
-#                the property was present again
-                remaining = battery_interface.GetProperty(self.BATTERY_REMAINING_TIME_PROPERTY)
+                
+#                dbus could not find a 'remaining_time' property on the battery. This occurs when the battery is full  
+                try:
+                    remaining = battery_interface.GetProperty(self.BATTERY_REMAINING_TIME_PROPERTY)
+                except:
+                    remaining = None
                 battery = Battery(not discharging, level, remaining)
         except:
-            pass
+            print "Dbus error:", sys.exc_info()[0]
         return battery
 
 class Battery(gtk.EventBox):
@@ -44,7 +48,7 @@ class Battery(gtk.EventBox):
         self._charging = charging
         self._level = level
         self._remaining = remaining
-    
+
     def charging(self):
         return self._charging
     
