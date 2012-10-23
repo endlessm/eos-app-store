@@ -1,6 +1,13 @@
 #!/bin/bash +e
 
 checkout_dir=/home/endlessm/checkout
+build_script=build.sh
+app_list=/etc/endlessm/application.list
+desktop_file=/home/endlessm/.endlessm/desktop.json
+
+if [ -d ${checkout_dir} ]; then
+  rm -rf ${checkout_dir}
+fi
 
 REPOS=( \
       'eos-desktop' \
@@ -23,10 +30,34 @@ pushd ${checkout_dir}
     sudo git clone http://github.com/endlessm/${repo}.git
     pushd ${repo}
       sudo git checkout ${branch}
-      ./build.sh
+      if [ -f ${build_script} ]; then
+        ./${build_script}
+      fi
     popd
   done
 
 popd
 
+
+if ! grep -q endlessm /etc/sudoers
+then
+  print_msg "updating sudoers"
+  echo "endlessm ALL=NOPASSWD: /usr/bin/gnome-control-center" >> /etc/sudoers
+fi
+
+
 sudo chown -R endlessm:endlessm ${checkout_dir}
+
+replacement=$',{"key":"terminal","icon":"/usr/share/icons/gnome/48x48/apps/gnome-terminal.png","name":"Terminal"},{"key":"terminal","icon":"/usr/share/icons/gnome/48x48/apps/gnome-terminal.png","name":"QA","params":["/home/endlessm/checkout/restart-launcher.sh"]}]'
+
+if ! grep -q terminal ${app_list}
+then
+  echo "updating ${app_list}..."
+  sudo sed -i'.bak' -e's/}$/  ,"terminal":"gnome-terminal.desktop"\n}/' ${app_list}
+fi  
+
+if ! grep -q terminal ${desktop_file}
+then
+  echo "updating ${desktop_file}"
+  sudo sed -i'.bak' -e"s|\]$|${replacement}|" ${desktop_file}
+fi  
