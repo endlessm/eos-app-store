@@ -10,18 +10,19 @@ if [ -d ${checkout_dir} ]; then
 fi
 
 REPOS=( \
-      'eos-common' \
       'eos-desktop' \
+      'eos-common' \
      #'eos-config' \
      #'eos-browser' \
       )
 
+echo "#################################################################"
+echo -n "Enter branch, type [dev] if you are unsure, then press [ENTER]: "
+read branch
+
 sudo apt-get install git -y
 
 sudo mkdir -p ${checkout_dir}
-
-echo -n "Enter branch, type [dev] if you are unsure, then press [ENTER]: "
-read branch
 
 pushd ${checkout_dir}
 
