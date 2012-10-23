@@ -10,7 +10,6 @@ class TasksTest(unittest.TestCase):
 
 	def setUp(self):
 		self._clean_up()
-		os.makedirs(self.ENDLESS_DIR)
 
 		self._test_object = Tasks()
 		self._test_object.TASK_PLUGINS = [Mock()]
@@ -43,6 +42,7 @@ class TasksTest(unittest.TestCase):
 		self.assertTrue(os.path.exists(os.path.join(self.ENDLESS_DIR, ".initialized")))
 
 	def test_dont_call_anything_if_system_is_already_initialized(self):
+		os.makedirs(self.ENDLESS_DIR)
 		open(os.path.join(self.ENDLESS_DIR, ".initialized"), "w").close()
 
 		self._test_object.initialize_shotwell_settings = Mock()
