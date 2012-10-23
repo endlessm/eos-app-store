@@ -159,7 +159,7 @@ class BatteryView(AbstractNotifier):
 
         self._vbox = gtk.VBox()
         self._vbox.set_border_width(10)
-        self._vbox.set_focus_chain([])su 
+        self._vbox.set_focus_chain([])
         self._vbox.add(self._button_power_settings)
         self._vbox.add(self._percentage_label)
         
