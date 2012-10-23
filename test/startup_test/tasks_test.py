@@ -51,8 +51,8 @@ class TasksTest(unittest.TestCase):
 		self.assertTrue(mock_task.execute.called)
 		
 	def test_if_there_are_errors_they_are_logged(self):
-		orig_eos_error = log.eos_error
-		log.eos_error = Mock()
+		orig_eos_error = log.error
+		log.error = Mock()
 		
 		task_name = "this is the task name"
 		
@@ -67,9 +67,9 @@ class TasksTest(unittest.TestCase):
 
 		self._test_object.perform_startup_tasks()
 
-		log.eos_error.assert_called_once_with("An error ocurred while executing " + task_name)
+		log.error.assert_called_once_with("An error ocurred while executing " + task_name)
 		
-		log.eos_error = orig_eos_error
+		log.error = orig_eos_error
 
 	def test_initialized_file_is_created_after_running_perform_startup_tasks(self):
 

@@ -16,7 +16,7 @@ class Tasks():
 				try:
 					task().execute()
 				except:
-					log.eos_error("An error ocurred while executing " + task.__name__)
+					log.error("An error ocurred while executing " + task.__name__)
 
 			self._create_initialized_file()
 
