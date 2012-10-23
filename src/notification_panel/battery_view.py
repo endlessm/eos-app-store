@@ -12,7 +12,7 @@ from panel_constants import PanelConstants
 from notification_plugin import NotificationPlugin
 
 class BatteryView(AbstractNotifier):
-    X_OFFSET = 25
+    X_OFFSET = 27
     Y_LOCATION = 37
     WINDOW_WIDTH = 330
     WINDOW_HEIGHT = 160
@@ -159,7 +159,7 @@ class BatteryView(AbstractNotifier):
 
         self._vbox = gtk.VBox()
         self._vbox.set_border_width(10)
-        self._vbox.set_focus_chain([])
+        self._vbox.set_focus_chain([])su 
         self._vbox.add(self._button_power_settings)
         self._vbox.add(self._percentage_label)
         
