@@ -153,11 +153,20 @@ class EndlessDesktopView(gtk.Window):
         items = [self._app_shortcuts[key] for key in icon_data]
         index = 0
         step = int(self._max_icons_in_row)
-        while index < len(items) + 1:
-            row = self._create_row(items[index:(step + index)])
-            icon_container.add(row)
-            index += step
+        
+        number_of_rows = int(math.ceil(len(items)/step))
+        
+        if number_of_rows%step == 0:
+            number_of_rows += 1
             
+        last_row = False
+        while index <= number_of_rows:
+            row = self._create_row(items[index*step:(index*step+step)], last_row)
+            icon_container.add(row)
+            index += 1
+            if index == number_of_rows:
+                last_row = True
+        
         self._align.add(icon_container)        
         self._align.show()
         
@@ -201,7 +210,7 @@ class EndlessDesktopView(gtk.Window):
         for item in self._app_shortcuts.values():
             item.remove_shortcut()
         
-    def _create_row(self, items):
+    def _create_row(self, items, last_row=False):
         row = gtk.HBox()
         row.show()
         
@@ -231,10 +240,11 @@ class EndlessDesktopView(gtk.Window):
             sep_last = sep_new
         
         #Adding AddRemove icon at the end of row
-        add_remove = AddRemoveShortcut(callback=self.show_add_dialogue)
-        add_remove.connect("application-shortcut-remove", self._delete_shortcuts)
-        row.pack_start(add_remove, False, False, 0)
-        add_remove.show()
+        if last_row:
+            add_remove = AddRemoveShortcut(callback=self.show_add_dialogue)
+            add_remove.connect("application-shortcut-remove", self._delete_shortcuts)
+            row.pack_start(add_remove, False, False, 0)
+            add_remove.show()
         
         return row
         
