@@ -18,8 +18,7 @@ class AllSettingsPresenter():
 
     def _update_software(self, view, model):
         view.hide_window()
-        if view.confirm(AllSettingsView.UPDATE_MESSAGE):
-            model.update_software()
+        model.update_software()
 
     def _open_settings(self, view, model):
         view.hide_window()

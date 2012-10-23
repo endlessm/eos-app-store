@@ -7,9 +7,10 @@ import gtk
 class DesktopShortcut(gtk.VBox):
     DND_TARGET_TYPE_TEXT = 80
     DND_TRANSFER_TYPE = [( "text/plain", gtk.TARGET_SAME_APP, DND_TARGET_TYPE_TEXT )]
-    
+
     _motion_callbacks = []
     _drag_end_callbacks = []
+    _drag_begin_callbacks = []
     @classmethod
     def _add_motion_broadcast_callback(cls, callback):
         cls._motion_callbacks.append(callback)
@@ -17,6 +18,10 @@ class DesktopShortcut(gtk.VBox):
     @classmethod
     def _add_drag_end_broadcast_callback(cls, callback):
         cls._drag_end_callbacks.append(callback)
+        
+    @classmethod
+    def _add_drag_begin_broadcast_callback(cls, callback):
+        cls._drag_begin_callbacks.append(callback)
     
     @classmethod
     def _motion_broadcast(cls, source, destination, x, y):
@@ -26,6 +31,11 @@ class DesktopShortcut(gtk.VBox):
     @classmethod
     def _drag_end_broadcast(cls, source):
         for cb in cls._drag_end_callbacks:
+            cb(source)
+    
+    @classmethod
+    def _drag_begin_broadcast(cls, source):
+        for cb in cls._drag_begin_callbacks:
             cb(source)
         
     def __init__(self, label_text="", draggable=True):
@@ -71,7 +81,7 @@ class DesktopShortcut(gtk.VBox):
             self.DND_TRANSFER_TYPE, 
             gtk.gdk.ACTION_MOVE
             )
-            
+        
     def dnd_send_data(self, widget, context, selection, targetType, eventTime):
         if targetType == self.DND_TARGET_TYPE_TEXT:
             if hasattr(self, '_transmiter_handler_callback'):
@@ -110,6 +120,7 @@ class DesktopShortcut(gtk.VBox):
         self._label.hide()
         self._event_box.hide()
         self.set_moving(True)
+        DesktopShortcut._drag_begin_broadcast(widget)
    
     def set_moving(self, is_moving):
         self._is_moving = is_moving

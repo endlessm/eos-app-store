@@ -85,5 +85,8 @@ class TestEndlessDesktopPresenter(unittest.TestCase):
         self.testObject.revert_background()
         
         self.testObject.change_background.assert_called_once_with(filename)
-        
-        
+    
+    def test_delete_shortcut(self):
+        shortcut = "shortcut"
+        self.testObject.delete_shortcut(shortcut)
+        self.mock_model.delete_shortcut.assert_called_once_with(shortcut)

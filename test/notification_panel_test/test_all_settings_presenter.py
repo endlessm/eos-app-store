@@ -40,19 +40,11 @@ class AllSettingsPresenterTest(unittest.TestCase):
 
     def test_only_update_software_when_user_confirms(self):
         AllSettingsPresenter(self._mock_view, self._mock_model, self._mock_background_chooser)
-        self._mock_view.confirm = Mock(return_value=True)
+#        self._mock_view.confirm = Mock(return_value=True)
 
         self._update_software_listener()
 
         self._mock_model.update_software.assert_called_once_with()
-
-    def test_dont_update_software_when_user_does_not_confirm(self):
-        AllSettingsPresenter(self._mock_view, self._mock_model, self._mock_background_chooser)
-        self._mock_view.confirm = Mock(return_value=False)
-
-        self._update_software_listener()
-
-        self.assertFalse(self._mock_model.update_software.called)
 
     def test_only_logout_when_user_confirms(self):
         AllSettingsPresenter(self._mock_view, self._mock_model, self._mock_background_chooser)
