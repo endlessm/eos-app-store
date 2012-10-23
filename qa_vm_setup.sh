@@ -40,7 +40,7 @@ popd
 
 sudo chown -R endlessm:endlessm ${checkout_dir}
 
-replacement=$',{"key":"terminal","icon":"/usr/share/icons/gnome/48x48/apps/gnome-terminal.png","name":"Terminal"},{"key":"terminal","icon":"/usr/share/icons/gnome/48x48/apps/gnome-terminal.png","name":"QA","params":["--command","/home/endlessm/checkout/restart-launcher.sh"]}]'
+replacement=$',{"key":"terminal","icon":"/usr/share/icons/gnome/48x48/apps/gnome-terminal.png","name":"Terminal"},{"key":"terminal","icon":"/usr/share/icons/gnome/48x48/apps/gnome-terminal.png","name":"QA","params":["--command","/home/endlessm/checkout/eos-desktop/restart-launcher.sh"]}]'
 
 if ! grep -q terminal ${app_list}
 then
