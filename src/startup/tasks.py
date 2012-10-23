@@ -2,6 +2,7 @@ import os.path
 
 from startup.shotwell_tasks import ShotwellTasks
 from startup.beatbox_tasks import BeatboxTasks
+from eos_log import log
 
 class Tasks():
 	TASK_PLUGINS = [
@@ -12,7 +13,10 @@ class Tasks():
 	def perform_startup_tasks(self):
 		if self._is_initial_startup():
 			for task in self.TASK_PLUGINS:
-				task().execute()
+				try:
+					task().execute()
+				except:
+					log.eos_error("An error ocurred while executing " + task.__name__)
 
 			self._create_initialized_file()
 
