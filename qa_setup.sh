@@ -1,26 +1,32 @@
-#!/bin/bash
+#!/bin/bash +e
 
 checkout_dir=/home/endlessm/checkout
+
+REPOS=( \
+      'eos-desktop' \
+      'eos-common' \
+     #'eos-config' \
+     #'eos-browser' \
+      )
 
 sudo apt-get install git -y
 
 sudo mkdir -p ${checkout_dir}
 
+echo -n "Enter branch, type [dev] if you are unsure, then press [ENTER]"
+read branch
+
 pushd ${checkout_dir}
 
-sudo git clone http://github.com/endlessm/eos-desktop.git
-
-pushd eos-desktop
-git status
-
-sudo git checkout issues/439
-
-popd
-
-echo "done with git.."
+  for repo in ${REPOS[@]}
+  do
+    sudo git clone http://github.com/endlessm/${repo}.git
+    pushd ${repo}
+      sudo git checkout ${branch}
+      ./build.sh
+    popd
+  done
 
 popd
-
-echo "done with script.."
 
 sudo chown -R endlessm:endlessm ${checkout_dir}
