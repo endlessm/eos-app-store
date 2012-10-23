@@ -20,4 +20,9 @@ class Tasks():
 		return not os.path.exists(os.path.expanduser("~/.endlessm/.initialized"))
 
 	def _create_initialized_file(self):
-		open(os.path.expanduser("~/.endlessm/.initialized"), "w").close()
+		preferences_folder = os.path.expanduser("~/.endlessm")
+		
+		if not os.path.exists(preferences_folder):
+			os.makedirs(preferences_folder)
+			
+		open(os.path.expanduser(os.path.join(preferences_folder, ".initialized")), "w").close()
