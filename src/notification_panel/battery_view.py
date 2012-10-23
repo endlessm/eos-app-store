@@ -12,7 +12,7 @@ from panel_constants import PanelConstants
 from notification_plugin import NotificationPlugin
 
 class BatteryView(AbstractNotifier):
-    X_OFFSET = 20
+    X_OFFSET = 25
     Y_LOCATION = 37
     WINDOW_WIDTH = 330
     WINDOW_HEIGHT = 160
