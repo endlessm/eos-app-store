@@ -11,7 +11,7 @@ class BatteryPresenter():
 
     def post_init(self):        
         self._view.add_listener(BatteryView.POWER_SETTINGS, 
-                lambda: self._open_settings(self._view, self._model))
+                lambda: self._open_settings())
         self._view.display_battery(self._model.level(), self._model.time_to_depletion(), self._model.charging())
         self._start_poll_battery()
         

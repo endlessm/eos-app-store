@@ -12,10 +12,11 @@ from panel_constants import PanelConstants
 from notification_plugin import NotificationPlugin
 
 class BatteryView(AbstractNotifier):
-    X_OFFSET = 13
+    X_OFFSET = 20
     Y_LOCATION = 37
     WINDOW_WIDTH = 330
     WINDOW_HEIGHT = 160
+    SMALLER_HEIGHT = 100
     WINDOW_BORDER = 10
     
     LEFT_MARGIN = 3
@@ -152,7 +153,6 @@ class BatteryView(AbstractNotifier):
         self._battery_top_height = self._battery_base_height / self.GOLDEN_RATIO
     
     def _create_menu(self):
-        print "create menu..."
         self._button_power_settings = gtk.Button(_('Power Settings'))
         self._button_power_settings.connect('button-press-event', 
                 lambda w, e: self._notify(self.POWER_SETTINGS))
@@ -162,19 +162,10 @@ class BatteryView(AbstractNotifier):
         self._vbox.set_focus_chain([])
         self._vbox.add(self._button_power_settings)
         self._vbox.add(self._percentage_label)
-        self._vbox.add(self._time_to_depletion_label)
         
         self._parent.set_visible_window(False)
     
         self._window = TransparentWindow(None)
-
-        x = screen_util.get_width() - self.WINDOW_WIDTH - self.X_OFFSET
-    
-        # Get the x location of the center of the widget (icon), relative to the settings window
-        self._window.move(x, self.Y_LOCATION)
-        
-        self._window.set_size_request(self.WINDOW_WIDTH, self.WINDOW_HEIGHT)
-        self._window.set_border_width(self.WINDOW_BORDER)
 
         # Set up the window so that it can be exposed
         # with a transparent background and triangle decoration
@@ -190,22 +181,41 @@ class BatteryView(AbstractNotifier):
         self._window.add(self._container)
         self._is_active = False
         
+    def _remove_if_exists(self, component):
+        found = False
+        for child in self._vbox.get_children():
+            found |= (child == component)
+        if found:    
+            self._vbox.remove(component)
+    
     def display_menu(self, level, time):
         if not self._window:
             self._create_menu()
         
 #        self.hide_window()
         
-        print "display menu..."    
         self._percentage_label.set_text(str(level)+'%')
+        self._remove_if_exists(self._time_to_depletion_label)
+
+        x = screen_util.get_width() - self.WINDOW_WIDTH - self.X_OFFSET
+    
+        # Get the x location of the center of the widget (icon), relative to the settings window
+        self._window.set_border_width(self.WINDOW_BORDER)
+
+        height = 0
         if time:
             if self._charging:
                 suffix = ' To Charge'
             else:  
                 suffix = ' Left'
             self._time_to_depletion_label.set_text(time+suffix)
+            self._vbox.add(self._time_to_depletion_label)
+            height = self.WINDOW_HEIGHT
         else: 
-            self._time_to_depletion_label.hide()
+            height = self.SMALLER_HEIGHT
+
+        self._window.move(x, self.Y_LOCATION)
+        self._window.set_size_request(self.WINDOW_WIDTH, height)
             
         self._is_active = False
         self.display()
@@ -226,10 +236,8 @@ class BatteryView(AbstractNotifier):
         return False
 
     def display(self):
-        print "display"
         self._window.show_all()
 
     def hide_window(self):
-        print "hide"
         self._window.hide_all()
 
