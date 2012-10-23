@@ -6,7 +6,7 @@ app_list=/etc/endlessm/application.list
 desktop_file=/home/endlessm/.endlessm/desktop.json
 
 if [ -d ${checkout_dir} ]; then
-  rm -rf ${checkout_dir}
+  sudo rm -rf ${checkout_dir}
 fi
 
 REPOS=( \
@@ -20,7 +20,7 @@ sudo apt-get install git -y
 
 sudo mkdir -p ${checkout_dir}
 
-echo -n "Enter branch, type [dev] if you are unsure, then press [ENTER]"
+echo -n "Enter branch, type [dev] if you are unsure, then press [ENTER]:\n"
 read branch
 
 pushd ${checkout_dir}
@@ -38,17 +38,9 @@ pushd ${checkout_dir}
 
 popd
 
-
-if ! grep -q endlessm /etc/sudoers
-then
-  print_msg "updating sudoers"
-  echo "endlessm ALL=NOPASSWD: /usr/bin/gnome-control-center" >> /etc/sudoers
-fi
-
-
 sudo chown -R endlessm:endlessm ${checkout_dir}
 
-replacement=$',{"key":"terminal","icon":"/usr/share/icons/gnome/48x48/apps/gnome-terminal.png","name":"Terminal"},{"key":"terminal","icon":"/usr/share/icons/gnome/48x48/apps/gnome-terminal.png","name":"QA","params":["/home/endlessm/checkout/restart-launcher.sh"]}]'
+replacement=$',{"key":"terminal","icon":"/usr/share/icons/gnome/48x48/apps/gnome-terminal.png","name":"Terminal"},{"key":"terminal","icon":"/usr/share/icons/gnome/48x48/apps/gnome-terminal.png","name":"QA","params":["--command","/home/endlessm/checkout/restart-launcher.sh"]}]'
 
 if ! grep -q terminal ${app_list}
 then
