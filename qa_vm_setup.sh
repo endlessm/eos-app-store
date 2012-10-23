@@ -2,6 +2,7 @@
 
 checkout_dir=/home/endlessm/checkout
 build_script=build.sh
+setup=setup.py
 app_list=/etc/endlessm/application.list
 desktop_file=/home/endlessm/.endlessm/desktop.json
 
@@ -33,6 +34,9 @@ pushd ${checkout_dir}
       sudo git checkout ${branch}
       if [ -f ${build_script} ]; then
         ./${build_script}
+      fi
+      if [ -f ${setup} ]; then
+        sudo python ${setup} install
       fi
     popd
   done
