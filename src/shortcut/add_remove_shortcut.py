@@ -95,34 +95,37 @@ class AddRemoveShortcut(DesktopShortcut):
         self._event_box.show()
         
     def _drag_begin_broadcast_callback(self, widget):
-        if widget._identifier != _('Files'):
-            self.change_icon(self.get_dragged_images())
+        pass
+#if widget._identifier != _('Files'):
+#self.change_icon(self.get_dragged_images())
         
     def _drag_end_broadcast_callback(self, widget):
         self.change_icon(self.get_images())
     
     def dnd_drag_leave(self, widget, context, time):
-        source_widget = context.get_source_widget()
-        if source_widget._identifier != _('Files'):
-            self.change_icon(self.get_dragged_images())
+        pass
+#source_widget = context.get_source_widget()
+#if source_widget._identifier != _('Files'):
+#self.change_icon(self.get_dragged_images())
 
         
     def dnd_receive_data(self, widget, context, x, y, selection, targetType, time):
-        source_widget = context.get_source_widget()
-        label = context.get_source_widget().parent._label.get_text()
+        pass
+#source_widget = context.get_source_widget()
+#label = context.get_source_widget().parent._label.get_text()
         
-        if label == _('Files'):
-            return
+#if label == _('Files'):
+#return
         
-        super(AddRemoveShortcut, self).dnd_motion_data(widget, context, x, y, time)
-        if not source_widget.parent._shortcut.has_children():
-            self._confirmation_popup = RemovalConfirmationPopupWindow(self._confirmation_received, widget=source_widget, label=label)
-            self._confirmation_popup.show()
-            source_widget.parent._event_box.set_images(())
-            source_widget.parent._label.set_text('')
-        else:
-            self._delete_not_possible_popup = DeleteNotPossiblePopupWindow()
-            self._delete_not_possible_popup.show()
+#super(AddRemoveShortcut, self).dnd_motion_data(widget, context, x, y, time)
+#if not source_widget.parent._shortcut.has_children():
+#self._confirmation_popup = RemovalConfirmationPopupWindow(self._confirmation_received, widget=source_widget, label=label)
+#self._confirmation_popup.show()
+#source_widget.parent._event_box.set_images(())
+#source_widget.parent._label.set_text('')
+#else:
+#self._delete_not_possible_popup = DeleteNotPossiblePopupWindow()
+#self._delete_not_possible_popup.show()
 
     def _drag_motion_broadcast_callback(self, source, destination, x, y):
         if isinstance(destination.parent, AddRemoveShortcut) and source._identifier != _('Files'):
