@@ -6,13 +6,14 @@ import gtk
 import gobject
 from gtk import gdk
 
-from util import image_util, screen_util
-from shortcut.bugs_and_feedback_shortcut import BugsAndFeedbackShortcut
+from util import image_util
 from shortcut.application_shortcut import ApplicationShortcut
 from feedback_module.feedback_response_dialog_view import FeedbackResponseDialogView
-from search.search_box import SearchBox
 from feedback_module.bugs_and_feedback_popup_window import BugsAndFeedbackPopupWindow
+from removal_module.removal_confirmation_popup_window import RemovalConfirmationPopupWindow
 from shortcut.folder_shortcut import FolderShortcut
+from shortcut.separator_shortcut import SeparatorShortcut
+from shortcut.add_remove_shortcut import AddRemoveShortcut
 from folder.folder_window import OpenFolderWindow
 from notification_panel.notification_panel import NotificationPanel
 from taskbar_panel.taskbar_panel import TaskbarPanel
@@ -44,15 +45,14 @@ class EndlessDesktopView(gtk.Window):
         self.show()
         self.set_app_paintable(True)
         
-        self._set_background()
+        # -----------WORKSPACE-----------
         
         self._align = gtk.Alignment(0.5, 0.5, 0, 0)
-        
         
         self._taskbar_panel = TaskbarPanel(width)
         self._taskbar_panel.connect('feedback-clicked', lambda w: self._feedback_icon_clicked_callback())
                     
-        self._notification_panel = NotificationPanel()
+        self._notification_panel = NotificationPanel(self)
 
         taskbar_alignment = gtk.Alignment(0.5, 0.5, 1.0, 1.0)
         taskbar_alignment.add(self._taskbar_panel)
@@ -69,24 +69,23 @@ class EndlessDesktopView(gtk.Window):
         self._max_icons_in_row = self._calculate_max_icons()
     
         screen = gtk.gdk.Screen() #@UndefinedVariable
-        screen.connect('size-changed', lambda s: self._set_background())
+        screen.connect('size-changed', lambda s: self._set_background(self.BACKGROUND_NAME))
     
     def unfocus_widget(self, widget, event):
         widget.set_focus(None)
         self.hide_folder_window()
+        self._notification_panel.close_settings_plugin_window()
 
     def set_presenter(self, presenter):
-        self._presenter = presenter
-        
-#        self._add_icon = AddRemoveShortcut(_("Add new"), self._add_icon_clicked_callback)
-#        self._add_icon.connect("application-shortcut-remove", lambda w, e: self._add_icon.toggle_drag(False))
-#        self._add_icon.connect("application-shortcut-remove", self._remove_icon)
-        
+        self._presenter = presenter        
         self._taskbar_panel.connect('launch-search', lambda w, s: self._presenter.launch_search(s))
 
-    def _set_background(self):
+    def get_presenter(self):
+        return self._presenter
+    
+    def set_background_pixbuf(self, pixbuf):
         width, height = self._get_net_work_area()
-        pixbuf = image_util.load_pixbuf("background.png")
+#        pixbuf = image_util.load_pixbuf(background_name)
         
         sized_pixbuf = pixbuf.scale_simple(width, height, gtk.gdk.INTERP_BILINEAR) #@UndefinedVariable
         pixmap, mask = sized_pixbuf.render_pixmap_and_mask()
@@ -100,7 +99,6 @@ class EndlessDesktopView(gtk.Window):
         
         self.window.invalidate_rect((0, 0, width, height), False)
  
-
     def populate_popups(self, all_applications):
         self.popup = gtk.Menu()
         apps_menu = gtk.MenuItem(_("Apps"))
@@ -155,11 +153,20 @@ class EndlessDesktopView(gtk.Window):
         items = [self._app_shortcuts[key] for key in icon_data]
         index = 0
         step = int(self._max_icons_in_row)
-        while index < len(items) + 1:
-            row = self._create_row(items[index:(step + index)])
-            icon_container.add(row)
-            index += step
+        
+        number_of_rows = int(math.ceil(len(items)/step))
+        
+        if number_of_rows%step == 0:
+            number_of_rows += 1
             
+        last_row = False
+        while index <= number_of_rows:
+            row = self._create_row(items[index*step:(index*step+step)], last_row)
+            icon_container.add(row)
+            index += 1
+            if index == number_of_rows:
+                last_row = True
+        
         self._align.add(icon_container)        
         self._align.show()
         
@@ -202,45 +209,54 @@ class EndlessDesktopView(gtk.Window):
     def _remove_all(self):
         for item in self._app_shortcuts.values():
             item.remove_shortcut()
-            
-#        self._add_icon.remove_shortcut()
         
-    def _create_row(self, items):
+    def _create_row(self, items, last_row=False):
         row = gtk.HBox()
         row.show()
         
+        sep_last = SeparatorShortcut()
+        sep_last.connect("application-shortcut-move", self._rearrange_shortcuts)
+        row.pack_start(sep_last, False, False, 0)
         for item in items:
             if isinstance(item, ApplicationShortcut):
                 item.connect("application-shortcut-rename", lambda w, shortcut, new_name: self._presenter.rename_item(shortcut, new_name))
-                item.connect("application-shortcut-activate", lambda w, app_key, params: self._presenter.activate_item(app_key, params))
-                item.connect("application-shortcut-dragging-over", lambda w, s: self._insert_placeholder(s))
-                item.connect("application-shortcut-drag", lambda w, state: self._add_icon.toggle_drag(state))
-                item.connect("application-shortcut-move", lambda w: self._presenter.move_item(self._shorcuts_buffer))
-                
+                item.connect("application-shortcut-activate", lambda w, app_key, params: self._presenter.activate_item(app_key, params))                
                 item.show()
                 
             elif isinstance(item, FolderShortcut):
-                item.connect("application-shortcut-activate", lambda w, app_id, params: self._presenter.activate_item(app_id, params))
-                
+                item.connect("folder-shortcut-activate", self._folder_icon_clicked_callback)
                 item.show()
                 
             if item.parent != None:
                 print >> sys.stderr, "Item has parent!", item
-            row.pack_start(item, False, False, 30)
-            
-        return row
-    
-    def _insert_placeholder(self, s):
-        moving = [x for x in self._shorcuts_buffer if self._app_shortcuts[x].is_moving()]
+            row.pack_start(item, False, False, 0)
+            sep_new = SeparatorShortcut()
+            sep_new.connect("application-shortcut-move", self._rearrange_shortcuts)
+            row.pack_start(sep_new, False, False, 0)
+            sep_last.set_right_separator(sep_new)
+            sep_last.set_right_widget(item)
+            sep_new.set_left_separator(sep_last)
+            sep_last.set_left_widget(item)
+            sep_last = sep_new
         
-        if moving:
-            for item in moving:
-                new_index = self._shorcuts_buffer.index(s.id())
-                
-                self._shorcuts_buffer.remove(item)
-                self._shorcuts_buffer.insert(new_index, item)
-            
-            self._redraw(self._shorcuts_buffer)
+        #Adding AddRemove icon at the end of row
+        if last_row:
+            add_remove = AddRemoveShortcut(callback=self.show_add_dialogue)
+            add_remove.connect("application-shortcut-remove", self._delete_shortcuts)
+            row.pack_start(add_remove, False, False, 0)
+            add_remove.show()
+        
+        return row
+        
+    def _rearrange_shortcuts(self, widget, sc_moved, sc_to_move):        
+        self._shorcuts_buffer.remove(sc_moved)
+        if sc_to_move != '':
+            new_index = self._shorcuts_buffer.index(sc_to_move)
+            self._shorcuts_buffer.insert(new_index, sc_moved)
+        else:
+            self._shorcuts_buffer.append(sc_moved)
+        self._redraw(self._shorcuts_buffer)
+        self._presenter.move_item(self._shorcuts_buffer)
         
     def _calculate_max_icons(self):
         width = self._get_net_work_area()[0]
@@ -258,6 +274,14 @@ class EndlessDesktopView(gtk.Window):
         height = geometry.height
                 
         return width, height
+    
+    def show_add_dialogue(self, event_box, event):
+        print "Should show add dialogue..."
+        
+    def _delete_shortcuts(self, widget, sc_deleted):
+        self._presenter.delete_shortcut(sc_deleted)
+        self._shorcuts_buffer.remove(sc_deleted)
+        self._redraw(self._shorcuts_buffer)
     
     def main(self):
         gobject.threads_init()

@@ -116,7 +116,7 @@ class ApplicationListPlugin(gtk.HBox):
             
             if task not in self._taskbar_icons.keys():
                 self._application_event_box = TaskbarIcon(task, window_name, scaled_pixbuf, is_selected)
-                self._application_event_box.connect("button-release-event", self.toggle_state)
+                self._application_event_box.connect("button-press-event", self.toggle_state)
                 del scaled_pixbuf
                 
                 self._taskbar_icons[task] = self._application_event_box

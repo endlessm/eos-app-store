@@ -6,14 +6,15 @@ import pango
 import cairo
 
 from notification_panel_config import NotificationPanelConfig
+from notification_plugin import NotificationPlugin
 
-class TimeDisplayPlugin(gtk.EventBox):
-    SHADOW_OFFSET = 1
+class TimeDisplayPlugin(NotificationPlugin):
+    COMMAND = 'sudo gnome-control-center --class=eos-network-manager datetime'
     LEFT_MARGIN = 3
     RIGHT_MARGIN = 3
     
     def __init__(self, icon_size):
-        super(TimeDisplayPlugin, self).__init__()
+        super(TimeDisplayPlugin, self).__init__(self.COMMAND)
         
         self._update_time()
         
@@ -44,10 +45,6 @@ class TimeDisplayPlugin(gtk.EventBox):
         
         return True
         
-    @staticmethod
-    def get_launch_command():
-        return 'sudo gnome-control-center --class=eos-network-manager datetime'
-    
     def _draw(self, widget, event):
         cr = widget.window.cairo_create()
         cr.save()

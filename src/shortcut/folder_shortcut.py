@@ -5,7 +5,7 @@ import gobject
 
 class FolderShortcut(DesktopShortcut):
     __gsignals__ = {
-        "application-shortcut-activate": (gobject.SIGNAL_RUN_FIRST, #@UndefinedVariable
+        "folder-shortcut-activate": (gobject.SIGNAL_RUN_FIRST, #@UndefinedVariable
                    gobject.TYPE_NONE,
                    (gobject.TYPE_STRING,gobject.TYPE_PYOBJECT)),
     }
@@ -24,14 +24,16 @@ class FolderShortcut(DesktopShortcut):
         self._event_box.connect("leave-notify-event", self.mouse_out_callback)
 
         self.show_all()
+        self.set_moving(False)
         
     def mouse_release_callback(self, widget, event):
-        if event.button == 1:# and event.type == gtk.gdk._2BUTTON_PRESS:
-            self._callback(widget, event, self._shortcut)
-            self._event_box.set_images(self.get_images(self.ICON_STATE_NORMAL))
-            self._event_box.hide()
-            self._event_box.show()
-            return True
+        if not self.is_moving():
+            if event.button == 1:
+                self.emit("folder-shortcut-activate", event, self._shortcut)
+                self._event_box.set_images(self.get_images(self.ICON_STATE_NORMAL))
+                self._event_box.hide()
+                self._event_box.show()
+                return True
         return False
     
     def mouse_press_callback(self, widget, event):
@@ -59,7 +61,7 @@ class FolderShortcut(DesktopShortcut):
             self.parent.remove(self)
     
     def get_images(self, event_state):
-        image_name = self._shortcut.icon()[event_state]
-        if not image_name:
-            image_name = image_util.image_path("folder.png")
+        shortcut_icon_dict = self._shortcut.icon()
+        default_icon = shortcut_icon_dict.get(self.ICON_STATE_NORMAL, image_util.image_path("folder.png"))
+        image_name = shortcut_icon_dict.get(event_state, default_icon)
         return (image_name, )

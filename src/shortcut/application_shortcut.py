@@ -10,9 +10,6 @@ class ApplicationShortcut(DesktopShortcut):
     "application-shortcut-rename": (gobject.SIGNAL_RUN_FIRST, #@UndefinedVariable
                        gobject.TYPE_NONE,
                        (gobject.TYPE_PYOBJECT, gobject.TYPE_STRING,)),
-    "application-shortcut-move": (gobject.SIGNAL_RUN_FIRST, #@UndefinedVariable
-                       gobject.TYPE_NONE,
-                       ()),
     "application-shortcut-activate": (gobject.SIGNAL_RUN_FIRST, #@UndefinedVariable
                        gobject.TYPE_NONE,
                        (gobject.TYPE_STRING,gobject.TYPE_PYOBJECT,)),
@@ -36,59 +33,22 @@ class ApplicationShortcut(DesktopShortcut):
         self._event_box.set_data('id', self._shortcut.key())
         self._event_box.set_data('params', self._shortcut.params())
         
-#        self._event_box.connect("drag_begin", lambda c, d: self._drag_begin())
-#        self._event_box.connect("drag_end", lambda c, d: self._drag_end())
-#        self._event_box.connect("drag_data_get", self._send_callback)
-#        self._event_box.connect("drag_motion", lambda w, ctx, x, y, t: self._dragged_over(ctx.get_source_widget().get_data('id')))
-#        self._event_box.connect("drag_data_received", self.drag_data_received_callback)
-#        self._event_box.connect("drag-failed", lambda w, c, r: self.show_drag_failed_animation(w, c, r, True))
-
-#        self._event_box.drag_source_set(gtk.gdk.BUTTON_PRESS_MASK, self.DND_TRANSFER_TYPE, gtk.gdk.ACTION_MOVE)
-        
         self.show_all()
         self.set_moving(False)
         
 #        self.add_rename_entry(label_text)
-
-    def drag_data_received_callback(self, widget, context, x, y, selection, targetType, time):
-        if targetType == self.DND_TARGET_TYPE_TEXT:
-            self.emit("application-shortcut-move")
-            
-    def show_drag_failed_animation(self, widget, context, result, kill_animation):
-        return kill_animation
        
     def get_images(self, event_state):
-        icon = self._shortcut.icon()[self.ICON_STATE_NORMAL]
-        if {event_state}.issubset(self._shortcut.icon()):
-            icon = self._shortcut.icon()[event_state]
-
-        if self._show_background:
-            return (image_util.image_path("endless-shortcut-well.png"),icon,image_util.image_path("endless-shortcut-foreground.png"))
-        else:
-            return (image_util.image_path("endless-shortcut-well.png"), icon, image_util.image_path("endless-shortcut-foreground.png"))
+        shortcut_icon_dict = self._shortcut.icon()
+        default_icon = shortcut_icon_dict.get(self.ICON_STATE_NORMAL)
+        icon = shortcut_icon_dict.get(event_state, default_icon)
+        
+        return (image_util.image_path("endless-shortcut-well.png"), 
+                icon, 
+                image_util.image_path("endless-shortcut-foreground.png"))
          
     def get_shortcut(self):
         return self._shortcut
-        
-    def _dragged_over(self, app_id):
-        self.emit("application-shortcut-dragging-over", self._shortcut)
-        
-    def _drag_begin(self):
-        self._label.hide()
-        self._event_box.child.hide()
-        self.set_moving(True)
-        self.emit("application-shortcut-drag", True)
-    
-    def _drag_end(self):
-        self._label.show()
-        self._event_box.child.show()
-        self.set_moving(False)
-        self.emit("application-shortcut-drag", False)
-        self.emit("application-shortcut-move")
-        
-    def _send_callback(self, widget, context, selection, targetType, eventTime):
-        if targetType == self.DND_TARGET_TYPE_TEXT:
-            selection.set(selection.target, 8, str(self._event_box.get_data('id')))
         
     def add_rename_entry(self, text):
         self.text_view = gtk.TextView()
@@ -161,13 +121,13 @@ class ApplicationShortcut(DesktopShortcut):
         return False
     
     def mouse_release_callback(self, widget, event):
-        if event.button == 1:
-            self.emit("application-shortcut-activate", self._shortcut.key(), self._shortcut.params())
-            self._event_box.set_images(self.get_images(self.ICON_STATE_NORMAL))
-            self._event_box.hide()
-            self._event_box.show()
-            return True
-        
+        if not self.is_moving():
+            if event.button == 1:
+                self.emit("application-shortcut-activate", self._shortcut.key(), self._shortcut.params())
+                self._event_box.set_images(self.get_images(self.ICON_STATE_NORMAL))
+                self._event_box.hide()
+                self._event_box.show()
+                return True
         return False
     
     def mouse_press_callback(self, widget, event):

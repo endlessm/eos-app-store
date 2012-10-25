@@ -1,13 +1,13 @@
 import cairo
 import gtk
-from gtk import gdk
-from util import image_util, screen_util
+from util import screen_util
+from osapps.desktop_preferences_datastore import DesktopPreferencesDatastore
 
 class TransparentWindow(gtk.Window):
-    def __init__(self, parent):
+    def __init__(self, parent, desktop_preference_class = DesktopPreferencesDatastore):
         gtk.Window.__init__(self, gtk.WINDOW_TOPLEVEL)
+        self._desktop_preferences = desktop_preference_class.get_instance()
         self.set_wmclass("endless_os_desktop", "modal")
-        self.set_type_hint(gdk.WINDOW_TYPE_HINT_DESKTOP) #@UndefinedVariable
 
         self.set_property("accept-focus", True)
         self.set_property("destroy-with-parent", True)
@@ -19,7 +19,7 @@ class TransparentWindow(gtk.Window):
         self.set_can_default(True)
 
         self.connect("expose-event", self._handle_event)
-        self._background = image_util.load_pixbuf("background.png")
+        self._background = self._desktop_preferences.get_background_pixbuf()
         
         self._background = self._background.scale_simple(screen_util.get_width(), screen_util.get_height(),gtk.gdk.INTERP_BILINEAR)
         self.set_app_paintable(True)

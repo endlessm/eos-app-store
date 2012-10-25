@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: dev 1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-06-22 08:39-0500\n"
+"POT-Creation-Date: 2012-10-20 06:06+0200\n"
 "PO-Revision-Date: 2012-05-31 11:54-0500\n"
 "Last-Translator: Automatically generated\n"
 "Language-Team: none\n"
@@ -18,56 +18,94 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
 
-#: src/desktop/endless_desktop_view.py:86
-msgid "Add new"
-msgstr "Adicionar Novo"
-
-#: src/desktop/endless_desktop_view.py:99
+#: src/desktop/endless_desktop_view.py:104
 msgid "Apps"
 msgstr "Aplicativos"
+
+#: src/notification_panel/all_settings_view.py:37
+msgid "Background"
+msgstr "Fundo"
 
 #: ui/bugs_and_feedback.glade:76
 msgid "Bugbuffer1"
 msgstr ""
 
-#: ui/bugs_and_feedback.glade:10 src/desktop/endless_desktop_view.py:90
-msgid "Feedback"
+#: ui/bugs_and_feedback.glade:10
+#: src/feedback_module/bugs_and_feedback_popup_window.py:16
+#, fuzzy
+msgid "Bugs And Feedback"
 msgstr "Feedback"
 
-#: src/shortcut/add_remove_shortcut.py:43
+#: src/shortcut/add_remove_shortcut.py:81
 msgid "Delete"
 msgstr "Excluir"
 
-#: src/search/search_box.py:18
-msgid "Enter Search or URL..."
-msgstr "Digite pesquisa ou um URL..."
+#: src/shortcut/add_remove_shortcut.py:98
+#: src/shortcut/add_remove_shortcut.py:106
+#: src/shortcut/add_remove_shortcut.py:114
+#: src/shortcut/add_remove_shortcut.py:128
+msgid "Files"
+msgstr "Files"
 
-#: src/desktop/endless_desktop_view.py:112
+#: src/folder/folder_window.py:19 src/desktop/endless_desktop_view.py:117
 msgid "Folder"
 msgstr "Diretórios"
 
 #: ui/bugs_and_feedback.glade:42
+#: src/feedback_module/bugs_and_feedback_popup_window.py:42
 msgid "Give us feedback"
 msgstr "Deixe seu comentário."
 
+#: src/notification_panel/all_settings_view.py:41
+msgid "Log Out"
+msgstr "Sair"
+
+#: src/notification_panel/all_settings_view.py:32
+msgid "Log Out?"
+msgstr "Sair?"
+
+#: ui/bugs_and_feedback.glade:6
+#: src/feedback_module/bugs_and_feedback_popup_window.py:55
+msgid ""
+"Please let us know how the problem occured and we will resolve it as soon as "
+"possible."
+msgstr ""
+"Por favor, deixe-nos saber como o problema ocorreu e vamos resolvê-lo como "
+"mais rapidamente possível."
+
 #: ui/bugs_and_feedback.glade:30
+#: src/feedback_module/bugs_and_feedback_popup_window.py:38
 msgid "Report a Bug"
 msgstr "Relatar um bug"
 
+#: src/notification_panel/all_settings_view.py:42
+msgid "Restart"
+msgstr "Reinicializar"
+
+#: src/notification_panel/all_settings_view.py:30
+msgid "Restart?"
+msgstr "Reinicializar?"
+
 #: ui/bugs_and_feedback.glade:94
+#: src/feedback_module/bugs_and_feedback_popup_window.py:65
 msgid "SUBMIT"
 msgstr "ENVIAR"
 
-msgid "CANCEL"
-msgstr "CANCELAR"
+#: src/search/search_box.py:22
+msgid "Search or Type Web Site"
+msgstr "Busque ou digite o site"
 
-#: ui/bugs_and_feedback.glade:6
-msgid ""
-"Please let us know how the problem occured "
-"and we will resolve it as soon as possible."
-msgstr ""
-"Por favor, deixe-nos saber como o problema "
-"ocorreu e vamos resolvê-lo como mais rapidamente possível."
+#: src/notification_panel/all_settings_view.py:40
+msgid "Settings"
+msgstr "Definições"
+
+#: src/notification_panel/all_settings_view.py:43
+msgid "Shut Down"
+msgstr "Desligar"
+
+#: src/notification_panel/all_settings_view.py:31
+msgid "Shutdown?"
+msgstr "Desligar?"
 
 #: src/feedback_module/feedback_response_dialog_view.py:9
 msgid "Thank You"
@@ -78,10 +116,46 @@ msgstr "Obrigado"
 msgid "Thank you for your feedback."
 msgstr "Obrigado pelo seu feedback."
 
-#: src/desktop/endless_desktop_view.py:111
+#: src/removal_module/delete_not_possible_popup.py:44
+msgid ""
+"To delete a folder you have to\n"
+"remove all of the items inside\n"
+"of it first.\n"
+"\n"
+"We are just trying to\n"
+"keep you safe."
+msgstr ""
+"Para apagar uma pasta que você\n"
+"tem que remover todos os itens\n"
+"dentro do primeiro.\n"
+"\n"
+"Estamos apenas tentando mantê-lo\n"
+"seguro."
+
+#: src/notification_panel/all_settings_view.py:39
+msgid "Update"
+msgstr "Atualizar"
+
+#: src/removal_module/delete_not_possible_popup.py:15
+msgid "WARNING!"
+msgstr "AVISO"
+
+#: src/desktop/endless_desktop_view.py:116
 msgid "Websites"
 msgstr "Páginas Web"
 
 #: ui/feedback_response_dialog.glade:33
 msgid "button"
 msgstr ""
+
+#~ msgid "Update EndlessOS?"
+#~ msgstr "Atualizar EndlessOS?"
+
+#~ msgid "Enter Search or URL..."
+#~ msgstr "Digite pesquisa ou um URL..."
+
+#~ msgid "Add new"
+#~ msgstr "Adicionar Novo"
+
+#~ msgid "CANCEL"
+#~ msgstr "CANCELAR"
