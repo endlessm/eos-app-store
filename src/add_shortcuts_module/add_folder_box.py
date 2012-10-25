@@ -112,6 +112,7 @@ class AddFolderBox(gtk.VBox):
         print 'Creating folder...'
         if self._text_entry.get_text() != 'Untitled' and self._text_entry.get_text():
             self._parent.create_folder(self._text_entry.get_text(), image_file)
+            self._parent.destroy(None, None)
         else:
             print 'FOLDER MUST HAVE A NAME!'
         print 'Done.'
