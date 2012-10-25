@@ -18,6 +18,6 @@ def image_path(image_name):
     return os.path.join(SHARED_IMAGES_DIRECTORY, image_name)
 
 def scrub_image_path(image):
-    if not image or not image.endswith(".png") or not os.path.exists(image):
-        return image_path("endless.png")
+    if not image or image.endswith('.svg') or not os.path.exists(image):
+        image = image_path("endless.png")
     return image
