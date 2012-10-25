@@ -21,6 +21,11 @@ class DesktopModelTestCase(unittest.TestCase):
                                App(567, "app 5", "", "", "", False, False, True), 
                                App(890, "app 6", "", "", "", False, False, True), 
                                ]
+        self.available_app_shortcuts = [
+                                        AppShortcut(123, "App 1", "", []),
+                                        AppShortcut(234, "App 2", "", []),
+                                        AppShortcut(345, "App 3", "", [])
+                                        ]
         self.mock_desktop_locale_datastore = Mock(DesktopLocaleDatastore)
         self.mock_desktop_locale_datastore.get_all_shortcuts = Mock(return_value=self.available_apps)
         self.mock_app_datastore = Mock(AppDatastore)
@@ -87,6 +92,19 @@ class DesktopModelTestCase(unittest.TestCase):
         
         self.mock_desktop_preferences.get_default_background.assert_called()
         
+    def test_delete_shortcut_exists(self):
+        self.mock_desktop_locale_datastore.get_all_shortcuts = Mock(return_value=self.available_app_shortcuts)
+        self.assertEqual(self.testObject.delete_shortcut('App 2'), True, 'Delete shortcut which exists FAILED.')
+    
+    def test_delete_shortcut_does_not_exist(self):
+        self.mock_desktop_locale_datastore.get_all_shortcuts = Mock(return_value=self.available_app_shortcuts)
+        self.assertEqual(self.testObject.delete_shortcut('Dummy, non existant App'), False, 'Delete shortcut which does not exist FAILED.')
+    
+    def test_delete_shortcut_exception_handled(self):
+        self.mock_desktop_locale_datastore.get_all_shortcuts = Mock(return_value=self.available_app_shortcuts)
+        self.mock_desktop_locale_datastore.set_all_shortcuts_by_name = Mock(side_effect=Exception('Booom!'))
+        #self.mock_desktop_locale_datastore.set_all_shortcuts_by_name()
+        self.assertEqual(self.testObject.delete_shortcut('App 2'), False, 'Delete shortcut, exception handled FAILED.')
     def test_relocate_shortcut_invalid_source(self):
         ret = self.testObject.relocate_shortcut(None, 'irrelevant')
         self.assertEqual(ret, False)

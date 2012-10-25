@@ -92,4 +92,6 @@ class DesktopPresenter(object):
     def get_preferences(self):
         return self._model.get_preferences()
 
+    def delete_shortcut(self, what):
+        self._model.delete_shortcut(what)
     
