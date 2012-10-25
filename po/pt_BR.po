@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: dev 1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-10-15 20:16+0200\n"
+"POT-Creation-Date: 2012-10-20 06:06+0200\n"
 "PO-Revision-Date: 2012-05-31 11:54-0500\n"
 "Last-Translator: Automatically generated\n"
 "Language-Team: none\n"
@@ -39,6 +39,13 @@ msgstr "Feedback"
 #: src/shortcut/add_remove_shortcut.py:81
 msgid "Delete"
 msgstr "Excluir"
+
+#: src/shortcut/add_remove_shortcut.py:98
+#: src/shortcut/add_remove_shortcut.py:106
+#: src/shortcut/add_remove_shortcut.py:114
+#: src/shortcut/add_remove_shortcut.py:128
+msgid "Files"
+msgstr "Files"
 
 #: src/folder/folder_window.py:19 src/desktop/endless_desktop_view.py:117
 msgid "Folder"
