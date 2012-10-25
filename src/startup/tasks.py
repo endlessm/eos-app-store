@@ -3,10 +3,12 @@ import os.path
 from startup.shotwell_tasks import ShotwellTasks
 from startup.beatbox_tasks import BeatboxTasks
 from startup.windows_migration_tasks import WindowsMigrationTasks
+from startup.delete_desktop_state_task import DeleteDesktopStateTask
 from eos_log import log
 
 class Tasks():
 	TASK_PLUGINS = [
+				DeleteDesktopStateTask, 
 				ShotwellTasks, 
 				BeatboxTasks,
 				WindowsMigrationTasks,
