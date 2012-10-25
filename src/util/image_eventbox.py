@@ -23,7 +23,7 @@ class ImageEventBox(gtk.EventBox):
         x = area.x
         y = area.y
         w, h = self.size_request()
-                        
+        
         for image in self._images:
             image = image_util.scrub_image_path(image)
             
