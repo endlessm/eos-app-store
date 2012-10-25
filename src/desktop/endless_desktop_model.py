@@ -16,6 +16,9 @@ class EndlessDesktopModel(object):
 
     def set_shortcuts_by_name(self, shortcuts_names):
         self._app_desktop_datastore.set_all_shortcuts_by_name(shortcuts_names)
+        
+    def set_shortcuts(self, shortcuts):
+        self._app_desktop_datastore.set_all_shortcuts(shortcuts)
     
     def _relocate_shortcut_to_root(self, source_shortcut):
         source_parent = source_shortcut.parent()

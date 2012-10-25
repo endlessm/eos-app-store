@@ -120,3 +120,118 @@ class TestEndlessDesktopPresenter(unittest.TestCase):
         app_ret = self.testObject.get_shortcut_by_name('app 4')
         self.assertEqual(app_ret, None)
         
+        
+    def test_rearrange_shortcuts_no_relocate(self):
+        self.testObject._model.get_shortcuts = Mock(return_value=None)
+        source_shortcut = Mock()
+        source_shortcut.parent = Mock(return_value = None)
+        self.testObject.relocate_item = Mock()
+    
+        self.testObject.rearrange_shortcuts(source_shortcut, None, None)
+        
+        self.assertFalse(self.testObject.relocate_item.called)
+    
+    def test_rearrange_shortcuts_relocate(self):
+        self.testObject._model.get_shortcuts = Mock(return_value=None)
+        source_shortcut = Mock()
+        source_shortcut.parent = Mock(return_value = Mock())
+        self.testObject.relocate_item = Mock()
+    
+        self.testObject.rearrange_shortcuts(source_shortcut, None, None)
+        
+        self.testObject.relocate_item.assert_called_once_with(source_shortcut, None)
+        
+    def test_rearrange_shortcuts_left_destination(self):
+        all_shortcuts = Mock()
+        self.testObject._model.get_shortcuts = Mock(return_value=all_shortcuts)
+        source_shortcut = Mock()
+        source_shortcut.parent = Mock(return_value = None)
+        left_shortcut = Mock()
+        self.testObject.move_item_left = Mock()
+        self.testObject.move_item = Mock()
+        self.testObject.move_item_right = Mock()
+        
+        self.testObject.rearrange_shortcuts(source_shortcut, left_shortcut, None)
+        
+        self.testObject.move_item_left.assert_called_once_with(source_shortcut, left_shortcut, all_shortcuts)
+        self.testObject.move_item.assert_called_once_with(all_shortcuts)
+        self.assertFalse(self.testObject.move_item_right.called)
+
+    def test_rearrange_shortcuts_right_destination(self):
+        all_shortcuts = Mock()
+        self.testObject._model.get_shortcuts = Mock(return_value=all_shortcuts)
+        source_shortcut = Mock()
+        source_shortcut.parent = Mock(return_value = None)
+        right_shortcut = Mock()
+        self.testObject.move_item_right = Mock()
+        self.testObject.move_item = Mock()
+        self.testObject.move_item_left = Mock()
+        
+        self.testObject.rearrange_shortcuts(source_shortcut, None, right_shortcut)
+        
+        self.testObject.move_item_right.assert_called_once_with(source_shortcut, right_shortcut, all_shortcuts)
+        self.testObject.move_item.assert_called_once_with(all_shortcuts)
+        self.assertFalse(self.testObject.move_item_left.called)
+
+    def test_move_item_right_source_on_desk(self):
+        sc_1 = Mock()
+        sc_2 = Mock()
+        sc_3 = Mock()
+        all_shortcuts = [sc_1, sc_2, sc_3]
+    
+        self.testObject.move_item_right(sc_1, sc_3, all_shortcuts)
+        
+        self.assertEqual(all_shortcuts, [sc_2, sc_1, sc_3])
+        
+    def test_move_item_right_source_not_on_desk(self):
+        sc_1 = Mock()
+        sc_2 = Mock()
+        sc_3 = Mock()
+        all_shortcuts = [sc_2, sc_3]
+    
+        self.testObject.move_item_right(sc_1, sc_3, all_shortcuts)
+        
+        self.assertEqual(all_shortcuts, [sc_2, sc_1, sc_3])
+        
+    def test_move_item_left_source_on_desk_place_on_end(self):
+        sc_1 = Mock()
+        sc_2 = Mock()
+        sc_3 = Mock()
+        all_shortcuts = [sc_1, sc_2, sc_3]
+    
+        self.testObject.move_item_left(sc_1, sc_3, all_shortcuts)
+        
+        self.assertEqual(all_shortcuts, [sc_2, sc_3, sc_1])
+        
+    def test_move_item_left_source_on_desk_place_in_between(self):
+        sc_1 = Mock()
+        sc_2 = Mock()
+        sc_3 = Mock()
+        all_shortcuts = [sc_1, sc_2, sc_3]
+    
+        self.testObject.move_item_left(sc_1, sc_2, all_shortcuts)
+        
+        self.assertEqual(all_shortcuts, [sc_2, sc_1, sc_3])
+        
+    def test_move_item_left_source_not_on_desk_place_on_end(self):
+        sc_1 = Mock()
+        sc_2 = Mock()
+        sc_3 = Mock()
+        all_shortcuts = [sc_2, sc_3]
+    
+        self.testObject.move_item_left(sc_1, sc_3, all_shortcuts)
+        
+        self.assertEqual(all_shortcuts, [sc_2, sc_3, sc_1])
+        
+    def test_move_item_left_source_not_on_desk_place_in_between(self):
+        sc_1 = Mock()
+        sc_2 = Mock()
+        sc_3 = Mock()
+        all_shortcuts = [sc_1, sc_2, sc_3]
+    
+        self.testObject.move_item_left(sc_1, sc_2, all_shortcuts)
+        
+        self.assertEqual(all_shortcuts, [sc_2, sc_1, sc_3])
+        
+
+        

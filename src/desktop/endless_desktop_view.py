@@ -260,27 +260,12 @@ class EndlessDesktopView(gtk.Window):
     def _rearrange_shortcuts(self, widget, source_shortcut, left_shortcut, 
             right_shortcut
             ):
-        if source_shortcut.parent() is not None:
-            self._relocation_callback(widget, source_shortcut, None)
+        self._presenter.rearrange_shortcuts(
+            source_shortcut, 
+            left_shortcut, 
+            right_shortcut
+            )
             
-        if right_shortcut is not None:
-            if source_shortcut.name() in self._shorcuts_buffer:
-                self._shorcuts_buffer.remove(source_shortcut.name())
-            index = self._shorcuts_buffer.index(right_shortcut.name())
-            self._shorcuts_buffer.insert(index, source_shortcut.name())
-            self._presenter.move_item(self._shorcuts_buffer)
-            return
-            
-        if left_shortcut is not None:
-            if source_shortcut.name() in self._shorcuts_buffer:
-                self._shorcuts_buffer.remove(source_shortcut.name())
-            index = self._shorcuts_buffer.index(left_shortcut.name()) + 1
-            if index < len(self._shorcuts_buffer):
-                self._shorcuts_buffer.insert(index, source_shortcut.name())
-            else:
-                self._shorcuts_buffer.append(source_shortcut.name())
-            self._presenter.move_item(self._shorcuts_buffer)
-        
     def _calculate_max_icons(self):
         width = self._get_net_work_area()[0]
 
