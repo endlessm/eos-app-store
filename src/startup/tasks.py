@@ -2,12 +2,14 @@ import os.path
 
 from startup.shotwell_tasks import ShotwellTasks
 from startup.beatbox_tasks import BeatboxTasks
+from startup.windows_migration_tasks import WindowsMigrationTasks
 from eos_log import log
 
 class Tasks():
 	TASK_PLUGINS = [
 				ShotwellTasks, 
 				BeatboxTasks,
+				WindowsMigrationTasks,
 				]
 	
 	def perform_startup_tasks(self):
