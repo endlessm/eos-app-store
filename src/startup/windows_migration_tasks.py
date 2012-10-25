@@ -3,13 +3,11 @@ from subprocess import Popen, PIPE
 
 class WindowsMigrationTasks:
     USER_PATH = '/home/endlessm'
-    MOUNT_POINT = "/eos-mnt"
+    MOUNT_POINT = '/eos-mnt'
     
     def __init__(self):
         # For now, support only English and Portuguese
         # Note: 'Documents and Settings' is not internationalized on Portuguese Win XP
-        # We could use _localize_directory() to translate 'Documents', 'Pictures', 'Videos', and 'Music',
-        # but it would not handle 'Users' or 'My'
         self._documents_and_settings = ['Documents and Settings']
         self._users = ['Users', 'Usu\xc3\xa1rios']
         self._xp_pic_dirs = ['My Pictures', 'Minhas Imagens']
@@ -22,8 +20,14 @@ class WindowsMigrationTasks:
         self._w7_music_dirs = ['Music', 'M\xc3\xbasicas']
     
     def execute(self):
-        for user in self.get_windows_users(self.MOUNT_POINT):
-            self.import_user(self.MOUNT_POINT, user)
+        for directory in os.listdir(self.MOUNT_POINT):
+            full_path = os.path.join(self.MOUNT_POINT, directory)
+            if os.path.isdir(full_path):
+                self.import_mounted_directory(full_path)
+    
+    def import_mounted_directory(self, mount_point):
+        for user in self.get_windows_users(mount_point):
+            self.import_user(mount_point, user)
 
     def is_windows(self, mount_point):
         return self.is_windows_7(mount_point) or self.is_windows_xp(mount_point) 
@@ -123,6 +127,4 @@ class WindowsMigrationTasks:
     
 
 if __name__ == '__main__':
-    # Note: need to run as 'sudo'
-    migrator = WindowsMigrator()
-    migrator.import_all_devices('/mnt')
+    WindowsMigrationTasks().execute()

@@ -13,8 +13,6 @@ class WindowsMigrationTasksTestCase(unittest.TestCase):
         self._src_dir = tempfile.mkdtemp()
         self._dst_dir = tempfile.mkdtemp()
         
-        self._test_object.MOUNT_POINT = self._src_dir
-
     def tearDown(self):
         # Remove the temporary directories
         shutil.rmtree(self._src_dir)
@@ -97,7 +95,7 @@ class WindowsMigrationTasksTestCase(unittest.TestCase):
     def test_import_win_xp_multiple_users(self):
         self._make_windows_xp()
         self._test_object.import_user = Mock()
-        self._test_object.execute()
+        self._test_object.import_mounted_directory(self._src_dir)
         calls = []
         calls.append(call(self._src_dir, 'Default'))
         calls.append(call(self._src_dir, 'WindowsUser'))
@@ -107,7 +105,7 @@ class WindowsMigrationTasksTestCase(unittest.TestCase):
     def test_import_win_7_multiple_users(self):
         self._make_windows_7()
         self._test_object.import_user = Mock()
-        self._test_object.execute()
+        self._test_object.import_mounted_directory(self._src_dir)
         calls = []
         calls.append(call(self._src_dir, 'Default'))
         calls.append(call(self._src_dir, 'WindowsUser'))
@@ -197,3 +195,33 @@ class WindowsMigrationTasksTestCase(unittest.TestCase):
         f.write(content)
         f.close()
         
+    def test_execution_will_crawl_all_directories_in_mount_point_and_import_all_children(self):
+        self._test_object.import_mounted_directory = Mock()
+        
+        self._test_object.MOUNT_POINT = self._src_dir
+        full_path1 = os.path.join(self._test_object.MOUNT_POINT, "dir1")
+        full_path2 = os.path.join(self._test_object.MOUNT_POINT, "dir2")
+        full_path3 = os.path.join(self._test_object.MOUNT_POINT, "file1")
+        
+        os.makedirs(full_path1)
+        os.makedirs(full_path2)
+        open(full_path3, "w").close()
+        
+        self._test_object.execute()
+    
+        self._test_object.import_mounted_directory.assert_has_calls([ 
+                                                                     call(full_path1), 
+                                                                     call(full_path2) 
+                                                                     ])
+        self.assertEqual(2, self._test_object.import_mounted_directory.call_count)
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
