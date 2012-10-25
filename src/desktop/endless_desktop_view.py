@@ -17,6 +17,7 @@ from shortcut.add_remove_shortcut import AddRemoveShortcut
 from folder.folder_window import OpenFolderWindow
 from notification_panel.notification_panel import NotificationPanel
 from taskbar_panel.taskbar_panel import TaskbarPanel
+from add_shortcuts_module.add_shortcuts_view import AddShortcutsView 
 
 gettext.install('endless_desktop', '/usr/share/locale', unicode=True, names=['ngettext'])
 gtk.gdk.threads_init()
@@ -129,9 +130,12 @@ class EndlessDesktopView(gtk.Window):
 
             if shortcut.key() not in self._app_shortcuts:
                 if shortcut.has_children():
-                    app_shortcut = FolderShortcut(shortcut, self._folder_icon_clicked_callback)
+                    app_shortcut = FolderShortcut(shortcut, self._folder_icon_clicked_callback, '')
                 else:
-                    app_shortcut = ApplicationShortcut(shortcut)
+                    if hasattr(shortcut, 'icon') and shortcut.icon() and not shortcut.key():
+                        app_shortcut = FolderShortcut(shortcut, self._folder_icon_clicked_callback, shortcut.icon())
+                    else:
+                        app_shortcut = ApplicationShortcut(shortcut)
                 
                 self._app_shortcuts[shortcut.name()] = app_shortcut
         self._shorcuts_buffer = [shortcut.name() for shortcut in shortcuts]
@@ -267,6 +271,9 @@ class EndlessDesktopView(gtk.Window):
     
     def show_add_dialogue(self, event_box, event):
         print "Should show add dialogue..."
+        add_shortcut_popup = AddShortcutsView(parent=self)
+        self._align.hide()
+        add_shortcut_popup.show()
         
     def _delete_shortcuts(self, widget, sc_deleted):
         self._presenter.delete_shortcut(sc_deleted)
