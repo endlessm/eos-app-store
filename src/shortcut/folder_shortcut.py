@@ -63,5 +63,4 @@ class FolderShortcut(DesktopShortcut):
     def get_images(self, event_state):
         shortcut_icon_dict = self._shortcut.icon()
         default_icon = shortcut_icon_dict.get(self.ICON_STATE_NORMAL, image_util.image_path("folder.png"))
-        image_name = shortcut_icon_dict.get(event_state, default_icon)
-        return (image_name, )
+        return (shortcut_icon_dict.get(event_state, default_icon))
