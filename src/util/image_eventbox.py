@@ -26,19 +26,32 @@ class ImageEventBox(gtk.EventBox):
                         
         for image in self._images:
             image = image_util.scrub_image_path(image)
-            if self._width > 0:
-                pixbuf = image_util.load_pixbuf(image)
-                scaled_pixbuf = pixbuf.scale_simple(self._width, pixbuf.get_height(), gdk.INTERP_BILINEAR)
-                
-                cr.set_source_pixbuf(scaled_pixbuf, 0, 0)
-                cr.paint()
-                
-                del pixbuf
-                del scaled_pixbuf
+            
+            if self._width > 0 or image.endswith('.xpm'):
+                self._draw_pixbuf(cr, image_util.load_pixbuf(image), x, y, w, h)
             else:
                 img_surface = cairo.ImageSurface.create_from_png(image)
-                cr.set_source_surface(img_surface, x+(w/2-(img_surface.get_width()/2)), y+(h/2-(img_surface.get_height()/2)))
-                cr.paint()
+                
+                offset_x = x+(w/2-(img_surface.get_width()/2))
+                offset_y = y+(h/2-(img_surface.get_height()/2))
+                
+                cr.set_source_surface(img_surface, offset_x, offset_y)
+                
+            cr.paint()
     
+    def _draw_pixbuf(self, cr, pixbuf, x, y, w, h):
+        # If we want a specific width, scale it
+        # otherwise scale to whatever the requested size is
+        if self._width:
+            scaled_pixbuf = pixbuf.scale_simple(self._width, pixbuf.get_height(), gdk.INTERP_BILINEAR)
+            cr.set_source_pixbuf(scaled_pixbuf, 0, 0)
+        else:
+            aspect_ratio = w / float(pixbuf.get_width())
+            scaled_pixbuf = pixbuf.scale_simple(w, int(pixbuf.get_height() * aspect_ratio), gdk.INTERP_BILINEAR)
+            cr.set_source_pixbuf(scaled_pixbuf, x+(w/2-(scaled_pixbuf.get_width()/2)), y+(h/2-(scaled_pixbuf.get_height()/2)))
+            
+        del scaled_pixbuf
+        del pixbuf
+
     def set_images(self, images):
         self._images = images
