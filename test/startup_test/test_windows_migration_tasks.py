@@ -8,7 +8,9 @@ from startup.windows_migration_tasks import WindowsMigrationTasks
 
 class WindowsMigrationTasksTestCase(unittest.TestCase):
     def setUp(self):
-        self._test_object = WindowsMigrationTasks()
+        self._mock_home_path_provider = Mock()
+        self._mock_home_path_provider.get_user_directory = Mock(return_value="")
+        self._test_object = WindowsMigrationTasks(self._mock_home_path_provider)
         # Create temporary directories
         self._src_dir = tempfile.mkdtemp()
         self._dst_dir = tempfile.mkdtemp()
@@ -133,16 +135,32 @@ class WindowsMigrationTasksTestCase(unittest.TestCase):
         self.assertEqual(target, os.readlink(expected))
     
     def test_get_users_pictures_directory(self):
-        self.assertEqual('/home/endlessm/Pictures', self._test_object.pictures_dir())
+        self._mock_home_path_provider.get_user_directory = Mock(return_value="something")
+        
+        self.assertEqual('something', self._test_object.pictures_dir())
+        
+        self._mock_home_path_provider.get_user_directory.assert_called_once_with("Pictures")
 
     def test_get_users_videos_directory(self):
-        self.assertEqual('/home/endlessm/Videos', self._test_object.videos_dir())
+        self._mock_home_path_provider.get_user_directory = Mock(return_value="something")
+        
+        self.assertEqual('something', self._test_object.videos_dir())
+        
+        self._mock_home_path_provider.get_user_directory.assert_called_once_with("Videos")
 
     def test_get_users_music_directory(self):
-        self.assertEqual('/home/endlessm/Music', self._test_object.music_dir())
+        self._mock_home_path_provider.get_user_directory = Mock(return_value="something")
+        
+        self.assertEqual('something', self._test_object.music_dir())
+        
+        self._mock_home_path_provider.get_user_directory.assert_called_once_with("Music")
 
     def test_get_users_documents_directory(self):
-        self.assertEqual('/home/endlessm/Documents', self._test_object.documents_dir())
+        self._mock_home_path_provider.get_user_directory = Mock(return_value="something")
+        
+        self.assertEqual('something', self._test_object.documents_dir())
+        
+        self._mock_home_path_provider.get_user_directory.assert_called_once_with("Documents")
 
     def _make_windows_xp(self):
         documents_dir = os.path.join(self._src_dir, 'Documents and Settings')

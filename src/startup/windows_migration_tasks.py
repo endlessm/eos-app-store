@@ -1,11 +1,12 @@
 import os
 from subprocess import Popen, PIPE
+from osapps.home_path_provider import HomePathProvider
 
 class WindowsMigrationTasks:
     USER_PATH = '/home/endlessm'
     MOUNT_POINT = '/eos-mnt'
     
-    def __init__(self):
+    def __init__(self, home_path_provider=HomePathProvider()):
         # For now, support only English and Portuguese
         # Note: 'Documents and Settings' is not internationalized on Portuguese Win XP
         self._documents_and_settings = ['Documents and Settings']
@@ -18,6 +19,8 @@ class WindowsMigrationTasks:
         self._w7_pic_dirs = ['Pictures', 'Imagens']
         self._w7_video_dirs = ['Videos', 'V\xc3\xaddeos']
         self._w7_music_dirs = ['Music', 'M\xc3\xbasicas']
+        
+        self._home_path_provider = home_path_provider
     
     def execute(self):
         for directory in os.listdir(self.MOUNT_POINT):
@@ -76,16 +79,16 @@ class WindowsMigrationTasks:
                         self._link_directory(user, docs_path, self._xp_video_dirs, self.videos_dir())
     
     def pictures_dir(self):
-        return os.path.join(self.USER_PATH, self._localize_directory('Pictures'))
+        return self._home_path_provider.get_user_directory("Pictures")
     
     def videos_dir(self):
-        return os.path.join(self.USER_PATH, self._localize_directory('Videos'))
+        return self._home_path_provider.get_user_directory("Videos")
     
     def documents_dir(self):
-        return os.path.join(self.USER_PATH, self._localize_directory('Documents'))
+        return self._home_path_provider.get_user_directory("Documents")
     
     def music_dir(self):
-        return os.path.join(self.USER_PATH, self._localize_directory('Music'))
+        return self._home_path_provider.get_user_directory("Music")
     
     def _create_link(self, link_name, destination, parent_dir):
         link = os.path.join(parent_dir, link_name)
@@ -109,22 +112,6 @@ class WindowsMigrationTasks:
             path = os.path.join(parent, source_dir)
             if os.path.isdir(path):
                 self._create_link(user, path, target_dir)
-
-    def _add_to_fstab(self, device, mount_point):
-        mgr = FstabManager(self.FSTAB_PATH)
-        mgr.mount_device(device, mount_point)
-        
-    def _localize_directory(self, directory):
-        localized_name = self._execute(["gettext", "-d", "xdg-user-dirs", directory])
-        return localized_name
-
-    def _execute(self, cmd_args):
-        p = Popen(cmd_args, stdout=PIPE)
-        output = p.communicate()
-        if p.returncode != 0:
-            raise Exception(output[1])
-        return output[0].strip()
-    
 
 if __name__ == '__main__':
     WindowsMigrationTasks().execute()
