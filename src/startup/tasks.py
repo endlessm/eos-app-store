@@ -19,8 +19,8 @@ class Tasks():
 			for task in self.TASK_PLUGINS:
 				try:
 					task().execute()
-				except:
-					log.error("An error ocurred while executing " + task.__name__)
+				except Exception as e:
+					log.error("An error ocurred while executing " + task.__name__, e)
 
 			self._create_initialized_file()
 
