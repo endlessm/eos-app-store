@@ -1,9 +1,8 @@
-import shutil
-import os.path
+import os
 
 class DeleteDesktopStateTask:
-    def __init__(self, shell_util=shutil):
-        self._shell_utils = shell_util
+    def __init__(self, os_util=os):
+        self._os_util = os_util
         
     def execute(self):
-        self._shell_utils.rmtree(os.path.expanduser("~/.endlessm/desktop.json"), True)
+        self._os_util.remove(os.path.expanduser("~/.endlessm/desktop.json"))

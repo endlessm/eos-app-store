@@ -7,10 +7,10 @@ import os
 
 class DeleteDesktopStateTaskTest(unittest.TestCase):
     def setUp(self):
-        self._mock_shell_utils = Mock()
+        self._mock_os_utils = Mock()
         
-        self._test_object = DeleteDesktopStateTask(self._mock_shell_utils)
+        self._test_object = DeleteDesktopStateTask(self._mock_os_utils)
     
     def test_delete_state_removes_state_file(self):
         self._test_object.execute()
-        self._mock_shell_utils.rmtree.assert_called_once_with(os.path.expanduser("~/.endlessm/desktop.json"), True)
+        self._mock_os_utils.remove.assert_called_once_with(os.path.expanduser("~/.endlessm/desktop.json"))
