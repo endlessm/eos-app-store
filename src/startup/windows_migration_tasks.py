@@ -23,10 +23,11 @@ class WindowsMigrationTasks:
         self._home_path_provider = home_path_provider
     
     def execute(self):
-        for directory in os.listdir(self.MOUNT_POINT):
-            full_path = os.path.join(self.MOUNT_POINT, directory)
-            if os.path.isdir(full_path):
-                self.import_mounted_directory(full_path)
+        if os.path.exists(self.MOUNT_POINT):
+            for directory in os.listdir(self.MOUNT_POINT):
+                full_path = os.path.join(self.MOUNT_POINT, directory)
+                if os.path.isdir(full_path):
+                    self.import_mounted_directory(full_path)
     
     def import_mounted_directory(self, mount_point):
         for user in self.get_windows_users(mount_point):

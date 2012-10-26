@@ -233,13 +233,8 @@ class WindowsMigrationTasksTestCase(unittest.TestCase):
                                                                      ])
         self.assertEqual(2, self._test_object.import_mounted_directory.call_count)
     
-    
-    
-    
-    
-    
-    
-    
-    
-    
+    def test_execution_not_blow_up_if_theres_no_mount_directory(self):
+        self._test_object.MOUNT_POINT = "monkeys"
+        
+        self._test_object.execute()
     
