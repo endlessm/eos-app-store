@@ -241,10 +241,11 @@ class EndlessDesktopView(gtk.Window):
         
         #Adding AddRemove icon at the end of row
         if last_row:
-            add_remove = AddRemoveShortcut(callback=self.show_add_dialogue)
-            add_remove.connect("application-shortcut-remove", self._delete_shortcuts)
-            row.pack_start(add_remove, False, False, 0)
-            add_remove.show()
+            pass
+#add_remove = AddRemoveShortcut(callback=self.show_add_dialogue)
+#add_remove.connect("application-shortcut-remove", self._delete_shortcuts)
+#row.pack_start(add_remove, False, False, 0)
+#add_remove.show()
         
         return row
         

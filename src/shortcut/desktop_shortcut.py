@@ -7,6 +7,9 @@ import gtk
 class DesktopShortcut(gtk.VBox):
     DND_TARGET_TYPE_TEXT = 80
     DND_TRANSFER_TYPE = [( "text/plain", gtk.TARGET_SAME_APP, DND_TARGET_TYPE_TEXT )]
+    ICON_STATE_NORMAL = 'normal'
+    ICON_STATE_PRESSED = 'pressed'
+    ICON_STATE_MOUSEOVER = 'mouseover'
 
     _motion_callbacks = []
     _drag_end_callbacks = []
@@ -41,7 +44,7 @@ class DesktopShortcut(gtk.VBox):
     def __init__(self, label_text="", draggable=True):
         super(DesktopShortcut, self).__init__()
         self.set_size_request(64, 64)
-        self._event_box = self._create_icon(self.get_images())
+        self._event_box = self._create_icon(self.get_images(self.ICON_STATE_NORMAL))
         
         self._label = gtk.Label(label_text)
         self._identifier = label_text
@@ -131,7 +134,7 @@ class DesktopShortcut(gtk.VBox):
     def get_shortcut(self):
         return None
     
-    def get_images(self):
+    def get_images(self, event_state):
         return ()
     
     def remove_shortcut(self):
