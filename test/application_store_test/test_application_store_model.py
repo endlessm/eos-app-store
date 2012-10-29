@@ -17,7 +17,12 @@ class ApplicationStoreModelTestCase(unittest.TestCase):
         # Remove the temporary directories
         shutil.rmtree(self._app_store_dir)
 
+    def test_get_categories_returns_an_empty_list_when_there_are_no_files(self):
+        self.assertEquals(ImmutableSet([]), self._test_object.get_categories())
+
     def test_get_categories_returns_an_empty_list_when_there_are_no_categories(self):
+        self._make_file(self._app_store_dir, 'app1.desktop', '[Desktop Entry]\nType=Application\nName=app1\nExec=foo')        
+        self._make_file(self._app_store_dir, 'app2.desktop', '[Desktop Entry]\nType=Application\nName=app2\nExec=bar')        
         self.assertEquals(ImmutableSet([]), self._test_object.get_categories())
 
     def test_get_categories_returns_single_category_from_single_file(self):
