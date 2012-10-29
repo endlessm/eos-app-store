@@ -25,14 +25,15 @@ class ApplicationStoreIntegrationTestCase(unittest.TestCase):
         
         self._view.show_categories.assert_called_once_with(ImmutableSet([]))
 
-    def test_categories_sends_single_list_to_the_view_if_there_is_one_desktop_files(self):
+    def test_categories_sends_single_list_to_the_view_if_there_is_any_desktop_files(self):
         self._make_file(self._app_store_dir, 'app1.desktop', '[Desktop Entry]\nCategories=Audio\nType=Application\nName=app1\nExec=foo')        
+        self._make_file(self._app_store_dir, 'app2.desktop', '[Desktop Entry]\nCategories=Games;Video\nType=Application\nName=app2\nExec=bar')
         
         self._view.show_categories = Mock()
         
         self._test_object.show_categories()
         
-        self._view.show_categories.assert_called_once_with(ImmutableSet(['Audio']))
+        self._view.show_categories.assert_called_once_with(ImmutableSet(['Audio', 'Games', 'Video']))
 
     def _make_file(self, dirname, filename, content = 'Testing'):
         f = open(os.path.join(dirname, filename), 'w')

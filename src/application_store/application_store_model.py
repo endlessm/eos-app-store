@@ -13,5 +13,6 @@ class ApplicationStoreModel():
             if os.path.isfile(desktop_file_path):
                 desktop_entry = DesktopEntry()
                 desktop_entry.parse(desktop_file_path)
-                categories.append(desktop_entry.getCategories()[0])
+                for category in desktop_entry.getCategories():
+                    categories.append(category)
         return ImmutableSet(categories)
