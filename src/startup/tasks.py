@@ -2,12 +2,16 @@ import os.path
 
 from startup.shotwell_tasks import ShotwellTasks
 from startup.beatbox_tasks import BeatboxTasks
+from startup.windows_migration_tasks import WindowsMigrationTasks
+from startup.delete_desktop_state_task import DeleteDesktopStateTask
 from eos_log import log
 
 class Tasks():
 	TASK_PLUGINS = [
+				DeleteDesktopStateTask, 
 				ShotwellTasks, 
 				BeatboxTasks,
+				WindowsMigrationTasks,
 				]
 	
 	def perform_startup_tasks(self):
@@ -15,8 +19,8 @@ class Tasks():
 			for task in self.TASK_PLUGINS:
 				try:
 					task().execute()
-				except:
-					log.error("An error ocurred while executing " + task.__name__)
+				except Exception as e:
+					log.error("An error ocurred while executing " + task.__name__, e)
 
 			self._create_initialized_file()
 

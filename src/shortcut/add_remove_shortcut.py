@@ -47,7 +47,7 @@ class AddRemoveShortcut(DesktopShortcut):
         if self.parent:
             self.parent.remove(self)
             
-    def get_images(self):
+    def get_images(self, event_state):
         return (
             image_util.image_path("endless-shortcut-well.png"),
             image_util.image_path("endless-add.png"),

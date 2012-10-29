@@ -7,6 +7,9 @@ import gtk
 class DesktopShortcut(gtk.VBox):
     DND_TARGET_TYPE_TEXT = 80
     DND_TRANSFER_TYPE = [( "text/plain", gtk.TARGET_SAME_APP, DND_TARGET_TYPE_TEXT )]
+    ICON_STATE_NORMAL = 'normal'
+    ICON_STATE_PRESSED = 'pressed'
+    ICON_STATE_MOUSEOVER = 'mouseover'
 
     __gsignals__ = {
         "desktop-shortcut-dnd-begin": (
@@ -50,7 +53,7 @@ class DesktopShortcut(gtk.VBox):
         super(DesktopShortcut, self).__init__()
         self.__dnd_enter_flag = False
         self.set_size_request(64, 64)
-        self._event_box = self._create_icon(self.get_images())
+        self._event_box = self._create_icon(self.get_images(self.ICON_STATE_NORMAL))
         
         self._label = gtk.Label(label_text)
         self._identifier = label_text
@@ -165,14 +168,14 @@ class DesktopShortcut(gtk.VBox):
         return self._is_moving
     
     def _refresh(self, images=None):
-        images = images or self.get_images()
+        images = images or self.get_images(self.ICON_STATE_NORMAL)
         self._event_box.set_images(images)
         self._event_box.repaint()
     
     def get_shortcut(self):
         return None
     
-    def get_images(self):
+    def get_images(self, event_state):
         return ()
         
     def get_highlight_images(self):
