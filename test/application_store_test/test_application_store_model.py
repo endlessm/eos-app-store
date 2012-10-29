@@ -5,6 +5,7 @@ import tempfile
 import shutil
 import os
 from sets import ImmutableSet
+from application_store.application_store_errors import ApplicationStoreWrappedException
 
 
 class ApplicationStoreModelTestCase(unittest.TestCase):
@@ -16,6 +17,9 @@ class ApplicationStoreModelTestCase(unittest.TestCase):
     def tearDown(self):
         # Remove the temporary directories
         shutil.rmtree(self._app_store_dir)
+        
+    def test_when_there_is_no_directory_categories_wraps_the_exception(self):
+        self.assertRaises(ApplicationStoreWrappedException, ApplicationStoreModel('NonExistantDir').get_categories)
 
     def test_get_categories_returns_an_empty_list_when_there_are_no_files(self):
         self.assertEquals(ImmutableSet([]), self._test_object.get_categories())

@@ -1,7 +1,7 @@
 import os
 from xdg.DesktopEntry import DesktopEntry
 from sets import ImmutableSet
-from application_store.application_store_errors import ApplicationStoreError
+from application_store.application_store_errors import ApplicationStoreWrappedException
 
 class ApplicationStoreModel():
     def __init__(self, base_dir=''):
@@ -18,5 +18,5 @@ class ApplicationStoreModel():
                     for category in desktop_entry.getCategories():
                         categories.append(category)
         except OSError as e:
-            raise ApplicationStoreError(e, 'failed to find app store directory')
+            raise ApplicationStoreWrappedException(e, 'failed to find app store directory')
         return ImmutableSet(categories)
