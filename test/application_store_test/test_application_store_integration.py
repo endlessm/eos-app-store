@@ -5,6 +5,7 @@ import tempfile
 import shutil
 import os
 from application_store.application_store_model import ApplicationStoreModel
+from sets import ImmutableSet
 
 
 class ApplicationStoreIntegrationTestCase(unittest.TestCase):
@@ -22,16 +23,16 @@ class ApplicationStoreIntegrationTestCase(unittest.TestCase):
         
         self._test_object.show_categories()
         
-        self._view.show_categories.assert_called_once_with([])
+        self._view.show_categories.assert_called_once_with(ImmutableSet([]))
 
-#    def test_categories_sends_single_list_to_the_view_if_there_is_one_desktop_files(self):
-#        self._make_file(self._app_store_dir, 'app1.desktop', '[Desktop Entry]\nCategories=Audio\nType=Application\nName=app1\nExec=foo')        
-#        
-#        self._view.show_categories = Mock()
-#        
-#        self._test_object.show_categories()
-#        
-#        self._view.show_categories.assert_called_once_with(['Audio'])
+    def test_categories_sends_single_list_to_the_view_if_there_is_one_desktop_files(self):
+        self._make_file(self._app_store_dir, 'app1.desktop', '[Desktop Entry]\nCategories=Audio\nType=Application\nName=app1\nExec=foo')        
+        
+        self._view.show_categories = Mock()
+        
+        self._test_object.show_categories()
+        
+        self._view.show_categories.assert_called_once_with(ImmutableSet(['Audio']))
 
     def _make_file(self, dirname, filename, content = 'Testing'):
         f = open(os.path.join(dirname, filename), 'w')
