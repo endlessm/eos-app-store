@@ -23,6 +23,11 @@ class ApplicationStoreModelTestCase(unittest.TestCase):
     def test_get_categories_returns_single_category_from_single_file(self):
         self._make_file(self._app_store_dir, 'app1.desktop', '[Desktop Entry]\nCategories=Audio\nType=Application\nName=app1\nExec=foo')        
         self.assertEquals(ImmutableSet(['Audio']), self._test_object.get_categories())
+
+    def test_two_files_with_same_category(self):
+        self._make_file(self._app_store_dir, 'app1.desktop', '[Desktop Entry]\nCategories=Audio\nType=Application\nName=app1\nExec=foo')        
+        self._make_file(self._app_store_dir, 'app2.desktop', '[Desktop Entry]\nCategories=Audio\nType=Application\nName=app2\nExec=bar')        
+        self.assertEquals(ImmutableSet(['Audio']), self._test_object.get_categories())
     
     def _make_file(self, dirname, filename, content = 'Testing'):
         f = open(os.path.join(dirname, filename), 'w')
