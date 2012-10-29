@@ -2,14 +2,12 @@ import gtk
 import cairo
 import math
 
-from icon_plugin import IconPlugin
 from ui.abstract_notifier import AbstractNotifier
 from util.transparent_window import TransparentWindow
-from util import screen_util
-from battery_provider import BatteryProvider
 from notification_panel_config import NotificationPanelConfig
 from panel_constants import PanelConstants
 from notification_plugin import NotificationPlugin
+from util import screen_util
 
 class BatteryView(AbstractNotifier):
     X_OFFSET = 27
@@ -30,13 +28,11 @@ class BatteryView(AbstractNotifier):
     
     FONT_SIZE = 9
     POWER_SETTINGS = "power_settings"
-    POWER_menu = "power_menu"
 
     def __init__(self, parent):
         self._parent = parent
         self._percentage_label = gtk.Label()
         self._time_to_depletion_label= gtk.Label()
-        self._window = None
         self._parent.connect("expose-event", self._draw)
         
     def display_battery(self, level, time_to_depletion, charging):
@@ -163,15 +159,16 @@ class BatteryView(AbstractNotifier):
         self._vbox.add(self._button_power_settings)
         self._vbox.add(self._percentage_label)
         
-        self._parent.set_visible_window(False)
-    
-        self._window = TransparentWindow(None)
-
+        self._window = TransparentWindow(self._parent.get_toplevel())
         # Set up the window so that it can be exposed
         # with a transparent background and triangle decoration
         self._window.connect('expose-event', self._expose)
         self._window.connect('focus-out-event', lambda w, e: self.hide_window())
-        
+        self._window.set_border_width(self.WINDOW_BORDER)
+        self._window.set_keep_above(False)
+        self._window.set_name(_('Battery Info'))
+        self._window.set_title(_('Battery Info'))
+
         # Place the widget in an event box within the window
         # (which has a different background than the transparent window)
         self._container = gtk.EventBox()
@@ -179,7 +176,6 @@ class BatteryView(AbstractNotifier):
         self._vbox.show()
         self._container.add(self._vbox)
         self._window.add(self._container)
-        self._is_active = False
         
     def _remove_if_exists(self, component):
         found = False
@@ -189,25 +185,25 @@ class BatteryView(AbstractNotifier):
             self._vbox.remove(component)
     
     def display_menu(self, level, time):
-        if not self._window:
+        if not hasattr(self, '_window'):
             self._create_menu()
         
-#        self.hide_window()
-        
+        if self._window.get_visible():
+            self._window.show_now()
+            return 
+                
         self._percentage_label.set_text(str(level)+'%')
         self._remove_if_exists(self._time_to_depletion_label)
 
         x = screen_util.get_width() - self.WINDOW_WIDTH - self.X_OFFSET
     
         # Get the x location of the center of the widget (icon), relative to the settings window
-        self._window.set_border_width(self.WINDOW_BORDER)
-
         height = 0
         if time:
             if self._charging:
-                suffix = ' To Charge'
+                suffix = _(' min to charge fully')
             else:  
-                suffix = ' Left'
+                suffix = _(' min left until empty')
             self._time_to_depletion_label.set_text(time+suffix)
             self._vbox.add(self._time_to_depletion_label)
             height = self.WINDOW_HEIGHT
@@ -216,17 +212,17 @@ class BatteryView(AbstractNotifier):
 
         self._window.move(x, self.Y_LOCATION)
         self._window.set_size_request(self.WINDOW_WIDTH, height)
-            
-        self._is_active = False
+        
+        self._window.show_all()
         self.display()
         
-    # To do: make the triangle position configurable
+    # TODO make the triangle position configurable
     def _expose(self, widget, event):
         cr = widget.window.cairo_create()
 
         # Decorate the border with a triangle pointing up
         # Use the same color as the default event box background
-        # To do: eliminate need for these "magic" numbers
+        # TODO eliminate need for these "magic" numbers
         cr.set_source_rgba(0xf2/255.0, 0xf1/255.0, 0xf0/255.0, 1.0)
         self._pointer = 110
         cr.move_to(self._pointer, 0)
@@ -236,8 +232,10 @@ class BatteryView(AbstractNotifier):
         return False
 
     def display(self):
-        self._window.show_all()
+        self._window.set_visible(True)
+        self._window.present()
+        self._window.set_focus(self._window)
 
     def hide_window(self):
-        self._window.hide_all()
-
+        self._window.set_visible(False)
+        self._window.hide()

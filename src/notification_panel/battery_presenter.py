@@ -1,4 +1,5 @@
 from battery_view import BatteryView
+from battery_model import BatteryModel
 import gobject
 
 class BatteryPresenter():
@@ -12,15 +13,14 @@ class BatteryPresenter():
     def post_init(self):        
         self._view.add_listener(BatteryView.POWER_SETTINGS, 
                 lambda: self._open_settings())
-        self._view.display_battery(self._model.level(), self._model.time_to_depletion(), self._model.charging())
-        self._start_poll_battery()
+        self._model.add_listener(BatteryModel.BATTERY_STATE_CHANGED, 
+                lambda: self._update_battery_state())
         
-    def _start_poll_battery(self):
-        self._gobj.timeout_add(self.REFRESH_TIME, self._poll_for_battery)
-    
-    def _poll_for_battery(self):
         self._view.display_battery(self._model.level(), self._model.time_to_depletion(), self._model.charging())
-        return True
+        
+    def _update_battery_state(self):
+        print "checking", self._model.level(), self._model.time_to_depletion(), self._model.charging()
+        self._view.display_battery(self._model.level(), self._model.time_to_depletion(), self._model.charging())
             
     def _open_settings(self):
         self._view.hide_window()
@@ -28,6 +28,4 @@ class BatteryPresenter():
     
     def display_menu(self):
         self._view.display_menu(self._model.level(), self._model.time_to_depletion())
-
-
     
