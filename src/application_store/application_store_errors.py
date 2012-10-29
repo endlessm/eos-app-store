@@ -4,5 +4,5 @@ class ApplicationStoreError(Exception):
         self._msg = msg
     
     def __str__(self):
-        return repr(self._original_exception)
+        return (repr(self._msg), repr(self._original_exception), repr(self._original_exception.__str__()))
         
