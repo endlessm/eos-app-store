@@ -6,6 +6,7 @@ import shutil
 import os
 from application_store.application_store_model import ApplicationStoreModel
 from sets import ImmutableSet
+from application_store.application_store_errors import ApplicationStoreError
 
 
 class ApplicationStoreIntegrationTestCase(unittest.TestCase):
@@ -20,6 +21,10 @@ class ApplicationStoreIntegrationTestCase(unittest.TestCase):
 
     def tearDown(self):
         self._remove_temporary_directory()
+        
+    def test_categories_throws_an_exception_if_the_app_store_directory_does_not_exist(self):
+        self._test_object = ApplicationStorePresenter(self._view, ApplicationStoreModel('non/existant/directory'))
+        self.assertRaises(ApplicationStoreError, self._test_object.show_categories)
 
     def test_categories_sends_an_empty_list_to_the_view_if_there_are_no_desktop_files(self):
         self._view.show_categories = Mock()
