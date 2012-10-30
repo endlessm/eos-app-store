@@ -101,10 +101,3 @@ class FolderShortcut(DesktopShortcut):
         shortcut_icon_dict = self._shortcut.icon()
         default_icon = shortcut_icon_dict.get(self.ICON_STATE_NORMAL, image_util.image_path("folder.png"))
         return (shortcut_icon_dict.get(event_state, default_icon), )
-        
-    def get_highlight_images(self):
-        return (
-            image_util.image_path("icon_highlight.png"), 
-            image_util.image_path("folder.png"), 
-            image_util.image_path("endless-shortcut-foreground.png")
-            )

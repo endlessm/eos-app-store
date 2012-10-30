@@ -10,6 +10,7 @@ class DesktopShortcut(gtk.VBox):
     ICON_STATE_NORMAL = 'normal'
     ICON_STATE_PRESSED = 'pressed'
     ICON_STATE_MOUSEOVER = 'mouseover'
+    ICON_STATE_HIGHLIGHT = 'highlight'
 
     __gsignals__ = {
         "desktop-shortcut-dnd-begin": (
@@ -159,7 +160,7 @@ class DesktopShortcut(gtk.VBox):
         if hasattr(self, '_drag_enter_handler_callback'):
             self._drag_enter_handler_callback(source_widget, widget)
         if self.highlightable:
-            self._refresh(self.get_highlight_images())
+            self._refresh(self.get_images(self.ICON_STATE_HIGHLIGHT))
             
     def set_moving(self, is_moving):
         self._is_moving = is_moving
@@ -176,9 +177,6 @@ class DesktopShortcut(gtk.VBox):
         return None
     
     def get_images(self, event_state):
-        return ()
-        
-    def get_highlight_images(self):
         return ()
     
     def remove_shortcut(self):
