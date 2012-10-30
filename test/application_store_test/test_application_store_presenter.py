@@ -10,9 +10,22 @@ class ApplicationStorePresenterTestCase(unittest.TestCase):
         model = Mock()
         categories = ['Audio']
         model.get_categories = Mock(return_value=categories)
-        self._test_object = ApplicationStorePresenter(view, model)
+        self._presenter = ApplicationStorePresenter(view, model)
         
-        self._test_object.show_categories()
+        self._presenter.show_categories()
         
         model.get_categories.assert_called_once_with()
         view.show_categories.assert_called_once_with(categories)
+    
+    def test_show_category(self):
+        view = Mock()
+        view.show_category = Mock()
+        model = Mock()
+        category = Mock()
+        applications_set = Mock()
+        category.get_applications_set = Mock(return_value=applications_set)
+        self._presenter = ApplicationStorePresenter(view, model)
+        
+        self._presenter.show_category(category)
+        
+        view.show_category.assert_called_once_with(applications_set)
