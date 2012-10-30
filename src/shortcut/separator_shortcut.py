@@ -3,71 +3,67 @@ from shortcut.desktop_shortcut import DesktopShortcut
 
 class SeparatorShortcut(DesktopShortcut):
     __gsignals__ = {
-        "application-shortcut-move": (gobject.SIGNAL_RUN_FIRST, #@UndefinedVariable
-                   gobject.TYPE_NONE,
-                   (gobject.TYPE_PYOBJECT, gobject.TYPE_PYOBJECT)),
-    }
+        "application-shortcut-move": (
+            gobject.SIGNAL_RUN_FIRST, #@UndefinedVariable
+            gobject.TYPE_NONE,
+                (
+                    gobject.TYPE_PYOBJECT, 
+                    gobject.TYPE_PYOBJECT, 
+                    gobject.TYPE_PYOBJECT
+                    )
+            ),
+        }
 
     left = None
     right = None
     left_widget = None
     right_widget = None
     expanded = False
-    _all_separators = set()
     
     def __init__(self, width=30, height=64):
-        super(SeparatorShortcut, self).__init__('', draggable=False)
-        # listen for motion on all widgets
-        DesktopShortcut._add_motion_broadcast_callback(
-            SeparatorShortcut._motion_broadcast_callback
-            )
-        # listen for drag end on all widgets
-        DesktopShortcut._add_drag_end_broadcast_callback(
-            SeparatorShortcut._drag_end_broadcast_callback
-            )            
+        super(SeparatorShortcut, self).__init__('', draggable=False)          
         self.w = width
         self.h = height
         self.set_size_request(self.w, self.h)
-        self.class_name = 'sch_sep'
-        self._event_box._sep_obj = self
-        SeparatorShortcut._all_separators.add(self)
         self._image_name = ''
         self._show_background = True
         self.show_all()
         
-    # DND Callbacks
-    def _received_handler_callback(self, source, destination, x, y, data=None):
-        if hasattr(destination, '_sep_obj'):
-            source_name = source._identifier
-            if destination._sep_obj.right_widget:
-                destination_name = destination._sep_obj.right_widget._identifier
-            else:
-                destination_name = ''
+        DesktopShortcut._add_drag_end_broadcast_callback(
+            self._drag_end_broadcast_callback
+            )
         
+    def _received_handler_callback(self, source, destination, x, y, data=None):
+        dest_widget = destination.parent
+        source_widget = source.parent
+        
+        if isinstance(dest_widget, SeparatorShortcut):
+            source_shortcut = source_widget.get_shortcut()
+            if source_shortcut is None:
+                return
+            
+            left_shortcut = None
+            if dest_widget.left_widget is not None:
+                left_shortcut = dest_widget.left_widget.get_shortcut()
+            right_shortcut = None
+            if dest_widget.right_widget is not None:
+                right_shortcut = dest_widget.right_widget.get_shortcut()
+                
             self.emit(
                 "application-shortcut-move",
-                source_name, 
-                destination_name
+                source_shortcut, 
+                left_shortcut, 
+                right_shortcut
                 )
         
-    @classmethod
-    def _motion_broadcast_callback(cls, source, destination, x, y):
-        if hasattr(destination, '_sep_obj'):
-            if (y > 10) and (y < (destination._sep_obj.h-10)):
-                destination._sep_obj.expand()
-            else:
-                SeparatorShortcut._reset_all()
-        else:
-            SeparatorShortcut._reset_all()
-            
-    @classmethod
-    def _drag_end_broadcast_callback(cls, source):
-        SeparatorShortcut._reset_all()
-            
-    @classmethod
-    def _reset_all(cls):
-        for sep in cls._all_separators:
-            sep.reset()
+    def _drag_leave_handler_callback(self, source, destination):
+        self.reset()
+        
+    def _drag_enter_handler_callback(self, source, destination):
+        self.expand()
+        
+    def _drag_end_broadcast_callback(self, source):
+        self.reset()
         
     def set_left_separator(self, separator=None):
         self.left = separator

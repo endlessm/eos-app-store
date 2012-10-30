@@ -9,12 +9,66 @@ class DesktopPresenter(object):
         
         self.refresh_view()
 
+    def get_shortcut_by_name(self, shortcut_name):
+        all_shortcuts = self._model.get_shortcuts()
+        for shortcut in all_shortcuts:
+            if shortcut_name == shortcut.name():
+                return shortcut
+        return None
+        
     def activate_item(self, app_key, params):
         self._view.hide_folder_window()
         self._model.execute_app(app_key, params)
         
     def move_item(self, shortcuts):
         self._model.set_shortcuts(shortcuts)
+        self._view.refresh(self._model.get_shortcuts(force=True))
+    
+    def relocate_item(self, source_shortcut, folder_shortcut):
+        self._view.close_folder_window()
+        success = self._model.relocate_shortcut(
+            source_shortcut, 
+            folder_shortcut
+            )
+        all_shortcuts = self._model.get_shortcuts(force=True)
+        self._view.refresh(all_shortcuts)
+        if success:
+            if folder_shortcut is not None:
+                self._view.show_folder_window_by_name(folder_shortcut.name())
+            return True
+        return False
+        
+    def move_item_right(self, source_shortcut, right_shortcut, all_shortcuts):
+        if source_shortcut in all_shortcuts:
+            all_shortcuts.remove(source_shortcut)
+        index = all_shortcuts.index(right_shortcut)
+        all_shortcuts.insert(index, source_shortcut)
+    
+    def move_item_left(self, source_shortcut, left_shortcut, all_shortcuts):
+        if source_shortcut in all_shortcuts:
+            all_shortcuts.remove(source_shortcut)
+        index = all_shortcuts.index(left_shortcut) + 1
+        if index < len(all_shortcuts):
+            all_shortcuts.insert(index, source_shortcut)
+        else:
+            all_shortcuts.append(source_shortcut)
+        
+    def rearrange_shortcuts(self, source_shortcut, left_shortcut, 
+            right_shortcut
+            ):
+            
+        all_shortcuts = self._model.get_shortcuts()
+        if source_shortcut.parent() is not None:
+            self.relocate_item(source_shortcut, None)
+            
+        if right_shortcut is not None:
+            self.move_item_right(source_shortcut, right_shortcut, all_shortcuts)
+            self.move_item(all_shortcuts)
+        elif left_shortcut is not None:
+            self.move_item_left(source_shortcut, left_shortcut, all_shortcuts)
+            self.move_item(all_shortcuts)
+        else:
+            pass
     
     def refresh_view(self):
         if not self._is_refreshing:

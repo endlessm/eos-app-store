@@ -73,7 +73,7 @@ class EndlessDesktopView(gtk.Window):
     
     def unfocus_widget(self, widget, event):
         widget.set_focus(None)
-        self.hide_folder_window()
+        self.close_folder_window()
         self._notification_panel.close_settings_plugin_window()
 
     def set_presenter(self, presenter):
@@ -197,14 +197,32 @@ class EndlessDesktopView(gtk.Window):
         
     def hide_folder_window(self):
         if hasattr(self, '_folder_window') and self._folder_window:
+            self._folder_window.hide()
+            
+    def close_folder_window(self):
+        if hasattr(self, '_folder_window') and self._folder_window:
             self._folder_window.destroy()
             self._folder_window = None
-                
+            
+    def show_folder_window(self, shortcut):
+        self.close_folder_window()
+        self._folder_window = OpenFolderWindow(
+            self, 
+            self._presenter.activate_item, 
+            shortcut, 
+            self._dnd_begin
+            ) 
+        self._folder_window.show()
+    
+    def show_folder_window_by_name(self, shortcut_name):
+        shortcut = self._presenter.get_shortcut_by_name(shortcut_name)
+        if shortcut is not None:
+            self.show_folder_window(shortcut)
+        
     # Show folder content
     def _folder_icon_clicked_callback(self, widget, event, shortcut):
-        self.hide_folder_window()
-        self._folder_window = OpenFolderWindow(self, self._presenter.activate_item, shortcut) 
-        self._folder_window.show()
+        self.close_folder_window()
+        self.show_folder_window(shortcut)
         
     def _remove_all(self):
         for item in self._app_shortcuts.values():
@@ -220,11 +238,14 @@ class EndlessDesktopView(gtk.Window):
         for item in items:
             if isinstance(item, ApplicationShortcut):
                 item.connect("application-shortcut-rename", lambda w, shortcut, new_name: self._presenter.rename_item(shortcut, new_name))
-                item.connect("application-shortcut-activate", lambda w, app_key, params: self._presenter.activate_item(app_key, params))                
+                item.connect("application-shortcut-activate", lambda w, app_key, params: self._presenter.activate_item(app_key, params))
+                item.connect("desktop-shortcut-dnd-begin", self._dnd_begin)
                 item.show()
                 
             elif isinstance(item, FolderShortcut):
                 item.connect("folder-shortcut-activate", self._folder_icon_clicked_callback)
+                item.connect("folder-shortcut-relocation", self._relocation_callback)
+                item.connect("desktop-shortcut-dnd-begin", self._dnd_begin)
                 item.show()
                 
             if item.parent != None:
@@ -236,7 +257,7 @@ class EndlessDesktopView(gtk.Window):
             sep_last.set_right_separator(sep_new)
             sep_last.set_right_widget(item)
             sep_new.set_left_separator(sep_last)
-            sep_last.set_left_widget(item)
+            sep_new.set_left_widget(item)
             sep_last = sep_new
         
         #Adding AddRemove icon at the end of row
@@ -249,16 +270,21 @@ class EndlessDesktopView(gtk.Window):
         
         return row
         
-    def _rearrange_shortcuts(self, widget, sc_moved, sc_to_move):        
-        self._shorcuts_buffer.remove(sc_moved)
-        if sc_to_move != '':
-            new_index = self._shorcuts_buffer.index(sc_to_move)
-            self._shorcuts_buffer.insert(new_index, sc_moved)
-        else:
-            self._shorcuts_buffer.append(sc_moved)
-        self._redraw(self._shorcuts_buffer)
-        self._presenter.move_item(self._shorcuts_buffer)
+    def _dnd_begin(self, widget):
+        self.hide_folder_window()
         
+    def _relocation_callback(self, widget, source_shortcut, folder_shortcut):
+        self._presenter.relocate_item(source_shortcut, folder_shortcut)
+        
+    def _rearrange_shortcuts(self, widget, source_shortcut, left_shortcut, 
+            right_shortcut
+            ):
+        self._presenter.rearrange_shortcuts(
+            source_shortcut, 
+            left_shortcut, 
+            right_shortcut
+            )
+            
     def _calculate_max_icons(self):
         width = self._get_net_work_area()[0]
 
