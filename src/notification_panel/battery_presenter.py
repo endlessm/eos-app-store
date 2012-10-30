@@ -3,23 +3,20 @@ from battery_model import BatteryModel
 import gobject
 
 class BatteryPresenter():
-    REFRESH_TIME = 2000
-    
     def __init__(self, view, model, gobj = gobject):
         self._view = view
         self._model = model
         self._gobj = gobj
 
-    def post_init(self):        
+    def post_init(self):
         self._view.add_listener(BatteryView.POWER_SETTINGS, 
-                lambda: self._open_settings())
+            lambda: self._open_settings())
         self._model.add_listener(BatteryModel.BATTERY_STATE_CHANGED, 
-                lambda: self._update_battery_state())
-        
-        self._view.display_battery(self._model.level(), self._model.time_to_depletion(), self._model.charging())
+            lambda: self._update_battery_state())
+    
+        self._update_battery_state()
         
     def _update_battery_state(self):
-        print "checking", self._model.level(), self._model.time_to_depletion(), self._model.charging()
         self._view.display_battery(self._model.level(), self._model.time_to_depletion(), self._model.charging())
             
     def _open_settings(self):

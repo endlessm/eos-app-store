@@ -33,6 +33,5 @@ class BatteryModel(AbstractNotifier):
     
     def _battery_state_changed(self, battery):
         self._battery = battery
-        
         self._notify(self.BATTERY_STATE_CHANGED)
 
