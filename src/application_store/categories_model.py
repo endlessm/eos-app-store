@@ -10,7 +10,7 @@ class CategoriesModel():
     
     def add_application(self, application):
         application.visit(self.add)
-    
+        
     def add(self, category_name, application):
         category = self.categories.get(category_name, CategoryModel(category_name)) 
         category.add_application(application)

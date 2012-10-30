@@ -1,5 +1,6 @@
 class ApplicationModel:
-    def __init__(self, application_id, categories):
+    def __init__(self, desktop_file_path, application_id, categories):
+        self._desktop_file_path = desktop_file_path
         self._id = application_id
         self._categories = categories
     
@@ -18,3 +19,6 @@ class ApplicationModel:
     def visit(self, visitor):
         for category in self._categories:
             visitor(category, self)
+    
+    def id(self):
+        return self._id

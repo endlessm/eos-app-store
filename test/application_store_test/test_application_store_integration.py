@@ -49,6 +49,18 @@ class ApplicationStoreIntegrationTestCase(unittest.TestCase):
         self._view.click_category(0)
         
         self.assertEquals(self._view._category_list[0].get_applications_set(), self._view.applications_set)
+    
+    def test_installing_an_application(self):
+        self._make_file(self._app_store_dir, 'app1.desktop', '[Desktop Entry]\nCategories=Audio\nType=Application\nName=app1\nExec=foo')        
+        self._make_file(self._app_store_dir, 'app2.desktop', '[Desktop Entry]\nCategories=Audio\nType=Application\nName=app2\nExec=bar')
+        self._presenter.show_categories()
+        self._view.click_category(0)
+        
+        installed_application = self._view._application_list[0]
+        
+        self._view.install_application(0)        
+        
+        self.assertNotIn(installed_application, self._view.applications_set)
 
     def _make_file(self, dirname, filename, content = 'Testing'):
         f = open(os.path.join(dirname, filename), 'w')
@@ -71,3 +83,10 @@ class FakeView():
     
     def show_category(self, applications_set):
         self.applications_set = applications_set
+        self._application_list = []
+        for app in applications_set:
+            self._application_list.append(app)
+    
+    def install_application(self, application_index):
+        self._presenter.install_application(self._application_list[application_index])
+        

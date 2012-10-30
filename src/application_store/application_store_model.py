@@ -5,24 +5,36 @@ from application_store.application_store_errors import ApplicationStoreWrappedEx
 from application_store.application_model import ApplicationModel
 from application_store.category_model import CategoryModel
 from application_store.categories_model import CategoriesModel
+from application_store.installed_applications_model import InstalledApplicationsModel
 
 class ApplicationStoreModel():
-    def __init__(self, base_dir=''):
+    def __init__(self, base_dir='', installed_applications_model = InstalledApplicationsModel()):
         self._base_dir = base_dir
+        self._installed_applications_model = installed_applications_model
+        self._installed_applications_model.set_data_dir(self._base_dir)
+
+    def current_category(self):
+        return self._current_category
+
+    def set_current_category(self, category):
+        self._current_category = category
 
     def get_categories(self):
         categories = CategoriesModel()
         try:
             for desktop_filename in os.listdir(self._base_dir):
                 desktop_file_path = os.path.join(self._base_dir, desktop_filename)
-                if os.path.isfile(desktop_file_path):
-                    application = self.get_application(desktop_file_path)
+                if os.path.isfile(desktop_file_path) and not self._installed_applications_model.is_installed(desktop_filename):
+                    application = self.get_application(desktop_file_path, desktop_filename)
                     categories.add_application(application)
         except OSError as e:
             raise ApplicationStoreWrappedException(e, 'failed to find app store directory')
         return categories.get_categories_set()
 
-    def get_application(self, file_path):
+    def get_application(self, file_path, filename):
         desktop_entry = DesktopEntry()
         desktop_entry.parse(file_path)
-        return ApplicationModel(file_path, desktop_entry.getCategories())
+        return ApplicationModel(file_path, filename, desktop_entry.getCategories())
+    
+    def install(self, application):
+        self._installed_applications_model.install(application.id())

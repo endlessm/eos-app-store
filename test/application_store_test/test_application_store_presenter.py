@@ -21,6 +21,7 @@ class ApplicationStorePresenterTestCase(unittest.TestCase):
         view = Mock()
         view.show_category = Mock()
         model = Mock()
+        model.set_current_category = Mock()
         category = Mock()
         applications_set = Mock()
         category.get_applications_set = Mock(return_value=applications_set)
@@ -29,3 +30,20 @@ class ApplicationStorePresenterTestCase(unittest.TestCase):
         self._presenter.show_category(category)
         
         view.show_category.assert_called_once_with(applications_set)
+        model.set_current_category.assert_called_once_with(category)
+        
+    def test_install_application(self):
+        view = Mock()
+        view.show_category = Mock()
+        model = Mock()
+        current_category = Mock()
+        model.current_category = Mock(return_value=current_category)
+        current_application_set = Mock()
+        application = Mock()
+        current_category.get_applications_set = Mock(return_value=current_application_set)
+        self._presenter = ApplicationStorePresenter(view, model)
+        
+        self._presenter.install_application(application)
+        
+        model.install.assert_called_once_with(application)
+        view.show_category.assert_called_once_with(current_application_set)
