@@ -14,7 +14,7 @@ class InitialTasks():
 				WindowsMigrationTasks,
 				]
 	
-	def perform_startup_tasks(self):
+	def perform_tasks(self):
 		if self._is_initial_startup():
 			for task in self.TASK_PLUGINS:
 				try:
