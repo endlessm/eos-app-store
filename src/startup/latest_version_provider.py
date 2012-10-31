@@ -5,7 +5,7 @@ from startup import endpoint_provider
 
 class LatestVersionProvider():
     USERNAME = 'endlessos'
-    PASSWORD = 'sosseldne'
+    PASSWORD = 'install'
     
     def __init__(self, web_connection=WebConnection()):
         self._web_connection = web_connection
