@@ -4,9 +4,10 @@ from util import screen_util
 from osapps.desktop_preferences_datastore import DesktopPreferencesDatastore
 
 class TransparentWindow(gtk.Window):
-    def __init__(self, parent, desktop_preference_class = DesktopPreferencesDatastore):
+    def __init__(self, parent, desktop_preference_class = DesktopPreferencesDatastore, gradient_type=None):
         gtk.Window.__init__(self, gtk.WINDOW_TOPLEVEL)
         self._desktop_preferences = desktop_preference_class.get_instance()
+        self.gradient_type = gradient_type
         self.set_wmclass("endless_os_desktop", "modal")
 
         self.set_property("accept-focus", True)
@@ -30,8 +31,8 @@ class TransparentWindow(gtk.Window):
         cr = widget.window.cairo_create()
         x,y = self.window.get_origin()
         
-        cr.set_source_rgba(0, 0, 0, 255);
-        cr.set_operator(cairo.OPERATOR_SOURCE);
+        cr.set_source_rgba(0, 0, 0, 255)
+        cr.set_operator(cairo.OPERATOR_SOURCE)
         cr.paint()
         
         self.draw(cr, x,y)
@@ -41,11 +42,25 @@ class TransparentWindow(gtk.Window):
         return False
         
     def draw(self, cr, x, y):
-        w, h = self.size_request()
-        pixbuf = self._background.subpixbuf(x, y, w, h)
-        cr.set_source_pixbuf(pixbuf, 0, 0)
+        if self.gradient_type is None:
+            w, h = self.size_request()
+            pixbuf = self._background.subpixbuf(x, y, w, h)
+            cr.set_source_pixbuf(pixbuf, 0, 0)
 
-        cr.paint()
+            cr.paint()
+        else:        
+            x, y, w, h = self.get_allocation()
+            pixbuf = self._background.subpixbuf(x, y, w, h)
+            cr.set_source_pixbuf(pixbuf, 0, 0)
+            
+            gradient = cairo.LinearGradient(0, 0, 0, h)
+            gradient.add_color_stop_rgba(0.005, 255, 255, 255, 0)
+            gradient.add_color_stop_rgba(0.006, 0, 0, 0, 1)
+            gradient.add_color_stop_rgba(0.994, 0, 0, 0, 0)
+            gradient.add_color_stop_rgba(0.995, 255, 255, 255, 0)
+            cr.mask(gradient)
+            cr.fill()
+        
         self.queue_draw()
         
         return False
