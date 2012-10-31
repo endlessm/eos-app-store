@@ -10,6 +10,7 @@ from application_store.installed_applications_model import InstalledApplications
 class ApplicationStoreModel():
     def __init__(self, base_dir='', installed_applications_model = InstalledApplicationsModel()):
         self._base_dir = base_dir
+        self._current_category = None
         self._installed_applications_model = installed_applications_model
         self._installed_applications_model.set_data_dir(self._base_dir)
 
@@ -20,16 +21,7 @@ class ApplicationStoreModel():
         self._current_category = category
 
     def get_categories(self):
-        categories = CategoriesModel()
-        try:
-            for desktop_filename in os.listdir(self._base_dir):
-                desktop_file_path = os.path.join(self._base_dir, desktop_filename)
-                if os.path.isfile(desktop_file_path) and not self._installed_applications_model.is_installed(desktop_filename):
-                    application = self.get_application(desktop_file_path, desktop_filename)
-                    categories.add_application(application)
-        except OSError as e:
-            raise ApplicationStoreWrappedException(e, 'failed to find app store directory')
-        return categories.get_categories_set()
+        return self._refresh().get_categories_set()
 
     def get_application(self, file_path, filename):
         desktop_entry = DesktopEntry()
@@ -38,3 +30,25 @@ class ApplicationStoreModel():
     
     def install(self, application):
         self._installed_applications_model.install(application.id())
+        self._refresh()
+
+    def _refresh(self):
+        categories = CategoriesModel()
+        try:
+            for desktop_filename in self._desktop_files():                    
+                desktop_file_path = os.path.join(self._base_dir, desktop_filename)
+                if not self._installed_applications_model.is_installed(desktop_filename):
+                    application = self.get_application(desktop_file_path, desktop_filename)
+                    categories.add_application(application)
+        except OSError as e:
+            raise ApplicationStoreWrappedException(e, 'failed to find app store directory')
+        if self._current_category is not None:
+            self._current_category = categories.get_updated_category(self._current_category)
+        return categories
+
+    def _desktop_files(self):
+        desktop_files = []
+        for filename in os.listdir(self._base_dir):
+            if filename.endswith('.desktop'):
+                desktop_files.append(filename)
+        return desktop_files

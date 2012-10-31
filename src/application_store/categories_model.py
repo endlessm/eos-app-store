@@ -15,3 +15,6 @@ class CategoriesModel():
         category = self.categories.get(category_name, CategoryModel(category_name)) 
         category.add_application(application)
         self.categories[category_name] = category
+
+    def get_updated_category(self, stale_category):
+        return self.categories.get(stale_category.name())

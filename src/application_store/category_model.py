@@ -4,6 +4,9 @@ class CategoryModel:
         self._name = name
         self._applications = Set()
     
+    def name(self):
+        return self._name
+    
     def add_application(self, application):
         self._applications.add(application)
 

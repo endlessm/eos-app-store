@@ -16,4 +16,5 @@ class ApplicationStorePresenter():
         
     def install_application(self, application):
         self._model.install(application)
+        self._view.show_categories(self._model.get_categories())
         self._view.show_category(self._model.current_category().get_applications_set())

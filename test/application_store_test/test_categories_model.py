@@ -42,3 +42,13 @@ class CategoriesModelTestCase(unittest.TestCase):
         
         application.visit.assert_called_once_with(self._test_object.add)
 
+    def test_refreshing_stale_category(self):
+        app1 = Mock()
+        self._test_object.add('category_1', app1)
+        self._test_object.add('category_2', Mock())
+        stale_category = CategoryModel('category_1')
+
+        refreshed_category = self._test_object.get_updated_category(stale_category)
+        
+        self.assertIsNot(stale_category, refreshed_category)
+        self.assertIn(app1, refreshed_category.get_applications_set())

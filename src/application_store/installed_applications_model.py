@@ -4,9 +4,8 @@ import json
 from fileinput import close
 
 class InstalledApplicationsModel():
-    def __init__(self, file_location=''):
+    def __init__(self):
         self._installed_applications = []
-        self.set_data_dir(file_location)
     
     def set_data_dir(self, file_location):
         self._file_location = file_location
@@ -14,10 +13,9 @@ class InstalledApplicationsModel():
         if os.path.isfile(self._full_path):
             fp = open(self._full_path, 'r')
             json_data = json.load(fp)
-            if json_data:
-                self._installed_applications = json_data['installed_applications']
+            if json_data is not None:
+                self._installed_applications = json_data
 
-    
     def installed_applications(self):
         return self._installed_applications
     
@@ -30,4 +28,4 @@ class InstalledApplicationsModel():
         json.dump(self._installed_applications, open(self._full_path, "w"))
         
     def is_installed(self, application):
-        return False
+        return application in self._installed_applications

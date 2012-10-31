@@ -13,7 +13,8 @@ class InstalledApplicationsModelTestCase(unittest.TestCase):
     
     def setUp(self):
         self._app_store_dir = tempfile.mkdtemp()
-        self._test_object = InstalledApplicationsModel(self._app_store_dir)
+        self._test_object = InstalledApplicationsModel()
+        self._test_object.set_data_dir(self._app_store_dir)
 
     def tearDown(self):
         # Remove the temporary directories
@@ -32,7 +33,7 @@ class InstalledApplicationsModelTestCase(unittest.TestCase):
         self.assertEquals(0, len(installed_apps))
         
     def test_reading_single_item_array_from_file(self):
-        self._make_file(self._app_store_dir, 'installed_applications.json', '{"installed_applications":["foo"]}')
+        self._make_file(self._app_store_dir, 'installed_applications.json', '["foo"]')
         self._test_object.set_data_dir(self._app_store_dir)
         installed_apps = self._test_object.installed_applications()
         self.assertIsNotNone(installed_apps)
@@ -40,7 +41,7 @@ class InstalledApplicationsModelTestCase(unittest.TestCase):
         self.assertEquals('foo', installed_apps[0])
         
     def test_reading_multiple_items_array_from_file(self):
-        self._make_file(self._app_store_dir, 'installed_applications.json', '{"installed_applications":["foo", "bar"]}')
+        self._make_file(self._app_store_dir, 'installed_applications.json', '["foo", "bar"]')
         self._test_object.set_data_dir(self._app_store_dir)
         installed_apps = self._test_object.installed_applications()
         self.assertIsNotNone(installed_apps)
@@ -48,31 +49,38 @@ class InstalledApplicationsModelTestCase(unittest.TestCase):
         self.assertIn('foo', installed_apps)
         self.assertIn('bar', installed_apps)
         
-    def test_installing_an_application(self):
-        self._test_object.install('foo')
-
-        self.assertIn('foo', self._test_object.installed_applications())
-            
     def test_installing_an_application_creates_file(self):
         self._test_object.install('foo')
 
         self.assertIn('foo', self._test_object.installed_applications())
-        full_path = os.path.join(self._app_store_dir, 'installed_applications.json')
-        self.assertTrue(os.path.isfile(full_path))
-        json_data = json.load(open(full_path, "r"))
-        print ("json ="), json_data
-        apps = json_data
-        self.assertIsNotNone(apps)
-        self.assertIn('foo', apps) 
-
-    def test_uninstalling_an_application(self):
+        self._verify_file_content(['foo']) 
+            
+    def test_uninstalling_an_application_removes_it_from_file(self):
         self._test_object.install('foo')
+        self._test_object.install('bar')
 
         self._test_object.uninstall('foo')
+        
+        self.assertIn('bar', self._test_object.installed_applications())
+        self._verify_file_content(['bar']) 
 
-        self.assertNotIn('foo', self._test_object.installed_applications())
+    def test_is_installed(self):
+        self.assertFalse(self._test_object.is_installed('not-installed'))
+        self._test_object.install('newly-installed')
+        self.assertTrue(self._test_object.is_installed('newly-installed'))
+        self._test_object.uninstall('newly-installed')
+        self.assertFalse(self._test_object.is_installed('newly-installed'))
         
     def _make_file(self, dirname, filename, content = 'Testing'):
         f = open(os.path.join(dirname, filename), 'w')
         f.write(content)
         f.close()
+
+    def _verify_file_content(self, expected):
+        full_path = os.path.join(self._app_store_dir, 'installed_applications.json')
+        self.assertTrue(os.path.isfile(full_path))
+        json_data = json.load(open(full_path, "r"))
+        self.assertIsNotNone(json_data)
+        for app in expected:
+            self.assertIn(app, json_data)
+
