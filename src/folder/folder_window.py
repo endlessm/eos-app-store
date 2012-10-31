@@ -8,13 +8,14 @@ from folder.folder_icons import FolderIcons
 gettext.install('endless_desktop', '/usr/share/locale', unicode = True, names=['ngettext'])
 
 FULL_FOLDER_ITEMS_COUNT = 21
+MAX_ITEMS_IN_ROW = 7
 class OpenFolderWindow():
     TASKBAR_HEIGHT = 60
     
     def __init__(self, parent, callback, shortcut, hide_callback):
         self._width = screen_util.get_width()
         # TODO fix this
-        self._height = 116
+        self._height = 400
         
         self._window = TransparentWindow(parent)
         self._window.set_title(_("Folder"))
@@ -33,18 +34,31 @@ class OpenFolderWindow():
         self._center = gtk.Alignment(.5,0.1,0,0)
         self._center.show()
         
-        self._container = gtk.HBox(False)
+        self._container = gtk.VBox(homogeneous=True, spacing=64)
         
-        folder_icons = FolderIcons(shortcut.children())
-        self._container.pack_start(folder_icons, False, False, 0)
-        folder_icons.connect(
-            "application-shortcut-activate", 
-            lambda w, app_id, params: callback(app_id, params)
-            )
-        folder_icons.connect(
-            "desktop-shortcut-dnd-begin", 
-            lambda w: hide_callback(w)
-            )
+        rows = []
+        row_items = []
+        for child in shortcut.children():
+            if len(row_items) >= MAX_ITEMS_IN_ROW:
+                rows.append(row_items)
+                row_items = []
+            row_items.append(child)
+        rows.append(row_items)
+        
+        print 'rows', rows
+                
+        for row in rows:
+            folder_icons = FolderIcons(row)
+            self._container.pack_start(folder_icons, False, False, 0)
+            folder_icons.connect(
+                "application-shortcut-activate", 
+                lambda w, app_id, params: callback(app_id, params)
+                )
+            
+            folder_icons.connect(
+                "desktop-shortcut-dnd-begin", 
+                lambda w: hide_callback(w)
+                )
         
         self._center.add(self._container)
         self._fancy_container.add(self._center)
