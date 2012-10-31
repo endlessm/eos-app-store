@@ -36,11 +36,11 @@ class CategoriesModelTestCase(unittest.TestCase):
 
     def test_visiting_added_application(self):
         application = Mock()
-        application.visit = Mock()
+        application.visit_categories = Mock()
         
         self._test_object.add_application(application)
         
-        application.visit.assert_called_once_with(self._test_object.add)
+        application.visit_categories.assert_called_once_with(self._test_object.add)
 
     def test_refreshing_stale_category(self):
         app1 = Mock()

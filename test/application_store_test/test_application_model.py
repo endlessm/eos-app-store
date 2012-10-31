@@ -23,7 +23,7 @@ class ApplicationModelTestCase(unittest.TestCase):
         test_object = ApplicationModel(Mock(), 'id', ["Audio", "Video"])
         visitor = Mock()
         
-        test_object.visit(visitor)
+        test_object.visit_categories(visitor)
         
         calls = []
         calls.append(call("Audio", test_object))

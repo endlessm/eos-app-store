@@ -16,7 +16,7 @@ class ApplicationModel:
     def __hash__(self):
         return self._id.__hash__()
     
-    def visit(self, visitor):
+    def visit_categories(self, visitor):
         for category in self._categories:
             visitor(category, self)
     
