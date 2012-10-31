@@ -1,7 +1,5 @@
-from sets import ImmutableSet
 import os
 import json
-from fileinput import close
 
 class InstalledApplicationsModel():
     def __init__(self):

@@ -3,10 +3,10 @@ from application_store.application_store_presenter import ApplicationStorePresen
 import tempfile
 import shutil
 import os
-from application_store.application_store_model import ApplicationStoreModel,\
-    CategoryModel
+from application_store.application_store_model import ApplicationStoreModel
 from sets import ImmutableSet
 from application_store.application_store_errors import ApplicationStoreError
+from application_store.category_model import CategoryModel
 
 
 class ApplicationStoreIntegrationTestCase(unittest.TestCase):

@@ -1,9 +1,7 @@
 import os
 from xdg.DesktopEntry import DesktopEntry
-from sets import ImmutableSet
 from application_store.application_store_errors import ApplicationStoreWrappedException
 from application_store.application_model import ApplicationModel
-from application_store.category_model import CategoryModel
 from application_store.categories_model import CategoriesModel
 from application_store.installed_applications_model import InstalledApplicationsModel
 
