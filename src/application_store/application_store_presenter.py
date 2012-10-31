@@ -1,8 +1,10 @@
 from application_store.application_store_model import ApplicationStoreModel
 from application_store.application_store_view import ApplicationStoreView
+from desktop.endless_desktop_presenter import DesktopPresenter
 
 class ApplicationStorePresenter():
-    def __init__(self, view = ApplicationStoreView(), model = ApplicationStoreModel()):
+    def __init__(self, desktop_presenter, view = ApplicationStoreView(), model = ApplicationStoreModel()):
+        self._desktop_presenter = desktop_presenter
         self._view = view
         self._model = model
         self._view.set_presenter(self)
@@ -18,3 +20,4 @@ class ApplicationStorePresenter():
         self._model.install(application)
         self._view.show_categories(self._model.get_categories())
         self._view.show_category(self._model.current_category().get_applications_set())
+        self._desktop_presenter.refresh_view()

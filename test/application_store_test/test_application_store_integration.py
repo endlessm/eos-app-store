@@ -7,13 +7,16 @@ from application_store.application_store_model import ApplicationStoreModel
 from sets import ImmutableSet
 from application_store.application_store_errors import ApplicationStoreError
 from application_store.category_model import CategoryModel
+from mock import Mock
 
 
 class ApplicationStoreIntegrationTestCase(unittest.TestCase):
     def setUp(self):
         self._view = FakeView()
         self._app_store_dir = tempfile.mkdtemp()
-        self._presenter = ApplicationStorePresenter(self._view, ApplicationStoreModel(self._app_store_dir))
+        self.desktop_presenter = Mock()
+        self.desktop_presenter.refresh_view = Mock()
+        self._presenter = ApplicationStorePresenter(self.desktop_presenter, self._view, ApplicationStoreModel(self._app_store_dir))
         
 
     def _remove_temporary_directory(self):
@@ -23,7 +26,7 @@ class ApplicationStoreIntegrationTestCase(unittest.TestCase):
         self._remove_temporary_directory()
         
     def test_categories_throws_an_exception_if_the_app_store_directory_does_not_exist(self):
-        self._presenter = ApplicationStorePresenter(self._view, ApplicationStoreModel('non/existant/directory'))
+        self._presenter = ApplicationStorePresenter(self.desktop_presenter, self._view, ApplicationStoreModel('non/existant/directory'))
         
         self.assertRaises(ApplicationStoreError, self._presenter.show_categories)
 

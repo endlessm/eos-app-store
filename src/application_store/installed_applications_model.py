@@ -19,6 +19,7 @@ class InstalledApplicationsModel():
     
     def install(self, application):
         self._installed_applications.append(application)
+        # TODO Actually install the application on issue 434
         json.dump(self._installed_applications, open(self._full_path, "w"))
     
     def uninstall(self, application):
