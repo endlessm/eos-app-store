@@ -1,19 +1,18 @@
 import unittest
-from startup.tasks import Tasks
-from mock import Mock, call
+from startup.initial_tasks import InitialTasks
+from mock import Mock #@UnresolvedImport
 import shutil
 import os.path
-import sys
 
 from eos_log import log
 
-class TasksTest(unittest.TestCase):
+class InitialTasksTest(unittest.TestCase):
 	ENDLESS_DIR = os.path.expanduser("~/.endlessm")
 
 	def setUp(self):
 		self._clean_up()
 
-		self._test_object = Tasks()
+		self._test_object = InitialTasks()
 		self._test_object.TASK_PLUGINS = [Mock()]
 
 	def tearDown(self):

@@ -1,9 +1,8 @@
 #!/usr/bin/env python
 from desktop_builder import build_desktop
-from startup.tasks import Tasks
+from startup.initial_tasks import InitialTasks
 
 if __name__ == "__main__":
-	Tasks().perform_startup_tasks()
+	InitialTasks().perform_startup_tasks()
 
 	build_desktop()
-    
