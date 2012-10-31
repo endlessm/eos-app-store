@@ -115,7 +115,7 @@ class AddRemoveShortcut(DesktopShortcut):
             return
                 
         super(AddRemoveShortcut, self).dnd_motion_data(widget, context, x, y, time)
-        if not source_widget.parent._shortcut.has_children():
+        if len(source_widget.parent._shortcut.children()) == 0:
             self._confirmation_popup = RemovalConfirmationPopupWindow(self._confirmation_received, widget=source_widget, label=label)
             self._confirmation_popup.show()
             source_widget.parent._event_box.set_images(())

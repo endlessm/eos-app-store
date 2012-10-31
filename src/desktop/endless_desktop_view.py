@@ -123,7 +123,10 @@ class EndlessDesktopView(gtk.Window):
         self.popup.add(website_menu) 
         self.popup.add(folder_menu)
         
-    def refresh(self, shortcuts):
+    def refresh(self, shortcuts, force=False):
+        
+        if force:
+           self._app_shortcuts = {}
         self._folder_shortcuts = {}
         for shortcut in shortcuts:
 
