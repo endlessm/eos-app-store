@@ -9,7 +9,7 @@ gettext.install('endless_desktop', '/usr/share/locale', unicode = True, names=['
 
 FULL_FOLDER_ITEMS_COUNT = 21
 class OpenFolderWindow():
-    TASKBAR_HEIGHT = 40
+    TASKBAR_HEIGHT = 60
     
     def __init__(self, parent, callback, shortcut, hide_callback):
         self._width = screen_util.get_width()
