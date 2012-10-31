@@ -7,6 +7,7 @@ from folder.folder_icons import FolderIcons
 
 gettext.install('endless_desktop', '/usr/share/locale', unicode = True, names=['ngettext'])
 
+FULL_FOLDER_ITEMS_COUNT = 21
 class OpenFolderWindow():
     TASKBAR_HEIGHT = 40
     

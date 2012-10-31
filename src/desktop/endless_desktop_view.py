@@ -15,6 +15,7 @@ from shortcut.folder_shortcut import FolderShortcut
 from shortcut.separator_shortcut import SeparatorShortcut
 from shortcut.add_remove_shortcut import AddRemoveShortcut
 from folder.folder_window import OpenFolderWindow
+from folder.folder_window import FULL_FOLDER_ITEMS_COUNT
 from notification_panel.notification_panel import NotificationPanel
 from taskbar_panel.taskbar_panel import TaskbarPanel
 
@@ -274,7 +275,14 @@ class EndlessDesktopView(gtk.Window):
         self.hide_folder_window()
         
     def _relocation_callback(self, widget, source_shortcut, folder_shortcut):
-        self._presenter.relocate_item(source_shortcut, folder_shortcut)
+        # move on desktop
+        if folder_shortcut is None:
+            self._presenter.relocate_item(source_shortcut, folder_shortcut)
+            return
+    
+        if len(folder_shortcut.children()) < FULL_FOLDER_ITEMS_COUNT:
+            self._presenter.relocate_item(source_shortcut, folder_shortcut)
+            
         
     def _rearrange_shortcuts(self, widget, source_shortcut, left_shortcut, 
             right_shortcut
