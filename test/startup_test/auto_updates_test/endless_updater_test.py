@@ -2,7 +2,7 @@ import unittest
 from mock import Mock #@UnresolvedImport
 import os
 
-from startup.endless_updater import EndlessUpdater
+from startup.auto_updates.endless_updater import EndlessUpdater
 
 class EndlessUpdaterTestCase(unittest.TestCase):
     _test_directory = "this is the test directory"

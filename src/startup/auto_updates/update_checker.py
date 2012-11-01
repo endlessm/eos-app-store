@@ -1,6 +1,6 @@
 import re
-from startup.latest_version_provider import LatestVersionProvider
-from startup.endless_updater import EndlessUpdater
+from startup.auto_updates.latest_version_provider import LatestVersionProvider
+from startup.auto_updates.endless_updater import EndlessUpdater
 from osapps.os_util import OsUtil
 
 class UpdateChecker():

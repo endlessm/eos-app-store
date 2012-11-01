@@ -1,6 +1,6 @@
-from startup.endless_downloader import EndlessDownloader
-from startup.endless_installer import EndlessInstaller
-from startup.install_notifier import InstallNotifier
+from startup.auto_updates.endless_downloader import EndlessDownloader
+from startup.auto_updates.endless_installer import EndlessInstaller
+from startup.auto_updates.install_notifier import InstallNotifier
 
 import os
 

@@ -3,7 +3,7 @@ from mock import Mock #@UnresolvedImport
 
 import shutil
 import os
-from startup.endless_downloader import EndlessDownloader
+from startup.auto_updates.endless_downloader import EndlessDownloader
 
 class EndlessDownloaderTestCase(unittest.TestCase):
     _test_directory = "/tmp/updater_test_dir"

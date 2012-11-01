@@ -1,6 +1,6 @@
 import unittest
 from mock import Mock #@UnresolvedImport
-from startup.update_checker import UpdateChecker
+from startup.auto_updates.update_checker import UpdateChecker
 
 class UpdateCheckerTestCase(unittest.TestCase):
 

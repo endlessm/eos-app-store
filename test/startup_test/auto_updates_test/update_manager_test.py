@@ -2,7 +2,7 @@ import unittest
 from mock import Mock #@UnresolvedImport
 
 import time
-from startup.update_manager import UpdateManager
+from startup.auto_updates.update_manager import UpdateManager
 
 class UpdateManagerTestCase(unittest.TestCase):
     _mock_check_for_updates_calls = 0

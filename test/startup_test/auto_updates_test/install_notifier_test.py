@@ -1,5 +1,5 @@
 import unittest
-from startup.install_notifier import InstallNotifier
+from startup.auto_updates.install_notifier import InstallNotifier
 
 class InstallNotifierTestCase(unittest.TestCase):
     def setUp(self):

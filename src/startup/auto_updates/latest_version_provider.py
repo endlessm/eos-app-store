@@ -1,7 +1,7 @@
 import json
 
 from osapps.web_connection import WebConnection
-from startup import endpoint_provider
+from startup.auto_updates import endpoint_provider
 
 class LatestVersionProvider():
     USERNAME = 'endlessos'

@@ -2,7 +2,7 @@ import unittest
 from mock import Mock #@UnresolvedImport
 
 import os
-from startup.endless_installer import EndlessInstaller
+from startup.auto_updates.endless_installer import EndlessInstaller
 
 class EndlessInstallerTestCase(unittest.TestCase):
     _test_directory = "this is the download directory"

@@ -1,4 +1,4 @@
-from update_manager import UpdateManager
+from auto_updates.update_manager import UpdateManager
 from eos_log import log
 
 class StartupTasks(object):

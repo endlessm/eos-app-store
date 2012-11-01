@@ -1,8 +1,8 @@
 import unittest
 from mock import Mock #@UnresolvedImport
-from startup.latest_version_provider import LatestVersionProvider
+from startup.auto_updates.latest_version_provider import LatestVersionProvider
 import json
-from startup import endpoint_provider
+from startup.auto_updates import endpoint_provider
 
 class LatestVersionProviderTestCase(unittest.TestCase):
     def setUp(self):

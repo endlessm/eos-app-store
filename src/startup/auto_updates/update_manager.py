@@ -1,5 +1,5 @@
 from threading import Thread
-from startup.update_checker import UpdateChecker
+from startup.auto_updates.update_checker import UpdateChecker
 import time
 
 class UpdateManager(object):
