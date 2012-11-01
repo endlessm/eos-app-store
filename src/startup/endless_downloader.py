@@ -7,15 +7,12 @@ class EndlessDownloader():
         self._os_util = os_util
     
     def update_repositories(self):
-        self._os_util.execute(["sudo", "apt-get", "update"])
+        self._os_util.execute(["sudo", "/usr/bin/endless_update_repositories.sh"])
     
     def download_all_packages(self, download_directory):
         self._clean_out_download_directory(download_directory)
         
-        self._os_util.execute(
-                              ["sudo", "apt-get", 
-                                "-y", "-d", "-o", "Dir::Cache::Archives=" + download_directory, 
-                                "install", "endless*"])
+        self._os_util.execute(["sudo", "/usr/bin/endless_install_all_packages.sh"])
         
     def _clean_out_download_directory(self, download_directory):
         if not os.path.exists(download_directory):

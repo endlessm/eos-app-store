@@ -32,7 +32,7 @@ class EndlessUpdaterTestCase(unittest.TestCase):
         
         self._test_object.update()
         
-        self._mock_endless_installer.install_all_packages.assert_called_once_with(self._test_directory)
+        self._mock_endless_installer.install_all_packages.assert_called_once_with()
 
 #    def test_update_updates_the_repositories_downloads_packages_and_installs_them(self):
 #        update_repositories = MagicMock()

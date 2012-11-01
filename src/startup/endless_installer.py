@@ -6,7 +6,6 @@ class EndlessInstaller():
         self._os_util = os_util
         
     def install_all_packages(self, download_directory):
-        self._os_util.execute(["sudo", "dpkg", "-i", 
-                               os.path.join(download_directory, "*")])
+        self._os_util.execute(["sudo", "/usr/bin/endless_install_all_packages.sh"])
 
 

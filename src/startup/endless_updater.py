@@ -1,6 +1,6 @@
 from startup.endless_downloader import EndlessDownloader
 from startup.endless_installer import EndlessInstaller
-
+import os
 
 class EndlessUpdater():
     def __init__(self, download_directory="/tmp/endless-os-install-directory/", 
@@ -11,6 +11,8 @@ class EndlessUpdater():
         self._endless_installer = endless_installer
     
     def update(self):
+        os.environ["ENDLESS_DOWNLOAD_DIRECTORY"] = self._download_directory
+        
         self._endless_downloader.update_repositories()
         self._endless_downloader.download_all_packages(self._download_directory)
-        self._endless_installer.install_all_packages(self._download_directory)
+        self._endless_installer.install_all_packages()
