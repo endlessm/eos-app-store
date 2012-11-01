@@ -49,13 +49,12 @@ class TransparentWindow(gtk.Window):
             cr.set_source_pixbuf(pixbuf, 0, 0)
 
             cr.paint()
-        else:        
+        else:
             x, y, w, h = self.get_allocation()
             
             screen_height = self._background.get_height()
             
-            w_h = int(self.working_area/2)
-            offset = int((screen_height - self.working_area)/2)
+            offset = int(round((screen_height - self.working_area)/2))
             pixbuf = self._background.subpixbuf(x, screen_height-h-offset, w, h)
             cr.set_source_pixbuf(pixbuf, 0, 0)
             
