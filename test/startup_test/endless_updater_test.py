@@ -10,9 +10,11 @@ class EndlessUpdaterTestCase(unittest.TestCase):
     def setUp(self):
         self._mock_endless_downloader = Mock()
         self._mock_endless_installer = Mock()
+        self._mock_install_notifier = Mock()
         self._test_object = EndlessUpdater(self._test_directory, 
                                            self._mock_endless_downloader, 
-                                           self._mock_endless_installer)
+                                           self._mock_endless_installer,
+                                           self._mock_install_notifier)
         
         self._orig_os_environ = os.environ
     
@@ -25,7 +27,6 @@ class EndlessUpdaterTestCase(unittest.TestCase):
         self._test_object.update()
 
         self.assertEquals(self._test_directory, os.environ["ENDLESS_DOWNLOAD_DIRECTORY"])
-        
     
     def test_update_first_updates_the_repositories(self):
         self._mock_endless_downloader.update_repositories = Mock()
@@ -41,31 +42,20 @@ class EndlessUpdaterTestCase(unittest.TestCase):
         
         self._mock_endless_downloader.download_all_packages.assert_called_once_with(self._test_directory)
 
-    def test_update_then_installs_all_the_downloaded_packages(self):
+    def test_if_user_is_ok_with_doing_updates_then_install_all_the_downloaded_packages(self):
+        self._mock_install_notifier.notify_user = Mock(return_value=True)
         self._mock_endless_installer.install_all_packages = Mock()
         
         self._test_object.update()
         
         self._mock_endless_installer.install_all_packages.assert_called_once_with()
 
-#    def test_update_updates_the_repositories_downloads_packages_and_installs_them(self):
-#        update_repositories = MagicMock()
-#        download_all_packages = MagicMock()
-#        install_all_packages = MagicMock()
-#        
-#        self._mock_endless_downloader.update_repositories = update_repositories
-#        self._mock_endless_downloader.download_all_packages = download_all_packages
-#        self._mock_endless_installer.install_all_packages = install_all_packages
-#
-#        parent_mock = MagicMock()
-#        parent_mock.update_repositories = update_repositories
-#        parent_mock.download_all_packages = download_all_packages
-#        parent_mock.install_all_packages = install_all_packages
-#        
-#        self._test_object.update()
-#        
-#        expected_calls = [call.update_repositories(), 
-#                          call.download_all_packages(self._test_directory), 
-#                          call.install_all_packages(self._test_directory)]
-#        
-#        self.assertEquals(expected_calls, parent_mock.mock_calls)
+    def test_if_user_is_not_ok_with_doing_updates_then_dont_install_all_the_downloaded_packages(self):
+        self._mock_install_notifier.notify_user = Mock(return_value=False)
+        self._mock_endless_installer.install_all_packages = Mock()
+        
+        self._test_object.update()
+        
+        self.assertFalse(self._mock_endless_installer.install_all_packages.called, 
+                         "Should not have installed all packages")
+
