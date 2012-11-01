@@ -124,7 +124,10 @@ class EndlessDesktopView(gtk.Window):
         self.popup.add(website_menu) 
         self.popup.add(folder_menu)
         
-    def refresh(self, shortcuts):
+    def refresh(self, shortcuts, force=False):
+        
+        if force:
+           self._app_shortcuts = {}
         self._folder_shortcuts = {}
         for shortcut in shortcuts:
 
@@ -263,11 +266,10 @@ class EndlessDesktopView(gtk.Window):
         
         #Adding AddRemove icon at the end of row
         if last_row:
-            pass
-#add_remove = AddRemoveShortcut(callback=self.show_add_dialogue)
-#add_remove.connect("application-shortcut-remove", self._delete_shortcuts)
-#row.pack_start(add_remove, False, False, 0)
-#add_remove.show()
+            add_remove = AddRemoveShortcut(callback=self.show_add_dialogue)
+            add_remove.connect("application-shortcut-remove", self._delete_shortcuts)
+            row.pack_start(add_remove, False, False, 0)
+            add_remove.show()
         
         return row
         
@@ -315,8 +317,6 @@ class EndlessDesktopView(gtk.Window):
         
     def _delete_shortcuts(self, widget, sc_deleted):
         self._presenter.delete_shortcut(sc_deleted)
-        self._shorcuts_buffer.remove(sc_deleted)
-        self._redraw(self._shorcuts_buffer)
     
     def main(self):
         gobject.threads_init()
