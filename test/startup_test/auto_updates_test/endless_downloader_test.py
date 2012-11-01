@@ -30,7 +30,7 @@ class EndlessDownloaderTestCase(unittest.TestCase):
         self._test_object.download_all_packages(self._test_directory)
         
         self._mock_os_util.execute.assert_called_once_with(
-                                   ["sudo", "/usr/bin/endless_install_all_packages.sh"])
+                                   ["sudo", "/usr/bin/endless_download_all_packages.sh"])
 
     def test_download_all_packages_will_remove_any_file_that_is_in_the_given_directory(self):
         open(os.path.join(self._test_directory, "some_file.txt"), "w").close()

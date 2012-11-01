@@ -8,10 +8,12 @@ class EndlessUpdaterTestCase(unittest.TestCase):
     _test_directory = "this is the test directory"
     
     def setUp(self):
+        self._mock_install_script_executor = Mock()
         self._mock_endless_downloader = Mock()
         self._mock_endless_installer = Mock()
         self._mock_install_notifier = Mock()
-        self._test_object = EndlessUpdater(self._test_directory, 
+        self._test_object = EndlessUpdater(self._mock_install_script_executor,
+                                           self._test_directory,
                                            self._mock_endless_downloader, 
                                            self._mock_endless_installer,
                                            self._mock_install_notifier)
@@ -20,6 +22,15 @@ class EndlessUpdaterTestCase(unittest.TestCase):
     
     def tearDown(self):
         os.environ = self._orig_os_environ
+    
+    def test_pre_and_post_install_scripts_are_executed(self):
+        self._mock_install_script_executor.execute_preinstall_script = Mock()
+        self._mock_install_script_executor.execute_postinstall_script = Mock()
+        
+        self._test_object.update()
+        
+        self._mock_install_script_executor.execute_preinstall_script.assert_called_once_with()
+        self._mock_install_script_executor.execute_postinstall_script.assert_called_once_with()
     
     def test_correct_environment_variable_is_setup(self):
         os.environ = {}
