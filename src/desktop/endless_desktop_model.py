@@ -88,14 +88,39 @@ class EndlessDesktopModel(object):
         return self._preferences_provider.get_default_background()
     
     def delete_shortcut(self, shortcut):
-        all_shortcuts = [item.name() for item in self._app_desktop_datastore.get_all_shortcuts()]
-        for item in all_shortcuts:
-            if item == shortcut:
-                try:
-                    all_shortcuts.remove(item)
-                    self._app_desktop_datastore.set_all_shortcuts_by_name(all_shortcuts)
-                    return True
-                except:
-                    print >> sys.stderr, "delete shortcut failed!"
-                break
+        all_shortcuts = self._app_desktop_datastore.get_all_shortcuts()
+        parent = shortcut.parent()
+        
+        success = False
+        if parent is not None:
+            success = self.delete_from_folder(shortcut, parent)
+        else:
+            if shortcut in all_shortcuts:
+                success = self.delete_from_desktop(shortcut, all_shortcuts)
+            else:
+                print >> sys.stderr, "delete shortcut failed!"
+                
+        if success:
+            try:
+                self._app_desktop_datastore.set_all_shortcuts(all_shortcuts)
+                return True
+            except:
+                print >> sys.stderr, "delete shortcut failed!"
         return False
+        
+    def delete_from_folder(self, shortcut, parent):
+        try:
+            parent.remove_child(shortcut)
+            return True
+        except:
+            print >> sys.stderr, "removing child from folder failed!"
+        return False
+        
+    def delete_from_desktop(self, shortcut, all_shortcuts):
+        try:
+            all_shortcuts.remove(shortcut)
+            return True
+        except:
+            print >> sys.stderr, "no shortcut on desktop!"
+        return False
+        

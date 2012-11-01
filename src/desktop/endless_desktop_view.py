@@ -314,8 +314,6 @@ class EndlessDesktopView(gtk.Window):
         
     def _delete_shortcuts(self, widget, sc_deleted):
         self._presenter.delete_shortcut(sc_deleted)
-        self._shorcuts_buffer.remove(sc_deleted)
-        self._redraw(self._shorcuts_buffer)
     
     def main(self):
         gobject.threads_init()
