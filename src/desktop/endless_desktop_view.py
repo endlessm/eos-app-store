@@ -25,6 +25,7 @@ class EndlessDesktopView(gtk.Window):
     MAX_ICONS_IN_ROW = 7
     HORIZONTAL_SPACING = 60
     VERTICAL_SPACING = 60
+    LABEL_HEIGHT = 10
     _padding = 100
     _app_shortcuts = {}
 
@@ -153,7 +154,7 @@ class EndlessDesktopView(gtk.Window):
         if child:
             child.parent.remove(child)
             
-        icon_container = gtk.VBox(spacing=self.VERTICAL_SPACING)
+        icon_container = gtk.VBox(spacing = self.VERTICAL_SPACING - self.LABEL_HEIGHT)
         icon_container.show()
                 
         items = [self._app_shortcuts[key] for key in icon_data]
@@ -166,6 +167,7 @@ class EndlessDesktopView(gtk.Window):
             number_of_rows += 1
             
         last_row = False
+        row = None
         while index <= number_of_rows:
             row = self._create_row(items[index*step:(index*step+step)], last_row)
             icon_container.add(row)
@@ -238,7 +240,7 @@ class EndlessDesktopView(gtk.Window):
         row = gtk.HBox()
         row.show()
         
-        sep_last = SeparatorShortcut(width=self.HORIZONTAL_SPACING)
+        sep_last = SeparatorShortcut(width=self.HORIZONTAL_SPACING/2)
         sep_last.connect("application-shortcut-move", self._rearrange_shortcuts)
         row.pack_start(sep_last, False, False, 0)
         for item in items:
@@ -257,7 +259,7 @@ class EndlessDesktopView(gtk.Window):
             if item.parent != None:
                 print >> sys.stderr, "Item has parent!", item
             row.pack_start(item, False, False, 0)
-            sep_new = SeparatorShortcut(width=self.HORIZONTAL_SPACING)
+            sep_new = SeparatorShortcut(width=self.HORIZONTAL_SPACING/2)
             sep_new.connect("application-shortcut-move", self._rearrange_shortcuts)
             row.pack_start(sep_new, False, False, 0)
             sep_last.set_right_separator(sep_new)
