@@ -1,5 +1,6 @@
 import unittest
 from mock import Mock #@UnresolvedImport
+import os
 
 from startup.endless_updater import EndlessUpdater
 
@@ -12,6 +13,19 @@ class EndlessUpdaterTestCase(unittest.TestCase):
         self._test_object = EndlessUpdater(self._test_directory, 
                                            self._mock_endless_downloader, 
                                            self._mock_endless_installer)
+        
+        self._orig_os_environ = os.environ
+    
+    def tearDown(self):
+        os.environ = self._orig_os_environ
+    
+    def test_correct_environment_variable_is_setup(self):
+        os.environ = {}
+        
+        self._test_object.update()
+
+        self.assertEquals(self._test_directory, os.environ["ENDLESS_DOWNLOAD_DIRECTORY"])
+        
     
     def test_update_first_updates_the_repositories(self):
         self._mock_endless_downloader.update_repositories = Mock()

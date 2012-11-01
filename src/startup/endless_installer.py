@@ -1,5 +1,4 @@
 from osapps.os_util import OsUtil
-import os.path
 
 class EndlessInstaller():
     def __init__(self, os_util=OsUtil()):
