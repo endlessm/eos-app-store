@@ -21,6 +21,7 @@ class TransparentWindow(gtk.Window):
 
         self.connect("expose-event", self._handle_event)
         self._background = self._desktop_preferences.get_background_pixbuf()
+        self.working_area = self._background.get_height()
         
         self._background = self._background.scale_simple(screen_util.get_width(), screen_util.get_height(),gtk.gdk.INTERP_BILINEAR)
         self.set_app_paintable(True)
@@ -50,17 +51,22 @@ class TransparentWindow(gtk.Window):
             cr.paint()
         else:        
             x, y, w, h = self.get_allocation()
-            pixbuf = self._background.subpixbuf(x, y, w, h)
+            
+            screen_height = self._background.get_height()
+            
+            w_h = int(self.working_area/2)
+            offset = int((screen_height - self.working_area)/2)
+            pixbuf = self._background.subpixbuf(x, screen_height-h-offset, w, h)
             cr.set_source_pixbuf(pixbuf, 0, 0)
             
             gradient = cairo.LinearGradient(0, 0, 0, h)
             gradient.add_color_stop_rgba(0.005, 255, 255, 255, 0)
-            gradient.add_color_stop_rgba(0.006, 0, 0, 0, 1)
-            gradient.add_color_stop_rgba(0.994, 0, 0, 0, 0)
+            gradient.add_color_stop_rgba(0.006, 0, 0, 0, 0.7)
+            gradient.add_color_stop_rgba(0.994, 0, 0, 0, 0.0)
             gradient.add_color_stop_rgba(0.995, 255, 255, 255, 0)
             cr.mask(gradient)
             cr.fill()
         
-        self.queue_draw()
+        #self.queue_draw()
         
         return False
