@@ -22,6 +22,9 @@ gettext.install('endless_desktop', '/usr/share/locale', unicode=True, names=['ng
 gtk.gdk.threads_init()
 
 class EndlessDesktopView(gtk.Window):
+    MAX_ICONS_IN_ROW = 7
+    HORIZONTAL_SPACING = 60
+    VERTICAL_SPACING = 60
     _padding = 100
     _app_shortcuts = {}
 
@@ -66,7 +69,8 @@ class EndlessDesktopView(gtk.Window):
         self.add(self._desktop)
         self.show_all()
         
-        self._max_icons_in_row = self._calculate_max_icons()
+        #self._max_icons_in_row = self._calculate_max_icons()
+        self._max_icons_in_row = self.MAX_ICONS_IN_ROW
     
         screen = gtk.gdk.Screen() #@UndefinedVariable
         screen.connect('size-changed', lambda s: self._set_background(self.BACKGROUND_NAME))
@@ -149,9 +153,8 @@ class EndlessDesktopView(gtk.Window):
         if child:
             child.parent.remove(child)
             
-        icon_container = gtk.VBox()
+        icon_container = gtk.VBox(spacing=self.VERTICAL_SPACING)
         icon_container.show()
-        icon_container.set_spacing(30)
                 
         items = [self._app_shortcuts[key] for key in icon_data]
         index = 0
@@ -235,7 +238,7 @@ class EndlessDesktopView(gtk.Window):
         row = gtk.HBox()
         row.show()
         
-        sep_last = SeparatorShortcut()
+        sep_last = SeparatorShortcut(width=self.HORIZONTAL_SPACING)
         sep_last.connect("application-shortcut-move", self._rearrange_shortcuts)
         row.pack_start(sep_last, False, False, 0)
         for item in items:
@@ -254,7 +257,7 @@ class EndlessDesktopView(gtk.Window):
             if item.parent != None:
                 print >> sys.stderr, "Item has parent!", item
             row.pack_start(item, False, False, 0)
-            sep_new = SeparatorShortcut()
+            sep_new = SeparatorShortcut(width=self.HORIZONTAL_SPACING)
             sep_new.connect("application-shortcut-move", self._rearrange_shortcuts)
             row.pack_start(sep_new, False, False, 0)
             sep_last.set_right_separator(sep_new)
