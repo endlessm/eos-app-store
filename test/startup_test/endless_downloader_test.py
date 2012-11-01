@@ -52,4 +52,12 @@ class EndlessDownloaderTestCase(unittest.TestCase):
         
         self.assertEquals(0, len(os.listdir(self._test_directory)))
 
+    def test_create_download_directory_if_it_does_not_exist_already(self):
+        shutil.rmtree(self._test_directory, True)
+        
+        self._mock_os_util.execute = Mock()
+        
+        self._test_object.download_all_packages(self._test_directory)
+        
+        self.assertTrue(os.path.isdir(self._test_directory))
 

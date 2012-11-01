@@ -3,7 +3,7 @@ from startup.endless_installer import EndlessInstaller
 
 
 class EndlessUpdater():
-    def __init__(self, download_directory, 
+    def __init__(self, download_directory="/tmp/endless-os-install-directory/", 
                  endless_downloader=EndlessDownloader(), 
                  endless_installer=EndlessInstaller()):
         self._download_directory = download_directory

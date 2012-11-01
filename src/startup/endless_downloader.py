@@ -18,6 +18,9 @@ class EndlessDownloader():
                                 "install", "endless*"])
         
     def _clean_out_download_directory(self, download_directory):
+        if not os.path.exists(download_directory):
+            os.makedirs(download_directory)
+        
         for item in os.listdir(download_directory):
             item_to_delete = os.path.join(download_directory, item)
             if os.path.isdir(item_to_delete):
