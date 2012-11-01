@@ -94,17 +94,21 @@ class DesktopModelTestCase(unittest.TestCase):
         
     def test_delete_shortcut_exists(self):
         self.mock_desktop_locale_datastore.get_all_shortcuts = Mock(return_value=self.available_app_shortcuts)
-        self.assertEqual(self.testObject.delete_shortcut('App 2'), True, 'Delete shortcut which exists FAILED.')
+        app1 = self.available_app_shortcuts[0]
+        self.assertEqual(self.testObject.delete_shortcut(app1), True, 'Delete shortcut which exists FAILED.')
     
     def test_delete_shortcut_does_not_exist(self):
         self.mock_desktop_locale_datastore.get_all_shortcuts = Mock(return_value=self.available_app_shortcuts)
-        self.assertEqual(self.testObject.delete_shortcut('Dummy, non existant App'), False, 'Delete shortcut which does not exist FAILED.')
+        invalid_app = AppShortcut(223, "App 5", "", [])
+        self.assertEqual(self.testObject.delete_shortcut(invalid_app), False, 'Delete shortcut which does not exist FAILED.')
     
     def test_delete_shortcut_exception_handled(self):
         self.mock_desktop_locale_datastore.get_all_shortcuts = Mock(return_value=self.available_app_shortcuts)
-        self.mock_desktop_locale_datastore.set_all_shortcuts_by_name = Mock(side_effect=Exception('Booom!'))
-        #self.mock_desktop_locale_datastore.set_all_shortcuts_by_name()
-        self.assertEqual(self.testObject.delete_shortcut('App 2'), False, 'Delete shortcut, exception handled FAILED.')
+        self.mock_desktop_locale_datastore.set_all_shortcuts = Mock(side_effect=Exception('Booom!'))
+        #self.mock_desktop_locale_datastore.set_all_shortcuts()
+        app1 = self.available_app_shortcuts[0]
+        self.assertEqual(self.testObject.delete_shortcut(app1), False, 'Delete shortcut, exception handled FAILED.')
+        
     def test_relocate_shortcut_invalid_source(self):
         ret = self.testObject.relocate_shortcut(None, 'irrelevant')
         self.assertEqual(ret, False)
