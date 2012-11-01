@@ -3,41 +3,42 @@ from mock import Mock #@UnresolvedImport
 import os
 
 from startup.auto_updates.endless_updater import EndlessUpdater
+from startup.auto_updates import endpoint_provider
 
 class EndlessUpdaterTestCase(unittest.TestCase):
     _test_directory = "this is the test directory"
     
     def setUp(self):
-        self._mock_install_script_executor = Mock()
         self._mock_endless_downloader = Mock()
         self._mock_endless_installer = Mock()
         self._mock_install_notifier = Mock()
-        self._test_object = EndlessUpdater(self._mock_install_script_executor,
-                                           self._test_directory,
+        self._test_object = EndlessUpdater(self._test_directory,
                                            self._mock_endless_downloader, 
                                            self._mock_endless_installer,
                                            self._mock_install_notifier)
         
         self._orig_os_environ = os.environ
+        self._orig_endpoint_provider = endpoint_provider.get_current_apt_endpoint
     
     def tearDown(self):
         os.environ = self._orig_os_environ
+        endpoint_provider.get_current_apt_endpoint = self._orig_endpoint_provider
     
-    def test_pre_and_post_install_scripts_are_executed(self):
-        self._mock_install_script_executor.execute_preinstall_script = Mock()
-        self._mock_install_script_executor.execute_postinstall_script = Mock()
-        
-        self._test_object.update()
-        
-        self._mock_install_script_executor.execute_preinstall_script.assert_called_once_with()
-        self._mock_install_script_executor.execute_postinstall_script.assert_called_once_with()
-    
-    def test_correct_environment_variable_is_setup(self):
+    def test_download_directory_environment_variable_is_setup(self):
         os.environ = {}
         
         self._test_object.update()
 
         self.assertEquals(self._test_directory, os.environ["ENDLESS_DOWNLOAD_DIRECTORY"])
+    
+    def test_endless_endpoint_environment_variable_is_setup(self):
+        os.environ = {}
+        apt_endpoint = "this is the endpoint"
+        endpoint_provider.get_current_apt_endpoint = Mock(return_value=apt_endpoint)
+        
+        self._test_object.update()
+
+        self.assertEquals(apt_endpoint, os.environ["ENDLESS_ENDPOINT"])
     
     def test_update_first_updates_the_repositories(self):
         self._mock_endless_downloader.update_repositories = Mock()
