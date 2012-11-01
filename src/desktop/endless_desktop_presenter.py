@@ -94,4 +94,5 @@ class DesktopPresenter(object):
 
     def delete_shortcut(self, what):
         self._model.delete_shortcut(what)
+        self._view.refresh(self._model.get_shortcuts(force=True))
     
