@@ -2,7 +2,10 @@
 
 /usr/bin/endless-pre-install.sh
 
-dpkg -i $ENDLESS_DOWNLOAD_DIRECTORY/*
+export DEBIAN_FRONTEND=noninteractive
+dpkg -i --force-confnew $ENDLESS_DOWNLOAD_DIRECTORY/*
+
+#FIXME: add auto fix here - kam & mct
 
 /usr/bin/endless-post-install.sh
 

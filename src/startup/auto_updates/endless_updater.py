@@ -12,8 +12,14 @@ class EndlessUpdater():
                  install_notifier=InstallNotifier()):
         self._download_directory = download_directory
         self._endless_downloader = endless_downloader
-        self._endless_installer = endless_installer
         self._install_notifier =install_notifier
+        self._install_notifier.add_listener(InstallNotifier.USER_RESPONSE, 
+                                lambda: self._handle_user_response(install_notifier, endless_installer))
+
+    def _handle_user_response(self, install_notifier, endless_installer):
+        if install_notifier.should_install():
+            endless_installer.install_all_packages()
+
     
     def update(self):
         os.environ["ENDLESS_DOWNLOAD_DIRECTORY"] = self._download_directory
@@ -23,5 +29,5 @@ class EndlessUpdater():
         
         self._endless_downloader.download_all_packages(self._download_directory)
         
-        if self._install_notifier.notify_user():
-            self._endless_installer.install_all_packages()
+        self._install_notifier.notify_user()
+
