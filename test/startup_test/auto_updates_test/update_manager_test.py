@@ -18,7 +18,7 @@ class UpdateManagerTestCase(unittest.TestCase):
     def test_execute_starts_up_thread(self):
         self._test_object.SLEEP_TIME = 1
         self._test_object.execute()
-        time.sleep(2)
+        time.sleep(1)
         self._test_object._done = True
         self._test_object._running_thread.join()
         

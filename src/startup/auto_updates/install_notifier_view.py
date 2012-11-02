@@ -1,13 +1,11 @@
 import gtk
-import gettext
 
 from ui.abstract_notifier import AbstractNotifier
 from ui import glade_ui_elements
 
-gettext.install("endless_desktop", "/usr/share/locale", unicode=True, names=["ngettext"])
-
 class InstallNotifierView(AbstractNotifier):
-    RESPONSE_EVENT = "response_event"
+    RESTART_NOW = "restart.now"
+    RESTART_LATER = "restart.later"
     
     def __init__(self):
         builder = gtk.Builder()
@@ -16,11 +14,21 @@ class InstallNotifierView(AbstractNotifier):
 
         self._window = builder.get_object("dialog_window")
         self._window.set_wmclass("eos-dialog", "Eos-dialog")
-        self._window.connect('response', lambda w, e: self._notify(self.RESPONSE_EVENT))
-
+        
+        self._message_label = builder.get_object("message_label")
+        self._restart_button = builder.get_object("restart_button")
+        self._cancel_button = builder.get_object("restart_later")
+        
+        self._restart_button.connect("released", lambda w: self._notify(self.RESTART_NOW))
+        self._cancel_button.connect("released", lambda w: self._notify(self.RESTART_LATER))
+        
     def display(self):
         self._window.show_all()
 
-    def close_dialog(self):
+    def close(self):
         self._window.destroy()
+        
+    def set_new_version(self, text):
+        formatted_text = "Version {0} of EndlessOS is ready to be installed. After installation, a restart is required.  Would you like to install and restart now?".format(text)
+        self._message_label.set_text(formatted_text)
 

@@ -10,11 +10,8 @@ class LatestVersionProviderTestCase(unittest.TestCase):
         
         content = json.dumps({"version": "1.0.0"})
         
-        mock_response = Mock()
-        mock_response.read = Mock(return_value=content)
-        
         self._mock_web_connection = Mock()
-        self._mock_web_connection.get = Mock(return_value=mock_response)
+        self._mock_web_connection.get = Mock(return_value=content)
         
         self._test_object = LatestVersionProvider(self._mock_web_connection)
         

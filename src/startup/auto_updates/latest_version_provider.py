@@ -13,7 +13,6 @@ class LatestVersionProvider():
     
     def get_latest_version(self):
         response = self._web_connection.get(self._endpoint, self.USERNAME, self.PASSWORD)
-        version_json = response.read()
-        version = json.loads(version_json)
+        version = json.loads(response)
         return version["version"]
     
