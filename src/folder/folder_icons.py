@@ -17,12 +17,13 @@ class FolderIcons(gtk.HBox):
          
     }
     
-    def __init__(self, shortcuts):
+    def __init__(self, shortcuts, spacing=0):
         gtk.HBox.__init__(self)
+        super(FolderIcons, self).__init__(homogeneous=False, spacing=spacing)
         
         for shortcut in shortcuts:
             app_shortcut = ApplicationShortcut(shortcut, False)
-            self.pack_start(app_shortcut, False, False, 30)
+            self.pack_start(app_shortcut, False, False, padding=0)
             app_shortcut.connect(
                 "application-shortcut-activate", 
                 lambda w, app_id, params: self.emit(
