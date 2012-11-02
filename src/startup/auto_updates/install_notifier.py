@@ -17,12 +17,12 @@ class InstallNotifier(AbstractNotifier):
         return self._model.should_install()
 
 
-def stupid_head(notifier):
-    print notifier.should_install()
 
 if __name__ == "__main__":
     import gtk
     notifier = InstallNotifier()
+    def stupid_head(notifier):
+        print notifier.should_install()
     notifier.add_listener(InstallNotifier.USER_RESPONSE, lambda: stupid_head(notifier))
     notifier.notify_user()
     gtk.main()
