@@ -3,7 +3,7 @@ from startup.auto_updates.update_checker import UpdateChecker
 import time
 
 class UpdateManager(object):
-    SLEEP_TIME = 60 * 60 * 24
+    SLEEP_TIME = 60 * 60
     
     def __init__(self, update_checker=UpdateChecker()):
         self._update_checker = update_checker
