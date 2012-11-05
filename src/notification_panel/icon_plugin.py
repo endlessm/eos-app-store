@@ -7,7 +7,6 @@ from notification_panel_config import NotificationPanelConfig
 from notification_plugin import NotificationPlugin
 
 class IconPlugin(NotificationPlugin):
-    
     def __init__(self, icon_size, icon_names, command, init_index = 0):
         super(IconPlugin, self).__init__(command)
         
