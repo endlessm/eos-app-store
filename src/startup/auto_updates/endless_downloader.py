@@ -4,9 +4,10 @@ import shutil
 
 from osapps.web_connection import WebConnection
 from startup.auto_updates import endpoint_provider
+from startup.auto_updates.file_synchronizer import FileSynchronizer
 
 class EndlessDownloader():
-    def __init__(self, web_connection=WebConnection(), file_synchronizer=None):
+    def __init__(self, web_connection=WebConnection(), file_synchronizer=FileSynchronizer()):
 		 self._web_connection = web_connection
 		 self._file_synchronizer = file_synchronizer
     
