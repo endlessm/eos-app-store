@@ -2,22 +2,23 @@ from osapps.os_util import OsUtil
 import os
 import shutil
 
+from osapps.web_connection import WebConnection
+from startup.auto_updates import endpoint_provider
+
 class EndlessDownloader():
-    def __init__(self, os_util=OsUtil()):
-        self._os_util = os_util
+    def __init__(self, web_connection=WebConnection(), file_synchronizer=None):
+		 self._web_connection = web_connection
+		 self._file_synchronizer = file_synchronizer
     
     def download_all_packages(self, download_directory):
-        self._clean_out_download_directory(download_directory)
-        
-        self._os_util.execute(["sudo", "/usr/bin/endless_download_all_packages.sh"])
-        
-    def _clean_out_download_directory(self, download_directory):
-        if not os.path.exists(download_directory):
-            os.makedirs(download_directory)
-        
-        for item in os.listdir(download_directory):
-            item_to_delete = os.path.join(download_directory, item)
-            if os.path.isdir(item_to_delete):
-                shutil.rmtree(item_to_delete, False)
-            else:
-                os.unlink(item_to_delete)
+        with open(os.path.join(download_directory, "files.txt"), "r") as f:
+            local_file_list = f.read()
+        endpoint = endpoint_provider.get_current_apt_endpoint()
+
+        remote_file_list = self._web_connection.get(endpoint + "/files.txt")
+        files_to_download = self._file_synchronizer.files_to_download(local_file_list, remote_file_list)
+        for remote_file in files_to_download:
+            file_content = self._web_connection.get(endpoint + "/" + remote_file)
+            with open(os.path.join(download_directory, remote_file), "w") as local_file:
+                local_file.write(file_content)
+
