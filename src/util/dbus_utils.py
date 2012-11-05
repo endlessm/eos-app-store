@@ -4,7 +4,6 @@ import re
 
 from eos_log import log
 
-# TODO test me
 class DbusUtils:
     HAL_DBUS_PATH = 'org.freedesktop.Hal'
     HAL_DBUS_MANAGER_URI = '/org/freedesktop/Hal/Manager'
@@ -25,7 +24,7 @@ class DbusUtils:
     
     def get_system_bus(self):
         return DbusUtils._system_bus
-
+    
     def register_property_listener(self, device_type, callback):
         interface = self.get_device_interface(device_type)
         interface.connect_to_signal(self.DBUS_PROPERTY_MODIFIED, callback)
@@ -50,7 +49,7 @@ class DbusUtils:
         except Exception as e:
             log.error("Device property retrieval error (" + device_type + ":" + property_name + ")", e)  
             return None
-        
+    
     def get_device_interface(self, device_type):
         devices_of_type = self._get_devices_of_type(device_type)
         if len(devices_of_type):

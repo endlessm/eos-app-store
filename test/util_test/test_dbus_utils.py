@@ -9,6 +9,10 @@ class DbusUtilsTestCase(unittest.TestCase):
     # outside of setUp (which is called for each test)
     _mock_system_bus = Mock()
     
+    @classmethod
+    def setUpClass(cls):
+        DbusUtils._system_bus = None
+    
     def setUp(self):
         self._mock_data_bus = Mock()
         self._mock_data_bus.SystemBus = Mock(return_value=self._mock_system_bus)
@@ -27,14 +31,16 @@ class DbusUtilsTestCase(unittest.TestCase):
                 return self._mock_hal_manager
             elif path == DbusUtils.HAL_DBUS_PATH and device == self._mock_device:
                 return self._mock_device_object
+
         self._mock_system_bus.get_object = get_object
-        
         self._mock_device_interface = Mock()
+        
         def get_interface(device_object, device_path):
             if device_object == self._mock_hal_manager and device_path == DbusUtils.HAL_DBUS_MANAGER_PATH:
                 return self._mock_hal_manager_interface
             elif device_object == self._mock_device_object and device_path == DbusUtils.HAL_DBUS_DEVICE_PATH:
                 return self._mock_device_interface
+            
         self._mock_data_bus.Interface = get_interface
         
     def test_get_system_bus_always_returns_static_system_bus(self):
@@ -44,8 +50,6 @@ class DbusUtilsTestCase(unittest.TestCase):
         self.assertEquals(DbusUtils(self._mock_data_bus).get_system_bus(), self._mock_system_bus)
         self.assertEquals(DbusUtils(self._mock_data_bus).get_system_bus(), self._mock_system_bus)
 
-    # TODO test reg prop listener 
-    
     def test_add_signal_callback_adds_signal_receiver_to_bus(self):
         def mock_add_signal_receiver(callback_wrapper, dbus_interface):
             self._callback_wrapper = callback_wrapper
@@ -96,5 +100,37 @@ class DbusUtilsTestCase(unittest.TestCase):
         self._mock_hal_manager_interface.FindDeviceByCapability = Mock(return_value = mock_devices)
         
         self.assertEquals(self._test_object.get_device_interface(self._mock_device_type), self._mock_device_interface)
+        self._mock_hal_manager_interface.FindDeviceByCapability.assert_called_once_with(self._mock_device_type, dbus_interface=DbusUtils.HAL_DBUS_MANAGER_PATH)
+        
+    def test_get_device_property_returns_none_if_we_get_an_exception(self):
+        self._mock_system_bus.get_object = Mock(side_effect=Exception())
+        
+        property_value = self._test_object.get_device_property('asd', 'def')
+        
+        self.assertIsNone(property_value)
+            
+    def test_get_device_property_returns_device_property(self):
+        mock_devices = [self._mock_device]
+        expected_property_value = Mock()
+        self._mock_hal_manager_interface.FindDeviceByCapability = Mock(return_value = mock_devices)
+        self._mock_device_interface.GetProperty = Mock(return_value = expected_property_value)
+        
+        property_name = Mock()
+        property_value = self._test_object.get_device_property(self._mock_device_type, property_name)
+
+        self.assertEquals(expected_property_value, property_value)
+        
+        self._mock_device_interface.GetProperty.assert_called_once_with(property_name)
+        self._mock_hal_manager_interface.FindDeviceByCapability.assert_called_once_with(self._mock_device_type, dbus_interface=DbusUtils.HAL_DBUS_MANAGER_PATH)
+        
+    def test_register_property_listener_connects_to_change_signal(self):
+        mock_devices = [self._mock_device]
+        self._mock_hal_manager_interface.FindDeviceByCapability = Mock(return_value = mock_devices)
+        
+        callback = Mock()
+        self._test_object.register_property_listener(self._mock_device_type, callback)
+        
+        self._mock_device_interface.connect_to_signal.assert_called_once_with(DbusUtils.DBUS_PROPERTY_MODIFIED, callback)
+        
         self._mock_hal_manager_interface.FindDeviceByCapability.assert_called_once_with(self._mock_device_type, dbus_interface=DbusUtils.HAL_DBUS_MANAGER_PATH)
         
