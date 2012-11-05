@@ -39,12 +39,7 @@ class DbusUtils:
         self.get_system_bus().add_signal_receiver(callback_wrapper, dbus_interface=DbusUtils.HAL_DBUS_MANAGER_PATH)
         
     def has_device_of_type(self, device_type):
-        hal_manager = self.get_system_bus().get_object(DbusUtils.HAL_DBUS_PATH, DbusUtils.HAL_DBUS_MANAGER_URI)
-        hal_manager_interface = self._data_bus.Interface(hal_manager, DbusUtils.HAL_DBUS_MANAGER_PATH)
-        
-        devices = hal_manager_interface.FindDeviceByCapability(device_type, dbus_interface=DbusUtils.HAL_DBUS_MANAGER_PATH)
-        
-        if len(devices):
+        if len(self._get_devices_of_type(device_type)):
             return True
         else:
             return False
@@ -57,11 +52,13 @@ class DbusUtils:
             return None
         
     def get_device_interface(self, device_type):
-        hal_manager = self.get_system_bus().get_object(DbusUtils.HAL_DBUS_PATH, DbusUtils.HAL_DBUS_MANAGER_URI)
-        hal_manager_interface = self._data_bus.Interface(hal_manager, DbusUtils.HAL_DBUS_MANAGER_PATH)
-        
-        devices_of_type = hal_manager_interface.FindDeviceByCapability(device_type, dbus_interface=self.HAL_DBUS_MANAGER_PATH)
+        devices_of_type = self._get_devices_of_type(device_type)
         if len(devices_of_type):
             primary_device = devices_of_type[0]
             device_object = self.get_system_bus().get_object(self.HAL_DBUS_PATH, primary_device)
             return self._data_bus.Interface(device_object, self.HAL_DBUS_DEVICE_PATH)
+        
+    def _get_devices_of_type(self, device_type):
+        hal_manager = self.get_system_bus().get_object(DbusUtils.HAL_DBUS_PATH, DbusUtils.HAL_DBUS_MANAGER_URI)
+        hal_manager_interface = self._data_bus.Interface(hal_manager, DbusUtils.HAL_DBUS_MANAGER_PATH)
+        return hal_manager_interface.FindDeviceByCapability(device_type, dbus_interface=DbusUtils.HAL_DBUS_MANAGER_PATH)
