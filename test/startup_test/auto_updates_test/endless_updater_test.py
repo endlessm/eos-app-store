@@ -41,13 +41,6 @@ class EndlessUpdaterTestCase(unittest.TestCase):
 
         self.assertEquals(apt_endpoint, os.environ["ENDLESS_ENDPOINT"])
     
-    def test_update_first_updates_the_repositories(self):
-        self._mock_endless_downloader.update_repositories = Mock()
-        
-        self._test_object.update()
-        
-        self._mock_endless_downloader.update_repositories.assert_called_once_with()
-        
     def test_update_then_downloads_all_packages(self):
         self._mock_endless_downloader.download_all_packages = Mock()
         

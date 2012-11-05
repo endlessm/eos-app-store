@@ -15,15 +15,6 @@ class EndlessDownloaderTestCase(unittest.TestCase):
         self._mock_os_util = Mock()
         self._test_object = EndlessDownloader(self._mock_os_util)
 
-    def test_update_repositories_will_use_apt_get_to_update_all_repositories(self):
-        self._mock_os_util.execute = Mock()
-        
-        self._test_object.update_repositories()
-        
-        self._mock_os_util.execute.assert_called_once_with(
-                                   ["sudo", "/usr/bin/endless_update_repositories.sh"])
-
-
     def test_download_all_packages_will_use_apt_get_to_download_all_files_to_the_given_directory(self):
         self._mock_os_util.execute = Mock()
         

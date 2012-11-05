@@ -6,9 +6,6 @@ class EndlessDownloader():
     def __init__(self, os_util=OsUtil()):
         self._os_util = os_util
     
-    def update_repositories(self):
-        self._os_util.execute(["sudo", "/usr/bin/endless_update_repositories.sh"])
-    
     def download_all_packages(self, download_directory):
         self._clean_out_download_directory(download_directory)
         
