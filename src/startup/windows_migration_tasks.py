@@ -1,5 +1,4 @@
 import os
-from subprocess import Popen, PIPE
 from osapps.home_path_provider import HomePathProvider
 
 class WindowsMigrationTasks:
@@ -9,12 +8,17 @@ class WindowsMigrationTasks:
     def __init__(self, home_path_provider=HomePathProvider()):
         # For now, support only English and Portuguese
         # Note: 'Documents and Settings' is not internationalized on Portuguese Win XP
-        self._documents_and_settings = ['Documents and Settings']
+        # Note: It appears that the Portuguese capitalization is 'Minhas imagens' rather than 'Minhas Imagens'
+        # For now, let's be paranoid and check for either word starting with lower case in Portuguese
+        # We expect 'Documents and Settings' to be the correct capitalization, but we'll be paranoid about it, too
+        # Down the road, we may want to handle this differently, perhaps parsing the Windows registry
+        # so that any language would be supported
+        self._documents_and_settings = ['Documents and Settings', 'Documents and settings', 'documents and settings']
         self._users = ['Users', 'Usu\xc3\xa1rios']
-        self._xp_pic_dirs = ['My Pictures', 'Minhas Imagens']
-        self._xp_video_dirs = ['My Videos', 'Meus V\xc3\xaddeos']
-        self._xp_music_dirs = ['My Music', 'Minhas M\xc3\xbasicas']
-        self._xp_docs_dirs = ['My Documents', 'Meus Documentos']
+        self._xp_pic_dirs = ['My Pictures', 'Minhas Imagens', 'Minhas imagens', 'minhas imagens']
+        self._xp_video_dirs = ['My Videos', 'Meus V\xc3\xaddeos', 'Meus v\xc3\xaddeos', 'meus v\xc3\xaddeos']
+        self._xp_music_dirs = ['My Music', 'Minhas M\xc3\xbasicas', 'Minhas m\xc3\xbasicas', 'minhas m\xc3\xbasicas']
+        self._xp_docs_dirs = ['My Documents', 'Meus Documentos', 'Meus documentos', 'meus documentos']
         self._w7_docs_dirs = ['Documents', 'Documentos']
         self._w7_pic_dirs = ['Pictures', 'Imagens']
         self._w7_video_dirs = ['Videos', 'V\xc3\xaddeos']
