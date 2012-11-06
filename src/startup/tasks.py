@@ -7,30 +7,30 @@ from startup.delete_desktop_state_task import DeleteDesktopStateTask
 from eos_log import log
 
 class Tasks():
-	TASK_PLUGINS = [
-				DeleteDesktopStateTask, 
-				ShotwellTasks, 
-				BeatboxTasks,
-				WindowsMigrationTasks,
-				]
-	
-	def perform_startup_tasks(self):
-		if self._is_initial_startup():
-			for task in self.TASK_PLUGINS:
-				try:
-					task().execute()
-				except Exception as e:
-					log.error("An error ocurred while executing " + task.__name__, e)
+    TASK_PLUGINS = [
+                DeleteDesktopStateTask,
+                ShotwellTasks,
+                BeatboxTasks,
+                WindowsMigrationTasks,
+                ]
 
-			self._create_initialized_file()
+    def perform_startup_tasks(self):
+        if self._is_initial_startup():
+            for task in self.TASK_PLUGINS:
+                try:
+                    task().execute()
+                except Exception as e:
+                    log.error("An error ocurred while executing " + task.__name__, e)
 
-	def _is_initial_startup(self):
-		return not os.path.exists(os.path.expanduser("~/.endlessm/.initialized"))
+            self._create_initialized_file()
 
-	def _create_initialized_file(self):
-		preferences_folder = os.path.expanduser("~/.endlessm")
-		
-		if not os.path.exists(preferences_folder):
-			os.makedirs(preferences_folder)
-			
-		open(os.path.expanduser(os.path.join(preferences_folder, ".initialized")), "w").close()
+    def _is_initial_startup(self):
+        return not os.path.exists(os.path.expanduser("~/.endlessm/.initialized"))
+
+    def _create_initialized_file(self):
+        preferences_folder = os.path.expanduser("~/.endlessm")
+
+        if not os.path.exists(preferences_folder):
+            os.makedirs(preferences_folder)
+
+        open(os.path.expanduser(os.path.join(preferences_folder, ".initialized")), "w").close()
