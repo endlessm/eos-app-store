@@ -25,6 +25,18 @@ class EndlessDownloaderTestCase(unittest.TestCase):
     def tearDown(self):
         endpoint_provider = self._orig_endpoint_provider
 
+    def test_remote_file_list_is_saved_as_new_current_files_list(self):
+        remote_file_content = "this is the remote file content"
+        self._mock_web_connection.get = Mock(return_value=remote_file_content)
+        self._mock_file_synchronizer.files_to_download = Mock(return_value=[])
+
+        self._test_object.download_all_packages(self._test_directory)
+
+        with open(os.path.join(self._test_directory, "files.txt"), "r") as f:
+            local_file_content = f.read()
+
+        self.assertEquals(remote_file_content, local_file_content)
+
     def test_give_files_file_to_file_synchronizer(self):
         remote_file_content = "this is the remote file content"
         local_file_content = "this is the local file content"
@@ -66,6 +78,8 @@ class EndlessDownloaderTestCase(unittest.TestCase):
                 return "file 2 content"
             elif args[0] == endpoint + "/file3":
                 return "file 3 content"
+            elif args[0] == endpoint + "/files.txt":
+                return "list of files content"
         self._mock_web_connection.get = Mock(side_effect=side_effect)
 
         self._test_object.download_all_packages(self._test_directory)

@@ -23,3 +23,6 @@ class EndlessDownloader():
             with open(os.path.join(download_directory, remote_file), "w") as local_file:
                 local_file.write(file_content)
 
+        with open(os.path.join(download_directory, "files.txt"), "w") as f:
+            f.write(remote_file_list)
+
