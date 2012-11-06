@@ -227,10 +227,8 @@ class WindowsMigrationTasksTestCase(unittest.TestCase):
         
         self._test_object.execute()
     
-        self._test_object.import_mounted_directory.assert_has_calls([ 
-                                                                     call(full_path1), 
-                                                                     call(full_path2) 
-                                                                     ])
+        for expected_call in [ call(full_path1), call(full_path2) ]:
+            assert expected_call in self._test_object.import_mounted_directory.call_args_list
         self.assertEqual(2, self._test_object.import_mounted_directory.call_count)
     
     def test_execution_not_blow_up_if_theres_no_mount_directory(self):
