@@ -64,3 +64,17 @@ class UpdateManagerTestCase(unittest.TestCase):
         
         log.error.assert_called_once_with("An error occurred during the check for updates", exception)
 
+    def test_(self):
+        def side_effect():
+            self._mock_check_for_updates_calls += 1
+            if self._mock_check_for_updates_calls == 1:
+                os.path.exists(UpdateManager.CURRENTLY_CHECKING_FOR_UPDATES)
+        self._mock_update_checker.check_for_updates = Mock(side_effect=side_effect)
+
+        self._test_object.SLEEP_TIME = 0
+        self._test_object.execute()
+        time.sleep(.1)
+        self._test_object._done = True
+        self._test_object._running_thread.join()
+        
+        
