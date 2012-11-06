@@ -6,6 +6,6 @@ class EndlessInstaller():
         
     def install_all_packages(self, package_directory):
         self._os_util.execute(
-                            ["sudo", "dpkg", "-i", "--force-confnew", package_directory + "/*"])
+                            ["sudo", "/usr/bin/endless_install_all_packages.sh", package_directory])
 
 

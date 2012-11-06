@@ -15,5 +15,5 @@ class EndlessInstallerTestCase(unittest.TestCase):
         self._test_object.install_all_packages(directory)
         
         self._mock_os_util.execute.assert_called_once_with(
-                            ["sudo", "dpkg", "-i", "--force-confnew", directory + "/*"])
+                            ["sudo", "/usr/bin/endless_install_all_packages.sh", directory])
 
