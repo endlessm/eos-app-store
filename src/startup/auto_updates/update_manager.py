@@ -5,7 +5,7 @@ from eos_log import log
 from startup.auto_updates.update_checker import UpdateChecker
 
 class UpdateManager(object):
-    SLEEP_TIME = 60 * 60
+    SLEEP_TIME = 60 * 60 # One hour
     
     def __init__(self, update_checker=UpdateChecker()):
         self._update_checker = update_checker

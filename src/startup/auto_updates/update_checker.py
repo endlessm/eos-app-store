@@ -14,10 +14,10 @@ class UpdateChecker():
             self._endless_updater.update()
             
     def _needs_update(self):
-        version1 = self._latest_version_provider.get_latest_version()
-        version2 = self._os_util.get_version()
+        remote_version = self._latest_version_provider.get_latest_version()
+        local_version = self._os_util.get_version()
         
-        return cmp(self._normalize(version1), self._normalize(version2)) > 0
+        return cmp(self._normalize(remote_version), self._normalize(local_version)) > 0
 
     def _normalize(self, v):
         return [int(x) for x in re.sub(r'(\.0+)*$','', v).split(".")]

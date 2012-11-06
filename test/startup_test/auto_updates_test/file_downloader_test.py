@@ -1,7 +1,7 @@
 import unittest
 import md5
 
-from mock import Mock
+from mock import Mock #@UnresolvedImport
 from uuid import uuid4
 
 from startup.auto_updates.file_downloader import FileDownloader
