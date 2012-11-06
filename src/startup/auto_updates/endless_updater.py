@@ -18,13 +18,10 @@ class EndlessUpdater():
 
     def _handle_user_response(self, install_notifier, endless_installer):
         if install_notifier.should_install():
-            endless_installer.install_all_packages()
+            endless_installer.install_all_packages(self._download_directory)
 
     
     def update(self):
-        os.environ["ENDLESS_DOWNLOAD_DIRECTORY"] = self._download_directory
-        os.environ["ENDLESS_ENDPOINT"] = endpoint_provider.get_current_apt_endpoint()
-        
         self._endless_downloader.download_all_packages(self._download_directory)
         
         self._install_notifier.notify_user()
