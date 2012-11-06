@@ -14,6 +14,7 @@ from removal_module.removal_confirmation_popup_window import RemovalConfirmation
 from shortcut.folder_shortcut import FolderShortcut
 from shortcut.separator_shortcut import SeparatorShortcut
 from shortcut.add_remove_shortcut import AddRemoveShortcut
+from desktop_page.desktop_page import DesktopPage
 from folder.folder_window import OpenFolderWindow
 from folder.folder_window import FULL_FOLDER_ITEMS_COUNT
 from notification_panel.notification_panel import NotificationPanel
@@ -41,7 +42,7 @@ class EndlessDesktopView(gtk.Window):
         self.add_events(gtk.gdk.BUTTON_PRESS_MASK)
         self.connect('button-press-event', self.unfocus_widget)
         self.connect('destroy', lambda w: gtk.main_quit())
-
+        
         # The following prevents propagation of signals that close
         # the dektop (<Alt>F4)
         self.connect('delete-event', lambda w, e: True)
@@ -52,38 +53,46 @@ class EndlessDesktopView(gtk.Window):
         
         # -----------WORKSPACE-----------
         
-        self._align = gtk.Alignment(0.5, 0.5, 0, 0)
+        self._align = gtk.Alignment(1.0, 1.0, 1.0, 1.0)
+        #self._align = gtk.HBox()
         
         self._taskbar_panel = TaskbarPanel(width)
         self._taskbar_panel.connect('feedback-clicked', lambda w: self._feedback_icon_clicked_callback())
-                    
+        
         self._notification_panel = NotificationPanel(self)
 
         taskbar_alignment = gtk.Alignment(0.5, 0.5, 1.0, 1.0)
         taskbar_alignment.add(self._taskbar_panel)
         
         # Main window layout
-        self._desktop = gtk.VBox(False,2)
-        self._desktop.pack_start(self._notification_panel, False, True, 0)
-        self._desktop.pack_start(self._align, True, False, 0)
-        self._desktop.pack_end(taskbar_alignment, False, True, 0)
+        self._desktop = gtk.VBox(False, 2)
+        self._desktop.pack_start(self._notification_panel, False, False, 0)
+        
+        # btn = gtk.Button()
+        # btn.modify_bg(gtk.STATE_NORMAL, gtk.gdk.Color(35,50000,1000))
+        # btn.show()
+        # self._desktop.pack_start(btn, True, False, 0)
+        
+        self._desktop.pack_start(self._align, True, True, 0)
+        self._desktop.pack_end(taskbar_alignment, False, False, 0)
         
         self.add(self._desktop)
         self.show_all()
         
         #self._max_icons_in_row = self._calculate_max_icons()
         self._max_icons_in_row = self.MAX_ICONS_IN_ROW
+        self._max_rows_in_page = 4
     
         screen = gtk.gdk.Screen() #@UndefinedVariable
         screen.connect('size-changed', lambda s: self._set_background(self.BACKGROUND_NAME))
-    
+        
     def unfocus_widget(self, widget, event):
         widget.set_focus(None)
         self.close_folder_window()
         self._notification_panel.close_settings_plugin_window()
 
     def set_presenter(self, presenter):
-        self._presenter = presenter        
+        self._presenter = presenter
         self._taskbar_panel.connect('launch-search', lambda w, s: self._presenter.launch_search(s))
 
     def get_presenter(self):
@@ -104,7 +113,7 @@ class EndlessDesktopView(gtk.Window):
         del mask
         
         self.window.invalidate_rect((0, 0, width, height), False)
- 
+
     def populate_popups(self, all_applications):
         self.popup = gtk.Menu()
         apps_menu = gtk.MenuItem(_("Apps"))
@@ -147,37 +156,48 @@ class EndlessDesktopView(gtk.Window):
         self._redraw(self._shorcuts_buffer)
                 
         self._align.show()
+        
+    def _page_change_callback(self):
+        print '_page_change_callback'
+        self._redraw(self._shorcuts_buffer)
 
     def _redraw(self, icon_data):
         self._remove_all()
+        
+        # childrens = self._align.get_children()
+        # for ch in childrens:
+            # self._align.remove(ch)
         
         child = self._align.get_child()
         if child:
             child.parent.remove(child)
             
-        icon_container = gtk.VBox(spacing = self.VERTICAL_SPACING - self.LABEL_HEIGHT)
-        icon_container.show()
-                
         items = [self._app_shortcuts[key] for key in icon_data]
-        index = 0
-        step = int(self._max_icons_in_row)
-        
-        number_of_rows = int(math.ceil(len(items)/step))
-        
-        if number_of_rows%step == 0:
-            number_of_rows += 1
+        DesktopPage.calc_pages(
+            items, 
+            create_row_callback = self._create_row, 
+            reload_callback = self._page_change_callback, 
+            max_items_in_row = self._max_icons_in_row, 
+            max_rows_in_page = self._max_rows_in_page
+            )
             
-        last_row = False
-        row = None
-        while index <= number_of_rows:
-            row = self._create_row(items[index*step:(index*step+step)], last_row)
-            icon_container.add(row)
-            index += 1
-            if index == number_of_rows:
-                last_row = True
+        desk_page = DesktopPage.get_current_page()
+        desk_page.show()
+        #desk_page.set_spacing(30)
         
-        self._align.add(icon_container)        
+        # wraper = gtk.HBox()
+        # wraper.pack_start(desk_page)
+        # wraper.show()
+        
+        btn = gtk.Button()
+        btn.modify_bg(gtk.STATE_NORMAL, gtk.gdk.Color(35,238,1000))
+        btn.show()
+        #self._align.add(btn)
+        #self._align.add(wraper)
+        self._align.add(desk_page)
+        desk_page.show()
         self._align.show()
+        print 'align allocation', self._align.allocation.width
         
     def _add_icon_clicked_callback(self, widget, event):
         self.popup.show_all()
