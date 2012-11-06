@@ -57,3 +57,5 @@ class BeatboxTasksTest(unittest.TestCase):
 
         self._mock_copy.assert_called_once_with("/tmp/default_music/test.music", os.path.join(music_files_directory, "test.music"))
 
+    def test_default_music_directory(self):
+        self.assertEquals("/usr/share/endlesm/default_music", BeatboxTasks(Mock(),Mock())._default_music_directory())

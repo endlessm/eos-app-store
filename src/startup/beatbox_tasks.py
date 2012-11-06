@@ -14,7 +14,7 @@ class BeatboxTasks():
 
         self._os_util.execute(["gsettings", "set", "net.launchpad.beatbox.settings", "music-folder", music_folder])
         for path in glob.iglob(self._default_music_directory()):
-			      shutil.copy2(path, os.path.join(music_folder, os.path.basename(path)))
+            shutil.copy2(path, os.path.join(music_folder, os.path.basename(path)))
 
     def _default_music_directory(self):
-        pass
+        return "/usr/share/endlesm/default_music"
