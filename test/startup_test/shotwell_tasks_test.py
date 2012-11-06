@@ -18,7 +18,7 @@ class TasksTest(unittest.TestCase):
 		self._mock_home_path_provider.get_user_directory = Mock(return_value="")
 		self._mock_os_util = Mock()
 		self._mock_os_util.execute = Mock()
-		
+
 		self._test_object = ShotwellTasks(self._mock_home_path_provider, self._mock_os_util)
 		shutil.rmtree("/tmp/default_image", True)
 		os.makedirs("/tmp/default_image")
@@ -45,7 +45,7 @@ class TasksTest(unittest.TestCase):
 		self._test_object.execute()
 
 		self._mock_os_util.execute.assert_has_calls([
-				call(["gsettings", "set", "org.yorba.shotwell.preferences.ui", "show-welcome-dialog", "false"]), 
+				call(["gsettings", "set", "org.yorba.shotwell.preferences.ui", "show-welcome-dialog", "false"]),
 				call(["gsettings", "set", "org.yorba.shotwell.preferences.files", "auto-import", "true"])
 				])
 
