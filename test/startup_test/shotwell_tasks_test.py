@@ -1,9 +1,6 @@
 import unittest
 from startup.tasks import Tasks
 from mock import Mock, call
-import shutil
-import os
-import os.path
 
 from startup.shotwell_tasks import ShotwellTasks
 
@@ -16,12 +13,11 @@ class ShotwellTaskTest(unittest.TestCase):
         self.home_path_provider = Mock(return_value =
                 self.home_path)
 
-        self.test_object = ShotwellTasks(self.home_path_provider,
-                self.home_directory_copier, self.os_util)
+        self.test_object = ShotwellTasks(self.home_directory_copier, self.os_util)
 
     def test_default_location_is_correct(self):
         self.assertEquals("/usr/share/endlessm/default_images",
-                self.test_object.IMAGES_FOLDER_PATH)
+                self.test_object._default_images_folder_path())
 
     def test_target_dir_is_correct(self):
         self.assertEqual('Pictures', self.test_object.TARGET_DIR)
@@ -35,4 +31,4 @@ class ShotwellTaskTest(unittest.TestCase):
 
     def test_file_copier_is_called_with_default_images_folder(self):
         self.test_object.execute()
-        self.home_directory_copier.copy_in.assert_called_once_with(self.test_object.IMAGES_FOLDER_PATH)
+        self.home_directory_copier.copy_from.assert_called_once_with(self.test_object._default_images_folder_path())
