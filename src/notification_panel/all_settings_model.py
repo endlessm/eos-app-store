@@ -5,6 +5,7 @@ from ui.abstract_notifier import AbstractNotifier
 from threading import Thread
 import time
 from startup.auto_updates.update_manager import UpdateManager
+import sys
 
 class AllSettingsModel(AbstractNotifier):
     UPDATE_LOCK = "update.lock"
@@ -24,6 +25,7 @@ class AllSettingsModel(AbstractNotifier):
         self._still_watching = True
         self._update_thread = Thread(target=self._update_checker)
         self._is_locked = UpdateLock().is_locked()
+        self._update_thread.setDaemon(True)
         self._update_thread.start()
 
     def _update_checker(self):
