@@ -21,10 +21,13 @@ class UpdateManager(object):
         
     def _background_process(self):
         while not self._done:
-            if self._lock.acquire():
-                try:
-                    self._update_checker.check_for_updates()
-                except(Exception) as e:
-                    log.error("An error occurred during the check for updates", e)
-                self._lock.release()
+            self.update_os()
             time.sleep(self.SLEEP_TIME) 
+            
+    def update_os(self):
+        if self._lock.acquire():
+            try:
+                self._update_checker.check_for_updates()
+            except(Exception) as e:
+                log.error("An error occurred during the check for updates", e)
+            self._lock.release()

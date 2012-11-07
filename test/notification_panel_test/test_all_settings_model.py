@@ -11,8 +11,10 @@ class TestAllSettingsModel(unittest.TestCase):
     def setUp(self):
         self._mock_os_util = Mock()
         self._mock_app_launcher = Mock()
+        self._mock_update_manager = Mock()
         
-        self._test_object = AllSettingsModel(self._mock_os_util, self._mock_app_launcher)
+        self._test_object = AllSettingsModel(self._mock_os_util, self._mock_app_launcher, 
+                                             self._mock_update_manager)
         
         self._cleanUp()
         
@@ -37,10 +39,11 @@ class TestAllSettingsModel(unittest.TestCase):
         self._mock_os_util.get_version.assert_called_once()
 
     def test_when_update_is_called_we_launch_updates(self):
+        self._mock_update_manager.update_os = Mock()
+        
         self._test_object.update_software()
 
-        expected_command = AllSettingsModel.UPDATE_COMMAND
-        self._mock_app_launcher.launch.assert_called_once_with(expected_command)
+        self.assertTrue(self._mock_update_manager.update_os.called)
 
     def test_get_version_delegates_to_os_util(self):
         self._mock_os_util.get_version = Mock(return_value="whatever")

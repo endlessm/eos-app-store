@@ -39,7 +39,7 @@ class UpdateManagerTestCase(unittest.TestCase):
         
         self.assertTrue(self._mock_check_for_updates_calls > 0, 
                 "should have called the check for updates at least once")
-
+        
     def test_thread_continues_to_live_regardless_of_exception_thrown_during_check_for_updates(self):
         def side_effect():
             self._mock_check_for_updates_calls += 1
@@ -104,3 +104,29 @@ class UpdateManagerTestCase(unittest.TestCase):
 
         self.assertFalse(os.path.exists(UpdateLock.LOCK_FILE))
 
+    def test_update_os_checks_for_updates(self):
+        self._mock_update_checker.check_for_updates = Mock()
+
+        self._test_object.update_os()
+
+        self.assertTrue(self._mock_update_checker.check_for_updates.called)
+
+    def test_update_os_does_not_check_for_updates_if_update_lock_is_locked(self):
+        UpdateLock().acquire()
+        self._mock_update_checker.check_for_updates = Mock()
+
+        self._test_object.update_os()
+
+        self.assertFalse(self._mock_update_checker.check_for_updates.called)
+
+    def test_update_os_acquires_lock_then_releases_it(self):
+        self._is_update_locked = False
+        def checker():
+            self._is_update_locked = UpdateLock().is_locked()
+        self._mock_update_checker.check_for_updates = Mock(side_effect=checker)
+
+        self._test_object.update_os()
+
+        self.assertTrue(self._is_update_locked)
+        self.assertFalse(UpdateLock().is_locked())
+        
