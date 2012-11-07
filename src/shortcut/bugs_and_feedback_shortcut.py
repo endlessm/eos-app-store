@@ -1,5 +1,5 @@
 from shortcut.desktop_shortcut import DesktopShortcut
-from util import image_util
+from eos_util import image_util
 import gtk
 
 class BugsAndFeedbackShortcut(DesktopShortcut):
