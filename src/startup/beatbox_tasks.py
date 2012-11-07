@@ -13,23 +13,4 @@ class BeatboxTasks():
     def execute(self):
         music_folder_path = self._home_path_provider.get_user_directory("Music")
         self._os_util.execute(["gsettings", "set", "net.launchpad.beatbox.settings", "music-folder", music_folder_path])
-        music_folder = Folder(music_folder_path)
-        originating_folder = Folder(self._default_music_directory)
-        originating_folder.copy_files_to(music_folder)
-        #os_util.copytree(self._default_music_directory, music_folder)
-
-class Folder():
-    def __init__(self, path, globber=glob.iglob, copier=shutil.copy2):
-      self.path = path
-      self.globber = globber
-      self.copier = copier
-
-    def copy_files_to(self, other_folder):
-        for file_path in self.file_paths():
-            other_folder.add_file(file_path)
-
-    def file_paths(self):
-        return  self.globber(self.path)
-
-    def add_file(self, file_path):
-        self.copier(file_path, self.path)
+        os_util.copytree(self._default_music_directory, music_folder)
