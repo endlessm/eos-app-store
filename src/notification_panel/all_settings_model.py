@@ -5,7 +5,6 @@ from ui.abstract_notifier import AbstractNotifier
 from threading import Thread
 import time
 from startup.auto_updates.update_manager import UpdateManager
-import sys
 
 class AllSettingsModel(AbstractNotifier):
     UPDATE_LOCK = "update.lock"
@@ -41,7 +40,8 @@ class AllSettingsModel(AbstractNotifier):
         self._update_thread.join(.5)
 
     def get_current_version(self):
-        return self._os_util.get_version()
+        version = self._os_util.get_version()
+        return "EndlessOS {0}".format(version) if version else "EndlessOS"
 
     def update_software(self):
         self._update_manager.update_os()

@@ -36,4 +36,13 @@ class UpdateCheckerTestCase(unittest.TestCase):
         self._test_object.check_for_updates()
         
         self.assertFalse(self._mock_endless_updater.update.called)
+
+    def test_for_stupid_allowable_characters(self):
+        self._mock_os_util.get_version = Mock(return_value="1.0.12~rc1")
+        self._mock_latest_version_provider.get_latest_version = Mock(return_value="1.0.12.~rc2")
+        self._mock_endless_updater.update = Mock()
         
+        self._test_object.check_for_updates()
+        
+        self.assertTrue(self._mock_endless_updater.update.called)
+                

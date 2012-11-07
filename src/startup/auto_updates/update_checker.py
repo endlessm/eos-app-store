@@ -1,7 +1,7 @@
-import re
 from startup.auto_updates.latest_version_provider import LatestVersionProvider
 from startup.auto_updates.endless_updater import EndlessUpdater
 from osapps.os_util import OsUtil
+import os
 
 class UpdateChecker():
     def __init__(self, latest_version_provider=LatestVersionProvider(), os_util=OsUtil(), endless_updater=EndlessUpdater()):
@@ -17,7 +17,5 @@ class UpdateChecker():
         remote_version = self._latest_version_provider.get_latest_version()
         local_version = self._os_util.get_version()
         
-        return cmp(self._normalize(remote_version), self._normalize(local_version)) > 0
-
-    def _normalize(self, v):
-        return [int(x) for x in re.sub(r'(\.0+)*$','', v).split(".")]
+        return os.system("dpkg --compare-versions %s lt %s" % (local_version, remote_version)) == 0
+        
