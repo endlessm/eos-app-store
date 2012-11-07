@@ -58,3 +58,4 @@ class StartupTasksTest(unittest.TestCase):
 		
 		log.error = orig_eos_error
 
+

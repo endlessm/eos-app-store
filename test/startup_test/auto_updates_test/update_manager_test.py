@@ -1,9 +1,11 @@
 import unittest
 from mock import Mock #@UnresolvedImport
 import time
+import os
 
 from eos_log import log
 from startup.auto_updates.update_manager import UpdateManager
+from util.update_lock import UpdateLock
 
 class UpdateManagerTestCase(unittest.TestCase):
     def setUp(self):
@@ -14,8 +16,15 @@ class UpdateManagerTestCase(unittest.TestCase):
         self._orig_eos_error = log.error
         log.error = Mock()
 
+        self._cleanUp()
+
     def tearDown(self):
         log.error = self._orig_eos_error 
+
+        self._cleanUp()
+
+    def _cleanUp(self):
+        UpdateLock().release()
     
     def test_execute_starts_up_thread(self):
         def side_effect():
@@ -64,11 +73,22 @@ class UpdateManagerTestCase(unittest.TestCase):
         
         log.error.assert_called_once_with("An error occurred during the check for updates", exception)
 
-    def test_(self):
+    def test_dont_check_for_udates_if_update_lock_is_locked(self):
+        assert UpdateLock().acquire()
+
+        self._mock_update_checker.check_for_updates = Mock()
+
+        self._test_object.SLEEP_TIME = 0
+        self._test_object.execute()
+        time.sleep(.1)
+        self._test_object._done = True
+        self._test_object._running_thread.join()
+        
+        self.assertFalse(self._mock_update_checker.check_for_updates.called)
+
+    def test_lock_the_update_lock_when_checking_for_updates(self):
         def side_effect():
-            self._mock_check_for_updates_calls += 1
-            if self._mock_check_for_updates_calls == 1:
-                os.path.exists(UpdateManager.CURRENTLY_CHECKING_FOR_UPDATES)
+            assert UpdateLock().is_locked()
         self._mock_update_checker.check_for_updates = Mock(side_effect=side_effect)
 
         self._test_object.SLEEP_TIME = 0
@@ -77,4 +97,10 @@ class UpdateManagerTestCase(unittest.TestCase):
         self._test_object._done = True
         self._test_object._running_thread.join()
         
-        
+    def test_if_update_lock_file_exists_delete_it(self):
+        open(UpdateLock.LOCK_FILE, "w").close()
+
+        UpdateManager(self._mock_update_checker)
+
+        self.assertFalse(os.path.exists(UpdateLock.LOCK_FILE))
+
