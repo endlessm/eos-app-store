@@ -3,33 +3,24 @@ import glob
 import os
 from osapps.os_util import OsUtil
 from osapps.home_path_provider import HomePathProvider
+from distutils import dir_util
+
+class HomeDirectoryCopier():
+    def __init__(self, destination_folder_name, destination_finder=HomePathProvider.get_user_directory, copier=dir_util.copy_tree):
+        self.destination_folder_name = destination_folder_name
+        self.destination_finder = destination_finder
+        self.copier = copier
+
+    def copy_in(self, source_folder):
+        destination_folder_path = self.destination_finder(self.destination_folder_name)
+        self.copier(source_folder, destination_folder_path)
 
 class BeatboxTasks():
-    def __init__(self, default_music_directory="/usr/share/endlesm/default_music/*", home_path_provider=HomePathProvider(), os_util=OsUtil()):
-        self._home_path_provider = home_path_provider
+    MUSIC_FOLDER_PATH = "/usr/share/endlessm/default_music"
+    def __init__(self, home_directory_copier=HomeDirectoryCopier("Music"), os_util=OsUtil()):
+        self._home_directory_copier = home_directory_copier
         self._os_util = os_util
-        self._default_music_directory = default_music_directory
 
     def execute(self):
-        music_folder_path = self._home_path_provider.get_user_directory("Music")
-        self._os_util.execute(["gsettings", "set", "net.launchpad.beatbox.settings", "music-folder", music_folder_path])
-        music_folder = Folder(music_folder_path)
-        originating_folder = Folder(self._default_music_directory)
-        originating_folder.copy_files_to(music_folder)
-        #os_util.copytree(self._default_music_directory, music_folder)
-
-class Folder():
-    def __init__(self, path, globber=glob.iglob, copier=shutil.copy2):
-      self.path = path
-      self.globber = globber
-      self.copier = copier
-
-    def copy_files_to(self, other_folder):
-        for file_path in self.file_paths():
-            other_folder.add_file(file_path)
-
-    def file_paths(self):
-        return  self.globber(self.path)
-
-    def add_file(self, file_path):
-        self.copier(file_path, self.path)
+        self._home_directory_copier.copy_in(self.MUSIC_FOLDER_PATH)
+        self._os_util.execute(["gsettings", "set", "net.launchpad.beatbox.settings", "music-folder", self.MUSIC_FOLDER_PATH])
