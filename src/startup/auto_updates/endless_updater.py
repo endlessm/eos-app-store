@@ -3,7 +3,7 @@ from startup.auto_updates.endless_installer import EndlessInstaller
 from startup.auto_updates.install_notifier import InstallNotifier
 
 class EndlessUpdater():
-    DEFAULT_DOWNLOAD_DIRECTORY = "/tmp/endless-os-install-directory/"
+    DEFAULT_DOWNLOAD_DIRECTORY = "/var/lib/endless/packages"
     
     def __init__(self, download_directory=DEFAULT_DOWNLOAD_DIRECTORY,
                  endless_downloader=EndlessDownloader(), 
@@ -21,7 +21,6 @@ class EndlessUpdater():
     def _handle_user_response(self, install_notifier, endless_installer):
         if install_notifier.should_install():
             endless_installer.install_all_packages(self._download_directory)
-
     
     def update(self):
         self._endless_downloader.download_all_packages(self._download_directory)

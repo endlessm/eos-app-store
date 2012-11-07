@@ -20,8 +20,6 @@ class EndlessDownloaderTestCase(unittest.TestCase):
 
         self._test_object = EndlessDownloader(self._mock_file_downloader, self._mock_file_synchronizer)
 
-        open(os.path.join(self._test_directory, "files.txt"), "w").close()
-
     def tearDown(self):
         endpoint_provider = self._orig_endpoint_provider
 
@@ -39,16 +37,18 @@ class EndlessDownloaderTestCase(unittest.TestCase):
 
     def test_give_files_file_to_file_synchronizer(self):
         remote_file_content = "this is the remote file content"
-        local_file_content = "this is the local file content"
-        with open(os.path.join(self._test_directory, "files.txt"), "w") as f:
-            f.write(local_file_content)
+        open(os.path.join(self._test_directory, "file1.txt"), "w").close()
+        open(os.path.join(self._test_directory, "file2.txt"), "w").close()
+        open(os.path.join(self._test_directory, "file3.txt"), "w").close()
+
         self._mock_file_downloader.download_file = Mock(return_value=remote_file_content)
 
         self._mock_file_synchronizer.files_to_download = Mock(return_value=[])
 
         self._test_object.download_all_packages(self._test_directory)
 
-        self._mock_file_synchronizer.files_to_download.assert_called_once_with(local_file_content, remote_file_content)
+        self._mock_file_synchronizer.files_to_download.assert_called_once_with(
+                                            ["file1.txt", "file2.txt", "file3.txt"], remote_file_content)
 
     def test_correct_files_are_being_downloaded(self):
         endpoint = "endpoint"

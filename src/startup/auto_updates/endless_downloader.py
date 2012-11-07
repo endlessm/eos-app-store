@@ -12,8 +12,7 @@ class EndlessDownloader():
         self._file_synchronizer = file_synchronizer
     
     def download_all_packages(self, download_directory):
-        with open(os.path.join(download_directory, self.INDEX_FILE), "r") as f:
-            local_file_list = f.read()
+        local_file_list = os.listdir(download_directory)
         endpoint = endpoint_provider.get_current_apt_endpoint()
 
         remote_file_list = self._file_downloader.download_file(os.path.join(endpoint, self.INDEX_FILE))
