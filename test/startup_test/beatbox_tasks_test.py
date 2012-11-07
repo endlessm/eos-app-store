@@ -1,5 +1,6 @@
 import unittest
 from startup.beatbox_tasks import BeatboxTasks
+from startup.beatbox_tasks import Folder
 
 from mock import Mock
 from mock import call
@@ -7,55 +8,65 @@ import shutil
 import os
 import os.path
 
-class BeatboxTasksTest(unittest.TestCase):
+
+class BeatboxTaskIntegrationTest(unittest.TestCase):
     def setUp(self):
-        self._mock_os_util = Mock()
-        self._mock_home_path_provider = Mock()
-        self._mock_home_path_provider.get_user_directory = Mock(return_value="")
-        self._mock_os_util.execute = Mock()
+        os.makedirs("/tmp/originating")
+        open("/tmp/originating/test.music", "w").close()
+        open("/tmp/originating/test2.music", "w").close()
+        os.makedirs("/tmp/destination")
 
-        self._test_object = BeatboxTasks(self._mock_home_path_provider, self._mock_os_util)
-
-        shutil.rmtree("/tmp/default_music", True)
-        os.makedirs("/tmp/default_music")
-        open("/tmp/default_music/test.music", "w").close()
-        def default_music_stub():
-            return "/tmp/default_music/*"
-        self._test_object._default_music_directory = default_music_stub
-
-        self._orig_copy = shutil.copy2
-        self._mock_copy = Mock()
-        shutil.copy2 = self._mock_copy
+        home_path_provider = Mock()
+        home_path_provider.get_user_directory = Mock(return_value="/tmp/destination")
+        os_util = Mock()
+        os_util.execute = Mock()
+        self.task = BeatboxTasks("/tmp/originating/*", home_path_provider, os_util)
 
     def tearDown(self):
-        self._clean_up()
-        shutil.copy2 = self._orig_copy
+        shutil.rmtree("/tmp/originating", True)
+        shutil.rmtree("/tmp/destination", True)
 
-    def _clean_up(self):
-        shutil.rmtree("/tmp/default_music", True)
+    def test_copying_files(self):
+        self.task.execute()
+        self.assertTrue(os.path.isfile("/tmp/destination/test.music"))
+        self.assertTrue(os.path.isfile("/tmp/destination/test2.music"))
 
-    def test_music_folder_settings_for_beatbox(self):
-        music_folder = "a music folder"
-        self._mock_home_path_provider.get_user_directory = Mock(return_value=music_folder)
+class FolderTest(unittest.TestCase):
+    def setUp(self):
+        self.globber = Mock()
+        self.path = Mock()
 
-        self._test_object.execute()
+    def test_copy_files_to(self):
+        file1 = Mock()
+        file2 = Mock()
+        self.globber =  Mock(return_value=[file1, file2])
 
-        self._mock_os_util.execute.assert_has_calls([
-                call(["gsettings", "set", "net.launchpad.beatbox.settings", "music-folder", music_folder])
-                ])
+        test_object = Folder(self.path, self.globber)
 
-    def test_internationalized_music_directory_is_used(self):
-        self._test_object.execute()
+        destination_folder = Mock()
+        destination_folder.add_file = Mock()
 
-        self._mock_home_path_provider.get_user_directory.assert_called_once_with("Music")
+        test_object.copy_files_to(destination_folder)
 
-    def test_copy_default_musics(self):
-        music_files_directory = "music_files directory"
-        self._mock_home_path_provider.get_user_directory = Mock(return_value=music_files_directory)
+        self.globber.assert_was_called_once_with(self.path)
+        destination_folder.add_file.assert_was_called_once_with(file1)
+        destination_folder.add_file.assert_was_called_once_with(file2)
 
-        self._test_object.execute()
+    def test_add_file(self):
+        copier = Mock()
+        test_object = Folder(self.path, self.globber, copier)
 
-        self._mock_copy.assert_called_once_with("/tmp/default_music/test.music", os.path.join(music_files_directory, "test.music"))
+        file_path = Mock()
 
-    def test_default_music_directory(self):
-        self.assertEquals("/usr/share/endlesm/default_music", BeatboxTasks(Mock(),Mock())._default_music_directory())
+        test_object.add_file(file_path)
+
+        copier.assert_was_called_once_with(file_path, self.path)
+
+    def test_file_paths(self):
+        file_collection = Mock()
+        self.globber =  Mock(return_value=file_collection)
+
+        test_object = Folder(self.path, self.globber)
+
+        self.assertEquals(file_collection, test_object.file_paths())
+        self.globber.assert_was_called_once_with(self.path)
