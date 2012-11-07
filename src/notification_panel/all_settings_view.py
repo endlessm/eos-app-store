@@ -131,5 +131,13 @@ class AllSettingsView(AbstractNotifier):
         self._window.show_all()
 
     def hide_window(self):
-        self._window.hide_all()
+        self._window.destroy()
+        
+    def enable_update_button(self):
+        self._button_update.set_sensitive(True)
 
+    def disable_update_button(self):
+        self._button_update.set_sensitive(False)
+        
+        
+        
