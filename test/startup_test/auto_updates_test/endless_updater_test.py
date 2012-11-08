@@ -18,11 +18,6 @@ class EndlessUpdaterTestCase(unittest.TestCase):
                                            self._mock_endless_installer,
                                            self._mock_install_notifier)
         
-        self._orig_endpoint_provider = endpoint_provider.get_current_apt_endpoint
-    
-    def tearDown(self):
-        endpoint_provider.get_current_apt_endpoint = self._orig_endpoint_provider
-    
     def test_update_then_downloads_all_packages(self):
         self._mock_endless_downloader.download_all_packages = Mock()
         

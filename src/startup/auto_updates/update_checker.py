@@ -18,4 +18,3 @@ class UpdateChecker():
         local_version = self._os_util.get_version()
         
         return os.system("dpkg --compare-versions %s lt %s" % (local_version, remote_version)) == 0
-        
