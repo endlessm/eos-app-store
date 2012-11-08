@@ -1,6 +1,6 @@
 import cairo
 import gtk
-from util import screen_util
+from util import screen_util, image_util
 from osapps.desktop_preferences_datastore import DesktopPreferencesDatastore
 
 class TransparentWindow(gtk.Window):
@@ -25,6 +25,7 @@ class TransparentWindow(gtk.Window):
         self.set_app_paintable(True)
         self.set_resizable(False)
         self.set_decorated(False)
+        self.set_icon(image_util.load_pixbuf('endless.png'))
 
     def _handle_event(self, widget, event):
         cr = widget.window.cairo_create()

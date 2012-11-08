@@ -55,9 +55,10 @@ class TasksTest(unittest.TestCase):
 		log.error = Mock()
 		
 		task_name = "this is the task name"
+		error = Exception()
 		
 		mock_task_instance = Mock()
-		mock_task_instance.execute = Mock(side_effect=Exception())
+		mock_task_instance.execute = Mock(side_effect=error)
 		
 		mock_task_class = Mock(return_value=mock_task_instance)
 		mock_task_class.__name__ = task_name
@@ -67,7 +68,7 @@ class TasksTest(unittest.TestCase):
 
 		self._test_object.perform_startup_tasks()
 
-		log.error.assert_called_once_with("An error ocurred while executing " + task_name)
+		log.error.assert_called_once_with("An error ocurred while executing " + task_name, error)
 		
 		log.error = orig_eos_error
 

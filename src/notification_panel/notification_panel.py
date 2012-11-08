@@ -4,6 +4,7 @@ from network_plugin import NetworkSettingsPlugin
 from time_display_plugin import TimeDisplayPlugin
 from bluetooth_plugin import BluetoothSettingsPlugin
 from printer_plugin import PrinterSettingsPlugin
+from battery_plugin import BatteryPlugin
 from all_settings_plugin import AllSettingsPlugin
 from audio_plugin import AudioSettingsPlugin
 
@@ -15,6 +16,7 @@ class NotificationPanel(gtk.HBox):
                 AudioSettingsPlugin,
                 BluetoothSettingsPlugin,
                 NetworkSettingsPlugin,
+                BatteryPlugin,
                 TimeDisplayPlugin,
                 AllSettingsPlugin
               ]
@@ -42,6 +44,7 @@ class NotificationPanel(gtk.HBox):
     def _register_plugin(self, notification_panel_items, clazz):
         plugin = clazz(PanelConstants.get_icon_size())
         plugin.set_parent(self._parent)
+        plugin.post_init()
         notification_panel_items.pack_start(plugin, False, False, 2)
         return plugin
 
