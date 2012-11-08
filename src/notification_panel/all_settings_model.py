@@ -1,10 +1,11 @@
+import time
+from threading import Thread
+
 from osapps.os_util import OsUtil
 from osapps.app_launcher import AppLauncher
 from util.update_lock import UpdateLock
 from ui.abstract_notifier import AbstractNotifier
-from threading import Thread
-import time
-from startup.auto_updates.update_manager import UpdateManager
+from startup.auto_updates.repo_chooser_launcher import RepoChooserLauncher
 
 class AllSettingsModel(AbstractNotifier):
     UPDATE_LOCK = "update.lock"
@@ -15,10 +16,10 @@ class AllSettingsModel(AbstractNotifier):
     RESTART_COMMAND = "sudo shutdown -r now"
     SHUTDOWN_COMMAND = "sudo shutdown -h now"
 
-    def __init__(self, os_util=OsUtil(), app_launcher=AppLauncher(), update_manager=UpdateManager()):
+    def __init__(self, os_util=OsUtil(), app_launcher=AppLauncher(), repo_chooser_launcher = RepoChooserLauncher()):
         self._os_util = os_util
         self._app_launcher = app_launcher
-        self._update_manager = update_manager
+        self._repo_chooser_launcher = repo_chooser_launcher
         
         self._still_watching = True
         self._update_thread = Thread(target=self._update_checker)
@@ -43,7 +44,7 @@ class AllSettingsModel(AbstractNotifier):
         return "EndlessOS {0}".format(version) if version else "EndlessOS"
 
     def update_software(self):
-        self._update_manager.update_os()
+        self._repo_chooser_launcher.launch()
 
     def open_settings(self):
         self._app_launcher.launch(self.SETTINGS_COMMAND)

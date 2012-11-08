@@ -11,10 +11,10 @@ class TestAllSettingsModel(unittest.TestCase):
     def setUp(self):
         self._mock_os_util = Mock()
         self._mock_app_launcher = Mock()
-        self._mock_update_manager = Mock()
+        self._mock_repo_chooser_launcher = Mock()
         
         self._test_object = AllSettingsModel(self._mock_os_util, self._mock_app_launcher, 
-                                             self._mock_update_manager)
+                                            self._mock_repo_chooser_launcher)
         
         self._cleanUp()
         
@@ -43,12 +43,12 @@ class TestAllSettingsModel(unittest.TestCase):
 
         self.assertEquals("EndlessOS", self._test_object.get_current_version())
 
-    def test_when_update_is_called_we_launch_updates(self):
-        self._mock_update_manager.update_os = Mock()
+    def test_when_update_is_called_we_launch_repo_chooser(self):
+        self._mock_repo_chooser_launcher.launch = Mock()
         
         self._test_object.update_software()
 
-        self.assertTrue(self._mock_update_manager.update_os.called)
+        self.assertTrue(self._mock_repo_chooser_launcher.launch.called)
 
     def test_when_restart_is_called_we_launch_restart(self):
         self._test_object.restart()

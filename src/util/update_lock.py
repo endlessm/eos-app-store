@@ -11,8 +11,8 @@ class UpdateLock():
         return True
 
     def release(self):
-        if os.path.exists(self.LOCK_FILE):
+        if os.path.isfile(self.LOCK_FILE):
             os.unlink(self.LOCK_FILE)
 
     def is_locked(self):
-        return os.path.exists(self.LOCK_FILE)
+        return os.path.isfile(self.LOCK_FILE)
