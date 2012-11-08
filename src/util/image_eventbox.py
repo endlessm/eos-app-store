@@ -2,6 +2,7 @@ import cairo
 import gtk
 from gtk import gdk
 from util import image_util
+import rsvg
 
 class ImageEventBox(gtk.EventBox):
     def __init__(self, images, width = 0):
@@ -36,8 +37,20 @@ class ImageEventBox(gtk.EventBox):
                 del pixbuf
                 del scaled_pixbuf
             else:
-                img_surface = cairo.ImageSurface.create_from_png(image)
-                cr.set_source_surface(img_surface, x+(w/2-(img_surface.get_width()/2)), y+(h/2-(img_surface.get_height()/2)))
+                if '.svg' in image:
+                    try:
+                        svg = rsvg.Handle(file=image)
+                    except:
+                        print 'Error. Could not open', image
+                        break
+                    img_surface = cairo.ImageSurface(cairo.FORMAT_ARGB32, 48, 48)
+                    cx = cairo.Context(img_surface)
+                    svg.render_cairo(cx)
+                    del cx
+                    cr.set_source_surface(img_surface, x+(64/2-(img_surface.get_width()/2)), y+(64/2-(img_surface.get_height()/2)))
+                else:
+                    img_surface = cairo.ImageSurface.create_from_png(image)
+                    cr.set_source_surface(img_surface, x+(w/2-(img_surface.get_width()/2)), y+(h/2-(img_surface.get_height()/2)))
                 cr.paint()
     
     def set_images(self, images):
