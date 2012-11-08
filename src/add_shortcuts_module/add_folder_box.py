@@ -30,8 +30,8 @@ class AddFolderBox(gtk.VBox):
         self._label_1 = gtk.Label()
         label_2_text = _('2. PICK A SYMBOL')
         self._label_2 = gtk.Label()
-        self._label_1.set_markup('<span color="#aaaaaa"><b>' + label_1_text + '</b></span>')
-        self._label_2.set_markup('<span color="#aaaaaa"><b>' + label_2_text + '</b></span>')
+        self._label_1.set_markup('<span color="#aaaaaa" size="12000"><b>' + label_1_text + '</b></span>')
+        self._label_2.set_markup('<span color="#aaaaaa" size="12000"><b>' + label_2_text + '</b></span>')
         
         self._text_entry_align = gtk.Alignment(0.5, 0.5, 0, 0)
         self._hbox = gtk.HBox()
