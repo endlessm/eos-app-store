@@ -8,7 +8,8 @@ class BeatboxTaskTest(unittest.TestCase):
         self.os_util = Mock()
         self.os_util.execute = Mock()
         self.home_path = "home_path"
-        self.home_path_provider = Mock(return_value=self.home_path)
+        self.home_path_provider = Mock()
+        self.home_path_provider.get_user_directory = Mock(return_value=self.home_path)
 
         self.test_object = BeatboxTasks(self.home_path_provider,self.home_directory_copier, self.os_util)
 
