@@ -1,54 +1,78 @@
 import gtk
-import os
+import cairo
 from util.image_eventbox import ImageEventBox
 from util import image_util
+from util import screen_util
+from osapps.desktop_preferences_datastore import DesktopPreferencesDatastore
 
 class AddFolderBox(gtk.VBox):
-    def __init__(self, parent=None, add_remove_widget=None):
-        super(AddFolderBox, self).__init__(self)
-        self.set_homogeneous(False)
-        self.set_spacing(10)
+    def __init__(self, parent=None, add_remove_widget=None, desktop_preference_class = DesktopPreferencesDatastore):
+        super(AddFolderBox, self).__init__()
+        
         self._parent = parent
-        #self._add_remove_widget = add_remove_widget
-        # first label
-        self._label_1 = gtk.Label('\n1. NAME YOUR FOLDER')
-        self._label_2 = gtk.Label('2. PICK A SYMBOL')
-        #text entry
+        self._scrolling = False
+        
+        self._DEFAULT_ICON_PATH = '/usr/share/icons/Humanity/places/48/'
+        
+        self._desktop_preferences = desktop_preference_class.get_instance()
+        self._background = self._desktop_preferences.get_background_pixbuf()
+        
+        self._background = self._background.scale_simple(screen_util.get_width(), screen_util.get_height(),gtk.gdk.INTERP_BILINEAR)
+        
+        self._viewport = gtk.Viewport()
+        self._viewport.set_shadow_type(gtk.SHADOW_NONE)
+        self._vbox = gtk.VBox()
+        self._vbox.set_homogeneous(False)
+        self._vbox.set_spacing(15)
+        self._vbox.connect("expose-event", self._handle_event)
+
+        label_1_text = _('1. NAME YOUR FOLDER')
+        self._label_1 = gtk.Label()
+        label_2_text = _('2. PICK A SYMBOL')
+        self._label_2 = gtk.Label()
+        self._label_1.set_markup('<span color="#aaaaaa"><b>' + label_1_text + '</b></span>')
+        self._label_2.set_markup('<span color="#aaaaaa"><b>' + label_2_text + '</b></span>')
+        
+        self._text_entry_align = gtk.Alignment(0.5, 0.5, 0, 0)
         self._hbox = gtk.HBox()
+        self._hbox.set_size_request(186, 24)
         self._text_entry = gtk.Entry(50)
         self._text_entry.set_alignment(0.5)
         self._hbox.pack_start(self._text_entry)
-        self._text_entry.set_text('Untitled')
-        self.pack_start(self._label_1, True, True, 0)
-        self.pack_start(self._hbox, True, False, 0)
-        self.pack_start(self._label_2, True, True, 0)
-        #@TODO: divider
-
-        # a grid of icons
+        self._text_entry.set_text('')
+        self._text_entry_align.add(self._hbox)
+        
+        
+        self.hbox_separator = gtk.HBox()
+        self.hbox_separator.set_size_request(-1, 15)
+        self._vbox.pack_start(self.hbox_separator, True, True, 0)
+        self._vbox.pack_start(self._label_1, True, True, 0)
+        self._vbox.pack_start(self._text_entry_align, False, False, 0)
+        self.hbox_separator1 = gtk.HBox()
+        self.hbox_separator1.set_size_request(-1, 15)
+        self.hbox_separator1.connect("expose-event", self._draw_divider_line)
+        self._vbox.pack_start(self.hbox_separator1)
+        self._vbox.pack_start(self._label_2, True, True, 0)
         
         files = self._get_folder_icons('', 'folder')
         icons = []
         for fi in files:
-            #get all needed images
-            #images = self.get_images('/usr/share/icons/oxygen/48x48/places/'+fi)
-            #create event box
             image_box = ImageEventBox(None)
             image_box.set_size_request(64, 64)
-            image_box.set_images(self.get_images('/usr/share/icons/oxygen/48x48/places/'+fi))
+            image_box.set_images(self.get_images(self._DEFAULT_ICON_PATH+fi))
             image_box.connect("enter-notify-event", self._display_plus, parent._add_remove_widget)
             image_box.connect("leave-notify-event", self._remove_plus, parent._add_remove_widget)
-            image_box.connect("button-release-event", self._create_folder, '/usr/share/icons/oxygen/48x48/places/'+fi)
+            image_box.connect("button-release-event", self._create_folder, self._DEFAULT_ICON_PATH+fi)
             image_box.show()
             icons.append(image_box)
-
-        num_of_icons = len(files)
+        
+        num_of_icons = len(icons)
         columns = int(500/82)
         rows = int(num_of_icons/columns) + 1
         self._table = gtk.Table(rows, columns)
         self._table.show()
         col = row = 0
-        icons_hbox = gtk.HBox()
-        icons_hbox.show()
+        
         for num in range(len(icons)):
             if (num)%columns == 0:
                 col = 0
@@ -59,31 +83,22 @@ class AddFolderBox(gtk.VBox):
         self._table.show()
         self._bottom_center = gtk.Alignment(0.5, 0, 0, 0)
         self._bottom_center.add(self._table)
-        self.pack_start(self._bottom_center)
+        self._vbox.pack_start(self._bottom_center)
+        self._viewport.add(self._vbox)
+        self.add(self._viewport)
+        
+        self.x = 0
+        self.y = 0
+
         self.show_all()
         
-    def _get_folder_icons(self, path='', hint='folder'):
-        if not path:
-            path = '/usr/share/icons/oxygen/48x48/places/'
-    
-        icon_list = os.listdir(path)
-    
-        for icon in icon_list:
-            if not hint in icon:
-                icon_list.remove(icon)
-        return icon_list
         
-#    def set_table(self, table):
-#        self._table = table
-#        self.show_all()
-#    
-#    def fill_table(self, images):
-#        print 'Should populate table with images'
+    def _get_folder_icons(self, path='', hint='folder'):
+        return self._parent._presenter.get_folder_icons(path, hint)
         
     def get_images(self, image_path):
         return (
             image_util.image_path("endless-shortcut-well.png"),
-            #image_util.image_path("endless-shortcut-background.png"),
             image_path,
             image_util.image_path("endless-shortcut-foreground.png")
             )
@@ -91,11 +106,12 @@ class AddFolderBox(gtk.VBox):
     def _display_plus(self, widget, event, add_remove_widget):
         images_tuple = widget._images
         images_list = list(images_tuple)
-        images_list.append(image_util.image_path("delete_ok_active.png"))
+        images_list.append(image_util.image_path("add_folder_icon.png"))
         widget.set_images(tuple(images_list))
         widget.hide()
         widget.show()
         add_remove_widget._event_box.set_images(images_tuple)
+        add_remove_widget._label.set_text(self._text_entry.get_text())
         add_remove_widget.hide()
         add_remove_widget.show()
     
@@ -105,6 +121,7 @@ class AddFolderBox(gtk.VBox):
         widget.hide()
         widget.show()
         add_remove_widget._event_box.set_images(add_remove_widget.get_images())
+        add_remove_widget._label.set_text('')
         add_remove_widget.hide()
         add_remove_widget.show()
     
@@ -116,3 +133,51 @@ class AddFolderBox(gtk.VBox):
         else:
             print 'FOLDER MUST HAVE A NAME!'
         print 'Done.'
+    
+    def _handle_event(self, widget, event):
+        cr = widget.window.cairo_create()
+        
+        x,y = self._vbox.window.get_origin()
+        if self.x == 0 and self.y == 0:
+            self.x = x
+            self.y = y
+            self._background = self._background.subpixbuf(self.x, self.y, event.area.width, event.area.height)
+
+        w = event.area.width
+        h = event.area.height
+        
+        self.draw(cr, event.area.x, event.area.y, w, h)
+        
+        return False
+        
+    def draw(self, cr, x, y, w, h):
+        if self._scrolling:
+            pixbuf = self._background.subpixbuf(0, 0, self._background.get_width(), self._background.get_height())
+            self._scrolling = False
+        else:
+            pixbuf = self._background.subpixbuf(x, y, w, h)
+        cr.set_source_pixbuf(pixbuf, x, y)
+        cr.paint()
+        self._draw_gradient(cr, x, y, w, h)
+
+    def _draw_gradient(self, cr, x, y, w, h):
+        pat = cairo.LinearGradient (0.0, 0.0, w, 0.0)
+        pat.add_color_stop_rgba (0.001, 0.0, 0.0, 0.0, 0.8)
+        pat.add_color_stop_rgba (1, 0.2, 0.2, 0.2, 0.8)
+        
+        cr.rectangle(x-1, y-1, w+2, h+2)
+        cr.set_source(pat)
+        cr.fill()
+    
+    def _draw_divider_line(self, widget, event):
+        cr = widget.window.cairo_create()
+        cr.rectangle(event.area.x, event.area.y, event.area.width, 1)
+        cr.set_source_rgba(0.08, 0.08, 0.08, 0.8)
+        cr.fill()
+        cr.rectangle(event.area.x, event.area.y+1, event.area.width, 1)
+        cr.set_source_rgba(0.5, 0.5, 0.5, 0.8)
+        cr.fill()
+    
+    def _handle_scroll_event(self, widget, event):
+        print 'Scrolling event caught, ', self._scrolling
+        self._scrolling = True
