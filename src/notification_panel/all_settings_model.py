@@ -10,7 +10,6 @@ class AllSettingsModel(AbstractNotifier):
     UPDATE_LOCK = "update.lock"
     
     VERSION_COMMAND = "dpkg -p endless-os-desktop-widget | grep ^Version: | awk \"{print $2}\""
-    UPDATE_COMMAND = "sudo /usr/bin/endless-installer.sh"
     SETTINGS_COMMAND = "sudo gnome-control-center --class=eos-network-manager"
     LOGOUT_COMMAND = "kill -9 -1"
     RESTART_COMMAND = "sudo shutdown -r now"
