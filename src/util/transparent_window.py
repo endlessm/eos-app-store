@@ -46,6 +46,6 @@ class TransparentWindow(gtk.Window):
         cr.set_source_pixbuf(pixbuf, 0, 0)
 
         cr.paint()
-        self.queue_draw()
+        #self.queue_draw()
         
-        return False
+        #return False
