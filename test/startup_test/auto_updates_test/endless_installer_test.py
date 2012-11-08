@@ -1,5 +1,5 @@
 import unittest
-from mock import Mock #@UnresolvedImport
+from mock import Mock, call #@UnresolvedImport
 
 from startup.auto_updates.endless_installer import EndlessInstaller
 
@@ -13,7 +13,11 @@ class EndlessInstallerTestCase(unittest.TestCase):
         self._mock_os_util.execute = Mock()
         
         self._test_object.install_all_packages(directory)
-        
-        self._mock_os_util.execute.assert_called_once_with(
-                            ["sudo", "/usr/bin/endless_install_all_packages.sh", directory])
+
+        expected_calls = [ 
+                    call(["sudo", "/usr/bin/endless_pre_install.sh"]),
+                    call(["sudo", "/usr/bin/endless_install_all_packages.sh", directory]),
+                    call(["sudo", "/usr/bin/endless_post_install.sh"])]
+
+        self.assertEquals(expected_calls, self._mock_os_util.execute.call_args_list)
 

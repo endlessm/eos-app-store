@@ -6,6 +6,10 @@ class EndlessInstaller():
         
     def install_all_packages(self, package_directory):
         self._os_util.execute(
+                            ["sudo", "/usr/bin/endless_pre_install.sh"])
+        self._os_util.execute(
                             ["sudo", "/usr/bin/endless_install_all_packages.sh", package_directory])
+        self._os_util.execute(
+                            ["sudo", "/usr/bin/endless_post_install.sh"])
 
 
