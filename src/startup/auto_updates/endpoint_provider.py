@@ -1,24 +1,29 @@
-import apt_pkg
+import os
 from urlparse import urlparse
 
-def get_current_apt_endpoint():
-    apt_pkg.init_config()
-    apt_pkg.init_system()
-    acquire = apt_pkg.Acquire()
-    slist = apt_pkg.SourceList()
-    slist.read_main_list()
-    slist.get_indexes(acquire, True)
+_DEFAULT_ENDLESS_URL = "http://apt.endlessdevelopment.com/updates"
+_endless_home_path = os.path.expanduser("~/.endlessm")
+_endless_mirror_file = os.path.join(_endless_home_path, "mirror")
 
-    url = "em-vm-build/repository"
-    for item in acquire.items:
-        if "endless" in item.desc_uri:
-            parsed_url = urlparse(item.desc_uri)
-            url = parsed_url.hostname + "/" + parsed_url.path.split("/")[1]
-            break
+def get_endless_url():
+    _endless_url_setup()
 
-    return "http://" + url
-    
-if __name__ == '__main__':
-    print get_current_apt_endpoint()
+    if os.path.exists(_endless_mirror_file):
+        with open(_endless_mirror_file, "r") as f:
+            url = f.read()
+    else:
+        url = _DEFAULT_ENDLESS_URL
+        with open(_endless_mirror_file, "w") as f:
+            f.write(_DEFAULT_ENDLESS_URL)
 
+    return url
 
+def set_endless_url(url):
+    _endless_url_setup()
+
+    with open(_endless_mirror_file, "w") as f:
+        f.write(url)
+
+def _endless_url_setup():
+    if not os.path.exists(_endless_home_path):
+        os.makedirs(_endless_home_path)

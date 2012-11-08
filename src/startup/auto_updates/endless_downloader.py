@@ -13,7 +13,7 @@ class EndlessDownloader():
     
     def download_all_packages(self, download_directory):
         local_file_list = os.listdir(download_directory)
-        endpoint = endpoint_provider.get_current_apt_endpoint()
+        endpoint = endpoint_provider.get_endless_url()
 
         remote_file_list = self._file_downloader.download_file(os.path.join(endpoint, self.INDEX_FILE))
         files_to_download = self._file_synchronizer.files_to_download(local_file_list, remote_file_list)

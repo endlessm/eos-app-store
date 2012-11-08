@@ -10,7 +10,7 @@ class EndlessDownloaderTestCase(unittest.TestCase):
     _test_directory = "/tmp/updater_test_dir"
     
     def setUp(self):
-        self._orig_endpoint_provider = endpoint_provider.get_current_apt_endpoint
+        self._orig_endpoint_provider = endpoint_provider.get_endless_url
 
         shutil.rmtree(self._test_directory, True)
         os.makedirs(self._test_directory)
@@ -21,7 +21,7 @@ class EndlessDownloaderTestCase(unittest.TestCase):
         self._test_object = EndlessDownloader(self._mock_file_downloader, self._mock_file_synchronizer)
 
     def tearDown(self):
-        endpoint_provider.get_current_apt_endpoint = self._orig_endpoint_provider
+        endpoint_provider.get_endless_url = self._orig_endpoint_provider
 
     def test_remote_file_list_is_saved_as_new_current_files_list(self):
         remote_file_content = "this is the remote file content"
@@ -52,7 +52,7 @@ class EndlessDownloaderTestCase(unittest.TestCase):
 
     def test_correct_files_are_being_downloaded(self):
         endpoint = "endpoint"
-        endpoint_provider.get_current_apt_endpoint = Mock(return_value=endpoint)
+        endpoint_provider.get_endless_url = Mock(return_value=endpoint)
         list_of_files = [("file1", "md5sum1"), ("file2", "md5sum2"), ("file3", "md5sum3")]
         self._mock_file_synchronizer.files_to_download = Mock(return_value=list_of_files)
         
@@ -68,7 +68,7 @@ class EndlessDownloaderTestCase(unittest.TestCase):
 
     def test_downloaded_files_go_to_correct_directory(self):
         endpoint = "endpoint"
-        endpoint_provider.get_current_apt_endpoint = Mock(return_value=endpoint)
+        endpoint_provider.get_endless_url = Mock(return_value=endpoint)
         
         self._mock_file_synchronizer.files_to_download = Mock(return_value=[("file1", "md5sum1"), ("file2", "md5sum2"), ("file3", "md5sum3")])
 
