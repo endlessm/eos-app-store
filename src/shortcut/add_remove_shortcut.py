@@ -47,7 +47,7 @@ class AddRemoveShortcut(DesktopShortcut):
         if self.parent:
             self.parent.remove(self)
             
-    def get_images(self):
+    def get_images(self, event_state):
         return (
             image_util.image_path("endless-shortcut-well.png"),
             image_util.image_path("endless-add.png"),
@@ -99,7 +99,7 @@ class AddRemoveShortcut(DesktopShortcut):
             self.change_icon(self.get_dragged_images())
         
     def _drag_end_broadcast_callback(self, widget):
-        self.change_icon(self.get_images())
+        self.change_icon(self.get_images(self.ICON_STATE_NORMAL))
     
     def dnd_drag_leave(self, widget, context, time):
         source_widget = context.get_source_widget()
@@ -130,13 +130,13 @@ class AddRemoveShortcut(DesktopShortcut):
     
     def _confirmation_received(self, result, widget, lbl):
         if result:
-            self.emit("application-shortcut-remove", widget._identifier)
+            self.emit("application-shortcut-remove", widget.parent.get_shortcut())
         else:
-            widget.set_images(widget.parent.get_images())
+            widget.set_images(widget.parent.get_images(self.ICON_STATE_NORMAL))
             widget.hide()
             widget.show()
             widget.parent._label.set_text(lbl)
             widget.parent._label.hide()
             widget.parent._label.show()
 
-        self.change_icon(self.get_images())
+        self.change_icon(self.get_images(self.ICON_STATE_NORMAL))

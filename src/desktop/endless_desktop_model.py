@@ -1,5 +1,6 @@
 import sys
 from util import image_util
+from osapps.app_shortcut import AppShortcut
 
 class EndlessDesktopModel(object):
     def __init__(self, app_desktop_datastore, preferences_provider, app_datastore, app_launcher, feedback_manager, time_provider):
@@ -10,11 +11,56 @@ class EndlessDesktopModel(object):
         self._app_datastore = app_datastore
         self._preferences_provider = preferences_provider
 
-    def get_shortcuts(self):
-        return self._app_desktop_datastore.get_all_shortcuts()
+    def get_shortcuts(self, force=False):
+        return self._app_desktop_datastore.get_all_shortcuts(force=force)
 
+    def set_shortcuts_by_name(self, shortcuts_names):
+        self._app_desktop_datastore.set_all_shortcuts_by_name(shortcuts_names)
+        
     def set_shortcuts(self, shortcuts):
         self._app_desktop_datastore.set_all_shortcuts(shortcuts)
+    
+    def _relocate_shortcut_to_root(self, source_shortcut):
+        source_parent = source_shortcut.parent()
+        source_parent.remove_child(source_shortcut)
+        
+        all_shortcuts = self._app_desktop_datastore.get_all_shortcuts()
+        all_shortcuts.append(source_shortcut)
+        self._app_desktop_datastore.set_all_shortcuts(all_shortcuts)
+        return True
+        
+    def _relocate_shortcut_to_folder(self, source_shortcut, folder_shortcut):
+        source_parent = source_shortcut.parent()
+        all_shortcuts = self._app_desktop_datastore.get_all_shortcuts()
+        
+        if (source_parent is None) and (source_shortcut in all_shortcuts):
+            all_shortcuts.remove(source_shortcut)
+            folder_shortcut.add_child(source_shortcut)
+            self._app_desktop_datastore.set_all_shortcuts(all_shortcuts)
+            return True
+        elif source_parent is not None:
+            source_parent.remove_child(source_shortcut)
+            folder_shortcut.add_child(source_shortcut)
+            self._app_desktop_datastore.set_all_shortcuts(all_shortcuts)
+            return True
+        else:
+            print >> sys.stderr, "unknown shortcut location"
+        return False
+    
+    def relocate_shortcut(self, source_shortcut, folder_shortcut):
+        if source_shortcut is not None:
+            source_parent = source_shortcut.parent()
+            all_shortcuts = self._app_desktop_datastore.get_all_shortcuts()
+
+            if folder_shortcut is None:
+                if source_parent is not None:
+                    return self._relocate_shortcut_to_root(source_shortcut)
+            else:
+                return self._relocate_shortcut_to_folder(
+                    source_shortcut, 
+                    folder_shortcut
+                    )                
+        return False
     
     def execute_app(self, app_key, params):
         app = self._app_datastore.get_app_by_key(app_key)
@@ -42,14 +88,39 @@ class EndlessDesktopModel(object):
         return self._preferences_provider.get_default_background()
     
     def delete_shortcut(self, shortcut):
-        all_shortcuts = [item.name() for item in self._app_desktop_datastore.get_all_shortcuts()]
-        for item in all_shortcuts:
-            if item == shortcut:
-                try:
-                    all_shortcuts.remove(item)
-                    self._app_desktop_datastore.set_all_shortcuts(all_shortcuts)
-                    return True
-                except:
-                    print >> sys.stderr, "delete shortcut failed!"
-                break
+        all_shortcuts = self._app_desktop_datastore.get_all_shortcuts()
+        parent = shortcut.parent()
+        
+        success = False
+        if parent is not None:
+            success = self.delete_from_folder(shortcut, parent)
+        else:
+            if shortcut in all_shortcuts:
+                success = self.delete_from_desktop(shortcut, all_shortcuts)
+            else:
+                print >> sys.stderr, "delete shortcut failed!"
+                
+        if success:
+            try:
+                self._app_desktop_datastore.set_all_shortcuts(all_shortcuts)
+                return True
+            except:
+                print >> sys.stderr, "delete shortcut failed!"
         return False
+        
+    def delete_from_folder(self, shortcut, parent):
+        try:
+            parent.remove_child(shortcut)
+            return True
+        except:
+            print >> sys.stderr, "removing child from folder failed!"
+        return False
+        
+    def delete_from_desktop(self, shortcut, all_shortcuts):
+        try:
+            all_shortcuts.remove(shortcut)
+            return True
+        except:
+            print >> sys.stderr, "no shortcut on desktop!"
+        return False
+        

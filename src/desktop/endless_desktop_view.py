@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 import math
 import sys
 import gettext
@@ -329,3 +330,4 @@ class EndlessDesktopView(gtk.Window):
         gobject.threads_init()
         gtk.threads_init()
         gtk.main()
+
