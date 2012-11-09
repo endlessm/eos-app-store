@@ -45,6 +45,7 @@ class TransparentWindow(gtk.Window):
             w, h = self.size_request()
             pixbuf = self._background.subpixbuf(x, y, w, h)
             cr.set_source_pixbuf(pixbuf, 0, 0)
+            
             cr.paint()
         else:
             x, y, w, h = self.get_allocation()
@@ -62,3 +63,7 @@ class TransparentWindow(gtk.Window):
             gradient.add_color_stop_rgba(0.995, 255, 255, 255, 0)
             cr.mask(gradient)
             cr.fill()
+        
+        #self.queue_draw()
+        
+        return False
