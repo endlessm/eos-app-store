@@ -166,12 +166,17 @@ class DesktopPage(gtk.VBox):
         wraper.show()
 
         self.__class__.page_buttons = []
+        invisible = True
+        if len(self.__class__.pages) > 1:
+            invisible = False
+        
         for i in range(0, DesktopPage.get_pages_count()):
             btn = Button(
                 normal = (image_util.image_path("button_mini_desktop_normal.png"),), 
                 hover = (image_util.image_path("button_mini_desktop__hover_active.png"),), 
                 down = (image_util.image_path("button_mini_desktop_down.png"),),
-                select = (image_util.image_path("button_mini_desktop__active.png"),)
+                select = (image_util.image_path("button_mini_desktop__active.png"),), 
+                invisible = invisible
                 )
             self.__class__.page_buttons.append(btn)
             btn.page_index = i
