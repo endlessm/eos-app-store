@@ -2,6 +2,7 @@ import string
 from util import label_util
 import gobject
 from util.image_eventbox import ImageEventBox
+from util.shadowed_label_box import ShadowedLabelBox
 import gtk
 
 class DesktopShortcut(gtk.VBox):
@@ -68,9 +69,7 @@ class DesktopShortcut(gtk.VBox):
         
         self._label.set_alignment(0.5, 0.0)
         
-        self._label_event_box = gtk.EventBox()
-        self._label_event_box.add(self._label)
-        self._label_event_box.set_visible_window(False)
+        self._label_event_box = ShadowedLabelBox(self._label)
         
         self.pack_start(self._event_box, False, False, 3)
         self.pack_start(self._label_event_box, False, False, 3)
