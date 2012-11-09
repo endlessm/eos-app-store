@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: dev 1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-10-20 06:06+0200\n"
+"POT-Creation-Date: 2012-11-09 21:09+0100\n"
 "PO-Revision-Date: 2012-05-31 11:54-0500\n"
 "Last-Translator: Automatically generated\n"
 "Language-Team: none\n"
@@ -18,7 +18,23 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
 
-#: src/desktop/endless_desktop_view.py:104
+#: src/add_shortcuts_module/add_folder_box.py:29
+msgid "1. NAME YOUR FOLDER"
+msgstr "1. O NOME DO SEU FOLDER"
+
+#: src/add_shortcuts_module/add_folder_box.py:31
+msgid "2. PICK A SYMBOL"
+msgstr "2. ESCOLHA UM SÍMBOLO"
+
+#: src/add_shortcuts_module/add_shortcuts_model.py:10
+msgid "APP"
+msgstr "APP"
+
+#: src/add_shortcuts_module/add_shortcuts_view.py:28
+msgid "Add Shortcuts"
+msgstr "Adicionar Atalhos"
+
+#: src/desktop/endless_desktop_view.py:111
 msgid "Apps"
 msgstr "Aplicativos"
 
@@ -40,6 +56,14 @@ msgstr "Feedback"
 msgid "Delete"
 msgstr "Excluir"
 
+#: src/add_shortcuts_module/add_shortcuts_model.py:13
+msgid "ENTERTAINMENT"
+msgstr ""
+
+#: src/add_shortcuts_module/add_shortcuts_model.py:20
+msgid "FOLDER"
+msgstr "ENTERTAINMENT"
+
 #: src/shortcut/add_remove_shortcut.py:98
 #: src/shortcut/add_remove_shortcut.py:106
 #: src/shortcut/add_remove_shortcut.py:114
@@ -47,14 +71,22 @@ msgstr "Excluir"
 msgid "Files"
 msgstr "Files"
 
-#: src/folder/folder_window.py:19 src/desktop/endless_desktop_view.py:117
+#: src/folder/folder_window.py:19 src/desktop/endless_desktop_view.py:124
 msgid "Folder"
 msgstr "Diretórios"
+
+#: src/add_shortcuts_module/add_shortcuts_model.py:14
+msgid "GAMES"
+msgstr "JOGOS"
 
 #: ui/bugs_and_feedback.glade:42
 #: src/feedback_module/bugs_and_feedback_popup_window.py:42
 msgid "Give us feedback"
 msgstr "Deixe seu comentário."
+
+#: src/add_shortcuts_module/add_shortcuts_model.py:15
+msgid "HEALTH"
+msgstr "SAÚDE"
 
 #: src/notification_panel/all_settings_view.py:41
 msgid "Log Out"
@@ -63,6 +95,18 @@ msgstr "Sair"
 #: src/notification_panel/all_settings_view.py:32
 msgid "Log Out?"
 msgstr "Sair?"
+
+#: src/add_shortcuts_module/add_shortcuts_model.py:18
+msgid "MY TOWN"
+msgstr "MINHA CIDADE"
+
+#: src/add_shortcuts_module/add_shortcuts_model.py:11
+msgid "POPULAR"
+msgstr "POPULAR"
+
+#: src/add_shortcuts_module/add_shortcuts_model.py:12
+msgid "PRODUCTIVITY"
+msgstr "PRODUTIVIDADE"
 
 #: ui/bugs_and_feedback.glade:6
 #: src/feedback_module/bugs_and_feedback_popup_window.py:55
@@ -85,6 +129,10 @@ msgstr "Reinicializar"
 #: src/notification_panel/all_settings_view.py:30
 msgid "Restart?"
 msgstr "Reinicializar?"
+
+#: src/add_shortcuts_module/add_shortcuts_model.py:17
+msgid "SOCIAL"
+msgstr "SOCIAL"
 
 #: ui/bugs_and_feedback.glade:94
 #: src/feedback_module/bugs_and_feedback_popup_window.py:65
@@ -140,7 +188,15 @@ msgstr "Atualizar"
 msgid "WARNING!"
 msgstr "AVISO"
 
-#: src/desktop/endless_desktop_view.py:116
+#: src/add_shortcuts_module/add_shortcuts_model.py:19
+msgid "WEB"
+msgstr "WEB"
+
+#: src/add_shortcuts_module/add_shortcuts_model.py:16
+msgid "WORK"
+msgstr "TRABALHO"
+
+#: src/desktop/endless_desktop_view.py:123
 msgid "Websites"
 msgstr "Páginas Web"
 
