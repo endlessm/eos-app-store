@@ -4,7 +4,7 @@ from eos_util import image_util
 from util.transparent_window import TransparentWindow
 
 class RemovalConfirmationPopupWindow():
-    def __init__(self, callback, parent=None, widget=None, label=None):
+    def __init__(self, callback, parent=None, widget=None, label=None, caller_widget=None):
         self._width = 91
         self._height = 91
         self._ok_active_images = (image_util.image_path("delete_ok_active.png"),)
@@ -16,6 +16,11 @@ class RemovalConfirmationPopupWindow():
         self._window = TransparentWindow(parent)
         self._window.set_size_request(self._width,self._height)
         self._window.set_position(gtk.WIN_POS_MOUSE)
+        
+        
+        if caller_widget:
+            self._move_window(caller_widget)
+        
         self._window.connect("focus-out-event", lambda w, e: callback(False, widget, label))
         self._window.connect("focus-out-event", lambda w, e: self.destroy())
         
@@ -64,3 +69,8 @@ class RemovalConfirmationPopupWindow():
     def _refresh_button(self, widget):
         widget.hide()
         widget.show()
+    
+    def _move_window(self, caller_widget):
+        new_x = caller_widget.allocation.x - int((self._width - caller_widget.allocation.width)/2)
+        new_y = caller_widget.allocation.y + int((self._width - caller_widget.allocation.height)/2)
+        self._window.move(new_x, new_y)
