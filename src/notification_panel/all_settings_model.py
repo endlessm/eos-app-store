@@ -5,7 +5,7 @@ from osapps.os_util import OsUtil
 from osapps.app_launcher import AppLauncher
 from util.update_lock import UpdateLock
 from ui.abstract_notifier import AbstractNotifier
-from startup.auto_updates.repo_chooser_launcher import RepoChooserLauncher
+from repo_chooser.repo_chooser_launcher import RepoChooserLauncher
 
 class AllSettingsModel(AbstractNotifier):
     UPDATE_LOCK = "update.lock"
