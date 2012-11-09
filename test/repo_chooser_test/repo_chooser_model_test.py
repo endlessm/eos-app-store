@@ -66,13 +66,3 @@ class RepoChooserModelTestCase(unittest.TestCase):
     
         endpoint_provider.set_endless_url.assert_called_with(expected_repo)
 
-    def test_update_with_default_endpoint_url_when_user_changes_repository(self):
-        default_url = endpoint_provider.get_endless_url()
-
-        endpoint_provider.set_endless_url = Mock()
-
-        self._test_object.do_update()
-    
-        endpoint_provider.set_endless_url.assert_called_with(default_url)
-
-

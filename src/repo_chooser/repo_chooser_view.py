@@ -9,7 +9,7 @@ class RepoChooserView(AbstractNotifier):
     PASSWORD_ENTERED = "password.entered"
     UPDATE_RESPONSE = "update.response"
 
-    def display(self):
+    def __init__(self):
         self._update_dialog = gtk.MessageDialog(None, gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT, gtk.MESSAGE_QUESTION, gtk.BUTTONS_YES_NO, "Welcome to the EndlessOS installer.")
         self._update_dialog.set_position(gtk.WIN_POS_CENTER)
         self._update_dialog.set_modal(True)
@@ -21,6 +21,7 @@ class RepoChooserView(AbstractNotifier):
         self._update_dialog.connect("key_press_event", self._key_press_handler)
         self._update_dialog.connect("response", self._handle_update_response)
 
+    def display(self):
         self._update_dialog.show_all()
 
     def _handle_update_response(self, dialog, response_id):
