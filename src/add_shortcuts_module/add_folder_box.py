@@ -54,32 +54,8 @@ class AddFolderBox(gtk.VBox):
         self._vbox.pack_start(self.hbox_separator1)
         self._vbox.pack_start(self._label_2, True, True, 0)
         
-        files = self._get_folder_icons('', 'folder')
-        icons = []
-        for fi in files:
-            image_box = ImageEventBox(None)
-            image_box.set_size_request(64, 64)
-            image_box.set_images(self.get_images(self._DEFAULT_ICON_PATH+fi))
-            image_box.connect("enter-notify-event", self._display_plus, parent._add_remove_widget)
-            image_box.connect("leave-notify-event", self._remove_plus, parent._add_remove_widget)
-            image_box.connect("button-release-event", self._create_folder, self._DEFAULT_ICON_PATH+fi)
-            image_box.show()
-            icons.append(image_box)
+        self._fill_table()
         
-        num_of_icons = len(icons)
-        columns = int(500/82)
-        rows = int(num_of_icons/columns) + 1
-        self._table = gtk.Table(rows, columns)
-        self._table.show()
-        col = row = 0
-        
-        for num in range(len(icons)):
-            if (num)%columns == 0:
-                col = 0
-                row = row + 1
-            self._table.attach(icons[num], col, col+1, row, row+1, ypadding=25, xpadding=25)
-            col = col + 1
-
         self._table.show()
         self._bottom_center = gtk.Alignment(0.5, 0, 0, 0)
         self._bottom_center.add(self._table)
@@ -126,13 +102,11 @@ class AddFolderBox(gtk.VBox):
         add_remove_widget.show()
     
     def _create_folder(self, widget, event, image_file):
-        print 'Creating folder...'
         if self._text_entry.get_text() != 'Untitled' and self._text_entry.get_text():
             self._parent.create_folder(self._text_entry.get_text(), image_file)
             self._parent.destroy(None, None)
         else:
             print 'FOLDER MUST HAVE A NAME!'
-        print 'Done.'
     
     def _handle_event(self, widget, event):
         cr = widget.window.cairo_create()
@@ -142,11 +116,8 @@ class AddFolderBox(gtk.VBox):
             self.x = x
             self.y = y
             self._background = self._background.subpixbuf(self.x, self.y, event.area.width, event.area.height)
-
-        w = event.area.width
-        h = event.area.height
         
-        self.draw(cr, event.area.x, event.area.y, w, h)
+        self.draw(cr, event.area.x, event.area.y, event.area.width, event.area.height)
         
         return False
         
@@ -181,3 +152,31 @@ class AddFolderBox(gtk.VBox):
     def _handle_scroll_event(self, widget, event):
         print 'Scrolling event caught, ', self._scrolling
         self._scrolling = True
+    
+    def _fill_table(self):
+        files = self._get_folder_icons('', 'folder')
+        icons = []
+        for fi in files:
+            image_box = ImageEventBox(None)
+            image_box.set_size_request(64, 64)
+            image_box.set_images(self.get_images(self._DEFAULT_ICON_PATH+fi))
+            image_box.connect("enter-notify-event", self._display_plus, self._parent._add_remove_widget)
+            image_box.connect("leave-notify-event", self._remove_plus, self._parent._add_remove_widget)
+            image_box.connect("button-release-event", self._create_folder, self._DEFAULT_ICON_PATH+fi)
+            image_box.show()
+            icons.append(image_box)
+        
+        num_of_icons = len(icons)
+        available_width = screen_util.get_width() - self._parent._add_buton_box_width - self._parent._tree_view_width
+        columns = int(available_width/120)   # shold this be a fixed number like 5 as in pdf?
+        rows = int(num_of_icons/columns) + 1
+        self._table = gtk.Table(rows, columns)
+        self._table.show()
+        col = row = 0
+        
+        for num in range(len(icons)):
+            if (num)%columns == 0:
+                col = 0
+                row = row + 1
+            self._table.attach(icons[num], col, col+1, row, row+1, ypadding=25, xpadding=25)
+            col = col + 1

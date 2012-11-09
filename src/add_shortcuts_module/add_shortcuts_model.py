@@ -1,5 +1,5 @@
-import gtk
 import os
+from shortcut_category import ShortcutCategory
 
 class AddShortcutsModel():
     def __init__(self):
@@ -41,15 +41,12 @@ class AddShortcutsModel():
         if not path:
             path = self._DEFAULT_ICON_PATH
     
-        icon_list = os.listdir(path)
-    
+        icon_list = self.get_icon_list(path)
+        icons = []
         for icon in icon_list:
-            if not hint in icon or not (icon.endswith(".png") or icon.endswith(".svg")):
-                icon_list.remove(icon)
-        return icon_list
+            if hint in icon and (icon.endswith(".png") or icon.endswith(".svg")):
+                icons.append(icon)
+        return icons
         
-class ShortcutCategory():
-    def __init__(self, name='', active=False):
-        self.category = name
-        self.subcategories = []
-        self.active = active
+    def get_icon_list(self, path):
+        return os.listdir(path)
