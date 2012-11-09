@@ -16,23 +16,18 @@ class RepoChooserModelTestCase(unittest.TestCase):
     def tearDown(self):
         endpoint_provider.set_endless_url = self._original_endpoint_provider
 
-    def test_default_chosen_repository_is_empty(self):
-        self.assertEquals("", self._test_object.get_chosen_repository())
+    def test_default_chosen_repository_is_whatever_environment_manager_gives_us(self):
+        expected_repo = "expected repo"
+        self._mock_env_manager.get_current_repo = Mock(return_value=expected_repo)
+
+        self.assertEquals(expected_repo, self._test_object.get_chosen_repository())
 
     def test_choosing_a_password_returns_repo_from_environment_manager(self):
-        expected_repo = "expected repository"
-        given_password = "expected password"
-
-        def get_repo_from_password(password):
-            if password == given_password:
-                repo_def = Mock()
-                repo_def.display_name = expected_repo
-                return repo_def
-
-        self._mock_env_manager.find_repo = Mock(side_effect=get_repo_from_password)
+        given_password = "this is the given password"
 
         self._test_object.choose_repository(given_password)
-        self.assertEquals(expected_repo, self._test_object.get_chosen_repository())
+
+        self._mock_env_manager.set_current_repo.assert_called_once_with(given_password)
 
     def test_changing_repositories_notifies_the_repository_changed_listener(self):
         listener = Mock()
@@ -46,23 +41,4 @@ class RepoChooserModelTestCase(unittest.TestCase):
         self._test_object.do_update()
 
         self.assertTrue(self._mock_update_manager.update_os.called)
-
-    def test_update_endpoint_url_when_user_changes_repository(self):
-        expected_repo = "expected repository"
-        given_password = "the password"
-
-        def get_repo_from_password(password):
-            if password == given_password:
-                repo_def = Mock()
-                repo_def.repo_url = expected_repo
-                return repo_def
-        self._mock_env_manager.find_repo = Mock(side_effect=get_repo_from_password)
-
-        self._test_object.choose_repository(given_password)
-
-        endpoint_provider.set_endless_url = Mock()
-
-        self._test_object.do_update()
-    
-        endpoint_provider.set_endless_url.assert_called_with(expected_repo)
 

@@ -12,16 +12,11 @@ class RepoChooserModel(AbstractNotifier):
         self._update_manager = update_manager
 
     def get_chosen_repository(self):
-        if hasattr(self, "_chosen_repo"):
-            return self._chosen_repo.display_name
-        return ""
+        return self._environment_manager.get_current_repo()
 
     def choose_repository(self, password):
-        self._chosen_repo = self._environment_manager.find_repo(password)
+        self._environment_manager.set_current_repo(password)
         self._notify(self.REPO_CHANGED)
 
     def do_update(self):
-        if hasattr(self, "_chosen_repo"):
-            endpoint_provider.set_endless_url(self._chosen_repo.repo_url)
-
         self._update_manager.update_os()
