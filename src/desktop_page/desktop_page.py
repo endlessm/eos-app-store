@@ -26,7 +26,7 @@ class DesktopPage(gtk.VBox):
         cls.reload_callback = reload_callback
         cls.max_items_in_row = max_items_in_row
         cls.max_rows_in_page = max_rows_in_page
-        cls.max_items_in_page = max_items_in_row*max_rows_in_page
+        cls.max_items_in_page = (max_items_in_row*max_rows_in_page)-1
         
         pages_count = len(cls.items) / cls.max_items_in_page
         if (len(cls.items) % cls.max_items_in_page) != 0:
@@ -35,8 +35,6 @@ class DesktopPage(gtk.VBox):
         cls.pages = []
         for page_index in range(0, pages_count):
             cls.pages.append(page_index*cls.max_items_in_page)
-        
-        print 'pages start items indexes', cls.pages 
         
     @classmethod
     def get_pages_count(cls):
@@ -48,34 +46,58 @@ class DesktopPage(gtk.VBox):
         
     @classmethod
     def get_current_page(cls):
-        if cls._last_page_index != cls._current_page_index:
-            cls.page = DesktopPage()
-            offset = cls.pages[cls._current_page_index]
-            #offset = 0
-            index = 0
-            step = int(cls.max_items_in_row)
-            while index < cls.max_items_in_page:
-            #while index < len(cls.items):
-                print 'row created'
-                row = cls.create_row_callback(
-                    cls.items[(index+offset):(step+index+offset)]
-                    )
-                #cls.page.desk_area.pack_start(row, expand=False, fill=False, padding=0)
-                #row_wrap = gtk.EventBox()
-                #row_wrap.modify_bg(gtk.STATE_NORMAL, gtk.gdk.color_parse("green"))
-                #row_wrap.add(row)
-                #row_wrap.show()
-                row.show()
-                cls.page.desk_area.pack_start(row, expand=False, fill=False, padding=0)
-                index += step
-                if index >= len(cls.items)-offset:
-                    break
-            cls._last_page_index = cls._current_page_index
+        cls.page = DesktopPage()
+        if cls._current_page_index > (len(cls.pages)-1):
+            cls._current_page_index = len(cls.pages)-1
+        offset = cls.pages[cls._current_page_index]
+        visible_items = cls.items[offset:offset+(cls.max_items_in_page)]
+        last_row = False
+        rows_count = 0
+        while len(visible_items) > 0:
+            row = visible_items[:cls.max_items_in_row]
+            visible_items = visible_items[len(row):]
+            if len(row) < cls.max_items_in_row:
+                last_row = True
+            row_widget = cls.create_row_callback(row, last_row=last_row)
+            row_widget.show()
+            cls.page.desk_area.pack_start(
+                row_widget, 
+                expand=False, 
+                fill=False, 
+                padding=0
+                )
+            rows_count += 1
+            
+            if last_row or (not rows_count < cls.max_rows_in_page):
+                break
+                
+        if len(row) == cls.max_items_in_row:
+            row_widget = cls.create_row_callback([], last_row=True)
+            row_widget.show()
+            cls.page.desk_area.pack_start(
+                row_widget, 
+                expand=False, 
+                fill=False, 
+                padding=0
+                )
+                
+        cls.update_images(cls._current_page_index)
         return cls.page
         
     @classmethod
+    def has_next(cls):
+        if cls._current_page_index < (len(cls.pages)-1):
+            return True
+        return False
+        
+    @classmethod
+    def has_prev(cls):
+        if cls._current_page_index > 0:
+            return True
+        return False
+        
+    @classmethod
     def next_page(cls):
-        print 'next_page'
         if cls._current_page_index < len(cls.pages)-1:
             cls._current_page_index += 1
             cls.reload_callback()
@@ -83,7 +105,6 @@ class DesktopPage(gtk.VBox):
         
     @classmethod
     def prev_page(cls):
-        print 'prev_page'
         if cls._current_page_index > 0:
             cls._current_page_index -= 1
             cls.reload_callback()
@@ -100,16 +121,13 @@ class DesktopPage(gtk.VBox):
         i = 0
         for btn in cls.page_buttons:
             if i == index:
-                print 'page index', i
                 btn.selected()
             else:
-                print 'page not', i
                 btn.unselected()
             i += 1
         
     @classmethod
     def goto_page(cls, index):
-        print 'goto_page', index
         if cls._current_page_index != index:
             if (index >= 0) and (index < len(cls.pages)):
                 cls._current_page_index = index
@@ -124,7 +142,6 @@ class DesktopPage(gtk.VBox):
        
     @classmethod
     def _goto_page_callback(cls, w):
-        print 'index', w.page_index
         DesktopPage.goto_page(w.page_index)
         
     def __init__(self):
@@ -148,9 +165,6 @@ class DesktopPage(gtk.VBox):
         wraper.add(self.bottom_hbox)
         wraper.show()
 
-        
-        
-        
         self.__class__.page_buttons = []
         for i in range(0, DesktopPage.get_pages_count()):
             btn = Button(
@@ -173,27 +187,32 @@ class DesktopPage(gtk.VBox):
         self.desk_area.set_spacing(60)
         
         
+        hide_btn = True
+        if self.__class__.has_prev():
+            hide_btn = False
         self.prev_button = Button(
             normal = (), 
             hover = (image_util.image_path("button_arrow_desktop_left_hover.png"),), 
-            down = (image_util.image_path("button_arrow_desktop_left_down.png"),)
+            down = (image_util.image_path("button_arrow_desktop_left_down.png"),), 
+            invisible = hide_btn
             )
         self.prev_button.connect("clicked", lambda w: DesktopPage.prev_page())
         self.prev_button.set_size_request(50, 420)
-        self.prev_button_wrap = Button.align_it(self.prev_button)
-        self.prev_button_wrap.show()
         
+        self.prev_button_wrap = Button.align_it(self.prev_button)
+        
+        hide_btn = True
+        if self.__class__.has_next():
+            hide_btn = False
         self.next_button = Button(
             normal = (), 
             hover = (image_util.image_path("button_arrow_desktop_right_hover.png"),), 
-            down = (image_util.image_path("button_arrow_desktop_right_down.png"),)
+            down = (image_util.image_path("button_arrow_desktop_right_down.png"),), 
+            invisible = hide_btn
             )
         self.next_button.connect("clicked", lambda w: DesktopPage.next_page())
         self.next_button.set_size_request(50, 420)
         self.next_button_wrap = Button.align_it(self.next_button)
-        self.next_button_wrap.show()
-        
-        
         
         self.icons_alignment.add(self.desk_area)
         self.desk_container.pack_start(self.prev_button_wrap, expand=False, fill=False, padding=0)
@@ -205,7 +224,7 @@ class DesktopPage(gtk.VBox):
         self.pack_end(wraper, expand=False, fill=False, padding=0)
         
         self.show_all()
-
+        
                 
     
     

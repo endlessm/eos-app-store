@@ -33,6 +33,7 @@ class EndlessDesktopView(gtk.Window):
 
     def __init__(self):
         gtk.Window.__init__(self)
+        self._app_shortcuts = []
         
         width, height = self._get_net_work_area()
         self.resize(width, height)
@@ -54,7 +55,6 @@ class EndlessDesktopView(gtk.Window):
         # -----------WORKSPACE-----------
         
         self._align = gtk.Alignment(1.0, 1.0, 1.0, 1.0)
-        #self._align = gtk.HBox()
         
         self._taskbar_panel = TaskbarPanel(width)
         self._taskbar_panel.connect('feedback-clicked', lambda w: self._feedback_icon_clicked_callback())
@@ -139,71 +139,33 @@ class EndlessDesktopView(gtk.Window):
         self.popup.add(folder_menu)
         
     def refresh(self, shortcuts, force=False):
-        
-        if force:
-           self._app_shortcuts = {}
-        self._folder_shortcuts = {}
-        for shortcut in shortcuts:
-
-            if shortcut.key() not in self._app_shortcuts:
-                if shortcut.has_children():
-                    app_shortcut = FolderShortcut(shortcut, self._folder_icon_clicked_callback)
-                else:
-                    app_shortcut = ApplicationShortcut(shortcut)
-                
-                self._app_shortcuts[shortcut.name()] = app_shortcut
-        self._shorcuts_buffer = [shortcut.name() for shortcut in shortcuts]
-        self._redraw(self._shorcuts_buffer)
-                
-        self._align.show()
-        
-    def _page_change_callback(self):
-        print '_page_change_callback'
-        self._redraw(self._shorcuts_buffer)
-
-    def _redraw(self, icon_data):
-        self._remove_all()
-        
-        # childrens = self._align.get_children()
-        # for ch in childrens:
-            # self._align.remove(ch)
-        
+            
         child = self._align.get_child()
         if child:
             child.parent.remove(child)
+            child.destroy()
             
-        items = [self._app_shortcuts[key] for key in icon_data]
         DesktopPage.calc_pages(
-            items, 
+            shortcuts, 
             create_row_callback = self._create_row, 
             reload_callback = self._page_change_callback, 
             max_items_in_row = self._max_icons_in_row, 
             max_rows_in_page = self._max_rows_in_page
             )
-            
         desk_page = DesktopPage.get_current_page()
         desk_page.show()
-        #desk_page.set_spacing(30)
         
-        # wraper = gtk.HBox()
-        # wraper.pack_start(desk_page)
-        # wraper.show()
-        
-        btn = gtk.Button()
-        btn.modify_bg(gtk.STATE_NORMAL, gtk.gdk.Color(35,238,1000))
-        btn.show()
-        #self._align.add(btn)
-        #self._align.add(wraper)
         self._align.add(desk_page)
         desk_page.show()
         self._align.show()
-        print 'align allocation', self._align.allocation.width
+        
+    def _page_change_callback(self):
+        self._presenter._page_change_callback()
         
     def _add_icon_clicked_callback(self, widget, event):
         self.popup.show_all()
         self.popup.popup(None, None, None, event.button, event.time)
-
-            
+        
     def _feedback_submitted(self, widget):
         self._presenter.submit_feedback(self._feedback_popup.get_text(), self._feedback_popup.is_bug())
         self._feedback_popup.destroy()
@@ -253,30 +215,33 @@ class EndlessDesktopView(gtk.Window):
         self.close_folder_window()
         self.show_folder_window(shortcut)
         
-    def _remove_all(self):
-        for item in self._app_shortcuts.values():
-            item.remove_shortcut()
-        
     def _create_row(self, items, last_row=False):
+    
+        while len(self._app_shortcuts) > 0:
+            w = self._app_shortcuts[0]
+            w.destroy()
+    
         row = gtk.HBox()
         row.show()
         
         sep_last = SeparatorShortcut(width=self.HORIZONTAL_SPACING/2)
         sep_last.connect("application-shortcut-move", self._rearrange_shortcuts)
         row.pack_start(sep_last, False, False, 0)
-        for item in items:
-            if isinstance(item, ApplicationShortcut):
-                item.connect("application-shortcut-rename", lambda w, shortcut, new_name: self._presenter.rename_item(shortcut, new_name))
-                item.connect("application-shortcut-activate", lambda w, app_key, params: self._presenter.activate_item(app_key, params))
-                item.connect("desktop-shortcut-dnd-begin", self._dnd_begin)
-                item.show()
-                
-            elif isinstance(item, FolderShortcut):
+        
+        for shortcut in items:
+            if shortcut.has_children():
+                item = FolderShortcut(shortcut, self._folder_icon_clicked_callback)
                 item.connect("folder-shortcut-activate", self._folder_icon_clicked_callback)
                 item.connect("folder-shortcut-relocation", self._relocation_callback)
                 item.connect("desktop-shortcut-dnd-begin", self._dnd_begin)
                 item.show()
-                
+            else:
+                item = ApplicationShortcut(shortcut)
+                item.connect("application-shortcut-rename", lambda w, shortcut, new_name: self._presenter.rename_item(shortcut, new_name))
+                item.connect("application-shortcut-activate", lambda w, app_key, params: self._presenter.activate_item(app_key, params))
+                item.connect("desktop-shortcut-dnd-begin", self._dnd_begin)
+                item.show()
+        #
             if item.parent != None:
                 print >> sys.stderr, "Item has parent!", item
             row.pack_start(item, False, False, 0)

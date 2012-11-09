@@ -96,6 +96,9 @@ class DesktopShortcut(gtk.VBox):
             gtk.gdk.ACTION_MOVE
             )
         
+    def __str__(self):
+        return self._event_box._identifier
+        
     def set_is_highlightable(self, value):
         self.highlightable = value
             
@@ -217,4 +220,10 @@ class DesktopShortcut(gtk.VBox):
         icon.show()
         
         return icon
+        
+    def destroy(self):
+        self.unparent()
+        self._label.destroy()
+        self._event_box.destroy()
+        
 

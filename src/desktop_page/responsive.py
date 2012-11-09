@@ -11,7 +11,7 @@ class Button(ImageEventBox):
         align.add(button)
         return align
 
-    def __init__(self, normal=(), hover=(), down=(), select=()):
+    def __init__(self, normal=(), hover=(), down=(), select=(), invisible=False):
         self.normal = normal
         self.hover = hover
         self.down = down
@@ -19,6 +19,8 @@ class Button(ImageEventBox):
         self.is_selected = False
         self._set_last_images(self.normal)
         self._on_clicked = None
+        self._invisible = invisible
+        self.set_invisible(self._invisible)
         super(Button, self).__init__(self.normal)
         
         self.connect("button_press_event", self.button_press_event)
@@ -44,46 +46,47 @@ class Button(ImageEventBox):
     def _get_last_images(self):
         return self._last_images
         
-    def selected(self):
-        print 'selected', self
-        self.is_selected = True
-        self.set_images(self.select)
-        self._set_last_images(self.select)
+    def set_invisible(self, value):
+        self._invisible = value
+        
+    def display(self):
+        if self._invisible:
+            self.set_images(())
         self.hide()
         self.show()
         
+    def selected(self):
+        self.is_selected = True
+        self.set_images(self.select)
+        self._set_last_images(self.select)
+        self.display()
+        
     def unselected(self):
-        print 'unselected', self
         self.is_selected = False
         self.set_images(self.normal)
         self._set_last_images(self.normal)
-        self.hide()
-        self.show()
+        self.display()
                             
     def button_press_event(self, widget, event):
         self.set_images(self.down)
-        self.hide()
-        self.show()
+        self.display()
         if self._on_clicked is not None:
             self._on_clicked(widget)
         
     def button_release_event(self, widget, event):
         self.set_images(self._get_last_images())
-        self.hide()
-        self.show()
+        self.display()
         
     def enter_notify_event(self, widget, event):
         if not self.is_selected:
             self.set_images(self.hover)
             #self._set_last_images(self.hover)
-            self.hide()
-            self.show()
+            self.display()
         
     def leave_notify_event(self, widget, event):
         #self.set_images(self.normal)
         #self._set_last_images(self.normal)
         if not self.is_selected:
             self.set_images(self._get_last_images())
-            self.hide()
-            self.show()
+            self.display()
         
