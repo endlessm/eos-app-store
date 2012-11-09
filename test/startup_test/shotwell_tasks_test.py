@@ -1,8 +1,6 @@
 import unittest
-from startup.tasks import Tasks
-from mock import Mock, call
+from mock import Mock, call #@UnresolvedImport
 import shutil
-import os
 import os.path
 
 from startup.shotwell_tasks import ShotwellTasks
