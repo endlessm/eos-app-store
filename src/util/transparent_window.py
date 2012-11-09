@@ -40,7 +40,7 @@ class TransparentWindow(gtk.Window):
         
         return False
         
-     def draw(self, cr, x, y):
+    def draw(self, cr, x, y):
         if self.gradient_type is None:
             w, h = self.size_request()
             pixbuf = self._background.subpixbuf(x, y, w, h)
