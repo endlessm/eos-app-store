@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 import math
 import sys
 import gettext
