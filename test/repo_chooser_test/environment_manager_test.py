@@ -2,7 +2,6 @@ import unittest
 import os.path
 
 from repo_chooser.environment_manager import EnvironmentManager
-from repo_chooser.repo_def import RepoDef
 
 from startup.auto_updates import endpoint_provider
 
