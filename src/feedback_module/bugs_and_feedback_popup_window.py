@@ -1,7 +1,7 @@
 import gtk
 import gettext
-from util.image_eventbox import ImageEventBox
-from util import image_util
+from eos_widgets.image_eventbox import ImageEventBox
+from eos_util import image_util
 from util.transparent_window import TransparentWindow
 
 gettext.install('endless_desktop', '/usr/share/locale', unicode = True, names=['ngettext'])

@@ -2,7 +2,7 @@ import gobject
 from shortcut.desktop_shortcut import DesktopShortcut
 from removal_module.removal_confirmation_popup_window import RemovalConfirmationPopupWindow
 from removal_module.delete_not_possible_popup import DeleteNotPossiblePopupWindow
-from util import image_util
+from eos_util import image_util
 
 class AddRemoveShortcut(DesktopShortcut):
     __gsignals__ = {

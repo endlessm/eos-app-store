@@ -1,6 +1,6 @@
 from shortcut.desktop_shortcut import DesktopShortcut
 from shortcut.application_shortcut import ApplicationShortcut
-from util import image_util
+from eos_util import image_util
 import gtk
 import gobject
 

@@ -2,7 +2,8 @@ import gobject
 import string
 import gtk.keysyms
 import gtk
-from util import label_util, image_util
+from eos_util import image_util
+from util import label_util
 from shortcut.desktop_shortcut import DesktopShortcut
 
 class ApplicationShortcut(DesktopShortcut):
