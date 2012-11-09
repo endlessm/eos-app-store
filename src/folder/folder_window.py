@@ -1,7 +1,8 @@
 import gtk
 import gettext
-from util.image_eventbox import ImageEventBox
-from util import image_util, screen_util
+from eos_widgets.image_eventbox import ImageEventBox
+from eos_util import image_util
+from util import screen_util
 from util.transparent_window import TransparentWindow
 from folder.folder_icons import FolderIcons
 

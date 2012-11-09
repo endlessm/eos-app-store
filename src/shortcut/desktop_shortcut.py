@@ -1,7 +1,7 @@
 import string
 from util import label_util
 import gobject
-from util.image_eventbox import ImageEventBox
+from widgets.image_eventbox import ImageEventBox
 import gtk
 
 class DesktopShortcut(gtk.VBox):
