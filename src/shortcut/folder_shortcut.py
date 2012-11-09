@@ -11,17 +11,13 @@ class FolderShortcut(DesktopShortcut):
     }
 
     def __init__(self, shortcut, callback, image=''):
-        self.image = image
         self._shortcut = shortcut
+        self._normal_text = shortcut.name()
         super(FolderShortcut, self).__init__(shortcut.name())
 #        self._image = image
 #        print hasattr(self, '_image')
 #        print hasattr(shortcut, '_image')
         self._callback = callback
-        
-        
-        self._shortcut._image = image
-        self._normal_text = shortcut.name()
         
         self._event_box.connect("button-release-event", self.mouse_release_callback)
 
@@ -42,6 +38,12 @@ class FolderShortcut(DesktopShortcut):
         if self.parent:
             self.parent.remove(self)
     
-    def get_images(self):
-        image = self.image or image_util.image_path("folder.png")
-        return (image_util.image_path("endless-shortcut-well.png"), image ,image_util.image_path("endless-shortcut-foreground.png"))
+    def get_images(self, event_state):
+        shortcut_icon_dict = self._shortcut.icon()
+        default_icon = shortcut_icon_dict.get(self.ICON_STATE_NORMAL, image_util.image_path("folder.png"))
+        return (shortcut_icon_dict.get(event_state, default_icon), )
+        
+    def get_highlight_images(self, event_state):
+        icon = self.get_images(event_state)
+        highlight_icon = image_util.image_path("icon_highlight.png")
+        return icon + (highlight_icon, )

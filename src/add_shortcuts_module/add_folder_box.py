@@ -96,7 +96,7 @@ class AddFolderBox(gtk.VBox):
         widget.set_images(tuple(images[:-1]))
         widget.hide()
         widget.show()
-        add_remove_widget._event_box.set_images(add_remove_widget.get_images())
+        add_remove_widget._event_box.set_images(add_remove_widget.get_images('normal'))
         add_remove_widget._label.set_text('')
         add_remove_widget.hide()
         add_remove_widget.show()

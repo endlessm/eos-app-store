@@ -40,12 +40,25 @@ class TransparentWindow(gtk.Window):
         
         return False
         
-    def draw(self, cr, x, y):
-        w, h = self.size_request()
-        pixbuf = self._background.subpixbuf(x, y, w, h)
-        cr.set_source_pixbuf(pixbuf, 0, 0)
-
-        cr.paint()
-        #self.queue_draw()
-        
-        #return False
+     def draw(self, cr, x, y):
+        if self.gradient_type is None:
+            w, h = self.size_request()
+            pixbuf = self._background.subpixbuf(x, y, w, h)
+            cr.set_source_pixbuf(pixbuf, 0, 0)
+            cr.paint()
+        else:
+            x, y, w, h = self.get_allocation()
+            
+            screen_height = self._background.get_height()
+            
+            offset = int(round((screen_height - self.working_area)/2))
+            pixbuf = self._background.subpixbuf(x, screen_height-h-offset, w, h)
+            cr.set_source_pixbuf(pixbuf, 0, 0)
+            
+            gradient = cairo.LinearGradient(0, 0, 0, h)
+            gradient.add_color_stop_rgba(0.005, 255, 255, 255, 0)
+            gradient.add_color_stop_rgba(0.006, 0, 0, 0, 0.7)
+            gradient.add_color_stop_rgba(0.994, 0, 0, 0, 0.0)
+            gradient.add_color_stop_rgba(0.995, 255, 255, 255, 0)
+            cr.mask(gradient)
+            cr.fill()

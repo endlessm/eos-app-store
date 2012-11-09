@@ -15,7 +15,7 @@ class AddShortcutsPresenter():
         dir_name = self.check_dir_name(dir_name, shortcuts)
         path = self._model.create_directory(dir_name)
         if path:
-            shortcut = AppShortcut(key='', name=dir_name, icon=image_file)
+            shortcut = AppShortcut(key='', name=dir_name, icon={'normal':image_file})
             presenter._model._app_desktop_datastore.add_shortcut(shortcut)
     
     def get_folder_icons(self, path, hint):
