@@ -53,7 +53,8 @@ class EndlessDownloaderTestCase(unittest.TestCase):
     def test_correct_files_are_being_downloaded(self):
         endpoint = "endpoint"
         endpoint_provider.get_endless_url = Mock(return_value=endpoint)
-        list_of_files = [("file1", "md5sum1"), ("file2", "md5sum2"), ("file3", "md5sum3")]
+        list_of_files = [("file1", "md5sum1"), ("file2", "md5sum2"), 
+                        ("file3", "md5sum3"), ("file%3a4", "md5sum4")]
         self._mock_file_synchronizer.files_to_download = Mock(return_value=list_of_files)
         
         self._mock_file_downloader.download_file = Mock(return_value="")
@@ -62,7 +63,8 @@ class EndlessDownloaderTestCase(unittest.TestCase):
         expected_calls = [call(endpoint + "/mirror/files.txt"), 
 		  						call(endpoint + "/mirror/file1", "md5sum1"), 
 								call(endpoint + "/mirror/file2", "md5sum2"), 
-								call(endpoint + "/mirror/file3", "md5sum3")]
+								call(endpoint + "/mirror/file3", "md5sum3"),
+								call(endpoint + "/mirror/file%253a4", "md5sum4")]
 
         self.assertEquals(expected_calls, self._mock_file_downloader.download_file.call_args_list)
 

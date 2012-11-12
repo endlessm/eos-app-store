@@ -4,6 +4,8 @@ from startup.auto_updates import endpoint_provider
 from startup.auto_updates.file_synchronizer import FileSynchronizer
 from startup.auto_updates.file_downloader import FileDownloader
 
+import re
+
 class EndlessDownloader():
     INDEX_FILE = "files.txt"
     
@@ -21,6 +23,8 @@ class EndlessDownloader():
         remote_file_list = self._file_downloader.download_file(mirror_url + self.INDEX_FILE)
         files_to_download = self._file_synchronizer.files_to_download(local_file_list, remote_file_list)
         for remote_file, expected_md5 in files_to_download:
+            if "%" in remote_file:
+                remote_file = re.sub("%", "%25", remote_file)
             file_content = self._file_downloader.download_file(mirror_url + remote_file, expected_md5)
 
             with open(os.path.join(download_directory, remote_file), "w") as local_file:
