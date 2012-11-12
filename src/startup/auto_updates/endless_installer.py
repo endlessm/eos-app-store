@@ -21,8 +21,10 @@ class EndlessInstaller():
         self._os_util.execute(
                             ["sudo", "/usr/bin/endless_post_install.sh"])
 
+        log.info("resetting the mirror endpoint to production")
         endpoint_provider.reset_url()
 
+        log.info("installation successful -- restarting")
         self._os_util.execute(
                             ["sudo", "/sbin/shutdown", "-r", "now"])
 
