@@ -1,8 +1,10 @@
 from auto_updates.update_manager import UpdateManager
+from auto_updates.force_install import ForceInstall
 from eos_log import log
 
 class StartupTasks(object):
     TASK_PLUGINS = [
+                    ForceInstall,
                     UpdateManager
                 ]
     

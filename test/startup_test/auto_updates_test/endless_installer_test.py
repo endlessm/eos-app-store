@@ -7,7 +7,9 @@ from startup.auto_updates import endpoint_provider
 class EndlessInstallerTestCase(unittest.TestCase):
     def setUp(self):
         self._mock_os_util = Mock()
-        self._test_object = EndlessInstaller(self._mock_os_util)
+        self._mock_force_install_checker = Mock()
+
+        self._test_object = EndlessInstaller(self._mock_os_util, self._mock_force_install_checker)
 
         self._orig_endpoint_provider = endpoint_provider.reset_url
 
@@ -34,4 +36,9 @@ class EndlessInstallerTestCase(unittest.TestCase):
         self._test_object.install_all_packages(Mock())
 
         self.assertTrue(endpoint_provider.reset_url.called)
+
+    def test_installing_all_packages_should_inform_the_install_checker_that_the_install_was_accomplished(self):
+        self._test_object.install_all_packages(Mock())
+
+        self.assertTrue(self._mock_force_install_checker.install_accomplished.called)
 
