@@ -27,3 +27,6 @@ def set_endless_url(url):
 def _endless_url_setup():
     if not os.path.exists(_endless_home_path):
         os.makedirs(_endless_home_path)
+
+def reset_url():
+    set_endless_url(_DEFAULT_ENDLESS_URL)

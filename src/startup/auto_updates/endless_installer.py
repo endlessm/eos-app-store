@@ -1,6 +1,8 @@
 from osapps.os_util import OsUtil
 from eos_log import log
 
+from startup.auto_updates import endpoint_provider
+
 class EndlessInstaller():
     def __init__(self, os_util=OsUtil()):
         self._os_util = os_util
@@ -19,4 +21,5 @@ class EndlessInstaller():
         self._os_util.execute(
                             ["sudo", "/usr/bin/endless_post_install.sh"])
 
+        endpoint_provider.reset_url()
 

@@ -61,3 +61,11 @@ class EndpointProviderTestCase(unittest.TestCase):
 
         self.assertEquals(expected_endpoint, actual_endpoint)
 
+
+    def test_reset_url_should_switch_the_endpoint_to_the_default_url(self):
+        default_value = endpoint_provider.get_endless_url()
+        endpoint_provider.set_endless_url("this is some other value")
+
+        endpoint_provider.reset_url()
+
+        self.assertEquals(default_value, endpoint_provider.get_endless_url())
