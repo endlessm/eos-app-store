@@ -23,6 +23,9 @@ class DesktopPresenter(object):
     def move_item(self, shortcuts):
         self._model.set_shortcuts(shortcuts)
         self._view.refresh(self._model.get_shortcuts(force=True), force=True)
+        
+    def _page_change_callback(self):
+        self._view.refresh(self._model.get_shortcuts())
     
     def relocate_item(self, source_shortcut, folder_shortcut):
         self._view.close_folder_window()

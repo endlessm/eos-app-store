@@ -37,24 +37,26 @@ class SeparatorShortcut(DesktopShortcut):
         dest_widget = destination.parent
         source_widget = source.parent
         
-        if isinstance(dest_widget, SeparatorShortcut):
-            source_shortcut = source_widget.get_shortcut()
-            if source_shortcut is None:
-                return
-            
-            left_shortcut = None
-            if dest_widget.left_widget is not None:
-                left_shortcut = dest_widget.left_widget.get_shortcut()
-            right_shortcut = None
-            if dest_widget.right_widget is not None:
-                right_shortcut = dest_widget.right_widget.get_shortcut()
+        if isinstance(dest_widget, SeparatorShortcut) and \
+            (source_widget is not self.left_widget) and \
+            (source_widget is not self.right_widget):
+                source_shortcut = source_widget.get_shortcut()
+                if source_shortcut is None:
+                    return
                 
-            self.emit(
-                "application-shortcut-move",
-                source_shortcut, 
-                left_shortcut, 
-                right_shortcut
-                )
+                left_shortcut = None
+                if dest_widget.left_widget is not None:
+                    left_shortcut = dest_widget.left_widget.get_shortcut()
+                right_shortcut = None
+                if dest_widget.right_widget is not None:
+                    right_shortcut = dest_widget.right_widget.get_shortcut()
+                    
+                self.emit(
+                    "application-shortcut-move",
+                    source_shortcut, 
+                    left_shortcut, 
+                    right_shortcut
+                    )
         
     def _drag_leave_handler_callback(self, source, destination):
         self.reset()

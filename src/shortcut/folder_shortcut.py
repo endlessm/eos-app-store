@@ -1,6 +1,6 @@
 from shortcut.desktop_shortcut import DesktopShortcut
 from shortcut.application_shortcut import ApplicationShortcut
-from util import image_util
+from eos_util import image_util
 import gtk
 import gobject
 
@@ -106,5 +106,3 @@ class FolderShortcut(DesktopShortcut):
     def get_highlight_images(self, event_state):
         icon = self.get_images(event_state)
         highlight_icon = image_util.image_path("icon_highlight.png")
-        return icon + (highlight_icon, )
-

@@ -2,7 +2,7 @@ import gobject
 from shortcut.desktop_shortcut import DesktopShortcut
 from removal_module.removal_confirmation_popup_window import RemovalConfirmationPopupWindow
 from removal_module.delete_not_possible_popup import DeleteNotPossiblePopupWindow
-from util import image_util
+from eos_util import image_util
 
 class AddRemoveShortcut(DesktopShortcut):
     __gsignals__ = {
@@ -116,7 +116,7 @@ class AddRemoveShortcut(DesktopShortcut):
         
         super(AddRemoveShortcut, self).dnd_motion_data(widget, context, x, y, time)
         if len(source_widget.parent._shortcut.children()) == 0:
-            self._confirmation_popup = RemovalConfirmationPopupWindow(self._confirmation_received, widget=source_widget, label=label)
+            self._confirmation_popup = RemovalConfirmationPopupWindow(self._confirmation_received, caller_widget=self._event_box, widget=source_widget, label=label)
             self._confirmation_popup.show()
             source_widget.parent._event_box.set_images(())
             source_widget.parent._label.set_text('')
