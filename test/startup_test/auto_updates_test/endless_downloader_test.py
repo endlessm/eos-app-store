@@ -59,10 +59,10 @@ class EndlessDownloaderTestCase(unittest.TestCase):
         self._mock_file_downloader.download_file = Mock(return_value="")
         
         self._test_object.download_all_packages(self._test_directory)
-        expected_calls = [call(endpoint + "/files.txt"), 
-		  						call(endpoint + "/file1", "md5sum1"), 
-								call(endpoint + "/file2", "md5sum2"), 
-								call(endpoint + "/file3", "md5sum3")]
+        expected_calls = [call(endpoint + "/mirror/files.txt"), 
+		  						call(endpoint + "/mirror/file1", "md5sum1"), 
+								call(endpoint + "/mirror/file2", "md5sum2"), 
+								call(endpoint + "/mirror/file3", "md5sum3")]
 
         self.assertEquals(expected_calls, self._mock_file_downloader.download_file.call_args_list)
 
@@ -73,13 +73,13 @@ class EndlessDownloaderTestCase(unittest.TestCase):
         self._mock_file_synchronizer.files_to_download = Mock(return_value=[("file1", "md5sum1"), ("file2", "md5sum2"), ("file3", "md5sum3")])
 
         def side_effect(*args, **kwargs):
-            if args[0] == endpoint + "/file1":
+            if args[0] == endpoint + "/mirror/file1":
                 return "file 1 content"
-            elif args[0] == endpoint + "/file2":
+            elif args[0] == endpoint + "/mirror/file2":
                 return "file 2 content"
-            elif args[0] == endpoint + "/file3":
+            elif args[0] == endpoint + "/mirror/file3":
                 return "file 3 content"
-            elif args[0] == endpoint + "/files.txt":
+            elif args[0] == endpoint + "/mirror/files.txt":
                 return "list of files content"
         self._mock_file_downloader.download_file = Mock(side_effect=side_effect)
 

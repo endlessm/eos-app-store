@@ -16,10 +16,12 @@ class EndlessDownloader():
         local_file_list.sort()
         endpoint = endpoint_provider.get_endless_url()
 
-        remote_file_list = self._file_downloader.download_file(os.path.join(endpoint, self.INDEX_FILE))
+        mirror_url = endpoint + "/mirror/"
+
+        remote_file_list = self._file_downloader.download_file(mirror_url + self.INDEX_FILE)
         files_to_download = self._file_synchronizer.files_to_download(local_file_list, remote_file_list)
         for remote_file, expected_md5 in files_to_download:
-            file_content = self._file_downloader.download_file(endpoint + "/" + remote_file, expected_md5)
+            file_content = self._file_downloader.download_file(mirror_url + remote_file, expected_md5)
 
             with open(os.path.join(download_directory, remote_file), "w") as local_file:
                 local_file.write(file_content)
