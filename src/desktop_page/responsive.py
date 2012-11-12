@@ -1,6 +1,6 @@
 import gtk
-from util import image_util
-from util.image_eventbox import ImageEventBox
+from eos_util import image_util
+from eos_widgets.image_eventbox import ImageEventBox
 
 
 class Button(ImageEventBox):

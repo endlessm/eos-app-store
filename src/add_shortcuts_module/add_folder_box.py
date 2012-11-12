@@ -1,7 +1,7 @@
 import gtk
 import cairo
-from util.image_eventbox import ImageEventBox
-from util import image_util
+from eos_widgets.image_eventbox import ImageEventBox
+from eos_util import image_util
 from util import screen_util
 from osapps.desktop_preferences_datastore import DesktopPreferencesDatastore
 
