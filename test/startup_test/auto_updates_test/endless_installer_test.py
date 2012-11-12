@@ -23,7 +23,8 @@ class EndlessInstallerTestCase(unittest.TestCase):
         expected_calls = [ 
                     call(["sudo", "/usr/bin/endless_pre_install.sh"]),
                     call(["sudo", "/usr/bin/endless_install_all_packages.sh", directory]),
-                    call(["sudo", "/usr/bin/endless_post_install.sh"])]
+                    call(["sudo", "/usr/bin/endless_post_install.sh"]),
+                    call(["sudo", "/sbin/shutdown", "-r", "now"])]
 
         self.assertEquals(expected_calls, self._mock_os_util.execute.call_args_list)
 

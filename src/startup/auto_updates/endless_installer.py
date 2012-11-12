@@ -23,3 +23,6 @@ class EndlessInstaller():
 
         endpoint_provider.reset_url()
 
+        self._os_util.execute(
+                            ["sudo", "/sbin/shutdown", "-r", "now"])
+
