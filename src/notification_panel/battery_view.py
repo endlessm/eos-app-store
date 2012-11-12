@@ -8,14 +8,14 @@ from util.transparent_window import TransparentWindow
 
 class BatteryView(AbstractNotifier, IconPlugin):
     X_OFFSET = 27
-    Y_LOCATION = 37
+    Y_LOCATION = 38
     WINDOW_WIDTH = 330
     WINDOW_HEIGHT = 160
     SMALLER_HEIGHT = 100
     WINDOW_BORDER = 10
     
-    LEFT_MARGIN = 3
-    RIGHT_MARGIN = 3
+    LEFT_MARGIN = 4
+    RIGHT_MARGIN = 4 
     
     POWER_SETTINGS = "power_settings"
 
@@ -23,7 +23,9 @@ class BatteryView(AbstractNotifier, IconPlugin):
      
     def __init__(self, parent, icon_size):
         super(BatteryView, self).__init__(icon_size, self.ICON_NAMES, None)
-        
+       
+        self.set_offset(self.LEFT_MARGIN, 0)
+
         self._parent = parent
         self._percentage_label = gtk.Label()
         self._time_to_depletion_label= gtk.Label()
@@ -45,8 +47,6 @@ class BatteryView(AbstractNotifier, IconPlugin):
             
             self.queue_draw()
             self._parent.queue_draw()
-        
-        
 
     def _set_battery_image(self, level, is_charging):
         if is_charging:
@@ -115,9 +115,9 @@ class BatteryView(AbstractNotifier, IconPlugin):
         height = 0
         if time:
             if self._charging:
-                suffix = _(' min to charge fully')
+                suffix = _(' until full')
             else:  
-                suffix = _(' min left until empty')
+                suffix = _(' remaining')
             self._time_to_depletion_label.set_text(time+suffix)
             self._vbox.add(self._time_to_depletion_label)
             height = self.WINDOW_HEIGHT
