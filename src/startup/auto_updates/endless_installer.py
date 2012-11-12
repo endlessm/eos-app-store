@@ -10,9 +10,10 @@ class EndlessInstaller():
         self._os_util.execute(
                             ["sudo", "/usr/bin/endless_pre_install.sh"])
 
-        log.info("executing install -- dpkg")
-        self._os_util.execute(
+        log.info("executing install -- dpkg on directory %s" % package_directory)
+        output = self._os_util.execute(
                             ["sudo", "/usr/bin/endless_install_all_packages.sh", package_directory])
+        log.info("install output: %s" % output)
 
         log.info("executing post install script")
         self._os_util.execute(

@@ -1,5 +1,6 @@
 import md5
 
+from eos_log import log
 from osapps.web_connection import WebConnection
 
 class FileDownloader(object):
@@ -12,6 +13,7 @@ class FileDownloader(object):
         current_attempt = 1
         
         while current_attempt <= self.MAX_RETRIES:
+            log.info("downloading %s -- attempt %d" % (location, current_attempt))
             file_content = self._web_connection.get(location)
 
             if not expected_md5:
@@ -20,6 +22,8 @@ class FileDownloader(object):
             md5sum = md5.new(file_content).hexdigest()
             if md5sum == expected_md5:
                 return file_content
+            else:
+                log.error("downloading failed b/c of bad md5sum... trying again")
             
             current_attempt += 1
          
