@@ -19,7 +19,7 @@ class BatteryView(AbstractNotifier, IconPlugin):
     
     POWER_SETTINGS = "power_settings"
 
-    ICON_NAMES = ['battery_charging.png','battery_empty.png', 'battery_15.png', 'battery_50.png', 'battery_full.png']
+    ICON_NAMES = ['battery_charging.png','battery_empty.png', 'battery_10.png', 'battery_25.png', 'battery_60.png', 'battery_full.png']
      
     def __init__(self, parent, icon_size):
         super(BatteryView, self).__init__(icon_size, self.ICON_NAMES, None)
@@ -53,12 +53,14 @@ class BatteryView(AbstractNotifier, IconPlugin):
             self._set_index(0)
         elif level < 5:
             self._set_index(1)
-        elif level < 25:
-            self._set_index(2)
-        elif level < 75:
+        elif level < 15:
+            self._set_index(2)    
+        elif level < 30:
             self._set_index(3)
-        else:
+        elif level < 75:
             self._set_index(4)
+        else:
+            self._set_index(5)
         
     def _create_menu(self):
         self._button_power_settings = gtk.Button(_('Power Settings'))
