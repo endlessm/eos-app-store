@@ -6,7 +6,7 @@ import gtk
 import gobject
 from gtk import gdk
 
-from util import image_util
+from eos_util import image_util
 from shortcut.application_shortcut import ApplicationShortcut
 from feedback_module.feedback_response_dialog_view import FeedbackResponseDialogView
 from feedback_module.bugs_and_feedback_popup_window import BugsAndFeedbackPopupWindow
@@ -97,7 +97,7 @@ class EndlessDesktopView(gtk.Window):
 
     def get_presenter(self):
         return self._presenter
-    
+
     def set_background_pixbuf(self, pixbuf):
         width, height = self._get_net_work_area()
 #        pixbuf = image_util.load_pixbuf(background_name)

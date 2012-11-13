@@ -1,6 +1,6 @@
 import cairo
 import gtk
-from util import screen_util, image_util
+from eos_util import screen_util, image_util
 from osapps.desktop_preferences_datastore import DesktopPreferencesDatastore
 
 class TransparentWindow(gtk.Window):
@@ -13,9 +13,9 @@ class TransparentWindow(gtk.Window):
         self.set_property("accept-focus", True)
         self.set_property("destroy-with-parent", True)
         self.set_property("focus-on-map", True)
-        
+
         self.set_transient_for(parent)
-        
+
         self.set_can_focus(True)
         self.set_can_default(True)
 
@@ -36,13 +36,13 @@ class TransparentWindow(gtk.Window):
         cr.set_source_rgba(0, 0, 0, 255)
         cr.set_operator(cairo.OPERATOR_SOURCE)
         cr.paint()
-        
+
         self.draw(cr, x,y)
-        
+
         self.show_all()
-        
+
         return False
-        
+
     def draw(self, cr, x, y):
         if self.gradient_type is None:
             w, h = self.size_request()
