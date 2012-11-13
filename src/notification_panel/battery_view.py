@@ -7,7 +7,7 @@ from util import screen_util
 from util.transparent_window import TransparentWindow
 
 class BatteryView(AbstractNotifier, IconPlugin):
-    X_OFFSET = 27
+    X_OFFSET = 30 
     Y_LOCATION = 38
     WINDOW_WIDTH = 330
     WINDOW_HEIGHT = 160
