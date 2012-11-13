@@ -7,14 +7,11 @@ from startup.auto_updates import endpoint_provider
 from startup.auto_updates.install_notifier import InstallNotifier
 
 class EndlessUpdaterTestCase(unittest.TestCase):
-    _test_directory = "this is the test directory"
-    
     def setUp(self):
         self._mock_endless_downloader = Mock()
         self._mock_endless_installer = Mock()
         self._mock_install_notifier = Mock()
-        self._test_object = EndlessUpdater(self._test_directory,
-                                           self._mock_endless_downloader, 
+        self._test_object = EndlessUpdater(self._mock_endless_downloader, 
                                            self._mock_endless_installer,
                                            self._mock_install_notifier)
         
@@ -23,7 +20,7 @@ class EndlessUpdaterTestCase(unittest.TestCase):
         
         self._test_object.update()
         
-        self._mock_endless_downloader.download_all_packages.assert_called_once_with(self._test_directory)
+        self.assertTrue(self._mock_endless_downloader.download_all_packages.called)
 
     def test_when_doing_updates_user_is_notified(self):
         self._mock_install_notifier.notify_user = Mock()
@@ -35,8 +32,7 @@ class EndlessUpdaterTestCase(unittest.TestCase):
     def test_do_not_install_all_packages_until_user_responds(self):
         self._mock_install_notifier.add_listener = Mock(side_effect=self._user_notifier_add_listener)
         
-        self._test_object = EndlessUpdater(self._test_directory,
-                                           self._mock_endless_downloader, 
+        self._test_object = EndlessUpdater(self._mock_endless_downloader, 
                                            self._mock_endless_installer,
                                            self._mock_install_notifier)
         
@@ -49,8 +45,7 @@ class EndlessUpdaterTestCase(unittest.TestCase):
     def test_when_user_response_that_they_want_to_install_then_install_all_packages(self):
         self._mock_install_notifier.add_listener = Mock(side_effect=self._user_notifier_add_listener)
         
-        self._test_object = EndlessUpdater(self._test_directory,
-                                           self._mock_endless_downloader, 
+        self._test_object = EndlessUpdater(self._mock_endless_downloader, 
                                            self._mock_endless_installer,
                                            self._mock_install_notifier)
         
@@ -60,13 +55,12 @@ class EndlessUpdaterTestCase(unittest.TestCase):
 
         self._user_notified_listener()
         
-        self._mock_endless_installer.install_all_packages.assert_called_once_with(self._test_directory)
+        self.assertTrue(self._mock_endless_installer.install_all_packages.called)
         
     def test_when_user_response_that_they_do_not_want_to_install_then_install_all_packages(self):
         self._mock_install_notifier.add_listener = Mock(side_effect=self._user_notifier_add_listener)
         
-        self._test_object = EndlessUpdater(self._test_directory,
-                                           self._mock_endless_downloader, 
+        self._test_object = EndlessUpdater(self._mock_endless_downloader, 
                                            self._mock_endless_installer,
                                            self._mock_install_notifier)
         

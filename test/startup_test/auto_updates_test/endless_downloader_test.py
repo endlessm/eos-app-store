@@ -18,7 +18,7 @@ class EndlessDownloaderTestCase(unittest.TestCase):
         self._mock_file_synchronizer = Mock()
         self._mock_file_downloader = Mock()
 
-        self._test_object = EndlessDownloader(self._mock_file_downloader, self._mock_file_synchronizer)
+        self._test_object = EndlessDownloader(self._mock_file_downloader, self._mock_file_synchronizer, self._test_directory)
 
     def tearDown(self):
         endpoint_provider.get_endless_url = self._orig_endpoint_provider
@@ -28,7 +28,7 @@ class EndlessDownloaderTestCase(unittest.TestCase):
         self._mock_file_downloader.download_file = Mock(return_value=remote_file_content)
         self._mock_file_synchronizer.files_to_download = Mock(return_value=[])
 
-        self._test_object.download_all_packages(self._test_directory)
+        self._test_object.download_all_packages()
 
         with open(os.path.join(self._test_directory, "files.txt"), "r") as f:
             local_file_content = f.read()
@@ -45,7 +45,7 @@ class EndlessDownloaderTestCase(unittest.TestCase):
 
         self._mock_file_synchronizer.files_to_download = Mock(return_value=[])
 
-        self._test_object.download_all_packages(self._test_directory)
+        self._test_object.download_all_packages()
 
         self._mock_file_synchronizer.files_to_download.assert_called_once_with(
                                             ["file1.txt", "file2.txt", "file3.txt"], remote_file_content)
@@ -59,7 +59,7 @@ class EndlessDownloaderTestCase(unittest.TestCase):
         
         self._mock_file_downloader.download_file = Mock(return_value="")
         
-        self._test_object.download_all_packages(self._test_directory)
+        self._test_object.download_all_packages()
         expected_calls = [call(endpoint + "/mirror/files.txt"), 
 		  						call(endpoint + "/mirror/file1", "md5sum1"), 
 								call(endpoint + "/mirror/file2", "md5sum2"), 
@@ -85,7 +85,7 @@ class EndlessDownloaderTestCase(unittest.TestCase):
                 return "list of files content"
         self._mock_file_downloader.download_file = Mock(side_effect=side_effect)
 
-        self._test_object.download_all_packages(self._test_directory)
+        self._test_object.download_all_packages()
 
         with open(os.path.join(self._test_directory, "file1"), "r") as f:
             self.assertEquals("file 1 content", f.read())
@@ -94,6 +94,3 @@ class EndlessDownloaderTestCase(unittest.TestCase):
         with open(os.path.join(self._test_directory, "file3"), "r") as f:
             self.assertEquals("file 3 content", f.read())
     
-#    def test_when_an_exception_occurs_downloading_a_file_???????(self):
-#        pass
-
