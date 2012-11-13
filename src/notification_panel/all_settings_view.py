@@ -4,7 +4,7 @@ import gtk
 from icon_plugin import IconPlugin
 from ui.abstract_notifier import AbstractNotifier
 from util.transparent_window import TransparentWindow
-from util import screen_util
+from eos_util import screen_util
 from panel_constants import PanelConstants
 
 gettext.install('endless_desktop', '/usr/share/locale', unicode = True, names=['ngettext'])
