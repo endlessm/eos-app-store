@@ -5,12 +5,12 @@ from icon_plugin import IconPlugin
 from ui.abstract_notifier import AbstractNotifier
 from util.transparent_window import TransparentWindow
 from util import screen_util
+from panel_constants import PanelConstants
 
 gettext.install('endless_desktop', '/usr/share/locale', unicode = True, names=['ngettext'])
 
 class AllSettingsView(AbstractNotifier):
     X_OFFSET = 13
-    Y_LOCATION = 37
     WINDOW_WIDTH = 330
     WINDOW_HEIGHT = 160
     WINDOW_BORDER = 10
@@ -73,7 +73,7 @@ class AllSettingsView(AbstractNotifier):
         x = screen_util.get_width() - self.WINDOW_WIDTH - self.X_OFFSET
     
         # Get the x location of the center of the widget (icon), relative to the settings window
-        self._window.move(x, self.Y_LOCATION)
+        self._window.move(x, PanelConstants.DEFAULT_POPUP_VERTICAL_MARGIN)
         
         self._window.set_size_request(self.WINDOW_WIDTH, self.WINDOW_HEIGHT)
         self._window.set_border_width(self.WINDOW_BORDER)

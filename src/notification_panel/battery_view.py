@@ -8,14 +8,12 @@ from util.transparent_window import TransparentWindow
 
 class BatteryView(AbstractNotifier, IconPlugin):
     X_OFFSET = 30 
-    Y_LOCATION = 38
     WINDOW_WIDTH = 330
     WINDOW_HEIGHT = 160
     SMALLER_HEIGHT = 100
     WINDOW_BORDER = 10
     
-    LEFT_MARGIN = 4
-    RIGHT_MARGIN = 4 
+    HORIZONTAL_MARGIN = 4
     
     POWER_SETTINGS = "power_settings"
 
@@ -24,7 +22,7 @@ class BatteryView(AbstractNotifier, IconPlugin):
     def __init__(self, parent, icon_size):
         super(BatteryView, self).__init__(icon_size, self.ICON_NAMES, None)
        
-        self.set_offset(self.LEFT_MARGIN, 0)
+        self.set_margin(self.HORIZONTAL_MARGIN)
 
         self._parent = parent
         self._percentage_label = gtk.Label()
@@ -37,7 +35,7 @@ class BatteryView(AbstractNotifier, IconPlugin):
         self._charging = charging 
         
         self._parent.set_visible_window(False)
-        self._parent.set_size_request(PanelConstants.get_icon_size() + self.LEFT_MARGIN + self.RIGHT_MARGIN, PanelConstants.get_icon_size())
+        self._parent.set_size_request(PanelConstants.get_icon_size() + 2 * self.HORIZONTAL_MARGIN, PanelConstants.get_icon_size())
         
         if self._level == None:
             self._parent.hide()
@@ -124,7 +122,7 @@ class BatteryView(AbstractNotifier, IconPlugin):
         else: 
             height = self.SMALLER_HEIGHT
 
-        self._window.move(x, self.Y_LOCATION)
+        self._window.move(x, PanelConstants.DEFAULT_POPUP_VERTICAL_MARGIN)
         self._window.set_size_request(self.WINDOW_WIDTH, height)
         
         self._window.show_all()
