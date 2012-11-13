@@ -9,10 +9,10 @@ from startup.auto_updates.install_notifier import InstallNotifier
 class EndlessUpdaterTestCase(unittest.TestCase):
     def setUp(self):
         self._mock_endless_downloader = Mock()
-        self._mock_endless_installer = Mock()
+        self._mock_force_install = Mock()
         self._mock_install_notifier = Mock()
         self._test_object = EndlessUpdater(self._mock_endless_downloader, 
-                                           self._mock_endless_installer,
+                                           self._mock_force_install,
                                            self._mock_install_notifier)
         
     def test_update_then_downloads_all_packages(self):
@@ -33,44 +33,42 @@ class EndlessUpdaterTestCase(unittest.TestCase):
         self._mock_install_notifier.add_listener = Mock(side_effect=self._user_notifier_add_listener)
         
         self._test_object = EndlessUpdater(self._mock_endless_downloader, 
-                                           self._mock_endless_installer,
+                                           self._mock_force_install,
                                            self._mock_install_notifier)
         
-        self._mock_endless_installer.install_all_packages = Mock()
+        self._mock_force_install.install_all_packages = Mock()
         self._test_object.update()
 
-        self.assertFalse(self._mock_endless_installer.install_all_packages.called, 
+        self.assertFalse(self._mock_force_install.install_in_background.called, 
                          "Should not have installed all packages")
 
     def test_when_user_response_that_they_want_to_install_then_install_all_packages(self):
         self._mock_install_notifier.add_listener = Mock(side_effect=self._user_notifier_add_listener)
         
         self._test_object = EndlessUpdater(self._mock_endless_downloader, 
-                                           self._mock_endless_installer,
+                                           self._mock_force_install,
                                            self._mock_install_notifier)
         
         self._mock_install_notifier.should_install = Mock(return_value=True)
-        self._mock_endless_installer.install_all_packages = Mock()
         self._test_object.update()
 
         self._user_notified_listener()
         
-        self.assertTrue(self._mock_endless_installer.install_all_packages.called)
+        self.assertTrue(self._mock_force_install.install_in_background.called)
         
     def test_when_user_response_that_they_do_not_want_to_install_then_install_all_packages(self):
         self._mock_install_notifier.add_listener = Mock(side_effect=self._user_notifier_add_listener)
         
         self._test_object = EndlessUpdater(self._mock_endless_downloader, 
-                                           self._mock_endless_installer,
+                                           self._mock_force_install,
                                            self._mock_install_notifier)
         
         self._mock_install_notifier.should_install = Mock(return_value=False)
-        self._mock_endless_installer.install_all_packages = Mock()
         self._test_object.update()
 
         self._user_notified_listener()
         
-        self.assertFalse(self._mock_endless_installer.install_all_packages.called, 
+        self.assertFalse(self._mock_force_install.install_in_background.called, 
                          "Should not have installed all packages")
 
     def _user_notifier_add_listener(self, *args, **kwargs):
