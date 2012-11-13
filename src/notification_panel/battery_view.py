@@ -24,6 +24,8 @@ class BatteryView(AbstractNotifier, IconPlugin):
        
         self.set_margin(self.HORIZONTAL_MARGIN)
 
+        self._window = None
+
         self._parent = parent
         self._percentage_label = gtk.Label()
         self._time_to_depletion_label= gtk.Label()
@@ -81,6 +83,10 @@ class BatteryView(AbstractNotifier, IconPlugin):
         self._window.set_name(_('Battery Info'))
         self._window.set_title(_('Battery Info'))
 
+        screen = gtk.gdk.Screen() #@UndefinedVariable
+        screen.connect('size-changed', lambda s: self._resize_occurred)
+    
+
         # Place the widget in an event box within the window
         # (which has a different background than the transparent window)
         self._container = gtk.EventBox()
@@ -88,6 +94,10 @@ class BatteryView(AbstractNotifier, IconPlugin):
         self._vbox.show()
         self._container.add(self._vbox)
         self._window.add(self._container)
+        
+    def _resize_occurred(self):
+        self._window.destroy()
+        self._window = None
         
     def _remove_if_exists(self, component):
         found = False
@@ -97,7 +107,7 @@ class BatteryView(AbstractNotifier, IconPlugin):
             self._vbox.remove(component)
     
     def display_menu(self, level, time):
-        if not hasattr(self, '_window'):
+        if not self._window:
             self._create_menu()
         
         if self._window.get_visible():
@@ -151,3 +161,4 @@ class BatteryView(AbstractNotifier, IconPlugin):
     def hide_window(self):
         self._window.set_visible(False)
         self._window.hide()
+
