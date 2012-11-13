@@ -1,3 +1,4 @@
+import gettext
 import gtk
 
 from icon_plugin import IconPlugin
@@ -5,6 +6,8 @@ from panel_constants import PanelConstants
 from ui.abstract_notifier import AbstractNotifier
 from util import screen_util
 from util.transparent_window import TransparentWindow
+
+gettext.install('endless_desktop', '/usr/share/locale', unicode = True, names=['ngettext'])
 
 class BatteryView(AbstractNotifier, IconPlugin):
     X_OFFSET = 30 
@@ -30,7 +33,7 @@ class BatteryView(AbstractNotifier, IconPlugin):
         self._percentage_label = gtk.Label()
         self._time_to_depletion_label= gtk.Label()
         self._parent.connect("expose-event", self._draw)
-        
+
     def display_battery(self, level, time_to_depletion, charging):
         self._level = level
         self._time_to_depletion = time_to_depletion 
@@ -64,7 +67,7 @@ class BatteryView(AbstractNotifier, IconPlugin):
         
     def _create_menu(self):
         self._button_power_settings = gtk.Button(_('Power Settings'))
-        self._button_power_settings.connect('button-press-event', 
+        self._button_power_settings.connect('button-press-event',
                 lambda w, e: self._notify(self.POWER_SETTINGS))
 
         self._vbox = gtk.VBox()
@@ -72,7 +75,7 @@ class BatteryView(AbstractNotifier, IconPlugin):
         self._vbox.set_focus_chain([])
         self._vbox.add(self._button_power_settings)
         self._vbox.add(self._percentage_label)
-        
+
         self._window = TransparentWindow(self._parent.get_toplevel())
         # Set up the window so that it can be exposed
         # with a transparent background and triangle decoration
@@ -90,7 +93,7 @@ class BatteryView(AbstractNotifier, IconPlugin):
         # Place the widget in an event box within the window
         # (which has a different background than the transparent window)
         self._container = gtk.EventBox()
-        
+
         self._vbox.show()
         self._container.add(self._vbox)
         self._window.add(self._container)
@@ -103,22 +106,22 @@ class BatteryView(AbstractNotifier, IconPlugin):
         found = False
         for child in self._vbox.get_children():
             found |= (child == component)
-        if found:    
+        if found:
             self._vbox.remove(component)
-    
+
     def display_menu(self, level, time):
         if not self._window:
             self._create_menu()
-        
+
         if self._window.get_visible():
             self._window.show_now()
-            return 
-                
+            return
+
         self._percentage_label.set_text(str(level)+'%')
         self._remove_if_exists(self._time_to_depletion_label)
 
         x = screen_util.get_width() - self.WINDOW_WIDTH - self.X_OFFSET
-    
+
         # Get the x location of the center of the widget (icon), relative to the settings window
         height = 0
         if time:
@@ -126,18 +129,19 @@ class BatteryView(AbstractNotifier, IconPlugin):
                 suffix = _(' until full')
             else:  
                 suffix = _(' remaining')
+
             self._time_to_depletion_label.set_text(time+suffix)
             self._vbox.add(self._time_to_depletion_label)
             height = self.WINDOW_HEIGHT
-        else: 
+        else:
             height = self.SMALLER_HEIGHT
 
         self._window.move(x, PanelConstants.DEFAULT_POPUP_VERTICAL_MARGIN)
         self._window.set_size_request(self.WINDOW_WIDTH, height)
-        
+
         self._window.show_all()
         self.display()
-        
+
     # TODO make the triangle position configurable
     def _expose(self, widget, event):
         cr = widget.window.cairo_create()
