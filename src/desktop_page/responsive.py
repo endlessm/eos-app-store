@@ -1,5 +1,5 @@
 import gtk
-from util import image_util
+from eos_util import image_util
 from eos_widgets.image_eventbox import ImageEventBox
 
 
@@ -22,7 +22,7 @@ class Button(ImageEventBox):
         self._invisible = invisible
         self.set_invisible(self._invisible)
         super(Button, self).__init__(self.normal)
-        
+
         self.connect("button_press_event", self.button_press_event)
         self.connect("button_release_event", self.button_release_event)
         self.connect("enter_notify_event", self.enter_notify_event)
@@ -33,60 +33,59 @@ class Button(ImageEventBox):
                             | gtk.gdk.BUTTON_PRESS_MASK
                             | gtk.gdk.BUTTON_RELEASE_MASK
                             )
-                            
+
     def connect(self, signal, callback):
         if signal == "clicked":
             self._on_clicked = callback
         else:
             super(Button, self).connect(signal, callback)
-                            
+
     def _set_last_images(self, images):
         self._last_images = images
-        
+
     def _get_last_images(self):
         return self._last_images
-        
+
     def set_invisible(self, value):
         self._invisible = value
-        
+
     def display(self):
         if self._invisible:
             self.set_images(())
         self.hide()
         self.show()
-        
+
     def selected(self):
         self.is_selected = True
         self.set_images(self.select)
         self._set_last_images(self.select)
         self.display()
-        
+
     def unselected(self):
         self.is_selected = False
         self.set_images(self.normal)
         self._set_last_images(self.normal)
         self.display()
-                            
+
     def button_press_event(self, widget, event):
         self.set_images(self.down)
         self.display()
         if self._on_clicked is not None:
             self._on_clicked(widget)
-        
+
     def button_release_event(self, widget, event):
         self.set_images(self._get_last_images())
         self.display()
-        
+
     def enter_notify_event(self, widget, event):
         if not self.is_selected:
             self.set_images(self.hover)
             #self._set_last_images(self.hover)
             self.display()
-        
+
     def leave_notify_event(self, widget, event):
         #self.set_images(self.normal)
         #self._set_last_images(self.normal)
         if not self.is_selected:
             self.set_images(self._get_last_images())
             self.display()
-        
