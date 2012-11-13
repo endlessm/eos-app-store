@@ -12,6 +12,9 @@ class ForceInstall():
 
     def execute(self):
         if self._force_install_checker.should_force_install():
+            self.install_in_background()
+
+    def install_in_background(self):
             self._thread = Thread(target=self._endless_installer.install_all_packages, 
                                 args=[EndlessDownloader.DEFAULT_DOWNLOAD_DIRECTORY])
             self._thread.start()

@@ -3,6 +3,7 @@ import os
 from startup.auto_updates import endpoint_provider
 from startup.auto_updates.file_synchronizer import FileSynchronizer
 from startup.auto_updates.file_downloader import FileDownloader
+from startup.auto_updates.force_install_checker import ForceInstallChecker
 
 import re
 
@@ -13,10 +14,11 @@ class EndlessDownloader():
     
     def __init__(self, file_downloader=FileDownloader(), 
             file_synchronizer=FileSynchronizer(), 
-            download_directory=DEFAULT_DOWNLOAD_DIRECTORY):
+            download_directory=DEFAULT_DOWNLOAD_DIRECTORY, force_install_checker=ForceInstallChecker()):
         self._file_downloader = file_downloader
         self._file_synchronizer = file_synchronizer
         self._download_directory = download_directory
+        self._force_install_checker = force_install_checker
     
     def download_all_packages(self):
         local_file_list = os.listdir(self._download_directory)
@@ -38,5 +40,5 @@ class EndlessDownloader():
         with open(os.path.join(self._download_directory, self.INDEX_FILE), "w") as f:
             f.write(remote_file_list)
 
-
+        self._force_install_checker.need_to_do_install()        
 

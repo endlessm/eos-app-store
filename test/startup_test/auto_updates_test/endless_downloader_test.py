@@ -17,8 +17,9 @@ class EndlessDownloaderTestCase(unittest.TestCase):
         
         self._mock_file_synchronizer = Mock()
         self._mock_file_downloader = Mock()
+        self._mock_force_install_checker = Mock()
 
-        self._test_object = EndlessDownloader(self._mock_file_downloader, self._mock_file_synchronizer, self._test_directory)
+        self._test_object = EndlessDownloader(self._mock_file_downloader, self._mock_file_synchronizer, self._test_directory, self._mock_force_install_checker)
 
     def tearDown(self):
         endpoint_provider.get_endless_url = self._orig_endpoint_provider
@@ -94,3 +95,11 @@ class EndlessDownloaderTestCase(unittest.TestCase):
         with open(os.path.join(self._test_directory, "file3"), "r") as f:
             self.assertEquals("file 3 content", f.read())
     
+    def test_after_downloading_all_packages_ensure_that_force_install_check_occurs(self):
+        self._mock_file_synchronizer.files_to_download = Mock(return_value=[])
+        self._mock_file_downloader.download_file = Mock(return_value="")
+
+        self._test_object.download_all_packages()
+
+        self.assertTrue(self._mock_force_install_checker.need_to_do_install.called)
+
