@@ -3,6 +3,7 @@ from startup.auto_updates.endless_installer import EndlessInstaller
 from startup.auto_updates.force_install_ui import ForceInstallUI
 from startup.auto_updates.endless_downloader import EndlessDownloader
 from threading import Thread
+from eos_log import log
 
 class ForceInstall():
     def __init__(self, force_install_checker=ForceInstallChecker(), endless_installer=EndlessInstaller(), force_install_ui=ForceInstallUI()):
@@ -12,11 +13,16 @@ class ForceInstall():
 
     def execute(self):
         if self._force_install_checker.should_force_install():
+            log.info("proceeding to force install")
             self.install_in_background()
+        else:
+            log.info("no need to force install")
 
     def install_in_background(self):
+        log.info("launching installer in thread")
         self._thread = Thread(target=self._endless_installer.install_all_packages, 
                             args=[EndlessDownloader.DEFAULT_DOWNLOAD_DIRECTORY])
+        self._thread.setDaemon(True)
         self._thread.start()
 
         self._force_install_ui.launch_ui()
