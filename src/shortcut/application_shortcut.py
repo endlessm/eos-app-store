@@ -37,6 +37,9 @@ class ApplicationShortcut(DesktopShortcut):
         self.show_all()
         self.set_moving(False)
         
+        images = self.get_images(self.ICON_STATE_NORMAL)
+        self.set_dnd_icon(images)
+        
 #        self.add_rename_entry(label_text)
        
     def get_images(self, event_state):

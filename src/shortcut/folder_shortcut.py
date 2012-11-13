@@ -34,6 +34,9 @@ class FolderShortcut(DesktopShortcut):
         self.show_all()
         self.set_moving(False)
         
+        images = self.get_images(self.ICON_STATE_NORMAL)
+        self.set_dnd_icon(images)
+        
     def _received_handler_callback(self, source, destination, x, y, data=None):
         source_widget = source.parent
 
