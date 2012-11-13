@@ -20,7 +20,6 @@ class EndlessDownloader():
         self._download_directory = download_directory
         self._force_install_checker = force_install_checker
     
-    # TODO refactoring me!!!
     def download_all_packages(self):
         local_file_list = os.listdir(self._download_directory)
         local_file_list.sort()
