@@ -36,7 +36,8 @@ class TransparentWindow(gtk.Window):
     def _handle_event(self, widget, event):
         cr = widget.window.cairo_create()
         
-        self.x, self.y, self.w, self.h = self.get_allocation()
+        self.w = self.allocation.width
+        self.h = self.allocation.height
         self.x, self.y = self.window.get_origin()
         self.y -= screen_util.ScreenUtil.get_offset()
         
