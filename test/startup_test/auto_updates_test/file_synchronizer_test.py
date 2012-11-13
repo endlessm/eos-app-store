@@ -1,4 +1,5 @@
 import unittest
+import os
 
 from startup.auto_updates.file_synchronizer import FileSynchronizer
 
@@ -35,3 +36,14 @@ class FileSynchronizerTestCase(unittest.TestCase):
         to_download = self._test_object.files_to_download(local, remote)
 
         self.assertEquals([], to_download)
+
+    def test_real(self):
+        local = os.listdir("test_data_dir/file_sync/local")
+        with open("test_data_dir/file_sync/files.txt", "r") as f:
+            remote = f.read()
+
+        results = self._test_object.files_to_download(local, remote)
+
+        self.assertEquals(2, len(results))
+        self.assertIn("beatbox_0.7+r799-0~precise1_amd64.deb", results[0][0])
+        self.assertIn("beatbox_0.7+r811-0~precise1_amd64.deb", results[1][0])
