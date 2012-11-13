@@ -8,3 +8,15 @@ def get_width():
 def get_height():
     screen = gtk.gdk.Screen() #@UndefinedVariable
     return screen.get_height()
+    
+class ScreenUtil:
+    
+    WORKING_AREA_OFFSET = 0
+    
+    @classmethod
+    def get_offset(cls):
+        return cls.WORKING_AREA_OFFSET
+    
+    @classmethod
+    def set_offset(cls, value):
+        cls.WORKING_AREA_OFFSET = value
