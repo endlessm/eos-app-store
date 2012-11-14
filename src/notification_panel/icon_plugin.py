@@ -7,14 +7,14 @@ from notification_panel_config import NotificationPanelConfig
 from notification_plugin import NotificationPlugin
 
 class IconPlugin(NotificationPlugin):
-
     def __init__(self, icon_size, icon_names, command, init_index = 0):
         super(IconPlugin, self).__init__(command)
 
         self.set_visible_window(False)
-
         self.set_size_request(icon_size, icon_size)
-
+        self._horizontal_margin = 0
+        
+        self._icon_size = icon_size        
         self._scaled_pixbufs = [None] * len(icon_names)
 
         index = 0
@@ -28,6 +28,10 @@ class IconPlugin(NotificationPlugin):
         self._set_index(init_index)
 
         self.connect("expose-event", self._draw)
+        
+    def set_margin(self, horizontal_margin):
+        self._horizontal_margin = horizontal_margin
+        self.set_size_request(self._icon_size + 2 * self._horizontal_margin, self._icon_size)
 
     def _set_index(self, index):
         self._index = index
@@ -41,12 +45,12 @@ class IconPlugin(NotificationPlugin):
                     event.area.width, event.area.height)
         cr.clip()
         # Draw shadow
-        cr.set_source_pixbuf(self._scaled_pixbufs[self._index], event.area.x + self.SHADOW_OFFSET, event.area.y + self.SHADOW_OFFSET)
+        cr.set_source_pixbuf(self._scaled_pixbufs[self._index], event.area.x + self._horizontal_margin + self.SHADOW_OFFSET, event.area.y + self.SHADOW_OFFSET)
         cr.set_operator(cairo.OPERATOR_DEST_OUT);
         cr.paint_with_alpha(NotificationPanelConfig.SHADOW_ALPHA)
 
         # Draw icon
-        cr.set_source_pixbuf(self._scaled_pixbufs[self._index], event.area.x, event.area.y)
+        cr.set_source_pixbuf(self._scaled_pixbufs[self._index], event.area.x + self._horizontal_margin, event.area.y)
         cr.set_operator(cairo.OPERATOR_ATOP);
         cr.paint()
 

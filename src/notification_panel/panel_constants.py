@@ -5,6 +5,7 @@ class PanelConstants:
     DEFAULT_PLUGIN_WARN_COLOR = '#ff8844'
     DEFAULT_PLUGIN_CAUTION_COLOR = '#ff0000'
     
+    DEFAULT_POPUP_VERTICAL_MARGIN = 40
     
     @staticmethod
     def get_padding():
