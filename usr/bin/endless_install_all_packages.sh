@@ -23,11 +23,6 @@ then
     exit 1
 fi
 
-set +e
-for file in ${PACKAGE_DIRECTORY}/*.deb
-do
-    dpkg -i --force-confnew $file &>> /tmp/endless_auto_updates.log
-done
-set -e
+dpkg -iEG --force-confnew ${PACKAGE_DIRECTORY}/*.deb &>> /tmp/endless_auto_updates.log
 
 apt-get install -y -f &>> /tmp/endless_auto_updates.log
