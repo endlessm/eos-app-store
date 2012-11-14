@@ -51,10 +51,6 @@ class TransparentWindow(gtk.Window):
         pixbuf = self._background.subpixbuf(self.x, self.y, self.w, self.h)
         cr.set_source_pixbuf(pixbuf, 0, 0)
         if self.gradient_type is None:
-            w, h = self.size_request()
-            pixbuf = self._background.subpixbuf(x, y, w, h)
-            cr.set_source_pixbuf(pixbuf, 0, 0)
-
             cr.paint()
         else:
             gradient = cairo.LinearGradient(0, 0, 0, self.h)
