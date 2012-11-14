@@ -1,6 +1,6 @@
 import gtk
 import gettext
-from eos_widgets.image_eventbox import ImageEventBox
+from eos_widgets.folder_eventbox import FolderEventBox
 from eos_util import image_util
 from util import screen_util
 from util.transparent_window import TransparentWindow
@@ -23,7 +23,7 @@ class OpenFolderWindow():
 #        self._window.move(0, 0)
         self._window.move(0, screen_util.get_height() - self._height - self.TASKBAR_HEIGHT)
 
-        self._fancy_container = ImageEventBox([image_util.image_path("open-folder-bg.png")], self._width)
+        self._fancy_container = FolderEventBox([image_util.image_path("open-folder-bg.png")], self._width)
         self._fancy_container.show()
         
 
