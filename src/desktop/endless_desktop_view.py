@@ -304,7 +304,8 @@ class EndlessDesktopView(gtk.Window):
         return width, height
     
     def show_add_dialogue(self, event_box, event):
-        print "Should show add dialogue..."
+        add_shortcut_popup = AddShortcutsView(parent=self)
+        add_shortcut_popup.show()
         
     def _delete_shortcuts(self, widget, sc_deleted):
         self._presenter.delete_shortcut(sc_deleted)
