@@ -28,10 +28,6 @@ class TransparentWindow(gtk.Window):
         self.set_resizable(False)
         self.set_decorated(False)
         self.set_icon(image_util.load_pixbuf('endless.png'))
-        self.x = 0
-        self.y = 0
-        self.h = 0
-        self.w = 0
 
     def _handle_event(self, widget, event):
         cr = widget.window.cairo_create()

@@ -110,10 +110,10 @@ class AddRemoveShortcut(DesktopShortcut):
     def dnd_receive_data(self, widget, context, x, y, selection, targetType, time):
         source_widget = context.get_source_widget()
         label = context.get_source_widget().parent._label.get_text()
-                
+        
         if label == _('Files'):
             return
-                
+        
         super(AddRemoveShortcut, self).dnd_motion_data(widget, context, x, y, time)
         if len(source_widget.parent._shortcut.children()) == 0:
             self._confirmation_popup = RemovalConfirmationPopupWindow(self._confirmation_received, caller_widget=self._event_box, widget=source_widget, label=label)

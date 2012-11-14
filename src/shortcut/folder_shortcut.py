@@ -14,12 +14,13 @@ class FolderShortcut(DesktopShortcut):
                    (gobject.TYPE_PYOBJECT, gobject.TYPE_PYOBJECT)),
     }
 
-    def __init__(self, shortcut, callback):
+
+    def __init__(self, shortcut, callback, image=''):
         self._shortcut = shortcut
         self._normal_text = shortcut.name()
-
-        super(FolderShortcut, self).__init__(shortcut.name())
         
+        super(FolderShortcut, self).__init__(shortcut.name())
+
         self._callback = callback
         
         self._event_box.connect("button-release-event", self.mouse_release_callback)
@@ -109,4 +110,3 @@ class FolderShortcut(DesktopShortcut):
     def get_highlight_images(self, event_state):
         icon = self.get_images(event_state)
         highlight_icon = image_util.image_path("icon_highlight.png")
-        return icon + (highlight_icon, )
