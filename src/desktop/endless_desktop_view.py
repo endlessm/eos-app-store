@@ -19,7 +19,6 @@ from folder.folder_window import OpenFolderWindow
 from folder.folder_window import FULL_FOLDER_ITEMS_COUNT
 from notification_panel.notification_panel import NotificationPanel
 from taskbar_panel.taskbar_panel import TaskbarPanel
-from add_shortcuts_module.add_shortcuts_view import AddShortcutsView
 
 gettext.install('endless_desktop', '/usr/share/locale', unicode=True, names=['ngettext'])
 gtk.gdk.threads_init()
@@ -304,8 +303,7 @@ class EndlessDesktopView(gtk.Window):
         return width, height
     
     def show_add_dialogue(self, event_box, event):
-        add_shortcut_popup = AddShortcutsView(parent=self)
-        add_shortcut_popup.show()
+        print "Should show add dialogue..."
         
     def _delete_shortcuts(self, widget, sc_deleted):
         self._presenter.delete_shortcut(sc_deleted)
