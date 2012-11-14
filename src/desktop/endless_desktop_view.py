@@ -19,6 +19,7 @@ from folder.folder_window import OpenFolderWindow
 from folder.folder_window import FULL_FOLDER_ITEMS_COUNT
 from notification_panel.notification_panel import NotificationPanel
 from taskbar_panel.taskbar_panel import TaskbarPanel
+from add_shortcuts_module.add_shortcuts_view import AddShortcutsView
 
 gettext.install('endless_desktop', '/usr/share/locale', unicode=True, names=['ngettext'])
 gtk.gdk.threads_init()
