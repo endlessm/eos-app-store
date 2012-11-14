@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: dev 1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-11-09 21:09+0100\n"
+"POT-Creation-Date: 2012-10-20 06:06+0200\n"
 "PO-Revision-Date: 2012-05-31 11:54-0500\n"
 "Last-Translator: Automatically generated\n"
 "Language-Team: none\n"
@@ -34,6 +34,14 @@ msgstr "APP"
 msgid "Add Shortcuts"
 msgstr "Adicionar Atalhos"
 
+#: src/notification_panel/battery_view.py:120
+msgid " remaining"
+msgstr ""
+
+#: src/notification_panel/battery_view.py:118
+msgid " until full"
+msgstr ""
+
 #: src/desktop/endless_desktop_view.py:111
 msgid "Apps"
 msgstr "Aplicativos"
@@ -41,6 +49,11 @@ msgstr "Aplicativos"
 #: src/notification_panel/all_settings_view.py:37
 msgid "Background"
 msgstr "Fundo"
+
+#: src/notification_panel/battery_view.py:83
+#: src/notification_panel/battery_view.py:84
+msgid "Battery Info"
+msgstr ""
 
 #: ui/bugs_and_feedback.glade:76
 msgid "Bugbuffer1"
@@ -71,7 +84,7 @@ msgstr "ENTERTAINMENT"
 msgid "Files"
 msgstr "Files"
 
-#: src/folder/folder_window.py:19 src/desktop/endless_desktop_view.py:124
+#: src/folder/folder_window.py:19 src/desktop/endless_desktop_view.py:117
 msgid "Folder"
 msgstr "Diretórios"
 
@@ -116,6 +129,11 @@ msgid ""
 msgstr ""
 "Por favor, deixe-nos saber como o problema ocorreu e vamos resolvê-lo como "
 "mais rapidamente possível."
+
+#: src/notification_panel/battery_view.py:66
+#, fuzzy
+msgid "Power Settings"
+msgstr "Definições"
 
 #: ui/bugs_and_feedback.glade:30
 #: src/feedback_module/bugs_and_feedback_popup_window.py:38
