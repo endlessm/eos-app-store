@@ -20,7 +20,7 @@ class ForceInstallTestCase(unittest.TestCase):
         self._test_object.execute()
         self._test_object._thread.join()
     
-        self._mock_endless_installer.install_all_packages.assert_called_with(EndlessDownloader.DEFAULT_DOWNLOAD_DIRECTORY)
+        self.assertTrue(self._mock_endless_installer.install_all_packages.called)
 
     def test_dont_install_all_packages_when_no_force_install(self):
         self._mock_force_install_checker.should_force_install = Mock(return_value=False)
