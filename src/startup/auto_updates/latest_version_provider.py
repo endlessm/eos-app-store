@@ -9,10 +9,10 @@ class LatestVersionProvider():
     
     def __init__(self, web_connection=WebConnection()):
         self._web_connection = web_connection
-        self._endpoint = endpoint_provider.get_endless_url() + "/install/version.json"
     
     def get_latest_version(self):
-        response = self._web_connection.get(self._endpoint, self.USERNAME, self.PASSWORD)
+        endpoint = endpoint_provider.get_endless_url() + "/install/version.json"
+        response = self._web_connection.get(endpoint, self.USERNAME, self.PASSWORD)
         version = json.loads(response)
         return version["version"]
     

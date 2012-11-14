@@ -8,7 +8,8 @@ class LatestVersionProviderTestCase(unittest.TestCase):
     def setUp(self):
         self._orig_get_endless_url = endpoint_provider.get_endless_url
         
-        content = json.dumps({"version": "1.0.0"})
+        self._expected_version = "2.1.3"
+        content = json.dumps({"version": self._expected_version})
         
         self._mock_web_connection = Mock()
         self._mock_web_connection.get = Mock(return_value=content)
@@ -19,21 +20,15 @@ class LatestVersionProviderTestCase(unittest.TestCase):
         endpoint_provider.get_endless_url = self._orig_get_endless_url
         
     def test_get_latest_version(self):
-        self.assertEquals("1.0.0", self._test_object.get_latest_version())
+        self.assertEquals(self._expected_version, self._test_object.get_latest_version())
         
     def test_get_latest_version_calls_correct_endpoint(self):
+        given_endpoint = "this is an endpoint"
+        endpoint_provider.get_endless_url = Mock(return_value=given_endpoint)
+
         self._test_object.get_latest_version()
         
         self._mock_web_connection.get.assert_called_once_with(
-                          self._test_object._endpoint,
+                          given_endpoint + "/install/version.json",
                           self._test_object.USERNAME,
                           self._test_object.PASSWORD)
-
-    def test_endpoint_is_taken_from_endpoint_provider(self):
-        given_endpoint = "this is an endpoint"
-        
-        endpoint_provider.get_endless_url = Mock(return_value=given_endpoint)
-        
-        test_object = LatestVersionProvider()
-        
-        self.assertEquals(given_endpoint + "/install/version.json", test_object._endpoint)
