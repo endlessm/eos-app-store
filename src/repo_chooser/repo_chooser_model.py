@@ -3,6 +3,7 @@ from ui.abstract_notifier import AbstractNotifier
 from startup.auto_updates import endpoint_provider
 from environment_manager import EnvironmentManager
 from startup.auto_updates.update_manager import UpdateManager
+from eos_log import log
 
 class RepoChooserModel(AbstractNotifier):
     REPO_CHANGED = "repo.changed"
@@ -19,4 +20,5 @@ class RepoChooserModel(AbstractNotifier):
         self._notify(self.REPO_CHANGED)
 
     def do_update(self):
+        log.info("kicking off manual update")
         self._update_manager.update_os()
