@@ -23,4 +23,4 @@ then
     exit 1
 fi
 
-dpkg -i --force-confignew ${PACKAGE_DIRECTORY}/*.deb
+dpkg -i --force-confnew ${PACKAGE_DIRECTORY}/*.deb
