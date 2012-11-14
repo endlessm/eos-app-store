@@ -33,6 +33,7 @@ class ForceInstallTestCase(unittest.TestCase):
         self._mock_force_install_checker.should_force_install = Mock(return_value=True)
 
         self._test_object.execute()
+        self._test_object._thread.join()
 
         self.assertTrue(self._mock_force_install_ui.launch_ui.called)
 
