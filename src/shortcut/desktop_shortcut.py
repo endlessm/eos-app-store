@@ -135,7 +135,7 @@ class DesktopShortcut(gtk.VBox):
         return None
     
     def get_images(self, event_state):
-        return ()
+        return []
     
     def remove_shortcut(self):
         if self.parent != None:

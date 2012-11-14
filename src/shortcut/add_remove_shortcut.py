@@ -48,11 +48,11 @@ class AddRemoveShortcut(DesktopShortcut):
             self.parent.remove(self)
             
     def get_images(self, event_state):
-        return (
+        return [
             image_util.image_path("endless-shortcut-well.png"),
             image_util.image_path("endless-add.png"),
             image_util.image_path("endless-shortcut-foreground.png")
-            )
+            ]
     
     def get_dragged_images(self):
         return (
