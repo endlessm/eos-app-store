@@ -2,7 +2,7 @@ import gobject
 import string
 import gtk.keysyms
 import gtk
-from eos_util import image_util
+from eos_util.image import Image
 from util import label_util
 from shortcut.desktop_shortcut import DesktopShortcut
 
@@ -42,7 +42,7 @@ class ApplicationShortcut(DesktopShortcut):
     def get_images(self, event_state):
         shortcut_icon_dict = self._shortcut.icon()
         default_icon = shortcut_icon_dict.get(self.ICON_STATE_NORMAL)        
-        return [shortcut_icon_dict.get(event_state, default_icon)]
+        return [Image.from_path(shortcut_icon_dict.get(event_state, default_icon))]
          
     def get_shortcut(self):
         return self._shortcut

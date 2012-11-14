@@ -2,7 +2,7 @@ import gobject
 from shortcut.desktop_shortcut import DesktopShortcut
 from removal_module.removal_confirmation_popup_window import RemovalConfirmationPopupWindow
 from removal_module.delete_not_possible_popup import DeleteNotPossiblePopupWindow
-from eos_util import image_util
+from eos_util.image import Image
 
 class AddRemoveShortcut(DesktopShortcut):
     __gsignals__ = {
@@ -49,23 +49,23 @@ class AddRemoveShortcut(DesktopShortcut):
             
     def get_images(self, event_state):
         return [
-            image_util.image_path("endless-shortcut-well.png"),
-            image_util.image_path("endless-add.png"),
-            image_util.image_path("endless-shortcut-foreground.png")
+            Image.from_name("endless-shortcut-well.png"),
+            Image.from_name("endless-add.png"),
+            Image.from_name("endless-shortcut-foreground.png")
             ]
     
     def get_dragged_images(self):
         return (
-            image_util.image_path("endless-shortcut-well.png"),
-            image_util.image_path("trash_empty_icon.png"),
-            image_util.image_path("endless-shortcut-foreground.png")
+            Image.from_name("endless-shortcut-well.png"),
+            Image.from_name("trash_empty_icon.png"),
+            Image.from_name("endless-shortcut-foreground.png")
             )
 
     def get_trash_full_images(self):
         return (
-            image_util.image_path("endless-shortcut-well.png"),
-            image_util.image_path("trash_full_icon.png"),
-            image_util.image_path("endless-shortcut-foreground.png")
+            Image.from_name("endless-shortcut-well.png"),
+            Image.from_name("trash_full_icon.png"),
+            Image.from_name("endless-shortcut-foreground.png")
             )
     
     def mouse_press_callback(self, widget, event):
