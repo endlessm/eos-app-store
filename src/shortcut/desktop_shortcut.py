@@ -1,12 +1,12 @@
 import string
 from util import label_util
 import gobject
-from widgets.image_eventbox import ImageEventBox
+from eos_widgets.image_eventbox import ImageEventBox
 import gtk
 
 class DesktopShortcut(gtk.VBox):
     DND_TARGET_TYPE_TEXT = 80
-    DND_TRANSFER_TYPE = [( "text/plain", gtk.TARGET_SAME_APP, DND_TARGET_TYPE_TEXT )]
+    DND_TRANSFER_TYPE = [("text/plain", gtk.TARGET_SAME_APP, DND_TARGET_TYPE_TEXT)]
     ICON_STATE_NORMAL = 'normal'
     ICON_STATE_PRESSED = 'pressed'
     ICON_STATE_MOUSEOVER = 'mouseover'
@@ -69,8 +69,8 @@ class DesktopShortcut(gtk.VBox):
         if draggable:
             self._event_box.connect("drag_data_get", self.dnd_send_data)
             self._event_box.drag_source_set(
-                gtk.gdk.BUTTON1_MASK, 
-                self.DND_TRANSFER_TYPE, 
+                gtk.gdk.BUTTON1_MASK,
+                self.DND_TRANSFER_TYPE,
                 gtk.gdk.ACTION_MOVE
                 )
         self._event_box.connect("drag_data_received", self.dnd_receive_data)
@@ -79,9 +79,9 @@ class DesktopShortcut(gtk.VBox):
         self._event_box.connect("drag_begin", self.dnd_drag_begin)
         self._event_box.drag_dest_set(
             #gtk.DEST_DEFAULT_HIGHLIGHT |
-            gtk.DEST_DEFAULT_MOTION |
+            gtk.DEST_DEFAULT_MOTION | 
             gtk.DEST_DEFAULT_DROP,
-            self.DND_TRANSFER_TYPE, 
+            self.DND_TRANSFER_TYPE,
             gtk.gdk.ACTION_MOVE
             )
         
@@ -98,10 +98,10 @@ class DesktopShortcut(gtk.VBox):
         if targetType == self.DND_TARGET_TYPE_TEXT:
             if hasattr(self, '_received_handler_callback'):
                 self._received_handler_callback(
-                    source_widget, 
-                    widget, 
-                    x, 
-                    y, 
+                    source_widget,
+                    widget,
+                    x,
+                    y,
                     selection.data
                     )
             
@@ -155,7 +155,7 @@ class DesktopShortcut(gtk.VBox):
     
     def _create_event_box(self):
         event_box = gtk.EventBox()
-        event_box.set_size_request(64,64)
+        event_box.set_size_request(64, 64)
         event_box.set_visible_window(False)
         event_box.show()
                 
@@ -163,7 +163,7 @@ class DesktopShortcut(gtk.VBox):
     
     def _create_icon(self, images):
         icon = ImageEventBox(images)
-        icon.set_size_request(64,64)
+        icon.set_size_request(64, 64)
         icon.set_visible_window(False)
         icon.show()
         

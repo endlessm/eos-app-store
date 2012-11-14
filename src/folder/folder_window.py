@@ -13,8 +13,8 @@ class OpenFolderWindow():
     
     def __init__(self, parent, callback, shortcut):
         self._width = screen_util.get_width()
-        # TODO fix this
-        self._height = 116
+        # TODO fix this -- use the height of the folder image
+        self._height = 132
         
         self._window = TransparentWindow(parent)
         self._window.set_title(_("Folder"))
