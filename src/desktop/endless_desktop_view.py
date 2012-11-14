@@ -6,7 +6,7 @@ import gtk
 import gobject
 from gtk import gdk
 
-from eos_util import image_util
+from eos_util import image_util, screen_util
 from shortcut.application_shortcut import ApplicationShortcut
 from feedback_module.feedback_response_dialog_view import FeedbackResponseDialogView
 from feedback_module.bugs_and_feedback_popup_window import BugsAndFeedbackPopupWindow
@@ -139,6 +139,8 @@ class EndlessDesktopView(gtk.Window):
         self.popup.add(folder_menu)
         
     def refresh(self, shortcuts, force=False):
+        x, y = self.get_position()
+        screen_util.ScreenUtil.set_offset(y)
             
         child = self._align.get_child()
         if child:
