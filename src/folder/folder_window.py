@@ -1,8 +1,7 @@
 import gtk
 import gettext
 from eos_widgets.image_eventbox import ImageEventBox
-from eos_util import image_util
-from util import screen_util
+from eos_util import image_util, screen_util
 from util.transparent_window import TransparentWindow
 from folder.folder_icons import FolderIcons
 
@@ -68,6 +67,7 @@ class OpenFolderWindow():
 
         self._window.add(self._center)
         self._window.show()
+        
 
     def show(self):
         self._window.show_all()
