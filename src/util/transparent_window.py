@@ -31,34 +31,33 @@ class TransparentWindow(gtk.Window):
 
     def _handle_event(self, widget, event):
         cr = widget.window.cairo_create()
-        x,y = self.window.get_origin()
+        
+        self.w = self.allocation.width
+        self.h = self.allocation.height
+        self.x, self.y = self.window.get_origin()
+        self.y -= screen_util.ScreenUtil.get_offset()
         
         cr.set_source_rgba(0, 0, 0, 255)
         cr.set_operator(cairo.OPERATOR_SOURCE)
         cr.paint()
 
-        self.draw(cr, x,y)
+        self.draw(cr)
 
         self.show_all()
 
         return False
 
-    def draw(self, cr, x, y):
+    def draw(self, cr):
+        pixbuf = self._background.subpixbuf(self.x, self.y, self.w, self.h)
+        cr.set_source_pixbuf(pixbuf, 0, 0)
         if self.gradient_type is None:
             w, h = self.size_request()
             pixbuf = self._background.subpixbuf(x, y, w, h)
             cr.set_source_pixbuf(pixbuf, 0, 0)
+
             cr.paint()
         else:
-            x, y, w, h = self.get_allocation()
-            
-            screen_height = self._background.get_height()
-            
-            offset = int(round((screen_height - self.working_area)/2))
-            pixbuf = self._background.subpixbuf(x, screen_height-h-offset, w, h)
-            cr.set_source_pixbuf(pixbuf, 0, 0)
-            
-            gradient = cairo.LinearGradient(0, 0, 0, h)
+            gradient = cairo.LinearGradient(0, 0, 0, self.h)
             gradient.add_color_stop_rgba(0.005, 255, 255, 255, 0)
             gradient.add_color_stop_rgba(0.006, 0, 0, 0, 0.7)
             gradient.add_color_stop_rgba(0.994, 0, 0, 0, 0.0)

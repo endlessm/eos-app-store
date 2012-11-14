@@ -89,4 +89,3 @@ class Button(ImageEventBox):
         if not self.is_selected:
             self.set_images(self._get_last_images())
             self.display()
-
