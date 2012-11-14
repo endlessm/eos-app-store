@@ -8,8 +8,10 @@ class ForceInstallUI():
 
         window = builder.get_object("dialog-window")
         window.set_wmclass("eos-dialog", "Eos-dialog")
+        window.connect("close", lambda w: w.emit_stop_by_name("close"))
         
         window.show_all()
+        gtk.main()
 
 if __name__ == "__main__":
     ForceInstallUI().launch_ui()
