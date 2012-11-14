@@ -38,7 +38,8 @@ class ApplicationShortcut(DesktopShortcut):
         self.set_moving(False)
         
         images = self.get_images(self.ICON_STATE_NORMAL)
-        self.set_dnd_icon(images)
+        if len(images) > 0:
+            self.set_dnd_icon(images[0])
         
 #        self.add_rename_entry(label_text)
        

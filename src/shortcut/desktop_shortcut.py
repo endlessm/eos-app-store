@@ -102,14 +102,12 @@ class DesktopShortcut(gtk.VBox):
     def set_is_highlightable(self, value):
         self.highlightable = value
         
-    def set_dnd_icon(self, images):
-        if len(images) > 0:
-            image = images[0]
-            image = image_util.scrub_image_path(image)
-            pixbuf = image_util.load_pixbuf(image)
-            if (pixbuf.get_width() > 48) or (pixbuf.get_height() > 48):
-                pixbuf = pixbuf.scale_simple(48, 48, gtk.gdk.INTERP_BILINEAR)
-            self._event_box.drag_source_set_icon_pixbuf(pixbuf)
+    def set_dnd_icon(self, image):
+        image = image_util.scrub_image_path(image)
+        pixbuf = image_util.load_pixbuf(image)
+        if (pixbuf.get_width() > 48) or (pixbuf.get_height() > 48):
+            pixbuf = pixbuf.scale_simple(48, 48, gtk.gdk.INTERP_BILINEAR)
+        self._event_box.drag_source_set_icon_pixbuf(pixbuf)
 
     def dnd_send_data(self, widget, context, selection, targetType, eventTime):
         if targetType == self.DND_TARGET_TYPE_TEXT:
