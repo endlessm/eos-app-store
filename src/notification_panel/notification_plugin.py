@@ -23,7 +23,9 @@ class NotificationPlugin(gtk.EventBox):
     def is_plugin_enabled():
         # Default to enabled unless overridden by specific class
         return True
-
+    
+    def post_init(self):
+        pass
 
     def _hide_window(self, widget):
         pass

@@ -5,7 +5,7 @@ from wifi_util import WifiUtil
 from icon_plugin import IconPlugin
 
 class NetworkSettingsPlugin(IconPlugin):
-    COMMAND = 'sudo gnome-control-center --class=eos-network-manager network'
+    COMMAND = 'sudo gnome-control-center network'
     ICON_NAMES = ['wifi_off.png', 'wifi_low.png', 'wifi_med.png', 'wifi_full.png'] 
     
     def __init__(self, icon_size):

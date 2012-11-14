@@ -4,13 +4,13 @@ import gtk
 from icon_plugin import IconPlugin
 from ui.abstract_notifier import AbstractNotifier
 from util.transparent_window import TransparentWindow
-from util import screen_util
+from eos_util import screen_util
+from panel_constants import PanelConstants
 
 gettext.install('endless_desktop', '/usr/share/locale', unicode = True, names=['ngettext'])
 
 class AllSettingsView(AbstractNotifier):
     X_OFFSET = 13
-    Y_LOCATION = 37
     WINDOW_WIDTH = 330
     WINDOW_HEIGHT = 160
     WINDOW_BORDER = 10
@@ -42,19 +42,19 @@ class AllSettingsView(AbstractNotifier):
         self._button_restart = gtk.Button(_('Restart'))
         self._button_shutdown = gtk.Button(_('Shut Down'))
 
-        self._button_desktop.connect('button-press-event', 
+        self._button_desktop.connect('button-press-event',
                 lambda w, e: self._notify(self.DESKTOP_BACKGROUND))
-        self._button_update.connect('button-release-event', 
+        self._button_update.connect('button-release-event',
                 lambda w, e: self._notify(self.UPDATE_SOFTWARE))
-        self._button_settings.connect('button-release-event', 
+        self._button_settings.connect('button-release-event',
                 lambda w, e: self._notify(self.SETTINGS))
-        self._button_logout.connect('button-release-event', 
+        self._button_logout.connect('button-release-event',
                 lambda w, e: self._notify(self.LOGOUT))
-        self._button_restart.connect('button-release-event', 
+        self._button_restart.connect('button-release-event',
                 lambda w, e: self._notify(self.RESTART))
-        self._button_shutdown.connect('button-release-event', 
+        self._button_shutdown.connect('button-release-event',
                 lambda w, e: self._notify(self.SHUTDOWN))
-        
+
         self._table = gtk.Table(5, 3, True)
         self._table.set_border_width(10)
         self._table.set_focus_chain([])
@@ -65,23 +65,23 @@ class AllSettingsView(AbstractNotifier):
         self._table.attach(self._button_logout, 0, 1, 4, 5)
         self._table.attach(self._button_restart, 1, 2, 4, 5)
         self._table.attach(self._button_shutdown, 2, 3, 4, 5)
-        
+
         self._parent.set_visible_window(False)
     
-        self._window = TransparentWindow(None)
+        self._window = TransparentWindow(self._parent.get_toplevel())
 
         x = screen_util.get_width() - self.WINDOW_WIDTH - self.X_OFFSET
-    
+
         # Get the x location of the center of the widget (icon), relative to the settings window
-        self._window.move(x, self.Y_LOCATION)
+        self._window.move(x, PanelConstants.DEFAULT_POPUP_VERTICAL_MARGIN)
         
         self._window.set_size_request(self.WINDOW_WIDTH, self.WINDOW_HEIGHT)
         self._window.set_border_width(self.WINDOW_BORDER)
-        
+
         # Set up the window so that it can be exposed
         # with a transparent background and triangle decoration
         self._window.connect('expose-event', self._expose)
-        
+
         self._window.connect('focus-out-event', lambda w, e: self.hide_window())
 
         # Place the widget in an event box within the window
@@ -97,7 +97,7 @@ class AllSettingsView(AbstractNotifier):
     # To do: make the triangle position configurable
     def _expose(self, widget, event):
         cr = widget.window.cairo_create()
-        
+
         # Decorate the border with a triangle pointing up
         # Use the same color as the default event box background
         # To do: eliminate need for these "magic" numbers
@@ -107,7 +107,7 @@ class AllSettingsView(AbstractNotifier):
         cr.line_to(self._pointer + 10, 10)
         cr.line_to(self._pointer - 10, 10)
         cr.fill()
-        
+
     def confirm(self, message_id):
         dialog = gtk.Dialog("Confirmation", self._parent._parent, gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT)
         dialog.set_decorated(False)

@@ -6,4 +6,3 @@ if __name__ == "__main__":
 	Tasks().perform_startup_tasks()
 
 	build_desktop()
-    
