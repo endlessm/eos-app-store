@@ -21,6 +21,7 @@ class RepoChooserPresenter():
         view.close_password_dialog()
 
     def _handle_update_response(self, view, model):
-        if view.get_update_response():
-            model.do_update()
         view.close_update_dialog()
+        if view.get_update_response():
+            view.inform_user_of_update()
+            model.do_update()

@@ -99,3 +99,20 @@ class RepoChooserPresenterTestCase(unittest.TestCase):
         self._repo_changed_listener()
 
         self._mock_view.set_repo_name.assert_called_once_with(chosen_repository)
+
+    def test_repo_change_listener_inform_user_of_updates_if_chosen_to_update(self):
+        self._mock_view.get_update_response = Mock(return_value=True)
+
+        RepoChooserPresenter(self._mock_view, self._mock_model)
+        self._update_response_listener()
+
+        self.assertTrue(self._mock_view.inform_user_of_update.called)
+
+    def test_repo_change_listener_dont_inform_user_of_updates_if_not_chosen_to_update(self):
+        self._mock_view.get_update_response = Mock(return_value=False)
+
+        RepoChooserPresenter(self._mock_view, self._mock_model)
+        self._update_response_listener()
+
+        self.assertFalse(self._mock_view.inform_user_of_update.called)
+

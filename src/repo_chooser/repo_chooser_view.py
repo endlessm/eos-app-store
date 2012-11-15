@@ -74,3 +74,6 @@ class RepoChooserView(AbstractNotifier):
     def get_password(self):
         return self._entry.get_text()
         
+    def inform_user_of_update(self):
+        pass
+
