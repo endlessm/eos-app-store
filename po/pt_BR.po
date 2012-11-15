@@ -38,7 +38,7 @@ msgstr "Feedback"
 
 #: src/repo_chooser/repo_chooser_view.py:51
 msgid "Choose Repository"
-msgstr ""
+msgstr "Escolha o repositório"
 
 #: src/shortcut/add_remove_shortcut.py:81
 msgid "Delete"
@@ -49,12 +49,12 @@ msgid ""
 "Downloading updates to the EndlessOS. We will notify you once the updates "
 "are ready to install."
 msgstr ""
-"Downloading updates to the EndlessOS. We will notify you once the updates "
-"are ready to install."
+"Fazendo download das atualizações do EndlessOS. Informaremos assim que as "
+"atualizações estiverem prontas para instalação."
 
 #: src/repo_chooser/repo_chooser_view.py:22
 msgid "EndlessOS Installer"
-msgstr ""
+msgstr "Instalador do EndlessOS"
 
 #: src/shortcut/add_remove_shortcut.py:131
 msgid "Files"
@@ -79,7 +79,7 @@ msgstr "Sair?"
 
 #: src/repo_chooser/repo_chooser_view.py:55
 msgid "Password:"
-msgstr ""
+msgstr "Senha:"
 
 #: src/feedback_module/bugs_and_feedback_popup_window.py:55
 #: ui/bugs_and_feedback.glade:6
@@ -94,6 +94,8 @@ msgstr ""
 msgid ""
 "Please wait while we install the updates for the latest version of EndlessOS."
 msgstr ""
+"Por favor aguarde enquanto fazemos a instalação das atualizações da última "
+"versão do EndlessOS."
 
 #: src/feedback_module/bugs_and_feedback_popup_window.py:38
 #: ui/bugs_and_feedback.glade:30
@@ -197,12 +199,12 @@ msgstr "Páginas Web"
 
 #: src/repo_chooser/repo_chooser_view.py:17
 msgid "Welcome to the EndlessOS installer."
-msgstr ""
+msgstr "Benvindo ao instalador do EndlessOS."
 
 #: src/repo_chooser/repo_chooser_view.py:10
 #, python-format
 msgid "Would you like to begin the Endless OS %supdate now?"
-msgstr ""
+msgstr "Gostaria de iniciar a atualização do EndlessOS %sagora?"
 
 #: ui/feedback_response_dialog.glade:33
 msgid "button"
