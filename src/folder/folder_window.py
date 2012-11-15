@@ -27,7 +27,7 @@ class OpenFolderWindow():
         self._fancy_container.show()
         
 
-        self._fancy_container.set_size_request(self._width,self._height)
+        #self._fancy_container.set_size_request(self._width,self._height)
         self._window.set_size_request(self._width,self._height)
         
         self._center = gtk.Alignment(.5,0.1,0,0)
