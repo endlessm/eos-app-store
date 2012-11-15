@@ -132,13 +132,17 @@ msgstr ""
 "Estamos apenas tentando mantê-lo\n"
 "seguro."
 
-#: src/notification_panel/all_settings_view.py:39
+#: src/notification_panel/all_settings_view.py:25
 msgid "Update"
 msgstr "Atualizar"
 
+#: src/notification_panel/all_settings_view.py:26
+msgid "Updating..."
+msgstr "Atualizando..."
+
 #: src/removal_module/delete_not_possible_popup.py:15
 msgid "WARNING!"
-msgstr "AVISO"
+msgstr "AVISO!"
 
 #: src/desktop/endless_desktop_view.py:116
 msgid "Websites"

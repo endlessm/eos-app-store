@@ -21,6 +21,9 @@ class AllSettingsView(AbstractNotifier):
     LOGOUT = "logout"
     RESTART = "restart"
     SHUTDOWN = "shutdown"
+    
+    UPDATE_BUTTON_TEXT = _('Update')
+    UPDATE_IN_PROGRESS_BUTTON_TEXT = _('Updating...')
 
     RESTART_MESSAGE = 1
     SHUTDOWN_MESSAGE = 2
@@ -36,7 +39,7 @@ class AllSettingsView(AbstractNotifier):
         self._parent = parent
         self._button_desktop = gtk.Button(_('Background'))
         self._label_version = gtk.Label()
-        self._button_update = gtk.Button(_('Update'))
+        self._button_update = gtk.Button(self.UPDATE_BUTTON_TEXT)
         self._button_settings = gtk.Button(_('Settings'))
         self._button_logout = gtk.Button(_('Log Out'))
         self._button_restart = gtk.Button(_('Restart'))
@@ -135,9 +138,11 @@ class AllSettingsView(AbstractNotifier):
         
     def enable_update_button(self):
         self._button_update.set_sensitive(True)
+        self._button_update.set_label(self.UPDATE_BUTTON_TEXT)
 
     def disable_update_button(self):
         self._button_update.set_sensitive(False)
+        self._button_update.set_label(self.UPDATE_IN_PROGRESS_BUTTON_TEXT)
         
         
         
