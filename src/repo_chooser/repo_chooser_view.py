@@ -75,5 +75,8 @@ class RepoChooserView(AbstractNotifier):
         return self._entry.get_text()
         
     def inform_user_of_update(self):
-        pass
+        info_message = gtk.MessageDialog(None, gtk.DIALOG_DESTROY_WITH_PARENT, gtk.MESSAGE_INFO, gtk.BUTTONS_CLOSE, 
+                "Downloading updates to EndlessOS in background. We will notify you once the updates are ready to install.")
+        info_message.connect("response", lambda w, id: info_message.destroy())
+        info_message.show()
 
