@@ -13,22 +13,17 @@ class OpenFolderWindow():
     
     def __init__(self, parent, callback, shortcut):
         self._width = screen_util.get_width()
-        # TODO fix this -- use the height of the folder image
-        self._height = 132
+        image = Image.from_name("open-folder-bg.png")
         
         self._window = TransparentWindow(parent)
         self._window.set_title(_("Folder"))
         
-#        self._window.set_gravity(gtk.gdk.GRAVITY_SOUTH_WEST)
-#        self._window.move(0, 0)
-        self._window.move(0, screen_util.get_height() - self._height - self.TASKBAR_HEIGHT)
+        self._window.move(0, screen_util.get_height() - image.height - self.TASKBAR_HEIGHT)
 
-        self._fancy_container = FolderEventBox(Image.from_name("open-folder-bg.png"), self._width)
+        self._fancy_container = FolderEventBox(image, self._width)
         self._fancy_container.show()
         
-
-        #self._fancy_container.set_size_request(self._width,self._height)
-        self._window.set_size_request(self._width,self._height)
+        self._window.set_size_request(self._width, image.height)
         
         self._center = gtk.Alignment(.5,0.1,0,0)
         self._center.show()
