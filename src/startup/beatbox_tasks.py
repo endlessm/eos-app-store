@@ -15,7 +15,7 @@ class BeatboxTasks():
         self._initialize_beatbox_settings()
     
     def _default_music_folder_path(self):
-        return "/usr/share/endlessm/default_music"
+        return "/usr/share/endlessm-default-files/default_music"
     
     def _initialize_beatbox_settings(self):
         return self._os_util.execute(["gsettings", "set", "net.launchpad.beatbox.settings", "music-folder", self._home_path])

@@ -13,7 +13,7 @@ class ShotwellTasks():
         self._initialize_shotwell_settings()
     
     def _default_images_folder_path(self):
-        return "/usr/share/endlessm/default_images"
+        return "/usr/share/endlessm-default-files/default_images"
     
     def _initialize_shotwell_settings(self):
         self._os_util.execute(["gsettings", "set",

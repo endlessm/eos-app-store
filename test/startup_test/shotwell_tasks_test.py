@@ -16,7 +16,7 @@ class ShotwellTaskTest(unittest.TestCase):
         self.test_object = ShotwellTasks(self.home_directory_copier, self.os_util)
 
     def test_default_location_is_correct(self):
-        self.assertEquals("/usr/share/endlessm/default_images",
+        self.assertEquals("/usr/share/endlessm-default-files/default_images",
                 self.test_object._default_images_folder_path())
 
     def test_target_dir_is_correct(self):

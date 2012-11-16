@@ -14,7 +14,7 @@ class BeatboxTaskTest(unittest.TestCase):
         self.test_object = BeatboxTasks(self.home_path_provider,self.home_directory_copier, self.os_util)
 
     def test_default_location_is_correct(self):
-        self.assertEquals("/usr/share/endlessm/default_music",
+        self.assertEquals("/usr/share/endlessm-default-files/default_music",
                 self.test_object._default_music_folder_path())
 
     def test_gsettings_are_set_for_beatbox(self):
