@@ -1,19 +1,18 @@
 import unittest
-from startup.tasks import Tasks
-from mock import Mock, call
+from startup.initial_tasks import InitialTasks
+from mock import Mock #@UnresolvedImport
 import shutil
 import os.path
-import sys
 
 from eos_log import log
 
-class TasksTest(unittest.TestCase):
+class InitialTasksTest(unittest.TestCase):
 	ENDLESS_DIR = os.path.expanduser("~/.endlessm")
 
 	def setUp(self):
 		self._clean_up()
 
-		self._test_object = Tasks()
+		self._test_object = InitialTasks()
 		self._test_object.TASK_PLUGINS = [Mock()]
 
 	def tearDown(self):
@@ -23,7 +22,7 @@ class TasksTest(unittest.TestCase):
 		shutil.rmtree("/tmp/default_image", True)
 		shutil.rmtree(self.ENDLESS_DIR, True)
 
-	def test_correct_tasks_are_called_when_perform_startup_tasks_is_called(self):
+	def test_correct_tasks_are_called_when_perform_tasks_is_called(self):
 		mock_task1 = Mock()
 		mock_task1.execute = Mock()
 		
@@ -32,7 +31,7 @@ class TasksTest(unittest.TestCase):
 		
 		self._test_object.TASK_PLUGINS = [Mock(return_value=mock_task1), Mock(return_value=mock_task2)]
 
-		self._test_object.perform_startup_tasks()
+		self._test_object.perform_tasks()
 
 		self.assertTrue(mock_task1.execute.called)
 		self.assertTrue(mock_task2.execute.called)
@@ -46,7 +45,7 @@ class TasksTest(unittest.TestCase):
 		
 		self._test_object.TASK_PLUGINS = [error_class, Mock(return_value=mock_task)]
 
-		self._test_object.perform_startup_tasks()
+		self._test_object.perform_tasks()
 
 		self.assertTrue(mock_task.execute.called)
 		
@@ -66,15 +65,15 @@ class TasksTest(unittest.TestCase):
 		
 		self._test_object.TASK_PLUGINS = [mock_task_class]
 
-		self._test_object.perform_startup_tasks()
+		self._test_object.perform_tasks()
 
 		log.error.assert_called_once_with("An error ocurred while executing " + task_name, error)
 		
 		log.error = orig_eos_error
 
-	def test_initialized_file_is_created_after_running_perform_startup_tasks(self):
+	def test_initialized_file_is_created_after_running_perform_tasks(self):
 
-		self._test_object.perform_startup_tasks()
+		self._test_object.perform_tasks()
 
 		self.assertTrue(os.path.exists(os.path.join(self.ENDLESS_DIR, ".initialized")))
 
@@ -85,7 +84,7 @@ class TasksTest(unittest.TestCase):
 		self._test_object.initialize_shotwell_settings = Mock()
 		self._test_object.copy_default_images = Mock()
 
-		self._test_object.perform_startup_tasks()
+		self._test_object.perform_tasks()
 
 		self.assertFalse(self._test_object.initialize_shotwell_settings.called)
 		self.assertFalse(self._test_object.copy_default_images.called)
