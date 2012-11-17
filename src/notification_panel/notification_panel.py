@@ -9,6 +9,8 @@ from audio_plugin import AudioSettingsPlugin
 
 from panel_constants import PanelConstants
 
+from eos_log import log
+
 class NotificationPanel(gtk.HBox):
     # Add plugins for notification panel here
     PLUGINS = [ PrinterSettingsPlugin,
@@ -31,11 +33,14 @@ class NotificationPanel(gtk.HBox):
 
         #Other plugins                    
         for clazz in self.PLUGINS:
-            if clazz.is_plugin_enabled():
-                plugin = self._register_plugin(notification_panel_items, clazz)
-                plugin.connect('button-press-event', lambda w, e: self._launch_command(w))
-                plugin.connect('hide-window-event', plugin._hide_window)
-                self.plugins_list.append(plugin)
+            try:
+                if clazz.is_plugin_enabled():
+                    plugin = self._register_plugin(notification_panel_items, clazz)
+                    plugin.connect('button-press-event', lambda w, e: self._launch_command(w))
+                    plugin.connect('hide-window-event', plugin._hide_window)
+                    self.plugins_list.append(plugin)
+            except Exception, e:
+                log.error('Error registering plugin for ' + clazz.__name__ + ': ' + e.message)
             
         self.pack_end(self.notification_panel, False, False, 30) 
 
