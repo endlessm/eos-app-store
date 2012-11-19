@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: dev 1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-11-13 12:28-0500\n"
+"POT-Creation-Date: 2012-11-15 11:43-0600\n"
 "PO-Revision-Date: 2012-05-31 11:54-0500\n"
 "Last-Translator: Automatically generated\n"
 "Language-Team: none\n"
@@ -20,38 +20,54 @@ msgstr ""
 
 #: src/notification_panel/battery_view.py:120
 msgid " remaining"
-msgstr ""
+msgstr " restante"
 
 #: src/notification_panel/battery_view.py:118
 msgid " until full"
-msgstr ""
+msgstr " até carga completa"
 
 #: src/desktop/endless_desktop_view.py:104
 msgid "Apps"
 msgstr "Aplicativos"
 
-#: src/notification_panel/all_settings_view.py:37
+#: src/notification_panel/all_settings_view.py:40
 msgid "Background"
 msgstr "Fundo"
 
 #: src/notification_panel/battery_view.py:83
 #: src/notification_panel/battery_view.py:84
 msgid "Battery Info"
-msgstr ""
+msgstr "Informações sobre bateria"
 
 #: ui/bugs_and_feedback.glade:76
 msgid "Bugbuffer1"
 msgstr ""
 
-#: ui/bugs_and_feedback.glade:10
 #: src/feedback_module/bugs_and_feedback_popup_window.py:16
+#: ui/bugs_and_feedback.glade:10
 #, fuzzy
 msgid "Bugs And Feedback"
 msgstr "Feedback"
 
+#: src/repo_chooser/repo_chooser_view.py:51
+msgid "Choose Repository"
+msgstr "Escolha o repositório"
+
 #: src/shortcut/add_remove_shortcut.py:81
 msgid "Delete"
 msgstr "Excluir"
+
+#: src/repo_chooser/repo_chooser_view.py:83
+msgid ""
+"Downloading updates to the EndlessOS. We will notify you once the updates "
+"are ready to install."
+msgstr ""
+"Fazendo download das atualizações do EndlessOS. Informaremos assim que as "
+"atualizações estiverem prontas para instalação."
+
+#: src/repo_chooser/repo_chooser_view.py:22
+msgid "EndlessOS Installer"
+msgstr "Instalador do EndlessOS"
 
 #: src/shortcut/add_remove_shortcut.py:131
 msgid "Files"
@@ -61,21 +77,25 @@ msgstr "Files"
 msgid "Folder"
 msgstr "Diretórios"
 
-#: ui/bugs_and_feedback.glade:42
 #: src/feedback_module/bugs_and_feedback_popup_window.py:42
+#: ui/bugs_and_feedback.glade:42
 msgid "Give us feedback"
 msgstr "Deixe seu comentário."
 
-#: src/notification_panel/all_settings_view.py:41
+#: src/notification_panel/all_settings_view.py:44
 msgid "Log Out"
 msgstr "Sair"
 
-#: src/notification_panel/all_settings_view.py:32
+#: src/notification_panel/all_settings_view.py:35
 msgid "Log Out?"
 msgstr "Sair?"
 
-#: ui/bugs_and_feedback.glade:6
+#: src/repo_chooser/repo_chooser_view.py:55
+msgid "Password:"
+msgstr "Senha:"
+
 #: src/feedback_module/bugs_and_feedback_popup_window.py:55
+#: ui/bugs_and_feedback.glade:6
 msgid ""
 "Please let us know how the problem occured and we will resolve it as soon as "
 "possible."
@@ -86,23 +106,40 @@ msgstr ""
 #: src/notification_panel/battery_view.py:66
 #, fuzzy
 msgid "Power Settings"
-msgstr "Definições"
+msgstr "Configurações de energia"
 
-#: ui/bugs_and_feedback.glade:30
+#: ui/force_install.glade:50
+msgid ""
+"Please wait while we install the updates for the latest version of EndlessOS."
+msgstr ""
+"Por favor aguarde enquanto fazemos a instalação das atualizações da última "
+"versão do EndlessOS."
+
 #: src/feedback_module/bugs_and_feedback_popup_window.py:38
+#: ui/bugs_and_feedback.glade:30
 msgid "Report a Bug"
 msgstr "Relatar um bug"
 
-#: src/notification_panel/all_settings_view.py:42
+#: src/notification_panel/all_settings_view.py:45
 msgid "Restart"
 msgstr "Reinicializar"
 
-#: src/notification_panel/all_settings_view.py:30
+#: ui/install_notifier.glade:48
+#, fuzzy
+msgid "Restart Later"
+msgstr "Reinicializar"
+
+#: ui/install_notifier.glade:34
+#, fuzzy
+msgid "Restart Now"
+msgstr "Reinicializar"
+
+#: src/notification_panel/all_settings_view.py:33
 msgid "Restart?"
 msgstr "Reinicializar?"
 
-#: ui/bugs_and_feedback.glade:94
 #: src/feedback_module/bugs_and_feedback_popup_window.py:65
+#: ui/bugs_and_feedback.glade:94
 msgid "SUBMIT"
 msgstr "ENVIAR"
 
@@ -110,15 +147,15 @@ msgstr "ENVIAR"
 msgid "Search or Type Web Site"
 msgstr "Busque ou digite o site"
 
-#: src/notification_panel/all_settings_view.py:40
+#: src/notification_panel/all_settings_view.py:43
 msgid "Settings"
 msgstr "Definições"
 
-#: src/notification_panel/all_settings_view.py:43
+#: src/notification_panel/all_settings_view.py:46
 msgid "Shut Down"
 msgstr "Desligar"
 
-#: src/notification_panel/all_settings_view.py:31
+#: src/notification_panel/all_settings_view.py:34
 msgid "Shutdown?"
 msgstr "Desligar?"
 
@@ -126,10 +163,17 @@ msgstr "Desligar?"
 msgid "Thank You"
 msgstr "Obrigado"
 
-#: ui/feedback_response_dialog.glade:25
 #: src/feedback_module/feedback_response_dialog_view.py:8
+#: ui/feedback_response_dialog.glade:25
 msgid "Thank you for your feedback."
 msgstr "Obrigado pelo seu feedback."
+
+#: ui/install_notifier.glade:72
+msgid ""
+"This is a really long sentence.  This is a really long sentence.  This is a "
+"really long sentence.  This is a really long sentence.  This is a really "
+"long sentence.  This is a really long sentence."
+msgstr ""
 
 #: src/removal_module/delete_not_possible_popup.py:44
 msgid ""
@@ -147,17 +191,38 @@ msgstr ""
 "Estamos apenas tentando mantê-lo\n"
 "seguro."
 
-#: src/notification_panel/all_settings_view.py:39
+#: src/notification_panel/all_settings_view.py:25
 msgid "Update"
 msgstr "Atualizar"
 
+#: ui/force_install.glade:10
+msgid "Updates are being installed"
+msgstr ""
+
+#: ui/install_notifier.glade:10
+msgid "Updates are ready to install"
+msgstr ""
+
+#: src/notification_panel/all_settings_view.py:26
+msgid "Updating..."
+msgstr "Atualizando..."
+
 #: src/removal_module/delete_not_possible_popup.py:15
 msgid "WARNING!"
-msgstr "AVISO"
+msgstr "AVISO!"
 
 #: src/desktop/endless_desktop_view.py:116
 msgid "Websites"
 msgstr "Páginas Web"
+
+#: src/repo_chooser/repo_chooser_view.py:17
+msgid "Welcome to the EndlessOS installer."
+msgstr "Benvindo ao instalador do EndlessOS."
+
+#: src/repo_chooser/repo_chooser_view.py:10
+#, python-format
+msgid "Would you like to begin the Endless OS %supdate now?"
+msgstr "Gostaria de iniciar a atualização do EndlessOS %sagora?"
 
 #: ui/feedback_response_dialog.glade:33
 msgid "button"
