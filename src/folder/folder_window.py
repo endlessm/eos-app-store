@@ -1,7 +1,8 @@
 import gtk
 import gettext
-from eos_widgets.image_eventbox import ImageEventBox
-from eos_util import image_util, screen_util
+from eos_widgets.folder_eventbox import FolderEventBox
+from eos_util.image import Image
+from eos_util import screen_util
 from util.transparent_window import TransparentWindow
 from folder.folder_icons import FolderIcons
 
@@ -12,23 +13,18 @@ class OpenFolderWindow():
 
     def __init__(self, parent, callback, shortcut):
         self._width = screen_util.get_width()
-        # TODO fix this
-        self._height = 116
-
+        image = Image.from_name("open-folder-bg.png")
+        
         self._window = TransparentWindow(parent)
         self._window.set_title(_("Folder"))
+        
+        self._window.move(0, screen_util.get_height() - image.height - self.TASKBAR_HEIGHT)
 
-#        self._window.set_gravity(gtk.gdk.GRAVITY_SOUTH_WEST)
-#        self._window.move(0, 0)
-        self._window.move(0, screen_util.get_height() - self._height - self.TASKBAR_HEIGHT)
-
-        self._fancy_container = ImageEventBox((image_util.image_path("open-folder-bg.png"),), self._width)
+        self._fancy_container = FolderEventBox(image, self._width)
         self._fancy_container.show()
-
-
-        self._fancy_container.set_size_request(self._width,self._height)
-        self._window.set_size_request(self._width,self._height)
-
+        
+        self._window.set_size_request(self._width, image.height)
+        
         self._center = gtk.Alignment(.5,0.1,0,0)
         self._center.show()
 

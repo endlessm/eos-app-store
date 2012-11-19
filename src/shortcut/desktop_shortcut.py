@@ -6,7 +6,7 @@ import gtk
 
 class DesktopShortcut(gtk.VBox):
     DND_TARGET_TYPE_TEXT = 80
-    DND_TRANSFER_TYPE = [( "text/plain", gtk.TARGET_SAME_APP, DND_TARGET_TYPE_TEXT )]
+    DND_TRANSFER_TYPE = [("text/plain", gtk.TARGET_SAME_APP, DND_TARGET_TYPE_TEXT)]
     ICON_STATE_NORMAL = 'normal'
     ICON_STATE_PRESSED = 'pressed'
     ICON_STATE_MOUSEOVER = 'mouseover'
@@ -79,7 +79,7 @@ class DesktopShortcut(gtk.VBox):
         self._event_box.connect("drag_begin", self.dnd_drag_begin)
         self._event_box.drag_dest_set(
             #gtk.DEST_DEFAULT_HIGHLIGHT |
-            gtk.DEST_DEFAULT_MOTION |
+            gtk.DEST_DEFAULT_MOTION | 
             gtk.DEST_DEFAULT_DROP,
             self.DND_TRANSFER_TYPE,
             gtk.gdk.ACTION_MOVE
@@ -135,8 +135,8 @@ class DesktopShortcut(gtk.VBox):
         return None
 
     def get_images(self, event_state):
-        return ()
-
+        return []
+    
     def remove_shortcut(self):
         if self.parent != None:
             self.parent.remove(self)
@@ -155,7 +155,7 @@ class DesktopShortcut(gtk.VBox):
 
     def _create_event_box(self):
         event_box = gtk.EventBox()
-        event_box.set_size_request(64,64)
+        event_box.set_size_request(64, 64)
         event_box.set_visible_window(False)
         event_box.show()
 
@@ -163,7 +163,7 @@ class DesktopShortcut(gtk.VBox):
 
     def _create_icon(self, images):
         icon = ImageEventBox(images)
-        icon.set_size_request(64,64)
+        icon.set_size_request(64, 64)
         icon.set_visible_window(False)
         icon.show()
 
