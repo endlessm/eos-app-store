@@ -1,7 +1,8 @@
 import gtk
 import gettext
-from eos_widgets.image_eventbox import ImageEventBox
-from eos_util import image_util, screen_util
+from eos_widgets.folder_eventbox import FolderEventBox
+from eos_util.image import Image
+from eos_util import screen_util
 from util.transparent_window import TransparentWindow
 from folder.folder_icons import FolderIcons
 
@@ -53,15 +54,19 @@ class OpenFolderWindow():
 
         self._height = len(rows) * (WIDGET_HEIGHT + WIDGET_LABEL_HEIGHT + WIDGET_VERTICAL_SPACING)
         self._width = screen_util.get_width()
+        image = Image.from_name("open-folder-bg.png")
         
         self._window = TransparentWindow(parent, gradient_type='linear')
         self._window.set_title(_("Folder"))
         
-        self._window.move(0, screen_util.get_height() - self._height - self.TASKBAR_HEIGHT)
+        self._window.move(0, screen_util.get_height() - image.height - self.TASKBAR_HEIGHT)
 
-        self._window.set_size_request(self._width, self._height)
-                
-        self._center = gtk.Alignment(0.5, 0.38, 0, 0)
+        self._fancy_container = FolderEventBox(image, self._width)
+        self._fancy_container.show()
+        
+        self._window.set_size_request(self._width, image.height)
+        
+        self._center = gtk.Alignment(.5,0.1,0,0)
         self._center.show()
         self._center.add(self._container)
 

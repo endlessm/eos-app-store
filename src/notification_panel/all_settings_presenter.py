@@ -1,4 +1,5 @@
 from all_settings_view import AllSettingsView
+from all_settings_model import AllSettingsModel
 from background_chooser_launcher import BackgroundChooserLauncher
 
 class AllSettingsPresenter():
@@ -12,9 +13,19 @@ class AllSettingsPresenter():
         view.add_listener(AllSettingsView.LOGOUT, lambda: self._logout(view, model))
         view.add_listener(AllSettingsView.RESTART, lambda: self._restart(view, model))
         view.add_listener(AllSettingsView.SHUTDOWN, lambda: self._shutdown(view, model))
+        
+        model.add_listener(AllSettingsModel.UPDATE_LOCK, lambda: self._modify_update_button(view, model))
 
+        self._modify_update_button(view, model)
+        
         view.set_current_version(model.get_current_version())
         view.display()
+
+    def _modify_update_button(self, view, model):
+        if model.can_update():
+            view.enable_update_button()
+        else:
+            view.disable_update_button()
 
     def _update_software(self, view, model):
         view.hide_window()

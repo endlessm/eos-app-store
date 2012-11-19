@@ -8,7 +8,7 @@ import gtk
 
 class DesktopShortcut(gtk.VBox):
     DND_TARGET_TYPE_TEXT = 80
-    DND_TRANSFER_TYPE = [( "text/plain", gtk.TARGET_SAME_APP, DND_TARGET_TYPE_TEXT )]
+    DND_TRANSFER_TYPE = [("text/plain", gtk.TARGET_SAME_APP, DND_TARGET_TYPE_TEXT)]
     ICON_STATE_NORMAL = 'normal'
     ICON_STATE_PRESSED = 'pressed'
     ICON_STATE_MOUSEOVER = 'mouseover'
@@ -95,19 +95,16 @@ class DesktopShortcut(gtk.VBox):
             self.DND_TRANSFER_TYPE,
             gtk.gdk.ACTION_MOVE
             )
-        
+
     def __str__(self):
         return self._event_box._identifier
-        
+
     def set_is_highlightable(self, value):
         self.highlightable = value
-        
+
     def set_dnd_icon(self, image):
-        image = image_util.scrub_image_path(image)
-        pixbuf = image_util.load_pixbuf(image)
-        if (pixbuf.get_width() > 48) or (pixbuf.get_height() > 48):
-            pixbuf = pixbuf.scale_simple(48, 48, gtk.gdk.INTERP_BILINEAR)
-        self._event_box.drag_source_set_icon_pixbuf(pixbuf)
+        image.scale_from_width(48)
+        image.draw(self._event_box.drag_source_set_icon_pixbuf)
 
     def dnd_send_data(self, widget, context, selection, targetType, eventTime):
         if targetType == self.DND_TARGET_TYPE_TEXT:
@@ -186,7 +183,7 @@ class DesktopShortcut(gtk.VBox):
         return None
 
     def get_images(self, event_state):
-        return ()
+        return []
 
     def get_highlight_images(self, event_state):
         return self.get_images(event_state)
@@ -214,7 +211,7 @@ class DesktopShortcut(gtk.VBox):
 
     def _create_event_box(self):
         event_box = gtk.EventBox()
-        event_box.set_size_request(64,64)
+        event_box.set_size_request(64, 64)
         event_box.set_visible_window(False)
         event_box.show()
 
@@ -222,15 +219,15 @@ class DesktopShortcut(gtk.VBox):
 
     def _create_icon(self, images):
         icon = ImageEventBox(images)
-        icon.set_size_request(64,64)
+        icon.set_size_request(64, 64)
         icon.set_visible_window(False)
         icon.show()
 
         return icon
-        
+
     def destroy(self):
         self.unparent()
         self._label.destroy()
         self._event_box.destroy()
-        
+
 

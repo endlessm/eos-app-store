@@ -6,7 +6,7 @@ from startup.windows_migration_tasks import WindowsMigrationTasks
 from startup.delete_desktop_state_task import DeleteDesktopStateTask
 from eos_log import log
 
-class Tasks():
+class InitialTasks():
 	TASK_PLUGINS = [
 				DeleteDesktopStateTask, 
 				ShotwellTasks, 
@@ -14,7 +14,7 @@ class Tasks():
 				WindowsMigrationTasks,
 				]
 	
-	def perform_startup_tasks(self):
+	def perform_tasks(self):
 		if self._is_initial_startup():
 			for task in self.TASK_PLUGINS:
 				try:

@@ -24,7 +24,7 @@ class AudioSettingsPluginTestCase(unittest.TestCase):
     def test_audio_plugin_launches_settings_when_clicked(self):
         alsaaudio.cards = Mock(return_value = self.MOCK_AUDIO_CARD)
         self._audio_plugin = MockAudioSettingsPlugin(1)
-        self.assertEqual('sudo gnome-control-center --class=eos-audio-manager sound', self._audio_plugin.get_launch_command())
+        self.assertEqual('gnome-control-center --class=eos-audio-manager sound', self._audio_plugin.get_launch_command())
 
     def test_audio_plugin_displays_muted_icon(self):
         alsaaudio.cards = Mock(return_value = self.MOCK_AUDIO_CARD)
