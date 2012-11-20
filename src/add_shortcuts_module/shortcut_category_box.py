@@ -87,13 +87,13 @@ class ShortcutCategoryBox(gtk.EventBox):
             box.set_visible_window(False)
             
             if section.active:
-                markup = '<span color="#ffffff"><b>' + section.category + '</b></span>'
+                markup = '<span color="#ffffff"><b>' + section.category.upper() + '</b></span>'
                 self._active_category = section.category
                 image_start.set_from_file(self._separator_active)
                 image_end.set_from_file(self._separator_active)
                 box.connect("expose-event", self._draw_gradient, True)
             else:
-                markup = '<span color="#aaaaaa"><b>' + section.category + '</b></span>'
+                markup = '<span color="#aaaaaa"><b>' + section.category.upper() + '</b></span>'
                 image_start.set_from_file(self._separator_inactive)
                 image_end.set_from_file(self._separator_inactive)
             
@@ -105,7 +105,7 @@ class ShortcutCategoryBox(gtk.EventBox):
             hbox.pack_start(label, True, True, 20)
             vbox.pack_start(image_start)
             vbox.pack_start(hbox, True, True, 15)
-            active_subcategory = ''
+#            active_subcategory = ''
             if section.subcategories:
                 for category in section.subcategories:
                     if category.active:
@@ -119,10 +119,10 @@ class ShortcutCategoryBox(gtk.EventBox):
                     ebox.set_visible_window(False)
                     sub_label = gtk.Label()
                     if category.active:
-                        sub_label.set_markup('<span color="#ffffff"><b>' + category.category + '</b></span>')
+                        sub_label.set_markup('<span color="#ffffff"><b>' + category.category.upper() + '</b></span>')
 #                        print 'In shortcut category box, active subcategory =', active_subcategory
                     else:
-                        sub_label.set_markup('<span color="#aaaaaa"><b>' + category.category + '</b></span>')
+                        sub_label.set_markup('<span color="#aaaaaa"><b>' + category.category.upper() + '</b></span>')
                     sub_label.set_alignment(0, 0.5)
                     ebox.add(sub_label)
                     ebox.connect("button-release-event", self._handle_subcategory_click, section.category, category.category)
