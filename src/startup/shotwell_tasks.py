@@ -24,7 +24,10 @@ class ShotwellTasks():
 				"true"])
 	
 	def _copy_default_images(self):
-		pictures_directory = self._home_path_provider.get_user_directory("Pictures")
+		pictures_directory = self._home_path_provider.get_user_directory('Pictures')
+		
+		# Put the default pictures in a sub-folder named 'Endless'
+		pictures_directory = os.path.join(pictures_directory, 'Endless')
 		
 		for path in glob.iglob(self._default_images_directory()):
 			shutil.copy2(path, os.path.join(pictures_directory, os.path.basename(path)))

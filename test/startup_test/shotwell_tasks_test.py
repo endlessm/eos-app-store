@@ -56,9 +56,10 @@ class TasksTest(unittest.TestCase):
 
 	def test_copy_default_images(self):
 		pictures_directory = "pictures directory"
+		endless_pictures_directory = os.path.join(pictures_directory, "Endless")
 		self._mock_home_path_provider.get_user_directory = Mock(return_value=pictures_directory)
 
 		self._test_object.execute()
 
-		self._mock_copy.assert_called_once_with("/tmp/default_image/test.image", os.path.join(pictures_directory, "test.image"))
+		self._mock_copy.assert_called_once_with("/tmp/default_image/test.image", os.path.join(endless_pictures_directory, "test.image"))
 
