@@ -21,15 +21,15 @@ class WindowsMigrationTasksTestCase(unittest.TestCase):
         shutil.rmtree(self._dst_dir)
 
     def test_is_windows_given_xp(self):
-        self._make_windows_xp(num_users=1)
+        self._make_windows_xp()
         self.assertTrue(self._test_object.is_windows(self._src_dir))
         
     def test_is_windows_given_7(self):
-        self._make_windows_7(num_users=1)
+        self._make_windows_7()
         self.assertTrue(self._test_object.is_windows(self._src_dir))
         
     def test_is_source_system_win_xp(self):
-        self._make_windows_xp(num_users=1)
+        self._make_windows_xp()
         self.assertTrue(self._test_object.is_windows_xp(self._src_dir))
 
     def test_win_xp_documents_and_settings_is_dir(self):
@@ -37,7 +37,7 @@ class WindowsMigrationTasksTestCase(unittest.TestCase):
         self.assertFalse(self._test_object.is_windows_xp(self._src_dir))
 
     def test_is_source_system_win_7(self):
-        self._make_windows_7(num_users=1)
+        self._make_windows_7()
         self.assertTrue(self._test_object.is_windows_7(self._src_dir))
 
     def test_win_7_users_is_dir(self):
@@ -62,73 +62,87 @@ class WindowsMigrationTasksTestCase(unittest.TestCase):
         self.assertEquals(0, users.index('WindowsUser1'))
         self.assertEquals(1, users.index('WindowsUser2'))
 
-    def test_import_win_xp_user(self):
-        self._make_windows_xp(num_users=1)
-        os.symlink = Mock()
+    def test_import_user_win_xp(self):
+        self._make_windows_xp()
+        self._test_object._create_link = Mock()
         self._test_object.pictures_dir = Mock(return_value='/home/user/pictures')
         self._test_object.music_dir = Mock(return_value='/home/user/music')
         self._test_object.videos_dir = Mock(return_value='/home/user/videos')
         self._test_object.documents_dir = Mock(return_value='/home/user/docs')
-        self._test_object.import_user(self._src_dir, 'WindowsUser1')
+        self._test_object.import_user(self._src_dir, 'WindowsUser1', 'LinkName')
         calls = []
-        calls.append(call(os.path.join(self._src_dir, 'Documents and Settings/WindowsUser1/My Documents'), '/home/user/docs/WindowsUser1'))
-        calls.append(call(os.path.join(self._src_dir, 'Documents and Settings/WindowsUser1/My Documents/My Pictures'), '/home/user/pictures/WindowsUser1'))
-        calls.append(call(os.path.join(self._src_dir, 'Documents and Settings/WindowsUser1/My Documents/My Music'), '/home/user/music/WindowsUser1'))
-        calls.append(call(os.path.join(self._src_dir, 'Documents and Settings/WindowsUser1/My Documents/My Videos'), '/home/user/videos/WindowsUser1'))
-        os.symlink.assert_has_calls(calls, any_order=True)
+        calls.append(call(os.path.join(self._src_dir, 'Documents and Settings/WindowsUser1/My Documents'), '/home/user/docs/LinkName'))
+        calls.append(call(os.path.join(self._src_dir, 'Documents and Settings/WindowsUser1/My Documents/My Pictures'), '/home/user/pictures/LinkName'))
+        calls.append(call(os.path.join(self._src_dir, 'Documents and Settings/WindowsUser1/My Documents/My Music'), '/home/user/music/LinkName'))
+        calls.append(call(os.path.join(self._src_dir, 'Documents and Settings/WindowsUser1/My Documents/My Videos'), '/home/user/videos/LinkName'))
+        self._test_object._create_link.assert_has_calls(calls, any_order=True)
 
-    def test_import_win_7_user(self):
-        self._make_windows_7(num_users=1)
-        os.symlink = Mock()
+    def test_import_user_win_7(self):
+        self._make_windows_7()
+        self._test_object._create_link = Mock()
         self._test_object.pictures_dir = Mock(return_value='/home/user/pictures')
         self._test_object.music_dir = Mock(return_value='/home/user/music')
         self._test_object.videos_dir = Mock(return_value='/home/user/videos')
         self._test_object.documents_dir = Mock(return_value='/home/user/docs')
-        self._test_object.import_user(self._src_dir, 'WindowsUser1')
+        self._test_object.import_user(self._src_dir, 'WindowsUser1', 'LinkName')
         calls = []
-        calls.append(call(os.path.join(self._src_dir, 'Users/WindowsUser1/Documents'), '/home/user/docs/WindowsUser1'))
-        calls.append(call(os.path.join(self._src_dir, 'Users/WindowsUser1/Pictures'), '/home/user/pictures/WindowsUser1'))
-        calls.append(call(os.path.join(self._src_dir, 'Users/WindowsUser1/Music'), '/home/user/music/WindowsUser1'))
-        calls.append(call(os.path.join(self._src_dir, 'Users/WindowsUser1/Videos'), '/home/user/videos/WindowsUser1'))
-        os.symlink.assert_has_calls(calls, any_order=True)
+        calls.append(call(os.path.join(self._src_dir, 'Users/WindowsUser1/Documents'), '/home/user/docs/LinkName'))
+        calls.append(call(os.path.join(self._src_dir, 'Users/WindowsUser1/Pictures'), '/home/user/pictures/LinkName'))
+        calls.append(call(os.path.join(self._src_dir, 'Users/WindowsUser1/Music'), '/home/user/music/LinkName'))
+        calls.append(call(os.path.join(self._src_dir, 'Users/WindowsUser1/Videos'), '/home/user/videos/LinkName'))
+        self._test_object._create_link.assert_has_calls(calls, any_order=True)
         
-    def test_import_win_xp_multiple_users(self):
+    def test_import_mounted_directory_win_xp_single_user(self):
+        self._make_windows_xp()
+        self._test_object.import_user = Mock()
+        self._test_object.import_mounted_directory(self._src_dir)
+        # For a single user import, the generic name of 'Windows' is used instead of the real user name
+        self._test_object.import_user.assert_called_once_with(self._src_dir, 'WindowsUser1', 'Windows')
+
+    def test_import_mounted_directory_win_7_single_user(self):
+        self._make_windows_7()
+        self._test_object.import_user = Mock()
+        self._test_object.import_mounted_directory(self._src_dir)
+        # For a single user import, the generic name of 'Windows' is used instead of the real user name
+        self._test_object.import_user.assert_called_once_with(self._src_dir, 'WindowsUser1', 'Windows')
+
+    def test_import_mounted_directory_win_xp_multiple_users(self):
         self._make_windows_xp(num_users=2)
         self._test_object.import_user = Mock()
         self._test_object.import_mounted_directory(self._src_dir)
         calls = []
-        calls.append(call(self._src_dir, 'WindowsUser1'))
-        calls.append(call(self._src_dir, 'WindowsUser2'))
+        calls.append(call(self._src_dir, 'WindowsUser1', 'WindowsUser1'))
+        calls.append(call(self._src_dir, 'WindowsUser2', 'WindowsUser2'))
         self._test_object.import_user.assert_has_calls(calls, any_order=True)
 
-    def test_import_win_7_multiple_users(self):
+    def test_import_mounted_directory_win_7_multiple_users(self):
         self._make_windows_7(num_users=2)
         self._test_object.import_user = Mock()
         self._test_object.import_mounted_directory(self._src_dir)
         calls = []
-        calls.append(call(self._src_dir, 'WindowsUser1'))
-        calls.append(call(self._src_dir, 'WindowsUser2'))
+        calls.append(call(self._src_dir, 'WindowsUser1', 'WindowsUser1'))
+        calls.append(call(self._src_dir, 'WindowsUser2', 'WindowsUser2'))
         self._test_object.import_user.assert_has_calls(calls, any_order=True)
 
     def test_creating_links(self):
         self._make_file(self._src_dir, 'bar')
-        target = os.path.join(self._src_dir, 'bar')
-        expected = os.path.join(self._dst_dir, 'foo')
-        self._test_object._create_link('foo', target, self._dst_dir)
-        self.assertTrue(os.access(expected, os.R_OK))
-        self.assertTrue(os.path.islink(expected))
-        self.assertEqual(target, os.readlink(expected))
+        source = os.path.join(self._src_dir, 'bar')
+        link = os.path.join(self._dst_dir, 'foo')
+        self._test_object._create_link(source, link)
+        self.assertTrue(os.access(link, os.R_OK))
+        self.assertTrue(os.path.islink(link))
+        self.assertEqual(source, os.readlink(link))
 
     def test_creating_links_preserves_existing(self):
         self._make_file(self._src_dir, 'bar')
         os.symlink(os.path.join(self._src_dir, 'bar'), os.path.join(self._dst_dir, 'foo'))
         
-        target = os.path.join(self._src_dir, 'bar')
-        expected = os.path.join(self._dst_dir, 'foo')
-        self._test_object._create_link('foo', target, self._dst_dir)
-        self.assertTrue(os.access(expected, os.R_OK))
-        self.assertTrue(os.path.islink(expected))
-        self.assertEqual(target, os.readlink(expected))
+        source = os.path.join(self._src_dir, 'bar')
+        link = os.path.join(self._dst_dir, 'foo')
+        self._test_object._create_link(source, link)
+        self.assertTrue(os.access(link, os.R_OK))
+        self.assertTrue(os.path.islink(link))
+        self.assertEqual(source, os.readlink(link))
     
     def test_get_users_pictures_directory(self):
         self._mock_home_path_provider.get_user_directory = Mock(return_value="something")
@@ -158,12 +172,12 @@ class WindowsMigrationTasksTestCase(unittest.TestCase):
         
         self._mock_home_path_provider.get_user_directory.assert_called_once_with("Documents")
 
-    def _make_windows_xp(self, num_users):
+    def _make_windows_xp(self, num_users=1):
         documents_dir = os.path.join(self._src_dir, 'Documents and Settings')
         os.mkdir(documents_dir)
         self._make_windows_xp_users_dir(documents_dir, num_users)
     
-    def _make_windows_7(self, num_users):
+    def _make_windows_7(self, num_users=1):
         documents_dir = os.path.join(self._src_dir, 'Users')
         os.mkdir(documents_dir)
         self._make_windows_7_users_dir(documents_dir, num_users)
