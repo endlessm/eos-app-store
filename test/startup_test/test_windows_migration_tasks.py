@@ -51,18 +51,18 @@ class WindowsMigrationTasksTestCase(unittest.TestCase):
     def test_get_win_xp_users(self):
         self._make_windows_xp()
         users = self._test_object.get_windows_users(self._src_dir)
-        self.assertEquals(3, len(users))
+        self.assertEquals(6, len(users))
         self.assertEquals(0, users.index('All Users'))
-        self.assertEquals(1, users.index('Default'))
-        self.assertEquals(2, users.index('WindowsUser'))
+        self.assertEquals(2, users.index('Default User'))
+        self.assertEquals(5, users.index('WindowsUser'))
 
     def test_get_win_7_users(self):
         self._make_windows_7()
         users = self._test_object.get_windows_users(self._src_dir)
-        self.assertEquals(3, len(users))
+        self.assertEquals(8, len(users))
         self.assertEquals(0, users.index('All Users'))
-        self.assertEquals(1, users.index('Default'))
-        self.assertEquals(2, users.index('WindowsUser'))
+        self.assertEquals(3, users.index('Default User'))
+        self.assertEquals(7, users.index('WindowsUser'))
 
     def test_import_win_xp_user(self):
         self._make_windows_xp()
@@ -99,9 +99,9 @@ class WindowsMigrationTasksTestCase(unittest.TestCase):
         self._test_object.import_user = Mock()
         self._test_object.import_mounted_directory(self._src_dir)
         calls = []
-        calls.append(call(self._src_dir, 'Default'))
         calls.append(call(self._src_dir, 'WindowsUser'))
         calls.append(call(self._src_dir, 'All Users'))
+        calls.append(call(self._src_dir, 'Default User'))
         self._test_object.import_user.assert_has_calls(calls, any_order=True)
 
     def test_import_win_7_multiple_users(self):
@@ -109,9 +109,9 @@ class WindowsMigrationTasksTestCase(unittest.TestCase):
         self._test_object.import_user = Mock()
         self._test_object.import_mounted_directory(self._src_dir)
         calls = []
-        calls.append(call(self._src_dir, 'Default'))
         calls.append(call(self._src_dir, 'WindowsUser'))
         calls.append(call(self._src_dir, 'All Users'))
+        calls.append(call(self._src_dir, 'Default User'))
         self._test_object.import_user.assert_has_calls(calls, any_order=True)
 
     def test_creating_links(self):
@@ -165,48 +165,39 @@ class WindowsMigrationTasksTestCase(unittest.TestCase):
     def _make_windows_xp(self):
         documents_dir = os.path.join(self._src_dir, 'Documents and Settings')
         os.mkdir(documents_dir)
-        self._make_users_dir(documents_dir, True)
+        self._make_windows_xp_users_dir(documents_dir)
     
     def _make_windows_7(self):
         documents_dir = os.path.join(self._src_dir, 'Users')
         os.mkdir(documents_dir)
-        self._make_users_dir(documents_dir, False)
+        self._make_windows_7_users_dir(documents_dir)
     
-    def _make_users_dir(self, documents_dir, win_xp):
-        windows_user_dir = os.path.join(documents_dir, 'WindowsUser')
-        os.mkdir(windows_user_dir)
-        if win_xp:
-            self._make_windowsxp_home_dir(windows_user_dir)
-        else:
-            self._make_windows7_home_dir(windows_user_dir)
-            
-        all_users_dir = os.path.join(documents_dir, 'All Users')
-        os.mkdir(all_users_dir)
-        if win_xp:
-            self._make_windowsxp_home_dir(all_users_dir)
-        else:
-            self._make_windows7_home_dir(all_users_dir)
-            
-        default_user_dir = os.path.join(documents_dir, 'Default')
-        os.mkdir(default_user_dir)
-        if win_xp:
-            self._make_windowsxp_home_dir(default_user_dir)
-        else:
-            self._make_windows7_home_dir(default_user_dir)
+    def _make_windows_xp_users_dir(self, documents_dir):
+        # Note: all names other than the first two should be excluded by the logic under test
+        for user_name in ['WindowsUser', 'Another User', 'All Users', 'Default User', 'LocalService', 'NetworkService']:
+            user_dir = os.path.join(documents_dir, user_name)
+            os.mkdir(user_dir)
+            self._make_windows_xp_home_dir(user_dir)
 
-    
-    def _make_windows7_home_dir(self, user_dir):
-        os.mkdir(os.path.join(user_dir, 'Documents'))
-        os.mkdir(os.path.join(user_dir, 'Music'))
-        os.mkdir(os.path.join(user_dir, 'Pictures'))
-        os.mkdir(os.path.join(user_dir, 'Videos'))
-    
-    def _make_windowsxp_home_dir(self, user_dir):
+    def _make_windows_7_users_dir(self, documents_dir):
+        # Note: all names other than the first two should be excluded by the logic under test
+        for user_name in ['WindowsUser', 'Another User', 'All Users', 'Default', 'Default User', 'Public', 'Todos os Usu\xc3\xa1rios', 'Usu\xc3\xa1rio Padr\xc3\xa3o']:
+            user_dir = os.path.join(documents_dir, user_name)
+            os.mkdir(user_dir)
+            self._make_windows_7_home_dir(user_dir)
+        
+    def _make_windows_xp_home_dir(self, user_dir):
         docs_dir = os.path.join(user_dir, 'My Documents')
         os.mkdir(docs_dir)
         os.mkdir(os.path.join(docs_dir, 'My Music'))
         os.mkdir(os.path.join(docs_dir, 'My Pictures'))
         os.mkdir(os.path.join(docs_dir, 'My Videos'))
+    
+    def _make_windows_7_home_dir(self, user_dir):
+        os.mkdir(os.path.join(user_dir, 'Documents'))
+        os.mkdir(os.path.join(user_dir, 'Music'))
+        os.mkdir(os.path.join(user_dir, 'Pictures'))
+        os.mkdir(os.path.join(user_dir, 'Videos'))
     
     def _make_file(self, dirname, filename, content = 'Testing'):
         f = open(os.path.join(dirname, filename), 'w')
