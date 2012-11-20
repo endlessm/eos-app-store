@@ -9,6 +9,7 @@ class DefaultFileCopierTest(unittest.TestCase):
         self.test_source = "source"
         self.destination_folder = "dest_folder"
         self.destination_path = "dest_path"
+        self.endless_destination_path = "dest_path/Endless"
         
         self.home_path_provider = Mock()
         self.home_path_provider.get_user_directory = Mock(return_value = self.destination_path)
@@ -22,4 +23,4 @@ class DefaultFileCopierTest(unittest.TestCase):
         
         self.home_path_provider.get_user_directory.assert_called_once_with(self.destination_folder)
         self.copier.assert_called_once_with(self.test_source,
-                self.destination_path)
+                self.endless_destination_path)
