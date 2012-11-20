@@ -3,7 +3,7 @@ import os.path
 
 from repo_chooser.environment_manager import EnvironmentManager
 
-from startup.auto_updates import endpoint_provider
+from eos_installer import endpoint_provider
 
 class EnvironmentManagerTestCase(unittest.TestCase):
     def setUp(self):

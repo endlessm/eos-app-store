@@ -1,8 +1,8 @@
 import sys
 from ui.abstract_notifier import AbstractNotifier
-from startup.auto_updates import endpoint_provider
+from eos_installer import endpoint_provider
 from environment_manager import EnvironmentManager
-from startup.auto_updates.update_manager import UpdateManager
+from eos_installer.update_manager import UpdateManager
 from eos_log import log
 
 class RepoChooserModel(AbstractNotifier):

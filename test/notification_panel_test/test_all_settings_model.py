@@ -2,7 +2,7 @@ import unittest
 from mock import Mock #@UnresolvedImport
 
 from notification_panel.all_settings_model import AllSettingsModel
-from util.update_lock import UpdateLock
+from eos_installer.update_lock import UpdateLock
 import threading
 
 import time

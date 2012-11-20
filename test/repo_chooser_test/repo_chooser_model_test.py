@@ -2,7 +2,7 @@ import unittest
 from mock import Mock
 
 from repo_chooser.repo_chooser_model import RepoChooserModel
-from startup.auto_updates import endpoint_provider
+from eos_installer import endpoint_provider
 
 class RepoChooserModelTestCase(unittest.TestCase):
     def setUp(self):

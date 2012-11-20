@@ -3,7 +3,7 @@ from threading import Thread
 
 from osapps.os_util import OsUtil
 from osapps.app_launcher import AppLauncher
-from util.update_lock import UpdateLock
+from eos_installer.update_lock import UpdateLock
 from ui.abstract_notifier import AbstractNotifier
 from repo_chooser.repo_chooser_launcher import RepoChooserLauncher
 
