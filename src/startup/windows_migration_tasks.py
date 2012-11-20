@@ -15,6 +15,7 @@ class WindowsMigrationTasks:
         # so that any language would be supported
         self._documents_and_settings = ['Documents and Settings', 'Documents and settings', 'documents and settings']
         self._users = ['Users', 'Usu\xc3\xa1rios']
+        self._exclude_dirs = ['All Users', 'Default', 'Default User', 'Public', 'Todos os Usu\xc3\xa1rios', 'Usu\xc3\xa1rio Padr\xc3\xa3o', 'LocalService', 'NetworkService']
         self._xp_pic_dirs = ['My Pictures', 'Minhas Imagens', 'Minhas imagens', 'minhas imagens']
         self._xp_video_dirs = ['My Videos', 'Meus V\xc3\xaddeos', 'Meus v\xc3\xaddeos', 'meus v\xc3\xaddeos']
         self._xp_music_dirs = ['My Music', 'Minhas M\xc3\xbasicas', 'Minhas m\xc3\xbasicas', 'minhas m\xc3\xbasicas']
@@ -104,7 +105,8 @@ class WindowsMigrationTasks:
         if os.path.isdir(parent):
             for directory in os.listdir(parent):
                 if os.path.isdir(os.path.join(parent, directory)):
-                    list_of_users.append(directory)
+                    if directory not in self._exclude_dirs:
+                        list_of_users.append(directory)
     
     def _test_dirs_exist(self, parent_dir, dirs):
         for directory in dirs:
