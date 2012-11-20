@@ -1,5 +1,5 @@
 import gtk
-from eos_util import image_util
+from eos_util.image import Image
 from eos_widgets.image_eventbox import ImageEventBox
 from responsive import Button
 
@@ -172,10 +172,10 @@ class DesktopPage(gtk.VBox):
 
         for i in range(0, DesktopPage.get_pages_count()):
             btn = Button(
-                normal = (image_util.image_path("button_mini_desktop_normal.png"),),
-                hover = (image_util.image_path("button_mini_desktop__hover_active.png"),),
-                down = (image_util.image_path("button_mini_desktop_down.png"),),
-                select = (image_util.image_path("button_mini_desktop__active.png"),),
+                normal = (Image.from_name("button_mini_desktop_normal.png"),),
+                hover = (Image.from_name("button_mini_desktop__hover_active.png"),),
+                down = (Image.from_name("button_mini_desktop_down.png"),),
+                select = (Image.from_name("button_mini_desktop__active.png"),),
                 invisible = invisible
                 )
             self.__class__.page_buttons.append(btn)
@@ -197,8 +197,8 @@ class DesktopPage(gtk.VBox):
             hide_btn = False
         self.prev_button = Button(
             normal = (),
-            hover = (image_util.image_path("button_arrow_desktop_left_hover.png"),),
-            down = (image_util.image_path("button_arrow_desktop_left_down.png"),),
+            hover = (Image.from_name("button_arrow_desktop_left_hover.png"),),
+            down = (Image.from_name("button_arrow_desktop_left_down.png"),),
             invisible = hide_btn
             )
         self.prev_button.connect("clicked", lambda w: DesktopPage.prev_page())
@@ -211,8 +211,8 @@ class DesktopPage(gtk.VBox):
             hide_btn = False
         self.next_button = Button(
             normal = (),
-            hover = (image_util.image_path("button_arrow_desktop_right_hover.png"),),
-            down = (image_util.image_path("button_arrow_desktop_right_down.png"),),
+            hover = (Image.from_name("button_arrow_desktop_right_hover.png"),),
+            down = (Image.from_name("button_arrow_desktop_right_down.png"),),
             invisible = hide_btn
             )
         self.next_button.connect("clicked", lambda w: DesktopPage.next_page())

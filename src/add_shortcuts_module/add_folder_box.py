@@ -1,24 +1,24 @@
 import gtk
 import cairo
 from eos_widgets.image_eventbox import ImageEventBox
-from eos_util import image_util
+from eos_util.image import Image
 from eos_util import screen_util
 from osapps.desktop_preferences_datastore import DesktopPreferencesDatastore
 
 class AddFolderBox(gtk.VBox):
     def __init__(self, parent=None, add_remove_widget=None, desktop_preference_class = DesktopPreferencesDatastore):
         super(AddFolderBox, self).__init__()
-        
+
         self._parent = parent
         self._scrolling = False
-        
+
         self._DEFAULT_ICON_PATH = '/usr/share/icons/Humanity/places/48/'
-        
+
         self._desktop_preferences = desktop_preference_class.get_instance()
         self._background = self._desktop_preferences.get_background_pixbuf()
-        
+
         self._background = self._background.scale_simple(screen_util.get_width(), screen_util.get_height(),gtk.gdk.INTERP_BILINEAR)
-        
+
         self._viewport = gtk.Viewport()
         self._viewport.set_shadow_type(gtk.SHADOW_NONE)
         self._vbox = gtk.VBox()
@@ -32,7 +32,7 @@ class AddFolderBox(gtk.VBox):
         self._label_2 = gtk.Label()
         self._label_1.set_markup('<span color="#aaaaaa" font="Novecento wide" font_weight="bold" size="16000">' + label_1_text + '</span>')
         self._label_2.set_markup('<span color="#aaaaaa" font="Novecento wide" font_weight="bold" size="16000">' + label_2_text + '</span>')
-        
+
         self._text_entry_align = gtk.Alignment(0.5, 0.5, 0, 0)
         self._hbox = gtk.HBox()
         self._hbox.set_size_request(186, 24)
@@ -41,8 +41,8 @@ class AddFolderBox(gtk.VBox):
         self._hbox.pack_start(self._text_entry)
         self._text_entry.set_text('')
         self._text_entry_align.add(self._hbox)
-        
-        
+
+
         self.hbox_separator = gtk.HBox()
         self.hbox_separator.set_size_request(-1, 15)
         self._vbox.pack_start(self.hbox_separator, True, True, 0)
@@ -53,36 +53,36 @@ class AddFolderBox(gtk.VBox):
         self.hbox_separator1.connect("expose-event", self._draw_divider_line)
         self._vbox.pack_start(self.hbox_separator1)
         self._vbox.pack_start(self._label_2, True, True, 0)
-        
+
         self._fill_table()
-        
+
         self._table.show()
         self._bottom_center = gtk.Alignment(0.5, 0, 0, 0)
         self._bottom_center.add(self._table)
         self._vbox.pack_start(self._bottom_center)
         self._viewport.add(self._vbox)
         self.add(self._viewport)
-        
+
         self.x = 0
         self.y = 0
 
         self.show_all()
-        
-        
+
+
     def _get_folder_icons(self, path='', hint='folder'):
         return self._parent._presenter.get_folder_icons(path, hint)
-        
+
     def get_images(self, image_path):
         return (
-            image_util.image_path("endless-shortcut-well.png"),
-            image_path,
-            image_util.image_path("endless-shortcut-foreground.png")
+            Image.from_name("endless-shortcut-well.png"),
+            Image.from_name(image_path),
+            Image.from_name("endless-shortcut-foreground.png")
             )
-    
+
     def _display_plus(self, widget, event, add_remove_widget):
         images_tuple = widget._images
         images_list = list(images_tuple)
-        images_list.append(image_util.image_path("add_folder_icon.png"))
+        images_list.append(Image.from_name("add_folder_icon.png"))
         widget.set_images(tuple(images_list))
         widget.hide()
         widget.show()
@@ -90,7 +90,7 @@ class AddFolderBox(gtk.VBox):
         add_remove_widget._label.set_text(self._text_entry.get_text())
         add_remove_widget.hide()
         add_remove_widget.show()
-    
+
     def _remove_plus(self, widget, event, add_remove_widget):
         images = list(widget._images)
         widget.set_images(tuple(images[:-1]))
@@ -100,27 +100,27 @@ class AddFolderBox(gtk.VBox):
         add_remove_widget._label.set_text('')
         add_remove_widget.hide()
         add_remove_widget.show()
-    
+
     def _create_folder(self, widget, event, image_file):
         if self._text_entry.get_text() != 'Untitled' and self._text_entry.get_text():
             self._parent.create_folder(self._text_entry.get_text(), image_file)
             self._parent.destroy(None, None)
         else:
             print 'FOLDER MUST HAVE A NAME!'
-    
+
     def _handle_event(self, widget, event):
         cr = widget.window.cairo_create()
-        
+
         x,y = self._vbox.window.get_origin()
         if self.x == 0 and self.y == 0:
             self.x = x
             self.y = y
             self._background = self._background.subpixbuf(self.x, self.y, event.area.width, event.area.height)
-        
+
         self.draw(cr, event.area.x, event.area.y, event.area.width, event.area.height)
-        
+
         return False
-        
+
     def draw(self, cr, x, y, w, h):
         if self._scrolling:
             pixbuf = self._background.subpixbuf(0, 0, self._background.get_width(), self._background.get_height())
@@ -135,11 +135,11 @@ class AddFolderBox(gtk.VBox):
         pat = cairo.LinearGradient (0.0, 0.0, w, 0.0)
         pat.add_color_stop_rgba (0.001, 0.0, 0.0, 0.0, 0.8)
         pat.add_color_stop_rgba (1, 0.2, 0.2, 0.2, 0.8)
-        
+
         cr.rectangle(x-1, y-1, w+2, h+2)
         cr.set_source(pat)
         cr.fill()
-    
+
     def _draw_divider_line(self, widget, event):
         cr = widget.window.cairo_create()
         cr.rectangle(event.area.x, event.area.y, event.area.width, 1)
@@ -148,11 +148,11 @@ class AddFolderBox(gtk.VBox):
         cr.rectangle(event.area.x, event.area.y+1, event.area.width, 1)
         cr.set_source_rgba(0.5, 0.5, 0.5, 0.8)
         cr.fill()
-    
+
     def _handle_scroll_event(self, widget, event):
         print 'Scrolling event caught, ', self._scrolling
         self._scrolling = True
-    
+
     def _fill_table(self):
         files = self._get_folder_icons('', 'folder')
         icons = []
@@ -165,7 +165,7 @@ class AddFolderBox(gtk.VBox):
             image_box.connect("button-release-event", self._create_folder, self._DEFAULT_ICON_PATH+fi)
             image_box.show()
             icons.append(image_box)
-        
+
         num_of_icons = len(icons)
         available_width = screen_util.get_width() - self._parent._add_buton_box_width - self._parent._tree_view_width
         columns = int(available_width/120)   # shold this be a fixed number like 5 as in pdf?
@@ -173,7 +173,7 @@ class AddFolderBox(gtk.VBox):
         self._table = gtk.Table(rows, columns)
         self._table.show()
         col = row = 0
-        
+
         for num in range(len(icons)):
             if (num)%columns == 0:
                 col = 0

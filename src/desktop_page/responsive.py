@@ -1,5 +1,4 @@
 import gtk
-from eos_util import image_util
 from eos_widgets.image_eventbox import ImageEventBox
 
 
