@@ -51,18 +51,16 @@ class WindowsMigrationTasksTestCase(unittest.TestCase):
     def test_get_win_xp_users(self):
         self._make_windows_xp()
         users = self._test_object.get_windows_users(self._src_dir)
-        self.assertEquals(6, len(users))
-        self.assertEquals(0, users.index('All Users'))
-        self.assertEquals(2, users.index('Default User'))
-        self.assertEquals(5, users.index('WindowsUser'))
+        self.assertEquals(2, len(users))
+        self.assertEquals(0, users.index('Another User'))
+        self.assertEquals(1, users.index('WindowsUser'))
 
     def test_get_win_7_users(self):
         self._make_windows_7()
         users = self._test_object.get_windows_users(self._src_dir)
-        self.assertEquals(8, len(users))
-        self.assertEquals(0, users.index('All Users'))
-        self.assertEquals(3, users.index('Default User'))
-        self.assertEquals(7, users.index('WindowsUser'))
+        self.assertEquals(2, len(users))
+        self.assertEquals(0, users.index('Another User'))
+        self.assertEquals(1, users.index('WindowsUser'))
 
     def test_import_win_xp_user(self):
         self._make_windows_xp()
@@ -100,8 +98,7 @@ class WindowsMigrationTasksTestCase(unittest.TestCase):
         self._test_object.import_mounted_directory(self._src_dir)
         calls = []
         calls.append(call(self._src_dir, 'WindowsUser'))
-        calls.append(call(self._src_dir, 'All Users'))
-        calls.append(call(self._src_dir, 'Default User'))
+        calls.append(call(self._src_dir, 'Another User'))
         self._test_object.import_user.assert_has_calls(calls, any_order=True)
 
     def test_import_win_7_multiple_users(self):
@@ -110,8 +107,7 @@ class WindowsMigrationTasksTestCase(unittest.TestCase):
         self._test_object.import_mounted_directory(self._src_dir)
         calls = []
         calls.append(call(self._src_dir, 'WindowsUser'))
-        calls.append(call(self._src_dir, 'All Users'))
-        calls.append(call(self._src_dir, 'Default User'))
+        calls.append(call(self._src_dir, 'Another User'))
         self._test_object.import_user.assert_has_calls(calls, any_order=True)
 
     def test_creating_links(self):
