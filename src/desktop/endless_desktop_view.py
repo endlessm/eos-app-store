@@ -17,6 +17,8 @@ from shortcut.add_remove_shortcut import AddRemoveShortcut
 from folder.folder_window import OpenFolderWindow
 from notification_panel.notification_panel import NotificationPanel
 from taskbar_panel.taskbar_panel import TaskbarPanel
+from eos_util.image import Image
+
 
 gettext.install('endless_desktop', '/usr/share/locale', unicode=True, names=['ngettext'])
 gtk.gdk.threads_init()
@@ -42,7 +44,6 @@ class EndlessDesktopView(gtk.Window):
         self.connect('delete-event', lambda w, e: True)
 
         self.maximize()
-        self.show()
         self.set_app_paintable(True)
         
         # -----------WORKSPACE-----------
@@ -64,12 +65,13 @@ class EndlessDesktopView(gtk.Window):
         self._desktop.pack_end(taskbar_alignment, False, True, 0)
         
         self.add(self._desktop)
-        self.show_all()
         
         self._max_icons_in_row = self._calculate_max_icons()
     
         screen = gtk.gdk.Screen() #@UndefinedVariable
         screen.connect('size-changed', lambda s: self._set_background(self.BACKGROUND_NAME))
+        
+        self.show_all()
     
     def unfocus_widget(self, widget, event):
         widget.set_focus(None)
@@ -85,9 +87,8 @@ class EndlessDesktopView(gtk.Window):
 
     def set_background_pixbuf(self, pixbuf):
         width, height = self._get_net_work_area()
-#        pixbuf = image_util.load_pixbuf(background_name)
+        sized_pixbuf = self._resize_background(width, height, pixbuf)
         
-        sized_pixbuf = pixbuf.scale_simple(width, height, gtk.gdk.INTERP_BILINEAR) #@UndefinedVariable
         pixmap, mask = sized_pixbuf.render_pixmap_and_mask()
         
         del sized_pixbuf
@@ -138,6 +139,11 @@ class EndlessDesktopView(gtk.Window):
         self._redraw(self._shorcuts_buffer)
                 
         self._align.show()
+    
+    def _resize_background(self, screen_width, screen_height, pixbuf):
+        image = Image(pixbuf)
+        image.scale_to_best_fit(screen_width, screen_height)
+        return image.pixbuf
 
     def _redraw(self, icon_data):
         self._remove_all()
