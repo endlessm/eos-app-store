@@ -22,4 +22,3 @@ class ShotwellTasks():
         self._os_util.execute(["gsettings", "set",
                 "org.yorba.shotwell.preferences.files", "auto-import",
                 "true"])
-
