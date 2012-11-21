@@ -1,7 +1,7 @@
 import gtk
 import gettext
-from util.image_eventbox import ImageEventBox
-from util import image_util
+from eos_widgets.image_eventbox import ImageEventBox
+from eos_util.image import Image
 from util.transparent_window import TransparentWindow
 import gobject
 
@@ -16,10 +16,10 @@ class DeleteNotPossiblePopupWindow():
         self._window.set_position(gtk.WIN_POS_CENTER_ALWAYS)
         self._window.connect("focus-out-event", lambda w, e: self.destroy())
         
-        self._fancy_container = ImageEventBox((image_util.image_path("feedback-background.png"),))
+        self._fancy_container = ImageEventBox([Image.from_name("feedback-background.png")])
         self._fancy_container.set_size_request(self._width,self._height)
         
-        self._close = ImageEventBox((image_util.image_path("close.png"),))
+        self._close = ImageEventBox([Image.from_name("close.png")])
         self._close.set_size_request(24,24)
         self._close.connect("button-release-event", lambda w, e: self.destroy())
         

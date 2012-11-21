@@ -3,6 +3,8 @@
 	<name>eos-desktop</name>
 	<comment></comment>
 	<projects>
+		<project>eos-common</project>
+		<project>endless_os_apps</project>
 	</projects>
 	<buildSpec>
 		<buildCommand>

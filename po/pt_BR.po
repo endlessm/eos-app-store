@@ -18,6 +18,14 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
 
+#: src/notification_panel/battery_view.py:120
+msgid " remaining"
+msgstr " restante"
+
+#: src/notification_panel/battery_view.py:118
+msgid " until full"
+msgstr " até carga completa"
+
 #: src/desktop/endless_desktop_view.py:104
 msgid "Apps"
 msgstr "Aplicativos"
@@ -25,6 +33,11 @@ msgstr "Aplicativos"
 #: src/notification_panel/all_settings_view.py:40
 msgid "Background"
 msgstr "Fundo"
+
+#: src/notification_panel/battery_view.py:83
+#: src/notification_panel/battery_view.py:84
+msgid "Battery Info"
+msgstr "Informações sobre bateria"
 
 #: ui/bugs_and_feedback.glade:76
 msgid "Bugbuffer1"
@@ -60,7 +73,7 @@ msgstr "Instalador do EndlessOS"
 msgid "Files"
 msgstr "Files"
 
-#: src/folder/folder_window.py:19 src/desktop/endless_desktop_view.py:117
+#: src/desktop/endless_desktop_view.py:117 src/folder/folder_window.py:19
 msgid "Folder"
 msgstr "Diretórios"
 
@@ -89,6 +102,11 @@ msgid ""
 msgstr ""
 "Por favor, deixe-nos saber como o problema ocorreu e vamos resolvê-lo como "
 "mais rapidamente possível."
+
+#: src/notification_panel/battery_view.py:66
+#, fuzzy
+msgid "Power Settings"
+msgstr "Configurações de energia"
 
 #: ui/force_install.glade:50
 msgid ""

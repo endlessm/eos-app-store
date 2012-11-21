@@ -15,6 +15,7 @@ class WindowsMigrationTasks:
         # so that any language would be supported
         self._documents_and_settings = ['Documents and Settings', 'Documents and settings', 'documents and settings']
         self._users = ['Users', 'Usu\xc3\xa1rios']
+        self._exclude_dirs = ['All Users', 'Default', 'Default User', 'Public', 'Todos os Usu\xc3\xa1rios', 'Usu\xc3\xa1rio Padr\xc3\xa3o', 'LocalService', 'NetworkService']
         self._xp_pic_dirs = ['My Pictures', 'Minhas Imagens', 'Minhas imagens', 'minhas imagens']
         self._xp_video_dirs = ['My Videos', 'Meus V\xc3\xaddeos', 'Meus v\xc3\xaddeos', 'meus v\xc3\xaddeos']
         self._xp_music_dirs = ['My Music', 'Minhas M\xc3\xbasicas', 'Minhas m\xc3\xbasicas', 'minhas m\xc3\xbasicas']
@@ -34,8 +35,16 @@ class WindowsMigrationTasks:
                     self.import_mounted_directory(full_path)
     
     def import_mounted_directory(self, mount_point):
-        for user in self.get_windows_users(mount_point):
-            self.import_user(mount_point, user)
+        users = self.get_windows_users(mount_point)
+        num_users = len(users)
+        for user in users:
+            if num_users == 1:
+                # If single user, use 'Windows' as the name of the link rather than the user account name
+                link_name = 'Windows'
+            else:
+                # For multiple users, use the Windows account name as the link name
+                link_name = user
+            self.import_user(mount_point, user, link_name)
 
     def is_windows(self, mount_point):
         return self.is_windows_7(mount_point) or self.is_windows_xp(mount_point) 
@@ -61,15 +70,15 @@ class WindowsMigrationTasks:
         paths_to_user_home.sort()
         return paths_to_user_home
 
-    def import_user(self, mount_point, user):
+    def import_user(self, mount_point, user, link_name):
         if (self.is_windows_7(mount_point)):
             for directory in self._users:
                 home_path = os.path.join(mount_point, directory)
                 path = os.path.join(home_path, user)
-                self._link_directory(user, path, self._w7_docs_dirs, self.documents_dir())
-                self._link_directory(user, path, self._w7_pic_dirs, self.pictures_dir())
-                self._link_directory(user, path, self._w7_music_dirs, self.music_dir())
-                self._link_directory(user, path, self._w7_video_dirs, self.videos_dir())
+                self._link_directory(user, path, self._w7_docs_dirs, self.documents_dir(), link_name)
+                self._link_directory(user, path, self._w7_pic_dirs, self.pictures_dir(), link_name)
+                self._link_directory(user, path, self._w7_music_dirs, self.music_dir(), link_name)
+                self._link_directory(user, path, self._w7_video_dirs, self.videos_dir(), link_name)
         elif (self.is_windows_xp(mount_point)):
             for directory in self._documents_and_settings:
                 home_path = os.path.join(mount_point, directory)
@@ -78,10 +87,11 @@ class WindowsMigrationTasks:
                     docs_path = os.path.join(path, doc_dir)
                     if os.path.isdir(docs_path):
                         dest = self.documents_dir()
-                        self._create_link(user, docs_path, dest)
-                        self._link_directory(user, docs_path, self._xp_pic_dirs, self.pictures_dir())
-                        self._link_directory(user, docs_path, self._xp_music_dirs, self.music_dir())
-                        self._link_directory(user, docs_path, self._xp_video_dirs, self.videos_dir())
+                        link = os.path.join(dest, link_name)
+                        self._create_link(docs_path, link)
+                        self._link_directory(user, docs_path, self._xp_pic_dirs, self.pictures_dir(), link_name)
+                        self._link_directory(user, docs_path, self._xp_music_dirs, self.music_dir(), link_name)
+                        self._link_directory(user, docs_path, self._xp_video_dirs, self.videos_dir(), link_name)
     
     def pictures_dir(self):
         return self._home_path_provider.get_user_directory("Pictures")
@@ -95,16 +105,16 @@ class WindowsMigrationTasks:
     def music_dir(self):
         return self._home_path_provider.get_user_directory("Music")
     
-    def _create_link(self, link_name, destination, parent_dir):
-        link = os.path.join(parent_dir, link_name)
+    def _create_link(self, source, link):
         if not os.path.islink(link):
-            os.symlink(destination, link)
+            os.symlink(source, link)
     
     def _add_all_subdirs(self, list_of_users, parent):
         if os.path.isdir(parent):
             for directory in os.listdir(parent):
                 if os.path.isdir(os.path.join(parent, directory)):
-                    list_of_users.append(directory)
+                    if directory not in self._exclude_dirs:
+                        list_of_users.append(directory)
     
     def _test_dirs_exist(self, parent_dir, dirs):
         for directory in dirs:
@@ -112,11 +122,12 @@ class WindowsMigrationTasks:
                 return True
         return False
 
-    def _link_directory(self, user, parent, source_dirs_list, target_dir):
+    def _link_directory(self, user, parent, source_dirs_list, link_dir, link_name):
         for source_dir in source_dirs_list:
-            path = os.path.join(parent, source_dir)
-            if os.path.isdir(path):
-                self._create_link(user, path, target_dir)
+            source = os.path.join(parent, source_dir)
+            if os.path.isdir(source):
+                link = os.path.join(link_dir, link_name)
+                self._create_link(source, link)
 
 if __name__ == '__main__':
     WindowsMigrationTasks().execute()
