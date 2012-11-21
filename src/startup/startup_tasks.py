@@ -5,7 +5,7 @@ from eos_log import log
 
 
 class StartupTasks(object):
-    def __init__(self, tasks = [ForceInstall,UpdateManager,RemoveExtraDirectoriesTask]):
+    def __init__(self, tasks = [RemoveExtraDirectoriesTask,ForceInstall,UpdateManager]):
         self.TASK_PLUGINS = tasks 
     
     def perform_tasks(self):
