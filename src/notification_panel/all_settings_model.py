@@ -9,9 +9,10 @@ from repo_chooser.repo_chooser_launcher import RepoChooserLauncher
 
 class AllSettingsModel(AbstractNotifier):
     UPDATE_LOCK = "update.lock"
-    
+
     VERSION_COMMAND = "dpkg -p endless-os-desktop-widget | grep ^Version: | awk \"{print $2}\""
-    SETTINGS_COMMAND = "sudo gnome-control-center --class=eos-network-manager"
+    UPDATE_COMMAND = "sudo /usr/bin/endless-installer.sh"
+    SETTINGS_COMMAND = "sudo gnome-control-center"
     LOGOUT_COMMAND = "kill -9 -1"
     RESTART_COMMAND = "sudo shutdown -r now"
     SHUTDOWN_COMMAND = "sudo shutdown -h now"
@@ -20,7 +21,7 @@ class AllSettingsModel(AbstractNotifier):
         self._os_util = os_util
         self._app_launcher = app_launcher
         self._repo_chooser_launcher = repo_chooser_launcher
-        
+
         self._still_watching = True
         self._update_thread = Thread(target=self._update_checker)
         self._is_locked = UpdateLock().is_locked()
@@ -32,9 +33,9 @@ class AllSettingsModel(AbstractNotifier):
             current_lock = UpdateLock().is_locked()
             if current_lock != self._is_locked:
                 self._notify(self.UPDATE_LOCK)
-                self._is_locked = current_lock 
+                self._is_locked = current_lock
             time.sleep(.1)
-        
+
     def __del__(self):
         self._still_watching = False
         self._update_thread.join(.5)
@@ -59,4 +60,4 @@ class AllSettingsModel(AbstractNotifier):
         self._app_launcher.launch(self.SHUTDOWN_COMMAND)
 
     def can_update(self):
-        return not UpdateLock().is_locked()  
+        return not UpdateLock().is_locked()
