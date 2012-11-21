@@ -147,10 +147,13 @@ class AddShortcutsPresenter():
         else:
             filename = 'favicon.' + url + '.ico'
         filename = filename.replace('/', '_')
-        if os.path.exists(cache_path+filename):
-            return cache_path+filename
+        if not os.path.exists(cache_path+filename):
+            if self.get_favicon(url):
+                return cache_path+filename
+            else:
+                return None
         else:
-            return None
+            return cache_path+filename
     
     def get_custom_site_shortcut(self, url):
         if not url.startswith('http'):

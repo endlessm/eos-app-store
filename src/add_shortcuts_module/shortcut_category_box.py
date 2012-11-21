@@ -82,18 +82,7 @@ class ShortcutCategoryBox(gtk.EventBox):
             image_end = gtk.Image()
             box = gtk.EventBox()
             box.set_visible_window(False)
-            
-            if section.active:
-                markup = '<span color="#ffffff"><b>' + section.category.upper() + '</b></span>'
-                self._active_category = section.category
-                image_start.set_from_file(self._separator_active)
-                image_end.set_from_file(self._separator_active)
-                box.connect("expose-event", self._draw_gradient, True)
-            else:
-                markup = '<span color="#aaaaaa"><b>' + section.category.upper() + '</b></span>'
-                image_start.set_from_file(self._separator_inactive)
-                image_end.set_from_file(self._separator_inactive)
-            
+            markup = self._set_markup_and_separators(section, image_start, image_end, box)
             vbox = gtk.VBox(False)
             hbox = gtk.HBox()
             label = gtk.Label()
@@ -108,22 +97,7 @@ class ShortcutCategoryBox(gtk.EventBox):
                         self._active_subcategory = category.category
             
             if section.subcategories and section.active:
-                subcategories_vbox = gtk.VBox()
-                for category in section.subcategories:
-                    subcategory_hbox = gtk.HBox()
-                    ebox = gtk.EventBox()
-                    ebox.set_visible_window(False)
-                    sub_label = gtk.Label()
-                    if category.active:
-                        sub_label.set_markup('<span color="#ffffff"><b>' + category.category.upper() + '</b></span>')
-                    else:
-                        sub_label.set_markup('<span color="#aaaaaa"><b>' + category.category.upper() + '</b></span>')
-                    sub_label.set_alignment(0, 0.5)
-                    ebox.add(sub_label)
-                    ebox.connect("button-release-event", self._handle_subcategory_click, section.category, category.category)
-                    subcategory_hbox.pack_start(ebox, True, True, 20)
-                    subcategories_vbox.pack_start(subcategory_hbox, True, True, 5)
-                    vbox.pack_start(subcategories_vbox, True, True, 0)
+                self._fill_subcategories(section, vbox)
             
             vbox.pack_end(image_end)
             box.add(vbox)
@@ -152,4 +126,36 @@ class ShortcutCategoryBox(gtk.EventBox):
             child.destroy()
         self._fill_categories()
         self.middle.show()
+    
+    def _fill_subcategories(self, section, vbox):
+        for category in section.subcategories:
+            subcategories_vbox = gtk.VBox()
+            subcategory_hbox = gtk.HBox()
+            ebox = gtk.EventBox()
+            ebox.set_visible_window(False)
+            sub_label = gtk.Label()
+            if category.active:
+                sub_label.set_markup('<span color="#ffffff"><b>' + category.category.upper() + '</b></span>')
+            else:
+                sub_label.set_markup('<span color="#aaaaaa"><b>' + category.category.upper() + '</b></span>')
+            sub_label.set_alignment(0, 0.5)
+            ebox.add(sub_label)
+            ebox.connect("button-release-event", self._handle_subcategory_click, section.category, category.category)
+            subcategory_hbox.pack_start(ebox, True, True, 20)
+            subcategories_vbox.pack_start(subcategory_hbox, True, True, 5)
+            vbox.pack_start(subcategories_vbox, True, True, 0)
+    
+    def _set_markup_and_separators(self, section, image_start, image_end, box):
+        if section.active:
+            markup = '<span color="#ffffff"><b>' + section.category.upper() + '</b></span>'
+            self._active_category = section.category
+            image_start.set_from_file(self._separator_active)
+            image_end.set_from_file(self._separator_active)
+            box.connect("expose-event", self._draw_gradient, True)
+        else:
+            markup = '<span color="#aaaaaa"><b>' + section.category.upper() + '</b></span>'
+            image_start.set_from_file(self._separator_inactive)
+            image_end.set_from_file(self._separator_inactive)
+        
+        return markup
     
