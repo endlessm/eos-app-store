@@ -55,13 +55,7 @@ class AddShortcutsView():
         self.hbox2 = gtk.HBox()
         self.hbox2.set_size_request(self._width - self._tree_view_width - self._add_buton_box_width, self._height)
         
-        # possible scrolled window children
-#        self.add_folder_box = AddFolderBox(self)
-#        self.add_application_box = AddApplicationBox(self)
-#        self.add_website_box = AddWebsiteBoiteBox(self)
-        # by default AddFolderBox is displayed
         self.scrolled_window = AddFolderBox(self)
-#        self.scrolled_window = AddApplicationBox(self)
         self.hbox2.pack_start(self.scrolled_window)
         self.scrolled_window.show()
         self.hbox.pack_start(self.add_remove_vbox)
@@ -91,9 +85,7 @@ class AddShortcutsView():
     
     def install_site(self, site):
         presenter = self._parent.get_presenter()
-#        print presenter
         shortcut = self._presenter.install_site(site)
-#        print sh
         presenter._model._app_desktop_datastore.add_shortcut(shortcut)
     
     def _draw_triangle(self, widget, event):
@@ -114,10 +106,9 @@ class AddShortcutsView():
         self.scrolled_window.show()
     
     def set_add_shortcuts_box(self, category, subcategory=''):
-#        print 'should display items in', category, subcategory, 'in details box'
-        if category == 'APP':
+        if category == _('APP'):
             widget = AddApplicationBox(self, default_category=subcategory)
-        elif category == 'WEB':
+        elif category == _('WEB'):
             widget = AddWebsiteBox(self)
         else:
             widget = AddFolderBox(self)

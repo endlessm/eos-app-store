@@ -4,7 +4,6 @@ from eos_util import image_util
 from eos_util import screen_util
 from osapps.desktop_preferences_datastore import DesktopPreferencesDatastore
 from website_row_box import WebsiteRowBox
-#from recommended_sites_povider import RecommendedSitesProvider
 
 class AddWebsiteBox(gtk.VBox):
     def __init__(self, parent=None, desktop_preference_class = DesktopPreferencesDatastore, default_category=''):
@@ -55,7 +54,6 @@ class AddWebsiteBox(gtk.VBox):
         self.hbox_separator1.connect("expose-event", self._draw_divider_line)
         self._vbox.pack_start(self.hbox_separator1, False, False, 0)
         
-        #sites
         sites = self._presenter.get_recommended_sites()
         self._fill_sites(sites)
         
@@ -67,7 +65,6 @@ class AddWebsiteBox(gtk.VBox):
         
     
     def _fill_sites(self, sites):
-#        self._vbox = gtk.VBox()
         for site in sites:
             self._display_site(site)
 
@@ -79,28 +76,16 @@ class AddWebsiteBox(gtk.VBox):
         self._vbox.pack_start(row, False, False, 2)
     
     def _handle_expose_event(self, widget, event):
-#        print 'In _handle_expose_event function, background:', self._background.get_width(), self._background.get_height()
-#        print widget
         cr = widget.window.cairo_create()
-#        print widget.allocation
-#        print event
-        
         x,y = self._vbox.window.get_origin()
-#        print x, y
         self.draw(cr, x, y, self.allocation.width, self.allocation.height)
         self._draw_gradient(cr, self.allocation.width, self.allocation.height)
         if not self._refresh and event:
-#            print '-+'*40
-#            print "Da vidimo koordinate..."
-#            print widget.allocation
-#            print event.area
-#            print '-+'*40
             self._draw_gradient(cr, event.area.width, event.area.height, event.area.x, event.area.y)
         
         return False
         
     def draw(self, cr, x, y, w, h):
-#        print 'In draw function:', x, y, w, h
         if self._scrolling:
             pixbuf = self._background.subpixbuf(0, 0, self._background.get_width(), self._background.get_height())
             self._scrolling = False
@@ -119,10 +104,6 @@ class AddWebsiteBox(gtk.VBox):
         cr.fill()
     
     def _draw_active(self, widget, event, row):
-#        print 'ENTER'
-#        print widget.allocation
-#        print row.allocation
-#        print event
         self._refresh = False
         widget.queue_draw()
         widget.name_label.set_markup('<span color="#ffffff" font="Novecento wide" font_weight="bold">' + widget._name + '</span>')
@@ -138,10 +119,6 @@ class AddWebsiteBox(gtk.VBox):
         return False
     
     def _draw_inactive(self, widget, event, row):
-#        print 'LEAVE'
-#        print widget.allocation
-#        print row.allocation
-#        print event
         self._refresh = True
         widget.queue_draw()
         widget.name_label.set_markup('<span color="#aaaaaa" font="Novecento wide" font_weight="bold">' + widget._name + '</span>')
@@ -169,9 +146,6 @@ class AddWebsiteBox(gtk.VBox):
         widget.set_text('')
         
     def _handle_key_press(self, widget):
-#        print 'ACTIVATE captured'
-#        print event
-#        print widget
         if widget.get_text():
             site = self._presenter.get_custom_site_shortcut(widget.get_text())
             if site:

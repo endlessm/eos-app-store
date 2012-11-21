@@ -18,7 +18,6 @@ class AddShortcutsPresenter():
         self._app_store_model = ApplicationStoreModel(base_dir=os.path.expanduser("~/.endlessm/apps/"))
         self._add_shortcuts_view = None #AddShortcutsView()
         self._sites_provider = RecommendedSitesProvider(os.path.expanduser("~/.endlessm/sites/"))
-#        self._add_shortcuts_view.set_presenter(self)
 
     def get_category_data(self):
         category_data = self._model.get_category_data()
@@ -77,10 +76,7 @@ class AddShortcutsPresenter():
         self._add_shortcuts_view.set_presenter(self)
     
     def install_app(self, app):
-        #print 'In presenter, should install', desktop_entry.getName()
-        # store app as installed
         self._app_store_model.install(app)
-        # create and store desktop shortcut
         de = DesktopEntry()
         de.parse(app._desktop_file_path)
         name = de.getName()
@@ -94,7 +90,6 @@ class AddShortcutsPresenter():
         icon['pressed'] = pressed
         shortcut = AppShortcut(key, name, icon)
         return shortcut
-#        self._app_desktop_datastore.add_shortcut(shortcut)
 
 
     def install_site(self, site):
@@ -114,49 +109,32 @@ class AddShortcutsPresenter():
         icon['mouseover'] = hover
         icon['pressed'] = pressed
         parameters = [site._url]
-#        print key, name, icon, parameters
         shortcut = AppShortcut(key, name, icon, params=parameters)
-#        print shortcut
         return shortcut
     
     def get_favicon(self, url):
-#        print url
         cache_path = os.path.expanduser("~/.endlessm/image-cache/")
-#        file_name = ''
         if not url.startswith('http'):
             url = 'http://' + url
-        
-#        # see if site is valid
-#        try:
-#            response = urllib2.urlopen(url)
-#        except:
-#            return None
-#        
-#        print response.geturl()
         
         if url.startswith('https://'):
             filename = 'favicon.' + url[8:] + '.ico'
         elif url.startswith('http://'):
             filename = 'favicon.' + url[7:] + '.ico'
         filename = filename.replace('/', '_')
-        # see it there is a favicon.ico file cached already
+        
         if os.path.exists(cache_path+filename):
-            # if found cache it and return pixbuf
             return image_util.load_pixbuf(cache_path+filename)
         else:
-            # if not cached, go to site to find favicon.ico
-#            print 'Not found locally, going to web'
             try:
                 favicon_response = urllib2.urlopen(url+'/favicon.ico')
                 if favicon_response.geturl() == url+'/favicon.ico':
-                    # save the image
                     fi = open(cache_path+filename, 'wb')
                     fi.write(favicon_response.read())
                     fi.close()
                     return image_util.load_pixbuf(cache_path+filename)
             except:
                 return None 
-        # if everything fails return none
         return None
     
     def get_favicon_image_file(self, url):
@@ -169,17 +147,12 @@ class AddShortcutsPresenter():
         else:
             filename = 'favicon.' + url + '.ico'
         filename = filename.replace('/', '_')
-        # see it there is a favicon.ico file cached already
         if os.path.exists(cache_path+filename):
-            # if found cache it and return pixbuf
             return cache_path+filename
         else:
-            # if not cached, go to site to find favicon.ico
             return None
     
     def get_custom_site_shortcut(self, url):
-#        print url
-        
         if not url.startswith('http'):
             url = 'http://' + url
         
@@ -187,7 +160,6 @@ class AddShortcutsPresenter():
             response = urllib2.urlopen(url)
         except:
             return None
-#        print response.geturl()
         
         self.get_favicon(url)
         if url.startswith('https://'):

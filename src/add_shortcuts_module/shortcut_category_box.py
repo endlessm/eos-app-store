@@ -5,7 +5,6 @@ from eos_util import image_util
 
 class ShortcutCategoryBox(gtk.EventBox):
     def __init__(self, model, parent, width, presenter):
-#        print parent
         super(ShortcutCategoryBox, self).__init__()
         self.set_visible_window(False)
         self._parent = parent
@@ -47,8 +46,6 @@ class ShortcutCategoryBox(gtk.EventBox):
 
     
     def _handle_click(self, widget, event, label, subcategory=''):
-#        print label.get_text(), 'clicked, do something about it.'
-#        print 'SUBCATEGORY:', subcategory
         #change model and repaint categories box
         for section in self._model:
             if section.category == label.get_text():
@@ -105,7 +102,6 @@ class ShortcutCategoryBox(gtk.EventBox):
             hbox.pack_start(label, True, True, 20)
             vbox.pack_start(image_start)
             vbox.pack_start(hbox, True, True, 15)
-#            active_subcategory = ''
             if section.subcategories:
                 for category in section.subcategories:
                     if category.active:
@@ -120,7 +116,6 @@ class ShortcutCategoryBox(gtk.EventBox):
                     sub_label = gtk.Label()
                     if category.active:
                         sub_label.set_markup('<span color="#ffffff"><b>' + category.category.upper() + '</b></span>')
-#                        print 'In shortcut category box, active subcategory =', active_subcategory
                     else:
                         sub_label.set_markup('<span color="#aaaaaa"><b>' + category.category.upper() + '</b></span>')
                     sub_label.set_alignment(0, 0.5)
@@ -133,7 +128,6 @@ class ShortcutCategoryBox(gtk.EventBox):
             vbox.pack_end(image_end)
             box.add(vbox)
             box.connect("button-release-event", self._handle_click, label, self._active_subcategory)
-            #print 'At the end of section construction, connected to clikc event, active subcategory is', active_subcategory
             box.show()
             self.middle.pack_start(box)
 

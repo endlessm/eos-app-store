@@ -29,7 +29,6 @@ class ApplicationRowBox(gtk.EventBox):
         
         self._icon_width = 150
         self._plus_box_width = 80
-#        self._active = False
         
         # -- DISPLAY ELEMENTS
         self._vbox = gtk.VBox()
@@ -58,10 +57,6 @@ class ApplicationRowBox(gtk.EventBox):
         self.labels_box = gtk.VBox()
         self.labels_box.pack_start(self.name_label)
         self.labels_box.pack_start(self.description_label)
-#        else:
-#            self.labels_box = gtk.HBox()
-#            self.labels_box.pack_start(self.name_label, False, False, 20)
-#            self.labels_box.pack_start(self.description_label, False, False, 20)
 
         #place for displaying + icon
         self._plus_box_alignment = gtk.Alignment(0.5, 0.5, 0, 0)
@@ -82,6 +77,5 @@ class ApplicationRowBox(gtk.EventBox):
         self.show_all()
         
     def install_app(self, widget, event):
-#        self._presenter.install_app(self._item)
         self._parent.install_app(self._item)
     

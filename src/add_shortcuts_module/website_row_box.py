@@ -1,8 +1,6 @@
 import gtk
 from osapps.desktop_preferences_datastore import DesktopPreferencesDatastore
-from eos_util import image_util
-from xdg.DesktopEntry import DesktopEntry
-from application_store.application_model import ApplicationModel 
+from eos_util import image_util 
 
 
 class WebsiteRowBox(gtk.EventBox):
@@ -24,7 +22,6 @@ class WebsiteRowBox(gtk.EventBox):
         
         self._icon_width = 150
         self._plus_box_width = 80
-#        self._active = False
         
         # -- DISPLAY ELEMENTS
         self._vbox = gtk.VBox()
