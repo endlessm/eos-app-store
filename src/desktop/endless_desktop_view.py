@@ -27,7 +27,7 @@ class EndlessDesktopView(gtk.Window):
     _padding = 100
     _app_shortcuts = {}
 
-    def __init__(self, should_show=True):
+    def __init__(self):
         gtk.Window.__init__(self)
         
         width, height = self._get_net_work_area()
@@ -71,8 +71,7 @@ class EndlessDesktopView(gtk.Window):
         screen = gtk.gdk.Screen() #@UndefinedVariable
         screen.connect('size-changed', lambda s: self._set_background(self.BACKGROUND_NAME))
         
-        if should_show:
-            self.show_all()
+        self.show_all()
     
     def unfocus_widget(self, widget, event):
         widget.set_focus(None)
