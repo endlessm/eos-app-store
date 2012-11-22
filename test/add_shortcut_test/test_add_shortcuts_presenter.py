@@ -4,12 +4,17 @@ from add_shortcuts_module.add_shortcuts_presenter import AddShortcutsPresenter
 from add_shortcuts_module.add_shortcuts_model import AddShortcutsModel
 from osapps.app_shortcut import AppShortcut
 from application_store.application_store_model import ApplicationStoreModel
+from application_store.application_model import ApplicationModel
+from application_store.link_model import LinkModel
+from application_store.categories_model import CategoriesModel
 from application_store.recommended_sites_provider import RecommendedSitesProvider
+import gtk
 
 class TestAddShortcutsPresenter(unittest.TestCase):
     
     def setUp(self):
         self.mock_model = Mock()
+        self.mock_model.get_category_data = Mock(return_value=[])
         self.mock_app_store_model = Mock()
         self.mock_app_store_model.get_categories = Mock(return_value=[])
         self.mock_recommended_sites_provider = Mock()
@@ -29,14 +34,15 @@ class TestAddShortcutsPresenter(unittest.TestCase):
                                         AppShortcut(234, "App 1", "", []),
                                         AppShortcut(345, "App 2", "", [])
                                         ]
+        self.application_categories = ['AUDIO', 'VIDEO', 'MEDIA']
         
         self.mock_presenter._model._app_desktop_datastore.get_all_shortcuts = Mock(return_value=self.available_app_shortcuts)
         self.mock_presenter._model._app_desktop_datastore.add_shortcut = Mock()
         
     def test_get_category_data(self):
-        #alter this one!!!
         self.test_object.get_category_data()
-        self.mock_model.get_category_data.assert_called_once_with()
+        self.test_object._app_store_model.get_categories.assert_called_once()
+        self.test_object._model.get_category_data.assert_called_once()
         
     def test_get_folder_icons(self):
         self.test_object.get_folder_icons(self.path, self.hint)
@@ -73,21 +79,57 @@ class TestAddShortcutsPresenter(unittest.TestCase):
         view.set_presenter = Mock()
         self.test_object.set_add_shortcuts_view(view)
         self.assertEqual(self.test_object._add_shortcuts_view, view)
-        self.mock_add_shortcuts_view.set_presenter.assert_called_once_with(self.test_object)
+        self.test_object._add_shortcuts_view.set_presenter.assert_called_once_with(self.test_object)
         
     
     def test_install_app(self):
-        pass
+        app = ApplicationModel('dummy', 'dummy', [])
+        self.test_object.install_app(app)
+        self.test_object._app_store_model.install.assert_called_once_with(app)
     
     def test_install_site(self):
-        pass
+        name = 'facebook.com'
+        url = 'facebook.com'
+        comment = 'Blah, blah...'
+        site = LinkModel(name, url, comment)
+        self.test_object.get_favicon_image_file = Mock()
+        self.test_object.install_site(site)
+        self.test_object.get_favicon_image_file.assert_called_once_with(url)
     
     def test_get_favicon(self):
-        # this one is tricky
-        pass
+        url = 'facebook.com'
+        result = self.test_object.get_favicon(url)
+        self.assertTrue(result)
+        self.assertTrue(isinstance(result, gtk.gdk.Pixbuf))
+        url = 'dummy.url.kom'
+        result = self.test_object.get_favicon(url)
+        self.assertFalse(result)
     
     def test_get_favicon_image_file(self):
-        pass
+        url = 'facebook.com'
+        result = self.test_object.get_favicon_image_file(url)
+        self.assertTrue(result)
+        self.assertTrue(isinstance(result, str))
+        url = 'dummy.url.kom'
+        result = self.test_object.get_favicon_image_file(url)
+        self.assertFalse(result)
     
-    def get_custom_site_shortcut(self):
-        pass
+    def test_get_custom_site_shortcut(self):
+        url = 'facebook.com'
+        result = self.test_object.get_custom_site_shortcut(url)
+        self.assertTrue(result)
+        self.assertTrue(isinstance(result, LinkModel))
+        url = 'dummy.url.kom'
+        result = self.test_object.get_custom_site_shortcut(url)
+        self.assertFalse(result)
+    
+    def test_strip_protocol(self):
+        full = 'http://facebook.com'
+        full_ssl = 'https://facebook.com'
+        stripped = 'facebook.com'
+        result = self.test_object._strip_protocol(full)
+        self.assertEqual(result, stripped)
+        result = self.test_object._strip_protocol(full_ssl)
+        self.assertEqual(result, stripped)
+        result = self.test_object._strip_protocol(stripped)
+        self.assertEqual(result, stripped)
