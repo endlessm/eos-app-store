@@ -15,9 +15,9 @@ class AddShortcutsPresenter():
     def __init__(self):
         self._model = AddShortcutsModel()
         self._app_desktop_datastore = DesktopLocaleDatastore()
-        self._app_store_model = ApplicationStoreModel(base_dir=os.path.expanduser("~/.endlessm/apps/"))
+        self._app_store_model = ApplicationStoreModel()
         self._add_shortcuts_view = None #AddShortcutsView()
-        self._sites_provider = RecommendedSitesProvider(os.path.expanduser("~/.endlessm/sites/"))
+        self._sites_provider = RecommendedSitesProvider()
 
     def get_category_data(self):
         category_data = self._model.get_category_data()
@@ -93,12 +93,7 @@ class AddShortcutsPresenter():
 
 
     def install_site(self, site):
-        if site._url.startswith('https://'):
-            name = site._url[8:]
-        elif site._url.startswith('http://'):
-            name = site._url[7:]
-        else:
-            name = site._url
+        name = self._strip_protocol(site._url)
         
         key = 'browser'
         icon = {}
@@ -117,10 +112,7 @@ class AddShortcutsPresenter():
         if not url.startswith('http'):
             url = 'http://' + url
         
-        if url.startswith('https://'):
-            filename = 'favicon.' + url[8:] + '.ico'
-        elif url.startswith('http://'):
-            filename = 'favicon.' + url[7:] + '.ico'
+        filename = 'favicon.' + self._strip_protocol(url) + '.ico'
         filename = filename.replace('/', '_')
         
         if os.path.exists(cache_path+filename):
@@ -128,7 +120,7 @@ class AddShortcutsPresenter():
         else:
             try:
                 favicon_response = urllib2.urlopen(url+'/favicon.ico')
-                if favicon_response.geturl() == url+'/favicon.ico':
+                if self._strip_protocol(favicon_response.geturl()) == self._strip_protocol(url+'/favicon.ico'):
                     fi = open(cache_path+filename, 'wb')
                     fi.write(favicon_response.read())
                     fi.close()
@@ -140,12 +132,7 @@ class AddShortcutsPresenter():
     def get_favicon_image_file(self, url):
         cache_path = os.path.expanduser("~/.endlessm/image-cache/")
         
-        if url.startswith('https://'):
-            filename = 'favicon.' + url[8:] + '.ico'
-        elif url.startswith('http://'):
-            filename = 'favicon.' + url[7:] + '.ico'
-        else:
-            filename = 'favicon.' + url + '.ico'
+        filename = 'favicon.' + self._strip_protocol(url) + '.ico'
         filename = filename.replace('/', '_')
         if not os.path.exists(cache_path+filename):
             if self.get_favicon(url):
@@ -165,9 +152,13 @@ class AddShortcutsPresenter():
             return None
         
         self.get_favicon(url)
-        if url.startswith('https://'):
-            name = url[8:]
-        elif url.startswith('http://'):
-            name = url[7:]
+        name = self._strip_protocol(url)
         return LinkModel(url, name, url)
-            
+    
+    def _strip_protocol(self, url):
+        if url.startswith('https://'):
+            return url[8:]
+        elif url.startswith('http://'):
+            return url[7:]
+        else:
+            return url

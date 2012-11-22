@@ -69,7 +69,6 @@ class AddShortcutsView():
 
 
     def destroy(self, window, event):
-#        print 'DESTROY DESTROY DESTROY'
         self.window.destroy()
         self._parent.get_presenter().refresh_view()
 
