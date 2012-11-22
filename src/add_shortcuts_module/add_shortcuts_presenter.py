@@ -18,6 +18,7 @@ class AddShortcutsPresenter():
         self._app_store_model = ApplicationStoreModel()
         self._add_shortcuts_view = None #AddShortcutsView()
         self._sites_provider = RecommendedSitesProvider()
+        self.IMAGE_CACHE_PATH = '/tmp/'  #maybe /tmp/endless-image-cache/ ?
 
     def get_category_data(self):
         category_data = self._model.get_category_data()
@@ -77,19 +78,22 @@ class AddShortcutsPresenter():
     
     def install_app(self, app):
         self._app_store_model.install(app)
-        de = DesktopEntry()
-        de.parse(app._desktop_file_path)
-        name = de.getName()
-        key = de.getExec()
-        icon = {}
-        normal = de.get('X-EndlessM-Normal-Icon') or image_util.image_path("endless.png")
-        hover = de.get('X-EndlessM-Hover-Icon') or image_util.image_path("endless.png")
-        pressed = de.get('X-EndlessM-Down-Icon') or image_util.image_path("endless.png")
-        icon['normal'] = normal
-        icon['mouseover'] = hover
-        icon['pressed'] = pressed
-        shortcut = AppShortcut(key, name, icon)
-        return shortcut
+        try:
+            de = DesktopEntry()
+            de.parse(app._desktop_file_path)
+            name = de.getName()
+            key = de.getExec()
+            icon = {}
+            normal = de.get('X-EndlessM-Normal-Icon') or image_util.image_path("endless.png")
+            hover = de.get('X-EndlessM-Hover-Icon') or image_util.image_path("endless.png")
+            pressed = de.get('X-EndlessM-Down-Icon') or image_util.image_path("endless.png")
+            icon['normal'] = normal
+            icon['mouseover'] = hover
+            icon['pressed'] = pressed
+            shortcut = AppShortcut(key, name, icon)
+            return shortcut
+        except:
+            return None
 
 
     def install_site(self, site):
@@ -108,7 +112,7 @@ class AddShortcutsPresenter():
         return shortcut
     
     def get_favicon(self, url):
-        cache_path = os.path.expanduser("~/.endlessm/image-cache/")
+        cache_path = os.path.expanduser(self.IMAGE_CACHE_PATH)
         if not url.startswith('http'):
             url = 'http://' + url
         
@@ -130,7 +134,7 @@ class AddShortcutsPresenter():
         return None
     
     def get_favicon_image_file(self, url):
-        cache_path = os.path.expanduser("~/.endlessm/image-cache/")
+        cache_path = os.path.expanduser(self.IMAGE_CACHE_PATH)
         
         filename = 'favicon.' + self._strip_protocol(url) + '.ico'
         filename = filename.replace('/', '_')
