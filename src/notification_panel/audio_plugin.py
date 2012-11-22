@@ -5,7 +5,7 @@ import time
 from icon_plugin import IconPlugin
 
 class AudioSettingsPlugin(IconPlugin, threading.Thread):
-    COMMAND = 'sudo gnome-control-center --class=eos-audio-manager sound'
+    COMMAND = 'gnome-control-center --class=eos-audio-manager sound'
     ICON_NAMES = ['audio-volume-muted.png',
                   'audio-volume-low.png',
                   'audio-volume-medium.png',

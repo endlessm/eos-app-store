@@ -26,4 +26,4 @@ class BugsAndFeedbackShortcut(DesktopShortcut):
             self.parent.remove(self)
     
     def get_images(self):
-        return (image_util.image_path("endless-shortcut-well.png"),image_util.image_path("endless-shortcut-background.png"),image_util.image_path("endless-feedback.png"),image_util.image_path("endless-shortcut-foreground.png"))
+        return [Image.from_name("endless-shortcut-well.png"),Image.from_name("endless-shortcut-background.png"),Image.from_name("endless-feedback.png"), Image.from_name("endless-shortcut-foreground.png")]

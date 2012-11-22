@@ -50,6 +50,7 @@ class TransparentWindow(gtk.Window):
     def draw(self, cr):
         pixbuf = self._background.subpixbuf(self.x, self.y, self.w, self.h)
         cr.set_source_pixbuf(pixbuf, 0, 0)
+
         if self.gradient_type is None:
             cr.paint()
         else:
@@ -60,7 +61,4 @@ class TransparentWindow(gtk.Window):
             gradient.add_color_stop_rgba(0.995, 255, 255, 255, 0)
             cr.mask(gradient)
             cr.fill()
-        
-        #self.queue_draw()
-        
         return False

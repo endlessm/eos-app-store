@@ -1,6 +1,7 @@
 import gtk
 import cairo
 from eos_widgets.image_eventbox import ImageEventBox
+from eos_util.image import Image
 from eos_util import image_util
 
 class ShortcutCategoryBox(gtk.EventBox):
@@ -11,28 +12,27 @@ class ShortcutCategoryBox(gtk.EventBox):
         self._presenter = presenter
         self._width = width
         self._model = model
-        self._separator_active = image_util.image_path('category_separator_active.png')
-        self._separator_inactive = image_util.image_path('category_separator_inactive.png')
         self._active_category = None
         self._active_subcategory = None
-        
+        self._separator_active = image_util.image_path('category_separator_active.png')
+        self._separator_inactive = image_util.image_path('category_separator_inactive.png')
         self.top_align = gtk.Alignment(0.03, 0, 0, 0)
-        self.middle_align = gtk.Alignment(0, 0.5, 0, 0)        
-        
+        self.middle_align = gtk.Alignment(0, 0.5, 0, 0)
+
         self.tree = gtk.VBox()
         self.top = gtk.HBox()
-        
-        self._close = ImageEventBox((image_util.image_path("delete_no_unactive_24.png"),))
+
+        self._close = ImageEventBox((Image.from_name("delete_no_unactive_24.png"),))
         self._close.set_size_request(24,24)
         self._close.connect("button-release-event", lambda w, e: self.destroy())
         self.top.pack_start(self._close)
         self.top_align.add(self.top)
         self.top_align.show()
-        
+
         self.middle = gtk.VBox()
-        
+
         self._fill_categories()
-        
+
         self.middle_align.add(self.middle)
         self.bottom = gtk.HBox()
         self.bottom.set_size_request(24, 24)
@@ -44,7 +44,6 @@ class ShortcutCategoryBox(gtk.EventBox):
         self.connect("expose-event", self._draw_gradient)
         self.show_all()
 
-    
     def _handle_click(self, widget, event, label, subcategory=''):
         #change model and repaint categories box
         for section in self._model:
@@ -55,27 +54,27 @@ class ShortcutCategoryBox(gtk.EventBox):
         self.refresh_categories()
         self._presenter.set_add_shortcuts_box(label.get_text(), subcategory)
 
-    
+
     def _draw_gradient(self, widget, event, active=False):
         cr = widget.window.cairo_create()
-        
+
         if not active:
             pat = cairo.LinearGradient (0.0, 0.0, widget.allocation.width, 0.0)
             cr.rectangle(widget.allocation.x, widget.allocation.y, widget.allocation.width, widget.allocation.height)
         else:
             pat = cairo.LinearGradient (0.0, 0.0, self._width, 0.0)
             cr.rectangle(widget.allocation.x, widget.allocation.y, self._width, widget.allocation.height)
-        
+
         pat.add_color_stop_rgba (0.001, 0.0, 0.0, 0.0, 0.8)
         pat.add_color_stop_rgba (1, 0.2, 0.2, 0.2, 0.8)
-        
+
         cr.set_source(pat)
         cr.fill()
-    
-    
+
+
     def destroy(self):
         self._parent.destroy()
-    
+
     def _fill_categories(self):
         for section in self._model:
             image_start = gtk.Image()
