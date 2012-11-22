@@ -14,8 +14,8 @@ class ShortcutCategoryBox(gtk.EventBox):
         self._model = model
         self._active_category = None
         self._active_subcategory = None
-        self._separator_active = image_util.image_path('category_separator_active.png')
-        self._separator_inactive = image_util.image_path('category_separator_inactive.png')
+        self._separator_active = Image.from_name('category_separator_active.png')
+        self._separator_inactive = Image.from_name('category_separator_inactive.png')
         self.top_align = gtk.Alignment(0.03, 0, 0, 0)
         self.middle_align = gtk.Alignment(0, 0.5, 0, 0)
 
@@ -148,13 +148,13 @@ class ShortcutCategoryBox(gtk.EventBox):
         if section.active:
             markup = '<span color="#ffffff"><b>' + section.category.upper() + '</b></span>'
             self._active_category = section.category
-            image_start.set_from_file(self._separator_active)
-            image_end.set_from_file(self._separator_active)
+            image_start.set_from_pixbuf(self._separator_active.pixbuf)
+            image_end.set_from_pixbuf(self._separator_active.pixbuf)
             box.connect("expose-event", self._draw_gradient, True)
         else:
             markup = '<span color="#aaaaaa"><b>' + section.category.upper() + '</b></span>'
-            image_start.set_from_file(self._separator_inactive)
-            image_end.set_from_file(self._separator_inactive)
+            image_start.set_from_pixbuf(self._separator_inactive.pixbuf)
+            image_end.set_from_pixbuf(self._separator_inactive.pixbuf)
         
         return markup
     
