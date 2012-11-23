@@ -47,7 +47,7 @@ class AddApplicationBox(gtk.VBox):
         row = ApplicationRowBox(app, parent=self, presenter=self._presenter)
         row.connect("enter-notify-event", self._draw_active, row)
         row.connect("leave-notify-event", self._draw_inactive, row)
-        self._vbox.pack_start(row, False, False, 2)
+        self._vbox.pack_start(row, False, False, 0)
     
     def _handle_expose_event(self, widget, event):
         cr = widget.window.cairo_create()
@@ -79,7 +79,6 @@ class AddApplicationBox(gtk.VBox):
     
     def _draw_active(self, widget, event, row):
         self._refresh = False
-        widget.queue_draw()
         widget.name_label.set_markup('<span color="#ffffff" font="Novecento wide" font_weight="bold">' + widget._name + '</span>')
         widget.description_label.set_markup('<span color="#ffffff" font-style="italic">' + widget._description + '</span>')
         widget._plus_image.set_from_file(image_util.image_path("add_folder_icon.png"))
@@ -88,22 +87,22 @@ class AddApplicationBox(gtk.VBox):
         pixbuf = pixbuf.scale_simple(self.allocation.width, pixbuf.get_height(), gtk.gdk.INTERP_BILINEAR)
         widget._bottom_active_line.set_from_pixbuf(pixbuf)
         widget._top_active_line.set_from_pixbuf(pixbuf)
-        widget.show()
+        widget.draw(widget.get_allocation())
         
         return False
     
-    def _draw_inactive(self, widget, event, row):
+    def _draw_inactive(self, widget, event, row=None):
         self._refresh = True
-        widget.queue_draw()
         widget.name_label.set_markup('<span color="#aaaaaa" font="Novecento wide" font_weight="bold">' + widget._name + '</span>')
         widget.description_label.set_markup('<span color="#aaaaaa" font-style="italic">' + widget._description + '</span>')
-        widget._plus_image.set_from_pixbuf(None)
+        widget._plus_image.hide()
         widget._bottom_active_line.set_from_pixbuf(None)
         widget._top_active_line.set_from_pixbuf(None)
-        widget.show()
+        widget.draw(widget.get_allocation())
         
         return False
     
     def install_app(self, app):
         self._parent.install_app(app)
         self._parent.destroy(None, None)
+    
