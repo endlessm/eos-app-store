@@ -32,16 +32,13 @@ class AudioSettingsPlugin(IconPlugin, threading.Thread):
     def is_plugin_enabled():
         sound_cards = alsaaudio.cards()
         num_cards = len(sound_cards)
-        found_master = False
-        card_index = 0
-        while (card_index < num_cards) and not found_master:
+        for card_index in range(num_cards):
             mixers = alsaaudio.mixers(card_index)
             if 'Master' in mixers:
-                found_master = True
-            else:
-                card_index += 1
-        AudioSettingsPlugin.card_index = card_index
-        return found_master
+                AudioSettingsPlugin.card_index = card_index
+                return True
+        else:
+            return False
 
     def _init_thread(self):
         threading.Thread.__init__(self)
