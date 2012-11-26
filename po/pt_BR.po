@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: dev 1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-11-15 11:43-0600\n"
+"POT-Creation-Date: 2012-11-22 13:07+0100\n"
 "PO-Revision-Date: 2012-05-31 11:54-0500\n"
 "Last-Translator: Automatically generated\n"
 "Language-Team: none\n"
@@ -18,7 +18,33 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
 
-#: src/desktop/endless_desktop_view.py:104
+#: src/notification_panel/battery_view.py:131
+msgid " remaining"
+msgstr " restante"
+
+#: src/notification_panel/battery_view.py:129
+msgid " until full"
+msgstr " até carga completa"
+
+#: src/add_shortcuts_module/add_folder_box.py:29
+msgid "1. NAME YOUR FOLDER"
+msgstr "1. O NOME DO SEU FOLDER"
+
+#: src/add_shortcuts_module/add_folder_box.py:31
+msgid "2. PICK A SYMBOL"
+msgstr "2. ESCOLHA UM SÍMBOLO"
+
+#: src/add_shortcuts_module/add_shortcuts_model.py:10
+#: src/add_shortcuts_module/add_shortcuts_presenter.py:27
+#: src/add_shortcuts_module/add_shortcuts_view.py:108
+msgid "APP"
+msgstr "APP"
+
+#: src/add_shortcuts_module/add_shortcuts_view.py:31
+msgid "Add Shortcuts"
+msgstr "Adicionar Atalhos"
+
+#: src/desktop/endless_desktop_view.py:120
 msgid "Apps"
 msgstr "Aplicativos"
 
@@ -26,12 +52,17 @@ msgstr "Aplicativos"
 msgid "Background"
 msgstr "Fundo"
 
+#: src/notification_panel/battery_view.py:86
+#: src/notification_panel/battery_view.py:87
+msgid "Battery Info"
+msgstr "Informações sobre bateria"
+
 #: ui/bugs_and_feedback.glade:76
 msgid "Bugbuffer1"
 msgstr ""
 
-#: src/feedback_module/bugs_and_feedback_popup_window.py:16
 #: ui/bugs_and_feedback.glade:10
+#: src/feedback_module/bugs_and_feedback_popup_window.py:16
 #, fuzzy
 msgid "Bugs And Feedback"
 msgstr "Feedback"
@@ -56,16 +87,23 @@ msgstr ""
 msgid "EndlessOS Installer"
 msgstr "Instalador do EndlessOS"
 
-#: src/shortcut/add_remove_shortcut.py:131
+#: src/add_shortcuts_module/add_shortcuts_model.py:20
+msgid "FOLDER"
+msgstr "ENTERTAINMENT"
+
+#: src/shortcut/add_remove_shortcut.py:98
+#: src/shortcut/add_remove_shortcut.py:106
+#: src/shortcut/add_remove_shortcut.py:114
+#: src/shortcut/add_remove_shortcut.py:128
 msgid "Files"
 msgstr "Files"
 
-#: src/folder/folder_window.py:19 src/desktop/endless_desktop_view.py:117
+#: src/folder/folder_window.py:60 src/desktop/endless_desktop_view.py:133
 msgid "Folder"
 msgstr "Diretórios"
 
-#: src/feedback_module/bugs_and_feedback_popup_window.py:42
 #: ui/bugs_and_feedback.glade:42
+#: src/feedback_module/bugs_and_feedback_popup_window.py:42
 msgid "Give us feedback"
 msgstr "Deixe seu comentário."
 
@@ -81,8 +119,8 @@ msgstr "Sair?"
 msgid "Password:"
 msgstr "Senha:"
 
-#: src/feedback_module/bugs_and_feedback_popup_window.py:55
 #: ui/bugs_and_feedback.glade:6
+#: src/feedback_module/bugs_and_feedback_popup_window.py:55
 msgid ""
 "Please let us know how the problem occured and we will resolve it as soon as "
 "possible."
@@ -97,8 +135,13 @@ msgstr ""
 "Por favor aguarde enquanto fazemos a instalação das atualizações da última "
 "versão do EndlessOS."
 
-#: src/feedback_module/bugs_and_feedback_popup_window.py:38
+#: src/notification_panel/battery_view.py:69
+#, fuzzy
+msgid "Power Settings"
+msgstr "Configurações de energia"
+
 #: ui/bugs_and_feedback.glade:30
+#: src/feedback_module/bugs_and_feedback_popup_window.py:38
 msgid "Report a Bug"
 msgstr "Relatar um bug"
 
@@ -120,8 +163,12 @@ msgstr "Reinicializar"
 msgid "Restart?"
 msgstr "Reinicializar?"
 
-#: src/feedback_module/bugs_and_feedback_popup_window.py:65
+#: src/add_shortcuts_module/add_website_box.py:30
+msgid "SEARCH FOR A WEBSITE"
+msgstr ""
+
 #: ui/bugs_and_feedback.glade:94
+#: src/feedback_module/bugs_and_feedback_popup_window.py:65
 msgid "SUBMIT"
 msgstr "ENVIAR"
 
@@ -145,8 +192,8 @@ msgstr "Desligar?"
 msgid "Thank You"
 msgstr "Obrigado"
 
-#: src/feedback_module/feedback_response_dialog_view.py:8
 #: ui/feedback_response_dialog.glade:25
+#: src/feedback_module/feedback_response_dialog_view.py:8
 msgid "Thank you for your feedback."
 msgstr "Obrigado pelo seu feedback."
 
@@ -173,6 +220,10 @@ msgstr ""
 "Estamos apenas tentando mantê-lo\n"
 "seguro."
 
+#: src/add_shortcuts_module/add_website_box.py:43
+msgid "Type it here"
+msgstr ""
+
 #: src/notification_panel/all_settings_view.py:25
 msgid "Update"
 msgstr "Atualizar"
@@ -193,7 +244,12 @@ msgstr "Atualizando..."
 msgid "WARNING!"
 msgstr "AVISO!"
 
-#: src/desktop/endless_desktop_view.py:116
+#: src/add_shortcuts_module/add_shortcuts_model.py:19
+#: src/add_shortcuts_module/add_shortcuts_view.py:110
+msgid "WEB"
+msgstr "WEB"
+
+#: src/desktop/endless_desktop_view.py:132
 msgid "Websites"
 msgstr "Páginas Web"
 
@@ -209,6 +265,27 @@ msgstr "Gostaria de iniciar a atualização do EndlessOS %sagora?"
 #: ui/feedback_response_dialog.glade:33
 msgid "button"
 msgstr ""
+
+#~ msgid "GAMES"
+#~ msgstr "JOGOS"
+
+#~ msgid "HEALTH"
+#~ msgstr "SAÚDE"
+
+#~ msgid "MY TOWN"
+#~ msgstr "MINHA CIDADE"
+
+#~ msgid "POPULAR"
+#~ msgstr "POPULAR"
+
+#~ msgid "PRODUCTIVITY"
+#~ msgstr "PRODUTIVIDADE"
+
+#~ msgid "SOCIAL"
+#~ msgstr "SOCIAL"
+
+#~ msgid "WORK"
+#~ msgstr "TRABALHO"
 
 #~ msgid "Update EndlessOS?"
 #~ msgstr "Atualizar EndlessOS?"

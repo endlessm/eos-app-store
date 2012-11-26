@@ -1,7 +1,7 @@
 #!/bin/bash -e
 
 # Install dependencies
-sudo apt-get install -y devscripts debhelper python-xlib python-alsaaudio
+sudo apt-get install -y devscripts debhelper python-xlib python-alsaaudio hal
 sudo easy_install nose
 
 pushd `dirname $0`
@@ -34,7 +34,7 @@ pushd `dirname $0`
     ./convert.sh
   popd &> /dev/null
 
-  pushd ../eos-installer &> /dev/null
+  pushd ../eos-build &> /dev/null
   INSTALL_DIR=$(pwd)
   export GNUPGHOME=${INSTALL_DIR}/gnupg
   popd &> /dev/null

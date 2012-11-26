@@ -2,7 +2,7 @@ import unittest
 from mock import Mock #@UnresolvedImport
 
 from notification_panel.all_settings_model import AllSettingsModel
-from util.update_lock import UpdateLock
+from startup.auto_updates.update_lock import UpdateLock
 import threading
 
 import time
@@ -12,9 +12,11 @@ class TestAllSettingsModel(unittest.TestCase):
         self._mock_os_util = Mock()
         self._mock_app_launcher = Mock()
         self._mock_repo_chooser_launcher = Mock()
+        self._mock_update_manager = Mock()
         
         self._test_object = AllSettingsModel(self._mock_os_util, self._mock_app_launcher, 
-                                            self._mock_repo_chooser_launcher)
+                                            self._mock_repo_chooser_launcher,
+                                            self._mock_update_manager)
         
         self._cleanUp()
         
@@ -44,11 +46,12 @@ class TestAllSettingsModel(unittest.TestCase):
         self.assertEquals("EndlessOS", self._test_object.get_current_version())
 
     def test_when_update_is_called_we_launch_repo_chooser(self):
-        self._mock_repo_chooser_launcher.launch = Mock()
-        
+        mock_callback = Mock()
+        self._mock_update_manager.update_os = mock_callback
+
         self._test_object.update_software()
 
-        self.assertTrue(self._mock_repo_chooser_launcher.launch.called)
+        self._mock_repo_chooser_launcher.launch.assert_called_once_with(mock_callback)
 
     def test_when_restart_is_called_we_launch_restart(self):
         self._test_object.restart()
