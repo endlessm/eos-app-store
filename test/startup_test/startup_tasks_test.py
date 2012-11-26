@@ -3,11 +3,19 @@ from startup.startup_tasks import StartupTasks
 from mock import Mock #@UnresolvedImport
 
 from eos_log import log
+from startup.auto_updates.force_install import ForceInstall
+from startup.remove_extra_directories import RemoveExtraDirectoriesTask
+from startup.auto_updates.update_manager import UpdateManager
 
 class StartupTasksTest(unittest.TestCase):
 	def setUp(self):
 		self._test_object = StartupTasks()
 		self._test_object.TASK_PLUGINS = [Mock()]
+
+	def test_correct_default_tasks_exist(self):
+		self._test_object = StartupTasks()
+		self.assertEquals(set([ForceInstall,UpdateManager,RemoveExtraDirectoriesTask]), 
+						set(self._test_object.TASK_PLUGINS))
 
 	def test_correct_tasks_are_called_when_perform_tasks_is_called(self):
 		mock_task1 = Mock()

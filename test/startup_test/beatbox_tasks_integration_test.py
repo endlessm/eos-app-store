@@ -34,6 +34,6 @@ class BeatboxTaskTest(unittest.TestCase):
         self.test_object._default_music_folder_path = Mock(return_value = '/tmp/default_music')
         self.test_object.execute()
         
-        self.assertTrue(os.path.isfile("/tmp/destination/test.music"))
-        self.assertTrue(os.path.isfile("/tmp/destination/test2.music"))
+        self.assertTrue(os.path.isfile("/tmp/destination/Endless/test.music"))
+        self.assertTrue(os.path.isfile("/tmp/destination/Endless/test2.music"))
         
