@@ -1,5 +1,5 @@
-from eos_installer.update_manager import UpdateManager
-from eos_installer.force_install import ForceInstall
+from startup.auto_updates.update_manager import UpdateManager
+from startup.auto_updates.force_install import ForceInstall
 from startup.remove_extra_directories import RemoveExtraDirectoriesTask
 from eos_log import log
 
