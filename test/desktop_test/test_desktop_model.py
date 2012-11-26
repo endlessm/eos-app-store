@@ -36,7 +36,7 @@ class TestDesktopModel(unittest.TestCase):
     def test_write_empty_order_file(self):
         expected_contents = []
         order_file = os.path.join(self._tmp_directory, '.order')
-        self._test_object.write_order(self._tmp_directory)
+        self._test_object.write_order(order_file)
         fp = open(order_file, 'r')
         order = json.load(fp)
         self.assertEquals(expected_contents, order)
@@ -47,7 +47,7 @@ class TestDesktopModel(unittest.TestCase):
         
         expected_contents = ['link1.desktop', 'link2.desktop', 'link3.desktop']
         order_file = os.path.join(self._tmp_directory, '.order')
-        self._test_object.write_order(self._tmp_directory, model_list)
+        self._test_object.write_order(order_file, model_list)
         fp = open(order_file, 'r')
         order = json.load(fp)
         self.assertEquals(expected_contents, order)
@@ -56,24 +56,24 @@ class TestDesktopModel(unittest.TestCase):
         model_list.insert(1, m)
         expected_contents = ['link1.desktop', 'link3.desktop', 'link2.desktop']
         order_file = os.path.join(self._tmp_directory, '.order')
-        self._test_object.write_order(self._tmp_directory, model_list)
+        self._test_object.write_order(order_file, model_list)
         fp = open(order_file, 'r')
         order = json.load(fp)
         self.assertEquals(expected_contents, order)
         
         
-#    def test_shortcuts_are_returned_in_same_order_as_order_file(self):
-#        self._build_desktop()
-#        expected = []
-#        expected.append(self._file_helper.create_model(os.path.join(self._tmp_directory, 'link1.desktop'), 'link1.desktop'))
-#        expected.append(self._file_helper.create_model(os.path.join(self._tmp_directory, 'link2.desktop'), 'link2.desktop'))
-#        expected.append(self._file_helper.create_model(os.path.join(self._tmp_directory, 'link3.desktop'), 'link3.desktop'))
-#
-#        order_filename = os.path.join(self._tmp_directory, '.order')
-#        
-#        order_list = ['link1.desktop', 'link2.desktop', 'link3.desktop']
-#        json.dump(order_list, open(order_filename, "w"))
-#        self.assertEquals(expected, self._test_object.get_shortcuts(self._tmp_directory))
+    def test_shortcuts_are_returned_in_same_order_as_order_file(self):
+        self._build_desktop()
+        expected = []
+        expected.append(self._file_helper.create_model(os.path.join(self._tmp_directory, 'link1.desktop'), 'link1.desktop'))
+        expected.append(self._file_helper.create_model(os.path.join(self._tmp_directory, 'link3.desktop'), 'link3.desktop'))
+        expected.append(self._file_helper.create_model(os.path.join(self._tmp_directory, 'link2.desktop'), 'link2.desktop'))
+
+        order_filename = os.path.join(self._tmp_directory, '.order')
+        
+        order_list = ['link1.desktop', 'link3.desktop', 'link2.desktop']
+        json.dump(order_list, open(order_filename, "w"))
+        self.assertEquals(expected, self._test_object.get_shortcuts(self._tmp_directory))
         
 
     def _build_expected(self):
