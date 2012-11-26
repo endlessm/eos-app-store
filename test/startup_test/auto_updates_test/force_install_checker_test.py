@@ -40,3 +40,4 @@ class ForceInstallCheckerTestCase(unittest.TestCase):
         self._test_object.need_to_do_install()
 
         self.assertTrue(os.path.exists(os.path.expanduser("~/.endlessm/needs_restart")))
+

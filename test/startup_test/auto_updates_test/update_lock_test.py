@@ -1,7 +1,7 @@
 import unittest
 import os
 
-from util.update_lock import UpdateLock
+from startup.auto_updates.update_lock import UpdateLock
 
 class UpdateLockTestCase(unittest.TestCase):
     def setup(self):

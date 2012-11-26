@@ -1,11 +1,11 @@
-from auto_updates.update_manager import UpdateManager
-from auto_updates.force_install import ForceInstall
+from startup.auto_updates.update_manager import UpdateManager
+from startup.auto_updates.force_install import ForceInstall
 from startup.remove_extra_directories import RemoveExtraDirectoriesTask
 from eos_log import log
 
 
 class StartupTasks(object):
-    def __init__(self, tasks = [RemoveExtraDirectoriesTask,ForceInstall,UpdateManager]):
+    def __init__(self, tasks = [ForceInstall,UpdateManager,RemoveExtraDirectoriesTask]):
         self.TASK_PLUGINS = tasks 
     
     def perform_tasks(self):
