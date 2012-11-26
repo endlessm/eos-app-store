@@ -2,9 +2,11 @@ import gtk
 from add_shortcuts_presenter import AddShortcutsPresenter
 from shortcut_category_box import ShortcutCategoryBox
 from add_folder_box import AddFolderBox
+from add_application_box import AddApplicationBox
 from shortcut.add_remove_shortcut import AddRemoveShortcut
 from util.transparent_window import TransparentWindow
 from osapps.app_shortcut import AppShortcut
+from add_website_box import AddWebsiteBox
 import cairo
 from eos_util import image_util
 
@@ -24,6 +26,7 @@ class AddShortcutsView():
 
         self._parent = parent
         self._presenter = AddShortcutsPresenter()
+        self._presenter.set_add_shortcuts_view(self)
         self.window = TransparentWindow(self._parent)
         self.window.set_title(_("Add Shortcuts"))
         self.window.set_decorated(False)
@@ -46,12 +49,12 @@ class AddShortcutsView():
         self.hbox1.set_size_request(self._tree_view_width, self._height)
 
         self.data = self._presenter.get_category_data()
-        self.tree = ShortcutCategoryBox(self.data, self.window, self._tree_view_width)
+        self.tree = ShortcutCategoryBox(self.data, self.window, self._tree_view_width, self._presenter)
 
         self.hbox1.pack_start(self.tree)
         self.hbox2 = gtk.HBox()
         self.hbox2.set_size_request(self._width - self._tree_view_width - self._add_buton_box_width, self._height)
-
+        
         self.scrolled_window = AddFolderBox(self)
         self.hbox2.pack_start(self.scrolled_window)
         self.scrolled_window.show()
@@ -73,7 +76,17 @@ class AddShortcutsView():
     def create_folder(self, folder_name, image_file):
         presenter = self._parent.get_presenter()
         self._presenter.create_directory(folder_name, image_file, presenter)
-
+    
+    def install_app(self, app):
+        presenter = self._parent.get_presenter()
+        shortcut = self._presenter.install_app(app)
+        presenter._model._app_desktop_datastore.add_shortcut(shortcut)
+    
+    def install_site(self, site):
+        presenter = self._parent.get_presenter()
+        shortcut = self._presenter.install_site(site)
+        presenter._model._app_desktop_datastore.add_shortcut(shortcut)
+    
     def _draw_triangle(self, widget, event):
         ctx = self.add_remove_vbox.window.cairo_create()
         image_surface = cairo.ImageSurface.create_from_png(image_util.image_path("inactive_triangle.png"))
@@ -84,3 +97,22 @@ class AddShortcutsView():
         ctx.set_source_surface(image_surface)
         ctx.paint()
         ctx.restore()
+    
+    def set_scrolled_window(self, widget):
+        self.hbox2.remove(self.hbox2.get_children()[0])
+        self.scrolled_window = widget
+        self.hbox2.pack_start(self.scrolled_window)        
+        self.scrolled_window.show()
+    
+    def set_add_shortcuts_box(self, category, subcategory=''):
+        if category == _('APP'):
+            widget = AddApplicationBox(self, default_category=subcategory)
+        elif category == _('WEB'):
+            widget = AddWebsiteBox(self)
+        else:
+            widget = AddFolderBox(self)
+        
+        self.set_scrolled_window(widget)
+    
+    def set_presenter(self, presenter):
+        self._presenter = presenter
