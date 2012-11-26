@@ -20,6 +20,8 @@ from folder.folder_window import FULL_FOLDER_ITEMS_COUNT
 from notification_panel.notification_panel import NotificationPanel
 from taskbar_panel.taskbar_panel import TaskbarPanel
 from add_shortcuts_module.add_shortcuts_view import AddShortcutsView
+from eos_util.image import Image
+
 
 gettext.install('endless_desktop', '/usr/share/locale', unicode=True, names=['ngettext'])
 gtk.gdk.threads_init()
@@ -34,8 +36,7 @@ class EndlessDesktopView(gtk.Window):
 
     def __init__(self):
         gtk.Window.__init__(self)
-        self._app_shortcuts = []
-
+        
         width, height = self._get_net_work_area()
         self.resize(width, height)
         self.set_can_focus(False)
@@ -50,7 +51,6 @@ class EndlessDesktopView(gtk.Window):
         self.connect('delete-event', lambda w, e: True)
 
         self.maximize()
-        self.show()
         self.set_app_paintable(True)
 
         # -----------WORKSPACE-----------
@@ -101,9 +101,8 @@ class EndlessDesktopView(gtk.Window):
 
     def set_background_pixbuf(self, pixbuf):
         width, height = self._get_net_work_area()
-#        pixbuf = image_util.load_pixbuf(background_name)
-
-        sized_pixbuf = pixbuf.scale_simple(width, height, gtk.gdk.INTERP_BILINEAR) #@UndefinedVariable
+        sized_pixbuf = self._resize_background(width, height, pixbuf)
+        
         pixmap, mask = sized_pixbuf.render_pixmap_and_mask()
 
         del sized_pixbuf
@@ -138,6 +137,11 @@ class EndlessDesktopView(gtk.Window):
         self.popup.add(apps_menu)
         self.popup.add(website_menu)
         self.popup.add(folder_menu)
+
+    def _resize_background(self, screen_width, screen_height, pixbuf):
+        image = Image(pixbuf)
+        image.scale_to_best_fit(screen_width, screen_height)
+        return image.pixbuf
 
     def refresh(self, shortcuts, force=False):
 
