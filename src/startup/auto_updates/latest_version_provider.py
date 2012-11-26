@@ -1,6 +1,6 @@
 import json
 
-from eos_installer.web_connection import WebConnection
+from osapps.web_connection import WebConnection
 from eos_installer import endpoint_provider
 
 class LatestVersionProvider():
