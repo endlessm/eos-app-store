@@ -1,6 +1,6 @@
-from application_store.desktop_file_utilities import DesktopFileUtilities
 import os
 import json
+from desktop_files.desktop_file_utilities import DesktopFileUtilities
 
 class DesktopModel():
     def get_shortcuts(self, directory):
