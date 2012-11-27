@@ -3,8 +3,8 @@ from desktop.desktop_model import DesktopModel
 import tempfile
 import shutil
 import os
-from application_store.desktop_file_utilities import DesktopFileUtilities
 import json
+from desktop_files.desktop_file_utilities import DesktopFileUtilities
 
 class TestDesktopModel(unittest.TestCase):
     
