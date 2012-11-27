@@ -5,11 +5,12 @@ from eos_log import log
 
 
 class StartupTasks(object):
-    def __init__(self, tasks = [ForceInstall,UpdateManager,RemoveExtraDirectoriesTask]):
-        self.TASK_PLUGINS = tasks 
+    DEFAULT_TASKS = [ForceInstall,UpdateManager,RemoveExtraDirectoriesTask]
+    def __init__(self, tasks = DEFAULT_TASKS):
+        self._all_tasks = tasks 
     
     def perform_tasks(self):
-        for task in self.TASK_PLUGINS:
+        for task in self._all_tasks:
             try:
                 task().execute()
             except Exception as e:

@@ -4,18 +4,13 @@ from mock import Mock #@UnresolvedImport
 
 from eos_log import log
 from startup.auto_updates.force_install import ForceInstall
-from startup.remove_extra_directories import RemoveExtraDirectoriesTask
 from startup.auto_updates.update_manager import UpdateManager
 
 class StartupTasksTest(unittest.TestCase):
-	def setUp(self):
-		self._test_object = StartupTasks()
-		self._test_object.TASK_PLUGINS = [Mock()]
-
-	def test_correct_default_tasks_exist(self):
-		self._test_object = StartupTasks()
-		self.assertEquals(set([ForceInstall,UpdateManager,RemoveExtraDirectoriesTask]), 
-						set(self._test_object.TASK_PLUGINS))
+    def test_correct_default_tasks_exist(self):
+        test_object = StartupTasks()
+        self.assertIsInstance(test_object._all_tasks[0](), ForceInstall)
+        self.assertIsInstance(test_object._all_tasks[1](), UpdateManager)
 
 	def test_correct_tasks_are_called_when_perform_tasks_is_called(self):
 		mock_task1 = Mock()
@@ -24,9 +19,9 @@ class StartupTasksTest(unittest.TestCase):
 		mock_task2 = Mock()
 		mock_task2.execute = Mock()
 		
-		self._test_object.TASK_PLUGINS = [Mock(return_value=mock_task1), Mock(return_value=mock_task2)]
+		test_object = StartupTasks([Mock(return_value=mock_task1), Mock(return_value=mock_task2)])
 
-		self._test_object.perform_tasks()
+		test_object.perform_tasks()
 
 		self.assertTrue(mock_task1.execute.called)
 		self.assertTrue(mock_task2.execute.called)
@@ -38,9 +33,9 @@ class StartupTasksTest(unittest.TestCase):
 		error_class = Mock(side_effect=Exception())
 		error_class.__name__ = ""
 		
-		self._test_object.TASK_PLUGINS = [error_class, Mock(return_value=mock_task)]
+		test_object = StartupTasks([error_class, Mock(return_value=mock_task)])
 
-		self._test_object.perform_tasks()
+		test_object.perform_tasks()
 
 		self.assertTrue(mock_task.execute.called)
 		
@@ -58,12 +53,11 @@ class StartupTasksTest(unittest.TestCase):
 		mock_task_class.__name__ = task_name
 		
 		
-		self._test_object.TASK_PLUGINS = [mock_task_class]
+		test_object = StartupTasks([mock_task_class])
 
-		self._test_object.perform_tasks()
+		test_object.perform_tasks()
 
 		log.error.assert_called_once_with("An error ocurred while executing " + task_name, error)
 		
 		log.error = orig_eos_error
-
 
