@@ -19,6 +19,8 @@ class AudioSettingsPlugin(IconPlugin, threading.Thread):
     VOLUME_THRESH_LOW = 55
     VOLUME_THRESH_HIGH = 85
     
+    card_index = 0
+    
     def __init__(self, icon_size):
         # Only display the audio settings if a sound card is installed
         if AudioSettingsPlugin.is_plugin_enabled():
@@ -29,8 +31,15 @@ class AudioSettingsPlugin(IconPlugin, threading.Thread):
     @staticmethod
     def is_plugin_enabled():
         sound_cards = alsaaudio.cards()
-        return len(sound_cards) > 0
-        
+        num_cards = len(sound_cards)
+        for card_index in range(num_cards):
+            mixers = alsaaudio.mixers(card_index)
+            if 'Master' in mixers:
+                AudioSettingsPlugin.card_index = card_index
+                return True
+        else:
+            return False
+
     def _init_thread(self):
         threading.Thread.__init__(self)
         self.start()

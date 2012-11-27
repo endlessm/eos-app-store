@@ -1,7 +1,9 @@
 import string
 from util import label_util
 import gobject
+from util.shadowed_label_box import ShadowedLabelBox
 from eos_widgets.image_eventbox import ImageEventBox
+from eos_util import image_util
 import gtk
 
 class DesktopShortcut(gtk.VBox):
@@ -10,6 +12,14 @@ class DesktopShortcut(gtk.VBox):
     ICON_STATE_NORMAL = 'normal'
     ICON_STATE_PRESSED = 'pressed'
     ICON_STATE_MOUSEOVER = 'mouseover'
+
+    __gsignals__ = {
+        "desktop-shortcut-dnd-begin": (
+            gobject.SIGNAL_RUN_FIRST, #@UndefinedVariable
+            gobject.TYPE_NONE,
+            (),
+            ),
+        }
 
     _motion_callbacks = []
     _drag_end_callbacks = []
@@ -41,8 +51,9 @@ class DesktopShortcut(gtk.VBox):
         for cb in cls._drag_begin_callbacks:
             cb(source)
 
-    def __init__(self, label_text="", draggable=True):
+    def __init__(self, label_text="", draggable=True, highlightable=True):
         super(DesktopShortcut, self).__init__()
+        self.__dnd_enter_flag = False
         self.set_size_request(64, 64)
         self._event_box = self._create_icon(self.get_images(self.ICON_STATE_NORMAL))
 
@@ -59,13 +70,12 @@ class DesktopShortcut(gtk.VBox):
 
         self._label.set_alignment(0.5, 0.0)
 
-        self._label_event_box = gtk.EventBox()
-        self._label_event_box.add(self._label)
-        self._label_event_box.set_visible_window(False)
+        self._label_event_box = ShadowedLabelBox(self._label)
 
         self.pack_start(self._event_box, False, False, 3)
         self.pack_start(self._label_event_box, False, False, 3)
 
+        self.highlightable = highlightable
         if draggable:
             self._event_box.connect("drag_data_get", self.dnd_send_data)
             self._event_box.drag_source_set(
@@ -77,13 +87,24 @@ class DesktopShortcut(gtk.VBox):
         self._event_box.connect("drag_motion", self.dnd_motion_data)
         self._event_box.connect("drag_end", self.dnd_drag_end)
         self._event_box.connect("drag_begin", self.dnd_drag_begin)
+        self._event_box.connect("drag_leave", self.dnd_drag_leave)
         self._event_box.drag_dest_set(
             #gtk.DEST_DEFAULT_HIGHLIGHT |
-            gtk.DEST_DEFAULT_MOTION | 
+            gtk.DEST_DEFAULT_MOTION |
             gtk.DEST_DEFAULT_DROP,
             self.DND_TRANSFER_TYPE,
             gtk.gdk.ACTION_MOVE
             )
+
+    def __str__(self):
+        return self._event_box._identifier
+
+    def set_is_highlightable(self, value):
+        self.highlightable = value
+
+    def set_dnd_icon(self, image):
+        image.scale_from_width(48)
+        image.draw(self._event_box.drag_source_set_icon_pixbuf)
 
     def dnd_send_data(self, widget, context, selection, targetType, eventTime):
         if targetType == self.DND_TARGET_TYPE_TEXT:
@@ -106,6 +127,9 @@ class DesktopShortcut(gtk.VBox):
                     )
 
     def dnd_motion_data(self, widget, context, x, y, time):
+        if not self.__dnd_enter_flag:
+            self.__dnd_enter_flag = True
+            self.dnd_drag_enter(widget, context, time)
         source_widget = context.get_source_widget()
         DesktopShortcut._motion_broadcast(source_widget, widget, x, y)
         if hasattr(self, '_motion_handler_callback'):
@@ -118,12 +142,31 @@ class DesktopShortcut(gtk.VBox):
         self._event_box.show()
         self.set_moving(False)
         DesktopShortcut._drag_end_broadcast(widget)
+        if hasattr(self, '_drag_end_handler_callback'):
+            self._drag_end_handler_callback(widget)
 
     def dnd_drag_begin(self, widget, context):
         self._label.hide()
         self._event_box.hide()
         self.set_moving(True)
         DesktopShortcut._drag_begin_broadcast(widget)
+        self.emit("desktop-shortcut-dnd-begin")
+        if hasattr(self, '_drag_begin_handler_callback'):
+            self._drag_begin_handler_callback(widget)
+
+    def dnd_drag_leave(self, widget, context, time):
+        self.__dnd_enter_flag = False
+        source_widget = context.get_source_widget()
+        if hasattr(self, '_drag_leave_handler_callback'):
+            self._drag_leave_handler_callback(source_widget, widget)
+        self._refresh()
+
+    def dnd_drag_enter(self, widget, context, time):
+        source_widget = context.get_source_widget()
+        if hasattr(self, '_drag_enter_handler_callback'):
+            self._drag_enter_handler_callback(source_widget, widget)
+        if self.highlightable:
+            self._refresh(self.get_highlight_images(self.ICON_STATE_MOUSEOVER))
 
     def set_moving(self, is_moving):
         self._is_moving = is_moving
@@ -131,12 +174,20 @@ class DesktopShortcut(gtk.VBox):
     def is_moving(self):
         return self._is_moving
 
+    def _refresh(self, images=None):
+        images = images or self.get_images(self.ICON_STATE_NORMAL)
+        self._event_box.set_images(images)
+        #self._event_box.repaint()
+
     def get_shortcut(self):
         return None
 
     def get_images(self, event_state):
         return []
-    
+
+    def get_highlight_images(self, event_state):
+        return self.get_images(event_state)
+
     def remove_shortcut(self):
         if self.parent != None:
             self.parent.remove(self)
@@ -146,12 +197,17 @@ class DesktopShortcut(gtk.VBox):
 
             self._callbacks = []
 
-    def connect(self, signal, callback):
+    def connect(self, signal, callback, force=False):
         if not hasattr(self, "_callbacks"):
             self._callbacks = []
 
-        super(DesktopShortcut, self).connect(signal, callback)
-        self._callbacks.append(callback)
+        if not hasattr(self, "_signals"):
+            self._signals = {}
+
+        if force or (not self._signals.has_key(signal)):
+            self._signals[signal] = callback
+            super(DesktopShortcut, self).connect(signal, callback)
+            self._callbacks.append(callback)
 
     def _create_event_box(self):
         event_box = gtk.EventBox()
@@ -168,4 +224,10 @@ class DesktopShortcut(gtk.VBox):
         icon.show()
 
         return icon
+
+    def destroy(self):
+        self.unparent()
+        self._label.destroy()
+        self._event_box.destroy()
+
 
