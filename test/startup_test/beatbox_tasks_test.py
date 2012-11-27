@@ -20,7 +20,7 @@ class BeatboxTaskTest(unittest.TestCase):
     def test_gsettings_are_set_for_beatbox(self):
         self.test_object.execute()
         self.os_util.execute.assert_called_once_with(["gsettings",
-            "set", "net.launchpad.beatbox.settings", "music-folder",
+            "set", "net.launchpad.beatbox.Settings", "music-folder",
             self.home_path])
 
     def test_target_dir_is_correct(self):
