@@ -87,7 +87,7 @@ class TestAddShortcutsPresenter(unittest.TestCase):
         name = 'facebook.com'
         url = 'facebook.com'
         comment = 'Blah, blah...'
-        site = LinkModel(name, url, name, comment)
+        site = LinkModel(name, '', url, name, comment)
         self.test_object.get_favicon_image_file = Mock()
         self.test_object.install_site(site)
         self.test_object.get_favicon_image_file.assert_called_once_with(url)
