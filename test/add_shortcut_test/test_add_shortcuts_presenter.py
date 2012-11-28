@@ -1,14 +1,10 @@
 import unittest
 from mock import Mock
 from add_shortcuts_module.add_shortcuts_presenter import AddShortcutsPresenter
-from add_shortcuts_module.add_shortcuts_model import AddShortcutsModel
 from osapps.app_shortcut import AppShortcut
-from application_store.application_store_model import ApplicationStoreModel
-from application_store.application_model import ApplicationModel
-from application_store.link_model import LinkModel
-from application_store.categories_model import CategoriesModel
-from application_store.recommended_sites_provider import RecommendedSitesProvider
 import gtk
+from desktop_files.application_model import ApplicationModel
+from desktop_files.link_model import LinkModel
 
 class TestAddShortcutsPresenter(unittest.TestCase):
     
