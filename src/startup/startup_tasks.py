@@ -6,7 +6,7 @@ from startup.remove_extra_files_task import RemoveExtraFilesTask
 
 
 class StartupTasks(object):
-    def __init__(self, tasks = [RemoveExtraDirectoriesTask,RemoveExtraFilesTask,ForceInstall,UpdateManager]):
+    def __init__(self, tasks = [ForceInstall,UpdateManager,RemoveExtraDirectoriesTask,RemoveExtraFilesTask]):
         self.TASK_PLUGINS = tasks
 
     def perform_tasks(self):
