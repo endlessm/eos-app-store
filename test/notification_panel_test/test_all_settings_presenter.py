@@ -1,7 +1,8 @@
 import unittest
-from mock import Mock
+from mock import Mock #@UnresolvedImport
 from notification_panel.all_settings_view import AllSettingsView
 from notification_panel.all_settings_presenter import AllSettingsPresenter
+from notification_panel.all_settings_model import AllSettingsModel
 
 class AllSettingsPresenterTest(unittest.TestCase):
     def setUp(self):
@@ -10,6 +11,11 @@ class AllSettingsPresenterTest(unittest.TestCase):
         self._mock_background_chooser = Mock()
 
         self._mock_view.add_listener = Mock(side_effect=self._view_add_listener)
+        self._mock_model.add_listener = Mock(side_effect=self._model_add_listener)
+
+    def _model_add_listener(self, *args, **kwargs):
+        if args[0] == AllSettingsModel.UPDATE_LOCK:
+            self._update_lock_listener = args[1]
 
     def _view_add_listener(self, *args, **kwargs):
         if args[0] == AllSettingsView.DESKTOP_BACKGROUND:
@@ -37,6 +43,48 @@ class AllSettingsPresenterTest(unittest.TestCase):
         AllSettingsPresenter(self._mock_view, self._mock_model, self._mock_background_chooser)
 
         self._mock_view.set_current_version.assert_called_once_with(current_version)
+
+    def test_initially_enable_update_button_from_the_model(self):
+        self._mock_model.can_update = Mock(return_value=True)
+        self._mock_view.enable_update_button = Mock()
+
+        AllSettingsPresenter(self._mock_view, self._mock_model, self._mock_background_chooser)
+
+        self.assertTrue(self._mock_view.enable_update_button.called)
+
+    def test_initially_disable_update_button_from_the_model(self):
+        self._mock_model.can_update = Mock(return_value=False)
+        self._mock_view.enable_update_button = Mock()
+
+        AllSettingsPresenter(self._mock_view, self._mock_model, self._mock_background_chooser)
+
+        self.assertTrue(self._mock_view.disable_update_button.called)
+
+    def test_when_model_notifies_that_update_lock_changes_then_disable_button(self):
+        AllSettingsPresenter(self._mock_view, self._mock_model, self._mock_background_chooser)
+        self._mock_model.reset_mock()
+        self._mock_view.reset_mock()
+        
+        self._mock_model.can_update = Mock(return_value=False)
+        self._mock_view.enable_update_button = Mock()
+        
+        self._update_lock_listener()
+        
+        self.assertTrue(self._mock_view.disable_update_button.called)
+        self.assertFalse(self._mock_view.enable_update_button.called)
+
+    def test_when_model_notifies_that_update_lock_changes_then_enable_button(self):
+        AllSettingsPresenter(self._mock_view, self._mock_model, self._mock_background_chooser)
+        self._mock_model.reset_mock()
+        self._mock_view.reset_mock()
+        
+        self._mock_model.can_update = Mock(return_value=True)
+        self._mock_view.enable_update_button = Mock()
+        
+        self._update_lock_listener()
+        
+        self.assertTrue(self._mock_view.enable_update_button.called)
+        self.assertFalse(self._mock_view.disable_update_button.called)
 
     def test_only_update_software_when_user_confirms(self):
         AllSettingsPresenter(self._mock_view, self._mock_model, self._mock_background_chooser)

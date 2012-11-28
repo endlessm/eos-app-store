@@ -10,7 +10,7 @@ class BatteryViewTestCase(unittest.TestCase):
         self.mock_parent.set_visible_window = Mock()
         self.mock_parent.set_size_request = Mock()
         self.mock_parent.queue_draw = Mock()
-        self.test_object = BatteryView(self.mock_parent)
+        self.test_object = BatteryView(self.mock_parent, 1)
     
     def test_expose_event_is_attached_once(self):
         self.mock_parent.connect.assert_called_once_with("expose-event", self.test_object._draw)
@@ -28,7 +28,6 @@ class BatteryViewTestCase(unittest.TestCase):
         self.assertEqual(time_to_depletion, self.test_object._time_to_depletion)
         self.assertEqual(charging, self.test_object._charging)
         self.mock_parent.set_visible_window.assert_called_once_with(False)
-        self.mock_parent.set_size_request.assert_called_once_with(PanelConstants.get_icon_size() + self.test_object.LEFT_MARGIN + self.test_object.RIGHT_MARGIN, PanelConstants.get_icon_size())
-        self.test_object._recalculate_battery_bounds.assert_called_once_with()
+        self.mock_parent.set_size_request.assert_called_once_with(PanelConstants.get_icon_size() + 2 * self.test_object.HORIZONTAL_MARGIN, PanelConstants.get_icon_size())
         self.mock_parent.queue_draw.assert_called_once_with()
     

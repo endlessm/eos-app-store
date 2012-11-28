@@ -1,77 +1,120 @@
 import unittest
-from mock import Mock
+from mock import Mock #@UnresolvedImport
 
 from notification_panel.all_settings_model import AllSettingsModel
+from startup.auto_updates.update_lock import UpdateLock
+import threading
+
+import time
 
 class TestAllSettingsModel(unittest.TestCase):
+    def setUp(self):
+        self._mock_os_util = Mock()
+        self._mock_app_launcher = Mock()
+        self._mock_repo_chooser_launcher = Mock()
+        self._mock_update_manager = Mock()
+        
+        self._test_object = AllSettingsModel(self._mock_os_util, self._mock_app_launcher, 
+                                            self._mock_repo_chooser_launcher,
+                                            self._mock_update_manager)
+        
+        self._cleanUp()
+        
+    def tearDown(self):
+        self._cleanUp()
+        
+    def _cleanUp(self):
+        UpdateLock().release()
+    
     def test_get_current_version_uses_output_from_command_line_result(self):
         current_version = "version from desktop"
 
-        mock_os_util = Mock()
-        mock_os_util.get_version = Mock(return_value=current_version)
+        self._mock_os_util.get_version = Mock(return_value=current_version)
 
-        test_object = AllSettingsModel(mock_os_util, "file_that_doesn't exist.txt")
-
-        self.assertEquals(current_version, test_object.get_current_version())
+        self.assertEquals("EndlessOS " + current_version, self._test_object.get_current_version())
 
     def test_when_using_command_line_ensure_that_the_correct_command_is_used(self):
-        mock_os_util = Mock()
-        mock_os_util.execute = Mock(return_value="EndlessOS")
+        self._mock_os_util.execute = Mock(return_value="EndlessOS")
 
-        test_object = AllSettingsModel(mock_os_util, "file_that_doesn't exist.txt")
+        self._test_object.get_current_version()
 
-        test_object.get_current_version()
-
-        mock_os_util.get_version.assert_called_once()
-
-    def test_when_update_is_called_we_launch_updates(self):
-        mock_app_launcher= Mock()
+        self._mock_os_util.get_version.assert_called_once()
         
-        test_object = AllSettingsModel(None, mock_app_launcher)
-        test_object.update_software()
+    def test_get_version_that_gets_none_does_not_break(self):
+        self._mock_os_util.get_version = Mock(return_value=None)
 
-        expected_command = AllSettingsModel.UPDATE_COMMAND
-        mock_app_launcher.launch.assert_called_once_with(expected_command)
+        self.assertEquals("EndlessOS", self._test_object.get_current_version())
 
-    def test_get_version_delegates_to_os_util(self):
-        mock_os_util = Mock()
-        mock_os_util.get_version = Mock(return_value="whatever")
-        
-        test_object = AllSettingsModel(mock_os_util, None)
-        self.assertEqual("whatever", test_object.get_current_version())
+    def test_when_update_is_called_we_launch_repo_chooser(self):
+        mock_callback = Mock()
+        self._mock_update_manager.update_os = mock_callback
+
+        self._test_object.update_software()
+
+        self._mock_repo_chooser_launcher.launch.assert_called_once_with(mock_callback)
 
     def test_when_restart_is_called_we_launch_restart(self):
-        mock_os_util = Mock()
-        mock_app_launcher= Mock()
+        self._test_object.restart()
 
-        test_object = AllSettingsModel(mock_os_util, mock_app_launcher)
-        test_object.restart()
-
-        mock_app_launcher.launch.assert_called_once_with(AllSettingsModel.RESTART_COMMAND)
+        self._mock_app_launcher.launch.assert_called_once_with(AllSettingsModel.RESTART_COMMAND)
 
     def test_when_logout_is_called_we_launch_logout(self):
-        mock_os_util = Mock()
-        mock_app_launcher= Mock()
+        self._test_object.logout()
 
-        test_object = AllSettingsModel(mock_os_util, mock_app_launcher)
-        test_object.logout()
-
-        mock_app_launcher.launch.assert_called_once_with(AllSettingsModel.LOGOUT_COMMAND)
+        self._mock_app_launcher.launch.assert_called_once_with(AllSettingsModel.LOGOUT_COMMAND)
 
     def test_when_shutdown_is_called_we_launch_shutdown(self):
-        mock_os_util = Mock()
-        mock_app_launcher= Mock()
+        self._test_object.shutdown()
 
-        test_object = AllSettingsModel(mock_os_util, mock_app_launcher)
-        test_object.shutdown()
-
-        mock_app_launcher.launch.assert_called_once_with(AllSettingsModel.SHUTDOWN_COMMAND)
+        self._mock_app_launcher.launch.assert_called_once_with(AllSettingsModel.SHUTDOWN_COMMAND)
 
     def test_when_settings_is_called_we_launch_settings(self):
-        mock_os_util = Mock()
-        mock_app_launcher= Mock()
+        self._test_object.open_settings()
 
-        test_object = AllSettingsModel(mock_os_util, mock_app_launcher)
-        test_object.open_settings()
+        self._mock_app_launcher.launch.assert_called_once_with(AllSettingsModel.SETTINGS_COMMAND)
 
-        mock_app_launcher.launch.assert_called_once_with(AllSettingsModel.SETTINGS_COMMAND)
+    def test_when_update_lock_is_locked_then_cant_update(self):
+        UpdateLock().acquire()
+        
+        self.assertFalse(self._test_object.can_update())
+        
+    def test_when_update_lock_is_not_locked_then_can_update(self):
+        self.assertTrue(self._test_object.can_update())
+        
+    def test_update_listener_ist_nofitied_when_an_update_lock_is_acquried(self):
+        update_listener = Mock()
+            
+        test_object = AllSettingsModel()
+        test_object.add_listener(AllSettingsModel.UPDATE_LOCK, update_listener)
+        
+        self.assertFalse(update_listener.called)
+        
+        UpdateLock().acquire()
+        time.sleep(0.5)
+        
+        self.assertTrue(update_listener.called)
+        
+    def test_update_listener_ist_nofitied_when_an_update_lock_is_released(self):
+        UpdateLock().acquire()
+        
+        update_listener = Mock()
+            
+        test_object = AllSettingsModel()
+        test_object.add_listener(AllSettingsModel.UPDATE_LOCK, update_listener)
+        
+        self.assertFalse(update_listener.called)
+        
+        UpdateLock().release()
+        time.sleep(0.5)
+        
+        self.assertTrue(update_listener.called)
+        
+    def test_on_delete_update_lock_thread_is_killed(self):
+        test_object = AllSettingsModel()
+        
+        before = threading.active_count()
+        test_object.__del__()
+        after = threading.active_count()
+        
+        self.assertEquals(before - 1, after)
+        

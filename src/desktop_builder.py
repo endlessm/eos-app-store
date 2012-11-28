@@ -8,12 +8,13 @@ from util.feedback_manager import FeedbackManager
 from osapps.app_launcher import AppLauncher
 from osapps.app_datastore import AppDatastore
 from osapps.desktop_locale_datastore import DesktopLocaleDatastore
+import os
 
 def build_desktop():
     preferences_provider = DesktopPreferencesDatastore.get_instance()
     
     presenter = DesktopPresenter(EndlessDesktopView(), 
-                                 EndlessDesktopModel(DesktopLocaleDatastore(),
+                                 EndlessDesktopModel(DesktopLocaleDatastore(directory=os.path.expanduser("~/.endlessm/")),
                                                      preferences_provider, 
                                                      AppDatastore(), 
                                                      AppLauncher(), 
