@@ -1,7 +1,7 @@
 import math
 
 class ListPaginator:
-    def __init__(self, list_of_items, page_size = 4):
+    def __init__(self, list_of_items, page_size):
         self._list_of_items = list_of_items
         self._page_size = page_size
         self._page_count = math.ceil(len(self._list_of_items) / float(self._page_size))
