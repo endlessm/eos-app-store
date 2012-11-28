@@ -4,13 +4,18 @@ from mock import Mock #@UnresolvedImport
 
 from eos_log import log
 from startup.auto_updates.force_install import ForceInstall
+from startup.remove_extra_directories_task import RemoveExtraDirectoriesTask
+from startup.remove_extra_files_task import RemoveExtraFilesTask
 from startup.auto_updates.update_manager import UpdateManager
 
 class StartupTasksTest(unittest.TestCase):
-    def test_correct_default_tasks_exist(self):
-        test_object = StartupTasks()
-        self.assertIsInstance(test_object._all_tasks[0](), ForceInstall)
-        self.assertIsInstance(test_object._all_tasks[1](), UpdateManager)
+	
+	def test_correct_default_tasks_exist(self):
+		test_object = StartupTasks()
+		self.assertIsInstance(test_object._all_tasks[0](), ForceInstall)
+		self.assertIsInstance(test_object._all_tasks[1](), UpdateManager)
+		self.assertIsInstance(test_object._all_tasks[2](), RemoveExtraDirectoriesTask)
+		self.assertIsInstance(test_object._all_tasks[3](), RemoveExtraFilesTask)
 
 	def test_correct_tasks_are_called_when_perform_tasks_is_called(self):
 		mock_task1 = Mock()

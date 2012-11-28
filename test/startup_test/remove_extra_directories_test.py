@@ -1,5 +1,5 @@
 import unittest
-from startup.remove_extra_directories import RemoveExtraDirectoriesTask
+from startup.remove_extra_directories_task import RemoveExtraDirectoriesTask
 from mock import Mock, call #@UnresolvedImport
 
 class RemoveExtraDirectoriesTest(unittest.TestCase):
