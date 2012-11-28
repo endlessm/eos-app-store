@@ -1,0 +1,14 @@
+[Desktop Entry]
+Version=1.0
+Type=Application
+Name=Music
+Name[en_US]=Music
+Comment=Music
+TryExec=beatbox %U
+Exec=beatbox %U
+Icon=itunes
+Categories=
+X-EndlessM-Normal-Icon=/usr/share/icons/hicolor/48x48/apps/music_normal.png
+X-EndlessM-Hover-Icon=/usr/share/icons/hicolor/48x48/apps/music_hover.png
+X-EndlessM-Down-Icon=/usr/share/icons/hicolor/48x48/apps/music_down.png
+

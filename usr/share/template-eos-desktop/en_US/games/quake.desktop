@@ -1,0 +1,14 @@
+[Desktop Entry]
+Version=1.0
+Type=Application
+Name=Quake
+Name[en_US]=Quake
+Comment=Quake
+TryExec=/usr/games/openarena
+Exec=/usr/games/openarena
+Icon=quake
+Categories=
+X-EndlessM-Normal-Icon=/usr/share/icons/hicolor/48x48/apps/quake_normal.png
+X-EndlessM-Hover-Icon=/usr/share/icons/hicolor/48x48/apps/quake_hover.png
+X-EndlessM-Down-Icon=/usr/share/icons/hicolor/48x48/apps/quake_down.png
+

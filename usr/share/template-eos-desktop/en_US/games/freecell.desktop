@@ -1,0 +1,14 @@
+[Desktop Entry]
+Version=1.0
+Type=Application
+Name=Freecell
+Name[en_US]=Freecell
+Comment=Freecell
+TryExec=/usr/games/sol --freecell
+Exec=/usr/games/sol --freecell
+Icon=freecell
+Categories=
+X-EndlessM-Normal-Icon=/usr/share/icons/hicolor/48x48/apps/freecell_normal.png
+X-EndlessM-Hover-Icon=/usr/share/icons/hicolor/48x48/apps/freecell_hover.png
+X-EndlessM-Down-Icon=/usr/share/icons/hicolor/48x48/apps/freecell_down.png
+
