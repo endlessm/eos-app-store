@@ -6,7 +6,7 @@ from startup.remove_extra_files_task import RemoveExtraFilesTask
 
 
 class StartupTasks(object):
-    DEFAULT_TASKS = [ForceInstall,UpdateManager,RemoveExtraDirectoriesTask,RemoveExtraFilesTask]
+    DEFAULT_TASKS = [ForceInstall,UpdateManager]
     def __init__(self, tasks = DEFAULT_TASKS):
         self._all_tasks = tasks 
     
