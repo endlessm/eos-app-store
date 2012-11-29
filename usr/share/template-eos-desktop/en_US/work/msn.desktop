@@ -1,0 +1,14 @@
+[Desktop Entry]
+Version=1.0
+Name=MSN
+Comment=MSN
+GenericName=MSN
+Type=Link
+URL=http://www.msn.com
+Icon=msn
+Categories=Network
+X-EndlessM-Normal-Icon=/usr/share/endlessm/icons/msn_normal.png
+X-EndlessM-Hover-Icon=/usr/share/endlessm/icons/msn_hover.png
+X-EndlessM-Down-Icon=/usr/share/endlessm/icons/msn_down.png
+
+

@@ -1,0 +1,14 @@
+[Desktop Entry]
+Version=1.0
+Type=Application
+Name=Video
+Name[en_US]=Video
+Comment=Video
+TryExec=/usr/bin/vlc %U
+Exec=/usr/bin/vlc %U
+Icon=video
+Categories=
+X-EndlessM-Normal-Icon=/usr/share/icons/hicolor/48x48/apps/movies_normal.png
+X-EndlessM-Hover-Icon=/usr/share/icons/hicolor/48x48/apps/movies_hover.png
+X-EndlessM-Down-Icon=/usr/share/icons/hicolor/48x48/apps/movies_down.png
+

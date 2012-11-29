@@ -1,0 +1,14 @@
+[Desktop Entry]
+Version=1.0
+Type=Application
+Name=Files
+Name[en_US]=Files
+Comment=File Manager
+TryExec=pcmanfm %U
+Exec=pcmanfm %U
+Icon=system-file-manager
+Categories=FileManager;Utility;Core;GTK;
+X-EndlessM-Normal-Icon=/usr/share/icons/hicolor/48x48/apps/files_normal.png
+X-EndlessM-Hover-Icon=/usr/share/icons/hicolor/48x48/apps/files_hover.png
+X-EndlessM-Down-Icon=/usr/share/icons/hicolor/48x48/apps/files_down.png
+

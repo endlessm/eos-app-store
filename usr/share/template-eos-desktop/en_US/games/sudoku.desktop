@@ -1,0 +1,14 @@
+[Desktop Entry]
+Version=1.0
+Type=Application
+Name=Sudoku
+Name[en_US]=Sudoku
+Comment=Sudoku
+TryExec=/usr/games/gnome-sudoku
+Exec=/usr/games/gnome-sudoku
+Icon=sudoku
+Categories=
+X-EndlessM-Normal-Icon=/usr/share/icons/hicolor/48x48/apps/sudoku_normal.png
+X-EndlessM-Hover-Icon=/usr/share/icons/hicolor/48x48/apps/sudoku_hover.png
+X-EndlessM-Down-Icon=/usr/share/icons/hicolor/48x48/apps/sudoku_down.png
+
