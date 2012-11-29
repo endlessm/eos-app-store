@@ -29,6 +29,7 @@ class TransparentWindow(gtk.Window):
         self.set_decorated(False)
         self.set_has_frame(False)
         self.set_type_hint(gtk.gdk.WINDOW_TYPE_HINT_POPUP_MENU)
+	self.set_skip_taskbar_hint(True)
 
     def _handle_event(self, widget, event):
         cr = widget.window.cairo_create()
