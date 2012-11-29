@@ -42,6 +42,7 @@ class AudioSettingsPlugin(IconPlugin, threading.Thread):
 
     def _init_thread(self):
         threading.Thread.__init__(self)
+        self.setDaemon(True)
         self.start()
         
     def _get_volume(self):

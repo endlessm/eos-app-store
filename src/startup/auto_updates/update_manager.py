@@ -17,6 +17,7 @@ class UpdateManager(object):
     def execute(self):
         self._done = False
         self._running_thread = Thread(target=self._background_process)
+        self._running_thread.setDaemon(True)
         self._running_thread.start()
         
     def _background_process(self):

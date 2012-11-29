@@ -31,6 +31,7 @@ class UpdateTasksThread(Thread):
     def __init__(self, callback):
         super(UpdateTasksThread, self).__init__()
         self.set_icon_callback = callback
+        self.setDaemon(True)
     
     def run(self):
         while True :
