@@ -155,6 +155,7 @@ class ApplicationListPlugin(gtk.HBox):
 class UpdateTasksThread(Thread):
     def __init__(self, display, screen, client_list_atom_id, active_window_atom_id, watched_atom_ids, callback):
         super(UpdateTasksThread, self).__init__()
+        self.setDaemon(True)
 
         self._screen = screen
         self._display = display
