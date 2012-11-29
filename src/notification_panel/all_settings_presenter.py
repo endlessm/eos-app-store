@@ -15,6 +15,7 @@ class AllSettingsPresenter():
         view.add_listener(AllSettingsView.SHUTDOWN, lambda: self._shutdown(view, model))
         
         model.add_listener(AllSettingsModel.UPDATE_LOCK, lambda: self._modify_update_button(view, model))
+        model.add_listener(AllSettingsModel.UPDATE_STARTED, lambda: self._inform_user_of_update(view, model))
 
         self._modify_update_button(view, model)
         
@@ -30,6 +31,9 @@ class AllSettingsPresenter():
     def _update_software(self, view, model):
         view.hide_window()
         model.update_software()
+
+    def _inform_user_of_update(self, view, model):
+        view.inform_user_of_update()
 
     def _open_settings(self, view, model):
         view.hide_window()

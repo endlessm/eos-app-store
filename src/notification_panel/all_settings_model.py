@@ -10,6 +10,7 @@ from startup.auto_updates.update_manager import UpdateManager
 
 class AllSettingsModel(AbstractNotifier):
     UPDATE_LOCK = "update.lock"
+    UPDATE_STARTED = "update.started"
 
     VERSION_COMMAND = "dpkg -p endless-os-desktop-widget | grep ^Version: | awk \"{print $2}\""
     UPDATE_COMMAND = "sudo /usr/bin/endless-installer.sh"
@@ -47,7 +48,7 @@ class AllSettingsModel(AbstractNotifier):
         return "EndlessOS {0}".format(version) if version else "EndlessOS"
 
     def update_software(self):
-        self._repo_chooser_launcher.launch(self._update_manager.update_os)
+        self._repo_chooser_launcher.launch(self._repo_chosen_callback)
 
     def open_settings(self):
         self._app_launcher.launch(self.SETTINGS_COMMAND)
@@ -63,3 +64,7 @@ class AllSettingsModel(AbstractNotifier):
 
     def can_update(self):
         return not UpdateLock().is_locked()
+
+    def _repo_chosen_callback(self):
+        self._notify(self.UPDATE_STARTED)
+        self._update_manager.update_os()

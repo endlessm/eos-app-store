@@ -16,7 +16,9 @@ class AllSettingsPresenterTest(unittest.TestCase):
     def _model_add_listener(self, *args, **kwargs):
         if args[0] == AllSettingsModel.UPDATE_LOCK:
             self._update_lock_listener = args[1]
-
+        elif args[0] == AllSettingsModel.UPDATE_STARTED:
+            self._start_update_listener = args[1]
+    
     def _view_add_listener(self, *args, **kwargs):
         if args[0] == AllSettingsView.DESKTOP_BACKGROUND:
             self._desktop_listener = args[1]
@@ -30,6 +32,18 @@ class AllSettingsPresenterTest(unittest.TestCase):
             self._restart_listener = args[1]
         elif args[0] == AllSettingsView.SHUTDOWN:
             self._shutdown_listener = args[1]
+
+    def test_if_update_started_then_show_update_status_window(self):
+        AllSettingsPresenter(self._mock_view, self._mock_model, self._mock_background_chooser)
+        
+        self._mock_model.reset_mock()
+        self._mock_view.reset_mock()
+        
+        self._mock_view.inform_user_of_update = Mock()
+	
+        self._start_update_listener()
+        
+        self._mock_view.inform_user_of_update.assert_called_once_with()
 
     def test_initially_display_the_view(self):
         AllSettingsPresenter(self._mock_view, self._mock_model, self._mock_background_chooser)
