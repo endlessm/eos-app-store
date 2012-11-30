@@ -3,7 +3,7 @@ import gettext
 from eos_widgets.folder_eventbox import FolderEventBox
 from eos_util.image import Image
 from eos_util import screen_util
-from util.transparent_window import TransparentWindow
+from eos_widgets.transparent_window import TransparentWindow
 from folder.folder_icons import FolderIcons
 
 gettext.install('endless_desktop', '/usr/share/locale', unicode = True, names=['ngettext'])
@@ -52,19 +52,27 @@ class OpenFolderWindow():
                 lambda w: hide_callback(w)
                 )
 
-        self._height = len(rows) * (WIDGET_HEIGHT + WIDGET_LABEL_HEIGHT + WIDGET_VERTICAL_SPACING)
-        self._width = screen_util.get_width()
         image = Image.from_name("open-folder-bg.png")
         
-        self._window = TransparentWindow(parent, gradient_type='linear')
-        self._window.set_title(_("Folder"))
+        desktop_size = parent.get_size()
+        self._x = 0
+        self._y = desktop_size[1] - image.height - self.TASKBAR_HEIGHT
+        self._width = desktop_size[0]
+        self._height = image.height
+
+        # TODO Complete support for multiple rows of icons in folder.
+        # The following line appears to account for the possibility
+        # of multiple rows of icons in the folder,
+        # but I don't see the image being stretched to this height,
+        # so for now I'm going to comment it out and just use the image height.
+        # self._height = len(rows) * (WIDGET_HEIGHT + WIDGET_LABEL_HEIGHT + WIDGET_VERTICAL_SPACING)
         
-        self._window.move(0, screen_util.get_height() - image.height - self.TASKBAR_HEIGHT)
+        self._window = TransparentWindow(parent, (self._x, self._y), (self._width, self._height), gradient_type='linear')
 
         self._fancy_container = FolderEventBox(image, self._width)
         self._fancy_container.show()
         
-        self._window.set_size_request(self._width, image.height)
+        self._window.set_size_request(self._width, self._height)
         
         self._center = gtk.Alignment(.5,0.1,0,0)
         self._center.show()
