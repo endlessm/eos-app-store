@@ -157,7 +157,7 @@ class AddShortcutsPresenter():
 
         self.get_favicon(url)
         name = self._strip_protocol(url)
-        return LinkModel(url, name, url)
+        return LinkModel(url, '', name, url)
 
     def _strip_protocol(self, url):
         if url.startswith('https://'):
