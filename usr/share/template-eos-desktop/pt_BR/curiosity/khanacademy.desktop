@@ -1,0 +1,16 @@
+[Desktop Entry]
+Version=1.0
+Name=Khan Academy
+Name[en_US]=Khan Academy
+Name[pt_BR]=Khan Academy
+Comment=Khan Academy
+GenericName=Khan Academy
+Type=Link
+URL=http://www.khanacademy.org
+Icon=khanacademy
+Categories=Network
+X-EndlessM-Normal-Icon=/usr/share/endlessm/icons/khanacademy_normal.png
+X-EndlessM-Hover-Icon=/usr/share/endlessm/icons/khanacademy_hover.png
+X-EndlessM-Down-Icon=/usr/share/endlessm/icons/khanacademy_down.png
+
+
