@@ -132,6 +132,7 @@ class AllSettingsView(AbstractNotifier):
 
     def display(self):
         self._window.show_all()
+        self._window.present()
 
     def hide_window(self):
         self._window.destroy()
