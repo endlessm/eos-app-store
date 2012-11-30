@@ -1,0 +1,15 @@
+[Desktop Entry]
+Version=1.0
+Type=Application
+Name=Writer
+Name[en_US]=Writer
+Name[pt_BR]=Escritório
+Comment=Writer
+TryExec=libreoffice --writer %U
+Exec=libreoffice --writer %U
+Icon=libreoffice-writer
+Categories=
+X-EndlessM-Normal-Icon=/usr/share/icons/hicolor/48x48/apps/libreofficewriter_normal.png
+X-EndlessM-Hover-Icon=/usr/share/icons/hicolor/48x48/apps/libreofficewriter_hover.png
+X-EndlessM-Down-Icon=/usr/share/icons/hicolor/48x48/apps/libreofficewriter_down.png
+

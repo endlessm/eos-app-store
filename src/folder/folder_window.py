@@ -60,17 +60,19 @@ class OpenFolderWindow():
 
         self._height = len(rows) * (WIDGET_HEIGHT + WIDGET_LABEL_HEIGHT + WIDGET_VERTICAL_SPACING)
         self._width = screen_util.get_width()
-        image = Image.from_name("open-folder-bg.png")
+        #image = Image.from_name("open-folder-bg.png")
         
         self._window = TransparentWindow(parent, gradient_type='linear')
         self._window.set_title(_("Folder"))
         
-        self._window.move(0, screen_util.get_height() - image.height - self.TASKBAR_HEIGHT)
+        #self._window.move(0, screen_util.get_height() - image.height - self.TASKBAR_HEIGHT)
+        self._window.move(0, screen_util.get_height() - self._height - self.TASKBAR_HEIGHT)
 
-        self._fancy_container = FolderEventBox(image, self._width)
-        self._fancy_container.show()
+        #self._fancy_container = FolderEventBox(image, self._width)
+        #self._fancy_container.show()
         
-        self._window.set_size_request(self._width, image.height)
+        #self._window.set_size_request(self._width, image.height)
+        self._window.set_size_request(self._width, self._height)
         
         self._center = gtk.Alignment(.5,0.1,0,0)
         self._center.show()

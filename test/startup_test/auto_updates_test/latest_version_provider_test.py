@@ -2,7 +2,7 @@ import unittest
 from mock import Mock #@UnresolvedImport
 from startup.auto_updates.latest_version_provider import LatestVersionProvider
 import json
-from startup.auto_updates import endpoint_provider
+from eos_installer import endpoint_provider
 
 class LatestVersionProviderTestCase(unittest.TestCase):
     def setUp(self):

@@ -1,0 +1,14 @@
+[Desktop Entry]
+Version=1.0
+Name=Media
+Name[en_US]=Media
+Name[pt_BR]=Mídia
+Comment=Media
+GenericName=Media
+Type=Directory
+Icon=folder.png
+X-EndlessM-Normal-Icon=/usr/share/endlessm/icons/facebook_normal.png
+X-EndlessM-Hover-Icon=/usr/share/endlessm/icons/facebook_hover.png
+X-EndlessM-Down-Icon=/usr/share/endlessm/icons/facebook_down.png
+
+

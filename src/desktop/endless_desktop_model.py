@@ -1,6 +1,7 @@
 import sys
 from eos_util import image_util
 from osapps.app_shortcut import AppShortcut
+from eos_log import log
 
 class EndlessDesktopModel(object):
     def __init__(self, app_desktop_datastore, preferences_provider, app_datastore, app_launcher, feedback_manager, time_provider):
@@ -44,7 +45,7 @@ class EndlessDesktopModel(object):
             self._app_desktop_datastore.set_all_shortcuts(all_shortcuts)
             return True
         else:
-            print >> sys.stderr, "unknown shortcut location"
+            log.error("unknown shortcut location")
         return False
     
     def relocate_shortcut(self, source_shortcut, folder_shortcut):
@@ -68,7 +69,7 @@ class EndlessDesktopModel(object):
         if app:
             self._app_launcher.launch(app.executable(), params)
         else:
-            print >> sys.stderr, "could not find app: "+app_key
+            log.error("could not find app: " + app_key)
 
     def submit_feedback(self, message, bug):
         data = {"message":message, "timestamp":self._time_provider.get_current_time(), "bug":bug}
@@ -98,14 +99,14 @@ class EndlessDesktopModel(object):
             if shortcut in all_shortcuts:
                 success = self.delete_from_desktop(shortcut, all_shortcuts)
             else:
-                print >> sys.stderr, "delete shortcut failed!"
+                log.error("delete shortcut failed!")
                 
         if success:
             try:
                 self._app_desktop_datastore.set_all_shortcuts(all_shortcuts)
                 return True
             except:
-                print >> sys.stderr, "delete shortcut failed!"
+                log.error("delete shortcut failed!")
         return False
         
     def delete_from_folder(self, shortcut, parent):
@@ -113,7 +114,7 @@ class EndlessDesktopModel(object):
             parent.remove_child(shortcut)
             return True
         except:
-            print >> sys.stderr, "removing child from folder failed!"
+            log.error("removing child from folder failed!")
         return False
         
     def delete_from_desktop(self, shortcut, all_shortcuts):
@@ -121,6 +122,6 @@ class EndlessDesktopModel(object):
             all_shortcuts.remove(shortcut)
             return True
         except:
-            print >> sys.stderr, "no shortcut on desktop!"
+            log.error("no shortcut on desktop!")
         return False
         

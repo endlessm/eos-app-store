@@ -132,6 +132,7 @@ class AllSettingsView(AbstractNotifier):
 
     def display(self):
         self._window.show_all()
+        self._window.present()
 
     def hide_window(self):
         self._window.destroy()
@@ -144,5 +145,13 @@ class AllSettingsView(AbstractNotifier):
         self._button_update.set_sensitive(False)
         self._button_update.set_label(self.UPDATE_IN_PROGRESS_BUTTON_TEXT)
         
+    def inform_user_of_update(self): 
+        info_message = gtk.MessageDialog(self._parent.get_toplevel(), gtk.DIALOG_DESTROY_WITH_PARENT, 
+            gtk.MESSAGE_INFO, gtk.BUTTONS_CLOSE,
+            _("Downloading updates to the EndlessOS. We will notify you once the updates are ready to install.")
+             )
+        info_message.set_title(_("Update started"))
+        info_message.connect("response", lambda w, id: info_message.destroy()) 
+        info_message.show() 
         
         

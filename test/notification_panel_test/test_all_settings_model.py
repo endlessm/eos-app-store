@@ -2,7 +2,7 @@ import unittest
 from mock import Mock #@UnresolvedImport
 
 from notification_panel.all_settings_model import AllSettingsModel
-from util.update_lock import UpdateLock
+from startup.auto_updates.update_lock import UpdateLock
 import threading
 
 import time
@@ -12,9 +12,11 @@ class TestAllSettingsModel(unittest.TestCase):
         self._mock_os_util = Mock()
         self._mock_app_launcher = Mock()
         self._mock_repo_chooser_launcher = Mock()
+        self._mock_update_manager = Mock()
         
         self._test_object = AllSettingsModel(self._mock_os_util, self._mock_app_launcher, 
-                                            self._mock_repo_chooser_launcher)
+                                            self._mock_repo_chooser_launcher,
+                                            self._mock_update_manager)
         
         self._cleanUp()
         
@@ -23,7 +25,26 @@ class TestAllSettingsModel(unittest.TestCase):
         
     def _cleanUp(self):
         UpdateLock().release()
-    
+   
+    def test_repo_chosen_callback_notifies_and_updates(self):
+        self._mock_update_manager.update_os = Mock()
+        update_listener = Mock()
+
+        test_object = AllSettingsModel(self._mock_os_util, self._mock_app_launcher, 
+                                            self._mock_repo_chooser_launcher,
+                                            self._mock_update_manager)
+        test_object.add_listener(AllSettingsModel.UPDATE_STARTED, update_listener)
+        
+        test_object._repo_chosen_callback()
+	
+        self._mock_update_manager.update_os.assert_called_once_with()
+        self.assertTrue(update_listener.called)
+   
+    def test_callback_calls_repo_chosen_callback(self):
+        self._test_object.update_software()
+        
+	self._mock_repo_chooser_launcher.launch.assert_called_with(self._test_object._repo_chosen_callback)
+ 
     def test_get_current_version_uses_output_from_command_line_result(self):
         current_version = "version from desktop"
 
@@ -42,13 +63,6 @@ class TestAllSettingsModel(unittest.TestCase):
         self._mock_os_util.get_version = Mock(return_value=None)
 
         self.assertEquals("EndlessOS", self._test_object.get_current_version())
-
-    def test_when_update_is_called_we_launch_repo_chooser(self):
-        self._mock_repo_chooser_launcher.launch = Mock()
-        
-        self._test_object.update_software()
-
-        self.assertTrue(self._mock_repo_chooser_launcher.launch.called)
 
     def test_when_restart_is_called_we_launch_restart(self):
         self._test_object.restart()

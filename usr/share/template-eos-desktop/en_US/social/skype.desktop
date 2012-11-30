@@ -1,0 +1,15 @@
+[Desktop Entry]
+Version=1.0
+Type=Application
+Name=Skype
+Name[en_US]=Skype
+Name[pt_BR]=Skype
+Comment=Skype
+TryExec=skype %U
+Exec=skype %U
+Icon=skype
+Categories=
+X-EndlessM-Normal-Icon=/usr/share/icons/hicolor/48x48/apps/skype_normal.png
+X-EndlessM-Hover-Icon=/usr/share/icons/hicolor/48x48/apps/skype_hover.png
+X-EndlessM-Down-Icon=/usr/share/icons/hicolor/48x48/apps/skype_down.png
+

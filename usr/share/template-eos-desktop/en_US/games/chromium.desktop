@@ -1,0 +1,15 @@
+[Desktop Entry]
+Version=1.0
+Type=Application
+Name=Chromium
+Name[en_US]=Chromium
+Name[pt_BR]=Chromium
+Comment=Chromium
+TryExec=chromium-bsu
+Exec=chromium-bsu
+Icon=chromium
+Categories=
+X-EndlessM-Normal-Icon=/usr/share/icons/hicolor/48x48/apps/chromium_normal.png
+X-EndlessM-Hover-Icon=/usr/share/icons/hicolor/48x48/apps/chromium_hover.png
+X-EndlessM-Down-Icon=/usr/share/icons/hicolor/48x48/apps/chromium_down.png
+

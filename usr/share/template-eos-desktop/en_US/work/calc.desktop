@@ -1,0 +1,15 @@
+[Desktop Entry]
+Version=1.0
+Type=Application
+Name=Calculator
+Name[en_US]=Calculator
+Name[pt_BR]=Calculadora
+Comment=Calculator
+TryExec=qalculate-gtk
+Exec=qalculate-gtk
+Icon=calc
+Categories=
+X-EndlessM-Normal-Icon=/usr/share/icons/hicolor/48x48/apps/calculator_normal.png
+X-EndlessM-Hover-Icon=/usr/share/icons/hicolor/48x48/apps/calculator_hover.png
+X-EndlessM-Down-Icon=/usr/share/icons/hicolor/48x48/apps/calculator_down.png
+

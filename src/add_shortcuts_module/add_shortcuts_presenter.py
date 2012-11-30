@@ -2,7 +2,6 @@ from add_shortcuts_model import AddShortcutsModel
 from osapps.app_shortcut import AppShortcut
 from osapps.desktop_locale_datastore import DesktopLocaleDatastore
 from application_store.application_store_model import ApplicationStoreModel
-from application_store.application_store_presenter import ApplicationStorePresenter
 from shortcut_category import ShortcutCategory
 from xdg.DesktopEntry import DesktopEntry
 from desktop_files.link_model import LinkModel
@@ -10,6 +9,7 @@ from application_store.recommended_sites_provider import RecommendedSitesProvide
 import os
 import urllib2
 from eos_util import image_util
+from desktop_files.link_model import LinkModel
 
 class AddShortcutsPresenter():
     def __init__(self):

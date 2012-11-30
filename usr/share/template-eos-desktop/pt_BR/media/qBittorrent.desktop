@@ -1,0 +1,15 @@
+[Desktop Entry]
+Version=1.0
+Type=Application
+Name=qBittorrent
+Name[en_US]=qBittorrent
+Name[pt_BR]=qBittorrent
+Comment=qBittorrent
+TryExec=qbittorrent %U
+Exec=qbittorrent %U
+Icon=qBittorrent
+Categories=
+X-EndlessM-Normal-Icon=/usr/share/icons/hicolor/48x48/apps/qbittorrent_normal.png
+X-EndlessM-Hover-Icon=/usr/share/icons/hicolor/48x48/apps/qbittorrent_hover.png
+X-EndlessM-Down-Icon=/usr/share/icons/hicolor/48x48/apps/qbittorrent_down.png
+

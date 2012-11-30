@@ -5,7 +5,7 @@ import os
 
 from eos_log import log
 from startup.auto_updates.update_manager import UpdateManager
-from util.update_lock import UpdateLock
+from startup.auto_updates.update_lock import UpdateLock
 
 class UpdateManagerTestCase(unittest.TestCase):
     def setUp(self):

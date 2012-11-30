@@ -4,7 +4,7 @@ from shortcut_category import ShortcutCategory
 class AddShortcutsModel():
     def __init__(self):
         self._DEFAULT_ICON_PATH = '/usr/share/icons/Humanity/places/48/'
-    
+
     def get_category_data(self):
         data = []
         section_app = ShortcutCategory(_('APP'))
@@ -23,7 +23,7 @@ class AddShortcutsModel():
         data.append(section_web)
         data.append(section_folder)
         return data
-    
+
     def create_directory(self, folder_name, path=''):
         if not path:
             path = '~/'
@@ -36,17 +36,18 @@ class AddShortcutsModel():
         #    except:
         #        print 'ERROR occured while trying to make directory', full_path
         #        return ''
-    
+
     def get_folder_icons(self, path, hint):
         if not path:
             path = self._DEFAULT_ICON_PATH
-    
+
         icon_list = self.get_icon_list(path)
         icons = []
         for icon in icon_list:
             if hint in icon and (icon.endswith(".png") or icon.endswith(".svg")):
-                icons.append(icon)
+                if not os.path.islink(os.path.join(path, icon)):
+                    icons.append(icon)
         return icons
-        
+
     def get_icon_list(self, path):
         return os.listdir(path)
