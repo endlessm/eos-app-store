@@ -19,6 +19,7 @@ class OpenFolderWindow():
     TASKBAR_HEIGHT = 60
     
     def __init__(self, parent, callback, shortcut, hide_callback):
+        self._parent = parent
 
         self._container = gtk.VBox(
             homogeneous=False, 
@@ -50,6 +51,11 @@ class OpenFolderWindow():
             folder_icons.connect(
                 "desktop-shortcut-dnd-begin", 
                 lambda w: hide_callback(w)
+                )
+            
+            folder_icons.connect(
+                "desktop-shortcut-rename", 
+                lambda w, new_name, real_w: self._parent._rename_callback(real_w, new_name)
                 )
 
         self._height = len(rows) * (WIDGET_HEIGHT + WIDGET_LABEL_HEIGHT + WIDGET_VERTICAL_SPACING)

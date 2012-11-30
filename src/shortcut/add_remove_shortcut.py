@@ -120,6 +120,8 @@ class AddRemoveShortcut(DesktopShortcut):
             self._confirmation_popup.show()
             source_widget.parent._event_box.set_images(())
             source_widget.parent._label.set_text('')
+            source_widget.parent._label_event_box._label.set_text('')
+            source_widget.parent._label_event_box.refresh()
         else:
             self._delete_not_possible_popup = DeleteNotPossiblePopupWindow()
             self._delete_not_possible_popup.show()
@@ -136,6 +138,8 @@ class AddRemoveShortcut(DesktopShortcut):
             widget.hide()
             widget.show()
             widget.parent._label.set_text(lbl)
+            widget.parent._label_event_box._label.set_text(lbl)
+            widget.parent._label_event_box.refresh()
             widget.parent._label.hide()
             widget.parent._label.show()
 
