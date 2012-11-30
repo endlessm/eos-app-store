@@ -24,7 +24,7 @@ class AddShortcutsPresenter():
         category_data = self._model.get_category_data()
         app_categories = self._app_store_model.get_categories()
         for category in category_data:
-            if category.category == _('APP'):
+            if category.category == _('APP') and app_categories:
                 for app_category in app_categories:
                     category.subcategories.append(ShortcutCategory(app_category.name()))
                 category.subcategories[0].active = True
