@@ -239,12 +239,14 @@ class EndlessDesktopView(gtk.Window):
                 item.connect("folder-shortcut-activate", self._folder_icon_clicked_callback)
                 item.connect("folder-shortcut-relocation", self._relocation_callback)
                 item.connect("desktop-shortcut-dnd-begin", self._dnd_begin)
+                item.connect("desktop-shortcut-rename", self._rename_callback)
                 item.show()
             else:
                 item = ApplicationShortcut(shortcut)
                 item.connect("application-shortcut-rename", lambda w, shortcut, new_name: self._presenter.rename_item(shortcut, new_name))
                 item.connect("application-shortcut-activate", lambda w, app_key, params: self._presenter.activate_item(app_key, params))
                 item.connect("desktop-shortcut-dnd-begin", self._dnd_begin)
+                item.connect("desktop-shortcut-rename", self._rename_callback)
                 item.show()
         #
             if item.parent != None:
@@ -313,6 +315,12 @@ class EndlessDesktopView(gtk.Window):
 
     def _delete_shortcuts(self, widget, sc_deleted):
         self._presenter.delete_shortcut(sc_deleted)
+    
+    def _rename_callback(self, widget, new_name):
+        changed_shortcut = self._presenter.rename_shortcut(widget.get_shortcut(), new_name)
+        widget.set_shortcut(changed_shortcut)
+        widget._label_event_box.refresh()
+        
 
     def main(self):
         gobject.threads_init()

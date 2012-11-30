@@ -1,11 +1,15 @@
 import gtk
 import cairo
-import pango
+
+from util.rename_widget import RenameWidget
 
 class ShadowedLabelBox(gtk.EventBox):
     def __init__(self, label):
         super(ShadowedLabelBox, self).__init__()
         self.connect("expose-event", self.draw)
+        self.add_events(gtk.gdk.BUTTON_PRESS_MASK)
+        if label.get_text():
+            self.connect("button-press-event", self._click_handler)
         self._label = label
         self.SHADOW_OFFSET = 2
         self.SHADOW_ALPHA = 0.3
@@ -34,4 +38,14 @@ class ShadowedLabelBox(gtk.EventBox):
         cr.show_layout(self._shadow_layout)
         
         cr.restore()
-        
+    
+    def _click_handler(self, widget, event):
+        if event.button == 1:
+            yoffset = widget.get_toplevel().window.get_origin()[1]
+            RenameWidget(x=self._label.allocation.x, y=self._label.allocation.y, caller=widget.parent, y_offset=yoffset)
+        return False
+    
+    def refresh(self):
+        self._text_layout = self.create_pango_layout(self._label.get_text())
+        self._shadow_layout = self.create_pango_layout(self._label.get_text())
+        self.draw(self, None)

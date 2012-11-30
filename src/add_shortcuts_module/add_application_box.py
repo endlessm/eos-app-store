@@ -39,8 +39,9 @@ class AddApplicationBox(gtk.VBox):
     
     def _fill_applications(self, apps):
         self._vbox = gtk.VBox()
-        for app in apps:
-            self._display_application(app)
+        if apps:
+            for app in apps:
+                self._display_application(app)
 
 
     def _display_application(self, app):

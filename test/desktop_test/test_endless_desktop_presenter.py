@@ -1,6 +1,7 @@
 import unittest
 from mock import Mock, patch
 from desktop.endless_desktop_presenter import DesktopPresenter
+from osapps.app_shortcut import AppShortcut
 
 class TestEndlessDesktopPresenter(unittest.TestCase):
     
@@ -90,6 +91,22 @@ class TestEndlessDesktopPresenter(unittest.TestCase):
         shortcut = "shortcut"
         self.testObject.delete_shortcut(shortcut)
         self.mock_model.delete_shortcut.assert_called_once_with(shortcut)
+    
+    def test_rename_shortcut(self):
+        shortcut = AppShortcut(123, "App 1", "", [])
+        new_name = 'Blah'
+        self.mock_model.get_shortcuts = Mock(return_value=[shortcut])
+        changed_shortcut = self.testObject.rename_shortcut(shortcut, new_name)
+        self.mock_model.get_shortcuts.assert_called_once()
+        self.mock_model.set_shortcuts.assert_called_once()
+        self.assertEqual(changed_shortcut.name(), new_name)
+    
+    def test_check_shortcut_name(self):
+        shortcut1 = AppShortcut(123, "App", "", [])
+        shortcut2 = AppShortcut(123, "App 1", "", [])
+        self.mock_model.get_shortcuts = Mock(return_value=[shortcut1, shortcut2])
+        expected_value = 'App 2'
+        self.assertEqual(expected_value, self.testObject.check_shortcut_name('App', self.mock_model.get_shortcuts()))
         
     def test_relocate_item(self):
         self.mock_model.relocate_shortcut = Mock(return_value=True)

@@ -14,7 +14,11 @@ class FolderIcons(gtk.HBox):
             gobject.TYPE_NONE,
             ()
             ),
-         
+         "desktop-shortcut-rename": (
+            gobject.SIGNAL_RUN_FIRST, #@UndefinedVariable
+            gobject.TYPE_NONE,
+            (gobject.TYPE_PYOBJECT, gobject.TYPE_PYOBJECT),
+            ),
     }
     
     def __init__(self, shortcuts, spacing=0):
@@ -37,4 +41,8 @@ class FolderIcons(gtk.HBox):
                 lambda w: self.emit(
                     "desktop-shortcut-dnd-begin"
                     )
+                )
+            app_shortcut.connect(
+                "desktop-shortcut-rename", 
+                lambda w, new_name: self.emit("desktop-shortcut-rename", new_name, w)
                 )

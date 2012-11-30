@@ -6,7 +6,7 @@ def wrap_text(widget, text):
     
     return_text_width = get_length(widget, return_text)
     if (wrapped_text_needed(return_text_width)):
-        return_text = add_line_break(widget, text)
+#        return_text = add_line_break(widget, text)
         return_text = ellipsize_last_line(widget, return_text)
     return return_text
 
