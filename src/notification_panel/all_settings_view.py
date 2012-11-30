@@ -1,10 +1,8 @@
 import gettext
 import gtk
 
-from icon_plugin import IconPlugin
 from ui.abstract_notifier import AbstractNotifier
-from util.transparent_window import TransparentWindow
-from eos_util import screen_util
+from eos_widgets.transparent_window import TransparentWindow
 from panel_constants import PanelConstants
 
 gettext.install('endless_desktop', '/usr/share/locale', unicode = True, names=['ngettext'])
@@ -70,13 +68,16 @@ class AllSettingsView(AbstractNotifier):
         self._table.attach(self._button_shutdown, 2, 3, 4, 5)
 
         self._parent.set_visible_window(False)
-    
-        self._window = TransparentWindow(self._parent.get_toplevel())
 
-        x = screen_util.get_width() - self.WINDOW_WIDTH - self.X_OFFSET
+        desktop_size = self._parent.get_toplevel().get_size()    
+        x = desktop_size[0] - self.WINDOW_WIDTH - self.X_OFFSET
+        y = PanelConstants.DEFAULT_POPUP_VERTICAL_MARGIN
+        
+        self._window = TransparentWindow(self._parent.get_toplevel(), (x, y), (self.WINDOW_WIDTH, self.WINDOW_HEIGHT))
 
-        # Get the x location of the center of the widget (icon), relative to the settings window
-        self._window.move(x, PanelConstants.DEFAULT_POPUP_VERTICAL_MARGIN)
+
+#        # Get the x location of the center of the widget (icon), relative to the settings window
+#        self._window.move(x, PanelConstants.DEFAULT_POPUP_VERTICAL_MARGIN)
         
         self._window.set_size_request(self.WINDOW_WIDTH, self.WINDOW_HEIGHT)
         self._window.set_border_width(self.WINDOW_BORDER)
