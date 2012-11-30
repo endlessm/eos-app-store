@@ -177,7 +177,6 @@ class DesktopShortcut(gtk.VBox):
     def _refresh(self, images=None):
         images = images or self.get_images(self.ICON_STATE_NORMAL)
         self._event_box.set_images(images)
-        #self._event_box.repaint()
 
     def get_shortcut(self):
         return None

@@ -2,7 +2,7 @@ import gtk
 import gettext
 from eos_widgets.image_eventbox import ImageEventBox
 from eos_util.image import Image
-from util.transparent_window import TransparentWindow
+from eos_widgets.transparent_window import TransparentWindow
 
 gettext.install('endless_desktop', '/usr/share/locale', unicode = True, names=['ngettext'])
 
@@ -11,10 +11,13 @@ class BugsAndFeedbackPopupWindow():
         self._width = 256
         self._height = 225
         
-        self._window = TransparentWindow(parent)
-        self._window.set_size_request(self._width,self._height)
-        self._window.set_title(_("Bugs And Feedback"))
-        self._window.set_position(gtk.WIN_POS_CENTER_ALWAYS)
+        # Since the TransparentWindow class does not have an option to force centered,
+        # for now let's manually calculate the centered position
+        # self._window.set_position(gtk.WIN_POS_CENTER_ALWAYS)
+        desktop_size = parent.get_size()
+        x = (desktop_size[0] - self._width) / 2
+        y = (desktop_size[1] - self._height) / 2
+        self._window = TransparentWindow(parent, (x, y), (self._width, self._height))
 
         self._fancy_container = ImageEventBox([Image.from_name("feedback-background.png")])
         self._fancy_container.set_size_request(self._width,self._height)
