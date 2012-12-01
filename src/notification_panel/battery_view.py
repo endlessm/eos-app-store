@@ -112,8 +112,16 @@ class BatteryView(AbstractNotifier, IconPlugin):
             self._vbox.remove(component)
 
     def display_menu(self, level, time):
-        if not self._window:
-            self._create_menu()
+        
+        # In order to ensure we read the current background for the transparency,
+        # let's always re-create the menu here.
+        # TODO this could be handled more cleanly,
+        # but for now just fixing the issue with minimal impact to existing code
+        # if not self._window:
+        #     self._create_menu()
+        if self._window:
+            self._window.destroy()
+        self._create_menu()
 
         if self._window.get_visible():
             self._window.show_now()
