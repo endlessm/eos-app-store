@@ -82,8 +82,8 @@ class EndlessDesktopModel(object):
         new_image_path = image_util.image_path(filename)
         self._preferences_provider.set_background(new_image_path)
 
-    def get_background_pixbuf(self):
-        return self._preferences_provider.get_background_pixbuf()
+    def get_background_image(self):
+        return self._preferences_provider.get_background_image()
 
     def get_default_background(self):
         return self._preferences_provider.get_default_background()

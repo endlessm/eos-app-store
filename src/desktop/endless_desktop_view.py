@@ -6,11 +6,9 @@ import gtk
 import gobject
 from gtk import gdk
 
-from eos_util import image_util, screen_util
 from shortcut.application_shortcut import ApplicationShortcut
 from feedback_module.feedback_response_dialog_view import FeedbackResponseDialogView
 from feedback_module.bugs_and_feedback_popup_window import BugsAndFeedbackPopupWindow
-from removal_module.removal_confirmation_popup_window import RemovalConfirmationPopupWindow
 from shortcut.folder_shortcut import FolderShortcut
 from shortcut.separator_shortcut import SeparatorShortcut
 from shortcut.add_remove_shortcut import AddRemoveShortcut
@@ -99,14 +97,11 @@ class EndlessDesktopView(gtk.Window):
     def get_presenter(self):
         return self._presenter
 
-    def set_background_pixbuf(self, pixbuf):
+    def set_background_image(self, image):
         width, height = self._get_net_work_area()
-        sized_pixbuf = self._resize_background(width, height, pixbuf)
+        image.scale_to_best_fit(width, height)
         
-        pixmap, mask = sized_pixbuf.render_pixmap_and_mask()
-
-        del sized_pixbuf
-        del pixbuf
+        pixmap, mask = image.pixbuf.render_pixmap_and_mask()
 
         self.window.set_back_pixmap(pixmap, False)
         del pixmap

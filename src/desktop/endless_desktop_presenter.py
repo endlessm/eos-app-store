@@ -3,7 +3,7 @@ class DesktopPresenter(object):
         self._model = model
         self._view = view
         self._view.set_presenter(self)
-        self._view.set_background_pixbuf(self._model.get_background_pixbuf())
+        self._view.set_background_image(self._model.get_background_image())
         
         self._is_refreshing = False
         
@@ -87,7 +87,7 @@ class DesktopPresenter(object):
     
     def change_background(self, filename):
         self._model.set_background(filename)
-        self._view.set_background_pixbuf(self._model.get_background_pixbuf())
+        self._view.set_background_image(self._model.get_background_image())
     
     def revert_background(self):
         self.change_background(self._model.get_default_background())
