@@ -1,9 +1,6 @@
 import gtk
 import gettext
-from eos_widgets.folder_eventbox import FolderEventBox
-from eos_util.image import Image
-from eos_util import screen_util
-from eos_widgets.transparent_window import TransparentWindow
+from eos_widgets.desktop_transparent_window import DesktopTransparentWindow
 from folder.folder_icons import FolderIcons
 
 gettext.install('endless_desktop', '/usr/share/locale', unicode = True, names=['ngettext'])
@@ -15,8 +12,11 @@ WIDGET_WIDTH = 64
 WIDGET_LABEL_HEIGHT = 20
 WIDGET_VERTICAL_SPACING = 64
 WIDGET_HORIZONTAL_SPACING = 64
+WIDGET_PADDING = 20
+
 class OpenFolderWindow():
-    TASKBAR_HEIGHT = 60
+    TASKBAR_HEIGHT = 40
+    TASKBAR_PADDING = 20
     
     def __init__(self, parent, callback, shortcut, hide_callback):
 
@@ -52,25 +52,24 @@ class OpenFolderWindow():
                 lambda w: hide_callback(w)
                 )
 
-        image = Image.from_name("open-folder-bg.png")
-        
         desktop_size = parent.get_size()
-        self._x = 0
-        self._y = desktop_size[1] - image.height - self.TASKBAR_HEIGHT
         self._width = desktop_size[0]
-        self._height = image.height
-
-        # TODO Complete support for multiple rows of icons in folder.
-        # The following line appears to account for the possibility
-        # of multiple rows of icons in the folder,
-        # but I don't see the image being stretched to this height,
-        # so for now I'm going to comment it out and just use the image height.
-        # self._height = len(rows) * (WIDGET_HEIGHT + WIDGET_LABEL_HEIGHT + WIDGET_VERTICAL_SPACING)
+        self._height = len(rows) * WIDGET_HEIGHT + (len(rows) - 1) * WIDGET_VERTICAL_SPACING + WIDGET_LABEL_HEIGHT + WIDGET_PADDING
         
-        self._window = TransparentWindow(parent, (self._x, self._y), (self._width, self._height), gradient_type='linear')
+        self._x = 0
+        self._y = desktop_size[1] - self._height - (self.TASKBAR_HEIGHT + self.TASKBAR_PADDING)
 
-        self._fancy_container = FolderEventBox(image, self._width)
-        self._fancy_container.show()
+        self._window = DesktopTransparentWindow(parent, (self._x, self._y), (self._width, self._height), gradient_type='linear')
+
+        # When support for multiple rows was added,
+        # the image was ignored and replaced with a simple gradient.
+        # This slightly changes the look of the open folder window.
+        # TODO Is the current gradient per the design,
+        # or does the fancy container capability below
+        # need to be merged into the current capability?
+        # image = Image.from_name("open-folder-bg.png")
+        # self._fancy_container = FolderEventBox(image, self._width)
+        # self._fancy_container.show()
         
         self._window.set_size_request(self._width, self._height)
         
@@ -81,7 +80,6 @@ class OpenFolderWindow():
         self._window.add(self._center)
         self._window.show()
         
-
     def show(self):
         self._window.show_all()
         
