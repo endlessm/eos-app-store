@@ -2,7 +2,7 @@ import gtk
 import gettext
 from eos_widgets.image_eventbox import ImageEventBox
 from eos_util.image import Image
-from eos_widgets.transparent_window import TransparentWindow
+from eos_widgets.desktop_transparent_window import DesktopTransparentWindow
 
 gettext.install('endless_desktop', '/usr/share/locale', unicode = True, names=['ngettext'])
 
@@ -17,7 +17,7 @@ class BugsAndFeedbackPopupWindow():
         desktop_size = parent.get_size()
         x = (desktop_size[0] - self._width) / 2
         y = (desktop_size[1] - self._height) / 2
-        self._window = TransparentWindow(parent, (x, y), (self._width, self._height))
+        self._window = DesktopTransparentWindow(parent, (x, y), (self._width, self._height))
 
         self._fancy_container = ImageEventBox([Image.from_name("feedback-background.png")])
         self._fancy_container.set_size_request(self._width,self._height)
