@@ -4,15 +4,14 @@ from shortcut_category_box import ShortcutCategoryBox
 from add_folder_box import AddFolderBox
 from add_application_box import AddApplicationBox
 from shortcut.add_remove_shortcut import AddRemoveShortcut
-from util.transparent_window import TransparentWindow
-from osapps.app_shortcut import AppShortcut
+from eos_widgets.desktop_transparent_window import DesktopTransparentWindow
 from add_website_box import AddWebsiteBox
 import cairo
 from eos_util import image_util
 
 class AddShortcutsView():
     def __init__(self, parent=None, add_remove_widget=None, width=0, height=0):
-        self._add_buton_box_width = 120
+        self._add_button_box_width = 120
         self._tree_view_width = 214
 
         self._width = width or parent.allocation.width
@@ -27,17 +26,13 @@ class AddShortcutsView():
         self._parent = parent
         self._presenter = AddShortcutsPresenter()
         self._presenter.set_add_shortcuts_view(self)
-        self.window = TransparentWindow(self._parent)
-        self.window.set_title(_("Add Shortcuts"))
-        self.window.set_decorated(False)
-        self.window.set_size_request(self._width, self._height)
-        self.window.move(0,0)
+        self.window = DesktopTransparentWindow(self._parent, (0, 0), (self._width, self._height))
         self.window.connect("delete_event", self.destroy)
         self.window.connect("expose-event", self._draw_triangle)
 
         self.hbox = gtk.HBox()
         self.add_remove_vbox = gtk.VBox()
-        self.add_remove_vbox.set_size_request(self._add_buton_box_width, self._height)
+        self.add_remove_vbox.set_size_request(self._add_button_box_width, self._height)
 
         self._lc = gtk.Alignment(0.5, 0.5, 0, 0)
         self._add_remove_widget.show()
@@ -53,7 +48,7 @@ class AddShortcutsView():
 
         self.hbox1.pack_start(self.tree)
         self.hbox2 = gtk.HBox()
-        self.hbox2.set_size_request(self._width - self._tree_view_width - self._add_buton_box_width, self._height)
+        self.hbox2.set_size_request(self._width - self._tree_view_width - self._add_button_box_width, self._height)
         
         self.scrolled_window = AddFolderBox(self)
         self.hbox2.pack_start(self.scrolled_window)

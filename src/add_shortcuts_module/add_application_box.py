@@ -6,7 +6,7 @@ from osapps.desktop_preferences_datastore import DesktopPreferencesDatastore
 from application_row_box import ApplicationRowBox
 
 class AddApplicationBox(gtk.VBox):
-    def __init__(self, parent=None, add_remove_widget=None, desktop_preference_class = DesktopPreferencesDatastore, default_category=''):
+    def __init__(self, parent, add_remove_widget=None, desktop_preference_class = DesktopPreferencesDatastore, default_category=''):
         super(AddApplicationBox, self).__init__()
         self.set_homogeneous(False)
         
@@ -18,9 +18,8 @@ class AddApplicationBox(gtk.VBox):
         self._refresh = True
         
         self._desktop_preferences = desktop_preference_class.get_instance()
-        self._background = self._desktop_preferences.get_background_pixbuf()
-        
-        self._background = self._background.scale_simple(screen_util.get_width(), screen_util.get_height(),gtk.gdk.INTERP_BILINEAR)
+        self._background = self._desktop_preferences.get_scaled_background_image(
+                screen_util.get_width(parent.window), screen_util.get_height(parent.window))
         
         self._viewport = gtk.Viewport()
         self._viewport.set_shadow_type(gtk.SHADOW_NONE)
@@ -61,11 +60,11 @@ class AddApplicationBox(gtk.VBox):
         
     def draw(self, cr, x, y, w, h):
         if self._scrolling:
-            pixbuf = self._background.subpixbuf(0, 0, self._background.get_width(), self._background.get_height())
+            cropped_background = self._background
             self._scrolling = False
         else:
-            pixbuf = self._background.subpixbuf(x, y, w, h)
-        cr.set_source_pixbuf(pixbuf, 0, 0)
+            cropped_background = self._background.copy().crop(x, y, w, h)
+        cropped_background.draw(lambda pixbuf: cr.set_source_pixbuf(pixbuf, 0, 0))
         cr.paint()
     
     def _draw_gradient(self, cr, w, h, x=0, y=0):
