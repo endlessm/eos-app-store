@@ -1,7 +1,7 @@
 import gtk
 from eos_widgets.image_eventbox import ImageEventBox
 from eos_util.image import Image
-from util.transparent_window import TransparentWindow
+from eos_widgets.desktop_transparent_window import DesktopTransparentWindow
 
 class RemovalConfirmationPopupWindow():
     def __init__(self, callback, parent=None, widget=None, label=None, caller_widget=None):
@@ -13,7 +13,7 @@ class RemovalConfirmationPopupWindow():
         self._cancel_inactive_images = [Image.from_name("delete_no_unactive.png")]
         self._dialog_images = [Image.from_name("delete_dialog_box.png")]
         
-        self._window = TransparentWindow(parent)
+        self._window = DesktopTransparentWindow(parent)
         self._window.set_size_request(self._width,self._height)
         self._window.set_position(gtk.WIN_POS_MOUSE)
         
