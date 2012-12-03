@@ -4,7 +4,7 @@ from eos_util.image import Image
 from eos_widgets.desktop_transparent_window import DesktopTransparentWindow
 
 class DeleteNotPossiblePopupWindow():
-    def __init__(self, callback=None, parent=None, widget=None):
+    def __init__(self, parent, callback=None, widget=None):
         self._width = 256
         self._height = 225
         

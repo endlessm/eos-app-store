@@ -123,7 +123,7 @@ class AddRemoveShortcut(DesktopShortcut):
             source_widget.parent._label_event_box._label.set_text('')
             source_widget.parent._label_event_box.refresh()
         else:
-            self._delete_not_possible_popup = DeleteNotPossiblePopupWindow()
+            self._delete_not_possible_popup = DeleteNotPossiblePopupWindow(parent=self.get_toplevel())
             self._delete_not_possible_popup.show()
 
     def _drag_motion_broadcast_callback(self, source, destination, x, y):
