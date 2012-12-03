@@ -4,7 +4,7 @@ from eos_util.image import Image
 from eos_widgets.desktop_transparent_window import DesktopTransparentWindow
 
 class RemovalConfirmationPopupWindow():
-    def __init__(self, callback, parent=None, widget=None, label=None, caller_widget=None):
+    def __init__(self, callback, parent, widget=None, label=None, caller_widget=None):
         self._width = 91
         self._height = 91
         self._ok_active_images = [Image.from_name("delete_ok_active.png")]
@@ -13,10 +13,12 @@ class RemovalConfirmationPopupWindow():
         self._cancel_inactive_images = [Image.from_name("delete_no_unactive.png")]
         self._dialog_images = [Image.from_name("delete_dialog_box.png")]
         
+        # TODO The current implementation is a bit wasteful, in that it extracts
+        # the full desktop background and later shows only a small part of the background
+        # upon the call to _move_window().
         self._window = DesktopTransparentWindow(parent)
         self._window.set_size_request(self._width,self._height)
         self._window.set_position(gtk.WIN_POS_MOUSE)
-        
         
         if caller_widget:
             self._move_window(caller_widget)
@@ -73,4 +75,4 @@ class RemovalConfirmationPopupWindow():
     def _move_window(self, caller_widget):
         new_x = caller_widget.allocation.x - int((self._width - caller_widget.allocation.width)/2)
         new_y = caller_widget.allocation.y + int((self._width - caller_widget.allocation.height)/2)
-        self._window.move(new_x, new_y)
+        self._window.set_location((new_x, new_y))
