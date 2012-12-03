@@ -51,8 +51,9 @@ class AddApplicationBox(gtk.VBox):
     
     def _handle_expose_event(self, widget, event):
         cr = widget.window.cairo_create()
-        x,y = self._vbox.window.get_origin()
-        self.draw(cr, x, y, self.allocation.width, self.allocation.height)
+        x, y = self._vbox.window.get_origin()
+        top_x, top_y = self._vbox.window.get_toplevel().get_origin()
+        self.draw(cr, x - top_x, y - top_y, self.allocation.width, self.allocation.height)
         self._draw_gradient(cr, self.allocation.width, self.allocation.height)
         if not self._refresh and event:
             self._draw_gradient(cr, event.area.width, event.area.height, event.area.x, event.area.y)

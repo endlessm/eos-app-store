@@ -4,7 +4,9 @@ from eos_widgets.image_eventbox import ImageEventBox
 from eos_util.image import Image
 from eos_util import screen_util
 from osapps.desktop_preferences_datastore import DesktopPreferencesDatastore
+
 class AddFolderBox(gtk.VBox):
+
     def __init__(self, parent, add_remove_widget=None, desktop_preference_class = DesktopPreferencesDatastore):
         super(AddFolderBox, self).__init__()
 
@@ -112,10 +114,11 @@ class AddFolderBox(gtk.VBox):
     def _handle_event(self, widget, event):
         cr = widget.window.cairo_create()
 
-        x,y = self._vbox.window.get_origin()
         if self.x == 0 and self.y == 0:
-            self.x = x
-            self.y = y
+            x, y = self._vbox.window.get_origin()
+            top_x, top_y = self._vbox.window.get_toplevel().get_origin()
+            self.x = x - top_x
+            self.y = y - top_y
             self._background.crop(self.x, self.y, event.area.width, event.area.height)
 
         self.draw(cr, event.area.x, event.area.y, event.area.width, event.area.height)
