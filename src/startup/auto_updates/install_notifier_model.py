@@ -11,7 +11,8 @@ class InstallNotifierModel(AbstractNotifier):
         return self._should_install
     
     def get_new_version(self):
-        return self._latest_version_provider.get_latest_version()
+        version = self._latest_version_provider.get_latest_version()
+        return version[:version.index(";")]
 
     def install_now(self):
         self._should_install = True

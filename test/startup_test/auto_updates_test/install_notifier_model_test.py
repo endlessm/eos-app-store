@@ -9,11 +9,11 @@ class InstallNotifierModelTestCase(unittest.TestCase):
         self._test_object = InstallNotifierModel(self._mock_latest_version_provider)
     
     def test_get_new_version_returns_version_from_latest_version_provider(self):
-        new_version = "this is the new version"
+        new_version = "1.0.12~rc4; this is the new; version"
         
         self._mock_latest_version_provider.get_latest_version = Mock(return_value=new_version)
         
-        self.assertEquals(new_version, self._test_object.get_new_version())
+        self.assertEquals("1.0.12~rc4", self._test_object.get_new_version())
         
     def test_when_install_now_is_called_then_should_install_returns_true(self):
         self._test_object.install_now()
