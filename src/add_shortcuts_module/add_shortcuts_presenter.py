@@ -10,6 +10,7 @@ import os
 import urllib2
 from eos_util import image_util
 from desktop_files.link_model import LinkModel
+import sys
 
 class AddShortcutsPresenter():
     def __init__(self):
@@ -80,7 +81,7 @@ class AddShortcutsPresenter():
         self._app_store_model.install(app)
         try:
             de = DesktopEntry()
-            de.parse(app._desktop_file_path)
+            de.parse(app.file_path())
             name = de.getName()
             key = de.getExec()
             icon = {}
@@ -92,7 +93,8 @@ class AddShortcutsPresenter():
             icon['pressed'] = pressed
             shortcut = AppShortcut(key, name, icon)
             return shortcut
-        except:
+        except Exception as e:
+            print >> sys.stderr, "error: "+repr(e)
             return None
 
 
