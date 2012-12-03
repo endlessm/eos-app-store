@@ -4,13 +4,12 @@ import gtk
 from icon_plugin import IconPlugin
 from panel_constants import PanelConstants
 from ui.abstract_notifier import AbstractNotifier
-from eos_util import screen_util
-from util.transparent_window import TransparentWindow
+from eos_widgets.desktop_transparent_window import DesktopTransparentWindow
 
 gettext.install('endless_desktop', '/usr/share/locale', unicode = True, names=['ngettext'])
 
 class BatteryView(AbstractNotifier, IconPlugin):
-    X_OFFSET = 30 
+    X_OFFSET = 13
     WINDOW_WIDTH = 330
     WINDOW_HEIGHT = 160
     SMALLER_HEIGHT = 100
@@ -76,7 +75,11 @@ class BatteryView(AbstractNotifier, IconPlugin):
         self._vbox.add(self._button_power_settings)
         self._vbox.add(self._percentage_label)
 
-        self._window = TransparentWindow(self._parent.get_toplevel())
+        # Since the battery status dialog is resized dynamically,
+        # for now we will simply grab the entire desktop background.
+        # This is wasteful and could be optmized further.
+        self._window = DesktopTransparentWindow(self._parent.get_toplevel())
+        
         # Set up the window so that it can be exposed
         # with a transparent background and triangle decoration
         self._window.connect('expose-event', self._expose)
@@ -88,7 +91,6 @@ class BatteryView(AbstractNotifier, IconPlugin):
 
         screen = gtk.gdk.Screen() #@UndefinedVariable
         screen.connect('size-changed', lambda s: self._resize_occurred)
-    
 
         # Place the widget in an event box within the window
         # (which has a different background than the transparent window)
@@ -110,8 +112,16 @@ class BatteryView(AbstractNotifier, IconPlugin):
             self._vbox.remove(component)
 
     def display_menu(self, level, time):
-        if not self._window:
-            self._create_menu()
+        
+        # In order to ensure we read the current background for the transparency,
+        # let's always re-create the menu here.
+        # TODO this could be handled more cleanly,
+        # but for now just fixing the issue with minimal impact to existing code
+        # if not self._window:
+        #     self._create_menu()
+        if self._window:
+            self._window.destroy()
+        self._create_menu()
 
         if self._window.get_visible():
             self._window.show_now()
@@ -120,9 +130,10 @@ class BatteryView(AbstractNotifier, IconPlugin):
         self._percentage_label.set_text(str(level)+'%')
         self._remove_if_exists(self._time_to_depletion_label)
 
-        x = screen_util.get_width() - self.WINDOW_WIDTH - self.X_OFFSET
+        desktop_size = self._parent.get_toplevel().get_size()    
+        x = desktop_size[0] - self.WINDOW_WIDTH - self.X_OFFSET
+        y = PanelConstants.DEFAULT_POPUP_VERTICAL_MARGIN
 
-        # Get the x location of the center of the widget (icon), relative to the settings window
         height = 0
         if time:
             if self._charging:
@@ -136,7 +147,7 @@ class BatteryView(AbstractNotifier, IconPlugin):
         else:
             height = self.SMALLER_HEIGHT
 
-        self._window.move(x, PanelConstants.DEFAULT_POPUP_VERTICAL_MARGIN)
+        self._window.set_location((x, y))
         self._window.set_size_request(self.WINDOW_WIDTH, height)
 
         self._window.show_all()

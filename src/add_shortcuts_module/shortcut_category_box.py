@@ -124,7 +124,7 @@ class ShortcutCategoryBox(gtk.EventBox):
             self.middle.remove(child)
             child.destroy()
         self._fill_categories()
-        self.middle.show()
+        self.middle.show_all()
     
     def _fill_subcategories(self, section, vbox):
         for category in section.subcategories:

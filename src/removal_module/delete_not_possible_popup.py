@@ -1,19 +1,21 @@
 import gtk
-import gettext
 from eos_widgets.image_eventbox import ImageEventBox
 from eos_util.image import Image
-from util.transparent_window import TransparentWindow
-import gobject
+from eos_widgets.desktop_transparent_window import DesktopTransparentWindow
 
 class DeleteNotPossiblePopupWindow():
-    def __init__(self, callback=None, parent=None, widget=None):
+    def __init__(self, parent, callback=None, widget=None):
         self._width = 256
         self._height = 225
         
-        self._window = TransparentWindow(parent)
-        self._window.set_size_request(self._width,self._height)
-        self._window.set_title(_("WARNING!"))
-        self._window.set_position(gtk.WIN_POS_CENTER_ALWAYS)
+        # Since the TransparentWindow class does not have an option to force centered,
+        # for now let's manually calculate the centered position
+        # self._window.set_position(gtk.WIN_POS_CENTER_ALWAYS)
+        desktop_size = parent.get_size()
+        x = (desktop_size[0] - self._width) / 2
+        y = (desktop_size[1] - self._height) / 2
+        self._window = DesktopTransparentWindow(parent, (x, y), (self._width, self._height))
+        
         self._window.connect("focus-out-event", lambda w, e: self.destroy())
         
         self._fancy_container = ImageEventBox([Image.from_name("feedback-background.png")])

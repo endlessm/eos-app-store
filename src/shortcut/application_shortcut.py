@@ -39,7 +39,12 @@ class ApplicationShortcut(DesktopShortcut):
         
         images = self.get_images(self.ICON_STATE_NORMAL)
         if len(images) > 0:
-            self.set_dnd_icon(images[0])
+            try:
+                self.set_dnd_icon(images[0])
+            except:
+                # TODO should display a default icon
+                # For now, at least catch the exception so that the desktop will load!
+                pass
         
 #        self.add_rename_entry(label_text)
        

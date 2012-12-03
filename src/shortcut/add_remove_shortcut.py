@@ -116,14 +116,14 @@ class AddRemoveShortcut(DesktopShortcut):
         
         super(AddRemoveShortcut, self).dnd_motion_data(widget, context, x, y, time)
         if len(source_widget.parent._shortcut.children()) == 0:
-            self._confirmation_popup = RemovalConfirmationPopupWindow(self._confirmation_received, caller_widget=self._event_box, widget=source_widget, label=label)
+            self._confirmation_popup = RemovalConfirmationPopupWindow(self._confirmation_received, parent=self.get_toplevel(), caller_widget=self._event_box, widget=source_widget, label=label)
             self._confirmation_popup.show()
             source_widget.parent._event_box.set_images(())
             source_widget.parent._label.set_text('')
             source_widget.parent._label_event_box._label.set_text('')
             source_widget.parent._label_event_box.refresh()
         else:
-            self._delete_not_possible_popup = DeleteNotPossiblePopupWindow()
+            self._delete_not_possible_popup = DeleteNotPossiblePopupWindow(parent=self.get_toplevel())
             self._delete_not_possible_popup.show()
 
     def _drag_motion_broadcast_callback(self, source, destination, x, y):

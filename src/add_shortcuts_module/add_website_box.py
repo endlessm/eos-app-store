@@ -20,10 +20,9 @@ class AddWebsiteBox(gtk.VBox):
         self._refresh = True
 
         self._desktop_preferences = desktop_preference_class.get_instance()
-        self._background = self._desktop_preferences.get_background_pixbuf()
-
-        self._background = self._background.scale_simple(screen_util.get_width(), screen_util.get_height(),gtk.gdk.INTERP_BILINEAR)
-
+        self._background = self._desktop_preferences.get_scaled_background_image(
+                screen_util.get_width(parent.window), screen_util.get_height(parent.window))
+        
         self._viewport = gtk.ScrolledWindow()
         self._viewport.set_shadow_type(gtk.SHADOW_NONE)
 
@@ -77,8 +76,9 @@ class AddWebsiteBox(gtk.VBox):
 
     def _handle_expose_event(self, widget, event):
         cr = widget.window.cairo_create()
-        x,y = self._viewport.window.get_origin()
-        self.draw(cr, x, y, self.allocation.width, self.allocation.height)
+        x, y = self._viewport.window.get_origin()
+        top_x, top_y = self._viewport.window.get_toplevel().get_origin()
+        self.draw(cr, x - top_x, y - top_y, self.allocation.width, self.allocation.height)
         self._draw_gradient(cr, self.allocation.width, self.allocation.height)
         if not self._refresh and event:
             self._draw_gradient(cr, event.area.width, event.area.height, event.area.x, event.area.y)
@@ -87,11 +87,11 @@ class AddWebsiteBox(gtk.VBox):
 
     def draw(self, cr, x, y, w, h):
         if self._scrolling:
-            pixbuf = self._background.subpixbuf(0, 0, self._background.get_width(), self._background.get_height())
+            cropped_background = self._background
             self._scrolling = False
         else:
-            pixbuf = self._background.subpixbuf(x, y, w, h)
-        cr.set_source_pixbuf(pixbuf, 0, 0)
+            cropped_background = self._background.copy().crop(x, y, w, h)
+        cropped_background.draw(lambda pixbuf: cr.set_source_pixbuf(pixbuf, 0, 0))
         cr.paint()
 
     def _draw_gradient(self, cr, w, h, x=0, y=0):

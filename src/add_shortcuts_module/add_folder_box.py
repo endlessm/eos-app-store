@@ -6,7 +6,8 @@ from eos_util import screen_util
 from osapps.desktop_preferences_datastore import DesktopPreferencesDatastore
 
 class AddFolderBox(gtk.VBox):
-    def __init__(self, parent=None, add_remove_widget=None, desktop_preference_class = DesktopPreferencesDatastore):
+
+    def __init__(self, parent, add_remove_widget=None, desktop_preference_class = DesktopPreferencesDatastore):
         super(AddFolderBox, self).__init__()
 
         self._parent = parent
@@ -15,9 +16,11 @@ class AddFolderBox(gtk.VBox):
         self._DEFAULT_ICON_PATH = '/usr/share/icons/Humanity/places/48/'
 
         self._desktop_preferences = desktop_preference_class.get_instance()
-        self._background = self._desktop_preferences.get_background_pixbuf()
-
-        self._background = self._background.scale_simple(screen_util.get_width(), screen_util.get_height(),gtk.gdk.INTERP_BILINEAR)
+        # TODO should not rely on access to private member _parent of parent
+        # Is there a better way to get access to the desktop window for its size?
+        self._background = self._desktop_preferences.get_scaled_background_image(
+                screen_util.get_width(parent._parent),
+                screen_util.get_height(parent._parent)).copy()
 
         self._viewport = gtk.Viewport()
         self._viewport.set_shadow_type(gtk.SHADOW_NONE)
@@ -111,11 +114,12 @@ class AddFolderBox(gtk.VBox):
     def _handle_event(self, widget, event):
         cr = widget.window.cairo_create()
 
-        x,y = self._vbox.window.get_origin()
         if self.x == 0 and self.y == 0:
-            self.x = x
-            self.y = y
-            self._background = self._background.subpixbuf(self.x, self.y, event.area.width, event.area.height)
+            x, y = self._vbox.window.get_origin()
+            top_x, top_y = self._vbox.window.get_toplevel().get_origin()
+            self.x = x - top_x
+            self.y = y - top_y
+            self._background.crop(self.x, self.y, event.area.width, event.area.height)
 
         self.draw(cr, event.area.x, event.area.y, event.area.width, event.area.height)
 
@@ -123,11 +127,11 @@ class AddFolderBox(gtk.VBox):
 
     def draw(self, cr, x, y, w, h):
         if self._scrolling:
-            pixbuf = self._background.subpixbuf(0, 0, self._background.get_width(), self._background.get_height())
+            cropped_background = self._background
             self._scrolling = False
         else:
-            pixbuf = self._background.subpixbuf(x, y, w, h)
-        cr.set_source_pixbuf(pixbuf, x, y)
+            cropped_background = self._background.copy().crop(x, y, w, h)
+        cropped_background.draw(lambda pixbuf: cr.set_source_pixbuf(pixbuf, x, y))
         cr.paint()
         self._draw_gradient(cr, x, y, w, h)
 
@@ -150,7 +154,6 @@ class AddFolderBox(gtk.VBox):
         cr.fill()
 
     def _handle_scroll_event(self, widget, event):
-        print 'Scrolling event caught, ', self._scrolling
         self._scrolling = True
 
     def _fill_table(self):
@@ -167,7 +170,7 @@ class AddFolderBox(gtk.VBox):
             icons.append(image_box)
 
         num_of_icons = len(icons)
-        available_width = screen_util.get_width() - self._parent._add_buton_box_width - self._parent._tree_view_width
+        available_width = screen_util.get_width(self._parent._parent.window) - self._parent._add_button_box_width - self._parent._tree_view_width
         columns = int(available_width/120)   # shold this be a fixed number like 5 as in pdf?
         rows = int(num_of_icons/columns) + 1
         self._table = gtk.Table(rows, columns)

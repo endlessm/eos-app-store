@@ -3,7 +3,6 @@ from util import label_util
 import gobject
 from util.shadowed_label_box import ShadowedLabelBox
 from eos_widgets.image_eventbox import ImageEventBox
-from eos_util import image_util
 import gtk
 
 class DesktopShortcut(gtk.VBox):
@@ -29,6 +28,7 @@ class DesktopShortcut(gtk.VBox):
     _motion_callbacks = []
     _drag_end_callbacks = []
     _drag_begin_callbacks = []
+    
     @classmethod
     def _add_motion_broadcast_callback(cls, callback):
         cls._motion_callbacks.append(callback)
@@ -182,7 +182,6 @@ class DesktopShortcut(gtk.VBox):
     def _refresh(self, images=None):
         images = images or self.get_images(self.ICON_STATE_NORMAL)
         self._event_box.set_images(images)
-        #self._event_box.repaint()
         self._label_event_box.refresh()
 
     def get_shortcut(self):
