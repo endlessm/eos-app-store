@@ -2,7 +2,6 @@ import gtk
 from osapps.desktop_preferences_datastore import DesktopPreferencesDatastore
 from eos_util import image_util
 from xdg.DesktopEntry import DesktopEntry
-from application_store.application_model import ApplicationModel 
 
 
 class ApplicationRowBox(gtk.EventBox):
