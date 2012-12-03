@@ -111,3 +111,9 @@ class FolderShortcut(DesktopShortcut):
     def get_highlight_images(self, event_state):
         icon = self.get_images(event_state)
         highlight_icon = image_util.image_path("icon_highlight.png")
+
+    def set_shortcut(self, shortcut):
+        self._shortcut = shortcut
+        self._identifier = shortcut.name()
+        self._label_event_box._label.set_text(shortcut.name())
+        self._label_event_box.refresh()

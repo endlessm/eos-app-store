@@ -99,3 +99,25 @@ class DesktopPresenter(object):
         self._model.delete_shortcut(what)
         self._view.refresh(self._model.get_shortcuts(force=True))
     
+    def rename_shortcut(self, shortcut_obj, new_name):
+        all_shortcuts = self._model.get_shortcuts()
+        if not shortcut_obj._name == new_name.strip():
+            new_name = self.check_shortcut_name(new_name, all_shortcuts)
+            shortcut_obj._name = new_name
+            self._model._app_desktop_datastore.set_all_shortcuts(all_shortcuts)
+        return shortcut_obj
+    
+    def check_shortcut_name(self, name, shortcuts):
+        index = 0
+        done = False
+        new_name = name
+        
+        while not done:
+            done = True
+            for shortcut in shortcuts:
+                if shortcut.name() == new_name:
+                    index += 1
+                    new_name = name + ' ' + str(index)
+                    done = False
+        
+        return new_name

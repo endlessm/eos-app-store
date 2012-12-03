@@ -18,6 +18,11 @@ class DesktopShortcut(gtk.VBox):
             gobject.TYPE_NONE,
             (),
             ),
+        "desktop-shortcut-rename": (
+            gobject.SIGNAL_RUN_FIRST, #@UndefinedVariable
+            gobject.TYPE_NONE,
+            (gobject.TYPE_PYOBJECT,),
+            ),
         }
 
     _motion_callbacks = []
@@ -138,17 +143,17 @@ class DesktopShortcut(gtk.VBox):
         return True
 
     def dnd_drag_end(self, widget, context):
-        self._label.show()
-        self._event_box.show()
         self.set_moving(False)
+        self._label_event_box.show()
+        self._event_box.show()
         DesktopShortcut._drag_end_broadcast(widget)
         if hasattr(self, '_drag_end_handler_callback'):
             self._drag_end_handler_callback(widget)
 
     def dnd_drag_begin(self, widget, context):
-        self._label.hide()
-        self._event_box.hide()
         self.set_moving(True)
+        self._label_event_box.hide()
+        self._event_box.hide()
         DesktopShortcut._drag_begin_broadcast(widget)
         self.emit("desktop-shortcut-dnd-begin")
         if hasattr(self, '_drag_begin_handler_callback'):
@@ -177,8 +182,12 @@ class DesktopShortcut(gtk.VBox):
     def _refresh(self, images=None):
         images = images or self.get_images(self.ICON_STATE_NORMAL)
         self._event_box.set_images(images)
+        self._label_event_box.refresh()
 
     def get_shortcut(self):
+        return None
+    
+    def set_shortcut(self, shortcut):
         return None
 
     def get_images(self, event_state):
@@ -229,4 +238,5 @@ class DesktopShortcut(gtk.VBox):
         self._label.destroy()
         self._event_box.destroy()
 
-
+    def rename_shortcut(self, new_name):
+        self.emit("desktop-shortcut-rename", new_name)

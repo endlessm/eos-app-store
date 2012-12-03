@@ -18,7 +18,11 @@ class WebsiteRowBox(gtk.EventBox):
         self._default_icon_pixbuf = image_util.load_pixbuf(image_util.image_path("endless-browser.png"))
         self._height = 60
         
-        self._icon_image = self._presenter.get_favicon(self._item._url) or self._default_icon_pixbuf
+        # The current implementation of get_favicon is way too slow,
+        # as it retrieves data from each site at run-time
+        # For now, let's just use a default icon
+        #self._icon_image = self._presenter.get_favicon(self._item._url) or self._default_icon_pixbuf
+        self._icon_image = self._default_icon_pixbuf
         
         self._icon_width = 150
         self._plus_box_width = 80
@@ -52,6 +56,14 @@ class WebsiteRowBox(gtk.EventBox):
         self.labels_box = gtk.HBox()
         self.labels_box.pack_start(self.name_label, False, False, 20)
         self.labels_box.pack_start(self.description_label, False, False, 20)
+        
+        # This is a hack!
+        # If no size request is set, the plus icon is displayed half off the edge,
+        # at least on a 1366x768 laptop monitor.  By setting any size request,
+        # even though the size request seems to be ignored in terms of the size of the
+        # labels box, the plus icon appears in the correct location.
+        # TODO Consider how to fix for appropriate sizing based on screen size
+        self.labels_box.set_size_request(1, 1)
 
         #place for displaying + icon
         self._plus_box_alignment = gtk.Alignment(0.5, 0.5, 0, 0)
