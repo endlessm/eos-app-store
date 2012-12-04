@@ -25,8 +25,7 @@ class AddWebsiteBox(gtk.VBox):
         
         self._viewport = gtk.ScrolledWindow()
         self._viewport.set_policy(hscrollbar_policy=gtk.POLICY_NEVER, vscrollbar_policy=gtk.POLICY_AUTOMATIC)
-        self._viewport.set_shadow_type(gtk.SHADOW_NONE)
-        print dir(self._viewport)
+        self._viewport.connect("show", self._on_show)
 
         label_text = _('SEARCH FOR A WEBSITE')
         self._label = gtk.Label()
@@ -64,11 +63,9 @@ class AddWebsiteBox(gtk.VBox):
         self.add(self._viewport)
         self.show_all()
 
-
     def _fill_sites(self, sites):
         for site in sites:
             self._display_site(site)
-
 
     def _display_site(self, site):
         row = WebsiteRowBox(site, parent=self, presenter=self._presenter)
@@ -76,6 +73,9 @@ class AddWebsiteBox(gtk.VBox):
         row.connect("leave-notify-event", self._draw_inactive, row)
         self._vbox.pack_start(row, False, False, 0)
 
+    def _on_show(self, widget):
+        widget.get_child().set_shadow_type(gtk.SHADOW_NONE)
+        
     def _handle_expose_event(self, widget, event):
         cr = widget.window.cairo_create()
         x, y = self._viewport.window.get_origin()

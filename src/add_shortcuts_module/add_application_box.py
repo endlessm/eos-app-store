@@ -22,7 +22,7 @@ class AddApplicationBox(gtk.VBox):
 
         self._viewport = gtk.ScrolledWindow()
         self._viewport.set_policy(hscrollbar_policy=gtk.POLICY_NEVER, vscrollbar_policy=gtk.POLICY_AUTOMATIC)
-        self._viewport.set_shadow_type(gtk.SHADOW_NONE)
+        self._viewport.connect("show", self._on_show)
 
         self._active_category = default_category
         apps = self._presenter.get_category(self._active_category)
@@ -35,13 +35,11 @@ class AddApplicationBox(gtk.VBox):
         self.add(self._viewport)
         self.show_all()
 
-
     def _fill_applications(self, apps):
         self._vbox = gtk.VBox()
         if apps:
             for app in apps:
                 self._display_application(app)
-
 
     def _display_application(self, app):
         row = ApplicationRowBox(app, parent=self, presenter=self._presenter)
@@ -49,6 +47,9 @@ class AddApplicationBox(gtk.VBox):
         row.connect("leave-notify-event", self._draw_inactive, row)
         self._vbox.pack_start(row, False, False, 0)
 
+    def _on_show(self, widget):
+        widget.get_child().set_shadow_type(gtk.SHADOW_NONE)
+        
     def _handle_expose_event(self, widget, event):
         cr = widget.window.cairo_create()
         x, y = self._viewport.window.get_origin()
@@ -65,6 +66,7 @@ class AddApplicationBox(gtk.VBox):
         return False
 
     def draw(self, cr, x, y, w, h):
+        self._viewport.get_child().set_shadow_type(gtk.SHADOW_NONE)
         cropped_background = self._background.copy().crop(x, y, w, h)
         scroll_y = self._viewport.get_vscrollbar().get_value()
         cropped_background.draw(lambda pixbuf: cr.set_source_pixbuf(pixbuf, 0, scroll_y))
