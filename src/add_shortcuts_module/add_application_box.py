@@ -21,6 +21,7 @@ class AddApplicationBox(gtk.VBox):
                 screen_util.get_width(parent.window), screen_util.get_height(parent.window))
 
         self._viewport = gtk.ScrolledWindow()
+        self._viewport.set_policy(hscrollbar_policy=gtk.POLICY_NEVER, vscrollbar_policy=gtk.POLICY_AUTOMATIC)
         self._viewport.set_shadow_type(gtk.SHADOW_NONE)
 
         self._active_category = default_category
