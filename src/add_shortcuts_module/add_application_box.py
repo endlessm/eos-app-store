@@ -53,15 +53,20 @@ class AddApplicationBox(gtk.VBox):
         x, y = self._viewport.window.get_origin()
         top_x, top_y = self._viewport.window.get_toplevel().get_origin()
         self.draw(cr, x - top_x, y - top_y, self.allocation.width, self.allocation.height)
-        self._draw_gradient(cr, self.allocation.width, self.allocation.height)
-        if not self._refresh and event:
+        
+        # TODO what is the purpose of self._refresh?
+        # In the current implementation, things look better for the website box
+        # without the check, so I'm disabling it here as well
+        # if not self._refresh and event:
+        if event:
             self._draw_gradient(cr, event.area.width, event.area.height, event.area.x, event.area.y)
 
         return False
 
     def draw(self, cr, x, y, w, h):
         cropped_background = self._background.copy().crop(x, y, w, h)
-        cropped_background.draw(lambda pixbuf: cr.set_source_pixbuf(pixbuf, 0, 0))
+        scroll_y = self._viewport.get_vscrollbar().get_value()
+        cropped_background.draw(lambda pixbuf: cr.set_source_pixbuf(pixbuf, 0, scroll_y))
         cr.paint()
 
     def _draw_gradient(self, cr, w, h, x=0, y=0):
