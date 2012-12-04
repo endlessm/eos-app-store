@@ -78,7 +78,7 @@ class AddWebsiteBox(gtk.VBox):
         
     def _handle_expose_event(self, widget, event):
         cr = widget.window.cairo_create()
-        x, y = self._viewport.window.get_origin()
+        x, y = self._vbox.window.get_origin()
         top_x, top_y = self._viewport.window.get_toplevel().get_origin()
         self.draw(cr, x - top_x, y - top_y, self.allocation.width, self.allocation.height)
         
@@ -95,7 +95,7 @@ class AddWebsiteBox(gtk.VBox):
             cropped_background = self._background
             self._scrolling = False
         else:
-            cropped_background = self._background.copy().crop(x, y, w, h)
+            cropped_background = self._background.copy().crop(x, 0, w, h)
         scroll_y = self._viewport.get_vscrollbar().get_value()
         cropped_background.draw(lambda pixbuf: cr.set_source_pixbuf(pixbuf, 0, scroll_y))
         cr.paint()
