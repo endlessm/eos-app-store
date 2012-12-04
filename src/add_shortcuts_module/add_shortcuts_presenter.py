@@ -80,17 +80,22 @@ class AddShortcutsPresenter():
     def install_app(self, app):
         self._app_store_model.install(app)
         try:
-            de = DesktopEntry()
-            de.parse(app.file_path())
-            name = de.getName()
-            key = de.getExec()
+            #name = de.getName()
+            name = app.name()
+            #key = de.getExec()
+            key = app.id()
+            print >> sys.stderr, "install app: "+repr(app)
+            print >> sys.stderr, "install app id: "+repr(app.id())
             icon = {}
-            normal = de.get('X-EndlessM-Normal-Icon') or image_util.image_path("endless.png")
-            hover = de.get('X-EndlessM-Hover-Icon') or image_util.image_path("endless.png")
-            pressed = de.get('X-EndlessM-Down-Icon') or image_util.image_path("endless.png")
-            icon['normal'] = normal
-            icon['mouseover'] = hover
-            icon['pressed'] = pressed
+            #normal = de.get('X-EndlessM-Normal-Icon') or image_util.image_path("endless.png")
+            #hover = de.get('X-EndlessM-Hover-Icon') or image_util.image_path("endless.png")
+            #pressed = de.get('X-EndlessM-Down-Icon') or image_util.image_path("endless.png")
+            #normal = app.normal_icon()
+            #hover = app.hover_icon()
+            #pressed = app.down_icon()
+            icon['normal'] = app.normal_icon() or image_util.image_path("endless.png")
+            icon['mouseover'] = app.hover_icon() or image_util.image_path("endless.png")
+            icon['pressed'] = app.down_icon() or image_util.image_path("endless.png")
             shortcut = AppShortcut(key, name, icon)
             return shortcut
         except Exception as e:
