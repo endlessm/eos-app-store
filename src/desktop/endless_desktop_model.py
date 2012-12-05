@@ -105,7 +105,9 @@ class EndlessDesktopModel(object):
 
         if success:
             try:
+		log.info("successfully removed shortcut from desktop, now removing from json...")
                 self._app_desktop_datastore.set_all_shortcuts(all_shortcuts)
+            	self._installed_applications_model.uninstall(shortcut.key())
                 return True
             except:
                 log.error("delete shortcut failed!")
@@ -126,7 +128,6 @@ class EndlessDesktopModel(object):
                 all_shortcuts.remove(shortcut)
             else:
                 log.info("didn't find shortcut in list: " + repr(shortcut))
-            self._installed_applications_model.uninstall(shortcut.key())
             return True
         except Exception as e:
             log.error("no shortcut on desktop!", e)
