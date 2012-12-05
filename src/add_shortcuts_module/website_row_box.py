@@ -17,6 +17,7 @@ class WebsiteRowBox(gtk.EventBox):
         self._icon_image_height = 32
         self._default_icon_pixbuf = image_util.load_pixbuf(image_util.image_path("endless-browser.png"))
         self._height = 60
+        self._plus_offset_for_scrollbar = 30
         
         # The current implementation of get_favicon is way too slow,
         # as it retrieves data from each site at run-time
@@ -67,7 +68,8 @@ class WebsiteRowBox(gtk.EventBox):
 
         #place for displaying + icon
         self._plus_box_alignment = gtk.Alignment(0.5, 0.5, 0, 0)
-        self._plus_box_alignment.set_size_request(self._plus_box_width, self._height-2)
+        self._plus_box_alignment.set_size_request(self._plus_box_width + self._plus_offset_for_scrollbar,
+                                                  self._height - 2)
         self._plus_image = gtk.Image()
         self._plus_box_alignment.add(self._plus_image)
         
