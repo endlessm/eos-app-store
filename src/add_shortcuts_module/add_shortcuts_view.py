@@ -62,11 +62,9 @@ class AddShortcutsView():
     def show(self):
         self.window.show_all()
 
-
     def destroy(self, window, event):
         self.window.destroy()
         self._parent.get_presenter().refresh_view()
-
 
     def create_folder(self, folder_name, image_file):
         presenter = self._parent.get_presenter()

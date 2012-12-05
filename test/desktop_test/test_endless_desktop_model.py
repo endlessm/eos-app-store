@@ -93,11 +93,10 @@ class DesktopModelTestCase(unittest.TestCase):
 
         self.mock_desktop_preferences.get_default_background.assert_called()
 
-    #TODO: re-enable me, and fix me
-    #def test_delete_shortcut_exists(self):
-    #    self.mock_desktop_locale_datastore.get_all_shortcuts = Mock(return_value=self.available_app_shortcuts)
-    #    app1 = self.available_app_shortcuts[0]
-    #    self.assertEqual(self.testObject.delete_shortcut(app1), True, 'Delete shortcut which exists FAILED.')
+    def test_delete_shortcut_exists(self):
+        self.mock_desktop_locale_datastore.get_all_shortcuts = Mock(return_value=self.available_app_shortcuts)
+        app1 = self.available_app_shortcuts[0]
+        self.assertEqual(self.testObject.delete_shortcut(app1), True, 'Delete shortcut which exists FAILED.')
 
     def test_delete_shortcut_does_not_exist(self):
         self.mock_desktop_locale_datastore.get_all_shortcuts = Mock(return_value=self.available_app_shortcuts)

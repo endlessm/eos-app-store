@@ -24,7 +24,9 @@ class AddWebsiteBox(gtk.VBox):
                 screen_util.get_width(parent.window), screen_util.get_height(parent.window))
         
         self._viewport = gtk.ScrolledWindow()
-        self._viewport.set_shadow_type(gtk.SHADOW_NONE)
+        self._viewport.set_policy(hscrollbar_policy=gtk.POLICY_NEVER, vscrollbar_policy=gtk.POLICY_AUTOMATIC)
+        self._viewport.connect("show", self._on_show)
+        self._viewport.get_vscrollbar().connect("value-changed", self._on_scroll)
 
         label_text = _('SEARCH FOR A WEBSITE')
         self._label = gtk.Label()
@@ -62,11 +64,9 @@ class AddWebsiteBox(gtk.VBox):
         self.add(self._viewport)
         self.show_all()
 
-
     def _fill_sites(self, sites):
         for site in sites:
             self._display_site(site)
-
 
     def _display_site(self, site):
         row = WebsiteRowBox(site, parent=self, presenter=self._presenter)
@@ -74,24 +74,34 @@ class AddWebsiteBox(gtk.VBox):
         row.connect("leave-notify-event", self._draw_inactive, row)
         self._vbox.pack_start(row, False, False, 0)
 
+    def _on_show(self, widget):
+        widget.get_child().set_shadow_type(gtk.SHADOW_NONE)
+        
+    def _on_scroll(self, widget):
+        self._viewport.queue_draw()
+        
     def _handle_expose_event(self, widget, event):
         cr = widget.window.cairo_create()
-        x, y = self._viewport.window.get_origin()
+        x, y = self._vbox.window.get_origin()
         top_x, top_y = self._viewport.window.get_toplevel().get_origin()
         self.draw(cr, x - top_x, y - top_y, self.allocation.width, self.allocation.height)
-        self._draw_gradient(cr, self.allocation.width, self.allocation.height)
-        if not self._refresh and event:
+        
+        # TODO what is the purpose of self._refresh?
+        # In the current implementation, things look better without the check
+        # if not self._refresh and event:
+        if event:
             self._draw_gradient(cr, event.area.width, event.area.height, event.area.x, event.area.y)
 
         return False
 
     def draw(self, cr, x, y, w, h):
-        if self._scrolling:
-            cropped_background = self._background
-            self._scrolling = False
-        else:
-            cropped_background = self._background.copy().crop(x, y, w, h)
-        cropped_background.draw(lambda pixbuf: cr.set_source_pixbuf(pixbuf, 0, 0))
+        # Only copy/crop the background the first time through
+        # to avoid needless memory copies and image manipulation
+        if not self._scrolling:
+            self._background = self._background.copy().crop(x, 0, w, h)
+            self._scrolling = True
+        scroll_y = self._viewport.get_vscrollbar().get_value()
+        self._background.draw(lambda pixbuf: cr.set_source_pixbuf(pixbuf, 0, scroll_y))
         cr.paint()
 
     def _draw_gradient(self, cr, w, h, x=0, y=0):

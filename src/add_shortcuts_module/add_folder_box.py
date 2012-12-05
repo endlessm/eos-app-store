@@ -11,7 +11,6 @@ class AddFolderBox(gtk.VBox):
         super(AddFolderBox, self).__init__()
 
         self._parent = parent
-        self._scrolling = False
 
         self._DEFAULT_ICON_PATH = '/usr/share/icons/Humanity/places/48/'
 
@@ -126,16 +125,15 @@ class AddFolderBox(gtk.VBox):
         return False
 
     def draw(self, cr, x, y, w, h):
-        if self._scrolling:
-            cropped_background = self._background
-            self._scrolling = False
-        else:
-            cropped_background = self._background.copy().crop(x, y, w, h)
+        cropped_background = self._background.copy().crop(x, y, w, h)
         cropped_background.draw(lambda pixbuf: cr.set_source_pixbuf(pixbuf, x, y))
         cr.paint()
         self._draw_gradient(cr, x, y, w, h)
 
     def _draw_gradient(self, cr, x, y, w, h):
+        # TODO This is not quite appropriate when drawing the individual icons
+        # The gradient drawn should be that icon's portion of the overall gradient,
+        # not the full window gradient shrunk to fit in the icon
         pat = cairo.LinearGradient (0.0, 0.0, w, 0.0)
         pat.add_color_stop_rgba (0.001, 0.0, 0.0, 0.0, 0.8)
         pat.add_color_stop_rgba (1, 0.2, 0.2, 0.2, 0.8)
@@ -152,9 +150,6 @@ class AddFolderBox(gtk.VBox):
         cr.rectangle(event.area.x, event.area.y+1, event.area.width, 1)
         cr.set_source_rgba(0.5, 0.5, 0.5, 0.8)
         cr.fill()
-
-    def _handle_scroll_event(self, widget, event):
-        self._scrolling = True
 
     def _fill_table(self):
         files = self._get_folder_icons('', 'folder')
