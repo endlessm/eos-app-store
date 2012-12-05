@@ -74,5 +74,5 @@ class RemovalConfirmationPopupWindow():
     
     def _move_window(self, caller_widget):
         new_x = caller_widget.allocation.x - int((self._width - caller_widget.allocation.width)/2)
-        new_y = caller_widget.allocation.y + int((self._width - caller_widget.allocation.height)/2)
+        new_y = caller_widget.allocation.y - int((self._width - caller_widget.allocation.height)/2)
         self._window.set_location((new_x, new_y))
