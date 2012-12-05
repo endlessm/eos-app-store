@@ -15,6 +15,7 @@ class AddApplicationBox(gtk.VBox):
         self.x = 0
         self.y = 0
         self._refresh = True
+        self._scrolling = False
 
         self._desktop_preferences = desktop_preference_class.get_instance()
         self._background = self._desktop_preferences.get_scaled_background_image(
@@ -67,9 +68,13 @@ class AddApplicationBox(gtk.VBox):
 
     def draw(self, cr, x, y, w, h):
         self._viewport.get_child().set_shadow_type(gtk.SHADOW_NONE)
-        cropped_background = self._background.copy().crop(x, 0, w, h)
+        # Only copy/crop the background the first time through
+        # to avoid needless memory copies and image manipulation
+        if not self._scrolling:
+            self._background = self._background.copy().crop(x, 0, w, h)
+            self._scrolling = True
         scroll_y = self._viewport.get_vscrollbar().get_value()
-        cropped_background.draw(lambda pixbuf: cr.set_source_pixbuf(pixbuf, 0, scroll_y))
+        self._background.draw(lambda pixbuf: cr.set_source_pixbuf(pixbuf, 0, scroll_y))
         cr.paint()
 
     def _draw_gradient(self, cr, w, h, x=0, y=0):
