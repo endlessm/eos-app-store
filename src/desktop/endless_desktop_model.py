@@ -53,7 +53,6 @@ class EndlessDesktopModel(object):
     def relocate_shortcut(self, source_shortcut, folder_shortcut):
         if source_shortcut is not None:
             source_parent = source_shortcut.parent()
-            all_shortcuts = self._app_desktop_datastore.get_all_shortcuts()
 
             if folder_shortcut is None:
                 if source_parent is not None:
@@ -66,12 +65,7 @@ class EndlessDesktopModel(object):
         return False
 
     def execute_app(self, app_key, params):
-        #app = self._app_datastore.get_app_by_key(app_key)
-
-        #if app:
         self._app_launcher.launch_desktop(app_key, params)
-        #else:
-            #log.info("app not")
 
     def submit_feedback(self, message, bug):
         data = {"message":message, "timestamp":self._time_provider.get_current_time(), "bug":bug}
@@ -105,9 +99,17 @@ class EndlessDesktopModel(object):
 
         if success:
             try:
-		log.info("successfully removed shortcut from desktop, now removing from json...")
+                log.info("successfully removed shortcut from desktop, now removing from json...")
                 self._app_desktop_datastore.set_all_shortcuts(all_shortcuts)
-            	self._installed_applications_model.uninstall(shortcut.key())
+                # TODO This could probably be handled better so that we don't
+                # try to uninstall a shortcut for a website or folder
+                # For now, let's simply catch and discard the exception
+                # that results from trying to uninstall a shortcut that
+                # is for something other than an application
+                try:
+                    self._installed_applications_model.uninstall(shortcut.key())
+                except:
+                    pass
                 return True
             except:
                 log.error("delete shortcut failed!")
