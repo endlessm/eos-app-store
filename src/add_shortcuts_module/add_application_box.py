@@ -24,6 +24,7 @@ class AddApplicationBox(gtk.VBox):
         self._viewport = gtk.ScrolledWindow()
         self._viewport.set_policy(hscrollbar_policy=gtk.POLICY_NEVER, vscrollbar_policy=gtk.POLICY_AUTOMATIC)
         self._viewport.connect("show", self._on_show)
+        self._viewport.get_vscrollbar().connect("value-changed", self._on_scroll)
 
         self._active_category = default_category
         apps = self._presenter.get_category(self._active_category)
@@ -50,6 +51,9 @@ class AddApplicationBox(gtk.VBox):
 
     def _on_show(self, widget):
         widget.get_child().set_shadow_type(gtk.SHADOW_NONE)
+        
+    def _on_scroll(self, widget):
+        self._viewport.queue_draw()
         
     def _handle_expose_event(self, widget, event):
         cr = widget.window.cairo_create()

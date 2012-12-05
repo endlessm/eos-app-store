@@ -131,6 +131,9 @@ class AddFolderBox(gtk.VBox):
         self._draw_gradient(cr, x, y, w, h)
 
     def _draw_gradient(self, cr, x, y, w, h):
+        # TODO This is not quite appropriate when drawing the individual icons
+        # The gradient drawn should be that icon's portion of the overall gradient,
+        # not the full window gradient shrunk to fit in the icon
         pat = cairo.LinearGradient (0.0, 0.0, w, 0.0)
         pat.add_color_stop_rgba (0.001, 0.0, 0.0, 0.0, 0.8)
         pat.add_color_stop_rgba (1, 0.2, 0.2, 0.2, 0.8)
