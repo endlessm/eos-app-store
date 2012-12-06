@@ -46,4 +46,13 @@ pushd `dirname $0`
   mv ../endless-os-desktop-widget*.deb .
   mv ../endless-os-desktop-widget*.changes .
   rm -f ../*.build
+
+    if [[ $(dpkg -c *.deb | egrep "py$") ]]
+    then
+        echo "There are python source files in the debian package!"
+        exit 1
+    else
+        echo "There are no python source files in the debian package"
+    fi
+    
 popd
