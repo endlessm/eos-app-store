@@ -87,15 +87,10 @@ class AddShortcutsPresenter():
             print >> sys.stderr, "install app: "+repr(app)
             print >> sys.stderr, "install app id: "+repr(app.id())
             icon = {}
-            #normal = de.get('X-EndlessM-Normal-Icon') or image_util.image_path("endless.png")
-            #hover = de.get('X-EndlessM-Hover-Icon') or image_util.image_path("endless.png")
-            #pressed = de.get('X-EndlessM-Down-Icon') or image_util.image_path("endless.png")
-            #normal = app.normal_icon()
-            #hover = app.hover_icon()
-            #pressed = app.down_icon()
-            icon['normal'] = app.normal_icon() or image_util.image_path("endless.png")
-            icon['mouseover'] = app.hover_icon() or image_util.image_path("endless.png")
-            icon['pressed'] = app.down_icon() or image_util.image_path("endless.png")
+            backup_image = image_util.image_path("endless.png")
+            icon['normal'] = app.normal_icon() or backup_image
+            icon['mouseover'] = app.hover_icon() or backup_image
+            icon['pressed'] = app.down_icon() or backup_image
             shortcut = AppShortcut(key, name, icon)
             return shortcut
         except Exception as e:
@@ -108,12 +103,10 @@ class AddShortcutsPresenter():
 
         key = 'browser'
         icon = {}
-        normal = self.get_favicon_image_file(site._url) or image_util.image_path("endless-browser.png")
-        hover = normal
-        pressed = normal
-        icon['normal'] = normal
-        icon['mouseover'] = hover
-        icon['pressed'] = pressed
+        backup_image = self.get_favicon_image_file(site._url) or image_util.image_path("endless-browser.png")
+        icon['normal'] = site.normal_icon() or backup_image
+        icon['mouseover'] = site.hover_icon() or backup_image
+        icon['pressed'] = site.down_icon() or backup_image
         parameters = [site._url]
         shortcut = AppShortcut(key, name, icon, params=parameters)
         return shortcut
