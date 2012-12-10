@@ -18,7 +18,7 @@ class AddShortcutsView():
         self._height = height or parent.allocation.height
 
         if not add_remove_widget:
-            self._add_remove_widget = AddRemoveShortcut(callback=None)
+            self._add_remove_widget = AddRemoveShortcut(callback=lambda a, b:False)
             self._add_remove_widget.show()
         else:
             self._add_remove_widget = add_remove_widget
@@ -40,6 +40,11 @@ class AddShortcutsView():
 
         self.add_remove_vbox.pack_start(self._lc)
         self.add_remove_vbox.show()
+        self.event_box = gtk.EventBox()
+        self.event_box.set_visible_window(False)
+        self.event_box.connect('button-press-event', self.destroy)
+        self.event_box.add(self.add_remove_vbox)
+        
         self.hbox1 = gtk.HBox()
         self.hbox1.set_size_request(self._tree_view_width, self._height)
 
@@ -53,7 +58,7 @@ class AddShortcutsView():
         self.scrolled_window = AddFolderBox(self)
         self.hbox2.pack_start(self.scrolled_window)
         self.scrolled_window.show()
-        self.hbox.pack_start(self.add_remove_vbox)
+        self.hbox.pack_start(self.event_box)
         self.hbox.pack_start(self.hbox1)
         self.hbox.pack_end(self.hbox2)
         self.window.add(self.hbox)
