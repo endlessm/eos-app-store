@@ -84,13 +84,15 @@ class TestAddShortcutsPresenter(unittest.TestCase):
         self.test_object._app_store_model.install.assert_called_once_with(app)
     
     def test_install_site(self):
-        name = 'facebook.com'
+        name = 'Facebook'
         url = 'facebook.com'
         comment = 'Blah, blah...'
-        site = LinkModel(name, '', url, name, comment)
+        site = LinkModel(url, '', name, url, comment)
         self.test_object.get_favicon_image_file = Mock()
+        self.test_object._url_to_name = Mock()
         self.test_object.install_site(site)
         self.test_object.get_favicon_image_file.assert_called_once_with(url)
+        self.test_object._url_to_name.assert_called_once_with(name)
     
     def test_get_favicon(self):
         url = 'facebook.com'
@@ -129,3 +131,15 @@ class TestAddShortcutsPresenter(unittest.TestCase):
         self.assertEqual(result, stripped)
         result = self.test_object._strip_protocol(stripped)
         self.assertEqual(result, stripped)
+        
+    def test_url_to_name_formats_url_as_name(self):
+        url = 'www.test.name.com'
+        name = 'Test Name'
+        result = self.test_object._url_to_name(url)
+        self.assertEqual(result, name)
+        
+    def test_url_to_name_does_not_modify_valid_name(self):
+        name = 'TestName'
+        result = self.test_object._url_to_name(name)
+        self.assertEqual(result, name)
+        

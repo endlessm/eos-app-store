@@ -3,13 +3,11 @@ from osapps.app_shortcut import AppShortcut
 from osapps.desktop_locale_datastore import DesktopLocaleDatastore
 from application_store.application_store_model import ApplicationStoreModel
 from shortcut_category import ShortcutCategory
-from xdg.DesktopEntry import DesktopEntry
 from desktop_files.link_model import LinkModel
 from application_store.recommended_sites_provider import RecommendedSitesProvider
 import os
 import urllib2
 from eos_util import image_util
-from desktop_files.link_model import LinkModel
 import sys
 
 class AddShortcutsPresenter():
@@ -104,7 +102,8 @@ class AddShortcutsPresenter():
 
 
     def install_site(self, site):
-        name = self._strip_protocol(site._url)
+        name = self._strip_protocol(site.name())
+        name = self._url_to_name(name)
 
         key = 'browser'
         icon = {}
@@ -173,3 +172,20 @@ class AddShortcutsPresenter():
             return url[7:]
         else:
             return url
+
+    def _url_to_name(self, url):
+        name = url
+        # Strip off the 'www.' prefix, if present
+        www = 'www.'
+        if name.startswith(www):
+            name = name[len(www):]
+        # Strip off the TDL (e.g., '.com')
+        name = os.path.splitext(name)[0]
+        # Replace all remaining dots with spaces
+        name = name.replace('.', ' ')
+        # Make each word start with a capital letter
+        # Note; it is tempting to use name.title() or string.capwords(title),
+        # but that would incorrectly change 'TestName' to 'Testname'
+        name = ' '.join([s[0].upper() + s[1:] for s in name.split(' ')])
+        return name
+    
