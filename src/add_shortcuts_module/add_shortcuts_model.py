@@ -37,16 +37,18 @@ class AddShortcutsModel():
         #        print 'ERROR occured while trying to make directory', full_path
         #        return ''
 
-    def get_folder_icons(self, path, hint):
+    def get_folder_icons(self, path, prefix, suffix=''):
         if not path:
             path = self._DEFAULT_ICON_PATH
 
         icon_list = self.get_icon_list(path)
         icons = []
+        
         for icon in icon_list:
-            if hint in icon and (icon.endswith(".png") or icon.endswith(".svg")):
+            if icon.startswith(prefix) and (icon.endswith(suffix + '.png') or icon.endswith(suffix + '.svg')):
                 if not os.path.islink(os.path.join(path, icon)):
                     icons.append(icon)
+                    
         return icons
 
     def get_icon_list(self, path):
