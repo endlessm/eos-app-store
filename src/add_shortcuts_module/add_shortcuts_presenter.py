@@ -100,11 +100,8 @@ class AddShortcutsPresenter():
             print >> sys.stderr, "error: "+repr(e)
             return None
 
-
     def install_site(self, site):
-        name = self._strip_protocol(site.name())
-        name = self._url_to_name(name)
-
+        name = self._url_to_name(site.name())
         key = 'browser'
         icon = {}
         normal = self.get_favicon_image_file(site._url) or image_util.image_path("endless-browser.png")
@@ -174,15 +171,40 @@ class AddShortcutsPresenter():
             return url
 
     def _url_to_name(self, url):
-        name = url
+        print url
+        # Strip off the 'http://' or 'https://' protocol, if present
+        name = self._strip_protocol(url)
         # Strip off the 'www.' prefix, if present
         www = 'www.'
         if name.startswith(www):
             name = name[len(www):]
-        # Strip off the TDL (e.g., '.com')
-        name = os.path.splitext(name)[0]
+        # Split the host from the path (consider only the root of the path)
+        split_name = name.split('/')
+        host = split_name[0]
+        if len(split_name) > 1:
+            path = split_name[1]
+            # Remove any file extension from the path
+            if len(split_name) == 2:
+                path = os.path.splitext(path)[0]
+        else:
+            path = None
+        # Strip off the two-character country code, if present (e.g., '.br', '.uk')
+        if host[len(host) - 3] == '.':
+            host = host[:(len(host) - 3)]
+        # Strip off the TLD (e.g., '.com', '.gov')
+        host = os.path.splitext(host)[0]
+        # Reverse the order of any dot-separated fields,
+        # replacing dots with spaces
+        host = ' '.join(host.split('.')[::-1])
+        # Re-combine the modified host and path
+        if path:
+            name = host + ' ' + path
+        else:
+            name = host
         # Replace all remaining dots with spaces
         name = name.replace('.', ' ')
+        # Replace all hyphens with spaces
+        name = name.replace('-', ' ')
         # Make each word start with a capital letter
         # Note; it is tempting to use name.title() or string.capwords(title),
         # but that would incorrectly change 'TestName' to 'Testname'

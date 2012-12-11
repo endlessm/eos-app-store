@@ -132,14 +132,21 @@ class TestAddShortcutsPresenter(unittest.TestCase):
         result = self.test_object._strip_protocol(stripped)
         self.assertEqual(result, stripped)
         
-    def test_url_to_name_formats_url_as_name(self):
-        url = 'www.test.name.com'
-        name = 'Test Name'
-        result = self.test_object._url_to_name(url)
-        self.assertEqual(result, name)
-        
-    def test_url_to_name_does_not_modify_valid_name(self):
-        name = 'TestName'
-        result = self.test_object._url_to_name(name)
-        self.assertEqual(result, name)
-        
+    def test_url_to_name(self):
+        self.assertEqual(self.test_object._url_to_name('test.com'), 'Test')
+        self.assertEqual(self.test_object._url_to_name('test.com/'), 'Test')
+        self.assertEqual(self.test_object._url_to_name('http://test.com'), 'Test')
+        self.assertEqual(self.test_object._url_to_name('https://test.com'), 'Test')
+        self.assertEqual(self.test_object._url_to_name('www.name.test.com'), 'Test Name')
+        self.assertEqual(self.test_object._url_to_name('www.test.com/name'), 'Test Name')
+        self.assertEqual(self.test_object._url_to_name('www.test.com/name.html'), 'Test Name')
+        self.assertEqual(self.test_object._url_to_name('www.test.com/name/extra'), 'Test Name')
+        self.assertEqual(self.test_object._url_to_name('TestName'), 'TestName')
+        self.assertEqual(self.test_object._url_to_name('Test Name'), 'Test Name')
+        self.assertEqual(self.test_object._url_to_name('test name'), 'Test Name')
+        self.assertEqual(self.test_object._url_to_name('http://www.telegraph.co.uk/news/'), 'Telegraph News')
+        self.assertEqual(self.test_object._url_to_name('http://vagas.infojobs.com.br'), 'Infojobs Vagas')
+        self.assertEqual(self.test_object._url_to_name('http://blogs.lancenet.com.br'), 'Lancenet Blogs')
+        self.assertEqual(self.test_object._url_to_name('http://blogs.lancenet.com.br/gritodanacao'), 'Lancenet Blogs Gritodanacao')
+        self.assertEqual(self.test_object._url_to_name('http://www.esporte.gov.br'), 'Esporte')
+        self.assertEqual(self.test_object._url_to_name('http://www.saude.rj.gov.br/upas-24-horas/5629-upa-24h-rio-de-janeiro.html'), 'Rj Saude Upas 24 Horas')
