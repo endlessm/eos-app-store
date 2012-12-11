@@ -45,7 +45,7 @@ class TestDesktopModel(unittest.TestCase):
         self._build_desktop()
         model_list = self._build_expected()
         
-        expected_contents = ['link1.desktop', 'link2.desktop', 'link3.desktop']
+        expected_contents = ['foo1', 'foo2', 'link3.desktop']
         order_file = os.path.join(self._tmp_directory, '.order')
         self._test_object.write_order(order_file, model_list)
         fp = open(order_file, 'r')
@@ -54,7 +54,7 @@ class TestDesktopModel(unittest.TestCase):
         
         m = model_list.pop()
         model_list.insert(1, m)
-        expected_contents = ['link1.desktop', 'link3.desktop', 'link2.desktop']
+        expected_contents = ['foo1', 'link3.desktop', 'foo2']
         order_file = os.path.join(self._tmp_directory, '.order')
         self._test_object.write_order(order_file, model_list)
         fp = open(order_file, 'r')
@@ -71,7 +71,7 @@ class TestDesktopModel(unittest.TestCase):
 
         order_filename = os.path.join(self._tmp_directory, '.order')
         
-        order_list = ['link1.desktop', 'link3.desktop', 'link2.desktop']
+        order_list = ['foo1', 'link3.desktop', 'foo2']
         json.dump(order_list, open(order_filename, "w"))
         self.assertEquals(expected, self._test_object.get_shortcuts(self._tmp_directory))
         
