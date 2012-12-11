@@ -79,6 +79,8 @@ class AddShortcutsPresenter():
 
     def install_app(self, app):
         self._app_store_model.install(app)
+    
+    def build_shortcut_from_application_model(self, app):
         try:
             #name = de.getName()
             name = app.name()
