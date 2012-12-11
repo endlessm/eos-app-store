@@ -98,7 +98,7 @@ class AddShortcutsPresenter():
             return None
 
 
-    def install_site(self, site):
+    def build_shortcut_from_link_model(self, site):
         name = self._strip_protocol(site._url)
 
         key = 'browser'

@@ -82,7 +82,7 @@ class AddShortcutsView():
     
     def install_site(self, site):
         presenter = self._parent.get_presenter()
-        shortcut = self._presenter.install_site(site)
+        shortcut = self._presenter.build_shortcut_from_link_model(site)
         presenter._model._app_desktop_datastore.add_shortcut(shortcut)
     
     def _draw_triangle(self, widget, event):
