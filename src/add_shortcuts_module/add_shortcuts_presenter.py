@@ -33,15 +33,22 @@ class AddShortcutsPresenter():
 
 
     def create_directory(self, dir_name, image_file, presenter):
-        shortcuts = presenter._model._app_desktop_datastore.get_all_shortcuts()
+        shortcuts = presenter._model._app_desktop_datastore.get_all_shortcuts(True)
         dir_name = self.check_dir_name(dir_name, shortcuts)
         path = self._model.create_directory(dir_name)
         if path:
-            shortcut = AppShortcut(key='', name=dir_name, icon={'normal':image_file})
+            # Hack to get hover and down states for Endless folder icons
+            if image_file.endswith('_normal.png'):
+                icon_dict = {'normal':image_file,
+                             'mouseover':image_file.replace('_normal.png', '_hover.png'),
+                             'pressed':image_file.replace('_normal.png', '_down.png')}
+            else:
+                icon_dict = {'normal':image_file}
+            shortcut = AppShortcut(key='', name=dir_name, icon=icon_dict)
             presenter._model._app_desktop_datastore.add_shortcut(shortcut)
 
-    def get_folder_icons(self, path, hint):
-        return self._model.get_folder_icons(path, hint)
+    def get_folder_icons(self, path, prefix, suffix=''):
+        return self._model.get_folder_icons(path, prefix, suffix)
 
     def check_dir_name(self, dir_name, shortcuts):
         index = 0

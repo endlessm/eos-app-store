@@ -27,7 +27,7 @@ class AddShortcutsView():
         self._presenter = AddShortcutsPresenter()
         self._presenter.set_add_shortcuts_view(self)
         self.window = DesktopTransparentWindow(self._parent, (0, 0), (self._width, self._height))
-        self.window.connect("delete_event", self.destroy)
+        self.window.connect("delete-event", self.destroy)
         self.window.connect("expose-event", self._draw_triangle)
 
         self.hbox = gtk.HBox()
