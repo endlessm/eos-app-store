@@ -33,7 +33,7 @@ class AddShortcutsPresenter():
 
 
     def create_directory(self, dir_name, image_file, presenter):
-        shortcuts = presenter._model._app_desktop_datastore.get_all_shortcuts()
+        shortcuts = presenter._model._app_desktop_datastore.get_all_shortcuts(True)
         dir_name = self.check_dir_name(dir_name, shortcuts)
         path = self._model.create_directory(dir_name)
         if path:

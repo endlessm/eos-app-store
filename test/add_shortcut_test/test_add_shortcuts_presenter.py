@@ -48,7 +48,7 @@ class TestAddShortcutsPresenter(unittest.TestCase):
         dir_name = 'blah'
         self.test_object.create_directory(dir_name, '/tmp/image.svg', self.mock_presenter)
         self.mock_model.create_directory.assert_called_once_with(dir_name)
-        self.mock_presenter._model._app_desktop_datastore.get_all_shortcuts.assert_called_once_with()
+        self.mock_presenter._model._app_desktop_datastore.get_all_shortcuts.assert_called_once_with(True)
         self.mock_presenter._model._app_desktop_datastore.add_shortcut.assert_called_once()
     
     def test_check_dir_name(self):
