@@ -115,7 +115,7 @@ class AddApplicationBox(gtk.VBox):
 
         return False
 
-    def install_app(self, app):
-        self._parent.install_app(app)
+    def install_app(self, application_model):
+        self._parent.install_app(application_model)
         self._parent.destroy(None, None)
 

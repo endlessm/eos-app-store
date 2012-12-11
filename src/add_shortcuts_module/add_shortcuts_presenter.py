@@ -77,22 +77,22 @@ class AddShortcutsPresenter():
         self._add_shortcuts_view = view
         self._add_shortcuts_view.set_presenter(self)
 
-    def install_app(self, app):
-        self._app_store_model.install(app)
+    def install_app(self, application_model):
+        self._app_store_model.install(application_model)
     
-    def build_shortcut_from_application_model(self, app):
+    def build_shortcut_from_application_model(self, app_model):
         try:
             #name = de.getName()
-            name = app.name()
+            name = app_model.name()
             #key = de.getExec()
-            key = app.id()
-            print >> sys.stderr, "install app: "+repr(app)
-            print >> sys.stderr, "install app id: "+repr(app.id())
+            key = app_model.id()
+            print >> sys.stderr, "install app_model: "+repr(app_model)
+            print >> sys.stderr, "install app_model id: "+repr(app_model.id())
             icon = {}
             backup_image = image_util.image_path("endless.png")
-            icon['normal'] = app.normal_icon() or backup_image
-            icon['mouseover'] = app.hover_icon() or backup_image
-            icon['pressed'] = app.down_icon() or backup_image
+            icon['normal'] = app_model.normal_icon() or backup_image
+            icon['mouseover'] = app_model.hover_icon() or backup_image
+            icon['pressed'] = app_model.down_icon() or backup_image
             shortcut = AppShortcut(key, name, icon)
             return shortcut
         except Exception as e:
@@ -100,16 +100,16 @@ class AddShortcutsPresenter():
             return None
 
 
-    def build_shortcut_from_link_model(self, site):
-        name = self._strip_protocol(site._url)
+    def build_shortcut_from_link_model(self, link_model):
+        name = self._strip_protocol(link_model._url)
 
         key = 'browser'
         icon = {}
-        backup_image = self.get_favicon_image_file(site._url) or image_util.image_path("endless-browser.png")
-        icon['normal'] = site.normal_icon() or backup_image
-        icon['mouseover'] = site.hover_icon() or backup_image
-        icon['pressed'] = site.down_icon() or backup_image
-        parameters = [site._url]
+        backup_image = self.get_favicon_image_file(link_model._url) or image_util.image_path("endless-browser.png")
+        icon['normal'] = link_model.normal_icon() or backup_image
+        icon['mouseover'] = link_model.hover_icon() or backup_image
+        icon['pressed'] = link_model.down_icon() or backup_image
+        parameters = [link_model._url]
         shortcut = AppShortcut(key, name, icon, params=parameters)
         return shortcut
 
