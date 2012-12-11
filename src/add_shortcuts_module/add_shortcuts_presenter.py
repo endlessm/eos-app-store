@@ -148,7 +148,7 @@ class AddShortcutsPresenter():
         else:
             return cache_path+filename
 
-    def get_custom_site_shortcut(self, url):
+    def create_link_model(self, url):
         if not url.startswith('http'):
             url = 'http://' + url
 

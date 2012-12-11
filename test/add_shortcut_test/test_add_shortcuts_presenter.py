@@ -112,11 +112,11 @@ class TestAddShortcutsPresenter(unittest.TestCase):
     
     def test_get_custom_site_shortcut(self):
         url = 'facebook.com'
-        result = self.test_object.get_custom_site_shortcut(url)
+        result = self.test_object.create_link_model(url)
         self.assertTrue(result)
         self.assertTrue(isinstance(result, LinkModel))
         url = 'dummy.url.kom'
-        result = self.test_object.get_custom_site_shortcut(url)
+        result = self.test_object.create_link_model(url)
         self.assertFalse(result)
     
     def test_strip_protocol(self):

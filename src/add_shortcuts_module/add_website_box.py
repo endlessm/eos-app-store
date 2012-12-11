@@ -155,13 +155,13 @@ class AddWebsiteBox(gtk.VBox):
 
     def _handle_key_press(self, widget):
         if widget.get_text():
-            site = self._presenter.get_custom_site_shortcut(widget.get_text())
-            if site:
-                self.install_site(site)
+            link_model = self._presenter.create_link_model(widget.get_text())
+            if link_model:
+                self.install_site(link_model)
             else:
                 widget.set_text('Url invalid, please try again')
                 widget.select_region(0, -1)
 
-    def install_site(self, site):
-        self._parent.install_site(site)
+    def install_site(self, link_model):
+        self._parent.install_site(link_model)
         self._parent.destroy(None, None)
