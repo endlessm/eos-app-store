@@ -12,7 +12,7 @@ class AddFolderBox(gtk.VBox):
 
         self._parent = parent
 
-        self._ENDLESS_ICON_PATH = '/usr/share/icons/hicolor/48x48/apps/'
+        self._ENDLESS_ICON_PATH = '/usr/share/endlessm/icons/apps/'
         # For now, hard-code the names of the Endless-designed folder icons,
         # since they are mixed in the same directory as the apps and websites,
         # and don't start with a common 'folder' prefix
