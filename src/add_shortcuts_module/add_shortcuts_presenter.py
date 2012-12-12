@@ -9,6 +9,9 @@ import os
 import urllib2
 from eos_util import image_util
 import sys
+import re
+from urlparse import urlparse
+from add_shortcuts_module.name_format_util import NameFormatUtil
 
 class AddShortcutsPresenter():
     def __init__(self):
@@ -17,6 +20,7 @@ class AddShortcutsPresenter():
         self._app_store_model = ApplicationStoreModel()
         self._add_shortcuts_view = None #AddShortcutsView()
         self._sites_provider = RecommendedSitesProvider()
+        self._name_format_util = NameFormatUtil()
         self.IMAGE_CACHE_PATH = '/tmp/'  #maybe /tmp/endless-image-cache/ ?
 
     def get_category_data(self):
@@ -101,7 +105,7 @@ class AddShortcutsPresenter():
             return None
 
     def install_site(self, site):
-        name = self._url_to_name(site.name())
+        name = self._name_format_util.format(site.name())
         key = 'browser'
         icon = {}
         normal = self.get_favicon_image_file(site._url) or image_util.image_path("endless-browser.png")
@@ -163,51 +167,7 @@ class AddShortcutsPresenter():
         return LinkModel(url, '', name, url)
 
     def _strip_protocol(self, url):
-        if url.startswith('https://'):
-            return url[8:]
-        elif url.startswith('http://'):
-            return url[7:]
-        else:
-            return url
-
-    def _url_to_name(self, url):
-        print url
-        # Strip off the 'http://' or 'https://' protocol, if present
-        name = self._strip_protocol(url)
-        # Strip off the 'www.' prefix, if present
-        www = 'www.'
-        if name.startswith(www):
-            name = name[len(www):]
-        # Split the host from the path (consider only the root of the path)
-        split_name = name.split('/')
-        host = split_name[0]
-        if len(split_name) > 1:
-            path = split_name[1]
-            # Remove any file extension from the path
-            if len(split_name) == 2:
-                path = os.path.splitext(path)[0]
-        else:
-            path = None
-        # Strip off the two-character country code, if present (e.g., '.br', '.uk')
-        if host[len(host) - 3] == '.':
-            host = host[:(len(host) - 3)]
-        # Strip off the TLD (e.g., '.com', '.gov')
-        host = os.path.splitext(host)[0]
-        # Reverse the order of any dot-separated fields,
-        # replacing dots with spaces
-        host = ' '.join(host.split('.')[::-1])
-        # Re-combine the modified host and path
-        if path:
-            name = host + ' ' + path
-        else:
-            name = host
-        # Replace all remaining dots with spaces
-        name = name.replace('.', ' ')
-        # Replace all hyphens with spaces
-        name = name.replace('-', ' ')
-        # Make each word start with a capital letter
-        # Note; it is tempting to use name.title() or string.capwords(title),
-        # but that would incorrectly change 'TestName' to 'Testname'
-        name = ' '.join([s[0].upper() + s[1:] for s in name.split(' ')])
-        return name
-    
+        url = url.replace('http://', '')
+        url = url.replace('https://', '')
+        
+        return url

@@ -15,11 +15,15 @@ class TestAddShortcutsPresenter(unittest.TestCase):
         self.mock_app_store_model.get_categories = Mock(return_value=[])
         self.mock_recommended_sites_provider = Mock()
         self.mock_add_shortcuts_view = Mock()
+        self.mock_format_util = Mock()
+        self.mock_format_util.format = Mock(return_value='')
+        
         self.test_object = AddShortcutsPresenter()
         self.test_object._model = self.mock_model
         self.test_object._app_store_model = self.mock_app_store_model
         self.test_object._sites_provider = self.mock_recommended_sites_provider
         self.test_object._add_shortcuts_view = self.mock_add_shortcuts_view
+        self.test_object._name_format_util = self.mock_format_util
         
         self.mock_presenter = Mock()
         
@@ -89,10 +93,9 @@ class TestAddShortcutsPresenter(unittest.TestCase):
         comment = 'Blah, blah...'
         site = LinkModel(url, '', name, url, comment)
         self.test_object.get_favicon_image_file = Mock()
-        self.test_object._url_to_name = Mock()
         self.test_object.install_site(site)
         self.test_object.get_favicon_image_file.assert_called_once_with(url)
-        self.test_object._url_to_name.assert_called_once_with(name)
+        self.test_object._name_format_util.format.assert_called_once_with(name)
     
     def test_get_favicon(self):
         url = 'facebook.com'
@@ -132,21 +135,4 @@ class TestAddShortcutsPresenter(unittest.TestCase):
         result = self.test_object._strip_protocol(stripped)
         self.assertEqual(result, stripped)
         
-    def test_url_to_name(self):
-        self.assertEqual(self.test_object._url_to_name('test.com'), 'Test')
-        self.assertEqual(self.test_object._url_to_name('test.com/'), 'Test')
-        self.assertEqual(self.test_object._url_to_name('http://test.com'), 'Test')
-        self.assertEqual(self.test_object._url_to_name('https://test.com'), 'Test')
-        self.assertEqual(self.test_object._url_to_name('www.name.test.com'), 'Test Name')
-        self.assertEqual(self.test_object._url_to_name('www.test.com/name'), 'Test Name')
-        self.assertEqual(self.test_object._url_to_name('www.test.com/name.html'), 'Test Name')
-        self.assertEqual(self.test_object._url_to_name('www.test.com/name/extra'), 'Test Name')
-        self.assertEqual(self.test_object._url_to_name('TestName'), 'TestName')
-        self.assertEqual(self.test_object._url_to_name('Test Name'), 'Test Name')
-        self.assertEqual(self.test_object._url_to_name('test name'), 'Test Name')
-        self.assertEqual(self.test_object._url_to_name('http://www.telegraph.co.uk/news/'), 'Telegraph News')
-        self.assertEqual(self.test_object._url_to_name('http://vagas.infojobs.com.br'), 'Infojobs Vagas')
-        self.assertEqual(self.test_object._url_to_name('http://blogs.lancenet.com.br'), 'Lancenet Blogs')
-        self.assertEqual(self.test_object._url_to_name('http://blogs.lancenet.com.br/gritodanacao'), 'Lancenet Blogs Gritodanacao')
-        self.assertEqual(self.test_object._url_to_name('http://www.esporte.gov.br'), 'Esporte')
-        self.assertEqual(self.test_object._url_to_name('http://www.saude.rj.gov.br/upas-24-horas/5629-upa-24h-rio-de-janeiro.html'), 'Rj Saude Upas 24 Horas')
+    
