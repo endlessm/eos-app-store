@@ -86,7 +86,7 @@ class AddShortcutsPresenter():
 
     def install_app(self, application_model):
         self._app_store_model.install(application_model)
-    
+
     def build_shortcut_from_application_model(self, app_model):
         try:
             name = app_model.name()
@@ -104,7 +104,7 @@ class AddShortcutsPresenter():
             return None
 
     def build_shortcut_from_link_model(self, link_model):
-        name = self._name_format_util.format(link_model._url)
+        name = self._name_format_util.format(link_model.name())
 
         key = 'browser'
         icon = {}
@@ -170,5 +170,5 @@ class AddShortcutsPresenter():
     def _strip_protocol(self, url):
         url = url.replace('http://', '')
         url = url.replace('https://', '')
-        
+
         return url
