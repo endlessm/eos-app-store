@@ -101,7 +101,7 @@ class AddShortcutsPresenter():
             return None
 
     def install_site(self, site):
-        name = self._name_format_util.format(site.name())
+        name = self._name_format_util.format(site._url)
         key = 'browser'
         icon = {}
         normal = self.get_favicon_image_file(site._url) or image_util.image_path("endless-browser.png")

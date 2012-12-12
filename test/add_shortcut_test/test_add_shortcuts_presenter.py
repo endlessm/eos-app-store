@@ -15,6 +15,7 @@ class TestAddShortcutsPresenter(unittest.TestCase):
         self.mock_app_store_model.get_categories = Mock(return_value=[])
         self.mock_recommended_sites_provider = Mock()
         self.mock_add_shortcuts_view = Mock()
+        
         self.mock_format_util = Mock()
         self.mock_format_util.format = Mock(return_value='')
         
@@ -95,7 +96,7 @@ class TestAddShortcutsPresenter(unittest.TestCase):
         self.test_object.get_favicon_image_file = Mock()
         self.test_object.install_site(site)
         self.test_object.get_favicon_image_file.assert_called_once_with(site._url)
-        self.test_object._name_format_util.format.assert_called_once_with(name)
+        self.test_object._name_format_util.format.assert_called_once_with(site._url)
     
     def test_get_favicon(self):
         url = 'facebook.com'
