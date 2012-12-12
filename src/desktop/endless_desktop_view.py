@@ -30,6 +30,7 @@ class EndlessDesktopView(gtk.Window):
     VERTICAL_SPACING = 60
     LABEL_HEIGHT = 10
     _padding = 100
+    _app_shortcuts = {}
 
     def __init__(self):
         gtk.Window.__init__(self)
