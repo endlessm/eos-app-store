@@ -133,6 +133,12 @@ class AddShortcutsPresenter():
                     fi = open(cache_path+filename, 'wb')
                     fi.write(favicon_response.read())
                     fi.close()
+
+                    try:                    
+                        favicon_response.close()
+                    except:
+                        pass
+                    
                     return image_util.load_pixbuf(cache_path+filename)
             except:
                 return None
@@ -155,8 +161,10 @@ class AddShortcutsPresenter():
         if not url.startswith('http'):
             url = 'http://' + url
 
+        # TODO Why is this even here?  get_favicon should return None if the url is bad
         try:
-            response = urllib2.urlopen(url)
+            connection = urllib2.urlopen(url)
+            connection.close()
         except:
             return None
 
