@@ -3,7 +3,7 @@ from shortcut_category import ShortcutCategory
 
 class AddShortcutsModel():
     def __init__(self):
-        self._DEFAULT_ICON_PATH = '/usr/share/icons/Humanity/places/48/'
+        self._DEFAULT_ICON_PATH = '/usr/share/endlessm/icons/folders'
 
     def get_category_data(self):
         data = []
@@ -37,7 +37,7 @@ class AddShortcutsModel():
         #        print 'ERROR occured while trying to make directory', full_path
         #        return ''
 
-    def get_folder_icons(self, path, prefix, suffix=''):
+    def get_folder_icons(self, path, prefix='', suffix=''):
         if not path:
             path = self._DEFAULT_ICON_PATH
 

@@ -9,7 +9,7 @@ TryExec=supertux2
 Exec=supertux2
 Icon=supertux2
 Categories=
-X-EndlessM-Normal-Icon=/usr/share/icons/hicolor/48x48/apps/supertux_normal.png
-X-EndlessM-Hover-Icon=/usr/share/icons/hicolor/48x48/apps/supertux_hover.png
-X-EndlessM-Down-Icon=/usr/share/icons/hicolor/48x48/apps/supertux_down.png
+X-EndlessM-Normal-Icon=/usr/share/endlessm/icons/apps/supertux_normal.png
+X-EndlessM-Hover-Icon=/usr/share/endlessm/icons/apps/supertux_hover.png
+X-EndlessM-Down-Icon=/usr/share/endlessm/icons/apps/supertux_down.png
 
