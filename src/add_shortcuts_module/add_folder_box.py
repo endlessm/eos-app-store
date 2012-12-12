@@ -6,13 +6,6 @@ from eos_util import screen_util
 from osapps.desktop_preferences_datastore import DesktopPreferencesDatastore
 
 class AddFolderBox(gtk.VBox):
-    _DEFAULT_ICON_PATH = '/usr/share/icons/Humanity/places/48/'
-    _ENDLESS_ICON_PATH = '/usr/share/icons/hicolor/48x48/apps/'
-    
-    # For now, hard-code the names of the Endless-designed folder icons,
-    # since they are mixed in the same directory as the apps and websites,
-    # and don't start with a common 'folder' prefix
-    _ENDLESS_ICON_NAMES = ['media', 'games', 'social', 'work', 'news', 'curiosity']
     _FOLDER_ICON_PATH = '/usr/share/endlessm/icons/folders/'
 
     def __init__(self, parent, add_remove_widget=None, desktop_preference_class = DesktopPreferencesDatastore):
