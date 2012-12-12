@@ -9,6 +9,7 @@ class AddFolderBox(gtk.VBox):
 
     def __init__(self, parent, add_remove_widget=None, desktop_preference_class = DesktopPreferencesDatastore):
         super(AddFolderBox, self).__init__()
+        self.set_homogeneous(False)
 
         self._parent = parent
 
@@ -21,8 +22,13 @@ class AddFolderBox(gtk.VBox):
                 screen_util.get_width(parent._parent),
                 screen_util.get_height(parent._parent)).copy()
 
-        self._viewport = gtk.Viewport()
-        self._viewport.set_shadow_type(gtk.SHADOW_NONE)
+        self._scrolled_window = gtk.ScrolledWindow()
+        self._scrolled_window.set_policy(hscrollbar_policy=gtk.POLICY_NEVER, vscrollbar_policy=gtk.POLICY_AUTOMATIC)
+        self._scrolled_window.connect("show", self._on_show)
+        self._scrolled_window.get_vscrollbar().connect("value-changed", self._on_scroll)
+
+        self._scrolling = False
+
         self._vbox = gtk.VBox()
         self._vbox.set_homogeneous(False)
         self._vbox.set_spacing(15)
@@ -61,8 +67,8 @@ class AddFolderBox(gtk.VBox):
         self._bottom_center = gtk.Alignment(0.5, 0, 0, 0)
         self._bottom_center.add(self._table)
         self._vbox.pack_start(self._bottom_center)
-        self._viewport.add(self._vbox)
-        self.add(self._viewport)
+        self._scrolled_window.add_with_viewport(self._vbox)
+        self.add(self._scrolled_window)
 
         self.x = 0
         self.y = 0
@@ -110,25 +116,27 @@ class AddFolderBox(gtk.VBox):
 
     def _handle_event(self, widget, event):
         cr = widget.window.cairo_create()
-
-        if self.x == 0 and self.y == 0:
-            x, y = self._vbox.window.get_origin()
-            top_x, top_y = self._vbox.window.get_toplevel().get_origin()
-            self.x = x - top_x
-            self.y = y - top_y
-            self._background.crop(self.x, self.y, event.area.width, event.area.height)
-
-        self.draw(cr, event.area.x, event.area.y, event.area.width, event.area.height)
+        x, y = self._vbox.window.get_origin()
+        top_x, top_y = self._scrolled_window.window.get_toplevel().get_origin()
+        self.draw(cr, x - top_x, y - top_y, self.allocation.width, self.allocation.height)
+        
+        if event:
+            self._draw_gradient(cr, event.area.width, event.area.height, event.area.x, event.area.y)
 
         return False
 
     def draw(self, cr, x, y, w, h):
-        cropped_background = self._background.copy().crop(x, y, w, h)
-        cropped_background.draw(lambda pixbuf: cr.set_source_pixbuf(pixbuf, x, y))
+        self._scrolled_window.get_child().set_shadow_type(gtk.SHADOW_NONE)
+        # Only copy/crop the background the first time through
+        # to avoid needless memory copies and image manipulation
+        if not self._scrolling:
+            self._background = self._background.copy().crop(x, 0, w, h)
+            self._scrolling = True
+        scroll_y = self._scrolled_window.get_vscrollbar().get_value()
+        self._background.draw(lambda pixbuf: cr.set_source_pixbuf(pixbuf, 0, scroll_y))
         cr.paint()
-        self._draw_gradient(cr, x, y, w, h)
 
-    def _draw_gradient(self, cr, x, y, w, h):
+    def _draw_gradient(self, cr, w, h, x=0, y=0):
         # TODO This is not quite appropriate when drawing the individual icons
         # The gradient drawn should be that icon's portion of the overall gradient,
         # not the full window gradient shrunk to fit in the icon
@@ -136,7 +144,7 @@ class AddFolderBox(gtk.VBox):
         pat.add_color_stop_rgba (0.001, 0.0, 0.0, 0.0, 0.8)
         pat.add_color_stop_rgba (1, 0.2, 0.2, 0.2, 0.8)
 
-        cr.rectangle(x-1, y-1, w+2, h+2)
+        cr.rectangle(x, y, w, h)
         cr.set_source(pat)
         cr.fill()
 
@@ -178,3 +186,10 @@ class AddFolderBox(gtk.VBox):
                 row = row + 1
             self._table.attach(icons[num], col, col+1, row, row+1, ypadding=25, xpadding=25)
             col = col + 1
+
+    def _on_show(self, widget):
+        widget.get_child().set_shadow_type(gtk.SHADOW_NONE)
+        
+    def _on_scroll(self, widget):
+        self._scrolled_window.queue_draw()
+        

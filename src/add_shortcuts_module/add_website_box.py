@@ -15,18 +15,16 @@ class AddWebsiteBox(gtk.VBox):
         self._vbox = gtk.VBox()
         self._vbox.set_homogeneous(False)
         self._scrolling = False
-        self.x = 0
-        self.y = 0
         self._refresh = True
 
         self._desktop_preferences = desktop_preference_class.get_instance()
         self._background = self._desktop_preferences.get_scaled_background_image(
                 screen_util.get_width(parent.window), screen_util.get_height(parent.window))
         
-        self._viewport = gtk.ScrolledWindow()
-        self._viewport.set_policy(hscrollbar_policy=gtk.POLICY_NEVER, vscrollbar_policy=gtk.POLICY_AUTOMATIC)
-        self._viewport.connect("show", self._on_show)
-        self._viewport.get_vscrollbar().connect("value-changed", self._on_scroll)
+        self._scrolled_window = gtk.ScrolledWindow()
+        self._scrolled_window.set_policy(hscrollbar_policy=gtk.POLICY_NEVER, vscrollbar_policy=gtk.POLICY_AUTOMATIC)
+        self._scrolled_window.connect("show", self._on_show)
+        self._scrolled_window.get_vscrollbar().connect("value-changed", self._on_scroll)
 
         label_text = _('SEARCH FOR A WEBSITE')
         self._label = gtk.Label()
@@ -60,8 +58,8 @@ class AddWebsiteBox(gtk.VBox):
 
         self._vbox.connect("expose-event", self._handle_expose_event)
         self._text_entry.connect("activate", self._handle_key_press)
-        self._viewport.add_with_viewport(self._vbox)
-        self.add(self._viewport)
+        self._scrolled_window.add_with_viewport(self._vbox)
+        self.add(self._scrolled_window)
         self.show_all()
 
     def _fill_sites(self, sites):
@@ -78,12 +76,12 @@ class AddWebsiteBox(gtk.VBox):
         widget.get_child().set_shadow_type(gtk.SHADOW_NONE)
         
     def _on_scroll(self, widget):
-        self._viewport.queue_draw()
+        self._scrolled_window.queue_draw()
         
     def _handle_expose_event(self, widget, event):
         cr = widget.window.cairo_create()
         x, y = self._vbox.window.get_origin()
-        top_x, top_y = self._viewport.window.get_toplevel().get_origin()
+        top_x, top_y = self._scrolled_window.window.get_toplevel().get_origin()
         self.draw(cr, x - top_x, y - top_y, self.allocation.width, self.allocation.height)
         
         # TODO what is the purpose of self._refresh?
@@ -100,7 +98,7 @@ class AddWebsiteBox(gtk.VBox):
         if not self._scrolling:
             self._background = self._background.copy().crop(x, 0, w, h)
             self._scrolling = True
-        scroll_y = self._viewport.get_vscrollbar().get_value()
+        scroll_y = self._scrolled_window.get_vscrollbar().get_value()
         self._background.draw(lambda pixbuf: cr.set_source_pixbuf(pixbuf, 0, scroll_y))
         cr.paint()
 
