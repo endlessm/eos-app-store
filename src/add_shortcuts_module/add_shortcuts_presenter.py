@@ -9,8 +9,6 @@ import os
 import urllib2
 from eos_util import image_util
 import sys
-import re
-from urlparse import urlparse
 from add_shortcuts_module.name_format_util import NameFormatUtil
 
 class AddShortcutsPresenter():
@@ -86,8 +84,6 @@ class AddShortcutsPresenter():
             name = app.name()
             #key = de.getExec()
             key = app.id()
-            print >> sys.stderr, "install app: "+repr(app)
-            print >> sys.stderr, "install app id: "+repr(app.id())
             icon = {}
             #normal = de.get('X-EndlessM-Normal-Icon') or image_util.image_path("endless.png")
             #hover = de.get('X-EndlessM-Hover-Icon') or image_util.image_path("endless.png")
