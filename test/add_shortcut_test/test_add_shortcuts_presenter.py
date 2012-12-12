@@ -15,11 +15,16 @@ class TestAddShortcutsPresenter(unittest.TestCase):
         self.mock_app_store_model.get_categories = Mock(return_value=[])
         self.mock_recommended_sites_provider = Mock()
         self.mock_add_shortcuts_view = Mock()
+        
+        self.mock_format_util = Mock()
+        self.mock_format_util.format = Mock(return_value='')
+        
         self.test_object = AddShortcutsPresenter()
         self.test_object._model = self.mock_model
         self.test_object._app_store_model = self.mock_app_store_model
         self.test_object._sites_provider = self.mock_recommended_sites_provider
         self.test_object._add_shortcuts_view = self.mock_add_shortcuts_view
+        self.test_object._name_format_util = self.mock_format_util
         
         self.mock_presenter = Mock()
         
@@ -84,13 +89,15 @@ class TestAddShortcutsPresenter(unittest.TestCase):
         self.test_object._app_store_model.install.assert_called_once_with(app)
     
     def test_install_site(self):
-        name = 'facebook.com'
+        name = 'Facebook'
         url = 'facebook.com'
         comment = 'Blah, blah...'
+
         site = LinkModel('', url, name, comment)
         self.test_object.get_favicon_image_file = Mock()
         self.test_object.build_shortcut_from_link_model(site)
-        self.test_object.get_favicon_image_file.assert_called_once_with(url)
+        self.test_object.get_favicon_image_file.assert_called_once_with(site._url)
+        self.test_object._name_format_util.format.assert_called_once_with(site._url)
     
     def test_get_favicon(self):
         url = 'facebook.com'

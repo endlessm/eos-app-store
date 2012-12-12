@@ -3,14 +3,13 @@ from osapps.app_shortcut import AppShortcut
 from osapps.desktop_locale_datastore import DesktopLocaleDatastore
 from application_store.application_store_model import ApplicationStoreModel
 from shortcut_category import ShortcutCategory
-from xdg.DesktopEntry import DesktopEntry
 from desktop_files.link_model import LinkModel
 from application_store.recommended_sites_provider import RecommendedSitesProvider
 import os
 import urllib2
 from eos_util import image_util
-from desktop_files.link_model import LinkModel
 import sys
+from add_shortcuts_module.name_format_util import NameFormatUtil
 
 class AddShortcutsPresenter():
     def __init__(self):
@@ -19,6 +18,7 @@ class AddShortcutsPresenter():
         self._app_store_model = ApplicationStoreModel()
         self._add_shortcuts_view = None #AddShortcutsView()
         self._sites_provider = RecommendedSitesProvider()
+        self._name_format_util = NameFormatUtil()
         self.IMAGE_CACHE_PATH = '/tmp/'  #maybe /tmp/endless-image-cache/ ?
 
     def get_category_data(self):
@@ -89,12 +89,9 @@ class AddShortcutsPresenter():
     
     def build_shortcut_from_application_model(self, app_model):
         try:
-            #name = de.getName()
             name = app_model.name()
-            #key = de.getExec()
             key = app_model.id()
-            print >> sys.stderr, "install app_model: "+repr(app_model)
-            print >> sys.stderr, "install app_model id: "+repr(app_model.id())
+
             icon = {}
             backup_image = image_util.image_path("endless.png")
             icon['normal'] = app_model.normal_icon() or backup_image
@@ -106,9 +103,8 @@ class AddShortcutsPresenter():
             print >> sys.stderr, "error: "+repr(e)
             return None
 
-
     def build_shortcut_from_link_model(self, link_model):
-        name = self._strip_protocol(link_model._url)
+        name = self._name_format_util.format(link_model._url)
 
         key = 'browser'
         icon = {}
@@ -172,9 +168,7 @@ class AddShortcutsPresenter():
         return link_model
 
     def _strip_protocol(self, url):
-        if url.startswith('https://'):
-            return url[8:]
-        elif url.startswith('http://'):
-            return url[7:]
-        else:
-            return url
+        url = url.replace('http://', '')
+        url = url.replace('https://', '')
+        
+        return url
