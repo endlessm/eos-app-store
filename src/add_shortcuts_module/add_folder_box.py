@@ -12,6 +12,11 @@ class AddFolderBox(gtk.VBox):
 
         self._parent = parent
 
+        self._ENDLESS_ICON_PATH = '/usr/share/icons/hicolor/48x48/apps/'
+        # For now, hard-code the names of the Endless-designed folder icons,
+        # since they are mixed in the same directory as the apps and websites,
+        # and don't start with a common 'folder' prefix
+        self._ENDLESS_ICON_NAMES = ['media', 'games', 'social', 'work', 'news', 'curiosity']
         self._DEFAULT_ICON_PATH = '/usr/share/icons/Humanity/places/48/'
 
         self._desktop_preferences = desktop_preference_class.get_instance()
@@ -70,9 +75,8 @@ class AddFolderBox(gtk.VBox):
 
         self.show_all()
 
-
-    def _get_folder_icons(self, path='', hint='folder'):
-        return self._parent._presenter.get_folder_icons(path, hint)
+    def _get_folder_icons(self, path='', hint='folder', suffix=''):
+        return self._parent._presenter.get_folder_icons(path, hint, suffix)
 
     def get_images(self, image_path):
         return (
@@ -151,18 +155,26 @@ class AddFolderBox(gtk.VBox):
         cr.set_source_rgba(0.5, 0.5, 0.5, 0.8)
         cr.fill()
 
-    def _fill_table(self):
-        files = self._get_folder_icons('', 'folder')
-        icons = []
+    def _append_icons(self, icons, files, path):
         for fi in files:
             image_box = ImageEventBox(None)
             image_box.set_size_request(64, 64)
-            image_box.set_images(self.get_images(self._DEFAULT_ICON_PATH+fi))
+            image_box.set_images(self.get_images(path + fi))
             image_box.connect("enter-notify-event", self._display_plus, self._parent._add_remove_widget)
             image_box.connect("leave-notify-event", self._remove_plus, self._parent._add_remove_widget)
-            image_box.connect("button-release-event", self._create_folder, self._DEFAULT_ICON_PATH+fi)
+            image_box.connect("button-release-event", self._create_folder, path + fi)
             image_box.show()
             icons.append(image_box)
+        
+    def _fill_table(self):
+        icons = []
+        
+        for name in self._ENDLESS_ICON_NAMES:
+            files = self._get_folder_icons(self._ENDLESS_ICON_PATH, name, '_normal')
+            self._append_icons(icons, files, self._ENDLESS_ICON_PATH)
+
+        files = self._get_folder_icons(self._DEFAULT_ICON_PATH, 'folder')
+        self._append_icons(icons, files, self._DEFAULT_ICON_PATH)
 
         num_of_icons = len(icons)
         available_width = screen_util.get_width(self._parent._parent.window) - self._parent._add_button_box_width - self._parent._tree_view_width

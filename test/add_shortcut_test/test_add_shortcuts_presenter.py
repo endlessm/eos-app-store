@@ -47,13 +47,13 @@ class TestAddShortcutsPresenter(unittest.TestCase):
         
     def test_get_folder_icons(self):
         self.test_object.get_folder_icons(self.path, self.hint)
-        self.mock_model.get_folder_icons.assert_called_once_with(self.path, self.hint)
+        self.mock_model.get_folder_icons.assert_called_once_with(self.path, self.hint, '')
     
     def test_create_directory(self):
         dir_name = 'blah'
         self.test_object.create_directory(dir_name, '/tmp/image.svg', self.mock_presenter)
         self.mock_model.create_directory.assert_called_once_with(dir_name)
-        self.mock_presenter._model._app_desktop_datastore.get_all_shortcuts.assert_called_once_with()
+        self.mock_presenter._model._app_desktop_datastore.get_all_shortcuts.assert_called_once_with(True)
         self.mock_presenter._model._app_desktop_datastore.add_shortcut.assert_called_once()
     
     def test_check_dir_name(self):
@@ -65,7 +65,7 @@ class TestAddShortcutsPresenter(unittest.TestCase):
         self.test_object.get_category(category)
         self.mock_app_store_model.get_categories.assert_called_once(category)
     
-    def get_recommended_sites(self):
+    def test_get_recommended_sites(self):
         self.test_object._sites_provider.get_recommended_sites()
         self.mock_recommended_sites_provider.get_recommended_sites.assert_called_once()
     
@@ -92,9 +92,10 @@ class TestAddShortcutsPresenter(unittest.TestCase):
         name = 'Facebook'
         url = 'facebook.com'
         comment = 'Blah, blah...'
-        site = LinkModel(url, '', name, url, comment)
+
+        site = LinkModel('', url, name, comment)
         self.test_object.get_favicon_image_file = Mock()
-        self.test_object.install_site(site)
+        self.test_object.build_shortcut_from_link_model(site)
         self.test_object.get_favicon_image_file.assert_called_once_with(site._url)
         self.test_object._name_format_util.format.assert_called_once_with(site._url)
     
@@ -116,14 +117,22 @@ class TestAddShortcutsPresenter(unittest.TestCase):
         result = self.test_object.get_favicon_image_file(url)
         self.assertFalse(result)
     
-    def test_get_custom_site_shortcut(self):
+    def test_get_custom_site_shortcut_when_unknown_site(self):
         url = 'facebook.com'
-        result = self.test_object.get_custom_site_shortcut(url)
+        self.mock_recommended_sites_provider.get_recommended_sites = Mock(return_value=[Mock()])
+        result = self.test_object.create_link_model(url)
         self.assertTrue(result)
         self.assertTrue(isinstance(result, LinkModel))
         url = 'dummy.url.kom'
-        result = self.test_object.get_custom_site_shortcut(url)
+        result = self.test_object.create_link_model(url)
         self.assertFalse(result)
+    
+    def test_get_custom_site_shortcut_when_known_site(self):
+        url = 'facebook.com'
+        facebook_model = LinkModel(url, url, "http://"+url)
+        self.mock_recommended_sites_provider.get_recommended_sites = Mock(return_value=[facebook_model])
+        result = self.test_object.create_link_model(url)
+        self.assertEquals(result, facebook_model)
     
     def test_strip_protocol(self):
         full = 'http://facebook.com'
@@ -135,5 +144,3 @@ class TestAddShortcutsPresenter(unittest.TestCase):
         self.assertEqual(result, stripped)
         result = self.test_object._strip_protocol(stripped)
         self.assertEqual(result, stripped)
-        
-    

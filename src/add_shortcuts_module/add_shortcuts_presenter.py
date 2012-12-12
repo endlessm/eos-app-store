@@ -33,15 +33,22 @@ class AddShortcutsPresenter():
 
 
     def create_directory(self, dir_name, image_file, presenter):
-        shortcuts = presenter._model._app_desktop_datastore.get_all_shortcuts()
+        shortcuts = presenter._model._app_desktop_datastore.get_all_shortcuts(True)
         dir_name = self.check_dir_name(dir_name, shortcuts)
         path = self._model.create_directory(dir_name)
         if path:
-            shortcut = AppShortcut(key='', name=dir_name, icon={'normal':image_file})
+            # Hack to get hover and down states for Endless folder icons
+            if image_file.endswith('_normal.png'):
+                icon_dict = {'normal':image_file,
+                             'mouseover':image_file.replace('_normal.png', '_hover.png'),
+                             'pressed':image_file.replace('_normal.png', '_down.png')}
+            else:
+                icon_dict = {'normal':image_file}
+            shortcut = AppShortcut(key='', name=dir_name, icon=icon_dict)
             presenter._model._app_desktop_datastore.add_shortcut(shortcut)
 
-    def get_folder_icons(self, path, hint):
-        return self._model.get_folder_icons(path, hint)
+    def get_folder_icons(self, path, prefix, suffix=''):
+        return self._model.get_folder_icons(path, prefix, suffix)
 
     def check_dir_name(self, dir_name, shortcuts):
         index = 0
@@ -77,40 +84,35 @@ class AddShortcutsPresenter():
         self._add_shortcuts_view = view
         self._add_shortcuts_view.set_presenter(self)
 
-    def install_app(self, app):
-        self._app_store_model.install(app)
+    def install_app(self, application_model):
+        self._app_store_model.install(application_model)
+    
+    def build_shortcut_from_application_model(self, app_model):
         try:
-            #name = de.getName()
-            name = app.name()
-            #key = de.getExec()
-            key = app.id()
+            name = app_model.name()
+            key = app_model.id()
+
             icon = {}
-            #normal = de.get('X-EndlessM-Normal-Icon') or image_util.image_path("endless.png")
-            #hover = de.get('X-EndlessM-Hover-Icon') or image_util.image_path("endless.png")
-            #pressed = de.get('X-EndlessM-Down-Icon') or image_util.image_path("endless.png")
-            #normal = app.normal_icon()
-            #hover = app.hover_icon()
-            #pressed = app.down_icon()
-            icon['normal'] = app.normal_icon() or image_util.image_path("endless.png")
-            icon['mouseover'] = app.hover_icon() or image_util.image_path("endless.png")
-            icon['pressed'] = app.down_icon() or image_util.image_path("endless.png")
+            backup_image = image_util.image_path("endless.png")
+            icon['normal'] = app_model.normal_icon() or backup_image
+            icon['mouseover'] = app_model.hover_icon() or backup_image
+            icon['pressed'] = app_model.down_icon() or backup_image
             shortcut = AppShortcut(key, name, icon)
             return shortcut
         except Exception as e:
             print >> sys.stderr, "error: "+repr(e)
             return None
 
-    def install_site(self, site):
-        name = self._name_format_util.format(site._url)
+    def build_shortcut_from_link_model(self, link_model):
+        name = self._name_format_util.format(link_model._url)
+
         key = 'browser'
         icon = {}
-        normal = self.get_favicon_image_file(site._url) or image_util.image_path("endless-browser.png")
-        hover = normal
-        pressed = normal
-        icon['normal'] = normal
-        icon['mouseover'] = hover
-        icon['pressed'] = pressed
-        parameters = [site._url]
+        backup_image = self.get_favicon_image_file(link_model._url) or image_util.image_path("endless-browser.png")
+        icon['normal'] = link_model.normal_icon() or backup_image
+        icon['mouseover'] = link_model.hover_icon() or backup_image
+        icon['pressed'] = link_model.down_icon() or backup_image
+        parameters = [link_model._url]
         shortcut = AppShortcut(key, name, icon, params=parameters)
         return shortcut
 
@@ -149,7 +151,7 @@ class AddShortcutsPresenter():
         else:
             return cache_path+filename
 
-    def get_custom_site_shortcut(self, url):
+    def create_link_model(self, url):
         if not url.startswith('http'):
             url = 'http://' + url
 
@@ -160,7 +162,10 @@ class AddShortcutsPresenter():
 
         self.get_favicon(url)
         name = self._strip_protocol(url)
-        return LinkModel(url, '', name, url)
+        custom_link_model = LinkModel('', name, url)
+        recommended_sites = self.get_recommended_sites()
+        link_model = next((model for model in recommended_sites if model == custom_link_model), custom_link_model)
+        return link_model
 
     def _strip_protocol(self, url):
         url = url.replace('http://', '')

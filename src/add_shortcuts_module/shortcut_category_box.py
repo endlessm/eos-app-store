@@ -2,7 +2,6 @@ import gtk
 import cairo
 from eos_widgets.image_eventbox import ImageEventBox
 from eos_util.image import Image
-from eos_util import image_util
 
 class ShortcutCategoryBox(gtk.EventBox):
     def __init__(self, model, parent, width, presenter):
@@ -54,7 +53,6 @@ class ShortcutCategoryBox(gtk.EventBox):
         self.refresh_categories()
         self._presenter.set_add_shortcuts_box(label.get_text(), subcategory)
 
-
     def _draw_gradient(self, widget, event, active=False):
         cr = widget.window.cairo_create()
 
@@ -70,7 +68,6 @@ class ShortcutCategoryBox(gtk.EventBox):
 
         cr.set_source(pat)
         cr.fill()
-
 
     def destroy(self):
         self._parent.destroy()
