@@ -12,12 +12,7 @@ class AddFolderBox(gtk.VBox):
 
         self._parent = parent
 
-        self._ENDLESS_ICON_PATH = '/usr/share/endlessm/icons/apps/'
-        # For now, hard-code the names of the Endless-designed folder icons,
-        # since they are mixed in the same directory as the apps and websites,
-        # and don't start with a common 'folder' prefix
-        self._ENDLESS_ICON_NAMES = ['media', 'games', 'social', 'work', 'news', 'curiosity']
-        self._DEFAULT_ICON_PATH = '/usr/share/icons/Humanity/places/48/'
+        self._FOLDER_ICON_PATH = '/usr/share/endlessm/icons/folders/'
 
         self._desktop_preferences = desktop_preference_class.get_instance()
         # TODO should not rely on access to private member _parent of parent
@@ -49,7 +44,6 @@ class AddFolderBox(gtk.VBox):
         self._text_entry.set_text('')
         self._text_entry_align.add(self._hbox)
 
-
         self.hbox_separator = gtk.HBox()
         self.hbox_separator.set_size_request(-1, 15)
         self._vbox.pack_start(self.hbox_separator, True, True, 0)
@@ -75,8 +69,8 @@ class AddFolderBox(gtk.VBox):
 
         self.show_all()
 
-    def _get_folder_icons(self, path='', hint='folder', suffix=''):
-        return self._parent._presenter.get_folder_icons(path, hint, suffix)
+    def _get_folder_icons(self, path='', prefix='', suffix=''):
+        return self._parent._presenter.get_folder_icons(path, prefix, suffix)
 
     def get_images(self, image_path):
         return (
@@ -168,14 +162,8 @@ class AddFolderBox(gtk.VBox):
         
     def _fill_table(self):
         icons = []
-        
-        for name in self._ENDLESS_ICON_NAMES:
-            files = self._get_folder_icons(self._ENDLESS_ICON_PATH, name, '_normal')
-            self._append_icons(icons, files, self._ENDLESS_ICON_PATH)
-
-        files = self._get_folder_icons(self._DEFAULT_ICON_PATH, 'folder')
-        self._append_icons(icons, files, self._DEFAULT_ICON_PATH)
-
+        files = self._get_folder_icons(self._FOLDER_ICON_PATH, suffix='_normal')
+        self._append_icons(icons, files, self._FOLDER_ICON_PATH)
         num_of_icons = len(icons)
         available_width = screen_util.get_width(self._parent._parent.window) - self._parent._add_button_box_width - self._parent._tree_view_width
         columns = int(available_width/120)   # shold this be a fixed number like 5 as in pdf?
