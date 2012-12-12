@@ -114,6 +114,3 @@ class AddShortcutsView():
             widget = AddFolderBox(self)
         
         self.set_scrolled_window(widget)
-    
-    def set_presenter(self, presenter):
-        self._presenter = presenter

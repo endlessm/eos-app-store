@@ -86,7 +86,6 @@ class AddRemoveShortcut(DesktopShortcut):
         self._icon.set_images(self.get_images())    
     
     def _dragged_over(self):
-        #self.emit("application-shortcut-dragging-over", None)
         pass
     
     def change_icon(self, images):

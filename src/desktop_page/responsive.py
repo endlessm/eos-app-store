@@ -3,9 +3,8 @@ from eos_widgets.image_eventbox import ImageEventBox
 
 
 class Button(ImageEventBox):
-
-    @classmethod
-    def align_it(cls, button, xalign=0.5, yalign=0.5, xscale=0.0, yscale=0.0):
+    @staticmethod
+    def align_it(button, xalign=0.5, yalign=0.5, xscale=0.0, yscale=0.0):
         align = gtk.Alignment(xalign, yalign, xscale, yscale)
         align.add(button)
         return align

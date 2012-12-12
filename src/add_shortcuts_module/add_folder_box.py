@@ -6,6 +6,7 @@ from eos_util import screen_util
 from osapps.desktop_preferences_datastore import DesktopPreferencesDatastore
 
 class AddFolderBox(gtk.VBox):
+    _FOLDER_ICON_PATH = '/usr/share/endlessm/icons/folders/'
 
     def __init__(self, parent, add_remove_widget=None, desktop_preference_class = DesktopPreferencesDatastore):
         super(AddFolderBox, self).__init__()
@@ -13,7 +14,6 @@ class AddFolderBox(gtk.VBox):
 
         self._parent = parent
 
-        self._FOLDER_ICON_PATH = '/usr/share/endlessm/icons/folders/'
 
         self._desktop_preferences = desktop_preference_class.get_instance()
         # TODO should not rely on access to private member _parent of parent

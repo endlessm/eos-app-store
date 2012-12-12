@@ -29,10 +29,6 @@ class FolderShortcut(DesktopShortcut):
         self._event_box.connect("enter-notify-event", self.mouse_over_callback)
         self._event_box.connect("leave-notify-event", self.mouse_out_callback)
 
-        DesktopShortcut._add_drag_end_broadcast_callback(
-            self._drag_end_broadcast_callback
-            )
-
         self.show_all()
         self.set_moving(False)
 
@@ -60,11 +56,6 @@ class FolderShortcut(DesktopShortcut):
 
     def _drag_leave_handler_callback(self, source, destination):
         self.set_is_highlightable(False)
-
-    def _drag_end_broadcast_callback(self, source):
-        self._event_box.set_images(self.get_images(self.ICON_STATE_NORMAL))
-        self.hide()
-        self.show()
 
     def mouse_release_callback(self, widget, event):
         if not self.is_moving():

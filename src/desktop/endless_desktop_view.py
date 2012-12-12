@@ -139,12 +139,12 @@ class EndlessDesktopView(gtk.Window):
         return image.pixbuf
 
     def refresh(self, shortcuts, force=False):
-
+        
         child = self._align.get_child()
         if child:
             child.parent.remove(child)
             child.destroy()
-
+    
         DesktopPage.calc_pages(
             shortcuts,
             create_row_callback = self._create_row,
@@ -152,7 +152,9 @@ class EndlessDesktopView(gtk.Window):
             max_items_in_row = self._max_icons_in_row,
             max_rows_in_page = self._max_rows_in_page
             )
+
         desk_page = DesktopPage.get_current_page()
+
         desk_page.show()
 
         self._align.add(desk_page)
@@ -216,11 +218,7 @@ class EndlessDesktopView(gtk.Window):
         self.show_folder_window(shortcut)
 
     def _create_row(self, items, last_row=False):
-
-        while len(self._app_shortcuts) > 0:
-            w = self._app_shortcuts[0]
-            w.destroy()
-
+        
         row = gtk.HBox()
         row.show()
 
@@ -243,7 +241,7 @@ class EndlessDesktopView(gtk.Window):
                 item.connect("desktop-shortcut-dnd-begin", self._dnd_begin)
                 item.connect("desktop-shortcut-rename", self._rename_callback)
                 item.show()
-        #
+
             if item.parent != None:
                 print >> sys.stderr, "Item has parent!", item
             row.pack_start(item, False, False, 0)
