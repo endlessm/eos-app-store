@@ -2,7 +2,7 @@
 Version=1.0
 Name=Wikipedia
 Name[en_US]=Wikipedia
-Name[pt_BR]=Wikipedia
+Name[pt_BR]=Wikipédia
 Comment=Wikipedia
 GenericName=Wikipedia
 Type=Link
