@@ -1,3 +1,8 @@
+import os
+import urllib2
+from eos_util import image_util
+import sys
+
 from add_shortcuts_model import AddShortcutsModel
 from osapps.app_shortcut import AppShortcut
 from osapps.desktop_locale_datastore import DesktopLocaleDatastore
@@ -5,21 +10,20 @@ from application_store.application_store_model import ApplicationStoreModel
 from shortcut_category import ShortcutCategory
 from desktop_files.link_model import LinkModel
 from application_store.recommended_sites_provider import RecommendedSitesProvider
-import os
-import urllib2
-from eos_util import image_util
-import sys
 from add_shortcuts_module.name_format_util import NameFormatUtil
 
 class AddShortcutsPresenter():
-    def __init__(self):
+    IMAGE_CACHE_PATH = '/tmp/'  #maybe /tmp/endless-image-cache/ ?
+    
+    def __init__(self, url_opener = urllib2.urlopen, pixbuf_loader = image_util.load_pixbuf):
         self._model = AddShortcutsModel()
+        self._url_opener = url_opener
+        self._pixbuf_loader = pixbuf_loader
         self._app_desktop_datastore = DesktopLocaleDatastore()
         self._app_store_model = ApplicationStoreModel()
         self._add_shortcuts_view = None #AddShortcutsView()
         self._sites_provider = RecommendedSitesProvider()
         self._name_format_util = NameFormatUtil()
-        self.IMAGE_CACHE_PATH = '/tmp/'  #maybe /tmp/endless-image-cache/ ?
 
     def get_category_data(self):
         category_data = self._model.get_category_data()
@@ -115,21 +119,24 @@ class AddShortcutsPresenter():
         shortcut = AppShortcut(key, name, icon, params=parameters)
         return shortcut
 
+    def _is_image_in_cache(self, filename):
+        return os.path.exists(self.IMAGE_CACHE_PATH + filename)
+
     def get_favicon(self, url):
-        cache_path = os.path.expanduser(self.IMAGE_CACHE_PATH)
         if not url.startswith('http'):
             url = 'http://' + url
 
         filename = 'favicon.' + self._strip_protocol(url) + '.ico'
         filename = filename.replace('/', '_')
 
-        if os.path.exists(cache_path+filename):
-            return image_util.load_pixbuf(cache_path+filename)
+        if self._is_image_in_cache(filename):
+            return image_util.load_pixbuf(self.IMAGE_CACHE_PATH + filename)
         else:
             try:
-                favicon_response = urllib2.urlopen(url+'/favicon.ico')
+                favicon_response = self._url_opener(url+'/favicon.ico')
+                
                 if self._strip_protocol(favicon_response.geturl()) == self._strip_protocol(url+'/favicon.ico'):
-                    fi = open(cache_path+filename, 'wb')
+                    fi = open(self.IMAGE_CACHE_PATH + filename, 'wb')
                     fi.write(favicon_response.read())
                     fi.close()
 
@@ -138,8 +145,9 @@ class AddShortcutsPresenter():
                     except:
                         pass
                     
-                    return image_util.load_pixbuf(cache_path+filename)
+                    return self._pixbuf_loader(self.IMAGE_CACHE_PATH + filename)
             except:
+                print "err"
                 return None
         return None
 
@@ -162,7 +170,7 @@ class AddShortcutsPresenter():
 
         # TODO Why is this even here?  get_favicon should return None if the url is bad
         try:
-            connection = urllib2.urlopen(url)
+            connection = self._url_opener(url)
             connection.close()
         except:
             return None

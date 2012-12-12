@@ -5,9 +5,9 @@ from osapps.app_shortcut import AppShortcut
 import gtk
 from desktop_files.application_model import ApplicationModel
 from desktop_files.link_model import LinkModel
+import shutil
 
 class TestAddShortcutsPresenter(unittest.TestCase):
-
     def setUp(self):
         self.mock_model = Mock()
         self.mock_model.get_category_data = Mock(return_value=[])
@@ -19,6 +19,20 @@ class TestAddShortcutsPresenter(unittest.TestCase):
         self.mock_format_util = Mock()
         self.mock_format_util.format = Mock(return_value='')
 
+        self._mock_connection= Mock()
+        self._mock_connection.read = Mock(return_value="abc")
+        self._mock_connection.geturl = Mock(return_value="http://facebook.com/favicon.ico")
+        
+        self._mock_pixbuf_loader = Mock(return_value = "pixbuf")
+        
+        def mock_connection_callback(url):
+            print url
+            if url == "http://facebook.com" or url == "http://facebook.com/favicon.ico":
+                return self._mock_connection
+            else:
+                return None
+        
+        self._mock_url_connector = mock_connection_callback
         self.test_object = AddShortcutsPresenter()
         self.test_object._model = self.mock_model
         self.test_object._app_store_model = self.mock_app_store_model
@@ -77,11 +91,8 @@ class TestAddShortcutsPresenter(unittest.TestCase):
 
     def test_set_add_shortcuts_view(self):
         view = Mock()
-        view.set_presenter = Mock()
         self.test_object.set_add_shortcuts_view(view)
         self.assertEqual(self.test_object._add_shortcuts_view, view)
-        self.test_object._add_shortcuts_view.set_presenter.assert_called_once_with(self.test_object)
-
 
     def test_install_app(self):
         app = ApplicationModel('dummy', 'dummy', [])
@@ -100,10 +111,14 @@ class TestAddShortcutsPresenter(unittest.TestCase):
         self.test_object._name_format_util.format.assert_called_once_with(site._name)
 
     def test_get_favicon(self):
+        self.test_object = AddShortcutsPresenter(self._mock_url_connector, self._mock_pixbuf_loader)
+        self.test_object._sites_provider = self.mock_recommended_sites_provider
+        self.test_object._is_image_in_cache = Mock(return_value = False)
+        
         url = 'facebook.com'
-        result = self.test_object.get_favicon(url)
-        self.assertTrue(result)
-        self.assertTrue(isinstance(result, gtk.gdk.Pixbuf))
+        self.assertEquals('pixbuf', self.test_object.get_favicon(url))
+        self.assertTrue(self._mock_connection.close.called)       
+        
         url = 'dummy.url.kom'
         result = self.test_object.get_favicon(url)
         self.assertFalse(result)
@@ -118,11 +133,17 @@ class TestAddShortcutsPresenter(unittest.TestCase):
         self.assertFalse(result)
 
     def test_get_custom_site_shortcut_when_unknown_site(self):
+        self.test_object = AddShortcutsPresenter(self._mock_url_connector)
+        self.test_object._sites_provider = self.mock_recommended_sites_provider
+ 
         url = 'facebook.com'
         self.mock_recommended_sites_provider.get_recommended_sites = Mock(return_value=[Mock()])
         result = self.test_object.create_link_model(url)
+        
         self.assertTrue(result)
         self.assertTrue(isinstance(result, LinkModel))
+        self.assertTrue(self._mock_connection.close.called)
+
         url = 'dummy.url.kom'
         result = self.test_object.create_link_model(url)
         self.assertFalse(result)
