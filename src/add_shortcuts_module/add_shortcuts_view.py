@@ -75,15 +75,18 @@ class AddShortcutsView():
         presenter = self._parent.get_presenter()
         self._presenter.create_directory(folder_name, image_file, presenter)
     
-    def install_app(self, app):
-        presenter = self._parent.get_presenter()
-        shortcut = self._presenter.install_app(app)
-        presenter._model._app_desktop_datastore.add_shortcut(shortcut)
+    def install_app(self, application_model):
+        shortcut = self._presenter.build_shortcut_from_application_model(application_model)
+        self._presenter.install_app(application_model)
+        self.install_shortcut(shortcut)
     
-    def install_site(self, site):
-        presenter = self._parent.get_presenter()
-        shortcut = self._presenter.install_site(site)
-        presenter._model._app_desktop_datastore.add_shortcut(shortcut)
+    def install_site(self, link_model):
+        shortcut = self._presenter.build_shortcut_from_link_model(link_model)
+        self.install_shortcut(shortcut)
+    
+    def install_shortcut(self, shortcut):
+        parent_presenter = self._parent.get_presenter()
+        parent_presenter._model._app_desktop_datastore.add_shortcut(shortcut)
     
     def _draw_triangle(self, widget, event):
         ctx = self.add_remove_vbox.window.cairo_create()

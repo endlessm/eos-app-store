@@ -7,12 +7,12 @@ class WebsiteRowBox(gtk.EventBox):
     def __init__(self, item=None, parent=None, presenter=None, desktop_preference_class = DesktopPreferencesDatastore):
         super(WebsiteRowBox, self).__init__()
         self.set_visible_window(False)
-        self._item = item
+        self._link_model = item
         self._parent = parent
         self._presenter = presenter
         self._id = item._id
-        self._name = self._item._name
-        self._description = self._item._comment
+        self._name = self._link_model._name
+        self._description = self._link_model._comment
         self._icon_image_width = 32
         self._icon_image_height = 32
         self._default_icon_pixbuf = image_util.load_pixbuf(image_util.image_path("endless-browser.png"))
@@ -22,7 +22,7 @@ class WebsiteRowBox(gtk.EventBox):
         # The current implementation of get_favicon is way too slow,
         # as it retrieves data from each site at run-time
         # For now, let's just use a default icon
-        #self._icon_image = self._presenter.get_favicon(self._item._url) or self._default_icon_pixbuf
+        #self._icon_image = self._presenter.get_favicon(self._link_model._url) or self._default_icon_pixbuf
         self._icon_image = self._default_icon_pixbuf
         
         self._icon_width = 150
@@ -51,7 +51,7 @@ class WebsiteRowBox(gtk.EventBox):
         self.name_label.set_markup('<span color="#aaaaaa" font="Novecento wide" font_weight="bold">' + self._name + '</span>')
         self.name_label.set_alignment(0, 0.5)
         self.description_label = gtk.Label()
-        self.description_label.set_markup('<span color="#aaaaaa" font-style="italic">' + self._item._url + '</span>')
+        self.description_label.set_markup('<span color="#aaaaaa" font-style="italic">' + self._link_model._url + '</span>')
         self.description_label.set_alignment(0,0.5)
         
         self.labels_box = gtk.HBox()
@@ -86,4 +86,4 @@ class WebsiteRowBox(gtk.EventBox):
         self.show_all()
         
     def install_site(self, widget, event):
-        self._parent.install_site(self._item)
+        self._parent.install_site(self._link_model)

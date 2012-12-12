@@ -116,7 +116,7 @@ class AddWebsiteBox(gtk.VBox):
     def _draw_active(self, widget, event, row):
         self._refresh = False
         widget.name_label.set_markup('<span color="#ffffff" font="Novecento wide" font_weight="bold">' + widget._name + '</span>')
-        widget.description_label.set_markup('<span color="#ffffff" font-style="italic">' + widget._item._url + '</span>')
+        widget.description_label.set_markup('<span color="#ffffff" font-style="italic">' + widget._link_model._url + '</span>')
         widget._plus_image.set_from_file(image_util.image_path("add_folder_icon.png"))
         widget._plus_image.show()
         pixbuf = image_util.load_pixbuf(image_util.image_path('category_separator_inactive.png'))
@@ -130,7 +130,7 @@ class AddWebsiteBox(gtk.VBox):
     def _draw_inactive(self, widget, event, row):
         self._refresh = True
         widget.name_label.set_markup('<span color="#aaaaaa" font="Novecento wide" font_weight="bold">' + widget._name + '</span>')
-        widget.description_label.set_markup('<span color="#aaaaaa" font-style="italic">' + widget._item._url + '</span>')
+        widget.description_label.set_markup('<span color="#aaaaaa" font-style="italic">' + widget._link_model._url + '</span>')
         widget._plus_image.hide()
         widget._bottom_active_line.set_from_pixbuf(None)
         widget._top_active_line.set_from_pixbuf(None)
@@ -155,13 +155,13 @@ class AddWebsiteBox(gtk.VBox):
 
     def _handle_key_press(self, widget):
         if widget.get_text():
-            site = self._presenter.get_custom_site_shortcut(widget.get_text())
-            if site:
-                self.install_site(site)
+            link_model = self._presenter.create_link_model(widget.get_text())
+            if link_model:
+                self.install_site(link_model)
             else:
                 widget.set_text('Url invalid, please try again')
                 widget.select_region(0, -1)
 
-    def install_site(self, site):
-        self._parent.install_site(site)
+    def install_site(self, link_model):
+        self._parent.install_site(link_model)
         self._parent.destroy(None, None)
