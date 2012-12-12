@@ -71,7 +71,7 @@ class TestDesktopModel(unittest.TestCase):
 
         order_filename = os.path.join(self._tmp_directory, '.order')
         
-        order_list = ['link1.desktop', 'link3.desktop', 'link2.desktop']
+        order_list = ['foo1', 'link3.desktop', 'foo2']
         json.dump(order_list, open(order_filename, "w"))
         self.assertEquals(expected, self._test_object.get_shortcuts(self._tmp_directory))
         

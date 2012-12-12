@@ -94,7 +94,7 @@ class TestAddShortcutsPresenter(unittest.TestCase):
         site = LinkModel(url, '', name, url, comment)
         self.test_object.get_favicon_image_file = Mock()
         self.test_object.install_site(site)
-        self.test_object.get_favicon_image_file.assert_called_once_with(url)
+        self.test_object.get_favicon_image_file.assert_called_once_with(site._url)
         self.test_object._name_format_util.format.assert_called_once_with(name)
     
     def test_get_favicon(self):
