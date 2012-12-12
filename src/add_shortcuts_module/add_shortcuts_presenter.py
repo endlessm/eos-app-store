@@ -82,7 +82,6 @@ class AddShortcutsPresenter():
 
     def set_add_shortcuts_view(self, view):
         self._add_shortcuts_view = view
-        self._add_shortcuts_view.set_presenter(self)
 
     def install_app(self, application_model):
         self._app_store_model.install(application_model)
