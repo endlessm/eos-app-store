@@ -10,6 +10,7 @@ class RemoveExtraFilesTask:
                     "~/application.list",
                     "~/desktop.en_US",
                     "~/desktop.pt_BR",
+                    "~/examples.desktop",
                     "~/fluxbox-startup.log",
                 ]
         
