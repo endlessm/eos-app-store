@@ -38,7 +38,7 @@ msgstr "2. ESCOLHA UM SÍMBOLO"
 #: src/add_shortcuts_module/add_shortcuts_presenter.py:27
 #: src/add_shortcuts_module/add_shortcuts_view.py:108
 msgid "APP"
-msgstr "APP"
+msgstr "APLICATIVO"
 
 #: src/add_shortcuts_module/add_shortcuts_view.py:31
 msgid "Add Shortcuts"
@@ -89,7 +89,7 @@ msgstr "Instalador do EndlessOS"
 
 #: src/add_shortcuts_module/add_shortcuts_model.py:20
 msgid "FOLDER"
-msgstr "ENTERTAINMENT"
+msgstr "PASTA"
 
 #: src/shortcut/add_remove_shortcut.py:98
 #: src/shortcut/add_remove_shortcut.py:106
@@ -164,8 +164,8 @@ msgid "Restart?"
 msgstr "Reinicializar?"
 
 #: src/add_shortcuts_module/add_website_box.py:30
-msgid "SEARCH FOR A WEBSITE"
-msgstr ""
+msgid "TYPE WEBSITE"
+msgstr "DIGITE SITE"
 
 #: ui/bugs_and_feedback.glade:94
 #: src/feedback_module/bugs_and_feedback_popup_window.py:65
@@ -247,7 +247,7 @@ msgstr "AVISO!"
 #: src/add_shortcuts_module/add_shortcuts_model.py:19
 #: src/add_shortcuts_module/add_shortcuts_view.py:110
 msgid "WEB"
-msgstr "WEB"
+msgstr "SITES"
 
 #: src/desktop/endless_desktop_view.py:132
 msgid "Websites"
