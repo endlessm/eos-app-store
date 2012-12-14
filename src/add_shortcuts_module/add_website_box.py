@@ -26,7 +26,7 @@ class AddWebsiteBox(gtk.VBox):
         self._scrolled_window.connect("show", self._on_show)
         self._scrolled_window.get_vscrollbar().connect("value-changed", self._on_scroll)
 
-        label_text = _('SEARCH FOR A WEBSITE')
+        label_text = _('TYPE WEBSITE')
         self._label = gtk.Label()
         self._label.set_markup('<span color="#aaaaaa" font="Novecento wide" font_weight="bold" size="16000">' + label_text + '</span>')
 
@@ -39,7 +39,6 @@ class AddWebsiteBox(gtk.VBox):
 
         self._text_entry.set_alignment(0.5)
         self._hbox.pack_start(self._text_entry)
-        self._text_entry.set_text(_('Type it here'))
         self._text_entry_align.add(self._hbox)
 
 
