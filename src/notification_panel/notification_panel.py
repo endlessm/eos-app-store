@@ -42,7 +42,8 @@ class NotificationPanel(gtk.HBox):
                     plugin.connect('hide-window-event', plugin._hide_window)
                     self.plugins_list.append(plugin)
             except Exception, e:
-                log.error('Error registering plugin for ' + clazz.__name__ + ': ' + e.message)
+                import sys
+                print >> sys.stderr, 'Error registering plugin for ' + clazz.__name__ + ': ' + e.message
             
         self.pack_end(self.notification_panel, False, False, 30) 
 
