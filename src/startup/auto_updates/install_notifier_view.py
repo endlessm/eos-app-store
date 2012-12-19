@@ -1,10 +1,7 @@
 import gtk
 
-import gettext
 from ui.abstract_notifier import AbstractNotifier
 from ui import glade_ui_elements
-
-gettext.install('endless_desktop', '/usr/share/locale', unicode = True, names=['ngettext'])
 
 class InstallNotifierView(AbstractNotifier):
     RESTART_NOW = "restart.now"

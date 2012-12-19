@@ -149,16 +149,6 @@ msgstr "Relatar um bug"
 msgid "Restart"
 msgstr "Reinicializar"
 
-#: ui/install_notifier.glade:48
-#, fuzzy
-msgid "Restart Later"
-msgstr "Reinicializar"
-
-#: ui/install_notifier.glade:34
-#, fuzzy
-msgid "Restart Now"
-msgstr "Reinicializar"
-
 #: src/notification_panel/all_settings_view.py:33
 msgid "Restart?"
 msgstr "Reinicializar?"
@@ -270,10 +260,10 @@ msgid "Version {0} of EndlessOS is ready to be installed. After installation, a 
 msgstr "Versão {0} do EndlessOS está pronta para ser instalada. Após a instalação será necessário reiniciar o computador. Você deseja instalar e reiniciar o computador agora?"
 
 
-msgid "Restart now"
+msgid "Restart Now"
 msgstr "Reiniciar agora"
 
-msgid "Restart later"
+msgid "Restart Later"
 msgstr "Reiniciar depois"
 
 #~ msgid "GAMES"
