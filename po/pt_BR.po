@@ -266,6 +266,16 @@ msgstr "Gostaria de iniciar a atualização do EndlessOS %sagora?"
 msgid "button"
 msgstr ""
 
+msgid "Version {0} of EndlessOS is ready to be installed. After installation, a restart is required.  Would you like to install and restart now?"
+msgstr "Versão {0} do EndlessOS está pronta para ser instalada. Após a instalação será necessário reiniciar o computador. Você deseja instalar e reiniciar o computador agora?"
+
+
+msgid "Restart now"
+msgstr "Reiniciar agora"
+
+msgid "Restart later"
+msgstr "Reiniciar depois"
+
 #~ msgid "GAMES"
 #~ msgstr "JOGOS"
 
