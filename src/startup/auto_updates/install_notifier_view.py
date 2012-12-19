@@ -29,6 +29,6 @@ class InstallNotifierView(AbstractNotifier):
         self._window.destroy()
         
     def set_new_version(self, text):
-        formatted_text = "Version {0} of EndlessOS is ready to be installed. After installation, a restart is required.  Would you like to install and restart now?".format(text)
+        formatted_text = _("Version {0} of EndlessOS is ready to be installed. After installation, a restart is required.  Would you like to install and restart now?").format(text)
         self._message_label.set_text(formatted_text)
 
