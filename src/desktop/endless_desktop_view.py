@@ -57,6 +57,7 @@ class EndlessDesktopView(gtk.Window):
 
         self._taskbar_panel = TaskbarPanel(width)
         self._taskbar_panel.connect('feedback-clicked', lambda w: self._feedback_icon_clicked_callback())
+        self._taskbar_panel.connect('social-bar-clicked', lambda w: self._social_bar_icon_clicked_callback())
 
         self._notification_panel = NotificationPanel(self)
 
@@ -187,6 +188,9 @@ class EndlessDesktopView(gtk.Window):
     def _feedback_icon_clicked_callback(self):
         self._feedback_popup = BugsAndFeedbackPopupWindow(self, self._feedback_submitted)
         self._feedback_popup.show()
+    
+    def _social_bar_icon_clicked_callback(self):
+        print "Clicked social bar icon"
 
     def hide_folder_window(self):
         if hasattr(self, '_folder_window') and self._folder_window:
