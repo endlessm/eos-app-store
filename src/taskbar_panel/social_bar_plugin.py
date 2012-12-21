@@ -1,9 +1,7 @@
 import gtk
-from gtk import gdk
 
 from eos_util.image_util import load_pixbuf
 from eos_util.image import Image
-import math
 
 class SocialBarPlugin(gtk.EventBox):
     def __init__(self, icon_size):
@@ -16,7 +14,7 @@ class SocialBarPlugin(gtk.EventBox):
     
     def _create_static_icon(self):
         social_bar_icon = gtk.Image()
-        pixbuf = load_pixbuf('feedback-button.png')
+        pixbuf = load_pixbuf('button_social_normal.png')
         icon_image = Image(pixbuf)
         icon_image.scale(self._icon_size, self._icon_size)
         social_bar_icon.set_from_pixbuf(icon_image.pixbuf)        

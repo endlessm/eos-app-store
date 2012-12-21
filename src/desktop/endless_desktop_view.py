@@ -19,6 +19,7 @@ from notification_panel.notification_panel import NotificationPanel
 from taskbar_panel.taskbar_panel import TaskbarPanel
 from add_shortcuts_module.add_shortcuts_view import AddShortcutsView
 from eos_util.image import Image
+from desktop.social_bar_popup_window import SocialBarPopupWindow
 
 
 gettext.install('endless_desktop', '/usr/share/locale', unicode=True, names=['ngettext'])
@@ -190,7 +191,8 @@ class EndlessDesktopView(gtk.Window):
         self._feedback_popup.show()
     
     def _social_bar_icon_clicked_callback(self):
-        print "Clicked social bar icon"
+        self._social_bar_popup = SocialBarPopupWindow(self)
+        self._social_bar_popup.show()
 
     def hide_folder_window(self):
         if hasattr(self, '_folder_window') and self._folder_window:
