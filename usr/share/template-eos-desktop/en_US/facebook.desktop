@@ -1,16 +1,16 @@
 [Desktop Entry]
 Version=1.0
-Name=facebook
-Name[en_US]=facebook
-Name[pt_BR]=facebook
-Comment=facebook
-GenericName=facebook
+Name=Facebook
+Name[en_US]=Facebook
+Name[pt_BR]=Facebook
+Comment=Facebook
+GenericName=Facebook
 Type=Link
 URL=http://www.facebook.com
 Icon=facebook
 Categories=Network
-X-EndlessM-Normal-Icon=/usr/share/endlessm/icons/facebook_normal.png
-X-EndlessM-Hover-Icon=/usr/share/endlessm/icons/facebook_hover.png
-X-EndlessM-Down-Icon=/usr/share/endlessm/icons/facebook_down.png
+X-EndlessM-Normal-Icon=/usr/share/endlessm/icons/apps/facebook_normal.png
+X-EndlessM-Hover-Icon=/usr/share/endlessm/icons/apps/facebook_hover.png
+X-EndlessM-Down-Icon=/usr/share/endlessm/icons/apps/facebook_down.png
 
 

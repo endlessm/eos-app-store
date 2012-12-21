@@ -9,8 +9,8 @@ Type=Link
 URL=http://www.wikipedia.com
 Icon=wikipedia
 Categories=Network
-X-EndlessM-Normal-Icon=/usr/share/endlessm/icons/wikipedia_normal.png
-X-EndlessM-Hover-Icon=/usr/share/endlessm/icons/wikipedia_hover.png
-X-EndlessM-Down-Icon=/usr/share/endlessm/icons/wikipedia_down.png
+X-EndlessM-Normal-Icon=/usr/share/endlessm/icons/apps/wikipedia_normal.png
+X-EndlessM-Hover-Icon=/usr/share/endlessm/icons/apps/wikipedia_hover.png
+X-EndlessM-Down-Icon=/usr/share/endlessm/icons/apps/wikipedia_down.png
 
 

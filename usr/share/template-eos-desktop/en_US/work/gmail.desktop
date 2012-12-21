@@ -9,8 +9,8 @@ Type=Link
 URL=http://www.gmail.com
 Icon=gmail
 Categories=Network
-X-EndlessM-Normal-Icon=/usr/share/endlessm/icons/gmail_normal.png
-X-EndlessM-Hover-Icon=/usr/share/endlessm/icons/gmail_hover.png
-X-EndlessM-Down-Icon=/usr/share/endlessm/icons/gmail_down.png
+X-EndlessM-Normal-Icon=/usr/share/endlessm/icons/apps/gmail_normal.png
+X-EndlessM-Hover-Icon=/usr/share/endlessm/icons/apps/gmail_hover.png
+X-EndlessM-Down-Icon=/usr/share/endlessm/icons/apps/gmail_down.png
 
 

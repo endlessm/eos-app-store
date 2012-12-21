@@ -9,8 +9,8 @@ Type=Link
 URL=http://www.khanacademy.org
 Icon=khanacademy
 Categories=Network
-X-EndlessM-Normal-Icon=/usr/share/endlessm/icons/khanacademy_normal.png
-X-EndlessM-Hover-Icon=/usr/share/endlessm/icons/khanacademy_hover.png
-X-EndlessM-Down-Icon=/usr/share/endlessm/icons/khanacademy_down.png
+X-EndlessM-Normal-Icon=/usr/share/endlessm/icons/apps/khanacademy_normal.png
+X-EndlessM-Hover-Icon=/usr/share/endlessm/icons/apps/khanacademy_hover.png
+X-EndlessM-Down-Icon=/usr/share/endlessm/icons/apps/khanacademy_down.png
 
 

@@ -7,8 +7,8 @@ Comment=Work
 GenericName=Work
 Type=Directory
 Icon=folder_work_normal
-X-EndlessM-Normal-Icon=/usr/share/endlessm/icons/facebook_normal.png
-X-EndlessM-Hover-Icon=/usr/share/endlessm/icons/facebook_hover.png
-X-EndlessM-Down-Icon=/usr/share/endlessm/icons/facebook_down.png
+X-EndlessM-Normal-Icon=/usr/share/endlessm/icons/folders/work_normal.png
+X-EndlessM-Hover-Icon=/usr/share/endlessm/icons/folders/work_hover.png
+X-EndlessM-Down-Icon=/usr/share/endlessm/icons/folders/work_down.png
 
 
