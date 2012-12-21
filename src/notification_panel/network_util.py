@@ -2,7 +2,7 @@ from util.dbus_utils import DbusUtils
 from eos_util.custom_decorators import consumes_errors
 from eos_log import log
 
-class NetworkUtil(object):    
+class NetworkManager(object):    
     DBUS_NETWORK_MANAGER_PATH = 'org.freedesktop.NetworkManager'
     DBUS_NETWORK_MANAGER_URI = '/org/freedesktop/NetworkManager'
     DBUS_NETWORK_MANAGER_DEVICE_PATH = DBUS_NETWORK_MANAGER_PATH + '.Device'
@@ -26,8 +26,8 @@ class NetworkUtil(object):
         self._dbus_util = dbus_util
 
     def register_device_change_listener(self, callback):
-        network_manager_object = self.get_system_bus().get_object(NetworkUtil.DBUS_NETWORK_MANAGER_PATH, NetworkUtil.DBUS_NETWORK_MANAGER_URI)
-        network_manager_object.connect_to_signal(NetworkUtil.DBUS_PROPERTY_CHANGED_SIGNAL, callback)
+        network_manager_object = self.get_system_bus().get_object(NetworkManager.DBUS_NETWORK_MANAGER_PATH, NetworkManager.DBUS_NETWORK_MANAGER_URI)
+        network_manager_object.connect_to_signal(NetworkManager.DBUS_PROPERTY_CHANGED_SIGNAL, callback)
     
     @consumes_errors
     def get_network_state(self):
@@ -42,16 +42,16 @@ class NetworkUtil(object):
         wireless_adapter = self._get_first_active_wireless_device()
         if wireless_adapter:
             active_access_point_object = self._get_active_access_point_object(wireless_adapter)
-            active_access_point_object.connect_to_signal(NetworkUtil.DBUS_PROPERTY_CHANGED_SIGNAL, callback)
+            active_access_point_object.connect_to_signal(NetworkManager.DBUS_PROPERTY_CHANGED_SIGNAL, callback)
     
     def _get_device_strength(self, device):
            
         log.debug("Getting strength of" + repr(device))
 
         active_access_point_object = self._get_active_access_point_object(device)
-        active_access_point_properties = active_access_point_object.GetAll(NetworkUtil.DBUS_NETWORK_MANAGER_AP_PATH)
+        active_access_point_properties = active_access_point_object.GetAll(NetworkManager.DBUS_NETWORK_MANAGER_AP_PATH)
         
-        strength = int(active_access_point_properties[NetworkUtil.AP_CONNECTION_STRENGTH])
+        strength = int(active_access_point_properties[NetworkManager.AP_CONNECTION_STRENGTH])
         
         print "DEVICE Strength ==== ", strength
         log.debug("Strength is" + repr(strength))
@@ -64,18 +64,18 @@ class NetworkUtil(object):
                 return device
     
     def _get_devices(self):
-        self._network_manager = self.get_system_bus().get_object(NetworkUtil.DBUS_NETWORK_MANAGER_PATH, NetworkUtil.DBUS_NETWORK_MANAGER_URI)
-        self._network_manager_interface = self.get_data_bus().Interface(self._network_manager, NetworkUtil.DBUS_NETWORK_MANAGER_PATH)
+        self._network_manager = self.get_system_bus().get_object(NetworkManager.DBUS_NETWORK_MANAGER_PATH, NetworkManager.DBUS_NETWORK_MANAGER_URI)
+        self._network_manager_interface = self.get_data_bus().Interface(self._network_manager, NetworkManager.DBUS_NETWORK_MANAGER_PATH)
         return self._network_manager_interface.GetDevices()
     
     def _is_active_and_connected(self, device):
         interface = self.get_device_interface(device)
-        device_properties = interface.GetAll(NetworkUtil.DBUS_NETWORK_MANAGER_DEVICE_PATH)
+        device_properties = interface.GetAll(NetworkManager.DBUS_NETWORK_MANAGER_DEVICE_PATH)
         
-        device_type = device_properties[NetworkUtil.NETWORK_DEVICE_TYPE]
-        device_state = device_properties[NetworkUtil.NETWORK_DEVICE_STATE]
+        device_type = device_properties[NetworkManager.NETWORK_DEVICE_TYPE]
+        device_state = device_properties[NetworkManager.NETWORK_DEVICE_STATE]
             
-        if device_type == NetworkUtil.WIRELESS_DEVICE and device_state == NetworkUtil.DEVICE_CONNECTED:
+        if device_type == NetworkManager.WIRELESS_DEVICE and device_state == NetworkManager.DEVICE_CONNECTED:
             return True
         
         return False
@@ -83,16 +83,16 @@ class NetworkUtil(object):
     def _get_active_access_point_object(self, adapter):
         adapter_interface = self.get_device_interface(adapter)
         
-        wireless_adapter_properties = adapter_interface.GetAll(NetworkUtil.DBUS_NETWORK_WIRELESS_DEVICE_PATH)
+        wireless_adapter_properties = adapter_interface.GetAll(NetworkManager.DBUS_NETWORK_WIRELESS_DEVICE_PATH)
         
-        active_access_point = wireless_adapter_properties[NetworkUtil.ACTIVE_WIRELESS_PROPERTY_KEY]
+        active_access_point = wireless_adapter_properties[NetworkManager.ACTIVE_WIRELESS_PROPERTY_KEY]
         active_access_point_object = self.get_system_bus().get_object(self.DBUS_NETWORK_MANAGER_PATH, active_access_point)
         
         return active_access_point_object
     
     def get_device_interface(self, device):
-        device_object = self.get_system_bus().get_object(NetworkUtil.DBUS_NETWORK_MANAGER_PATH, device)
-        return self.get_data_bus().Interface(device_object, NetworkUtil.DBUS_PROPERTIES_PATH)
+        device_object = self.get_system_bus().get_object(NetworkManager.DBUS_NETWORK_MANAGER_PATH, device)
+        return self.get_data_bus().Interface(device_object, NetworkManager.DBUS_PROPERTIES_PATH)
 
     def get_system_bus(self):
         return self._dbus_util.get_system_bus()

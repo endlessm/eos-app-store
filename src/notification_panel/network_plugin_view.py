@@ -17,7 +17,7 @@ class NetworkPluginView(AbstractNotifier, IconPlugin):
         self._parent = parent
         self._parent.connect("expose-event", self._draw)
 
-    def display_network_state(self, strength):
+    def display_network_strength(self, strength):
         self._strength = strength 
         
         self._parent.set_visible_window(False)

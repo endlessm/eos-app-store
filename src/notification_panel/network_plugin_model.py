@@ -1,12 +1,12 @@
 from ui.abstract_notifier import AbstractNotifier
-from network_util import NetworkUtil
 from eos_util.custom_decorators import consumes_errors
+from network_manager import NetworkManager
 
 class NetworkPluginModel(AbstractNotifier):
     NETWORK_STATE_CHANGED = 'network-state-changed'
     
-    def __init__(self, network_util = NetworkUtil()):
-        self._network_util = network_util
+    def __init__(self, network_manager = NetworkManager.from_dbus()):
+        self._network_util = network_manager
         self._register_listeners()
     
     def _network_state_changed(self, *args):
