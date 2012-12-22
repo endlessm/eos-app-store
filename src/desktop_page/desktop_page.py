@@ -7,7 +7,7 @@ class DesktopPage(gtk.VBox):
 
     # Set the spacing to match the size of the icon
     # Note: horizontal spacing is handled in EndlessDesktopView
-    VERTICAL_SPACING = 60
+    VERTICAL_SPACING = 64
     
     pages = []
     page = None

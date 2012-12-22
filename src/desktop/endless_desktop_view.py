@@ -30,7 +30,7 @@ class EndlessDesktopView(gtk.Window):
     
     # Set the spacing to match the size of the icon
     # Note: vertical spacing is handled in DesktopPage
-    HORIZONTAL_SPACING = 60
+    HORIZONTAL_SPACING = 64
 
     LABEL_HEIGHT = 10
     _padding = 100
