@@ -59,12 +59,24 @@ class DesktopShortcut(gtk.VBox):
     def __init__(self, label_text="", draggable=True, highlightable=True):
         super(DesktopShortcut, self).__init__()
         self.__dnd_enter_flag = False
-        self.set_size_request(64, 64)
+        
+        # Create the shortcut wider than the icon image
+        # so that the label can extend into the space between icons
+        self.set_size_request(112, 64)
+        
         self._event_box = self._create_icon(self.get_images(self.ICON_STATE_NORMAL))
+        
+        # Center the icon within the shortcut
+        self._hbox = gtk.HBox()
+        self._hbox.set_size_request(112, 64)
+        self._spacer = gtk.VBox()
+        self._spacer.set_size_request((112-64)/2, 64)
+        self._hbox.pack_start(self._spacer, False, False)
+        self._hbox.pack_start(self._event_box, False, False)
 
         self._label = gtk.Label(label_text)
         self._identifier = label_text
-        self._event_box._identifier = label_text
+        self._hbox._identifier = label_text
 
         new_style = self._label.get_style().copy()
         new_style.fg[gtk.STATE_NORMAL] = self._label.get_colormap().alloc('#f0f0f0')
@@ -77,7 +89,7 @@ class DesktopShortcut(gtk.VBox):
 
         self._label_event_box = ShadowedLabelBox(self._label)
 
-        self.pack_start(self._event_box, False, False, 3)
+        self.pack_start(self._hbox, False, False, 3)
         self.pack_start(self._label_event_box, False, False, 3)
 
         self.highlightable = highlightable
