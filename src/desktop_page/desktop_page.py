@@ -5,6 +5,10 @@ from responsive import Button
 
 class DesktopPage(gtk.VBox):
 
+    # Set the spacing to match the size of the icon
+    # Note: horizontal spacing is handled in EndlessDesktopView
+    VERTICAL_SPACING = 60
+    
     pages = []
     page = None
     page_buttons = []
@@ -189,8 +193,7 @@ class DesktopPage(gtk.VBox):
         self.icons_alignment = gtk.Alignment(0.5, 0.5, 0.0, 0.0)
 
         self.desk_area = gtk.VBox(homogeneous=True)
-        self.desk_area.set_spacing(60)
-
+        self.desk_area.set_spacing(self.VERTICAL_SPACING)
 
         hide_btn = True
         if self.__class__.has_prev():
