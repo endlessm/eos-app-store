@@ -2,10 +2,10 @@ import gtk
 
 class RenameWidget:
 
-    def __init__(self, presenter=None, x=250, y=300, caller=None, y_offset=0, caller_width=64, container=None):
+    def __init__(self, presenter=None, x=250, y=300, caller=None, x_offset=0, y_offset=0, caller_width=64, container=None):
         self.caller = caller
         self.original_name = caller._identifier
-        self.x = x
+        self.x = x + x_offset
         self.y = y + y_offset
         self.presenter = presenter
         self.container = container
