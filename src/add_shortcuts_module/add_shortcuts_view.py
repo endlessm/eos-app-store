@@ -55,7 +55,7 @@ class AddShortcutsView():
         self.hbox2 = gtk.HBox()
         self.hbox2.set_size_request(self._width - self._tree_view_width - self._add_button_box_width, self._height)
         
-        self.scrolled_window = AddFolderBox(self)
+        self.scrolled_window = AddApplicationBox(self)
         self.hbox2.pack_start(self.scrolled_window)
         self.scrolled_window.show()
         self.hbox.pack_start(self.event_box)

@@ -6,7 +6,7 @@ from osapps.desktop_preferences_datastore import DesktopPreferencesDatastore
 from application_row_box import ApplicationRowBox
 
 class AddApplicationBox(gtk.VBox):
-    def __init__(self, parent, add_remove_widget=None, desktop_preference_class = DesktopPreferencesDatastore, default_category=''):
+    def __init__(self, parent, add_remove_widget=None, desktop_preference_class = DesktopPreferencesDatastore, default_category='All'):
         super(AddApplicationBox, self).__init__()
         self.set_homogeneous(False)
 
@@ -19,7 +19,7 @@ class AddApplicationBox(gtk.VBox):
 
         self._desktop_preferences = desktop_preference_class.get_instance()
         self._background = self._desktop_preferences.get_scaled_background_image(
-                screen_util.get_width(parent.window), screen_util.get_height(parent.window))
+                screen_util.get_width(parent._parent), screen_util.get_height(parent._parent))
 
         self._scrolled_window = gtk.ScrolledWindow()
         self._scrolled_window.set_policy(hscrollbar_policy=gtk.POLICY_NEVER, vscrollbar_policy=gtk.POLICY_AUTOMATIC)
