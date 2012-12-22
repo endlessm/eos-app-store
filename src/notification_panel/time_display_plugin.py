@@ -48,18 +48,23 @@ class TimeDisplayPlugin(NotificationPlugin):
     def _draw(self, widget, event):
         cr = widget.window.cairo_create()
         cr.save()
-        # clip to dimensions of widget
+
+        # clip to dimensions of event region
         cr.rectangle(event.area.x, event.area.y,
                     event.area.width, event.area.height)
         cr.clip()
         
+        # Need to draw relative to the area of the widget region
+        # rather than the event region
+        widget_area = widget.get_allocation()
+
         cr.set_source_rgba(0.0, 0.0, 0.0, NotificationPanelConfig.SHADOW_ALPHA);
-        cr.move_to(event.area.x + self.SHADOW_OFFSET + self.LEFT_MARGIN, event.area.y + self.SHADOW_OFFSET)
+        cr.move_to(widget_area.x + self.SHADOW_OFFSET + self.LEFT_MARGIN, widget_area.y + self.SHADOW_OFFSET)
         
         cr.set_operator(cairo.OPERATOR_DEST_OUT);
         cr.show_layout(self._shadow_layout)
 
-        cr.move_to(event.area.x + self.LEFT_MARGIN, event.area.y)
+        cr.move_to(widget_area.x + self.LEFT_MARGIN, widget_area.y)
         cr.set_operator(cairo.OPERATOR_ATOP);
         cr.show_layout(self._text_layout)
         
