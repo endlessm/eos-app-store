@@ -2,7 +2,7 @@ import gettext
 import gtk
 
 from ui.abstract_notifier import AbstractNotifier
-from eos_widgets.desktop_transparent_window import DesktopTransparentWindow
+from eos_widgets.application_transparent_window import ApplicationTransparentWindow
 from panel_constants import PanelConstants
 
 gettext.install('endless_desktop', '/usr/share/locale', unicode = True, names=['ngettext'])
@@ -73,7 +73,7 @@ class AllSettingsView(AbstractNotifier):
         x = desktop_size[0] - self.WINDOW_WIDTH - self.X_OFFSET
         y = PanelConstants.DEFAULT_POPUP_VERTICAL_MARGIN
         
-        self._window = DesktopTransparentWindow(self._parent.get_toplevel(), (x, y), (self.WINDOW_WIDTH, self.WINDOW_HEIGHT))
+        self._window = ApplicationTransparentWindow(self._parent.get_toplevel(), (x, y), (self.WINDOW_WIDTH, self.WINDOW_HEIGHT))
 
 
 #        # Get the x location of the center of the widget (icon), relative to the settings window
