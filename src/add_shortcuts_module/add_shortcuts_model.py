@@ -34,7 +34,7 @@ class AddShortcutsModel():
         #        os.makedirs(full_path)
         #        return full_path
         #    except:
-        #        print 'ERROR occured while trying to make directory', full_path
+        #        print 'ERROR occurred while trying to make directory', full_path
         #        return ''
 
     def get_folder_icons(self, path, prefix='', suffix=''):

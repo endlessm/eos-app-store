@@ -2,6 +2,7 @@
 Version=1.0
 Name=News
 Name[en_US]=News
+Name[es_GT]=Notícias
 Name[pt_BR]=Notícias
 Comment=News
 GenericName=News
