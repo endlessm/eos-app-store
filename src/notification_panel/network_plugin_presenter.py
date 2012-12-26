@@ -5,8 +5,8 @@ class NetworkPluginPresenter(object):
     
         self._model.add_state_changed_listener(self.update_network_state)
         
-        self.update_network_state()
+        self._model.retrieve_state()
         
-    def update_network_state(self):
-        self._model.display_strength_on(self._view.display_network_strength)
-        
+    def update_network_state(self, state):
+        self._view.display_network_state(state)
+       

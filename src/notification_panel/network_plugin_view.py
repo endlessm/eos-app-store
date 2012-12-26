@@ -17,6 +17,11 @@ class NetworkPluginView(AbstractNotifier, IconPlugin):
         self._parent = parent
         self._parent.connect("expose-event", self._draw)
 
+    def display_network_state(self, state):
+        # assuming that state agregates connection status and signal strength,
+        # display them both in some way.
+        self.display_network_strength(0)
+
     def display_network_strength(self, strength):
         self._strength = strength 
         
