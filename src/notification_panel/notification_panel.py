@@ -38,7 +38,7 @@ class NotificationPanel(gtk.HBox):
             try:
                 if clazz.is_plugin_enabled():
                     plugin = self._register_plugin(notification_panel_items, clazz)
-                    plugin.connect('button-press-event', lambda w, e: self._launch_command(w))
+                    plugin.connect('button-release-event', lambda w, e: self._launch_command(w))
                     plugin.connect('hide-window-event', plugin._hide_window)
                     self.plugins_list.append(plugin)
             except Exception, e:
