@@ -9,7 +9,8 @@ from search.search_box import SearchBox
 from eos_util import image_util
 from eos_util.image_util import load_pixbuf
 from application_list_plugin import ApplicationListPlugin
-from social_bar_plugin import SocialBarPlugin
+from taskbar_shortcut import TaskbarShortcut
+from social_bar.social_bar_plugin import SocialBarPlugin
 
 class TaskbarPanel(gtk.EventBox):
     __gsignals__ = {
@@ -37,20 +38,21 @@ class TaskbarPanel(gtk.EventBox):
         searchbox_holder = self._setup_searchbar_on_taskbar()
         application_list_plugin_holder = self._setup_apps_on_taskbar()
         feedback_plugin = self._setup_feedback_icon_on_taskbar()
-        social_bar_plugin = self._setup_social_bar_icon_on_taskbar()
 
-        self._draw_taskbar(width, taskbar_panel_items, application_list_plugin_holder, searchbox_holder, feedback_plugin, social_bar_plugin)
+        self._draw_taskbar(width, taskbar_panel_items, application_list_plugin_holder, searchbox_holder, feedback_plugin)
 
         self.add(self._taskbar_panel)
 
-    def _draw_taskbar(self, width, taskbar_panel_items, application_list_plugin_holder, searchbox_holder, feedback_plugin , social_bar_plugin):
+    def _draw_taskbar(self, width, taskbar_panel_items, application_list_plugin_holder, searchbox_holder, feedback_plugin):
         self._raw_taskbar_bg_pixbuf = load_pixbuf(image_util.image_path('glass_taskbar.png'))
         self._taskbar_bg_pixbuf = self._raw_taskbar_bg_pixbuf.scale_simple(width, 38, gdk.INTERP_TILES)
         del self._raw_taskbar_bg_pixbuf
         taskbar_panel_items.pack_start(searchbox_holder, False, False, 0)
         taskbar_panel_items.pack_start(application_list_plugin_holder, False, True, 0)
-        taskbar_panel_items.pack_end(social_bar_plugin, False, False, 10)
-        taskbar_panel_items.pack_end(feedback_plugin, False, False, 10)
+        
+        display_on_right = lambda plugin: taskbar_panel_items.pack_end(plugin, False, False, 10)
+        self._setup_social_bar_icon_on_taskbar().display(display_on_right )
+        display_on_right(feedback_plugin)
 
     def _setup_feedback_icon_on_taskbar(self):
         feedback_plugin = FeedbackPlugin(self.ICON_SIZE)
@@ -60,7 +62,7 @@ class TaskbarPanel(gtk.EventBox):
     def _setup_social_bar_icon_on_taskbar(self):
         social_bar_plugin = SocialBarPlugin(self.ICON_SIZE)
         social_bar_plugin.connect('button-press-event', lambda w, e:self.emit('social-bar-clicked'))
-        return social_bar_plugin
+        return TaskbarShortcut(social_bar_plugin, social_bar_plugin.PATH)
 
     def _align_taskbar(self):
         self._taskbar_panel = gtk.Alignment(0.5, 0.5, 1.0, 0)

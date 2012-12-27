@@ -3,6 +3,7 @@ import gtk
 from eos_util.image import Image
 
 class SocialBarPlugin(gtk.EventBox):
+    PATH = "/usr/bin/eos-social"
     def __init__(self, icon_size):
         super(SocialBarPlugin, self).__init__()
         self._icon_size = icon_size

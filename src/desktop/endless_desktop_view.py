@@ -190,7 +190,7 @@ class EndlessDesktopView(gtk.Window):
         self._feedback_popup = BugsAndFeedbackPopupWindow(self, self._feedback_submitted)
         self._feedback_popup.show()
     
-    def _social_bar_icon_clicked_callback(self):
+    def _social_bar_icon_clicked_callback(self):        
         self._social_bar_popup = SocialBarPopupWindow(self)
         self._social_bar_popup.show()
 
