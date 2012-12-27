@@ -30,30 +30,18 @@ class NetworkManager():
 
         return NetworkManager(interface, get_interface)
 
-    @classmethod
-    def _is_active_and_connected(cls, device, get_interface):
-        device_properties = device.GetAll(cls.DBUS_NETWORK_MANAGER_DEVICE_PATH)
-        
-        # Although we have a device, there may not be an active connection running on it 
-        device_connection = device_properties["ActiveConnection"]
-        if str(device_connection) == '/':
-            return False
-            
-        # is the wireless device connected, and selected by the OS as the default connection?
-        device_type = device_properties[cls.NETWORK_DEVICE_TYPE]
-        device_state = device_properties[cls.NETWORK_DEVICE_STATE]
-        return device_type == cls.WIRELESS_DEVICE and device_state == cls.DEVICE_CONNECTED
-
     
     def __init__(self, _interface, _get_interface):
         self._listeners = []
         self._ap_properties_changed_signal = None
+        self._device_interface = None
         self._get_interface = _get_interface
         self._interface = _interface
-        self._network_properties_changed_signal = _interface.connect_to_signal(self.PROPERTIES_CHANGED, self.retrieve_state)
+        if _interface is not None:
+            _interface.connect_to_signal(self.PROPERTIES_CHANGED, self.retrieve_state)
 
     def __eq__(self, other):
-        return other._device_interface == self._device_interface
+        return other._interface == self._interface
     
     def add_state_changed_listener(self, callback):
         '''
@@ -63,25 +51,51 @@ class NetworkManager():
         self._listeners.append(callback)
     
     def retrieve_state(self, args = None):
-        if self._ap_properties_changed_signal is not None:
-            self._ap_properties_changed_signal.remove()
-            
-        active_device_interface = None
-        active_device_path = None
+        self._disconnect_ap_signal()
+        
+        active_device_interface, active_device_path = self.find_active_wireless_devices()
+        
+        self._ap_interface = self._find_ap_interface(active_device_interface, active_device_path)
+        self._connect_ap_signal()
+        self.notify_listeners()
+
+    def find_active_wireless_devices(self):
         for device in self._interface.GetDevices():
             device_interface = self._get_interface(self.SERVICE_PATH, device, self.DBUS_PROPERTIES_PATH)
-            if NetworkManager._is_active_and_connected(device_interface, self._get_interface):
-                active_device_path = device
-                active_device_interface = device_interface
+            if self.is_active_and_connected(device_interface, self._get_interface):
+                return device_interface, device
         
-        self._ap_interface = None
+        return None, None
+
+    def _find_ap_interface(self, active_device_interface, active_device_path):
         if active_device_interface:
             device_properties_interface = self._get_interface(self.SERVICE_PATH, active_device_path, self.DBUS_PROPERTIES_PATH)
             ap_path = device_properties_interface.Get(self.DBUS_NETWORK_WIRELESS_DEVICE_PATH, NetworkManager.ACTIVE_WIRELESS_PROPERTY_KEY)
-            self._ap_interface = self._get_interface(self.SERVICE_PATH, ap_path, self.DBUS_PROPERTIES_PATH) 
+            return self._get_interface(self.SERVICE_PATH, ap_path, self.DBUS_PROPERTIES_PATH)
+        else:
+            return None 
+
+    def _connect_ap_signal(self):
+        if self._ap_interface is not None:
             self._ap_properties_changed_signal = self._ap_interface.connect_to_signal(self.PROPERTIES_CHANGED, self.notify_listeners)
+            
+    def _disconnect_ap_signal(self):
+        if self._ap_properties_changed_signal is not None:
+            self._ap_properties_changed_signal.remove()
+            self._ap_properties_changed_signal = None
+            
+    def is_active_and_connected(self, device, get_interface):
+        device_properties = device.GetAll(self.DBUS_NETWORK_MANAGER_DEVICE_PATH)
         
-        self.notify_listeners()
+        # Although we have a device, there may not be an active connection running on it 
+        device_connection = device_properties["ActiveConnection"]
+        if str(device_connection) == '/':
+            return False
+            
+        # is the wireless device connected, and selected by the OS as the default connection?
+        device_type = device_properties[self.NETWORK_DEVICE_TYPE]
+        device_state = device_properties[self.NETWORK_DEVICE_STATE]
+        return device_type == self.WIRELESS_DEVICE and device_state == self.DEVICE_CONNECTED
 
     def notify_listeners(self):
         self._broadcast_network_state(self.get_state_from_dbus())
@@ -97,14 +111,6 @@ class NetworkManager():
         for listener in self._listeners:
             listener(state)
     
-#    def display_strength_on(self, callback):
-#        self.active_device().display_strength_on(callback)
-    
-#    def display_state_on(self, callback):
-#        self._state().display_on(callback)
-#        
-#    def _state(self):
-#        return State(self._interface.state())
 
     #class State():
     #    enum = {
