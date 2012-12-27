@@ -4,7 +4,7 @@ import gtk
 from icon_plugin import IconPlugin
 from panel_constants import PanelConstants
 from ui.abstract_notifier import AbstractNotifier
-from eos_widgets.application_transparent_window import ApplicationTransparentWindow
+from eos_widgets.desktop_transparent_window import DesktopTransparentWindow
 
 gettext.install('endless_desktop', '/usr/share/locale', unicode = True, names=['ngettext'])
 
@@ -78,7 +78,7 @@ class BatteryView(AbstractNotifier, IconPlugin):
         # Since the battery status dialog is resized dynamically,
         # for now we will simply grab the entire desktop background.
         # This is wasteful and could be optmized further.
-        self._window = ApplicationTransparentWindow(self._parent.get_toplevel())
+        self._window = DesktopTransparentWindow(self._parent.get_toplevel())
         
         # Set up the window so that it can be exposed
         # with a transparent background and triangle decoration
