@@ -20,7 +20,7 @@ class NetworkPluginView(AbstractNotifier, IconPlugin):
     def display_network_state(self, state):
         # assuming that state agregates connection status and signal strength,
         # display them both in some way.
-        self.display_network_strength(0)
+        self.display_network_strength(state)
 
     def display_network_strength(self, strength):
         self._strength = strength 
