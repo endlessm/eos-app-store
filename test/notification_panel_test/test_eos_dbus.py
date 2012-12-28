@@ -1,6 +1,6 @@
 import unittest
-from notification_panel.dbus_foo import Dbus
 from mock import Mock
+from notification_panel.eos_dbus import Dbus
 
 
 class DbusTestCase(unittest.TestCase):

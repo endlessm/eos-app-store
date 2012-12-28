@@ -1,4 +1,4 @@
-from dbus_foo import Dbus
+from eos_dbus import Dbus
 
 class NetworkManager():
     SERVICE_PATH = 'org.freedesktop.NetworkManager'
