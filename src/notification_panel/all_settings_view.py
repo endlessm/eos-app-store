@@ -1,5 +1,6 @@
 import gettext
 import gtk
+import datetime
 
 from ui.abstract_notifier import AbstractNotifier
 from eos_widgets.desktop_transparent_window import DesktopTransparentWindow
@@ -27,6 +28,9 @@ class AllSettingsView(AbstractNotifier):
     SHUTDOWN_MESSAGE = 2
     LOGOUT_MESSAGE = 4
 
+    _last_focus_out = datetime.datetime.min
+    _focus_out_period = datetime.timedelta(milliseconds=250)
+
     _messages = {
                     RESTART_MESSAGE:  _("Restart?"),
                     SHUTDOWN_MESSAGE: _("Shutdown?"),
@@ -43,7 +47,7 @@ class AllSettingsView(AbstractNotifier):
         self._button_restart = gtk.Button(_('Restart'))
         self._button_shutdown = gtk.Button(_('Shut Down'))
 
-        self._button_desktop.connect('button-press-event',
+        self._button_desktop.connect('button-release-event',
                 lambda w, e: self._notify(self.DESKTOP_BACKGROUND))
         self._button_update.connect('button-release-event',
                 lambda w, e: self._notify(self.UPDATE_SOFTWARE))
@@ -132,10 +136,17 @@ class AllSettingsView(AbstractNotifier):
             return self._messages[message_id]
 
     def display(self):
-        self._window.show_all()
-        self._window.present()
+        # If we just had the focus out event (within the focus out period),
+        # don't display the menu, as it was most likely due to clicking
+        # on the settings icon to close the menu.
+        if (datetime.datetime.now() - AllSettingsView._last_focus_out) > AllSettingsView._focus_out_period:
+            self._window.show_all()
+            self._window.present()
 
     def hide_window(self):
+        # Keep track of when the focus out event occurred most recently
+        AllSettingsView._last_focus_out = datetime.datetime.now()
+        
         self._window.destroy()
         
     def enable_update_button(self):
