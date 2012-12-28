@@ -40,17 +40,22 @@ class IconPlugin(NotificationPlugin):
         cr = widget.window.cairo_create()
         cr.save()
 
-        # clip to dimensions of widget
+        # clip to dimensions of event region
         cr.rectangle(event.area.x, event.area.y,
                     event.area.width, event.area.height)
         cr.clip()
+
+        # Need to draw relative to the area of the widget region
+        # rather than the event region
+        widget_area = widget.get_allocation()
+
         # Draw shadow
-        cr.set_source_pixbuf(self._scaled_pixbufs[self._index], event.area.x + self._horizontal_margin + self.SHADOW_OFFSET, event.area.y + self.SHADOW_OFFSET)
+        cr.set_source_pixbuf(self._scaled_pixbufs[self._index], widget_area.x + self._horizontal_margin + self.SHADOW_OFFSET, widget_area.y + self.SHADOW_OFFSET)
         cr.set_operator(cairo.OPERATOR_DEST_OUT);
         cr.paint_with_alpha(NotificationPanelConfig.SHADOW_ALPHA)
 
         # Draw icon
-        cr.set_source_pixbuf(self._scaled_pixbufs[self._index], event.area.x + self._horizontal_margin, event.area.y)
+        cr.set_source_pixbuf(self._scaled_pixbufs[self._index], widget_area.x + self._horizontal_margin, widget_area.y)
         cr.set_operator(cairo.OPERATOR_ATOP);
         cr.paint()
 
