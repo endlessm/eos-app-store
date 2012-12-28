@@ -15,8 +15,6 @@ WIDGET_HORIZONTAL_SPACING = 64
 WIDGET_PADDING = 20
 
 class OpenFolderWindow():
-    TASKBAR_HEIGHT = 40
-    TASKBAR_PADDING = 20
     
     def __init__(self, parent, callback, shortcut, hide_callback):
         self._parent = parent
@@ -63,7 +61,7 @@ class OpenFolderWindow():
         self._height = len(rows) * WIDGET_HEIGHT + (len(rows) - 1) * WIDGET_VERTICAL_SPACING + WIDGET_LABEL_HEIGHT + WIDGET_PADDING
         
         self._x = 0
-        self._y = desktop_size[1] - self._height - (self.TASKBAR_HEIGHT + self.TASKBAR_PADDING)
+        self._y = desktop_size[1] - self._height
 
         self._window = DesktopTransparentWindow(parent, (self._x, self._y), (self._width, self._height), gradient_type='linear')
 
