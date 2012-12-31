@@ -38,6 +38,8 @@ class TestEndlessDesktopPresenter(unittest.TestCase):
         self.mock_model.get_menus = Mock(return_value=mock_menus)
 
         self.testObject.refresh_view()
+        
+        self.mock_model.get_shortcuts.assert_called_once_with()
 
         self.mock_view.refresh.assert_called_once_with(mock_shortcuts)
 
@@ -95,9 +97,8 @@ class TestEndlessDesktopPresenter(unittest.TestCase):
     def test_rename_shortcut(self):
         shortcut = AppShortcut(123, "App 1", "", [])
         new_name = 'Blah'
-        self.mock_model.get_shortcuts = Mock(return_value=[shortcut])
+        self.mock_model.get_shortcuts_from_cache = Mock(return_value=[shortcut])
         changed_shortcut = self.testObject.rename_shortcut(shortcut, new_name)
-        self.mock_model.get_shortcuts.assert_called_once()
         self.mock_model.set_shortcuts.assert_called_once()
         self.assertEqual(changed_shortcut.name(), new_name)
 
@@ -128,7 +129,7 @@ class TestEndlessDesktopPresenter(unittest.TestCase):
         app2.name = Mock(return_value='app 2')
         app3 = Mock()
         app3.name = Mock(return_value='app 3')
-        self.testObject._model.get_shortcuts = Mock(return_value=[app1, app2, app3])
+        self.testObject._model.get_shortcuts_from_cache = Mock(return_value=[app1, app2, app3])
 
         app_ret = self.testObject.get_shortcut_by_name('app 1')
         self.assertEqual(app_ret, app1)

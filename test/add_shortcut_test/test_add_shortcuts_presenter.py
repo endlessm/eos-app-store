@@ -12,7 +12,6 @@ class TestAddShortcutsPresenter(unittest.TestCase):
         self.mock_app_store_model = Mock()
         self.mock_app_store_model.get_categories = Mock(return_value=[])
         self.mock_recommended_sites_provider = Mock()
-        self.mock_add_shortcuts_view = Mock()
 
         self.mock_format_util = Mock()
         self.mock_format_util.format = Mock(return_value='')
@@ -31,11 +30,11 @@ class TestAddShortcutsPresenter(unittest.TestCase):
                 return None
         
         self._mock_url_connector = mock_connection_callback
-        self.test_object = AddShortcutsPresenter()
+        self._mock_view = Mock()
+        self.test_object = AddShortcutsPresenter(view = self._mock_view)
         self.test_object._model = self.mock_model
         self.test_object._app_store_model = self.mock_app_store_model
         self.test_object._sites_provider = self.mock_recommended_sites_provider
-        self.test_object._add_shortcuts_view = self.mock_add_shortcuts_view
         self.test_object._name_format_util = self.mock_format_util
 
         self.path = '/tmp/'
@@ -65,14 +64,15 @@ class TestAddShortcutsPresenter(unittest.TestCase):
         self.mock_model.create_directory.assert_called_once_with(dir_name)
         mock_datastore.get_all_shortcuts.assert_called_once_with(True)
         mock_datastore.add_shortcut.assert_called_once()
+        self._mock_view.close.assert_called_once_with()
         
     def test_add_shortcut(self):
         mock_datastore = Mock()
         shortcut = Mock()
         self.test_object.add_shortcut(shortcut, mock_datastore)
         mock_datastore.add_shortcut.called_once_with(shortcut)
+        self._mock_view.close.assert_called_once_with()
         
-
     def test_check_dir_name(self):
         expected_value = 'App 3'
         self.assertEqual(expected_value, self.test_object.check_dir_name('App', self.available_app_shortcuts))
@@ -90,12 +90,7 @@ class TestAddShortcutsPresenter(unittest.TestCase):
         category = 'Dummy category'
         subcategory = 'Dummy subcategory'
         self.test_object.set_add_shortcuts_box(category, subcategory)
-        self.mock_add_shortcuts_view.set_add_shortcuts_box.assert_called_once_with(category, subcategory)
-
-    def test_set_add_shortcuts_view(self):
-        view = Mock()
-        self.test_object.set_add_shortcuts_view(view)
-        self.assertEqual(self.test_object._add_shortcuts_view, view)
+        self._mock_view.set_add_shortcuts_box.assert_called_once_with(category, subcategory)
 
     def test_install_app(self):
         app = ApplicationModel('dummy', 'dummy', [])

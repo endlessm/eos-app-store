@@ -14,8 +14,11 @@ class EndlessDesktopModel(object):
         self._preferences_provider = preferences_provider
         self._installed_applications_model = installed_app_model
 
-    def get_shortcuts(self, force=False):
-        return self._app_desktop_datastore.get_all_shortcuts(force=force)
+    def get_shortcuts(self):
+        return self._app_desktop_datastore.get_all_shortcuts(force=True)
+
+    def get_shortcuts_from_cache(self):
+        return self._app_desktop_datastore.get_all_shortcuts(force=False)
 
     def set_shortcuts_by_name(self, shortcuts_names):
         self._app_desktop_datastore.set_all_shortcuts_by_name(shortcuts_names)

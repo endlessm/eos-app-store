@@ -10,7 +10,7 @@ class DesktopPresenter(object):
         self.refresh_view()
 
     def get_shortcut_by_name(self, shortcut_name):
-        all_shortcuts = self._model.get_shortcuts()
+        all_shortcuts = self._model.get_shortcuts_from_cache()
         for shortcut in all_shortcuts:
             if shortcut_name == shortcut.name():
                 return shortcut
@@ -22,10 +22,10 @@ class DesktopPresenter(object):
         
     def move_item(self, shortcuts):
         self._model.set_shortcuts(shortcuts)
-        self._view.refresh(self._model.get_shortcuts(force=True), force=True)
+        self._view.refresh(self._model.get_shortcuts(), force=True)
         
     def _page_change_callback(self):
-        self._view.refresh(self._model.get_shortcuts())
+        self._view.refresh(self._model.get_shortcuts_from_cache())
     
     def relocate_item(self, source_shortcut, folder_shortcut):
         self._view.close_folder_window()
@@ -33,7 +33,7 @@ class DesktopPresenter(object):
             source_shortcut, 
             folder_shortcut
             )
-        all_shortcuts = self._model.get_shortcuts(force=True)
+        all_shortcuts = self._model.get_shortcuts()
         self._view.refresh(all_shortcuts, force=True)
         if success:
             if folder_shortcut is not None:
@@ -97,10 +97,10 @@ class DesktopPresenter(object):
 
     def delete_shortcut(self, what):
         self._model.delete_shortcut(what)
-        self._view.refresh(self._model.get_shortcuts(force=True))
+        self._view.refresh(self._model.get_shortcuts())
     
     def rename_shortcut(self, shortcut_obj, new_name):
-        all_shortcuts = self._model.get_shortcuts()
+        all_shortcuts = self._model.get_shortcuts_from_cache()
         if not shortcut_obj._name == new_name.strip():
             new_name = self.check_shortcut_name(new_name, all_shortcuts)
             shortcut_obj._name = new_name

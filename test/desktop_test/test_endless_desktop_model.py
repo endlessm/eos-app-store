@@ -53,6 +53,14 @@ class DesktopModelTestCase(unittest.TestCase):
         #self.testObject.execute_app('123', params)
 
         #self.mock_app_launcher.launch.assert_called_once_with("eog", params)
+        
+    def test_get_shortcuts_from_datastore(self):
+        self.testObject.get_shortcuts()
+        self.mock_desktop_locale_datastore.get_all_shortcuts.assert_called_once_with(force=True)
+
+    def test_get_shortcuts_from_cache(self):
+        self.testObject.get_shortcuts_from_cache()
+        self.mock_desktop_locale_datastore.get_all_shortcuts.assert_called_once_with(force=False)
 
     def test_execute_app_with_cannot_find_app_no_exception(self):
         self.mock_app_datastore = Mock(AppDatastore)
@@ -109,10 +117,6 @@ class DesktopModelTestCase(unittest.TestCase):
         #self.mock_desktop_locale_datastore.set_all_shortcuts()
         app1 = self.available_app_shortcuts[0]
         self.assertEqual(self.testObject.delete_shortcut(app1), False, 'Delete shortcut, exception handled FAILED.')
-
-    def test_relocate_shortcut_invalid_source(self):
-        ret = self.testObject.relocate_shortcut(None, 'irrelevant')
-        self.assertEqual(ret, False)
 
     def test_relocate_shortcut_invalid_source(self):
         ret = self.testObject.relocate_shortcut(None, 'irrelevant')
