@@ -22,18 +22,18 @@ class NotificationPanel(gtk.HBox):
                 TimeDisplayPlugin,
                 AllSettingsPlugin
               ]
-    
+
     def __init__(self, parent):
         super(NotificationPanel, self).__init__(False, 2)
         self._parent = parent
-        
+
         self.notification_panel = gtk.Alignment(0.5, 0.5, 0, 0)
         self.notification_panel.set_padding(PanelConstants.get_padding(), 0, PanelConstants.get_padding(), 0)
         self.plugins_list = []
         notification_panel_items = gtk.HBox(False)
         self.notification_panel.add(notification_panel_items)
 
-        #Other plugins                    
+        #Other plugins
         for clazz in self.PLUGINS:
             try:
                 if clazz.is_plugin_enabled():
@@ -43,8 +43,8 @@ class NotificationPanel(gtk.HBox):
                     self.plugins_list.append(plugin)
             except Exception, e:
                 log.error('Error registering plugin for ' + clazz.__name__ + ': ' + e.message)
-            
-        self.pack_end(self.notification_panel, False, False, 30) 
+
+        self.pack_end(self.notification_panel, False, False, 30)
 
     def _register_plugin(self, notification_panel_items, clazz):
         plugin = clazz(PanelConstants.get_icon_size())
@@ -55,8 +55,8 @@ class NotificationPanel(gtk.HBox):
 
     def _launch_command(self, widget):
         widget.execute()
-        
+
     def close_settings_plugin_window(self):
         for plugin in self.plugins_list:
             plugin.emit("hide-window-event")
-        
+
