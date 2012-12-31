@@ -1,4 +1,5 @@
 import unittest
+from mock import Mock
 from notification_panel.network_plugin import NetworkSettingsPlugin
 
 class NetworkPluginTestCase(unittest.TestCase):
