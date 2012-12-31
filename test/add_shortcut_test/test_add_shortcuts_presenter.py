@@ -2,10 +2,8 @@ import unittest
 from mock import Mock
 from add_shortcuts_module.add_shortcuts_presenter import AddShortcutsPresenter
 from osapps.app_shortcut import AppShortcut
-import gtk
 from desktop_files.application_model import ApplicationModel
 from desktop_files.link_model import LinkModel
-import shutil
 
 class TestAddShortcutsPresenter(unittest.TestCase):
     def setUp(self):
@@ -40,8 +38,6 @@ class TestAddShortcutsPresenter(unittest.TestCase):
         self.test_object._add_shortcuts_view = self.mock_add_shortcuts_view
         self.test_object._name_format_util = self.mock_format_util
 
-        self.mock_presenter = Mock()
-
         self.path = '/tmp/'
         self.hint = 'blah'
         self.available_app_shortcuts = [
@@ -51,8 +47,6 @@ class TestAddShortcutsPresenter(unittest.TestCase):
                                         ]
         self.application_categories = ['AUDIO', 'VIDEO', 'MEDIA']
 
-        self.mock_presenter._model._app_desktop_datastore.get_all_shortcuts = Mock(return_value=self.available_app_shortcuts)
-        self.mock_presenter._model._app_desktop_datastore.add_shortcut = Mock()
 
     def test_get_category_data(self):
         self.test_object.get_category_data()
@@ -64,11 +58,13 @@ class TestAddShortcutsPresenter(unittest.TestCase):
         self.mock_model.get_folder_icons.assert_called_once_with(self.path, self.hint, '')
 
     def test_create_directory(self):
+        mock_datastore = Mock()
+        mock_datastore.get_all_shortcuts = Mock(return_value=self.available_app_shortcuts)
         dir_name = 'blah'
-        self.test_object.create_directory(dir_name, '/tmp/image.svg', self.mock_presenter)
+        self.test_object.create_directory(dir_name, '/tmp/image.svg', mock_datastore)
         self.mock_model.create_directory.assert_called_once_with(dir_name)
-        self.mock_presenter._model._app_desktop_datastore.get_all_shortcuts.assert_called_once_with(True)
-        self.mock_presenter._model._app_desktop_datastore.add_shortcut.assert_called_once()
+        mock_datastore.get_all_shortcuts.assert_called_once_with(True)
+        mock_datastore.add_shortcut.assert_called_once()
 
     def test_check_dir_name(self):
         expected_value = 'App 3'

@@ -72,8 +72,7 @@ class AddShortcutsView():
         self._parent.get_presenter().refresh_view()
 
     def create_folder(self, folder_name, image_file):
-        presenter = self._parent.get_presenter()
-        self._presenter.create_directory(folder_name, image_file, presenter)
+        self._presenter.create_directory(folder_name, image_file)
     
     def install_app(self, application_model):
         shortcut = self._presenter.build_shortcut_from_application_model(application_model)
