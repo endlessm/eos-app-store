@@ -92,8 +92,12 @@ class ShortcutCategoryBox(gtk.EventBox):
                     if category.active:
                         self._active_subcategory = category.category
             
-            if section.subcategories and section.active:
-                self._fill_subcategories(section, vbox)
+            # For now, we only support a single subcategory,
+            # so hide the display of the word "ALL"
+            # Re-enable the lines below once subcategory support
+            # is added back into the design.
+            # if section.subcategories and section.active:
+            #     self._fill_subcategories(section, vbox)
             
             vbox.pack_end(image_end)
             box.add(vbox)
