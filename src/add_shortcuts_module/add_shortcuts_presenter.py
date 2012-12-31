@@ -50,6 +50,9 @@ class AddShortcutsPresenter():
                 icon_dict = {'normal':image_file}
             shortcut = AppShortcut(key='', name=dir_name, icon=icon_dict)
             datastore.add_shortcut(shortcut)
+            
+    def add_shortcut(self, shortcut, datastore = DesktopLocaleDatastore()):
+        datastore.add_shortcut(shortcut)
 
     def get_folder_icons(self, path, prefix='', suffix=''):
         return self._model.get_folder_icons(path, prefix, suffix)

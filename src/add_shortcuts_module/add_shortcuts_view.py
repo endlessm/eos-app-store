@@ -84,8 +84,7 @@ class AddShortcutsView():
         self.install_shortcut(shortcut)
     
     def install_shortcut(self, shortcut):
-        parent_presenter = self._parent.get_presenter()
-        parent_presenter._model._app_desktop_datastore.add_shortcut(shortcut)
+        self._presenter.add_shortcut(shortcut)
     
     def _draw_triangle(self, widget, event):
         ctx = self.add_remove_vbox.window.cairo_create()

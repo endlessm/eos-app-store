@@ -65,6 +65,13 @@ class TestAddShortcutsPresenter(unittest.TestCase):
         self.mock_model.create_directory.assert_called_once_with(dir_name)
         mock_datastore.get_all_shortcuts.assert_called_once_with(True)
         mock_datastore.add_shortcut.assert_called_once()
+        
+    def test_add_shortcut(self):
+        mock_datastore = Mock()
+        shortcut = Mock()
+        self.test_object.add_shortcut(shortcut, mock_datastore)
+        mock_datastore.add_shortcut.called_once_with(shortcut)
+        
 
     def test_check_dir_name(self):
         expected_value = 'App 3'
