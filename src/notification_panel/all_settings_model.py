@@ -18,8 +18,9 @@ class AllSettingsModel(AbstractNotifier):
     LOGOUT_COMMAND = "kill -9 -1"
     RESTART_COMMAND = "sudo shutdown -r now"
     SHUTDOWN_COMMAND = "sudo shutdown -h now"
-
+    
     def __init__(self, os_util=OsUtil(), app_launcher=AppLauncher(), repo_chooser_launcher = RepoChooserLauncher(), update_manager=UpdateManager()):
+        self._can_show_dropdown = False
         self._os_util = os_util
         self._app_launcher = app_launcher
         self._repo_chooser_launcher = repo_chooser_launcher
@@ -68,3 +69,20 @@ class AllSettingsModel(AbstractNotifier):
     def _repo_chosen_callback(self):
         self._notify(self.UPDATE_STARTED)
         self._update_manager.update_os()
+        
+    def set_can_show_dropdown(self, can_show):
+        self._can_show_dropdown = can_show
+
+    def get_can_show_dropdown(self):
+        return self._can_show_dropdown
+        
+    def should_show_dropdown(self):
+        if not self.get_can_show_dropdown():
+            self.set_can_show_dropdown(True)
+        else:
+            self.set_can_show_dropdown(False)
+        return self.get_can_show_dropdown()
+        
+     
+
+            

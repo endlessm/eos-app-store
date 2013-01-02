@@ -1,6 +1,5 @@
 import gettext
 import gtk
-import datetime
 
 from ui.abstract_notifier import AbstractNotifier
 from eos_widgets.desktop_transparent_window import DesktopTransparentWindow
@@ -20,16 +19,14 @@ class AllSettingsView(AbstractNotifier):
     LOGOUT = "logout"
     RESTART = "restart"
     SHUTDOWN = "shutdown"
-    
+    FOCUS_OUT = "focus_out"
+        
     UPDATE_BUTTON_TEXT = _('Update')
     UPDATE_IN_PROGRESS_BUTTON_TEXT = _('Updating...')
 
     RESTART_MESSAGE = 1
     SHUTDOWN_MESSAGE = 2
     LOGOUT_MESSAGE = 4
-
-    _last_focus_out = datetime.datetime.min
-    _focus_out_period = datetime.timedelta(milliseconds=250)
 
     _messages = {
                     RESTART_MESSAGE:  _("Restart?"),
@@ -90,7 +87,8 @@ class AllSettingsView(AbstractNotifier):
         # with a transparent background and triangle decoration
         self._window.connect('expose-event', self._expose)
 
-        self._window.connect('focus-out-event', lambda w, e: self.hide_window())
+#        self._window.connect('focus-out-event', lambda w, e: self._notify(self.FOCUS_OUT))
+        self._window.connect('focus-out-event', lambda w, e: self._notify(self.FOCUS_OUT))
 
         # Place the widget in an event box within the window
         # (which has a different background than the transparent window)
@@ -136,18 +134,11 @@ class AllSettingsView(AbstractNotifier):
             return self._messages[message_id]
 
     def display(self):
-        # If we just had the focus out event (within the focus out period),
-        # don't display the menu, as it was most likely due to clicking
-        # on the settings icon to close the menu.
-        if (datetime.datetime.now() - AllSettingsView._last_focus_out) > AllSettingsView._focus_out_period:
-            self._window.show_all()
-            self._window.present()
+        self._window.show_all()
+        self._window.present()
 
     def hide_window(self):
-        # Keep track of when the focus out event occurred most recently
-        AllSettingsView._last_focus_out = datetime.datetime.now()
-        
-        self._window.destroy()
+        self._window.hide()
         
     def enable_update_button(self):
         self._button_update.set_sensitive(True)
@@ -165,5 +156,8 @@ class AllSettingsView(AbstractNotifier):
         info_message.set_title(_("Update started"))
         info_message.connect("response", lambda w, id: info_message.destroy()) 
         info_message.show() 
+        
+    def is_displayed(self):
+        return self._window.get_visible()
         
         

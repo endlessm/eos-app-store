@@ -129,3 +129,18 @@ class TestAllSettingsModel(unittest.TestCase):
         
         self.assertEquals(before - 1, after)
         
+    def test_if_dialog_not_open_return_that_can_open(self):
+        test_object = AllSettingsModel()
+        test_object.set_can_show_dropdown(False)
+        self.assertTrue(test_object.should_show_dropdown())
+
+    def test_if_dialog_is_open_return_that_can_close(self):
+        test_object = AllSettingsModel()
+        test_object.set_can_show_dropdown(True)
+        self.assertFalse(test_object.should_show_dropdown())
+       
+        
+        
+        
+        
+        

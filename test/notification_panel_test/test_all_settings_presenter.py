@@ -40,15 +40,10 @@ class AllSettingsPresenterTest(unittest.TestCase):
         self._mock_view.reset_mock()
         
         self._mock_view.inform_user_of_update = Mock()
-	
+
         self._start_update_listener()
         
         self._mock_view.inform_user_of_update.assert_called_once_with()
-
-    def test_initially_display_the_view(self):
-        AllSettingsPresenter(self._mock_view, self._mock_model, self._mock_background_chooser)
-
-        self._mock_view.display.assert_called_once_with()
 
     def test_initially_set_the_current_version_from_the_model(self):
         current_version = "this is the current version"
@@ -204,4 +199,24 @@ class AllSettingsPresenterTest(unittest.TestCase):
         self._desktop_listener()
 
         self._mock_background_chooser.launch.assert_called_once_with(self._mock_view)
+        
+    def test_display_dropdown_when_currently_not_displayed(self):
+        test_object = AllSettingsPresenter(self._mock_view, self._mock_model, self._mock_background_chooser)
+        
+        self._mock_model.should_show_dropdown = Mock(return_value=True)
+        
+        test_object.show_dropdown()
+        
+        self._mock_view.display.assert_called_once_with()
+        
+    def test_hide_dropdown_when_currently_displayed(self):
+        test_object = AllSettingsPresenter(self._mock_view, self._mock_model, self._mock_background_chooser)
+        
+        self._mock_model.should_show_dropdown = Mock(return_value=False)
+        
+        test_object.show_dropdown()
+        
+        self._mock_view.hide_window.assert_called_once_with()
+        
+        
 
