@@ -21,10 +21,10 @@ class SeparatorShortcut(DesktopShortcut):
     expanded = False
     
     def __init__(self, width, height):
-        super(SeparatorShortcut, self).__init__('', draggable=False)          
+        super(SeparatorShortcut, self).__init__('', draggable=False, has_icon=False,
+                                                width=width, height=height)
         self.w = width
         self.h = height
-        self.set_size_request(self.w, self.h)
         self._image_name = ''
         self._show_background = True
         self.show_all()

@@ -216,7 +216,7 @@ class EndlessDesktopView(gtk.Window):
         row = gtk.HBox()
         row.show()
 
-        sep_last = SeparatorShortcut(width=DesktopLayout.HORIZONTAL_SPACING, height=DesktopLayout.ICON_HEIGHT)
+        sep_last = SeparatorShortcut(width=DesktopLayout.get_separator_width(), height=DesktopLayout.ICON_HEIGHT)
         sep_last.connect("application-shortcut-move", self._rearrange_shortcuts)
         row.pack_start(sep_last, False, False, 0)
 
@@ -239,7 +239,7 @@ class EndlessDesktopView(gtk.Window):
             if item.parent != None:
                 print >> sys.stderr, "Item has parent!", item
             row.pack_start(item, False, False, 0)
-            sep_new = SeparatorShortcut(width=DesktopLayout.HORIZONTAL_SPACING, height=DesktopLayout.ICON_HEIGHT)
+            sep_new = SeparatorShortcut(width=DesktopLayout.get_separator_width(), height=DesktopLayout.ICON_HEIGHT)
             sep_new.connect("application-shortcut-move", self._rearrange_shortcuts)
             row.pack_start(sep_new, False, False, 0)
             sep_last.set_right_separator(sep_new)

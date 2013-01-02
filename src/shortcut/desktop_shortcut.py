@@ -57,26 +57,43 @@ class DesktopShortcut(gtk.VBox):
         for cb in cls._drag_begin_callbacks:
             cb(source)
 
-    def __init__(self, label_text="", draggable=True, highlightable=True):
+    def __init__(self, label_text="", draggable=True, highlightable=True, has_icon=True,
+                 width=DesktopLayout.LABEL_WIDTH_IN_PIXELS, height=DesktopLayout.ICON_HEIGHT):
         super(DesktopShortcut, self).__init__()
         self.__dnd_enter_flag = False
         
-        # Create the shortcut wider than the icon image
-        # so that the label can extend into the space between icons
-        width = DesktopLayout.LABEL_WIDTH_IN_PIXELS
-        height = DesktopLayout.ICON_HEIGHT
+        self._width = width
+        self._height = height
         self.set_size_request(width, height)
+        
+        if has_icon:
+            # Use the standard icon dimensions
+            # We will use a spacer to fill out the full dimensions
+            # so that the label can extend into the space between icons
+            self._icon_width = DesktopLayout.ICON_WIDTH
+            self._icon_height = DesktopLayout.ICON_HEIGHT
+        else:
+            # Let the icon fill the entire shortcut dimensions
+            self._icon_width = self._width
+            self._icon_height = self._height
         
         self._icon_event_box = self._create_icon(self.get_images(self.ICON_STATE_NORMAL))
         
-        # Center the icon within the shortcut
         self._centered_icon_hbox = gtk.HBox()
         self._centered_icon_hbox.set_size_request(width, height)
-#        self._spacer = gtk.VBox()
-#        self._spacer.set_size_request((112-64)/2, 64)
-#        self._hbox.pack_start(self._spacer, False, False)
-        self._centered_icon_hbox.pack_start(self._icon_event_box, False, False)
-
+        
+        if has_icon:
+            # Add spacers to center the icon within the shortcut
+            self._left_spacer = gtk.VBox()
+            self._right_spacer = gtk.VBox()
+            self._left_spacer.set_size_request(DesktopLayout.get_spacer_width(), height)
+            self._right_spacer.set_size_request(DesktopLayout.get_spacer_width(), height)
+            self._centered_icon_hbox.pack_start(self._left_spacer, False, False)
+            self._centered_icon_hbox.pack_start(self._icon_event_box, False, False)
+            self._centered_icon_hbox.pack_start(self._right_spacer, False, False)
+        else:
+            self._centered_icon_hbox.pack_start(self._icon_event_box, False, False)
+            
         self._label = gtk.Label(label_text)
         self._identifier = label_text
         self._centered_icon_hbox._identifier = label_text
@@ -93,7 +110,6 @@ class DesktopShortcut(gtk.VBox):
 
         self._label_event_box = ShadowedLabelBox(self._label)
 
-#        self.pack_start(self._hbox, False, False, 3)
         self.pack_start(self._centered_icon_hbox, False, False, 3)
         self.pack_start(self._label_event_box, False, False, 3)
 
@@ -125,7 +141,7 @@ class DesktopShortcut(gtk.VBox):
         self.highlightable = value
 
     def set_dnd_icon(self, image):
-        image.scale_from_width(48)
+        image.scale_from_width(DesktopLayout.DND_ICON_WIDTH)
         image.draw(self._icon_event_box.drag_source_set_icon_pixbuf)
 
     def dnd_send_data(self, widget, context, selection, targetType, eventTime):
@@ -161,8 +177,6 @@ class DesktopShortcut(gtk.VBox):
 
     def dnd_drag_end(self, widget, context):
         self.set_moving(False)
-#        self._label_event_box.show()
-#        self._hbox.show_all()
         self.show_all()
         DesktopShortcut._drag_end_broadcast(widget)
         if hasattr(self, '_drag_end_handler_callback'):
@@ -237,7 +251,7 @@ class DesktopShortcut(gtk.VBox):
 
     def _create_icon(self, images):
         icon = ImageEventBox(images)
-        icon.set_size_request(DesktopLayout.ICON_WIDTH, DesktopLayout.ICON_HEIGHT)
+        icon.set_size_request(self._icon_width, self._icon_height)
         icon.set_visible_window(False)
         icon.show()
 
