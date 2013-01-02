@@ -18,6 +18,7 @@ class RenameWidget:
         self.text_view.set_has_frame(False)
         self.text_view.set_editable(False)
         self.text_view.set_text(self.original_name)
+        self.text_view.set_state(gtk.STATE_SELECTED)
         self.text_view.select_region(0, -1)
         t_width = self.text_view.get_layout().get_pixel_size()[0]
         if t_width <= caller_width:
@@ -40,6 +41,7 @@ class RenameWidget:
             self._save_new_name(new_name)
     
     def _handle_click(self, widget, event):
+        self.text_view.set_state(gtk.STATE_NORMAL)
         self.text_view.set_editable(True)
     
     def _handle_focus_out(self, widget, event):
