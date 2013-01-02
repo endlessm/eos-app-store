@@ -4,7 +4,7 @@ from gtk import gdk
 import gobject
 
 from osapps.app_launcher import AppLauncher
-from feedback_plugin import FeedbackPlugin
+from feedback.feedback_plugin import FeedbackPlugin
 from search.search_box import SearchBox
 from eos_util import image_util
 from eos_util.image_util import load_pixbuf

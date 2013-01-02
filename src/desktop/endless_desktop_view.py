@@ -7,8 +7,8 @@ import gobject
 from gtk import gdk
 
 from shortcut.application_shortcut import ApplicationShortcut
-from feedback_module.feedback_response_dialog_view import FeedbackResponseDialogView
-from feedback_module.bugs_and_feedback_popup_window import BugsAndFeedbackPopupWindow
+from feedback.feedback_response_dialog_view import FeedbackResponseDialogView
+from feedback.bugs_and_feedback_popup_window import BugsAndFeedbackPopupWindow
 from shortcut.folder_shortcut import FolderShortcut
 from shortcut.separator_shortcut import SeparatorShortcut
 from shortcut.add_remove_shortcut import AddRemoveShortcut
