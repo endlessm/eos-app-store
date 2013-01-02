@@ -1,4 +1,4 @@
-import math
+from desktop_layout import DesktopLayout
 import sys
 import gettext
 
@@ -26,16 +26,6 @@ gtk.gdk.threads_init()
 
 class EndlessDesktopView(gtk.Window):
     
-    MAX_ICONS_IN_ROW = 7
-    
-    # Set the spacing to match the size of the icon
-    # Note: vertical spacing is handled in DesktopPage
-#    # Note: icon width is 64 within a box of width 112
-#    HORIZONTAL_SPACING = 2 * 64 - 112
-    HORIZONTAL_SPACING = 64
-
-    LABEL_HEIGHT = 10
-    _padding = 100
     _app_shortcuts = {}
 
     def __init__(self):
@@ -84,9 +74,7 @@ class EndlessDesktopView(gtk.Window):
         self.add(self._desktop)
         self.show_all()
 
-        #self._max_icons_in_row = self._calculate_max_icons()
-        self._max_icons_in_row = self.MAX_ICONS_IN_ROW
-        self._max_rows_in_page = 4
+        self._max_icons_in_row, self._max_rows_in_page = self._calculate_max_icons()
 
         screen = gtk.gdk.Screen() #@UndefinedVariable
         screen.connect('size-changed', lambda s: self._set_background(self.BACKGROUND_NAME))
@@ -228,7 +216,7 @@ class EndlessDesktopView(gtk.Window):
         row = gtk.HBox()
         row.show()
 
-        sep_last = SeparatorShortcut(width=self.HORIZONTAL_SPACING)
+        sep_last = SeparatorShortcut(width=DesktopLayout.HORIZONTAL_SPACING, height=DesktopLayout.ICON_HEIGHT)
         sep_last.connect("application-shortcut-move", self._rearrange_shortcuts)
         row.pack_start(sep_last, False, False, 0)
 
@@ -251,7 +239,7 @@ class EndlessDesktopView(gtk.Window):
             if item.parent != None:
                 print >> sys.stderr, "Item has parent!", item
             row.pack_start(item, False, False, 0)
-            sep_new = SeparatorShortcut(width=self.HORIZONTAL_SPACING)
+            sep_new = SeparatorShortcut(width=DesktopLayout.HORIZONTAL_SPACING, height=DesktopLayout.ICON_HEIGHT)
             sep_new.connect("application-shortcut-move", self._rearrange_shortcuts)
             row.pack_start(sep_new, False, False, 0)
             sep_last.set_right_separator(sep_new)
@@ -292,10 +280,9 @@ class EndlessDesktopView(gtk.Window):
             )
 
     def _calculate_max_icons(self):
-        width = self._get_net_work_area()[0]
-
-        available_width = width - (self._padding * 2)
-        return math.floor(available_width / 125)
+        # For now, these are hard-coded constants.
+        # TODO: Calculate based on available desktop size (scale with display resolution)
+        return (DesktopLayout.MAX_ICONS_IN_ROW, DesktopLayout.MAX_ROWS_OF_ICONS)
 
     def _get_net_work_area(self):
         """this section of code gets the net available area on the window (i.e. root window - panels)"""

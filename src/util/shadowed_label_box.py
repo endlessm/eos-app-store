@@ -42,10 +42,10 @@ class ShadowedLabelBox(gtk.EventBox):
     def _click_handler(self, widget, event):
         if event.button == 1:
 #            # Label box needs the same x offset as the icon
-#            xoffset = (112-64)/2
-            xoffset = 0
-            yoffset = widget.get_toplevel().window.get_origin()[1]
-            RenameWidget(x=self._label.allocation.x, y=self._label.allocation.y, caller=widget.parent, x_offset=xoffset, y_offset=yoffset)
+#            x_offset = (112-64)/2
+            x_offset = 0
+            y_offset = widget.get_toplevel().window.get_origin()[1]
+            RenameWidget(x=self._label.allocation.x + x_offset, y=self._label.allocation.y + y_offset, caller=widget.parent)
         return False
     
     def refresh(self):

@@ -1,0 +1,10 @@
+class DesktopLayout(object):
+    
+    ICON_WIDTH = 64
+    ICON_HEIGHT = 64
+    LABEL_WIDTH_IN_PIXELS = 64
+    HORIZONTAL_SPACING = 64
+    VERTICAL_SPACING = 64
+    MAX_ICONS_IN_ROW = 7
+    MAX_ROWS_OF_ICONS = 4
+    

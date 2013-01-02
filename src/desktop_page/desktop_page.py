@@ -1,14 +1,10 @@
 import gtk
 from eos_util.image import Image
-from eos_widgets.image_eventbox import ImageEventBox
+from desktop.desktop_layout import DesktopLayout
 from responsive import Button
 
 class DesktopPage(gtk.VBox):
 
-    # Set the spacing to match the size of the icon
-    # Note: horizontal spacing is handled in EndlessDesktopView
-    VERTICAL_SPACING = 64
-    
     pages = []
     page = None
     page_buttons = []
@@ -21,8 +17,8 @@ class DesktopPage(gtk.VBox):
             items,
             create_row_callback,
             reload_callback,
-            max_items_in_row=7,
-            max_rows_in_page=4
+            max_items_in_row,
+            max_rows_in_page
             ):
         cls.pages = []
         cls.items = items
@@ -193,7 +189,7 @@ class DesktopPage(gtk.VBox):
         self.icons_alignment = gtk.Alignment(0.5, 0.5, 0.0, 0.0)
 
         self.desk_area = gtk.VBox(homogeneous=True)
-        self.desk_area.set_spacing(self.VERTICAL_SPACING)
+        self.desk_area.set_spacing(DesktopLayout.VERTICAL_SPACING)
 
         hide_btn = True
         if self.__class__.has_prev():

@@ -20,7 +20,7 @@ class SeparatorShortcut(DesktopShortcut):
     right_widget = None
     expanded = False
     
-    def __init__(self, width=30, height=64):
+    def __init__(self, width, height):
         super(SeparatorShortcut, self).__init__('', draggable=False)          
         self.w = width
         self.h = height

@@ -3,6 +3,7 @@ from util import label_util
 import gobject
 from util.shadowed_label_box import ShadowedLabelBox
 from eos_widgets.image_eventbox import ImageEventBox
+from desktop.desktop_layout import DesktopLayout
 import gtk
 
 class DesktopShortcut(gtk.VBox):
@@ -63,7 +64,7 @@ class DesktopShortcut(gtk.VBox):
 #        # Create the shortcut wider than the icon image
 #        # so that the label can extend into the space between icons
 #        self.set_size_request(112, 64)
-        self.set_size_request(64, 64)
+        self.set_size_request(DesktopLayout.ICON_WIDTH, DesktopLayout.ICON_HEIGHT)
         
         self._event_box = self._create_icon(self.get_images(self.ICON_STATE_NORMAL))
         
@@ -232,17 +233,9 @@ class DesktopShortcut(gtk.VBox):
             super(DesktopShortcut, self).connect(signal, callback)
             self._callbacks.append(callback)
 
-    def _create_event_box(self):
-        event_box = gtk.EventBox()
-        event_box.set_size_request(64, 64)
-        event_box.set_visible_window(False)
-        event_box.show()
-
-        return event_box
-
     def _create_icon(self, images):
         icon = ImageEventBox(images)
-        icon.set_size_request(64, 64)
+        icon.set_size_request(DesktopLayout.ICON_WIDTH, DesktopLayout.ICON_HEIGHT)
         icon.set_visible_window(False)
         icon.show()
 

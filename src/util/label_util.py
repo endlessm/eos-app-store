@@ -1,6 +1,5 @@
 import string
-#MAX_LINE_LENGTH_IN_PIXELS = 112
-MAX_LINE_LENGTH_IN_PIXELS = 64
+from desktop.desktop_layout import DesktopLayout
 
 def wrap_text(widget, text):
     return_text = text
@@ -12,7 +11,7 @@ def wrap_text(widget, text):
     return return_text
 
 def wrapped_text_needed(return_text_width):
-    return return_text_width > MAX_LINE_LENGTH_IN_PIXELS
+    return return_text_width > DesktopLayout.LABEL_WIDTH_IN_PIXELS
 
 def ellipsize_last_line(widget, return_text):
     lines = return_text.split("\n")
@@ -32,13 +31,13 @@ def ellipsize_last_line(widget, return_text):
 
 def ellipsize_line(widget, line):
     length = get_length_for_word(widget, line)
-    while(length > MAX_LINE_LENGTH_IN_PIXELS):
+    while(length > DesktopLayout.LABEL_WIDTH_IN_PIXELS):
         line = line[0:-1]
         length = get_length_for_word(widget, line + "...")
     return line + "..."
 
 def line_needs_ellipsized(widget, line):
-    return get_length(widget, line) > MAX_LINE_LENGTH_IN_PIXELS
+    return get_length(widget, line) > DesktopLayout.LABEL_WIDTH_IN_PIXELS
 
 def get_length(widget, text):
     return widget.create_pango_layout(text).get_pixel_size()[0]
@@ -62,7 +61,7 @@ def add_line_break(widget, text):
         next_word_len = get_length_for_word(widget, " " + word)
         if curr_len == 0:
             return_text += word
-        elif curr_len + next_word_len <= MAX_LINE_LENGTH_IN_PIXELS:
+        elif curr_len + next_word_len <= DesktopLayout.LABEL_WIDTH_IN_PIXELS:
             return_text += " " + word
         else:
             return_text += "\n" + word
