@@ -34,8 +34,8 @@ class SeparatorShortcut(DesktopShortcut):
             )
         
     def _received_handler_callback(self, source, destination, x, y, data=None):
-        dest_widget = destination.parent
-        source_widget = source.parent
+        dest_widget = destination.parent.parent
+        source_widget = source.parent.parent
         
         if isinstance(dest_widget, SeparatorShortcut) and \
             (source_widget is not self.left_widget) and \

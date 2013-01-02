@@ -26,13 +26,13 @@ class ApplicationShortcut(DesktopShortcut):
         
         super(ApplicationShortcut, self).__init__(label_text)
         
-        self._event_box.connect("button-press-event", self.mouse_press_callback)
-        self._event_box.connect("button-release-event", self.mouse_release_callback)
-        self._event_box.connect("enter-notify-event", self.mouse_over_callback)
-        self._event_box.connect("leave-notify-event", self.mouse_out_callback)
+        self._icon_event_box.connect("button-press-event", self.mouse_press_callback)
+        self._icon_event_box.connect("button-release-event", self.mouse_release_callback)
+        self._icon_event_box.connect("enter-notify-event", self.mouse_over_callback)
+        self._icon_event_box.connect("leave-notify-event", self.mouse_out_callback)
         
-        self._event_box.set_data('id', self._shortcut.key())
-        self._event_box.set_data('params', self._shortcut.params())
+        self._icon_event_box.set_data('id', self._shortcut.key())
+        self._icon_event_box.set_data('params', self._shortcut.params())
         
         self.show_all()
         self.set_moving(False)
@@ -130,30 +130,30 @@ class ApplicationShortcut(DesktopShortcut):
         if not self.is_moving():
             if event.button == 1:
                 self.emit("application-shortcut-activate", self._shortcut.key(), self._shortcut.params())
-                self._event_box.set_images(self.get_images(self.ICON_STATE_NORMAL))
-                self._event_box.hide()
-                self._event_box.show()
+                self._icon_event_box.set_images(self.get_images(self.ICON_STATE_NORMAL))
+                self._icon_event_box.hide()
+                self._icon_event_box.show()
                 return True
         return False
     
     def mouse_press_callback(self, widget, event):
         if event.button == 1: # and event.type == gtk.gdk._2BUTTON_PRESS:
-            self._event_box.set_images(self.get_images(self.ICON_STATE_PRESSED))
-            self._event_box.hide()
-            self._event_box.show()
+            self._icon_event_box.set_images(self.get_images(self.ICON_STATE_PRESSED))
+            self._icon_event_box.hide()
+            self._icon_event_box.show()
             return True
         return False
     
     def mouse_out_callback(self, widget, event):
-        self._event_box.set_images(self.get_images(self.ICON_STATE_NORMAL))
-        self._event_box.hide()
-        self._event_box.show()
+        self._icon_event_box.set_images(self.get_images(self.ICON_STATE_NORMAL))
+        self._icon_event_box.hide()
+        self._icon_event_box.show()
         return True
         
     def mouse_over_callback(self, widget, event):
-        self._event_box.set_images(self.get_images(self.ICON_STATE_MOUSEOVER))
-        self._event_box.hide()
-        self._event_box.show()
+        self._icon_event_box.set_images(self.get_images(self.ICON_STATE_MOUSEOVER))
+        self._icon_event_box.hide()
+        self._icon_event_box.show()
         return True
 
     def set_shortcut(self, shortcut):

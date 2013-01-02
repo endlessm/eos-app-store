@@ -61,25 +61,26 @@ class DesktopShortcut(gtk.VBox):
         super(DesktopShortcut, self).__init__()
         self.__dnd_enter_flag = False
         
-#        # Create the shortcut wider than the icon image
-#        # so that the label can extend into the space between icons
-#        self.set_size_request(112, 64)
-        self.set_size_request(DesktopLayout.ICON_WIDTH, DesktopLayout.ICON_HEIGHT)
+        # Create the shortcut wider than the icon image
+        # so that the label can extend into the space between icons
+        width = DesktopLayout.LABEL_WIDTH_IN_PIXELS
+        height = DesktopLayout.ICON_HEIGHT
+        self.set_size_request(width, height)
         
-        self._event_box = self._create_icon(self.get_images(self.ICON_STATE_NORMAL))
+        self._icon_event_box = self._create_icon(self.get_images(self.ICON_STATE_NORMAL))
         
-#        # Center the icon within the shortcut
-#        self._hbox = gtk.HBox()
-#        self._hbox.set_size_request(112, 64)
+        # Center the icon within the shortcut
+        self._centered_icon_hbox = gtk.HBox()
+        self._centered_icon_hbox.set_size_request(width, height)
 #        self._spacer = gtk.VBox()
 #        self._spacer.set_size_request((112-64)/2, 64)
 #        self._hbox.pack_start(self._spacer, False, False)
-#        self._hbox.pack_start(self._event_box, False, False)
+        self._centered_icon_hbox.pack_start(self._icon_event_box, False, False)
 
         self._label = gtk.Label(label_text)
         self._identifier = label_text
-#        self._hbox._identifier = label_text
-        self._event_box._identifier = label_text
+        self._centered_icon_hbox._identifier = label_text
+        self._icon_event_box._identifier = label_text
 
         new_style = self._label.get_style().copy()
         new_style.fg[gtk.STATE_NORMAL] = self._label.get_colormap().alloc('#f0f0f0')
@@ -93,23 +94,23 @@ class DesktopShortcut(gtk.VBox):
         self._label_event_box = ShadowedLabelBox(self._label)
 
 #        self.pack_start(self._hbox, False, False, 3)
-        self.pack_start(self._event_box, False, False, 3)
+        self.pack_start(self._centered_icon_hbox, False, False, 3)
         self.pack_start(self._label_event_box, False, False, 3)
 
         self.highlightable = highlightable
         if draggable:
-            self._event_box.connect("drag_data_get", self.dnd_send_data)
-            self._event_box.drag_source_set(
+            self._icon_event_box.connect("drag_data_get", self.dnd_send_data)
+            self._icon_event_box.drag_source_set(
                 gtk.gdk.BUTTON1_MASK,
                 self.DND_TRANSFER_TYPE,
                 gtk.gdk.ACTION_MOVE
                 )
-        self._event_box.connect("drag_data_received", self.dnd_receive_data)
-        self._event_box.connect("drag_motion", self.dnd_motion_data)
-        self._event_box.connect("drag_end", self.dnd_drag_end)
-        self._event_box.connect("drag_begin", self.dnd_drag_begin)
-        self._event_box.connect("drag_leave", self.dnd_drag_leave)
-        self._event_box.drag_dest_set(
+        self._icon_event_box.connect("drag_data_received", self.dnd_receive_data)
+        self._icon_event_box.connect("drag_motion", self.dnd_motion_data)
+        self._icon_event_box.connect("drag_end", self.dnd_drag_end)
+        self._icon_event_box.connect("drag_begin", self.dnd_drag_begin)
+        self._icon_event_box.connect("drag_leave", self.dnd_drag_leave)
+        self._icon_event_box.drag_dest_set(
             #gtk.DEST_DEFAULT_HIGHLIGHT |
             gtk.DEST_DEFAULT_MOTION |
             gtk.DEST_DEFAULT_DROP,
@@ -118,14 +119,14 @@ class DesktopShortcut(gtk.VBox):
             )
 
     def __str__(self):
-        return self._event_box._identifier
+        return self._icon_event_box._identifier
 
     def set_is_highlightable(self, value):
         self.highlightable = value
 
     def set_dnd_icon(self, image):
         image.scale_from_width(48)
-        image.draw(self._event_box.drag_source_set_icon_pixbuf)
+        image.draw(self._icon_event_box.drag_source_set_icon_pixbuf)
 
     def dnd_send_data(self, widget, context, selection, targetType, eventTime):
         if targetType == self.DND_TARGET_TYPE_TEXT:
@@ -160,8 +161,9 @@ class DesktopShortcut(gtk.VBox):
 
     def dnd_drag_end(self, widget, context):
         self.set_moving(False)
-        self._label_event_box.show()
-        self._event_box.show()
+#        self._label_event_box.show()
+#        self._hbox.show_all()
+        self.show_all()
         DesktopShortcut._drag_end_broadcast(widget)
         if hasattr(self, '_drag_end_handler_callback'):
             self._drag_end_handler_callback(widget)
@@ -169,7 +171,7 @@ class DesktopShortcut(gtk.VBox):
     def dnd_drag_begin(self, widget, context):
         self.set_moving(True)
         self._label_event_box.hide()
-        self._event_box.hide()
+        self._icon_event_box.hide()
         DesktopShortcut._drag_begin_broadcast(widget)
         self.emit("desktop-shortcut-dnd-begin")
         if hasattr(self, '_drag_begin_handler_callback'):
@@ -197,7 +199,7 @@ class DesktopShortcut(gtk.VBox):
 
     def _refresh(self, images=None):
         images = images or self.get_images(self.ICON_STATE_NORMAL)
-        self._event_box.set_images(images)
+        self._icon_event_box.set_images(images)
         self._label_event_box.refresh()
 
     def get_shortcut(self):
@@ -244,7 +246,7 @@ class DesktopShortcut(gtk.VBox):
     def destroy(self):
         self.unparent()
         self._label.destroy()
-        self._event_box.destroy()
+        self._centered_icon_hbox.destroy()
 
     def rename_shortcut(self, new_name):
         self.emit("desktop-shortcut-rename", new_name)
