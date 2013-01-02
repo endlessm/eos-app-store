@@ -1,14 +1,24 @@
 import gtk
+import gobject
 
 from feedback.feedback_response_dialog_view import FeedbackResponseDialogView
 from feedback.bugs_and_feedback_popup_window import BugsAndFeedbackPopupWindow
+from feedback.feedback_plugin_model import FeedbackPluginModel
+from feedback.feedback_plugin_presenter import FeedbackPluginPresenter
 from eos_util.image import Image
+
+
+from metrics.time_provider import TimeProvider
+from util.feedback_manager import FeedbackManager
+
 
 class FeedbackPlugin(gtk.EventBox):
     def __init__(self, parent, icon_size):
         super(FeedbackPlugin, self).__init__()
 
         self._parent = parent
+
+        self._presenter = FeedbackPluginPresenter(FeedbackPluginModel(FeedbackManager(), TimeProvider()))
 
         self._pixbuf_normal = Image.from_name('report-icon_normal.png').scale(icon_size, icon_size)
         self._pixbuf_hover = Image.from_name('report-icon_hover.png').scale(icon_size, icon_size)
