@@ -1,5 +1,6 @@
 import string
-MAX_LINE_LENGTH_IN_PIXELS = 112
+#MAX_LINE_LENGTH_IN_PIXELS = 112
+MAX_LINE_LENGTH_IN_PIXELS = 64
 
 def wrap_text(widget, text):
     return_text = text

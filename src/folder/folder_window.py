@@ -11,8 +11,9 @@ WIDGET_HEIGHT = 64
 WIDGET_WIDTH = 64
 WIDGET_LABEL_HEIGHT = 20
 WIDGET_VERTICAL_SPACING = 64
-# Note: icon width is 64 within a box of width 112
-WIDGET_HORIZONTAL_SPACING = 2 * 64 - 112
+## Note: icon width is 64 within a box of width 112
+#WIDGET_HORIZONTAL_SPACING = 2 * 64 - 112
+WIDGET_HORIZONTAL_SPACING = 64
 WIDGET_PADDING = 20
 
 class OpenFolderWindow():
