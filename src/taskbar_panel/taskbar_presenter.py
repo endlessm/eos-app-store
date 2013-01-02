@@ -1,5 +1,3 @@
-import sys
-
 class TaskbarPresenter(object):
     def __init__(self, app_launcher):
         pass

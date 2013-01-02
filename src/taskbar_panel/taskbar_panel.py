@@ -29,8 +29,9 @@ class TaskbarPanel(gtk.EventBox):
 
     ICON_SIZE = 24
 
-    def __init__(self, width):
+    def __init__(self, parent, width):
         super(TaskbarPanel, self).__init__()
+        self._parent = parent
         self.set_visible_window(False)
         self.set_app_paintable(True)
         self._presenter = TaskbarPresenter(AppLauncher())
@@ -58,8 +59,7 @@ class TaskbarPanel(gtk.EventBox):
         display_on_right(feedback_plugin)
 
     def _setup_feedback_icon_on_taskbar(self):
-        feedback_plugin = FeedbackPlugin(self.ICON_SIZE)
-        feedback_plugin.connect('button-press-event', lambda w, e:self.emit('feedback-clicked'))
+        feedback_plugin = FeedbackPlugin(self._parent, self.ICON_SIZE)
         return feedback_plugin
 
     def _setup_social_bar_icon_on_taskbar(self):

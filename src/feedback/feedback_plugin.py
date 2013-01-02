@@ -1,19 +1,23 @@
 import gtk
 
+from feedback.feedback_response_dialog_view import FeedbackResponseDialogView
+from feedback.bugs_and_feedback_popup_window import BugsAndFeedbackPopupWindow
 from eos_util.image import Image
 
 class FeedbackPlugin(gtk.EventBox):
-    def __init__(self, icon_size):
+    def __init__(self, parent, icon_size):
         super(FeedbackPlugin, self).__init__()
- 
+
+        self._parent = parent
+
         self._pixbuf_normal = Image.from_name('report-icon_normal.png').scale(icon_size, icon_size)
         self._pixbuf_hover = Image.from_name('report-icon_hover.png').scale(icon_size, icon_size)
         self._pixbuf_down = Image.from_name('report-icon_down.png').scale(icon_size, icon_size)
-        
+
         self._feedback_icon = gtk.Image()
-        
+
         self._pixbuf_normal.draw(self._feedback_icon.set_from_pixbuf)
-        
+
         self.set_visible_window(False)
         self.add(self._feedback_icon)
 
@@ -22,5 +26,27 @@ class FeedbackPlugin(gtk.EventBox):
         self.connect('button-press-event', lambda w, e: self.toggle_image(self._feedback_icon, self._pixbuf_down))
         self.connect('button-release-event',lambda w, e: self.toggle_image(self._feedback_icon, self._pixbuf_normal))
 
+        self.connect('button-press-event', lambda w, e:self._feedback_icon_clicked_callback())
+
     def toggle_image(self, image, pixbuf):
         pixbuf.draw(image.set_from_pixbuf)
+
+    def _feedback_submitted(self, widget):
+        self._presenter.submit_feedback(self._feedback_popup.get_text(), self._feedback_popup.is_bug())
+        self._feedback_popup.destroy()
+        self._show_feedback_thank_you_message()
+
+    def _show_feedback_thank_you_message(self):
+        #spawn wait indicator
+        self._feedback_thank_you_dialog = FeedbackResponseDialogView()
+        self._feedback_thank_you_dialog.show()
+        gobject.timeout_add(3000, self._feedback_thanks_close)
+
+    def _feedback_thanks_close(self):
+        self._feedback_thank_you_dialog.destroy()
+        return False
+
+    # Show popup
+    def _feedback_icon_clicked_callback(self):
+        self._feedback_popup = BugsAndFeedbackPopupWindow(self._parent, self._feedback_submitted)
+        self._feedback_popup.show()
