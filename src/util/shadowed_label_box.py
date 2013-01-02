@@ -2,6 +2,7 @@ import gtk
 import cairo
 
 from util.rename_widget import RenameWidget
+from desktop.desktop_layout import DesktopLayout
 
 class ShadowedLabelBox(gtk.EventBox):
     def __init__(self, label):
@@ -45,7 +46,8 @@ class ShadowedLabelBox(gtk.EventBox):
 #            x_offset = (112-64)/2
             x_offset = 0
             y_offset = widget.get_toplevel().window.get_origin()[1]
-            RenameWidget(x=self._label.allocation.x + x_offset, y=self._label.allocation.y + y_offset, caller=widget.parent)
+            RenameWidget(x=self._label.allocation.x + x_offset, y=self._label.allocation.y + y_offset,
+                         caller=widget.parent, caller_width=DesktopLayout.LABEL_WIDTH_IN_PIXELS)
         return False
     
     def refresh(self):
