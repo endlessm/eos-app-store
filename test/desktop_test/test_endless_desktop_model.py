@@ -70,13 +70,6 @@ class DesktopModelTestCase(unittest.TestCase):
 
         self.assertFalse(self.mock_app_launcher.launch.called)
 
-    def test_launch_search_launches_browser_with_search_string(self):
-        search_string = "foo"
-
-        self.testObject.launch_search(search_string)
-
-        self.mock_app_launcher.launch_browser.assert_called_once_with(search_string)
-
     def test_get_background_delegates_to_preferences_datastore(self):
         self.testObject.get_background_image()
 

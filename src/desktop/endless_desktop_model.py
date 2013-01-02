@@ -71,9 +71,6 @@ class EndlessDesktopModel(object):
         data = {"message":message, "timestamp":self._time_provider.get_current_time(), "bug":bug}
         self._feedback_manager.write_data(data)
 
-    def launch_search(self, search_string):
-        self._app_launcher.launch_browser(search_string)
-
     def set_background(self, filename):
         new_image_path = image_util.image_path(filename)
         self._preferences_provider.set_background(new_image_path)

@@ -94,7 +94,6 @@ class EndlessDesktopView(gtk.Window):
 
     def set_presenter(self, presenter):
         self._presenter = presenter
-        self._taskbar_panel.connect('launch-search', lambda w, s: self._presenter.launch_search(s))
 
     def get_presenter(self):
         return self._presenter

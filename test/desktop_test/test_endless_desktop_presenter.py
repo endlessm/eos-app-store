@@ -59,13 +59,6 @@ class TestEndlessDesktopPresenter(unittest.TestCase):
         except:
             self.fail("Should not have thrown any errors as no code should have executed")
 
-    def test_launch_search_launches_search(self):
-        search_string = "blah"
-
-        self.testObject.launch_search(search_string)
-
-        self.mock_model.launch_search.assert_called_once_with(search_string)
-
     def test_change_background_sets_background(self):
         self.mock_model.reset_mock()
         self.mock_view.reset_mock()
