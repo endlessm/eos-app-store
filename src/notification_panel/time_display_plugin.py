@@ -18,36 +18,31 @@ class TimeDisplayPlugin(NotificationPlugin):
     
     def __init__(self, icon_size, time_display_plugin_model=TimeDisplayPluginModel()):
         super(TimeDisplayPlugin, self).__init__(self.COMMAND)
+        self._time_display_plugin_model = time_display_plugin_model
         
         self._update_time()
         
         self.set_visible_window(False)
 
-        self._time_display_plugin_model = time_display_plugin_model
-        
-        self._update_time()
         gobject.timeout_add(10000, self._update_time)
 
         self.connect("expose-event", self._draw)
     
     def _update_time(self):
-        try:
-            date = self._time_display_plugin_model.get_date_text()
+        date = self._time_display_plugin_model.get_date_text()
 
-            attributes = pango.parse_markup('<span color="#f6f6f6" size="large" weight="bold">' + date + '</span>', u'\x00')[0]
-            self._text_layout = self.create_pango_layout(date)
-            self._text_layout.set_attributes(attributes)
-            
-            shadow_attributes = pango.parse_markup('<span size="large" weight="bold">' + date + '</span>', u'\x00')[0]
-            self._shadow_layout = self.create_pango_layout(date)
-            self._shadow_layout.set_attributes(shadow_attributes)
+        attributes = pango.parse_markup('<span color="#f6f6f6" size="large" weight="bold">' + date + '</span>', u'\x00')[0]
+        self._text_layout = self.create_pango_layout(date)
+        self._text_layout.set_attributes(attributes)
+        
+        shadow_attributes = pango.parse_markup('<span size="large" weight="bold">' + date + '</span>', u'\x00')[0]
+        self._shadow_layout = self.create_pango_layout(date)
+        self._shadow_layout.set_attributes(shadow_attributes)
 
-            text_size_x, text_size_y = self._text_layout.get_pixel_size()
-            self.set_size_request(text_size_x + self.SHADOW_OFFSET + self.LEFT_MARGIN + self.RIGHT_MARGIN, text_size_y + self.SHADOW_OFFSET)
-            
-            self.queue_draw()
-        except:
-            pass
+        text_size_x, text_size_y = self._text_layout.get_pixel_size()
+        self.set_size_request(text_size_x + self.SHADOW_OFFSET + self.LEFT_MARGIN + self.RIGHT_MARGIN, text_size_y + self.SHADOW_OFFSET)
+        
+        self.queue_draw()
         
         return True
         
