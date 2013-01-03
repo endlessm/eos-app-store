@@ -18,7 +18,6 @@ class SeparatorShortcut(DesktopShortcut):
     right = None
     left_widget = None
     right_widget = None
-    expanded = False
     
     def __init__(self, width, height):
         super(SeparatorShortcut, self).__init__('', draggable=False, has_icon=False,
@@ -84,11 +83,14 @@ class SeparatorShortcut(DesktopShortcut):
         if self.left:
             self.left.set_size_request(self.left.w-10, self.left.h)
             _w += 10
-        if self.right:
-            self.right.set_size_request(self.right.w-10, self.right.h)
+        # At the end of the last row, the final separator
+        # before the add/remove icon has a right widget
+        # but no right separator
+        if self.right_widget:
+            if self.right:
+                self.right.set_size_request(self.right.w-10, self.right.h)
             _w += 10
         self.set_size_request(self.w+_w, self.h)
-        self.expanded = True
         
     def reset(self):
         if self.left:
@@ -96,5 +98,3 @@ class SeparatorShortcut(DesktopShortcut):
         if self.right:
             self.right.set_size_request(self.right.w, self.right.h)
         self.set_size_request(self.w, self.h)
-        self.expanded = False
-        

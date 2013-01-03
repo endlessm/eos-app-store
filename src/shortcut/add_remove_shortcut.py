@@ -133,8 +133,6 @@ class AddRemoveShortcut(DesktopShortcut):
         if result:
             self.emit("application-shortcut-remove", widget.parent.get_shortcut())
         else:
-            print widget
-            print widget.parent
             widget.parent.set_images(widget.parent.get_images(self.ICON_STATE_NORMAL))
             widget.hide()
             widget.show()

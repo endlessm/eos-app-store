@@ -254,6 +254,12 @@ class EndlessDesktopView(gtk.Window):
             add_remove.connect("application-shortcut-remove", self._delete_shortcuts)
             row.pack_start(add_remove, False, False, 0)
             add_remove.show()
+            if len(items) > 0:
+                # Add support to slide the AddRemove icon to the right
+                # during icon drag and drop, unless there are no other items
+                # in the row (in which case we currently do not support
+                # moving the icon to the first position of the last row)
+                sep_last.set_right_widget(add_remove)
 
         return row
 
