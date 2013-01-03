@@ -16,15 +16,9 @@ from taskbar_presenter import TaskbarPresenter
 
 class TaskbarPanel(gtk.EventBox):
     __gsignals__ = {
-                    'feedback-clicked': (gobject.SIGNAL_RUN_FIRST, #@UndefinedVariable
-                                         gobject.TYPE_NONE,
-                                         ()),
                     'social-bar-clicked': (gobject.SIGNAL_RUN_FIRST, #@UndefinedVariable
                                          gobject.TYPE_NONE,
                                          ()),
-                    #,'launch-search': (gobject.SIGNAL_RUN_FIRST, #@UndefinedVariable
-                                        #gobject.TYPE_NONE,
-                                        #(gobject.TYPE_PYOBJECT,)),
     }
 
     ICON_SIZE = 24
@@ -63,7 +57,7 @@ class TaskbarPanel(gtk.EventBox):
         return feedback_plugin
 
     def _setup_social_bar_icon_on_taskbar(self):
-        social_bar_plugin = SocialBarPlugin(self.ICON_SIZE)
+        social_bar_plugin = SocialBarPlugin(self._parent, self.ICON_SIZE)
         social_bar_plugin.connect('button-press-event', lambda w, e:self.emit('social-bar-clicked'))
         return TaskbarShortcut(social_bar_plugin, social_bar_plugin.PATH)
 
