@@ -8,29 +8,31 @@ import locale
 
 from notification_panel_config import NotificationPanelConfig
 from notification_plugin import NotificationPlugin
-from eos_util.locale_util import LocaleUtil
+from notification_plugin import NotificationPlugin
+from time_display_plugin_model import TimeDisplayPluginModel
 
 class TimeDisplayPlugin(NotificationPlugin):
     COMMAND = 'sudo gnome-control-center --class=eos-network-manager datetime'
     LEFT_MARGIN = 3
     RIGHT_MARGIN = 3
     
-    def __init__(self, icon_size):
+    def __init__(self, icon_size, time_display_plugin_model=TimeDisplayPluginModel()):
         super(TimeDisplayPlugin, self).__init__(self.COMMAND)
-        
-        self._locale_util = LocaleUtil()
         
         self._update_time()
         
         self.set_visible_window(False)
+
+        self._time_display_plugin_model = time_display_plugin_model
         
-        self.connect("expose-event", self._draw)
-        
+        self._update_time()
         gobject.timeout_add(10000, self._update_time)
+
+        self.connect("expose-event", self._draw)
     
     def _update_time(self):
         try:
-            date = self._locale_util.format_date_time(datetime.datetime.now()).upper()
+            date = self._time_display_plugin_model.get_date_text()
 
             attributes = pango.parse_markup('<span color="#f6f6f6" size="large" weight="bold">' + date + '</span>', u'\x00')[0]
             self._text_layout = self.create_pango_layout(date)
