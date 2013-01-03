@@ -264,3 +264,6 @@ class DesktopShortcut(gtk.VBox):
 
     def rename_shortcut(self, new_name):
         self.emit("desktop-shortcut-rename", new_name)
+    
+    def set_images(self, images):
+        self._icon_event_box.set_images(images)

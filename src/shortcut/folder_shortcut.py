@@ -49,7 +49,7 @@ class FolderShortcut(DesktopShortcut):
                     )
 
     def _drag_enter_handler_callback(self, source, destination):
-        if isinstance(source.parent, ApplicationShortcut):
+        if isinstance(source.parent.parent, ApplicationShortcut):
             self.set_is_highlightable(True)
         else:
             self.set_is_highlightable(False)

@@ -107,8 +107,8 @@ class AddRemoveShortcut(DesktopShortcut):
 
         
     def dnd_receive_data(self, widget, context, x, y, selection, targetType, time):
-        source_widget = context.get_source_widget()
-        label = context.get_source_widget().parent._label.get_text()
+        source_widget = context.get_source_widget().parent
+        label = source_widget.parent._label.get_text()
         
         if label == _('Files'):
             return
@@ -126,14 +126,16 @@ class AddRemoveShortcut(DesktopShortcut):
             self._delete_not_possible_popup.show()
 
     def _drag_motion_broadcast_callback(self, source, destination, x, y):
-        if isinstance(destination.parent, AddRemoveShortcut) and source._identifier != _('Files'):
+        if isinstance(destination.parent.parent, AddRemoveShortcut) and source._identifier != _('Files'):
             self.change_icon(self.get_trash_full_images())
     
     def _confirmation_received(self, result, widget, lbl):
         if result:
             self.emit("application-shortcut-remove", widget.parent.get_shortcut())
         else:
-            widget.set_images(widget.parent.get_images(self.ICON_STATE_NORMAL))
+            print widget
+            print widget.parent
+            widget.parent.set_images(widget.parent.get_images(self.ICON_STATE_NORMAL))
             widget.hide()
             widget.show()
             widget.parent._label.set_text(lbl)
