@@ -74,7 +74,15 @@ class DesktopShortcut(gtk.VBox):
             self._icon_height = DesktopLayout.ICON_HEIGHT
         else:
             # Let the icon fill the entire shortcut dimensions
-            self._icon_width = self._width
+            # The ' * 2 ' is a hack!  It was effectively present in the
+            # original code (though indirectly, as the specified width was
+            # divided by 2).  This solves a problem with multiple drag
+            # enter/leave events causing a jittery display while hovering
+            # over the separator.  Essentially, once the left separator
+            # is resized, this hack keeps the hovered separator fully
+            # under the cursor rather than making it appear that the cursor
+            # has left the repositioned hovered separator.
+            self._icon_width = self._width * 2
             self._icon_height = self._height
         
         self._icon_event_box = self._create_icon(self.get_images(self.ICON_STATE_NORMAL))
