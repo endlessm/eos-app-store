@@ -8,6 +8,7 @@ import locale
 
 from notification_panel_config import NotificationPanelConfig
 from notification_plugin import NotificationPlugin
+from eos_util.locale_util import LocaleUtil
 
 class TimeDisplayPlugin(NotificationPlugin):
     COMMAND = 'sudo gnome-control-center --class=eos-network-manager datetime'
@@ -16,6 +17,8 @@ class TimeDisplayPlugin(NotificationPlugin):
     
     def __init__(self, icon_size):
         super(TimeDisplayPlugin, self).__init__(self.COMMAND)
+        
+        self._locale_util = LocaleUtil()
         
         self._update_time()
         
@@ -27,13 +30,7 @@ class TimeDisplayPlugin(NotificationPlugin):
     
     def _update_time(self):
         try:
-            # There may be exceptions, but for now we can assume
-            # that the desired date format is DD MMM
-            # everywhere outside the US
-            if 'US' in getdefaultlocale():
-                date = datetime.datetime.now().strftime('%b %d | %H:%M %p').upper()
-            else:
-                date = datetime.datetime.now().strftime('%d %b | %H:%M %p').upper()
+            date = self._locale_util.format_date_time(datetime.datetime.now()).upper()
 
             attributes = pango.parse_markup('<span color="#f6f6f6" size="large" weight="bold">' + date + '</span>', u'\x00')[0]
             self._text_layout = self.create_pango_layout(date)
