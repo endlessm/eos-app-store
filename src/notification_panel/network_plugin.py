@@ -8,8 +8,8 @@ class NetworkSettingsPlugin(NotificationPlugin):
 
     def __init__(self, icon_size):
         super(NetworkSettingsPlugin, self).__init__(self.COMMAND)
-        self._create_mvp()
+        self._create_mvp(icon_size)
 
-    def _create_mvp(self):
+    def _create_mvp(self, icon_size):
         self._presenter = NetworkPluginPresenter(NetworkPluginView(self, icon_size), NetworkManager.from_dbus())
 
