@@ -41,14 +41,6 @@ class TestEndlessDesktopPresenter(unittest.TestCase):
 
         self.mock_view.refresh.assert_called_once_with(mock_shortcuts)
 
-    def test_submit_feedback_updates_model(self):
-        message = "some text"
-        is_bug = True
-
-        self.testObject.submit_feedback(message, is_bug)
-
-        self.mock_model.submit_feedback.assert_called_once_with(message, is_bug)
-
     def test_if_refresh_is_occuring_already_do_not_redraw_again(self):
         self.mock_view.refresh = None
         self.testObject._is_refreshing = True
@@ -58,13 +50,6 @@ class TestEndlessDesktopPresenter(unittest.TestCase):
             """Pass"""
         except:
             self.fail("Should not have thrown any errors as no code should have executed")
-
-    def test_launch_search_launches_search(self):
-        search_string = "blah"
-
-        self.testObject.launch_search(search_string)
-
-        self.mock_model.launch_search.assert_called_once_with(search_string)
 
     def test_change_background_sets_background(self):
         self.mock_model.reset_mock()

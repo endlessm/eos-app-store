@@ -7,8 +7,6 @@ import gobject
 from gtk import gdk
 
 from shortcut.application_shortcut import ApplicationShortcut
-from feedback_module.feedback_response_dialog_view import FeedbackResponseDialogView
-from feedback_module.bugs_and_feedback_popup_window import BugsAndFeedbackPopupWindow
 from shortcut.folder_shortcut import FolderShortcut
 from shortcut.separator_shortcut import SeparatorShortcut
 from shortcut.add_remove_shortcut import AddRemoveShortcut
@@ -51,8 +49,7 @@ class EndlessDesktopView(gtk.Window):
 
         self._align = gtk.Alignment(1.0, 1.0, 1.0, 1.0)
 
-        self._taskbar_panel = TaskbarPanel(width)
-        self._taskbar_panel.connect('feedback-clicked', lambda w: self._feedback_icon_clicked_callback())
+        self._taskbar_panel = TaskbarPanel(self, width)
 
         self._notification_panel = NotificationPanel(self)
 
@@ -86,7 +83,6 @@ class EndlessDesktopView(gtk.Window):
 
     def set_presenter(self, presenter):
         self._presenter = presenter
-        self._taskbar_panel.connect('launch-search', lambda w, s: self._presenter.launch_search(s))
 
     def get_presenter(self):
         return self._presenter
@@ -161,26 +157,6 @@ class EndlessDesktopView(gtk.Window):
     def _add_icon_clicked_callback(self, widget, event):
         self.popup.show_all()
         self.popup.popup(None, None, None, event.button, event.time)
-
-    def _feedback_submitted(self, widget):
-        self._presenter.submit_feedback(self._feedback_popup.get_text(), self._feedback_popup.is_bug())
-        self._feedback_popup.destroy()
-        self._show_feedback_thank_you_message()
-
-    def _show_feedback_thank_you_message(self):
-        #spawn wait indicator
-        self._feedback_thank_you_dialog = FeedbackResponseDialogView()
-        self._feedback_thank_you_dialog.show()
-        gobject.timeout_add(3000, self._feedback_thanks_close)
-
-    def _feedback_thanks_close(self):
-        self._feedback_thank_you_dialog.destroy()
-        return False
-
-    # Show popup
-    def _feedback_icon_clicked_callback(self):
-        self._feedback_popup = BugsAndFeedbackPopupWindow(self, self._feedback_submitted)
-        self._feedback_popup.show()
 
     def hide_folder_window(self):
         if hasattr(self, '_folder_window') and self._folder_window:
