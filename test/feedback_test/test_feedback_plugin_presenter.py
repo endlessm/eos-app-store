@@ -2,7 +2,7 @@ import unittest
 from mock import Mock, patch
 from feedback.feedback_plugin_presenter import FeedbackPluginPresenter
 
-class TestEndlessDesktopPresenter(unittest.TestCase):
+class TestFeedbackPluginPresenter(unittest.TestCase):
 
     def setUp(self):
         self.mock_model = Mock()
