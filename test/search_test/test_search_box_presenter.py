@@ -1,14 +1,14 @@
 import unittest
 from mock import Mock, patch
-from taskbar_panel.taskbar_presenter import TaskbarPresenter
+from search.search_box_presenter import SearchBoxPresenter
 from osapps.app_shortcut import AppShortcut
 
-class TestTaskbarPresenter(unittest.TestCase):
+class TestSearchBoxPresenter(unittest.TestCase):
 
     def setUp(self):
         self.mock_app_launcher = Mock()
 
-        self.testObject = TaskbarPresenter(self.mock_app_launcher)
+        self.testObject = SearchBoxPresenter(self.mock_app_launcher)
 
     def tearDown(self):
         pass

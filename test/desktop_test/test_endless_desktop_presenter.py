@@ -41,14 +41,6 @@ class TestEndlessDesktopPresenter(unittest.TestCase):
 
         self.mock_view.refresh.assert_called_once_with(mock_shortcuts)
 
-    def test_submit_feedback_updates_model(self):
-        message = "some text"
-        is_bug = True
-
-        self.testObject.submit_feedback(message, is_bug)
-
-        self.mock_model.submit_feedback.assert_called_once_with(message, is_bug)
-
     def test_if_refresh_is_occuring_already_do_not_redraw_again(self):
         self.mock_view.refresh = None
         self.testObject._is_refreshing = True

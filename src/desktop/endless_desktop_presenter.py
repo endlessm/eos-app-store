@@ -79,9 +79,6 @@ class DesktopPresenter(object):
             self._view.refresh(self._model.get_shortcuts())
             self._is_refreshing = False
 
-    def submit_feedback(self, message, bug):
-        self._model.submit_feedback(message, bug)
-
     def change_background(self, filename):
         self._model.set_background(filename)
         self._view.set_background_image(self._model.get_background_image())

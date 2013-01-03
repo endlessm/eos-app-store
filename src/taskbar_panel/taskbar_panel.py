@@ -3,7 +3,6 @@ import cairo
 from gtk import gdk
 import gobject
 
-from osapps.app_launcher import AppLauncher
 from feedback.feedback_plugin import FeedbackPlugin
 from search.search_box import SearchBox
 from eos_util import image_util
@@ -11,15 +10,8 @@ from eos_util.image_util import load_pixbuf
 from application_list_plugin import ApplicationListPlugin
 from taskbar_shortcut import TaskbarShortcut
 from social_bar.social_bar_plugin import SocialBarPlugin
-from osapps.app_launcher import AppLauncher
-from taskbar_presenter import TaskbarPresenter
 
 class TaskbarPanel(gtk.EventBox):
-    __gsignals__ = {
-                    'social-bar-clicked': (gobject.SIGNAL_RUN_FIRST, #@UndefinedVariable
-                                         gobject.TYPE_NONE,
-                                         ()),
-    }
 
     ICON_SIZE = 24
 
@@ -28,7 +20,6 @@ class TaskbarPanel(gtk.EventBox):
         self._parent = parent
         self.set_visible_window(False)
         self.set_app_paintable(True)
-        self._presenter = TaskbarPresenter(AppLauncher())
         self.connect('expose-event', self._redraw)
 
         taskbar_panel_items = self._align_taskbar()
@@ -58,7 +49,6 @@ class TaskbarPanel(gtk.EventBox):
 
     def _setup_social_bar_icon_on_taskbar(self):
         social_bar_plugin = SocialBarPlugin(self._parent, self.ICON_SIZE)
-        social_bar_plugin.connect('button-press-event', lambda w, e:self.emit('social-bar-clicked'))
         return TaskbarShortcut(social_bar_plugin, social_bar_plugin.PATH)
 
     def _align_taskbar(self):
@@ -72,7 +62,6 @@ class TaskbarPanel(gtk.EventBox):
         self._searchbox_holder = gtk.Alignment(0.5, 0.5, 0, 1.0)
         self._searchbox_holder.set_padding(0, 0, 2, 0)
         self._searchbox = SearchBox()
-        self._searchbox.connect('launch-search', lambda w, s:self._presenter.launch_search(s))
         self._searchbox_holder.add(self._searchbox)
         return self._searchbox_holder
 

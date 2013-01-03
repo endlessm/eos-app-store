@@ -17,7 +17,6 @@ from notification_panel.notification_panel import NotificationPanel
 from taskbar_panel.taskbar_panel import TaskbarPanel
 from add_shortcuts_module.add_shortcuts_view import AddShortcutsView
 from eos_util.image import Image
-from social_bar.social_bar_popup_window import SocialBarPopupWindow
 
 
 gettext.install('endless_desktop', '/usr/share/locale', unicode=True, names=['ngettext'])
