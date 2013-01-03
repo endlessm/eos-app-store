@@ -1,5 +1,6 @@
 import gtk
 import cairo
+from desktop.desktop_layout import DesktopLayout
 from eos_widgets.image_eventbox import ImageEventBox
 from eos_util.image import Image
 from eos_util import screen_util
@@ -92,7 +93,7 @@ class AddFolderBox(gtk.VBox):
         widget.set_images(tuple(images_list))
         widget.hide()
         widget.show()
-        add_remove_widget._event_box.set_images(images_tuple)
+        add_remove_widget._icon_event_box.set_images(images_tuple)
         add_remove_widget._label.set_text(self._text_entry.get_text())
         add_remove_widget.hide()
         add_remove_widget.show()
@@ -102,7 +103,7 @@ class AddFolderBox(gtk.VBox):
         widget.set_images(tuple(images[:-1]))
         widget.hide()
         widget.show()
-        add_remove_widget._event_box.set_images(add_remove_widget.get_images('normal'))
+        add_remove_widget._icon_event_box.set_images(add_remove_widget.get_images('normal'))
         add_remove_widget._label.set_text('')
         add_remove_widget.hide()
         add_remove_widget.show()
@@ -160,7 +161,7 @@ class AddFolderBox(gtk.VBox):
     def _append_icons(self, icons, files, path):
         for fi in files:
             image_box = ImageEventBox(None)
-            image_box.set_size_request(64, 64)
+            image_box.set_size_request(DesktopLayout.ICON_WIDTH, DesktopLayout.ICON_HEIGHT)
             image_box.set_images(self.get_images(path + fi))
             image_box.connect("enter-notify-event", self._display_plus, self._parent._add_remove_widget)
             image_box.connect("leave-notify-event", self._remove_plus, self._parent._add_remove_widget)

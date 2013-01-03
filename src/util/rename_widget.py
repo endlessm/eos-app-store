@@ -2,13 +2,11 @@ import gtk
 
 class RenameWidget:
 
-    def __init__(self, presenter=None, x=250, y=300, caller=None, y_offset=0, caller_width=64, container=None):
+    def __init__(self, x, y, caller, caller_width):
         self.caller = caller
         self.original_name = caller._identifier
         self.x = x
-        self.y = y + y_offset
-        self.presenter = presenter
-        self.container = container
+        self.y = y
         self._window = gtk.Window(gtk.WINDOW_TOPLEVEL)
         self._window.set_decorated(False)
         self._window.set_border_width(0)
