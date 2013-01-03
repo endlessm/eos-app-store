@@ -130,10 +130,6 @@ class BatteryView(AbstractNotifier, IconPlugin):
         self._percentage_label.set_text(str(level)+'%')
         self._remove_if_exists(self._time_to_depletion_label)
 
-        desktop_size = self._parent.get_toplevel().get_size()    
-        x = desktop_size[0] - self.WINDOW_WIDTH - self.X_OFFSET
-        y = PanelConstants.DEFAULT_POPUP_VERTICAL_MARGIN
-
         height = 0
         if time:
             if self._charging:
@@ -147,13 +143,24 @@ class BatteryView(AbstractNotifier, IconPlugin):
         else:
             height = self.SMALLER_HEIGHT
 
-        self._window.set_location((x, y))
+        self._window.set_location(self._calc_window_location())
         self._window.set_size_request(self.WINDOW_WIDTH, height)
 
         self._window.show_all()
         self.display()
 
-    # TODO make the triangle position configurable
+    def _calc_window_location(self):
+        desktop_size = self._parent.get_toplevel().get_size()    
+        x = desktop_size[0] - self.WINDOW_WIDTH - self.X_OFFSET
+        y = PanelConstants.DEFAULT_POPUP_VERTICAL_MARGIN
+        return (x, y)
+
+    def _calc_triangle_location(self):
+        window_x = self._calc_window_location()[0]
+        icon_x = self._parent.get_allocation().x
+        icon_width = self._parent.get_allocation().width
+        return icon_x + (icon_width / 2) - window_x
+
     def _expose(self, widget, event):
         cr = widget.window.cairo_create()
 
@@ -161,7 +168,7 @@ class BatteryView(AbstractNotifier, IconPlugin):
         # Use the same color as the default event box background
         # TODO eliminate need for these "magic" numbers
         cr.set_source_rgba(0xf2/255.0, 0xf1/255.0, 0xf0/255.0, 1.0)
-        self._pointer = 110
+        self._pointer = self._calc_triangle_location()
         cr.move_to(self._pointer, 0)
         cr.line_to(self._pointer + 10, 10)
         cr.line_to(self._pointer - 10, 10)
