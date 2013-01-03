@@ -18,13 +18,12 @@ class SeparatorShortcut(DesktopShortcut):
     right = None
     left_widget = None
     right_widget = None
-    expanded = False
     
-    def __init__(self, width=30, height=64):
-        super(SeparatorShortcut, self).__init__('', draggable=False)          
+    def __init__(self, width, height):
+        super(SeparatorShortcut, self).__init__('', draggable=False, has_icon=False,
+                                                width=width, height=height)
         self.w = width
         self.h = height
-        self.set_size_request(self.w, self.h)
         self._image_name = ''
         self._show_background = True
         self.show_all()
@@ -34,8 +33,8 @@ class SeparatorShortcut(DesktopShortcut):
             )
         
     def _received_handler_callback(self, source, destination, x, y, data=None):
-        dest_widget = destination.parent
-        source_widget = source.parent
+        dest_widget = destination.parent.parent
+        source_widget = source.parent.parent
         
         if isinstance(dest_widget, SeparatorShortcut) and \
             (source_widget is not self.left_widget) and \
@@ -84,11 +83,14 @@ class SeparatorShortcut(DesktopShortcut):
         if self.left:
             self.left.set_size_request(self.left.w-10, self.left.h)
             _w += 10
-        if self.right:
-            self.right.set_size_request(self.right.w-10, self.right.h)
+        # At the end of the last row, the final separator
+        # before the add/remove icon has a right widget
+        # but no right separator
+        if self.right_widget:
+            if self.right:
+                self.right.set_size_request(self.right.w-10, self.right.h)
             _w += 10
         self.set_size_request(self.w+_w, self.h)
-        self.expanded = True
         
     def reset(self):
         if self.left:
@@ -96,5 +98,3 @@ class SeparatorShortcut(DesktopShortcut):
         if self.right:
             self.right.set_size_request(self.right.w, self.right.h)
         self.set_size_request(self.w, self.h)
-        self.expanded = False
-        

@@ -8,8 +8,6 @@ from osapps.desktop_locale_datastore import DesktopLocaleDatastore
 from osapps.app_datastore import AppDatastore
 from osapps.launchable_app import LaunchableApp
 from osapps.desktop_preferences_datastore import DesktopPreferencesDatastore
-from util.feedback_manager import FeedbackManager
-from metrics.time_provider import TimeProvider
 
 class DesktopModelTestCase(unittest.TestCase):
     def setUp(self):
@@ -33,15 +31,11 @@ class DesktopModelTestCase(unittest.TestCase):
         self.app_mock.executable = Mock(return_value="eog")
         self.mock_app_datastore.get_app_by_key = Mock(return_value=self.app_mock)
         self.mock_app_launcher = Mock(AppLauncher)
-        self.mock_feedback_manager = Mock(FeedbackManager)
-        self.mock_time_provider = Mock(TimeProvider)
         self.mock_desktop_preferences = Mock(DesktopPreferencesDatastore)
         self.testObject = EndlessDesktopModel(self.mock_desktop_locale_datastore,
                                               self.mock_desktop_preferences,
                                               self.mock_app_datastore,
-                                              self.mock_app_launcher,
-                                              self.mock_feedback_manager,
-                                              self.mock_time_provider,
+                                              self.mock_app_launcher
                                               )
 
     def test_initially_shortcut_list_is_retrieved_from_app_util_manager(self):
@@ -60,22 +54,13 @@ class DesktopModelTestCase(unittest.TestCase):
         self.testObject = EndlessDesktopModel(self.mock_desktop_locale_datastore,
                                               self.mock_desktop_preferences,
                                               self.mock_app_datastore,
-                                              self.mock_app_launcher,
-                                              self.mock_feedback_manager,
-                                              self.mock_time_provider,
+                                              self.mock_app_launcher
                                               )
 
         params = []
         self.testObject.execute_app('123', params)
 
         self.assertFalse(self.mock_app_launcher.launch.called)
-
-    def test_launch_search_launches_browser_with_search_string(self):
-        search_string = "foo"
-
-        self.testObject.launch_search(search_string)
-
-        self.mock_app_launcher.launch_browser.assert_called_once_with(search_string)
 
     def test_get_background_delegates_to_preferences_datastore(self):
         self.testObject.get_background_image()
