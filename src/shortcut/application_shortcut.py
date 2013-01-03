@@ -24,7 +24,7 @@ class ApplicationShortcut(DesktopShortcut):
         label_text = shortcut.name()
         self._show_background = show_background
         
-        super(ApplicationShortcut, self).__init__(label_text)
+        super(ApplicationShortcut, self).__init__(label_text, highlightable=False)
         
         self._icon_event_box.connect("button-press-event", self.mouse_press_callback)
         self._icon_event_box.connect("button-release-event", self.mouse_release_callback)
