@@ -9,14 +9,19 @@ class AllSettingsPlugin(IconPlugin):
     def __init__(self, icon_size):
         self._all_settings_presenter = None
         super(AllSettingsPlugin, self).__init__(icon_size, [self.ICON_NAME], None, 0)
-        
+    
     def execute(self):
-        _all_settings_view = AllSettingsView(self)
- 
-        print "Am I open in the plugin:",  _all_settings_view.is_displayed()
-        
         if not self._all_settings_presenter:
-            self._all_settings_presenter = AllSettingsPresenter(_all_settings_view, AllSettingsModel())
+            self._all_settings_presenter = AllSettingsPresenter(AllSettingsView(self), AllSettingsModel())
+            self.connect('enter-notify-event', lambda w, e: self.disable_focus_out())
+            self.connect('leave-notify-event', lambda w, e: self.enable_focus_out())
             
-        self._all_settings_presenter.show_dropdown()
+        self._all_settings_presenter.toggle_display()
+        
+    def enable_focus_out(self):
+        self._all_settings_presenter.enable_focus_out()
+        
+    def disable_focus_out(self):
+        self._all_settings_presenter.disable_focus_out()
+        
             

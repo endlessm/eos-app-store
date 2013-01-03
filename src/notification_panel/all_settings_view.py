@@ -87,7 +87,6 @@ class AllSettingsView(AbstractNotifier):
         # with a transparent background and triangle decoration
         self._window.connect('expose-event', self._expose)
 
-#        self._window.connect('focus-out-event', lambda w, e: self._notify(self.FOCUS_OUT))
         self._window.connect('focus-out-event', lambda w, e: self._notify(self.FOCUS_OUT))
 
         # Place the widget in an event box within the window
@@ -134,6 +133,7 @@ class AllSettingsView(AbstractNotifier):
             return self._messages[message_id]
 
     def display(self):
+        self._button_settings.grab_focus()
         self._window.show_all()
         self._window.present()
 

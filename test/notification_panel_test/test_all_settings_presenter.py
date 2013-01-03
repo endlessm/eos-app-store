@@ -202,21 +202,37 @@ class AllSettingsPresenterTest(unittest.TestCase):
         
     def test_display_dropdown_when_currently_not_displayed(self):
         test_object = AllSettingsPresenter(self._mock_view, self._mock_model, self._mock_background_chooser)
+        self._mock_view.is_displayed = Mock(return_value=False)
         
-        self._mock_model.should_show_dropdown = Mock(return_value=True)
-        
-        test_object.show_dropdown()
+        test_object.toggle_display()
         
         self._mock_view.display.assert_called_once_with()
         
-    def test_hide_dropdown_when_currently_displayed(self):
+    def test_hide_display_when_currently_displayed(self):
         test_object = AllSettingsPresenter(self._mock_view, self._mock_model, self._mock_background_chooser)
+        self._mock_view.is_displayed = Mock(return_value=True)
         
-        self._mock_model.should_show_dropdown = Mock(return_value=False)
-        
-        test_object.show_dropdown()
+        test_object.toggle_display()
         
         self._mock_view.hide_window.assert_called_once_with()
+
+    def test_focus_out_hides_dropdown_when_enabled(self):
+        test_object = AllSettingsPresenter(self._mock_view, self._mock_model, self._mock_background_chooser)
+        test_object.enable_focus_out()
+        
+        test_object.focus_out()
+        
+        self._mock_view.hide_window.assert_called_once_with()
+        
+    def test_focus_out_doesnt_hide_dropdown_when_disabled(self):
+        test_object = AllSettingsPresenter(self._mock_view, self._mock_model, self._mock_background_chooser)
+        test_object.disable_focus_out()
+        
+        test_object.focus_out()
+        
+        self.assertFalse(self._mock_view.hide_window.called)
+        
+        
         
         
 
