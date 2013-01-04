@@ -19,7 +19,7 @@ class AddApplicationBox(gtk.VBox):
 
         self._desktop_preferences = desktop_preference_class.get_instance()
         self._background = self._desktop_preferences.get_scaled_background_image(
-                screen_util.get_width(parent._parent), screen_util.get_height(parent._parent))
+                screen_util.get_width(parent.parent), screen_util.get_height(parent.parent))
 
         self._scrolled_window = gtk.ScrolledWindow()
         self._scrolled_window.set_policy(hscrollbar_policy=gtk.POLICY_NEVER, vscrollbar_policy=gtk.POLICY_AUTOMATIC)

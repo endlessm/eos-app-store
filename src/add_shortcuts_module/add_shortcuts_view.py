@@ -64,6 +64,18 @@ class AddShortcutsView():
         self.window.add(self.hbox)
         self.show()
 
+    @property
+    def parent(self):
+        return self._parent
+
+    @property
+    def add_button_box_width(self):
+        return self._add_button_box_width
+    
+    @property
+    def tree_view_width(self):
+        return self._tree_view_width
+    
     def show(self):
         self.window.show_all()
 

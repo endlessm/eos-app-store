@@ -19,8 +19,8 @@ class AddFolderBox(gtk.VBox):
         # TODO should not rely on access to private member _parent of parent
         # Is there a better way to get access to the desktop window for its size?
         self._background = self._desktop_preferences.get_scaled_background_image(
-                screen_util.get_width(parent._parent),
-                screen_util.get_height(parent._parent)).copy()
+                screen_util.get_width(parent.parent),
+                screen_util.get_height(parent.parent)).copy()
 
         self._scrolled_window = gtk.ScrolledWindow()
         self._scrolled_window.set_policy(hscrollbar_policy=gtk.POLICY_NEVER, vscrollbar_policy=gtk.POLICY_AUTOMATIC)
@@ -173,7 +173,7 @@ class AddFolderBox(gtk.VBox):
         files = self._get_folder_icons(self._FOLDER_ICON_PATH, suffix='_normal')
         self._append_icons(icons, files, self._FOLDER_ICON_PATH)
         num_of_icons = len(icons)
-        available_width = screen_util.get_width(self._parent._parent.window) - self._parent._add_button_box_width - self._parent._tree_view_width
+        available_width = screen_util.get_width(self._parent.parent.window) - self._parent.add_button_box_width - self._parent.tree_view_width
         columns = int(available_width/120)   # shold this be a fixed number like 5 as in pdf?
         rows = int(num_of_icons/columns) + 1
         self._table = gtk.Table(rows, columns)
