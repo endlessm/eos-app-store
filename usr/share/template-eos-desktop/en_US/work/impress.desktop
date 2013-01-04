@@ -3,6 +3,7 @@ Version=1.0
 Type=Application
 Name=Presentation
 Name[en_US]=Presentation
+Name[es_GT]=Presentation
 Name[pt_BR]=Apresentação
 Comment=Impress
 TryExec=libreoffice --impress %U

@@ -1,0 +1,16 @@
+[Desktop Entry]
+Version=1.0
+Type=Application
+Name=Impress
+Name[en_US]=Impress
+Name[es_GT]=Impress
+Name[pt_BR]=Impress
+Comment=Impress
+TryExec=libreoffice --impress %U
+Exec=libreoffice --impress %U
+Icon=libreoffice-impress
+Categories=
+X-EndlessM-Normal-Icon=/usr/share/endlessm/icons/apps/libreofficeimpress_normal.png
+X-EndlessM-Hover-Icon=/usr/share/endlessm/icons/apps/libreofficeimpress_hover.png
+X-EndlessM-Down-Icon=/usr/share/endlessm/icons/apps/libreofficeimpress_down.png
+

@@ -3,6 +3,7 @@ Version=1.0
 Type=Application
 Name=Spreadsheet
 Name[en_US]=Spreadsheet
+Name[es_GT]=Hoja de Cálculo
 Name[pt_BR]=Planilha
 Comment=Spreadsheet
 TryExec=libreoffice --calc %U

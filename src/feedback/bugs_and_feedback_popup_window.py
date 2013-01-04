@@ -55,7 +55,7 @@ class BugsAndFeedbackPopupWindow():
         self._text.set_size_request(200,80)
         self._text.set_editable(True)
         self._text_buffer = gtk.TextBuffer()
-        self._text_buffer.set_text(_("Please let us know how the problem occured and we will resolve it as soon as possible."))
+        self._text_buffer.set_text(_("Please let us know how the problem occurred and we will resolve it as soon as possible."))
         self._text.set_buffer(self._text_buffer)
         
         self._text_holder = gtk.Alignment(.5,.5,0.9,0.8)
