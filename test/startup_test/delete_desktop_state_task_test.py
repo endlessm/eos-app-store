@@ -17,6 +17,6 @@ class DeleteDesktopStateTaskTest(unittest.TestCase):
         
         calls = [call(os.path.expanduser("~/.endlessm/desktop.json")), call(os.path.expanduser("~/.endlessm/installed_applications.json"))]
         self._mock_os_utils.remove.assert_has_calls(calls)
-        self._mock_sh_utils.copyfile.assert_called_once_with("/etc/endlessm/installed-applications.json", "~/.endlessm/installed_applications.json")
+        self._mock_sh_utils.copyfile.assert_called_once_with("/etc/endlessm/installed_applications.json", "~/.endlessm/installed_applications.json")
         
         
