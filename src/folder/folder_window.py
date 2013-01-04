@@ -13,7 +13,7 @@ WIDGET_WIDTH = DesktopLayout.ICON_WIDTH
 WIDGET_LABEL_HEIGHT = 20
 # For now, use the same spacing as the desktop
 WIDGET_VERTICAL_SPACING = DesktopLayout.ICON_HEIGHT
-WIDGET_HORIZONTAL_SPACING = DesktopLayout.ICON_WIDTH
+WIDGET_HORIZONTAL_SPACING = DesktopLayout.get_separator_width()
 WIDGET_PADDING = 20
 
 class OpenFolderWindow():
