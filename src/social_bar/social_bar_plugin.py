@@ -1,14 +1,14 @@
 import gtk
 
 from eos_util.image import Image
-from social_bar.social_bar_popup_window import SocialBarPopupWindow
+from social_bar.social_bar_presenter import SocialBarPresenter
 
 class SocialBarPlugin(gtk.EventBox):
-    PATH = "/usr/bin/eos-social"
-
+    
     def __init__(self, parent, icon_size):
         super(SocialBarPlugin, self).__init__()
         self._icon_size = icon_size
+        self._presenter = SocialBarPresenter()
 
         self._parent = parent
 
@@ -31,11 +31,12 @@ class SocialBarPlugin(gtk.EventBox):
 
         self.connect('button-press-event', lambda w, e: self._social_bar_icon_clicked_callback())
 
+    def get_path(self):
+        return self._presenter.get_path()
 
     def toggle_image(self, image, pixbuf):
         pixbuf.draw(image.set_from_pixbuf)
 
 
     def _social_bar_icon_clicked_callback(self):
-        self._social_bar_popup = SocialBarPopupWindow(self._parent)
-        self._social_bar_popup.show()
+        self._presenter.launch()

@@ -49,7 +49,7 @@ class TaskbarPanel(gtk.EventBox):
 
     def _setup_social_bar_icon_on_taskbar(self):
         social_bar_plugin = SocialBarPlugin(self._parent, self.ICON_SIZE)
-        return TaskbarShortcut(social_bar_plugin, social_bar_plugin.PATH)
+        return TaskbarShortcut(social_bar_plugin, social_bar_plugin.get_path())
 
     def _align_taskbar(self):
         self._taskbar_panel = gtk.Alignment(0.5, 0.5, 1.0, 0)
