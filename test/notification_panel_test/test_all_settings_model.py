@@ -36,14 +36,14 @@ class TestAllSettingsModel(unittest.TestCase):
         test_object.add_listener(AllSettingsModel.UPDATE_STARTED, update_listener)
         
         test_object._repo_chosen_callback()
-	
+
         self._mock_update_manager.update_os.assert_called_once_with()
         self.assertTrue(update_listener.called)
    
     def test_callback_calls_repo_chosen_callback(self):
         self._test_object.update_software()
         
-	self._mock_repo_chooser_launcher.launch.assert_called_with(self._test_object._repo_chosen_callback)
+        self._mock_repo_chooser_launcher.launch.assert_called_with(self._test_object._repo_chosen_callback)
  
     def test_get_current_version_uses_output_from_command_line_result(self):
         current_version = "version from desktop"
@@ -128,4 +128,7 @@ class TestAllSettingsModel(unittest.TestCase):
         after = threading.active_count()
         
         self.assertEquals(before - 1, after)
+        
+        
+        
         

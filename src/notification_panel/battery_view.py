@@ -1,5 +1,6 @@
 import gettext
 import gtk
+import datetime
 
 from icon_plugin import IconPlugin
 from panel_constants import PanelConstants
@@ -21,6 +22,9 @@ class BatteryView(AbstractNotifier, IconPlugin):
 
     ICON_NAMES = ['battery_charging.png','battery_empty.png', 'battery_10.png', 'battery_25.png', 'battery_60.png', 'battery_full.png']
      
+    _last_focus_out = datetime.datetime.min
+    _focus_out_period = datetime.timedelta(milliseconds=250)
+
     def __init__(self, parent, icon_size):
         super(BatteryView, self).__init__(icon_size, self.ICON_NAMES, None)
        
@@ -112,6 +116,11 @@ class BatteryView(AbstractNotifier, IconPlugin):
             self._vbox.remove(component)
 
     def display_menu(self, level, time):
+        # If we just had the focus out event (within the focus out period),
+        # don't display the menu, as it was most likely due to clicking
+        # on the battery icon to close the menu.
+        if (datetime.datetime.now() - BatteryView._last_focus_out) < BatteryView._focus_out_period:
+            return
         
         # In order to ensure we read the current background for the transparency,
         # let's always re-create the menu here.
@@ -181,6 +190,8 @@ class BatteryView(AbstractNotifier, IconPlugin):
         self._window.set_focus(self._window)
 
     def hide_window(self):
+        # Keep track of when the focus out event occurred most recently
+        BatteryView._last_focus_out = datetime.datetime.now()
+        
         self._window.set_visible(False)
         self._window.hide()
-

@@ -38,6 +38,11 @@ class NotificationPanel(gtk.HBox):
             try:
                 if clazz.is_plugin_enabled():
                     plugin = self._register_plugin(notification_panel_items, clazz)
+                    
+                    # At some point, it would most likely make sense to refactor this.  Currently,
+                    # with each click, both the button-press and hide events are chosen, and separate logic
+                    # then has to be inserted into each plugin to handle this.  A single event handler method
+                    # seems to make more sense.
                     plugin.connect('button-release-event', lambda w, e: self._launch_command(w))
                     plugin.connect('hide-window-event', plugin._hide_window)
                     self.plugins_list.append(plugin)
