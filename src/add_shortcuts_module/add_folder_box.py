@@ -1,5 +1,6 @@
 import gtk
 import cairo
+from desktop.desktop_layout import DesktopLayout
 from eos_widgets.image_eventbox import ImageEventBox
 from eos_util.image import Image
 from eos_util import screen_util
@@ -19,8 +20,8 @@ class AddFolderBox(gtk.VBox):
         # TODO should not rely on access to private member _parent of parent
         # Is there a better way to get access to the desktop window for its size?
         self._background = self._desktop_preferences.get_scaled_background_image(
-                screen_util.get_width(parent._parent),
-                screen_util.get_height(parent._parent)).copy()
+                screen_util.get_width(parent.parent),
+                screen_util.get_height(parent.parent)).copy()
 
         self._scrolled_window = gtk.ScrolledWindow()
         self._scrolled_window.set_policy(hscrollbar_policy=gtk.POLICY_NEVER, vscrollbar_policy=gtk.POLICY_AUTOMATIC)
@@ -92,7 +93,7 @@ class AddFolderBox(gtk.VBox):
         widget.set_images(tuple(images_list))
         widget.hide()
         widget.show()
-        add_remove_widget._event_box.set_images(images_tuple)
+        add_remove_widget._icon_event_box.set_images(images_tuple)
         add_remove_widget._label.set_text(self._text_entry.get_text())
         add_remove_widget.hide()
         add_remove_widget.show()
@@ -102,7 +103,7 @@ class AddFolderBox(gtk.VBox):
         widget.set_images(tuple(images[:-1]))
         widget.hide()
         widget.show()
-        add_remove_widget._event_box.set_images(add_remove_widget.get_images('normal'))
+        add_remove_widget._icon_event_box.set_images(add_remove_widget.get_images('normal'))
         add_remove_widget._label.set_text('')
         add_remove_widget.hide()
         add_remove_widget.show()
@@ -160,7 +161,7 @@ class AddFolderBox(gtk.VBox):
     def _append_icons(self, icons, files, path):
         for fi in files:
             image_box = ImageEventBox(None)
-            image_box.set_size_request(64, 64)
+            image_box.set_size_request(DesktopLayout.ICON_WIDTH, DesktopLayout.ICON_HEIGHT)
             image_box.set_images(self.get_images(path + fi))
             image_box.connect("enter-notify-event", self._display_plus, self._parent._add_remove_widget)
             image_box.connect("leave-notify-event", self._remove_plus, self._parent._add_remove_widget)
@@ -173,7 +174,7 @@ class AddFolderBox(gtk.VBox):
         files = self._get_folder_icons(self._FOLDER_ICON_PATH, suffix='_normal')
         self._append_icons(icons, files, self._FOLDER_ICON_PATH)
         num_of_icons = len(icons)
-        available_width = screen_util.get_width(self._parent._parent.window) - self._parent._add_button_box_width - self._parent._tree_view_width
+        available_width = screen_util.get_width(self._parent.parent.window) - self._parent.add_button_box_width - self._parent.tree_view_width
         columns = int(available_width/120)   # shold this be a fixed number like 5 as in pdf?
         rows = int(num_of_icons/columns) + 1
         self._table = gtk.Table(rows, columns)

@@ -9,7 +9,6 @@ class BatteryModelTestCase(unittest.TestCase):
         self._mock_battery_provider = Mock()
         self._mock_battery_provider.add_battery_callback = self._add_battery_callback
         
-        
     def test_when_button_is_clicked_power_settings_are_opened(self):
         mock_app_launcher= Mock()
 

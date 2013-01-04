@@ -1,4 +1,4 @@
-import math
+from desktop_layout import DesktopLayout
 import sys
 import gettext
 
@@ -7,8 +7,6 @@ import gobject
 from gtk import gdk
 
 from shortcut.application_shortcut import ApplicationShortcut
-from feedback_module.feedback_response_dialog_view import FeedbackResponseDialogView
-from feedback_module.bugs_and_feedback_popup_window import BugsAndFeedbackPopupWindow
 from shortcut.folder_shortcut import FolderShortcut
 from shortcut.separator_shortcut import SeparatorShortcut
 from shortcut.add_remove_shortcut import AddRemoveShortcut
@@ -25,11 +23,7 @@ gettext.install('endless_desktop', '/usr/share/locale', unicode=True, names=['ng
 gtk.gdk.threads_init()
 
 class EndlessDesktopView(gtk.Window):
-    MAX_ICONS_IN_ROW = 7
-    HORIZONTAL_SPACING = 60
-    VERTICAL_SPACING = 60
-    LABEL_HEIGHT = 10
-    _padding = 100
+    
     _app_shortcuts = {}
 
     def __init__(self):
@@ -55,8 +49,7 @@ class EndlessDesktopView(gtk.Window):
 
         self._align = gtk.Alignment(1.0, 1.0, 1.0, 1.0)
 
-        self._taskbar_panel = TaskbarPanel(width)
-        self._taskbar_panel.connect('feedback-clicked', lambda w: self._feedback_icon_clicked_callback())
+        self._taskbar_panel = TaskbarPanel(self, width)
 
         self._notification_panel = NotificationPanel(self)
 
@@ -78,9 +71,7 @@ class EndlessDesktopView(gtk.Window):
         self.add(self._desktop)
         self.show_all()
 
-        #self._max_icons_in_row = self._calculate_max_icons()
-        self._max_icons_in_row = self.MAX_ICONS_IN_ROW
-        self._max_rows_in_page = 4
+        self._max_icons_in_row, self._max_rows_in_page = self._calculate_max_icons()
 
         screen = gtk.gdk.Screen() #@UndefinedVariable
         screen.connect('size-changed', lambda s: self._set_background(self.BACKGROUND_NAME))
@@ -92,7 +83,6 @@ class EndlessDesktopView(gtk.Window):
 
     def set_presenter(self, presenter):
         self._presenter = presenter
-        self._taskbar_panel.connect('launch-search', lambda w, s: self._presenter.launch_search(s))
 
     def get_presenter(self):
         return self._presenter
@@ -168,26 +158,6 @@ class EndlessDesktopView(gtk.Window):
         self.popup.show_all()
         self.popup.popup(None, None, None, event.button, event.time)
 
-    def _feedback_submitted(self, widget):
-        self._presenter.submit_feedback(self._feedback_popup.get_text(), self._feedback_popup.is_bug())
-        self._feedback_popup.destroy()
-        self._show_feedback_thank_you_message()
-
-    def _show_feedback_thank_you_message(self):
-        #spawn wait indicator
-        self._feedback_thank_you_dialog = FeedbackResponseDialogView()
-        self._feedback_thank_you_dialog.show()
-        gobject.timeout_add(3000, self._feedback_thanks_close)
-
-    def _feedback_thanks_close(self):
-        self._feedback_thank_you_dialog.destroy()
-        return False
-
-    # Show popup
-    def _feedback_icon_clicked_callback(self):
-        self._feedback_popup = BugsAndFeedbackPopupWindow(self, self._feedback_submitted)
-        self._feedback_popup.show()
-
     def hide_folder_window(self):
         if hasattr(self, '_folder_window') and self._folder_window:
             self._folder_window.hide()
@@ -222,7 +192,7 @@ class EndlessDesktopView(gtk.Window):
         row = gtk.HBox()
         row.show()
 
-        sep_last = SeparatorShortcut(width=self.HORIZONTAL_SPACING/2)
+        sep_last = SeparatorShortcut(width=DesktopLayout.get_separator_width(), height=DesktopLayout.ICON_HEIGHT)
         sep_last.connect("application-shortcut-move", self._rearrange_shortcuts)
         row.pack_start(sep_last, False, False, 0)
 
@@ -245,7 +215,7 @@ class EndlessDesktopView(gtk.Window):
             if item.parent != None:
                 print >> sys.stderr, "Item has parent!", item
             row.pack_start(item, False, False, 0)
-            sep_new = SeparatorShortcut(width=self.HORIZONTAL_SPACING/2)
+            sep_new = SeparatorShortcut(width=DesktopLayout.get_separator_width(), height=DesktopLayout.ICON_HEIGHT)
             sep_new.connect("application-shortcut-move", self._rearrange_shortcuts)
             row.pack_start(sep_new, False, False, 0)
             sep_last.set_right_separator(sep_new)
@@ -260,6 +230,12 @@ class EndlessDesktopView(gtk.Window):
             add_remove.connect("application-shortcut-remove", self._delete_shortcuts)
             row.pack_start(add_remove, False, False, 0)
             add_remove.show()
+            if len(items) > 0:
+                # Add support to slide the AddRemove icon to the right
+                # during icon drag and drop, unless there are no other items
+                # in the row (in which case we currently do not support
+                # moving the icon to the first position of the last row)
+                sep_last.set_right_widget(add_remove)
 
         return row
 
@@ -286,10 +262,9 @@ class EndlessDesktopView(gtk.Window):
             )
 
     def _calculate_max_icons(self):
-        width = self._get_net_work_area()[0]
-
-        available_width = width - (self._padding * 2)
-        return math.floor(available_width / 125)
+        # For now, these are hard-coded constants.
+        # TODO: Calculate based on available desktop size (scale with display resolution)
+        return (DesktopLayout.MAX_ICONS_IN_ROW, DesktopLayout.MAX_ROWS_OF_ICONS)
 
     def _get_net_work_area(self):
         """this section of code gets the net available area on the window (i.e. root window - panels)"""

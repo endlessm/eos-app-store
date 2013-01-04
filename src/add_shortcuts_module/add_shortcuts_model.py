@@ -7,7 +7,7 @@ class AddShortcutsModel():
 
     def get_category_data(self):
         data = []
-        section_app = ShortcutCategory(_('APP'))
+        section_app = ShortcutCategory(_('APP'), True)
 #        section_app.subcategories = [ShortcutCategory(_('POPULAR')),
 #                                     ShortcutCategory(_('PRODUCTIVITY')),
 #                                     ShortcutCategory(_('ENTERTAINMENT')),
@@ -17,7 +17,7 @@ class AddShortcutsModel():
 #                                     ShortcutCategory(_('SOCIAL')),
 #                                     ShortcutCategory(_('MY TOWN'))]
         section_web = ShortcutCategory(_('WEB'))
-        section_folder = ShortcutCategory(_('FOLDER'), True)
+        section_folder = ShortcutCategory(_('FOLDER'))
 
         data.append(section_app)
         data.append(section_web)

@@ -19,7 +19,10 @@ class AllSettingsView(AbstractNotifier):
     LOGOUT = "logout"
     RESTART = "restart"
     SHUTDOWN = "shutdown"
-    
+    FOCUS_OUT = "focus_out"
+    DISABLE_FOCUS_OUT = "disable_focus_out"
+    ENABLE_FOCUS_OUT = "enable_focus_out"
+        
     UPDATE_BUTTON_TEXT = _('Update')
     UPDATE_IN_PROGRESS_BUTTON_TEXT = _('Updating...')
 
@@ -35,6 +38,10 @@ class AllSettingsView(AbstractNotifier):
 
     def __init__(self, parent):
         self._parent = parent
+
+        self._parent.connect('enter-notify-event', lambda w, e: self._notify(self.DISABLE_FOCUS_OUT))
+        self._parent.connect('leave-notify-event', lambda w, e: self._notify(self.ENABLE_FOCUS_OUT))
+
         self._button_desktop = gtk.Button(_('Background'))
         self._label_version = gtk.Label()
         self._button_update = gtk.Button(self.UPDATE_BUTTON_TEXT)
@@ -43,7 +50,7 @@ class AllSettingsView(AbstractNotifier):
         self._button_restart = gtk.Button(_('Restart'))
         self._button_shutdown = gtk.Button(_('Shut Down'))
 
-        self._button_desktop.connect('button-press-event',
+        self._button_desktop.connect('button-release-event',
                 lambda w, e: self._notify(self.DESKTOP_BACKGROUND))
         self._button_update.connect('button-release-event',
                 lambda w, e: self._notify(self.UPDATE_SOFTWARE))
@@ -86,7 +93,7 @@ class AllSettingsView(AbstractNotifier):
         # with a transparent background and triangle decoration
         self._window.connect('expose-event', self._expose)
 
-        self._window.connect('focus-out-event', lambda w, e: self.hide_window())
+        self._window.connect('focus-out-event', lambda w, e: self._notify(self.FOCUS_OUT))
 
         # Place the widget in an event box within the window
         # (which has a different background than the transparent window)
@@ -132,11 +139,12 @@ class AllSettingsView(AbstractNotifier):
             return self._messages[message_id]
 
     def display(self):
+        self._button_settings.grab_focus()
         self._window.show_all()
         self._window.present()
 
     def hide_window(self):
-        self._window.destroy()
+        self._window.hide()
         
     def enable_update_button(self):
         self._button_update.set_sensitive(True)
@@ -154,5 +162,8 @@ class AllSettingsView(AbstractNotifier):
         info_message.set_title(_("Update started"))
         info_message.connect("response", lambda w, id: info_message.destroy()) 
         info_message.show() 
+        
+    def is_displayed(self):
+        return self._window.get_visible()
         
         

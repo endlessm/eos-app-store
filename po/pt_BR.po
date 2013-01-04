@@ -147,11 +147,11 @@ msgstr "Relatar um bug"
 
 #: src/notification_panel/all_settings_view.py:45
 msgid "Restart"
-msgstr "Reinicializar"
+msgstr "Reiniciar"
 
 #: src/notification_panel/all_settings_view.py:33
 msgid "Restart?"
-msgstr "Reinicializar?"
+msgstr "Reiniciar?"
 
 #: src/add_shortcuts_module/add_website_box.py:30
 msgid "TYPE WEBSITE"

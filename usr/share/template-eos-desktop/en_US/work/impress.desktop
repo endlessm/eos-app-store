@@ -1,10 +1,10 @@
 [Desktop Entry]
 Version=1.0
 Type=Application
-Name=Impress
-Name[en_US]=Impress
-Name[es_GT]=Impress
-Name[pt_BR]=Impress
+Name=Presentation
+Name[en_US]=Presentation
+Name[es_GT]=Presentation
+Name[pt_BR]=Apresentação
 Comment=Impress
 TryExec=libreoffice --impress %U
 Exec=libreoffice --impress %U

@@ -2,13 +2,11 @@ import gtk
 
 class RenameWidget:
 
-    def __init__(self, presenter=None, x=250, y=300, caller=None, y_offset=0, caller_width=64, container=None):
+    def __init__(self, x, y, caller, caller_width):
         self.caller = caller
         self.original_name = caller._identifier
         self.x = x
-        self.y = y + y_offset
-        self.presenter = presenter
-        self.container = container
+        self.y = y
         self._window = gtk.Window(gtk.WINDOW_TOPLEVEL)
         self._window.set_decorated(False)
         self._window.set_border_width(0)
@@ -18,6 +16,7 @@ class RenameWidget:
         self.text_view.set_has_frame(False)
         self.text_view.set_editable(False)
         self.text_view.set_text(self.original_name)
+        self.text_view.set_state(gtk.STATE_SELECTED)
         self.text_view.select_region(0, -1)
         t_width = self.text_view.get_layout().get_pixel_size()[0]
         if t_width <= caller_width:
@@ -40,6 +39,7 @@ class RenameWidget:
             self._save_new_name(new_name)
     
     def _handle_click(self, widget, event):
+        self.text_view.set_state(gtk.STATE_NORMAL)
         self.text_view.set_editable(True)
     
     def _handle_focus_out(self, widget, event):

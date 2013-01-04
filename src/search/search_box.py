@@ -4,6 +4,8 @@ import gettext
 
 from eos_util import image_util
 from eos_util.image_util import load_pixbuf
+from osapps.app_launcher import AppLauncher
+from search.search_box_presenter import SearchBoxPresenter
 
 gettext.install('endless_desktop', '/usr/share/locale', unicode = True, names=['ngettext'])
 
@@ -21,15 +23,12 @@ class SearchBox(gtk.EventBox):
 
     DEFAULT_TEXT = _("Search or Type Web Site")
 
-    __gsignals__ = {
-           "launch-search": (gobject.SIGNAL_RUN_FIRST, #@UndefinedVariable
-                                    gobject.TYPE_NONE,
-                                    (gobject.TYPE_PYOBJECT,)),
-    }
     def __init__(self):
         gtk.EventBox.__init__(self)
         self.set_size_request(self.WIDTH, self.HEIGHT)
         self.set_visible_window(False)
+
+        self._presenter = SearchBoxPresenter(AppLauncher())
 
         self.connect('button-press-event', self.gain_focus)
         self._content = gtk.Fixed()
@@ -94,7 +93,7 @@ class SearchBox(gtk.EventBox):
         self._text_buffer.set_text("")
         self._text_view.hide()
         self._set_label_text(self.DEFAULT_TEXT)
-        self.emit("launch-search", search_text)
+        self._presenter.launch_search(search_text)
 
     def handle_keystrokes(self, widget, event):
         if(event.keyval == gtk.keysyms.Escape):

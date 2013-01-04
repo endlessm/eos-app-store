@@ -2,16 +2,18 @@ import gtk
 import gettext
 from eos_widgets.desktop_transparent_window import DesktopTransparentWindow
 from folder.folder_icons import FolderIcons
+from desktop.desktop_layout import DesktopLayout
 
 gettext.install('endless_desktop', '/usr/share/locale', unicode = True, names=['ngettext'])
 
 FULL_FOLDER_ITEMS_COUNT = 21
 MAX_ITEMS_IN_ROW = 7
-WIDGET_HEIGHT = 64
-WIDGET_WIDTH = 64
+WIDGET_HEIGHT = DesktopLayout.ICON_HEIGHT
+WIDGET_WIDTH = DesktopLayout.ICON_WIDTH
 WIDGET_LABEL_HEIGHT = 20
-WIDGET_VERTICAL_SPACING = 64
-WIDGET_HORIZONTAL_SPACING = 64
+# For now, use the same spacing as the desktop
+WIDGET_VERTICAL_SPACING = DesktopLayout.ICON_HEIGHT
+WIDGET_HORIZONTAL_SPACING = DesktopLayout.get_separator_width()
 WIDGET_PADDING = 20
 
 class OpenFolderWindow():

@@ -117,7 +117,7 @@ class AddWebsiteBox(gtk.VBox):
         widget._plus_image.set_from_file(image_util.image_path("add_folder_icon.png"))
         widget._plus_image.show()
         pixbuf = image_util.load_pixbuf(image_util.image_path('category_separator_inactive.png'))
-        pixbuf = pixbuf.scale_simple(self.allocation.width, pixbuf.get_height(), gtk.gdk.INTERP_BILINEAR)
+        pixbuf = pixbuf.scale_simple(widget.allocation.width, pixbuf.get_height(), gtk.gdk.INTERP_BILINEAR)
         widget._bottom_active_line.set_from_pixbuf(pixbuf)
         widget._top_active_line.set_from_pixbuf(pixbuf)
         widget.draw(widget.get_allocation())

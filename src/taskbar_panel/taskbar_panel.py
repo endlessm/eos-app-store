@@ -3,27 +3,21 @@ import cairo
 from gtk import gdk
 import gobject
 
-from osapps.app_launcher import AppLauncher
-from feedback_plugin import FeedbackPlugin
+from feedback.feedback_plugin import FeedbackPlugin
 from search.search_box import SearchBox
 from eos_util import image_util
 from eos_util.image_util import load_pixbuf
 from application_list_plugin import ApplicationListPlugin
+from taskbar_shortcut import TaskbarShortcut
+from social_bar.social_bar_plugin import SocialBarPlugin
 
 class TaskbarPanel(gtk.EventBox):
-    __gsignals__ = {
-                    'feedback-clicked': (gobject.SIGNAL_RUN_FIRST, #@UndefinedVariable
-                                         gobject.TYPE_NONE,
-                                         ()),
-                    'launch-search': (gobject.SIGNAL_RUN_FIRST, #@UndefinedVariable
-                                        gobject.TYPE_NONE,
-                                        (gobject.TYPE_PYOBJECT,)),
-    }
 
     ICON_SIZE = 24
 
-    def __init__(self, width):
+    def __init__(self, parent, width):
         super(TaskbarPanel, self).__init__()
+        self._parent = parent
         self.set_visible_window(False)
         self.set_app_paintable(True)
         self.connect('expose-event', self._redraw)
@@ -44,14 +38,18 @@ class TaskbarPanel(gtk.EventBox):
         del self._raw_taskbar_bg_pixbuf
         taskbar_panel_items.pack_start(searchbox_holder, False, False, 0)
         taskbar_panel_items.pack_start(application_list_plugin_holder, False, True, 0)
-        taskbar_panel_items.pack_end(feedback_plugin, False, False, 10)
 
+        display_on_right = lambda plugin: taskbar_panel_items.pack_end(plugin, False, False, 10)
+        self._setup_social_bar_icon_on_taskbar().display(display_on_right )
+        display_on_right(feedback_plugin)
 
     def _setup_feedback_icon_on_taskbar(self):
-        feedback_plugin = FeedbackPlugin(self.ICON_SIZE)
-        feedback_plugin.connect('button-press-event', lambda w, e:self.emit('feedback-clicked'))
+        feedback_plugin = FeedbackPlugin(self._parent, self.ICON_SIZE)
         return feedback_plugin
 
+    def _setup_social_bar_icon_on_taskbar(self):
+        social_bar_plugin = SocialBarPlugin(self._parent, self.ICON_SIZE)
+        return TaskbarShortcut(social_bar_plugin, social_bar_plugin.PATH)
 
     def _align_taskbar(self):
         self._taskbar_panel = gtk.Alignment(0.5, 0.5, 1.0, 0)
@@ -60,12 +58,10 @@ class TaskbarPanel(gtk.EventBox):
         self._taskbar_panel.add(taskbar_panel_items)
         return taskbar_panel_items
 
-
     def _setup_searchbar_on_taskbar(self):
         self._searchbox_holder = gtk.Alignment(0.5, 0.5, 0, 1.0)
         self._searchbox_holder.set_padding(0, 0, 2, 0)
         self._searchbox = SearchBox()
-        self._searchbox.connect('launch-search', lambda w, s:self.emit('launch-search', s))
         self._searchbox_holder.add(self._searchbox)
         return self._searchbox_holder
 

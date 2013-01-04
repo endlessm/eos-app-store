@@ -24,7 +24,6 @@ class ApplicationListPlugin(gtk.HBox):
         self._icon_size = icon_size
         pixbuf = load_pixbuf('endless.png')
         self._default_icon = pixbuf.scale_simple(icon_size, icon_size, gdk.INTERP_BILINEAR)
-        del pixbuf
 
         self._taskbar_icons = {}
 
