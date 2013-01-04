@@ -1,16 +1,16 @@
 import gtk
 import cairo
 from eos_util import image_util
-from eos_util import screen_util
 from osapps.desktop_preferences_datastore import DesktopPreferencesDatastore
 from application_row_box import ApplicationRowBox
 
 class AddApplicationBox(gtk.VBox):
-    def __init__(self, parent, add_remove_widget=None, desktop_preference_class = DesktopPreferencesDatastore, default_category='All'):
+    def __init__(self, parent, presenter, width, height, add_remove_widget=None, desktop_preference_class = DesktopPreferencesDatastore, default_category='All'):
         super(AddApplicationBox, self).__init__()
         self.set_homogeneous(False)
 
-        self._presenter = parent._presenter
+        #self._presenter = parent._presenter
+        self._presenter = presenter
         self._parent = parent
         self.x = 0
         self.y = 0
@@ -19,7 +19,8 @@ class AddApplicationBox(gtk.VBox):
 
         self._desktop_preferences = desktop_preference_class.get_instance()
         self._background = self._desktop_preferences.get_scaled_background_image(
-                screen_util.get_width(parent.parent), screen_util.get_height(parent.parent))
+                width, height)
+                #screen_util.get_width(parent.parent), screen_util.get_height(parent.parent))
 
         self._scrolled_window = gtk.ScrolledWindow()
         self._scrolled_window.set_policy(hscrollbar_policy=gtk.POLICY_NEVER, vscrollbar_policy=gtk.POLICY_AUTOMATIC)
@@ -51,16 +52,16 @@ class AddApplicationBox(gtk.VBox):
 
     def _on_show(self, widget):
         widget.get_child().set_shadow_type(gtk.SHADOW_NONE)
-        
+
     def _on_scroll(self, widget):
         self._scrolled_window.queue_draw()
-        
+
     def _handle_expose_event(self, widget, event):
         cr = widget.window.cairo_create()
         x, y = self._vbox.window.get_origin()
         top_x, top_y = self._scrolled_window.window.get_toplevel().get_origin()
         self.draw(cr, x - top_x, y - top_y, self.allocation.width, self.allocation.height)
-        
+
         # TODO what is the purpose of self._refresh?
         # In the current implementation, things look better for the website box
         # without the check, so I'm disabling it here as well
