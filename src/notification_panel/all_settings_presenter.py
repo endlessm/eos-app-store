@@ -4,6 +4,9 @@ from background_chooser_launcher import BackgroundChooserLauncher
 
 class AllSettingsPresenter():
     def __init__(self, view, model, backgroundChooserLauncher=BackgroundChooserLauncher()):
+        view.add_listener(AllSettingsView.DISABLE_FOCUS_OUT, self.disable_focus_out)
+        view.add_listener(AllSettingsView.ENABLE_FOCUS_OUT, self.enable_focus_out)
+
         view.add_listener(AllSettingsView.DESKTOP_BACKGROUND, 
                 lambda: self._desktop_background(view, model, backgroundChooserLauncher))
         view.add_listener(AllSettingsView.UPDATE_SOFTWARE, 
@@ -20,7 +23,7 @@ class AllSettingsPresenter():
   
         self._model = model
         self._view = view
-        self._focus_out_enabled = True
+        self._focus_out_enabled = False
         
         self._modify_update_button(view, model)
         

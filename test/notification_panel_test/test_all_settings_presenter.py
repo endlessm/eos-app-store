@@ -32,6 +32,31 @@ class AllSettingsPresenterTest(unittest.TestCase):
             self._restart_listener = args[1]
         elif args[0] == AllSettingsView.SHUTDOWN:
             self._shutdown_listener = args[1]
+        elif args[0] == AllSettingsView.DISABLE_FOCUS_OUT:
+            self._disable_focus_out_listener = args[1]
+        elif args[0] == AllSettingsView.ENABLE_FOCUS_OUT:
+            self._enable_focus_out_listener = args[1]
+
+    def test_intially_disable_focus_out(self):
+        presenter = AllSettingsPresenter(self._mock_view, self._mock_model, self._mock_background_chooser)
+
+        self.assertFalse(presenter.is_focus_out_enabled())
+
+    def test_enable_focus_out_when_view_signals_enable_focus_out(self):
+        presenter = AllSettingsPresenter(self._mock_view, self._mock_model, self._mock_background_chooser)
+
+        self._disable_focus_out_listener()
+        self._enable_focus_out_listener()
+
+        self.assertTrue(presenter.is_focus_out_enabled())
+
+    def test_disable_focus_out_when_view_signals_disable_focus_out(self):
+        presenter = AllSettingsPresenter(self._mock_view, self._mock_model, self._mock_background_chooser)
+
+        self._enable_focus_out_listener()
+        self._disable_focus_out_listener()
+
+        self.assertFalse(presenter.is_focus_out_enabled())
 
     def test_if_update_started_then_show_update_status_window(self):
         AllSettingsPresenter(self._mock_view, self._mock_model, self._mock_background_chooser)

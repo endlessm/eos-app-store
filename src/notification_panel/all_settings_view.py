@@ -20,6 +20,8 @@ class AllSettingsView(AbstractNotifier):
     RESTART = "restart"
     SHUTDOWN = "shutdown"
     FOCUS_OUT = "focus_out"
+    DISABLE_FOCUS_OUT = "disable_focus_out"
+    ENABLE_FOCUS_OUT = "enable_focus_out"
         
     UPDATE_BUTTON_TEXT = _('Update')
     UPDATE_IN_PROGRESS_BUTTON_TEXT = _('Updating...')
@@ -36,6 +38,10 @@ class AllSettingsView(AbstractNotifier):
 
     def __init__(self, parent):
         self._parent = parent
+
+        self._parent.connect('enter-notify-event', lambda w, e: self._notify(self.DISABLE_FOCUS_OUT))
+        self._parent.connect('leave-notify-event', lambda w, e: self._notify(self.ENABLE_FOCUS_OUT))
+
         self._button_desktop = gtk.Button(_('Background'))
         self._label_version = gtk.Label()
         self._button_update = gtk.Button(self.UPDATE_BUTTON_TEXT)
