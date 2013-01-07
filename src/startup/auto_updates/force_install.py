@@ -1,7 +1,6 @@
 from startup.auto_updates.force_install_checker import ForceInstallChecker
 from eos_installer.endless_installer import EndlessInstaller
 from startup.auto_updates.force_install_ui import ForceInstallUI
-from eos_installer.endless_downloader import EndlessDownloader
 from threading import Thread
 from eos_log import log
 from eos_installer import endpoint_provider

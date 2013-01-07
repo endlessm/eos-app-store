@@ -1,8 +1,6 @@
 from auto_updates.update_manager import UpdateManager
 from auto_updates.force_install import ForceInstall
-from startup.remove_extra_directories_task import RemoveExtraDirectoriesTask
 from eos_log import log
-from startup.remove_extra_files_task import RemoveExtraFilesTask
 
 
 class StartupTasks(object):
