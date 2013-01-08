@@ -13,11 +13,12 @@ class ForceInstall():
     def __init__(self, force_install_checker=ForceInstallChecker(), 
             endless_installer=EndlessInstaller(), 
             force_install_ui=ForceInstallUI(),
-            os_util=OsUtil()):
+            os_util=OsUtil(), update_lock=UpdateLock(UPGRADE_LOCK)):
         self._force_install_checker = force_install_checker
         self._endless_installer = endless_installer
         self._force_install_ui = force_install_ui
         self._os_util = os_util
+        self._update_lock = update_lock
 
     def execute(self):
         if self._force_install_checker.should_force_install():
@@ -29,15 +30,15 @@ class ForceInstall():
     def install_in_background(self):
         log.info("launching installer in thread")
         
-        if not UpdateLock(self.UPGRADE_LOCK).is_locked():
-            UpdateLock(self.UPGRADE_LOCK).acquire()
+        if not self._update_lock.is_locked():
+            self._update_lock.acquire()
             
             self._thread = Thread(target=self._background_installation_task)
             self._thread.start()
     
             self._force_install_ui.launch_ui()
             
-            UpdateLock(self.UPGRADE_LOCK).release()
+            self._update_lock.release()
         else:
             log.print_stack("Erroneous upgrade attempted")
         
