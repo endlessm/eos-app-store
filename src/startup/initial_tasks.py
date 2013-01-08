@@ -6,10 +6,12 @@ from startup.windows_migration_tasks import WindowsMigrationTasks
 from startup.delete_desktop_state_task import DeleteDesktopStateTask
 from startup.remove_extra_directories_task import RemoveExtraDirectoriesTask
 from startup.remove_extra_files_task import RemoveExtraFilesTask
+from startup.delete_install_lock_task import DeleteInstallLockTask
 from eos_log import log
 
 class InitialTasks():
 	TASK_PLUGINS = [
+				DeleteInstallLockTask,
 				DeleteDesktopStateTask, 
 				ShotwellTasks, 
 				BeatboxTasks,
