@@ -28,9 +28,7 @@ class SeparatorShortcut(DesktopShortcut):
         self._show_background = True
         self.show_all()
         
-        DesktopShortcut._add_drag_end_broadcast_callback(
-            self._drag_end_broadcast_callback
-            )
+        DesktopShortcut._add_drag_end_broadcast_callback(self, self._drag_end_broadcast_callback)
         
     def _received_handler_callback(self, source, destination, x, y, data=None):
         dest_widget = destination.parent.parent

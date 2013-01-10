@@ -1,11 +1,12 @@
+import gtk
+import gc
 import string
-from util import label_util
 import gobject
+
 from util.shadowed_label_box import ShadowedLabelBox
 from eos_widgets.image_eventbox import ImageEventBox
 from desktop.desktop_layout import DesktopLayout
-import gtk
-import gc
+from util import label_util
 
 class DesktopShortcut(gtk.VBox):
     DND_TARGET_TYPE_TEXT = 80
@@ -32,16 +33,19 @@ class DesktopShortcut(gtk.VBox):
     _drag_begin_callbacks = []
     
     @classmethod
-    def _add_motion_broadcast_callback(cls, callback):
+    def _add_motion_broadcast_callback(cls, widget, callback):
         cls._motion_callbacks.append(callback)
+        widget.connect("destroy", lambda w: cls._motion_callbacks.remove(callback))
 
     @classmethod
-    def _add_drag_end_broadcast_callback(cls, callback):
-        cls._drag_end_callbacks.append(callback)
+    def _add_drag_end_broadcast_callback(cls, widget, callback):
+        cls._drag_end_callbacks.append(callback) 
+        widget.connect("destroy", lambda w: cls._drag_end_callbacks.remove(callback))
 
     @classmethod
-    def _add_drag_begin_broadcast_callback(cls, callback):
+    def _add_drag_begin_broadcast_callback(cls, widget, callback):
         cls._drag_begin_callbacks.append(callback)
+        widget.connect("destroy", lambda w: cls._drag_begin_callbacks.remove(callback))
 
     @classmethod
     def _motion_broadcast(cls, source, destination, x, y):
