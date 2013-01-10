@@ -5,6 +5,7 @@ from util.shadowed_label_box import ShadowedLabelBox
 from eos_widgets.image_eventbox import ImageEventBox
 from desktop.desktop_layout import DesktopLayout
 import gtk
+import gc
 
 class DesktopShortcut(gtk.VBox):
     DND_TARGET_TYPE_TEXT = 80
@@ -275,3 +276,6 @@ class DesktopShortcut(gtk.VBox):
     
     def set_images(self, images):
         self._icon_event_box.set_images(images)
+        for image in images:
+           del image
+           gc.collect()
