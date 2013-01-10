@@ -10,6 +10,8 @@ import cairo
 from eos_util import image_util
 from eos_util import screen_util
 
+import sys
+import gc
 class AddShortcutsView():
     def __init__(self, parent=None, add_remove_widget=None, width=0, height=0):
         self._add_button_box_width = 120
@@ -113,7 +115,10 @@ class AddShortcutsView():
         ctx.restore()
 
     def set_scrolled_window(self, widget):
-        self.hbox2.remove(self.hbox2.get_children()[0])
+        old_widget = self.hbox2.get_children()[0]
+        self.hbox2.remove(old_widget)
+        old_widget.destroy()
+
         self.scrolled_window = widget
         self.hbox2.pack_start(self.scrolled_window)
         self.scrolled_window.show()
