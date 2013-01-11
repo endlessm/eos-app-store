@@ -1,7 +1,7 @@
 
 class MemUtils():
-   SCALE = {'kB': 1024.0, 'mB': 1024.0*1024.0,
-            'KB': 1024.0, 'MB': 1024.0*1024.0}
+   SCALE = {'kB': 1024.0, 'mB': 1024.0*1024.0, 'gB': 1024.0*1024.0*1024.0,
+            'KB': 1024.0, 'MB': 1024.0*1024.0, 'GB': 1024.0*1024.0*1024.0}
 
    def process_mem_size(self, pid, mem_units):
       with open("/proc/" + str(pid) + "/status", "r") as f:
