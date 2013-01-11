@@ -15,17 +15,11 @@ class AddRemoveShortcut(DesktopShortcut):
         super(AddRemoveShortcut, self).__init__(label_text, draggable=False)
         
         #listen for drag begin on all widgets
-        DesktopShortcut._add_drag_begin_broadcast_callback(
-            self._drag_begin_broadcast_callback
-            )
+        DesktopShortcut._add_drag_begin_broadcast_callback(self, self._drag_begin_broadcast_callback)
         #listen for drag end on all widgets
-        DesktopShortcut._add_drag_end_broadcast_callback(
-            self._drag_end_broadcast_callback
-            )
+        DesktopShortcut._add_drag_end_broadcast_callback(self, self._drag_end_broadcast_callback)
         #Listen for motion on all widgets
-        DesktopShortcut._add_motion_broadcast_callback(
-            self._drag_motion_broadcast_callback
-            )
+        DesktopShortcut._add_motion_broadcast_callback(self, self._drag_motion_broadcast_callback)
         
         
         self._callback = callback
