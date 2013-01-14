@@ -1,3 +1,5 @@
+import sys
+
 from desktop.endless_desktop_presenter import DesktopPresenter
 from desktop.endless_desktop_view import EndlessDesktopView
 
@@ -9,11 +11,14 @@ from osapps.desktop_locale_datastore import DesktopLocaleDatastore
 
 def build_desktop():
     preferences_provider = DesktopPreferencesDatastore.get_instance()
+    view = EndlessDesktopView()
+    model = EndlessDesktopModel(DesktopLocaleDatastore(),
+                              preferences_provider,
+                              AppDatastore(),
+                              AppLauncher())
+    presenter = DesktopPresenter(view, model)
 
-    presenter = DesktopPresenter(EndlessDesktopView(),
-                                 EndlessDesktopModel(DesktopLocaleDatastore(),
-                                                     preferences_provider,
-                                                     AppDatastore(),
-                                                     AppLauncher())
-                                                     )
-    presenter._view.main()
+    if len(sys.args) > 1 and sys.args[1] == 'uat':
+        from uat.uat_helper import UatHelper
+        UatHelper().setup(view)
+
