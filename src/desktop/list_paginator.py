@@ -8,7 +8,7 @@ class ListPaginator:
         self._page_num = 0
         
     def number_of_pages(self):
-        return self._page_count
+        return int(self._page_count)
     
     def current_page(self):
         index = self.list_index_for_current_page()
@@ -28,3 +28,6 @@ class ListPaginator:
         
     def prev(self):
         self._page_num = int((self._page_num + self._page_count - 1) % self._page_count)
+        
+    def is_last_page(self):
+        return self.current_page_index() == (self.number_of_pages() - 1)
