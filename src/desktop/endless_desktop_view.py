@@ -18,6 +18,9 @@ from taskbar_panel.taskbar_panel import TaskbarPanel
 from add_shortcuts_module.add_shortcuts_view import AddShortcutsView
 from eos_util.image import Image
 from shortcut.desktop_shortcut import DesktopShortcut
+from desktop.list_paginator import ListPaginator
+from desktop_page.desktop_page_view import DesktopPageView
+from desktop_page.responsive import Button
 
 
 gettext.install('endless_desktop', '/usr/share/locale', unicode=True, names=['ngettext'])
@@ -73,6 +76,7 @@ class EndlessDesktopView(gtk.Window):
         self.show_all()
 
         self._max_icons_in_row, self._max_rows_in_page = self._calculate_max_icons()
+        self._page_num = 0
 
         screen = gtk.gdk.Screen() #@UndefinedVariable
         screen.connect('size-changed', lambda s: self._set_background(self.BACKGROUND_NAME))
@@ -145,22 +149,124 @@ class EndlessDesktopView(gtk.Window):
     def refresh(self, shortcuts, force=False):
         
         self._cleanup()
-    
-        DesktopPage.calc_pages(
-            shortcuts,
-            create_row_callback = self._create_row,
-            reload_callback = self._page_change_callback,
-            max_items_in_row = self._max_icons_in_row,
-            max_rows_in_page = self._max_rows_in_page
+        
+        
+        
+        shortcut_paginator = ListPaginator(shortcuts, (self._max_icons_in_row * self._max_rows_in_page) - 1)
+#        self._page_num = shortcut_paginator.current_page_index()
+        if self._page_num > (shortcut_paginator.number_of_pages() - 1):
+            self._page_num = shortcut_paginator.number_of_pages() - 1
+        hide_page_buttons = not shortcut_paginator.number_of_pages() > 1
+        shortcut_paginator.go_to_page(self._page_num)
+        current_page_shortcuts = shortcut_paginator.current_page()
+        
+        #########################################################3333
+        
+        self.desktop_vbox = gtk.VBox()
+        
+        self.top_vbox = gtk.VBox()
+        self.top_vbox.set_size_request(0, 39)    
+            
+        self.desk_container = gtk.HBox(homogeneous=False, spacing=0)
+        #self.desk_container.modify_bg(gtk.STATE_NORMAL, gtk.gdk.Color(65535,238,0))
+
+        self.desk_container_wraper = gtk.Alignment(1.0, 0.5, 1.0, 0.0)
+        #self.desk_container_wraper.modify_bg(gtk.STATE_NORMAL, gtk.gdk.Color(35,238,0))
+        self.desk_container_wraper.add(self.desk_container)    
+        
+        self.icons_alignment = gtk.Alignment(0.5, 0.5, 0.0, 0.0)
+        
+        hide_btn = False
+        self.prev_button = Button(
+            normal = (),
+            hover = (Image.from_name("button_arrow_desktop_left_hover.png"),),
+            down = (Image.from_name("button_arrow_desktop_left_down.png"),),
+            invisible = hide_page_buttons
             )
+        self.prev_button.connect("clicked", lambda w: self._prev_desktop_callback(shortcut_paginator))
+        self.prev_button.set_size_request(50, 420)
 
-        desk_page = DesktopPage.get_current_page()
+        self.prev_button_wrap = Button.align_it(self.prev_button)
 
-        desk_page.show()
+        self.next_button = Button(
+            normal = (),
+            hover = (Image.from_name("button_arrow_desktop_right_hover.png"),),
+            down = (Image.from_name("button_arrow_desktop_right_down.png"),),
+            invisible = hide_page_buttons
+            )
+        self.next_button.connect("clicked", lambda w: self._next_desktop_callback(shortcut_paginator))
+        self.next_button.set_size_request(50, 420)
+        self.next_button_wrap = Button.align_it(self.next_button)
+            
+        self.desk_container.pack_start(self.prev_button_wrap, expand=False, fill=False, padding=0)
+        
+        desktop_page = DesktopPageView(current_page_shortcuts, self._max_icons_in_row, self._create_row)
 
-        self._align.add(desk_page)
-        desk_page.show()
+        self.icons_alignment.add(desktop_page)
+        
+        self.desk_container.pack_start(self.icons_alignment, expand=True, fill=True, padding=0)
+        
+        
+        self.desk_container.pack_end(self.next_button_wrap, expand=False, fill=False, padding=0)
+        
+        self.desktop_vbox.pack_start(self.top_vbox, expand=False, fill=False, padding=0)
+        self.desktop_vbox.pack_start(self.desk_container_wraper, expand=True, fill=True, padding=0)
+
+        self.desktop_vbox.show_all()
+        
+    ######################################################################
+        
+        
+        self.bottom_hbox = gtk.HBox(spacing=7)
+
+        wraper = gtk.Alignment(0.5, 0.5, 0.0, 0.0)
+        wraper.set_size_request(0, 39)
+        #wraper.modify_bg(gtk.STATE_NORMAL, gtk.gdk.Color(35,238,0))
+
+        wraper.add(self.bottom_hbox)
+        wraper.show()
+        self._page_buttons = []
+        for page_num in range(0, shortcut_paginator.number_of_pages()):
+            btn = Button(
+                normal = (Image.from_name("button_mini_desktop_normal.png"),),
+                hover = (Image.from_name("button_mini_desktop__hover_active.png"),),
+                down = (Image.from_name("button_mini_desktop_down.png"),),
+                select = (Image.from_name("button_mini_desktop__active.png"),),
+                invisible = hide_page_buttons
+                )
+            self._page_buttons.append(btn)
+            btn.connect("clicked", self._page_button_clicked)
+            #btn.modify_bg(gtk.STATE_NORMAL, gtk.gdk.Color(65535,0,0))
+            btn.set_size_request(21, 13)
+            self.bottom_hbox.pack_start(btn, expand=False, fill=False, padding=0)
+        for button in self._page_buttons:
+            button.unselected()
+            
+        self._page_buttons[self._page_num].selected()
+
+        self.desktop_vbox.pack_end(wraper, expand=False, fill=False, padding=0)
+
+        self.bottom_hbox.show_all()
+
+        self.desktop_vbox.show()
+
+        self._align.add(self.desktop_vbox)
+        self.desktop_vbox.show()
         self._align.show()
+
+    def _prev_desktop_callback(self, paginator):
+        paginator.next()
+        self._page_num = paginator.current_page_index()
+        self._presenter.refresh_view()
+        
+    def _next_desktop_callback(self, paginator):
+        paginator.next()
+        self._page_num = paginator.current_page_index()
+        self._presenter.refresh_view()
+        
+    def _page_button_clicked(self, widget):
+        self._page_num = self._page_buttons.index(widget)
+        self._presenter.refresh_view()
 
     def _page_change_callback(self):
         self._presenter._page_change_callback()
@@ -215,6 +321,10 @@ class EndlessDesktopView(gtk.Window):
                 item.connect("desktop-shortcut-dnd-begin", self._dnd_begin)
                 item.connect("desktop-shortcut-rename", self._rename_callback)
                 item.show()
+            elif shortcut.key() == "ADD_REMOVE_SHORTCUT_PLACEHOLDER":
+                item = AddRemoveShortcut(callback=self.show_add_dialogue)
+                item.connect("application-shortcut-remove", self._delete_shortcuts)
+                item.show()
             else:
                 item = ApplicationShortcut(shortcut)
                 item.connect("application-shortcut-rename", lambda w, shortcut, new_name: self._presenter.rename_item(shortcut, new_name))
@@ -222,6 +332,7 @@ class EndlessDesktopView(gtk.Window):
                 item.connect("desktop-shortcut-dnd-begin", self._dnd_begin)
                 item.connect("desktop-shortcut-rename", self._rename_callback)
                 item.show()
+
 
             if item.parent != None:
                 print >> sys.stderr, "Item has parent!", item
@@ -234,19 +345,6 @@ class EndlessDesktopView(gtk.Window):
             sep_new.set_left_separator(sep_last)
             sep_new.set_left_widget(item)
             sep_last = sep_new
-
-        #Adding AddRemove icon at the end of row
-        if last_row:
-            add_remove = AddRemoveShortcut(callback=self.show_add_dialogue)
-            add_remove.connect("application-shortcut-remove", self._delete_shortcuts)
-            row.pack_start(add_remove, False, False, 0)
-            add_remove.show()
-            if len(items) > 0:
-                # Add support to slide the AddRemove icon to the right
-                # during icon drag and drop, unless there are no other items
-                # in the row (in which case we currently do not support
-                # moving the icon to the first position of the last row)
-                sep_last.set_right_widget(add_remove)
 
         return row
 
