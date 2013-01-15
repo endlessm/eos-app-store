@@ -18,7 +18,7 @@ def build_desktop():
                               AppLauncher())
     presenter = DesktopPresenter(view, model)
 
-    if len(sys.args) > 1 and sys.args[1] == 'uat':
+    if len(sys.argv) > 1 and sys.argv[1] == 'uat':
         from uat.uat_helper import UatHelper
         UatHelper().setup(view)
 

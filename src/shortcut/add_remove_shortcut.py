@@ -1,4 +1,5 @@
 import gobject
+import uuid
 from shortcut.desktop_shortcut import DesktopShortcut
 from removal_module.removal_confirmation_popup_window import RemovalConfirmationPopupWindow
 from removal_module.delete_not_possible_popup import DeleteNotPossiblePopupWindow
@@ -36,6 +37,7 @@ class AddRemoveShortcut(DesktopShortcut):
         self._drag_data = {}
 
         self.show_all()
+        self.uat_id = "add_remove_apps"
         
     def remove_shortcut(self):
         if self.parent:

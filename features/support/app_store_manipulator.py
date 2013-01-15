@@ -1,12 +1,13 @@
-import sys
 from ldtp import *
-import time
+from ldtp_helper import LdtpHelper
 
 class AppStoreManipulator():
+   def __init__(self):
+      self._ldtp_helper = LdtpHelper()
+
    def click_through(self):
-      generatemouseevent(800,700)
-      time.sleep(0.3)
-      generatemouseevent(190,660)
-      time.sleep(0.3)
-      generatemouseevent(100,100)
-      time.sleep(0.1)
+      self._ldtp_helper.click_on("add_remove_apps")
+      self._ldtp_helper.click_on("folder_tab")
+      self._ldtp_helper.click_on("close_app_store")
+
+

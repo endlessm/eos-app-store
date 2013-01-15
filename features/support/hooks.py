@@ -8,7 +8,11 @@ import time
 
 @before.all
 def setUp():
-   argv = ['/usr/bin/python', './src/endless_os_desktop.py']
+   argv = [
+         '/usr/bin/python', 
+         './src/endless_os_desktop.py', 
+         'uat', 
+         ]
    tpid, tstdin, tstout, tsterr = glib.spawn_async(argv)
    world.tpid = tpid
 

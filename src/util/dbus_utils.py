@@ -24,6 +24,9 @@ class DbusUtils:
 
     def get_system_bus(self):
         return DbusUtils._system_bus
+    
+    def get_session_bus(self):
+        return self._data_bus.SessionBus()
 
     def register_property_listener(self, device_type, callback):
         interface = self.get_device_interface(device_type)
