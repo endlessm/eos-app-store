@@ -17,6 +17,7 @@ from notification_panel.notification_panel import NotificationPanel
 from taskbar_panel.taskbar_panel import TaskbarPanel
 from add_shortcuts_module.add_shortcuts_view import AddShortcutsView
 from eos_util.image import Image
+from shortcut.desktop_shortcut import DesktopShortcut
 
 
 gettext.install('endless_desktop', '/usr/share/locale', unicode=True, names=['ngettext'])
@@ -127,13 +128,23 @@ class EndlessDesktopView(gtk.Window):
         image = Image(pixbuf)
         image.scale_to_best_fit(screen_width, screen_height)
         return image.pixbuf
+    
+    #TODO: this fixes one symptom of performance and memory leaks by cleaning up callbacks, please refactor
+    def _cleanup(self):
 
-    def refresh(self, shortcuts, force=False):
-        
         child = self._align.get_child()
         if child:
             child.parent.remove(child)
             child.destroy()
+            del child
+        
+        DesktopShortcut._clear_callbacks()
+        
+    
+
+    def refresh(self, shortcuts, force=False):
+        
+        self._cleanup()
     
         DesktopPage.calc_pages(
             shortcuts,
