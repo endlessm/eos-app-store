@@ -1,12 +1,12 @@
 import gtk
 import json
 import operator
+import dbus
 import dbus.service
-from util.dbus_utils import DbusUtils
 
 class UatHelper(dbus.service.Object):
     def __init__(self):
-        bus_name = dbus.service.BusName('com.endlessm.uat.Desktop', DbusUtils().get_session_bus())
+        bus_name = dbus.service.BusName('com.endlessm.uat.Desktop', dbus.SessionBus())
         dbus.service.Object.__init__(self, bus_name, "/com/endlessm/uat/Desktop")
     
     def setup(self, root_node):
