@@ -13,7 +13,7 @@ class UatHelper(dbus.service.Object):
         self._root_node = root_node
 
     @dbus.service.method('com.endlessm.uat.Desktop', in_signature='', out_signature='s')
-    def get_stuff(self):
+    def get_gtk_tree_info(self):
         self._data = {}
         self._traverse(self._root_node)
         for window in gtk.window_list_toplevels():
@@ -43,15 +43,6 @@ class UatHelper(dbus.service.Object):
              
         click_area = tuple(map(operator.add, absolute_coords, widget_middle))
         
-#        with open("/tmp/monkey", "a") as f:
-#            print >> f, "*************", widget.uat_id
-#            print >> f, "window_coords", window_coords
-#            print >> f, "widget_coords", widget_coords
-#            print >> f, "absolute_coords", absolute_coords 
-#            print >> f, "widget_size", widget_size
-#            print >> f, "widget_middle", widget_middle
-#            print >> f, "click_area", click_area
-            
         if hasattr(widget, "uat_offset"):
             widget_offset = widget.uat_offset
             click_area = tuple(map(operator.add, click_area, widget_offset))

@@ -14,7 +14,7 @@ class LdtpHelper():
         dbus.mainloop.glib.DBusGMainLoop(set_as_default=True)
         bus = dbus.SessionBus()
         service = bus.get_object('com.endlessm.uat.Desktop', "/com/endlessm/uat/Desktop")
-        self._method = service.get_dbus_method('get_stuff', 'com.endlessm.uat.Desktop')
+        self._method = service.get_dbus_method('get_gtk_tree_info', 'com.endlessm.uat.Desktop')
         
     def click_on(self, widget_id, sleep_amount=DEFAULT_SLEEP_AMOUNT):
         x, y =  self._get_widget(widget_id)["coord"]
