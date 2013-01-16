@@ -43,12 +43,6 @@ class DbusUtilsTestCase(unittest.TestCase):
             
         self._mock_data_bus.Interface = get_interface
 
-    def test_get_session_bus_returns_sesion_bus_from_given_data_bus(self):
-        expected_session_bus = Mock()
-        self._mock_data_bus.SessionBus = Mock(return_value=expected_session_bus)
-        
-        self.assertEquals(self._test_object.get_session_bus(), expected_session_bus)
-        
     def test_get_system_bus_always_returns_static_system_bus(self):
         self._mock_data_bus.SystemBus = Mock(return_value=None)
         
