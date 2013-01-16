@@ -22,10 +22,10 @@ class DesktopPresenter(object):
 
     def move_item(self, shortcuts):
         self._model.set_shortcuts(shortcuts)
-        self._view.refresh(self._model.get_shortcuts(force=True), force=True)
+        self._view.refresh(self._model.get_shortcuts(force=True), self._model.get_page_index(), self._model.get_total_pages(), force=True)
 
     def _page_change_callback(self):
-        self._view.refresh(self._model.get_shortcuts())
+        self._view.refresh(self._model.get_shortcuts(), self._model.get_page_index(), self._model.get_total_pages())
 
     def relocate_item(self, source_shortcut, folder_shortcut):
         self._view.close_folder_window()
@@ -34,7 +34,7 @@ class DesktopPresenter(object):
             folder_shortcut
             )
         all_shortcuts = self._model.get_shortcuts(force=True)
-        self._view.refresh(all_shortcuts, force=True)
+        self._view.refresh(all_shortcuts, self._model.get_page_index(), self._model.get_total_pages(), force=True)
         if success:
             if folder_shortcut is not None:
                 self._view.show_folder_window_by_name(folder_shortcut.name())
@@ -76,7 +76,7 @@ class DesktopPresenter(object):
     def refresh_view(self):
         if not self._is_refreshing:
             self._is_refreshing = True
-            self._view.refresh(self._model.get_shortcuts())
+            self._view.refresh(self._model.get_shortcuts(), self._model.get_page_index(), self._model.get_total_pages())
             self._is_refreshing = False
 
     def change_background(self, filename):
@@ -91,7 +91,7 @@ class DesktopPresenter(object):
 
     def delete_shortcut(self, what):
         self._model.delete_shortcut(what)
-        self._view.refresh(self._model.get_shortcuts(force=True))
+        self._view.refresh(self._model.get_shortcuts(force=True), self._model.get_page_index(), self._model.get_total_pages())
 
     def rename_shortcut(self, shortcut_obj, new_name):
         all_shortcuts = self._model.get_shortcuts()
@@ -115,3 +115,15 @@ class DesktopPresenter(object):
                     done = False
 
         return new_name
+    
+    def next_desktop(self):
+        self._model.next_page()
+        self.refresh_view()
+
+    def previous_desktop(self):
+        self._model.previous_page()
+        self.refresh_view()
+        
+    def desktop_page_navigate(self, index):
+        self._model.go_to_page(index)
+        self.refresh_view()

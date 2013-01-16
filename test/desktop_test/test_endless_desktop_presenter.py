@@ -32,14 +32,20 @@ class TestEndlessDesktopPresenter(unittest.TestCase):
     def test_refresh_view_updates_view(self):
         mock_shortcuts = [Mock(), Mock()]
         mock_menus = [Mock(), Mock()]
+        page_index = 2
+        total_pages = 100
+        
         self.mock_view.refresh = Mock()
         self.mock_view.populate_popups = Mock()
         self.mock_model.get_shortcuts = Mock(return_value=mock_shortcuts)
         self.mock_model.get_menus = Mock(return_value=mock_menus)
+        
+        self.mock_model.get_page_index = Mock(return_value=page_index)
+        self.mock_model.get_total_pages = Mock(return_value=total_pages)
 
         self.testObject.refresh_view()
 
-        self.mock_view.refresh.assert_called_once_with(mock_shortcuts)
+        self.mock_view.refresh.assert_called_once_with(mock_shortcuts, page_index, total_pages)
 
     def test_if_refresh_is_occuring_already_do_not_redraw_again(self):
         self.mock_view.refresh = None
@@ -239,6 +245,56 @@ class TestEndlessDesktopPresenter(unittest.TestCase):
         self.testObject.move_item_left(sc_1, sc_2, all_shortcuts)
 
         self.assertEqual(all_shortcuts, [sc_2, sc_1, sc_3])
+        
+    def test_change_to_next_desktop_page(self):
+        sc_1 = Mock()
+        sc_2 = Mock()
+        sc_3 = Mock()
+        all_shortcuts = [sc_1, sc_2, sc_3]
+        page_num = 99
+        total_pages = 100
+        self.mock_view.refresh = Mock()
+        self.mock_model.next_page = Mock()
+        self.mock_model.get_shortcuts = Mock(return_value=all_shortcuts)
+        self.mock_model.get_page_index = Mock(return_value=page_num)
+        self.mock_model.get_total_pages = Mock(return_value=total_pages)
 
+        self.testObject.next_desktop()
+        
+        self.mock_model.next_page.assert_called_once_with()
+        self.mock_view.refresh.assert_called_once_with(all_shortcuts, page_num, total_pages)
+        
+    def test_change_to_previous_desktop_page(self):
+        sc_1 = Mock()
+        sc_2 = Mock()
+        sc_3 = Mock()
+        all_shortcuts = [sc_1, sc_2, sc_3]
+        page_num = 99
+        total_pages = 100
+        self.mock_view.refresh = Mock()
+        self.mock_model.previous_page = Mock()
+        self.mock_model.get_shortcuts = Mock(return_value=all_shortcuts)
+        self.mock_model.get_page_index = Mock(return_value=page_num)
+        self.mock_model.get_total_pages = Mock(return_value=total_pages)
 
+        self.testObject.previous_desktop()
+        
+        self.mock_model.previous_page.assert_called_once_with()
+        self.mock_view.refresh.assert_called_once_with(all_shortcuts, page_num, total_pages)
 
+    def test_desktop_page_navigate(self):
+        sc_1 = Mock()
+        sc_2 = Mock()
+        sc_3 = Mock()
+        all_shortcuts = [sc_1, sc_2, sc_3]
+        page_num = 3
+        total_pages = 5
+        self.mock_view.refresh = Mock()
+        self.mock_model.get_shortcuts = Mock(return_value=all_shortcuts)
+        self.mock_model.get_page_index = Mock(return_value=page_num)
+        self.mock_model.get_total_pages = Mock(return_value=total_pages)
+        
+        self.testObject.desktop_page_navigate(page_num)
+        
+        self.mock_model.go_to_page.assert_called_once_with(page_num)
+        self.mock_view.refresh.assert_called_once_with(all_shortcuts, page_num, total_pages)

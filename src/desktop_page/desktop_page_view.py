@@ -17,14 +17,6 @@ class DesktopPageView(gtk.VBox):
             row = self.create_row_callback(rowinator.current_page(), rowinator.is_last_page())
             self.pack_start(row, expand=False, fill=False, padding=0)
             rowinator.next()
-        
-
-            
-
-
-       
-
-
             
             
             

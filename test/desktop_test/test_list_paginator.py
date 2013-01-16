@@ -104,3 +104,16 @@ class TestListPaginator(unittest.TestCase):
         self.assertEquals(0, test_object.current_page_index())
         self.assertEquals([1, 2, 3, 4], test_object.current_page())
         self.assertFalse(test_object.is_last_page())
+        
+    def test_page_index_set_to_last_page_if_no_items_on_current_page(self):
+        test_object = ListPaginator([1, 2], 1)
+        test_object.go_to_page(1)
+        
+        test_object.adjust_list_of_items([1])
+        
+        self.assertEquals(0, test_object.current_page_index())
+        
+        test_object.go_to_page(3)
+        test_object.adjust_list_of_items([1, 2])
+        
+        self.assertEquals(1, test_object.current_page_index())
