@@ -84,6 +84,7 @@ class ShortcutCategoryBox(gtk.EventBox):
             label = gtk.Label()
             label.set_markup(markup)
             label.set_alignment(0, 0.5)
+            label.uat_id = section.category.lower() + "_tab"
             hbox.pack_start(label, True, True, 20)
             vbox.pack_start(image_start)
             vbox.pack_start(hbox, True, True, 15)

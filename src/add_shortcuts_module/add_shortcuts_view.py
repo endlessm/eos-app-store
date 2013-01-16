@@ -46,6 +46,9 @@ class AddShortcutsView():
         self.event_box = gtk.EventBox()
         self.event_box.set_visible_window(False)
         self.event_box.connect('button-press-event', self.destroy)
+        self.event_box.uat_id = 'close_app_store'
+        self.event_box.uat_offset = (0, -50)
+        
         self.event_box.add(self.add_remove_vbox)
 
         self.hbox1 = gtk.HBox()

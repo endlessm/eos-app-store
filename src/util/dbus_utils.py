@@ -24,7 +24,7 @@ class DbusUtils:
 
     def get_system_bus(self):
         return DbusUtils._system_bus
-
+    
     def register_property_listener(self, device_type, callback):
         interface = self.get_device_interface(device_type)
         interface.connect_to_signal(self.DBUS_PROPERTY_MODIFIED, callback)
