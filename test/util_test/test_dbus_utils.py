@@ -42,7 +42,7 @@ class DbusUtilsTestCase(unittest.TestCase):
                 return self._mock_device_interface
             
         self._mock_data_bus.Interface = get_interface
-        
+
     def test_get_system_bus_always_returns_static_system_bus(self):
         self._mock_data_bus.SystemBus = Mock(return_value=None)
         

@@ -368,9 +368,4 @@ class EndlessDesktopView(gtk.Window):
         changed_shortcut = self._presenter.rename_shortcut(widget.get_shortcut(), new_name)
         widget.set_shortcut(changed_shortcut)
         widget._label_event_box.refresh()
-        
 
-    def main(self):
-        gobject.threads_init()
-        gtk.threads_init()
-        gtk.main()
