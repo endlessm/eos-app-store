@@ -64,11 +64,6 @@ class EndlessDesktopView(gtk.Window):
         self._desktop = gtk.VBox(False, 2)
         self._desktop.pack_start(self._notification_panel, False, False, 0)
 
-        # btn = gtk.Button()
-        # btn.modify_bg(gtk.STATE_NORMAL, gtk.gdk.Color(35,50000,1000))
-        # btn.show()
-        # self._desktop.pack_start(btn, True, False, 0)
-
         self._desktop.pack_start(self._align, True, True, 0)
         self._desktop.pack_end(taskbar_alignment, False, False, 0)
 
@@ -133,8 +128,7 @@ class EndlessDesktopView(gtk.Window):
         return image.pixbuf
     
     #TODO: this fixes one symptom of performance and memory leaks by cleaning up callbacks, please refactor
-    def _cleanup(self):
-
+    def clean_up_legacy_page(self):
         child = self._align.get_child()
         if child:
             child.parent.remove(child)
@@ -142,108 +136,89 @@ class EndlessDesktopView(gtk.Window):
             del child
         
         DesktopShortcut._clear_callbacks()
-        
-    
 
-    def refresh(self, shortcuts, index=0, pages=1, force=False):
-        
-        self._cleanup()
-              
-        #########################################################3333
-        
-        hide_page_buttons = not pages > 1
-        
+
+    def are_page_buttons_disabled(self, pages):
+        return not pages > 1
+
+    def set_up_base_desktop(self):
         self.desktop_vbox = gtk.VBox()
-        
         self.top_vbox = gtk.VBox()
-        self.top_vbox.set_size_request(0, 39)    
-            
+        self.top_vbox.set_size_request(0, 39)
         self.desk_container = gtk.HBox(homogeneous=False, spacing=0)
-        #self.desk_container.modify_bg(gtk.STATE_NORMAL, gtk.gdk.Color(65535,238,0))
-
         self.desk_container_wraper = gtk.Alignment(1.0, 0.5, 1.0, 0.0)
-        #self.desk_container_wraper.modify_bg(gtk.STATE_NORMAL, gtk.gdk.Color(35,238,0))
-        self.desk_container_wraper.add(self.desk_container)    
-        
+        self.desk_container_wraper.add(self.desk_container)
         self.icons_alignment = gtk.Alignment(0.5, 0.5, 0.0, 0.0)
-        
+
+    def setup_left_right_page_buttons(self, hide_page_buttons):
         self.prev_button = Button(
-            normal = (),
-            hover = (Image.from_name("button_arrow_desktop_left_hover.png"),),
-            down = (Image.from_name("button_arrow_desktop_left_down.png"),),
-            invisible = hide_page_buttons
-            )
-        self.prev_button.connect("clicked", lambda w: self._presenter.previous_desktop())
+            normal=(), 
+            hover=(Image.from_name("button_arrow_desktop_left_hover.png"), ), 
+            down=(Image.from_name("button_arrow_desktop_left_down.png"), ), 
+            invisible=hide_page_buttons)
+        self.prev_button.connect("clicked", lambda w:self._presenter.previous_desktop())
         self.prev_button.set_size_request(50, 420)
-
         self.prev_button_wrap = Button.align_it(self.prev_button)
-
         self.next_button = Button(
-            normal = (),
-            hover = (Image.from_name("button_arrow_desktop_right_hover.png"),),
-            down = (Image.from_name("button_arrow_desktop_right_down.png"),),
-            invisible = hide_page_buttons
-            )
-        self.next_button.connect("clicked", lambda w: self._presenter.next_desktop())
+            normal=(), 
+            hover=(Image.from_name("button_arrow_desktop_right_hover.png"), ), 
+            down=(Image.from_name("button_arrow_desktop_right_down.png"), ), 
+            invisible=hide_page_buttons)
+        self.next_button.connect("clicked", lambda w:self._presenter.next_desktop())
         self.next_button.set_size_request(50, 420)
         self.next_button_wrap = Button.align_it(self.next_button)
-            
-        self.desk_container.pack_start(self.prev_button_wrap, expand=False, fill=False, padding=0)
-        
-        desktop_page = DesktopPageView(shortcuts, self._max_icons_in_row, self._create_row)
 
+    def add_widgets_to_desktop(self, shortcuts):
+        self.desk_container.pack_start(self.prev_button_wrap, expand=False, fill=False, padding=0)
+        desktop_page = DesktopPageView(shortcuts, self._max_icons_in_row, self._create_row)
         self.icons_alignment.add(desktop_page)
-        
         self.desk_container.pack_start(self.icons_alignment, expand=True, fill=True, padding=0)
-        
-        
         self.desk_container.pack_end(self.next_button_wrap, expand=False, fill=False, padding=0)
-        
         self.desktop_vbox.pack_start(self.top_vbox, expand=False, fill=False, padding=0)
         self.desktop_vbox.pack_start(self.desk_container_wraper, expand=True, fill=True, padding=0)
-
         self.desktop_vbox.show_all()
-        
-    ######################################################################
-        
-        
+
+    def setup_bottom_page_buttons(self, index, pages, hide_page_buttons):
         self.bottom_hbox = gtk.HBox(spacing=7)
-
-        wraper = gtk.Alignment(0.5, 0.5, 0.0, 0.0)
-        wraper.set_size_request(0, 39)
-        #wraper.modify_bg(gtk.STATE_NORMAL, gtk.gdk.Color(35,238,0))
-
-        wraper.add(self.bottom_hbox)
-        wraper.show()
+        wrapper = gtk.Alignment(0.5, 0.5, 0.0, 0.0)
+        wrapper.set_size_request(0, 39)
+        wrapper.add(self.bottom_hbox)
+        wrapper.show()
         self._page_buttons = []
         for page_num in range(0, pages):
             btn = Button(
-                normal = (Image.from_name("button_mini_desktop_normal.png"),),
-                hover = (Image.from_name("button_mini_desktop__hover_active.png"),),
-                down = (Image.from_name("button_mini_desktop_down.png"),),
-                select = (Image.from_name("button_mini_desktop__active.png"),),
-                invisible = hide_page_buttons
-                )
+                normal=(Image.from_name("button_mini_desktop_normal.png"), ), 
+                hover=(Image.from_name("button_mini_desktop__hover_active.png"), ), 
+                down=(Image.from_name("button_mini_desktop_down.png"), ), 
+                select=(Image.from_name("button_mini_desktop__active.png"), ), 
+                invisible=hide_page_buttons)
             self._page_buttons.append(btn)
             btn.connect("clicked", self.desktop_page_navigate)
             #btn.modify_bg(gtk.STATE_NORMAL, gtk.gdk.Color(65535,0,0))
             btn.set_size_request(21, 13)
             self.bottom_hbox.pack_start(btn, expand=False, fill=False, padding=0)
-            
+        
         for button in self._page_buttons:
             button.unselected()
-            
+        
         self._page_buttons[index].selected()
-
-        self.desktop_vbox.pack_end(wraper, expand=False, fill=False, padding=0)
-
+        self.desktop_vbox.pack_end(wrapper, expand=False, fill=False, padding=0)
         self.bottom_hbox.show_all()
 
+    def align_and_display_desktop(self):
         self.desktop_vbox.show()
-
         self._align.add(self.desktop_vbox)
         self.desktop_vbox.show()
         self._align.show()
+
+    def refresh(self, shortcuts, index=0, pages=1, force=False):
+        self.clean_up_legacy_page()
+        hide_page_buttons = self.are_page_buttons_disabled(pages)
+        self.set_up_base_desktop()
+        self.setup_left_right_page_buttons(hide_page_buttons)
+        self.add_widgets_to_desktop(shortcuts)
+        self.setup_bottom_page_buttons(index, pages, hide_page_buttons)
+        self.align_and_display_desktop()
         
     def desktop_page_navigate(self, widget):
         index = self._page_buttons.index(widget)
