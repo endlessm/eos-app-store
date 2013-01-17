@@ -229,6 +229,7 @@ class EndlessDesktopView(gtk.Window):
             #btn.modify_bg(gtk.STATE_NORMAL, gtk.gdk.Color(65535,0,0))
             btn.set_size_request(21, 13)
             self.bottom_hbox.pack_start(btn, expand=False, fill=False, padding=0)
+            
         for button in self._page_buttons:
             button.unselected()
             
@@ -281,6 +282,47 @@ class EndlessDesktopView(gtk.Window):
         self.close_folder_window()
         self.show_folder_window(shortcut)
 
+
+    def _create_folder_shortcut(self, shortcut, row):
+        item = FolderShortcut(shortcut, self._folder_icon_clicked_callback)
+        item.connect("folder-shortcut-activate", self._folder_icon_clicked_callback)
+        item.connect("folder-shortcut-relocation", self._relocation_callback)
+        item.connect("desktop-shortcut-dnd-begin", self._dnd_begin)
+        item.connect("desktop-shortcut-rename", self._rename_callback)
+        item.show()
+        row.pack_start(item, False, False, 0)
+        return item
+
+
+    def _create_add_remove_shortcut(self, row):
+        item = AddRemoveShortcut(callback=self.show_add_dialogue)
+        item.connect("application-shortcut-remove", self._delete_shortcuts)
+        item.show()
+        row.pack_start(item, False, False, 0)
+        return item
+
+    def _create_application_shortcut(self, shortcut, row):
+        item = ApplicationShortcut(shortcut)
+        item.connect("application-shortcut-rename", lambda w, shortcut, new_name:self._presenter.rename_item(shortcut, new_name))
+        item.connect("application-shortcut-activate", lambda w, app_key, params:self._presenter.activate_item(app_key, params))
+        item.connect("desktop-shortcut-dnd-begin", self._dnd_begin)
+        item.connect("desktop-shortcut-rename", self._rename_callback)
+        item.show()
+        row.pack_start(item, False, False, 0)
+        return item
+
+
+    def _adjust_separator(self, row, sep_last, item):
+        sep_new = SeparatorShortcut(width=DesktopLayout.get_separator_width(), height=DesktopLayout.ICON_HEIGHT)
+        sep_new.connect("application-shortcut-move", self._rearrange_shortcuts)
+        row.pack_start(sep_new, False, False, 0)
+        sep_last.set_right_separator(sep_new)
+        sep_last.set_right_widget(item)
+        sep_new.set_left_separator(sep_last)
+        sep_new.set_left_widget(item)
+        sep_last = sep_new
+        return sep_new, sep_last
+
     def _create_row(self, items, last_row=False):
         
         row = gtk.HBox()
@@ -292,36 +334,13 @@ class EndlessDesktopView(gtk.Window):
 
         for shortcut in items:
             if shortcut.has_children():
-                item = FolderShortcut(shortcut, self._folder_icon_clicked_callback)
-                item.connect("folder-shortcut-activate", self._folder_icon_clicked_callback)
-                item.connect("folder-shortcut-relocation", self._relocation_callback)
-                item.connect("desktop-shortcut-dnd-begin", self._dnd_begin)
-                item.connect("desktop-shortcut-rename", self._rename_callback)
-                item.show()
+                item = self._create_folder_shortcut(shortcut, row)
+                sep_new, sep_last = self._adjust_separator(row, sep_last, item)
             elif shortcut.key() == "ADD_REMOVE_SHORTCUT_PLACEHOLDER":
-                item = AddRemoveShortcut(callback=self.show_add_dialogue)
-                item.connect("application-shortcut-remove", self._delete_shortcuts)
-                item.show()
+                item = self._create_add_remove_shortcut(row)
             else:
-                item = ApplicationShortcut(shortcut)
-                item.connect("application-shortcut-rename", lambda w, shortcut, new_name: self._presenter.rename_item(shortcut, new_name))
-                item.connect("application-shortcut-activate", lambda w, app_key, params: self._presenter.activate_item(app_key, params))
-                item.connect("desktop-shortcut-dnd-begin", self._dnd_begin)
-                item.connect("desktop-shortcut-rename", self._rename_callback)
-                item.show()
-
-
-            if item.parent != None:
-                print >> sys.stderr, "Item has parent!", item
-            row.pack_start(item, False, False, 0)
-            sep_new = SeparatorShortcut(width=DesktopLayout.get_separator_width(), height=DesktopLayout.ICON_HEIGHT)
-            sep_new.connect("application-shortcut-move", self._rearrange_shortcuts)
-            row.pack_start(sep_new, False, False, 0)
-            sep_last.set_right_separator(sep_new)
-            sep_last.set_right_widget(item)
-            sep_new.set_left_separator(sep_last)
-            sep_new.set_left_widget(item)
-            sep_last = sep_new
+                item = self._create_application_shortcut(shortcut, row)
+                sep_new, sep_last = self._adjust_separator(row, sep_last, item)
 
         return row
 
