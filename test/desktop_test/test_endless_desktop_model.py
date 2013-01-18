@@ -216,11 +216,11 @@ class DesktopModelTestCase(unittest.TestCase):
         self.assertEquals(shortcuts, [app1])
         
     def test_get_current_page_index(self):
-        self.mock_paginator.current_page_index = Mock(return_value=1)
+        self.mock_paginator.current_page_number = Mock(return_value=1)
         
-        self.assertEquals(1, self.testObject.get_page_index())
+        self.assertEquals(1, self.testObject.get_page_number())
         
-        self.mock_paginator.current_page_index.assert_called_once_with()
+        self.mock_paginator.current_page_number.assert_called_once_with()
 
     def test_get_next_page_of_shortcuts(self):
         self.testObject.next_page()

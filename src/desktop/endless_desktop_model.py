@@ -128,8 +128,8 @@ class EndlessDesktopModel(object):
             log.error("no shortcut on desktop!", e)
         return False
     
-    def get_page_index(self):
-        return self._paginator.current_page_index()
+    def get_page_number(self):
+        return self._paginator.current_page_number()
     
     def next_page(self):
         self._paginator.next()

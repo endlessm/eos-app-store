@@ -40,7 +40,7 @@ class TestEndlessDesktopPresenter(unittest.TestCase):
         self.mock_model.get_shortcuts = Mock(return_value=mock_shortcuts)
         self.mock_model.get_menus = Mock(return_value=mock_menus)
         
-        self.mock_model.get_page_index = Mock(return_value=page_index)
+        self.mock_model.get_page_number = Mock(return_value=page_index)
         self.mock_model.get_total_pages = Mock(return_value=total_pages)
 
         self.testObject.refresh_view()
@@ -256,7 +256,7 @@ class TestEndlessDesktopPresenter(unittest.TestCase):
         self.mock_view.refresh = Mock()
         self.mock_model.next_page = Mock()
         self.mock_model.get_shortcuts = Mock(return_value=all_shortcuts)
-        self.mock_model.get_page_index = Mock(return_value=page_num)
+        self.mock_model.get_page_number = Mock(return_value=page_num)
         self.mock_model.get_total_pages = Mock(return_value=total_pages)
 
         self.testObject.next_desktop()
@@ -274,7 +274,7 @@ class TestEndlessDesktopPresenter(unittest.TestCase):
         self.mock_view.refresh = Mock()
         self.mock_model.previous_page = Mock()
         self.mock_model.get_shortcuts = Mock(return_value=all_shortcuts)
-        self.mock_model.get_page_index = Mock(return_value=page_num)
+        self.mock_model.get_page_number = Mock(return_value=page_num)
         self.mock_model.get_total_pages = Mock(return_value=total_pages)
 
         self.testObject.previous_desktop()
@@ -291,7 +291,7 @@ class TestEndlessDesktopPresenter(unittest.TestCase):
         total_pages = 5
         self.mock_view.refresh = Mock()
         self.mock_model.get_shortcuts = Mock(return_value=all_shortcuts)
-        self.mock_model.get_page_index = Mock(return_value=page_num)
+        self.mock_model.get_page_number = Mock(return_value=page_num)
         self.mock_model.get_total_pages = Mock(return_value=total_pages)
         
         self.testObject.desktop_page_navigate(page_num)

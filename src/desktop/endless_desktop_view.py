@@ -10,7 +10,6 @@ from shortcut.application_shortcut import ApplicationShortcut
 from shortcut.folder_shortcut import FolderShortcut
 from shortcut.separator_shortcut import SeparatorShortcut
 from shortcut.add_remove_shortcut import AddRemoveShortcut
-from desktop_page.desktop_page import DesktopPage
 from folder.folder_window import OpenFolderWindow
 from folder.folder_window import FULL_FOLDER_ITEMS_COUNT
 from notification_panel.notification_panel import NotificationPanel
@@ -18,7 +17,6 @@ from taskbar_panel.taskbar_panel import TaskbarPanel
 from add_shortcuts_module.add_shortcuts_view import AddShortcutsView
 from eos_util.image import Image
 from shortcut.desktop_shortcut import DesktopShortcut
-from desktop.list_paginator import ListPaginator
 from desktop_page.desktop_page_view import DesktopPageView
 from desktop_page.responsive import Button
 
@@ -178,7 +176,7 @@ class EndlessDesktopView(gtk.Window):
         self.desktop_vbox.pack_start(self.desk_container_wraper, expand=True, fill=True, padding=0)
         self.desktop_vbox.show_all()
 
-    def setup_bottom_page_buttons(self, index, pages, hide_page_buttons):
+    def setup_bottom_page_buttons(self, page_number, pages, hide_page_buttons):
         self.bottom_hbox = gtk.HBox(spacing=7)
         wrapper = gtk.Alignment(0.5, 0.5, 0.0, 0.0)
         wrapper.set_size_request(0, 39)
@@ -201,7 +199,7 @@ class EndlessDesktopView(gtk.Window):
         for button in self._page_buttons:
             button.unselected()
         
-        self._page_buttons[index].selected()
+        self._page_buttons[page_number - 1].selected()
         self.desktop_vbox.pack_end(wrapper, expand=False, fill=False, padding=0)
         self.bottom_hbox.show_all()
 
@@ -211,18 +209,18 @@ class EndlessDesktopView(gtk.Window):
         self.desktop_vbox.show()
         self._align.show()
 
-    def refresh(self, shortcuts, index=0, pages=1, force=False):
+    def refresh(self, shortcuts, page_number=0, pages=1, force=False):
         self.clean_up_legacy_page()
         hide_page_buttons = self.are_page_buttons_disabled(pages)
         self.set_up_base_desktop()
         self.setup_left_right_page_buttons(hide_page_buttons)
         self.add_widgets_to_desktop(shortcuts)
-        self.setup_bottom_page_buttons(index, pages, hide_page_buttons)
+        self.setup_bottom_page_buttons(page_number, pages, hide_page_buttons)
         self.align_and_display_desktop()
         
     def desktop_page_navigate(self, widget):
         index = self._page_buttons.index(widget)
-        self._presenter.desktop_page_navigate(index)
+        self._presenter.desktop_page_navigate(index + 1)
 
     def _add_icon_clicked_callback(self, widget, event):
         self.popup.show_all()
