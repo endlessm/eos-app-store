@@ -1,19 +1,21 @@
-import sys
 from eos_util import image_util
-from osapps.app_shortcut import AppShortcut
 from eos_log import log
 from application_store.installed_applications_model import InstalledApplicationsModel
+from desktop.list_paginator import ListPaginator
 
 class EndlessDesktopModel(object):
-    def __init__(self, app_desktop_datastore, preferences_provider, app_datastore, app_launcher, installed_app_model=InstalledApplicationsModel()):
+    def __init__(self, app_desktop_datastore, preferences_provider, app_datastore, app_launcher, installed_app_model=InstalledApplicationsModel(), paginator=ListPaginator(page_size=27)):
         self._app_launcher = app_launcher
         self._app_desktop_datastore = app_desktop_datastore
         self._app_datastore = app_datastore
         self._preferences_provider = preferences_provider
         self._installed_applications_model = installed_app_model
+        self._paginator = paginator
 
     def get_shortcuts(self, force=False):
-        return self._app_desktop_datastore.get_all_shortcuts(force=force)
+        all_shortcuts = self._app_desktop_datastore.get_all_shortcuts(force=force)
+        self._paginator.adjust_list_of_items(all_shortcuts)
+        return self._paginator.current_page()
 
     def set_shortcuts_by_name(self, shortcuts_names):
         self._app_desktop_datastore.set_all_shortcuts_by_name(shortcuts_names)
@@ -125,4 +127,18 @@ class EndlessDesktopModel(object):
         except Exception as e:
             log.error("no shortcut on desktop!", e)
         return False
+    
+    def get_page_number(self):
+        return self._paginator.current_page_number()
+    
+    def next_page(self):
+        self._paginator.next()
 
+    def previous_page(self):
+        self._paginator.prev()
+        
+    def go_to_page(self, page_index):
+        self._paginator.go_to_page(page_index)
+        
+    def get_total_pages(self):
+        return self._paginator.number_of_pages()

@@ -2,51 +2,42 @@ import unittest
 from desktop.endless_desktop_model import EndlessDesktopModel
 from mock import Mock #@UnresolvedImport
 from osapps.app_launcher import AppLauncher
-from osapps.app import App
+#from osapps.app import App
 from osapps.app_shortcut import AppShortcut
 from osapps.desktop_locale_datastore import DesktopLocaleDatastore
 from osapps.app_datastore import AppDatastore
 from osapps.launchable_app import LaunchableApp
 from osapps.desktop_preferences_datastore import DesktopPreferencesDatastore
+from desktop.list_paginator import ListPaginator
 
 class DesktopModelTestCase(unittest.TestCase):
     def setUp(self):
-        self.available_apps = [
-                               App(123, "app 1", "", "", "", False, False, True),
-                               App(234, "app 2", "", "", "", False, False, True),
-                               App(345, "app 3", "", "", "", False, False, True),
-                               App(456, "app 4", "", "", "", False, False, False),
-                               App(567, "app 5", "", "", "", False, False, True),
-                               App(890, "app 6", "", "", "", False, False, True),
-                               ]
         self.available_app_shortcuts = [
                                         AppShortcut(123, "App 1", "", []),
                                         AppShortcut(234, "App 2", "", []),
                                         AppShortcut(345, "App 3", "", [])
                                         ]
         self.mock_desktop_locale_datastore = Mock(DesktopLocaleDatastore)
-        self.mock_desktop_locale_datastore.get_all_shortcuts = Mock(return_value=self.available_apps)
+        self.mock_desktop_locale_datastore.get_all_shortcuts = Mock(return_value=self.available_app_shortcuts)
         self.mock_app_datastore = Mock(AppDatastore)
         self.app_mock = Mock(LaunchableApp)
         self.app_mock.executable = Mock(return_value="eog")
         self.mock_app_datastore.get_app_by_key = Mock(return_value=self.app_mock)
         self.mock_app_launcher = Mock(AppLauncher)
         self.mock_desktop_preferences = Mock(DesktopPreferencesDatastore)
+        self.mock_paginator = Mock(ListPaginator)
         self.testObject = EndlessDesktopModel(self.mock_desktop_locale_datastore,
                                               self.mock_desktop_preferences,
                                               self.mock_app_datastore,
-                                              self.mock_app_launcher
+                                              self.mock_app_launcher,
+                                              paginator=self.mock_paginator
                                               )
 
-    def test_initially_shortcut_list_is_retrieved_from_app_util_manager(self):
-        self.assertEqual(self.available_apps, self.testObject.get_shortcuts())
+    def test_execute_app_with_id_calls_launc_app_on_app_util(self):
+        params = []
+        self.testObject.execute_app('123', params)
 
-    #TODO: please re-enable
-    #def test_execute_app_with_id_calls_launc_app_on_app_util(self):
-        #params = []
-        #self.testObject.execute_app('123', params)
-
-        #self.mock_app_launcher.launch.assert_called_once_with("eog", params)
+        self.mock_app_launcher.launch_desktop.assert_called_once_with("123", params)
 
     def test_execute_app_with_cannot_find_app_no_exception(self):
         self.mock_app_datastore = Mock(AppDatastore)
@@ -94,10 +85,6 @@ class DesktopModelTestCase(unittest.TestCase):
         #self.mock_desktop_locale_datastore.set_all_shortcuts()
         app1 = self.available_app_shortcuts[0]
         self.assertEqual(self.testObject.delete_shortcut(app1), False, 'Delete shortcut, exception handled FAILED.')
-
-    def test_relocate_shortcut_invalid_source(self):
-        ret = self.testObject.relocate_shortcut(None, 'irrelevant')
-        self.assertEqual(ret, False)
 
     def test_relocate_shortcut_invalid_source(self):
         ret = self.testObject.relocate_shortcut(None, 'irrelevant')
@@ -212,3 +199,53 @@ class DesktopModelTestCase(unittest.TestCase):
         self.assertEqual(ret, True)
         self.assertEqual(app1.parent(), None)
         self.assertTrue(app2 not in app1.children())
+        
+    def test_get_paginated_shortcuts(self):
+        app1 = AppShortcut('', 'app1', '')
+        app2 = AppShortcut('', 'app2', '')
+        app3 = AppShortcut('', 'app3', '')
+        all_shortcuts = [app1, app2, app3]
+        self.mock_desktop_locale_datastore.get_all_shortcuts = Mock(return_value=all_shortcuts)
+        self.mock_paginator.current_page = Mock(return_value=[app1])
+
+        shortcuts = self.testObject.get_shortcuts()
+        
+        self.mock_paginator.adjust_list_of_items.assert_called_once_with(all_shortcuts)
+        
+        self.mock_paginator.current_page.assert_called_once_with()
+        self.assertEquals(shortcuts, [app1])
+        
+    def test_get_current_page_index(self):
+        self.mock_paginator.current_page_number = Mock(return_value=1)
+        
+        self.assertEquals(1, self.testObject.get_page_number())
+        
+        self.mock_paginator.current_page_number.assert_called_once_with()
+
+    def test_get_next_page_of_shortcuts(self):
+        self.testObject.next_page()
+        
+        self.mock_paginator.next.assert_called_once_with()
+        
+    def test_get_previous_page_of_shortcuts(self):
+        self.testObject.previous_page()
+        
+        self.mock_paginator.prev.assert_called_once_with()
+        
+    def test_get_page_by_index(self):
+        page_index = 3
+        
+        self.testObject.go_to_page(page_index)
+        
+        self.mock_paginator.go_to_page.assert_called_once_with(page_index)
+        
+    def test_get_total_pages(self):
+        page_count = 3
+        self.mock_paginator.number_of_pages = Mock(return_value=page_count)
+        
+        self.assertEquals(page_count,self.testObject.get_total_pages())
+        
+        self.mock_paginator.number_of_pages.assert_called_once_with()
+
+        
+        
