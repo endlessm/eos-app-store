@@ -38,6 +38,7 @@ class ApplicationListPlugin(gtk.HBox):
         self._NET_WM_STATE_HIDDEN_ATOM_ID   = self._local_display.intern_atom('_NET_WM_STATE_HIDDEN')
         self._NET_ACTIVE_WINDOW_ATOM_ID     = self._local_display.intern_atom('_NET_ACTIVE_WINDOW')
         self._NET_WM_NAME_ATOM_ID           = self._local_display.intern_atom('_NET_WM_NAME')
+        self._UTF8_ATOM_ID           	    = self._local_display.intern_atom('UTF8_STRING')
 
 
         watched_atom_ids = [self._NET_CLIENT_LIST_ATOM_ID,
@@ -80,10 +81,19 @@ class ApplicationListPlugin(gtk.HBox):
             # Get window name
             window_name = ""
             try:
-                window_name = window.get_wm_name()
-            except:
-                print "Failed to get app name"
-                pass
+                try:
+                    window_name = window.get_full_property(self._NET_WM_NAME_ATOM_ID, self._UTF8_ATOM_ID).value
+       	        except (NameError, AttributeError) as e:
+                    pass
+		except Exception as e:
+                    print >> sys.stderr, e, type(e)
+
+        	if window_name:
+   	            window_name = unicode(window_name, 'utf-8')
+                else:
+                    window_name = unicode(window.get_wm_name())
+            except Exception as e:
+                print "Failed to get app name", e
 
             scaled_pixbuf = self._default_icon
             # Get window's icons
