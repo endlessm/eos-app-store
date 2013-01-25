@@ -9,7 +9,7 @@ TryExec=/usr/bin/vlc %U
 Exec=/usr/bin/vlc %U
 Icon=video
 Categories=
-X-EndlessM-Normal-Icon=/usr/share/endlessm/icons/apps/movies_normal.png
-X-EndlessM-Hover-Icon=/usr/share/endlessm/icons/apps/movies_hover.png
-X-EndlessM-Down-Icon=/usr/share/endlessm/icons/apps/movies_down.png
+X-EndlessM-Normal-Icon=/usr/share/endlessm/icons/apps/video_normal.png
+X-EndlessM-Hover-Icon=/usr/share/endlessm/icons/apps/video_hover.png
+X-EndlessM-Down-Icon=/usr/share/endlessm/icons/apps/video_down.png
 

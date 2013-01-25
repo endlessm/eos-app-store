@@ -7,10 +7,10 @@ Comment=World Wonders
 GenericName=World Wonders
 Type=Link
 URL=http://www.google.com/culturalinstitute/worldwonders/
-Icon=worldwonders
+Icon=worldwondersproject
 Categories=Network
-X-EndlessM-Normal-Icon=/usr/share/endlessm/icons/apps/worldwonders_normal.png
-X-EndlessM-Hover-Icon=/usr/share/endlessm/icons/apps/worldwonders_hover.png
-X-EndlessM-Down-Icon=/usr/share/endlessm/icons/apps/worldwonders_down.png
+X-EndlessM-Normal-Icon=/usr/share/endlessm/icons/apps/worldwondersproject_normal.png
+X-EndlessM-Hover-Icon=/usr/share/endlessm/icons/apps/worldwondersproject_hover.png
+X-EndlessM-Down-Icon=/usr/share/endlessm/icons/apps/worldwondersproject_down.png
 
 

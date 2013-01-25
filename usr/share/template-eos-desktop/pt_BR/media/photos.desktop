@@ -7,9 +7,9 @@ Name[pt_BR]=Fotos
 Comment=Photos
 TryExec=shotwell %U
 Exec=shotwell %U
-Icon=photos
+Icon=photo
 Categories=
-X-EndlessM-Normal-Icon=/usr/share/endlessm/icons/apps/photos_normal.png
-X-EndlessM-Hover-Icon=/usr/share/endlessm/icons/apps/photos_hover.png
-X-EndlessM-Down-Icon=/usr/share/endlessm/icons/apps/photos_down.png
+X-EndlessM-Normal-Icon=/usr/share/endlessm/icons/apps/photo_normal.png
+X-EndlessM-Hover-Icon=/usr/share/endlessm/icons/apps/photo_hover.png
+X-EndlessM-Down-Icon=/usr/share/endlessm/icons/apps/photo_down.png
 

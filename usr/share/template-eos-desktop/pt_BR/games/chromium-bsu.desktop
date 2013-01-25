@@ -1,0 +1,15 @@
+[Desktop Entry]
+Version=1.0
+Type=Application
+Name=Chromium BSU
+Name[en_US]=Chromium BSU
+Name[pt_BR]=Chromium BSU
+Comment=Chromium BSU
+TryExec=chromium-bsu
+Exec=chromium-bsu
+Icon=chromium-bsu
+Categories=
+X-EndlessM-Normal-Icon=/usr/share/endlessm/icons/apps/chromium-bsu_normal.png
+X-EndlessM-Hover-Icon=/usr/share/endlessm/icons/apps/chromium-bsu_hover.png
+X-EndlessM-Down-Icon=/usr/share/endlessm/icons/apps/chromium-bsu_down.png
+
