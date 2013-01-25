@@ -1,15 +1,13 @@
 import gtk
-import sys
-import time
 import Xlib
 import array
-import threading
 from gtk import gdk
 from Xlib import Xatom, display, Xutil, X
 
+from eos_log import log
 from taskbar_icon import TaskbarIcon
-from threading import Thread
 from eos_util.image_util import load_pixbuf
+from update_task_thread import UpdateTasksThread
 
 # DO NOT REMOVE!!! PyInstaller cannot know that these are imported
 # on its own so we have to manually import them
@@ -49,17 +47,18 @@ class ApplicationListPlugin(gtk.HBox):
 
 
 
-        update_thread = UpdateTasksThread(self._local_display, self._screen,
-                                          self._NET_CLIENT_LIST_ATOM_ID, self._NET_ACTIVE_WINDOW_ATOM_ID,
-                                          watched_atom_ids, self._draw_tasks)
+        update_thread = UpdateTasksThread(self._local_display, 
+                                          self._screen,
+                                          self._NET_CLIENT_LIST_ATOM_ID, 
+                                          self._NET_ACTIVE_WINDOW_ATOM_ID,
+                                          watched_atom_ids, 
+                                          self._draw_tasks)
         update_thread.start()
 
         self.show_all()
 
-
     def _draw_tasks(self, tasks, selected_window):
         gtk.threads_enter()
-
 
         for taskbar_icon in self._taskbar_icons.keys():
             if taskbar_icon not in tasks:
@@ -83,17 +82,17 @@ class ApplicationListPlugin(gtk.HBox):
             try:
                 try:
                     window_name = window.get_full_property(self._NET_WM_NAME_ATOM_ID, self._UTF8_ATOM_ID).value
-       	        except (NameError, AttributeError) as e:
+                except (NameError, AttributeError) as e:
                     pass
-		except Exception as e:
-                    print >> sys.stderr, e, type(e)
+                except Exception as e:
+                    log.error("Could not retrieve window name by default means. Continuing.", e)
 
-        	if window_name:
-   	            window_name = unicode(window_name, 'utf-8')
+                if window_name:
+                    window_name = unicode(window_name, 'utf-8')
                 else:
                     window_name = unicode(window.get_wm_name())
             except Exception as e:
-                print "Failed to get app name", e
+                log.error("Failed to get window name. Continuing", e)
 
             scaled_pixbuf = self._default_icon
             # Get window's icons
@@ -153,65 +152,10 @@ class ApplicationListPlugin(gtk.HBox):
                     data=(32, (2, X.CurrentTime, 0, 0, 0))
                 )
                 self._screen.root.send_event(clientmessage, (X.SubstructureRedirectMask | X.SubstructureNotifyMask))
-        except:
-            print "Error toggling the task", sys.exc_info()
+        except Exception as e:
+            log.error("Error toggling the task", e)
 
         try:
             self._local_display.flush()
         except:
-            print "Error flushing the display"
-
-class UpdateTasksThread(Thread):
-    def __init__(self, display, screen, client_list_atom_id, active_window_atom_id, watched_atom_ids, callback):
-        super(UpdateTasksThread, self).__init__()
-        self.setDaemon(True)
-
-        self._screen = screen
-        self._display = display
-        self._client_list_atom_id = client_list_atom_id
-        self._active_window_atom_id = active_window_atom_id
-        self._watched_atom_ids = watched_atom_ids
-
-        self._draw_tasks_callback = callback
-
-    def run(self):
-        # Attach  to root screen property changes
-        self._screen.root.change_attributes(event_mask=(
-            X.PropertyChangeMask | X.FocusChangeMask | X.StructureNotifyMask))
-
-        # Force the first update on start
-        needs_update = True
-
-        # Main loop
-        while True :
-            # Are there pending events waiting for us
-            while self._display.pending_events():
-                event = self._display.next_event()
-
-                # If we haven't set the update flag yet, check if it matches our watched list
-                if not needs_update:
-                    try:
-                        if event.type == X.PropertyNotify and hasattr(event, 'atom') and event.atom in self._watched_atom_ids:
-                            # Set needs update flag since it is something we care about
-                            needs_update = True
-                    except:
-                        print >> sys.stderr, "Could not retrieve change atom IDs. Continuing"
-
-            # Taskbar needs updating
-            if needs_update:
-                try:
-                    tasks = self._screen.root.get_full_property(self._client_list_atom_id, Xatom.WINDOW).value
-                    selected_window = self._screen.root.get_full_property(self._active_window_atom_id, Xatom.WINDOW).value
-                    self._draw_tasks_callback(tasks, selected_window)
-                except:
-                    print >> sys.stderr, "Could not retrieve tasks. Continuing"
-
-            needs_update = False
-
-            # Sleep so that we don't waste CPU cycles
-            time.sleep(0.25)
-
-
-
-
-
+            log.error("Error flushing the display", e)
