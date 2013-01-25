@@ -45,23 +45,17 @@ class AddRemoveShortcut(DesktopShortcut):
             
     def get_images(self, event_state):
         return [
-            Image.from_name("endless-shortcut-well.png"),
-            Image.from_name("endless-add.png"),
-            Image.from_name("endless-shortcut-foreground.png")
+            Image.from_name("add_normal.png"),
             ]
     
     def get_dragged_images(self):
         return (
-            Image.from_name("endless-shortcut-well.png"),
-            Image.from_name("trash_empty_icon.png"),
-            Image.from_name("endless-shortcut-foreground.png")
+            Image.from_name("trash-can_normal.png"),
             )
 
     def get_trash_full_images(self):
         return (
-            Image.from_name("endless-shortcut-well.png"),
-            Image.from_name("trash_full_icon.png"),
-            Image.from_name("endless-shortcut-foreground.png")
+            Image.from_name("trash-can_hover.png"),
             )
     
     def mouse_press_callback(self, widget, event):
