@@ -8,44 +8,44 @@ from eos_log import log
 from taskbar_icon import TaskbarIcon
 from eos_util.image_util import load_pixbuf
 from update_task_thread import UpdateTasksThread
+from xlib_helper import XlibHelper
 
-# DO NOT REMOVE!!! PyInstaller cannot know that these are imported
+# DO NOT REMOVE!!! PyInstaller does not know that these are imported
 # on its own so we have to manually import them
 from Xlib.support import unix_connect
 from Xlib.ext import xtest, shape, xinerama, record, composite, randr
 # *****************
 
 class ApplicationListPlugin(gtk.HBox):
-    def __init__(self, icon_size):
+    def __init__(self, icon_size, local_display = display.Display(), pixbuf_loader = load_pixbuf):
         super(ApplicationListPlugin, self).__init__()
 
         self._icon_size = icon_size
-        pixbuf = load_pixbuf('endless.png')
+        pixbuf = pixbuf_loader('endless.png')
         self._default_icon = pixbuf.scale_simple(icon_size, icon_size, gdk.INTERP_BILINEAR)
 
         self._taskbar_icons = {}
 
-        self._local_display = display.Display()
+        self._local_display = local_display
         self._screen = self._local_display.screen()
+        
+        self._xlib_helper = XlibHelper(local_display)
 
-        self._NET_CLIENT_LIST_ATOM_ID       = self._local_display.intern_atom('_NET_CLIENT_LIST')
-        self._NET_WM_SKIP_TASKBAR_ATOM_ID   = self._local_display.intern_atom('_NET_WM_STATE_SKIP_TASKBAR')
-        self._NET_WM_STATE_ATOM_ID          = self._local_display.intern_atom('_NET_WM_STATE')
-        self._NET_WM_ICON_ATOM_ID           = self._local_display.intern_atom('_NET_WM_ICON')
-        self._WM_CHANGE_STATE_ATOM_ID       = self._local_display.intern_atom('WM_CHANGE_STATE')
-        self._NET_WM_STATE_HIDDEN_ATOM_ID   = self._local_display.intern_atom('_NET_WM_STATE_HIDDEN')
-        self._NET_ACTIVE_WINDOW_ATOM_ID     = self._local_display.intern_atom('_NET_ACTIVE_WINDOW')
-        self._NET_WM_NAME_ATOM_ID           = self._local_display.intern_atom('_NET_WM_NAME')
-        self._UTF8_ATOM_ID           	    = self._local_display.intern_atom('UTF8_STRING')
-
-
+        self._NET_CLIENT_LIST_ATOM_ID       = self._xlib_helper.get_atom_id(XlibHelper.Atom.CLIENT_LIST)
+        self._NET_WM_SKIP_TASKBAR_ATOM_ID   = self._xlib_helper.get_atom_id(XlibHelper.Atom.SKIP_TASKBAR)
+        self._NET_WM_STATE_ATOM_ID          = self._xlib_helper.get_atom_id(XlibHelper.Atom.WINDOW_STATE)
+        self._NET_WM_ICON_ATOM_ID           = self._xlib_helper.get_atom_id(XlibHelper.Atom.ICON)
+        self._WM_CHANGE_STATE_ATOM_ID       = self._xlib_helper.get_atom_id(XlibHelper.Atom.WINDOW_CHANGE_STATE)
+        self._NET_WM_STATE_HIDDEN_ATOM_ID   = self._xlib_helper.get_atom_id(XlibHelper.Atom.WINDOW_STATE_HIDDEN)
+        self._NET_ACTIVE_WINDOW_ATOM_ID     = self._xlib_helper.get_atom_id(XlibHelper.Atom.ACTIVE_WINDOW)
+        self._NET_WM_NAME_ATOM_ID           = self._xlib_helper.get_atom_id(XlibHelper.Atom.WINDOW_NAME)
+        self._UTF8_ATOM_ID           	    = self._xlib_helper.get_atom_id(XlibHelper.Atom.UTF8)
+        
         watched_atom_ids = [self._NET_CLIENT_LIST_ATOM_ID,
                             self._NET_ACTIVE_WINDOW_ATOM_ID,
                             self._NET_WM_STATE_ATOM_ID,
                             self._NET_WM_ICON_ATOM_ID,
                             self._NET_WM_NAME_ATOM_ID]
-
-
 
         update_thread = UpdateTasksThread(self._local_display, 
                                           self._screen,
@@ -77,22 +77,7 @@ class ApplicationListPlugin(gtk.HBox):
             except:
                 pass
 
-            # Get window name
-            window_name = ""
-            try:
-                try:
-                    window_name = window.get_full_property(self._NET_WM_NAME_ATOM_ID, self._UTF8_ATOM_ID).value
-                except (NameError, AttributeError) as e:
-                    pass
-                except Exception as e:
-                    log.error("Could not retrieve window name by default means. Continuing.", e)
-
-                if window_name:
-                    window_name = unicode(window_name, 'utf-8')
-                else:
-                    window_name = unicode(window.get_wm_name())
-            except Exception as e:
-                log.error("Failed to get window name. Continuing", e)
+            window_name = self._xlib_helper.get_window_name(window)
 
             scaled_pixbuf = self._default_icon
             # Get window's icons

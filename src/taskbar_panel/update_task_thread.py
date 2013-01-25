@@ -1,5 +1,5 @@
 import time
-from Xlib import X
+from Xlib import X, Xatom
 from threading import Thread
 from eos_log import log
 
