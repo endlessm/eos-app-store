@@ -11,7 +11,7 @@ gettext.install('endless_desktop', '/usr/share/locale', unicode = True, names=['
 
 class SearchBox(gtk.EventBox):
     HEIGHT = 30
-    WIDTH = 234
+    WIDTH = 273
     LEFT_PADDING = 10
     RIGHT_MARGIN = 33
     BOTTOM_MARGIN = 13

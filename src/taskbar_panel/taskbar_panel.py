@@ -4,7 +4,6 @@ from gtk import gdk
 import gobject
 
 from feedback.feedback_plugin import FeedbackPlugin
-from search.search_box import SearchBox
 from eos_util import image_util
 from eos_util.image_util import load_pixbuf
 from application_list_plugin import ApplicationListPlugin
@@ -24,19 +23,17 @@ class TaskbarPanel(gtk.EventBox):
 
         taskbar_panel_items = self._align_taskbar()
 
-        searchbox_holder = self._setup_searchbar_on_taskbar()
         application_list_plugin_holder = self._setup_apps_on_taskbar()
         feedback_plugin = self._setup_feedback_icon_on_taskbar()
 
-        self._draw_taskbar(width, taskbar_panel_items, application_list_plugin_holder, searchbox_holder, feedback_plugin)
+        self._draw_taskbar(width, taskbar_panel_items, application_list_plugin_holder, feedback_plugin)
 
         self.add(self._taskbar_panel)
 
-    def _draw_taskbar(self, width, taskbar_panel_items, application_list_plugin_holder, searchbox_holder, feedback_plugin):
+    def _draw_taskbar(self, width, taskbar_panel_items, application_list_plugin_holder, feedback_plugin):
         self._raw_taskbar_bg_pixbuf = load_pixbuf(image_util.image_path('glass_taskbar.png'))
         self._taskbar_bg_pixbuf = self._raw_taskbar_bg_pixbuf.scale_simple(width, 38, gdk.INTERP_TILES)
         del self._raw_taskbar_bg_pixbuf
-        taskbar_panel_items.pack_start(searchbox_holder, False, False, 0)
         taskbar_panel_items.pack_start(application_list_plugin_holder, False, True, 0)
 
         display_on_right = lambda plugin: taskbar_panel_items.pack_end(plugin, False, False, 10)
@@ -58,20 +55,12 @@ class TaskbarPanel(gtk.EventBox):
         self._taskbar_panel.add(taskbar_panel_items)
         return taskbar_panel_items
 
-    def _setup_searchbar_on_taskbar(self):
-        self._searchbox_holder = gtk.Alignment(0.5, 0.5, 0, 1.0)
-        self._searchbox_holder.set_padding(0, 0, 2, 0)
-        self._searchbox = SearchBox()
-        self._searchbox_holder.add(self._searchbox)
-        return self._searchbox_holder
-
     def _setup_apps_on_taskbar(self):
         application_list_plugin_holder = gtk.Alignment(0.5, 0.5, 0, 1.0)
         application_list_plugin_holder.set_padding(0, 0, 2, 0)
         application_list_plugin = ApplicationListPlugin(self.ICON_SIZE)
         application_list_plugin_holder.add(application_list_plugin)
         return application_list_plugin_holder
-
 
     def _redraw(self, widget, event):
         cr = widget.window.cairo_create()
