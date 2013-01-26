@@ -24,8 +24,6 @@ class NotificationPanel(gtk.HBox):
                 SocialBarPlugin,
                 AllSettingsPlugin
               ]
-#         return TaskbarShortcut(social_bar_plugin, social_bar_plugin.get_path())
-
     def __init__(self, parent):
         super(NotificationPanel, self).__init__(False, 2)
         self._parent = parent
