@@ -19,6 +19,8 @@ class AudioSettingsPlugin(IconPlugin, threading.Thread):
     VOLUME_THRESH_LOW = 55
     VOLUME_THRESH_HIGH = 85
     
+    HORIZONTAL_MARGIN = 3
+    
     card_index = 0
     
     def __init__(self, icon_size):
@@ -26,7 +28,9 @@ class AudioSettingsPlugin(IconPlugin, threading.Thread):
         if AudioSettingsPlugin.is_plugin_enabled():
             self._volume = self._get_volume()
             super(AudioSettingsPlugin, self).__init__(icon_size, self.ICON_NAMES, self.COMMAND, self._volume)
+            self.set_margin(self.HORIZONTAL_MARGIN)
             self._init_thread()
+            
 
     @staticmethod
     def is_plugin_enabled():
