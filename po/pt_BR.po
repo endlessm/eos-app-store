@@ -163,7 +163,7 @@ msgid "SUBMIT"
 msgstr "ENVIAR"
 
 #: src/search/search_box.py:22
-msgid "Search or Type Web Site"
+msgid "Google or type website"
 msgstr "Busque ou digite o site"
 
 #: src/notification_panel/all_settings_view.py:43
@@ -290,7 +290,7 @@ msgstr "Reiniciar depois"
 #~ msgid "Update EndlessOS?"
 #~ msgstr "Atualizar EndlessOS?"
 
-#~ msgid "Enter Search or URL..."
+#~ msgid "Google or type website"
 #~ msgstr "Digite pesquisa ou um URL..."
 
 #~ msgid "Add new"

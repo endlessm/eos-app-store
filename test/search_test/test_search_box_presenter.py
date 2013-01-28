@@ -20,5 +20,16 @@ class TestSearchBoxPresenter(unittest.TestCase):
 
         self.mock_app_launcher.launch_browser.assert_called_once_with(search_string)
 
+    def test_launch_search_searches_google_if_empty_string_is_given(self):
+        self.testObject.launch_search('')
+
+        self.mock_app_launcher.launch_browser.assert_called_once_with("www.google.com")
+
+    def test_launch_search_searches_google_if_no_string_is_given(self):
+        self.testObject.launch_search(None)
+
+        self.mock_app_launcher.launch_browser.assert_called_once_with("www.google.com")
+
+
 
 
