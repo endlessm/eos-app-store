@@ -10,7 +10,7 @@ TryExec=supertuxkart
 Exec=supertuxkart
 Icon=supertuxkart
 Categories=
-X-EndlessM-Normal-Icon=/usr/share/endlessm/icons/apps/tuxkart_normal.png
-X-EndlessM-Hover-Icon=/usr/share/endlessm/icons/apps/tuxkart_hover.png
-X-EndlessM-Down-Icon=/usr/share/endlessm/icons/apps/tuxkart_down.png
+X-EndlessM-Normal-Icon=/usr/share/endlessm/icons/apps/supertuxkart_normal.png
+X-EndlessM-Hover-Icon=/usr/share/endlessm/icons/apps/supertuxkart_hover.png
+X-EndlessM-Down-Icon=/usr/share/endlessm/icons/apps/supertuxkart_down.png
 

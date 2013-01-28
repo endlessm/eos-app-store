@@ -10,7 +10,7 @@ TryExec=libreoffice --writer %U
 Exec=libreoffice --writer %U
 Icon=libreoffice-writer
 Categories=
-X-EndlessM-Normal-Icon=/usr/share/endlessm/icons/apps/libreofficewriter_normal.png
-X-EndlessM-Hover-Icon=/usr/share/endlessm/icons/apps/libreofficewriter_hover.png
-X-EndlessM-Down-Icon=/usr/share/endlessm/icons/apps/libreofficewriter_down.png
+X-EndlessM-Normal-Icon=/usr/share/endlessm/icons/apps/office_text_normal.png
+X-EndlessM-Hover-Icon=/usr/share/endlessm/icons/apps/office_text_hover.png
+X-EndlessM-Down-Icon=/usr/share/endlessm/icons/apps/office_text_down.png
 

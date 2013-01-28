@@ -81,9 +81,7 @@ class AddFolderBox(gtk.VBox):
 
     def get_images(self, image_path):
         return (
-            Image.from_name("endless-shortcut-well.png"),
             Image.from_name(image_path),
-            Image.from_name("endless-shortcut-foreground.png")
             )
 
     def _display_plus(self, widget, event, add_remove_widget):
