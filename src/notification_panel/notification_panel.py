@@ -16,10 +16,11 @@ from social_bar.social_bar_plugin import SocialBarPlugin
 class NotificationPanel(gtk.HBox):
     # Add plugins for notification panel here
     PLUGINS = [ TimeDisplayPlugin,
-                PrinterSettingsPlugin,
-                BluetoothSettingsPlugin,
-                BatteryPlugin,
-                NetworkSettingsPlugin,
+                # BugsAndFeedbackPlugin, -- TODO need this!
+                # PrinterSettingsPlugin, -- TODO No longer on notification panel; add to settings dialog
+                # BluetoothSettingsPlugin, -- TODO No longer on notification panel; add to settings dialog
+                #BatteryPlugin, #-- TODO tempoarily disabled for demo
+                #NetworkSettingsPlugin, # TODO temporarily disabled for demo
                 AudioSettingsPlugin,
                 SocialBarPlugin,
                 AllSettingsPlugin

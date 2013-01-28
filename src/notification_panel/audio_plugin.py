@@ -21,7 +21,7 @@ class AudioSettingsPlugin(IconPlugin, threading.Thread):
     VOLUME_THRESH_LOW = 55
     VOLUME_THRESH_HIGH = 85
     
-    HORIZONTAL_MARGIN = 3
+    HORIZONTAL_MARGIN = 6
     
     card_index = 0
     
