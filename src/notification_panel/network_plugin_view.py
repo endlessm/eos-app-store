@@ -3,7 +3,9 @@ from ui.abstract_notifier import AbstractNotifier
 from panel_constants import PanelConstants
 
 class NetworkPluginView(AbstractNotifier, IconPlugin):
-    ICON_NAMES = ['wifi_off.png', 'wifi_low.png', 'wifi_med.png', 'wifi_full.png'] 
+    # TODO add hover/down states
+    # TODO need assets for off vs. low vs. med vs. full (in that order)
+    ICON_NAMES = ['wifi_normal.png', 'wifi_normal.png', 'wifi_normal.png', 'wifi_normal.png'] 
 
     HORIZONTAL_MARGIN = 0
      

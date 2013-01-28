@@ -20,9 +20,9 @@ class FeedbackPlugin(gtk.EventBox):
 
         self._presenter = FeedbackPluginPresenter(FeedbackPluginModel(FeedbackManager(), TimeProvider()))
 
-        self._pixbuf_normal = Image.from_name('report-icon_normal.png').scale(icon_size, icon_size)
-        self._pixbuf_hover = Image.from_name('report-icon_hover.png').scale(icon_size, icon_size)
-        self._pixbuf_down = Image.from_name('report-icon_down.png').scale(icon_size, icon_size)
+        self._pixbuf_normal = Image.from_name('bugs_normal.png').scale(icon_size, icon_size)
+        self._pixbuf_hover = Image.from_name('bugs_hover.png').scale(icon_size, icon_size)
+        self._pixbuf_down = Image.from_name('bugs_down.png').scale(icon_size, icon_size)
 
         self._feedback_icon = gtk.Image()
 
