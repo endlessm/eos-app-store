@@ -12,10 +12,10 @@ class SearchBox(gtk.EventBox):
     HEIGHT = 30
     WIDTH = 298
     LEFT_PADDING = 10
-    RIGHT_MARGIN = 33
-    BOTTOM_MARGIN = 13
+    RIGHT_MARGIN = 15
+    BOTTOM_MARGIN = 8
 
-    TOP_MARGIN = 5
+    TOP_MARGIN = 6
     LEFT_MARGIN = 40
     RIGHT_PADDING = 16
     RIGHT_MARGIN_LABEL = 30
