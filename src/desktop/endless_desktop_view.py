@@ -17,6 +17,7 @@ from eos_util.image import Image
 from shortcut.desktop_shortcut import DesktopShortcut
 from desktop_page.desktop_page_view import DesktopPageView
 from desktop_page.responsive import Button
+from search.search_box import SearchBox
 
 
 gettext.install('endless_desktop', '/usr/share/locale', unicode=True, names=['ngettext'])
@@ -47,7 +48,7 @@ class EndlessDesktopView(gtk.Window):
 
         # -----------WORKSPACE-----------
 
-        self._align = gtk.Alignment(1.0, 1.0, 1.0, 1.0)
+        self._desktop_alignment = gtk.Alignment(1.0, 1.0, 1.0, 1.0)
 
         self._taskbar_panel = TaskbarPanel(self, width)
 
@@ -57,7 +58,8 @@ class EndlessDesktopView(gtk.Window):
 
         # Main window layout
         self._desktop = gtk.VBox(False, 2)
-        self._desktop.pack_start(self._align, True, True, 0)
+
+        self._desktop.pack_start(self._desktop_alignment, True, True, 0)
         self._desktop.pack_end(taskbar_alignment, False, False, 0)
 
         self.add(self._desktop)
@@ -122,7 +124,7 @@ class EndlessDesktopView(gtk.Window):
     
     #TODO: this fixes one symptom of performance and memory leaks by cleaning up callbacks, please refactor
     def clean_up_legacy_page(self):
-        child = self._align.get_child()
+        child = self._desktop_alignment.get_child()
         if child:
             child.parent.remove(child)
             child.destroy()
@@ -169,14 +171,24 @@ class EndlessDesktopView(gtk.Window):
         self.desk_container.pack_end(self.next_button_wrap, expand=False, fill=False, padding=0)
         self.desktop_vbox.pack_start(self.top_vbox, expand=False, fill=False, padding=0)
         self.desktop_vbox.pack_start(self.desk_container_wraper, expand=True, fill=True, padding=0)
+        
         self.desktop_vbox.show_all()
 
-    def setup_bottom_page_buttons(self, page_number, pages, hide_page_buttons):
+    def _setup_searchbar(self, parent_container):
+        searchbox_holder = gtk.Alignment(0.5, 0.5, 0, 1.0)
+        searchbox_holder.set_padding(0, 150, 0, 0)
+        searchbox = SearchBox()
+        searchbox_holder.add(searchbox)
+        parent_container.pack_start(searchbox_holder, expand=False, fill=False, padding=0)
+
+
+    def setup_bottom_page_buttons(self, parent_container, page_number, pages, hide_page_buttons):
         self.bottom_hbox = gtk.HBox(spacing=7)
         wrapper = gtk.Alignment(0.5, 0.5, 0.0, 0.0)
         wrapper.set_size_request(0, 39)
         wrapper.add(self.bottom_hbox)
         wrapper.show()
+        
         self._page_buttons = []
         for page_num in range(0, pages):
             btn = Button(
@@ -195,14 +207,14 @@ class EndlessDesktopView(gtk.Window):
             button.unselected()
         
         self._page_buttons[page_number - 1].selected()
-        self.desktop_vbox.pack_end(wrapper, expand=False, fill=False, padding=0)
+        parent_container.pack_end(wrapper, expand=False, fill=False, padding=0)
         self.bottom_hbox.show_all()
 
     def align_and_display_desktop(self):
         self.desktop_vbox.show()
-        self._align.add(self.desktop_vbox)
+        self._desktop_alignment.add(self.desktop_vbox)
         self.desktop_vbox.show()
-        self._align.show()
+        self._desktop_alignment.show()
 
     def refresh(self, shortcuts, page_number=0, pages=1, force=False):
         self.clean_up_legacy_page()
@@ -210,8 +222,18 @@ class EndlessDesktopView(gtk.Window):
         self.set_up_base_desktop()
         self.setup_left_right_page_buttons(hide_page_buttons)
         self.add_widgets_to_desktop(shortcuts)
-        self.setup_bottom_page_buttons(page_number, pages, hide_page_buttons)
+        bottom_vbox = self._create_bottom_vbox()
+        self._setup_searchbar(bottom_vbox)
+        self.setup_bottom_page_buttons(bottom_vbox, page_number, pages, hide_page_buttons)
+        bottom_vbox.show_all()
         self.align_and_display_desktop()
+        
+    def _create_bottom_vbox(self):
+        vbox = gtk.VBox()
+        
+        self.desktop_vbox.pack_end(vbox, expand=False, fill=False, padding=0)
+        vbox.show()
+        return vbox
         
     def desktop_page_navigate(self, widget):
         index = self._page_buttons.index(widget)
