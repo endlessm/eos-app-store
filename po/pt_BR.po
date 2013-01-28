@@ -290,9 +290,6 @@ msgstr "Reiniciar depois"
 #~ msgid "Update EndlessOS?"
 #~ msgstr "Atualizar EndlessOS?"
 
-#~ msgid "Google or type website"
-#~ msgstr "Digite pesquisa ou um URL..."
-
 #~ msgid "Add new"
 #~ msgstr "Adicionar Novo"
 
