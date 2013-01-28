@@ -58,6 +58,8 @@ class SearchBox(gtk.EventBox):
         self._text_view.modify_base(gtk.STATE_NORMAL, gtk.gdk.Color('#030303'))
 
         self._text_view.set_size_request(self.WIDTH-self.RIGHT_MARGIN - self.LEFT_MARGIN, self.HEIGHT-self.BOTTOM_MARGIN)
+        self._text_view.set_left_margin(5)
+        self._text_view.set_pixels_above_lines(3)
 
         self._text_view.hide()
 
