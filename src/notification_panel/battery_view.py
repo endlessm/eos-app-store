@@ -11,12 +11,13 @@ gettext.install('endless_desktop', '/usr/share/locale', unicode = True, names=['
 
 class BatteryView(AbstractNotifier, IconPlugin):
     X_OFFSET = 13
+    
     WINDOW_WIDTH = 330
     WINDOW_HEIGHT = 160
     SMALLER_HEIGHT = 100
     WINDOW_BORDER = 10
     
-    HORIZONTAL_MARGIN = 4
+    HORIZONTAL_MARGIN = 3
     
     POWER_SETTINGS = "power_settings"
 
@@ -159,16 +160,17 @@ class BatteryView(AbstractNotifier, IconPlugin):
         self.display()
 
     def _calc_window_location(self):
-        desktop_size = self._parent.get_toplevel().get_size()    
-        x = desktop_size[0] - self.WINDOW_WIDTH - self.X_OFFSET
-        y = PanelConstants.DEFAULT_POPUP_VERTICAL_MARGIN
+        desktop_size_x, desktop_size_y = self._parent.get_toplevel().get_size()    
+        x = desktop_size_x - self.WINDOW_WIDTH - self.X_OFFSET
+        y = desktop_size_y - self.WINDOW_HEIGHT
         return (x, y)
 
     def _calc_triangle_location(self):
         window_x = self._calc_window_location()[0]
         icon_x = self._parent.get_allocation().x
         icon_width = self._parent.get_allocation().width
-        return icon_x + (icon_width / 2) - window_x
+        
+        return icon_x + (icon_width / 2) - window_x, self.SMALLER_HEIGHT
 
     def _expose(self, widget, event):
         cr = widget.window.cairo_create()
@@ -177,10 +179,10 @@ class BatteryView(AbstractNotifier, IconPlugin):
         # Use the same color as the default event box background
         # TODO eliminate need for these "magic" numbers
         cr.set_source_rgba(0xf2/255.0, 0xf1/255.0, 0xf0/255.0, 1.0)
-        self._pointer = self._calc_triangle_location()
-        cr.move_to(self._pointer, 0)
-        cr.line_to(self._pointer + 10, 10)
-        cr.line_to(self._pointer - 10, 10)
+        start_x, start_y = self._calc_triangle_location()
+        cr.move_to(start_x, start_y)
+        cr.line_to(start_x - 10, start_y - 10)
+        cr.line_to(start_x + 10, start_y - 10)
         cr.fill()
         return False
 

@@ -11,24 +11,25 @@ from audio_plugin import AudioSettingsPlugin
 from panel_constants import PanelConstants
 
 from eos_log import log
+from social_bar.social_bar_plugin import SocialBarPlugin
 
 class NotificationPanel(gtk.HBox):
     # Add plugins for notification panel here
-    PLUGINS = [ PrinterSettingsPlugin,
-                AudioSettingsPlugin,
+    PLUGINS = [ TimeDisplayPlugin,
+                PrinterSettingsPlugin,
                 BluetoothSettingsPlugin,
-                NetworkSettingsPlugin,
                 BatteryPlugin,
-                TimeDisplayPlugin,
+                NetworkSettingsPlugin,
+                AudioSettingsPlugin,
+                SocialBarPlugin,
                 AllSettingsPlugin
               ]
-
     def __init__(self, parent):
         super(NotificationPanel, self).__init__(False, 2)
         self._parent = parent
 
         self.notification_panel = gtk.Alignment(0.5, 0.5, 0, 0)
-        self.notification_panel.set_padding(PanelConstants.get_padding(), 0, PanelConstants.get_padding(), 0)
+        self.notification_panel.set_padding(0, 0, 0, 3)
         self.plugins_list = []
         notification_panel_items = gtk.HBox(False)
         self.notification_panel.add(notification_panel_items)
@@ -49,7 +50,7 @@ class NotificationPanel(gtk.HBox):
             except Exception, e:
                 log.error('Error registering plugin for ' + clazz.__name__ + ': ' + e.message)
 
-        self.pack_end(self.notification_panel, False, False, 30)
+        self.pack_end(self.notification_panel, False, False, 5)
 
     def _register_plugin(self, notification_panel_items, clazz):
         plugin = clazz(PanelConstants.get_icon_size())

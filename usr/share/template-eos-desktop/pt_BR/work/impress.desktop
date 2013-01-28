@@ -9,7 +9,7 @@ TryExec=libreoffice --impress %U
 Exec=libreoffice --impress %U
 Icon=libreoffice-impress
 Categories=
-X-EndlessM-Normal-Icon=/usr/share/endlessm/icons/apps/libreofficeimpress_normal.png
-X-EndlessM-Hover-Icon=/usr/share/endlessm/icons/apps/libreofficeimpress_hover.png
-X-EndlessM-Down-Icon=/usr/share/endlessm/icons/apps/libreofficeimpress_down.png
+X-EndlessM-Normal-Icon=/usr/share/endlessm/icons/apps/office_presentation_normal.png
+X-EndlessM-Hover-Icon=/usr/share/endlessm/icons/apps/office_presentation_hover.png
+X-EndlessM-Down-Icon=/usr/share/endlessm/icons/apps/office_presentation_down.png
 

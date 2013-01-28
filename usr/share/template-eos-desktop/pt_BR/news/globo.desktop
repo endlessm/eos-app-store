@@ -5,10 +5,10 @@ Comment=globo
 GenericName=globo
 Type=Link
 URL=http://globo.com
-Icon=firefox
+Icon=globo-dot-com
 Categories=Network
-X-EndlessM-Normal-Icon=/usr/share/endlessm/icons/globo_normal.png
-X-EndlessM-Hover-Icon=/usr/share/endlessm/icons/globo_hover.png
-X-EndlessM-Down-Icon=/usr/share/endlessm/icons/globo_down.png
+X-EndlessM-Normal-Icon=/usr/share/endlessm/icons/globo-dot-com_normal.png
+X-EndlessM-Hover-Icon=/usr/share/endlessm/icons/globo-dot-com_hover.png
+X-EndlessM-Down-Icon=/usr/share/endlessm/icons/globo-dot-com_down.png
 
 

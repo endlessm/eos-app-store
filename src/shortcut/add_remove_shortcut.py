@@ -28,7 +28,10 @@ class AddRemoveShortcut(DesktopShortcut):
         self._normal_text = label_text
         
         self._icon_event_box.connect("drag_motion", lambda w, ctx, x, y, t: self._dragged_over())
-        self._icon_event_box.connect("button-press-event", self.mouse_press_callback)
+        self._icon_event_box.connect("enter_notify_event", self._on_enter_notify)
+        self._icon_event_box.connect("leave_notify_event", self._on_leave_notify)
+        self._icon_event_box.connect("button-press-event", self._on_button_press)
+        self._icon_event_box.connect("button-release-event", self._on_button_release)
         self._icon_event_box.connect("drag_leave", self.dnd_drag_leave)
         
         self._plus_images = ()
@@ -44,28 +47,31 @@ class AddRemoveShortcut(DesktopShortcut):
             self.parent.remove(self)
             
     def get_images(self, event_state):
-        return [
-            Image.from_name("endless-shortcut-well.png"),
-            Image.from_name("endless-add.png"),
-            Image.from_name("endless-shortcut-foreground.png")
-            ]
+        if event_state == self.ICON_STATE_MOUSEOVER:
+            return [Image.from_name('add_hover.png')]
+        elif event_state == self.ICON_STATE_PRESSED:
+            return [Image.from_name('add_down.png')]
+        else:
+            return [Image.from_name("add_normal.png")]
     
     def get_dragged_images(self):
-        return (
-            Image.from_name("endless-shortcut-well.png"),
-            Image.from_name("trash_empty_icon.png"),
-            Image.from_name("endless-shortcut-foreground.png")
-            )
+        return [Image.from_name("trash-can_normal.png")]
 
     def get_trash_full_images(self):
-        return (
-            Image.from_name("endless-shortcut-well.png"),
-            Image.from_name("trash_full_icon.png"),
-            Image.from_name("endless-shortcut-foreground.png")
-            )
+        return [Image.from_name("trash-can_hover.png")]
     
-    def mouse_press_callback(self, widget, event):
+    def _on_enter_notify(self, widget, event):
+        self.change_icon(self.get_images(self.ICON_STATE_MOUSEOVER))
+        
+    def _on_leave_notify(self, widget, event):
+        self.change_icon(self.get_images(self.ICON_STATE_NORMAL))
+        
+    def _on_button_press(self, widget, event):
+        self.change_icon(self.get_images(self.ICON_STATE_PRESSED))
+        
+    def _on_button_release(self, widget, event):
         if event.button == 1:
+            self.change_icon(self.get_images(self.ICON_STATE_NORMAL))
             self._callback(widget, event)
             return True
       

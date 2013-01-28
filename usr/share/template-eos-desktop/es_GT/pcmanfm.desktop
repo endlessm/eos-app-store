@@ -8,9 +8,9 @@ Name[pt_BR]=Documentos
 Comment=File Manager
 TryExec=pcmanfm %U
 Exec=pcmanfm %U
-Icon=system-file-manager
+Icon=file-manager
 Categories=FileManager;Utility;Core;GTK;
-X-EndlessM-Normal-Icon=/usr/share/endlessm/icons/apps/files_normal.png
-X-EndlessM-Hover-Icon=/usr/share/endlessm/icons/apps/files_hover.png
-X-EndlessM-Down-Icon=/usr/share/endlessm/icons/apps/files_down.png
+X-EndlessM-Normal-Icon=/usr/share/endlessm/icons/apps/file-manager_normal.png
+X-EndlessM-Hover-Icon=/usr/share/endlessm/icons/apps/file-manager_hover.png
+X-EndlessM-Down-Icon=/usr/share/endlessm/icons/apps/file-manager_down.png
 
