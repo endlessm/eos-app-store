@@ -6,4 +6,3 @@ class BrowserButtonPresenter():
       view.add_listener(BrowserButtonConstants.CLICK_EVENT, lambda: app_launcher.launch_browser(model.get_exploration_center_url()))
 
 
-# presenter.launch_search("file:/usr/share/endlessm/exploration_center/index.html?lang=en-US#newspaper"))
