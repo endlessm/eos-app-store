@@ -176,10 +176,10 @@ class EndlessDesktopView(gtk.Window):
 
     def _setup_searchbar(self, parent_container):
         searchbox_holder = gtk.Alignment(0.5, 0.5, 0, 1.0)
-        searchbox_holder.set_padding(0, 150, 0, 0)
+#searchbox_holder.set_padding(0, 150, 0, 0)
         searchbox = SearchBox()
         searchbox_holder.add(searchbox)
-        parent_container.pack_start(searchbox_holder, expand=False, fill=False, padding=0)
+        parent_container.add(searchbox_holder)
 
 
     def setup_bottom_page_buttons(self, parent_container, page_number, pages, hide_page_buttons):
@@ -231,7 +231,7 @@ class EndlessDesktopView(gtk.Window):
     def _create_bottom_vbox(self):
         vbox = gtk.VBox()
         
-        self.desktop_vbox.pack_end(vbox, expand=False, fill=False, padding=0)
+        self.desktop_vbox.pack_end(vbox, expand=True, fill=False, padding=0)
         vbox.show()
         return vbox
         
