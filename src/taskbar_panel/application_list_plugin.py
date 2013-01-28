@@ -142,5 +142,5 @@ class ApplicationListPlugin(gtk.HBox):
 
         try:
             self._local_display.flush()
-        except:
+        except Exception as e:
             log.error("Error flushing the display", e)
