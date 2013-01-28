@@ -1,13 +1,8 @@
-import gtk
-
-import datetime
 import gobject
 import pango
 import cairo
-import locale
 
 from notification_panel_config import NotificationPanelConfig
-from notification_plugin import NotificationPlugin
 from notification_plugin import NotificationPlugin
 from time_display_plugin_model import TimeDisplayPluginModel
 
@@ -31,11 +26,11 @@ class TimeDisplayPlugin(NotificationPlugin):
     def _update_time(self):
         date = self._time_display_plugin_model.get_date_text()
 
-        attributes = pango.parse_markup('<span color="#f6f6f6" size="large" weight="bold">' + date + '</span>', u'\x00')[0]
+        attributes = pango.parse_markup('<span color="#f6f6f6" size="large" weight="light">' + date + '</span>', u'\x00')[0]
         self._text_layout = self.create_pango_layout(date)
         self._text_layout.set_attributes(attributes)
         
-        shadow_attributes = pango.parse_markup('<span size="large" weight="bold">' + date + '</span>', u'\x00')[0]
+        shadow_attributes = pango.parse_markup('<span size="large" weight="light">' + date + '</span>', u'\x00')[0]
         self._shadow_layout = self.create_pango_layout(date)
         self._shadow_layout.set_attributes(shadow_attributes)
 

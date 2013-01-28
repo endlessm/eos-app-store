@@ -1,5 +1,4 @@
 from desktop_layout import DesktopLayout
-import sys
 import gettext
 
 import gtk
@@ -12,7 +11,6 @@ from shortcut.separator_shortcut import SeparatorShortcut
 from shortcut.add_remove_shortcut import AddRemoveShortcut
 from folder.folder_window import OpenFolderWindow
 from folder.folder_window import FULL_FOLDER_ITEMS_COUNT
-from notification_panel.notification_panel import NotificationPanel
 from taskbar_panel.taskbar_panel import TaskbarPanel
 from add_shortcuts_module.add_shortcuts_view import AddShortcutsView
 from eos_util.image import Image
@@ -53,15 +51,12 @@ class EndlessDesktopView(gtk.Window):
 
         self._taskbar_panel = TaskbarPanel(self, width)
 
-        self._notification_panel = NotificationPanel(self)
 
         taskbar_alignment = gtk.Alignment(0.5, 0.5, 1.0, 1.0)
         taskbar_alignment.add(self._taskbar_panel)
 
         # Main window layout
         self._desktop = gtk.VBox(False, 2)
-        self._desktop.pack_start(self._notification_panel, False, False, 0)
-
         self._desktop.pack_start(self._align, True, True, 0)
         self._desktop.pack_end(taskbar_alignment, False, False, 0)
 
@@ -76,7 +71,7 @@ class EndlessDesktopView(gtk.Window):
     def unfocus_widget(self, widget, event):
         widget.set_focus(None)
         self.close_folder_window()
-        self._notification_panel.close_settings_plugin_window()
+        self._taskbar_panel.close_settings_plugin_window()
 
     def set_presenter(self, presenter):
         self._presenter = presenter

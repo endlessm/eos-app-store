@@ -3,12 +3,12 @@ import gtk
 
 from ui.abstract_notifier import AbstractNotifier
 from eos_widgets.desktop_transparent_window import DesktopTransparentWindow
-from panel_constants import PanelConstants
-
 gettext.install('endless_desktop', '/usr/share/locale', unicode = True, names=['ngettext'])
 
 class AllSettingsView(AbstractNotifier):
-    X_OFFSET = 13
+    X_OFFSET = 0
+    Y_OFFSET = 40
+        
     WINDOW_WIDTH = 330
     WINDOW_HEIGHT = 160
     WINDOW_BORDER = 10
@@ -78,7 +78,7 @@ class AllSettingsView(AbstractNotifier):
 
         desktop_size = self._parent.get_toplevel().get_size()    
         x = desktop_size[0] - self.WINDOW_WIDTH - self.X_OFFSET
-        y = PanelConstants.DEFAULT_POPUP_VERTICAL_MARGIN
+        y = desktop_size[1] - self.WINDOW_HEIGHT - self.Y_OFFSET
         
         self._window = DesktopTransparentWindow(self._parent.get_toplevel(), (x, y), (self.WINDOW_WIDTH, self.WINDOW_HEIGHT))
 
@@ -105,19 +105,21 @@ class AllSettingsView(AbstractNotifier):
     def set_current_version(self, version_text):
         self._label_version.set_text(version_text)
 
-    # To do: make the triangle position configurable
     def _expose(self, widget, event):
         cr = widget.window.cairo_create()
 
         # Decorate the border with a triangle pointing up
         # Use the same color as the default event box background
-        # To do: eliminate need for these "magic" numbers
+        # TODO eliminate need for these "magic" numbers
         cr.set_source_rgba(0xf2/255.0, 0xf1/255.0, 0xf0/255.0, 1.0)
-        self._pointer = 300
-        cr.move_to(self._pointer, 0)
-        cr.line_to(self._pointer + 10, 10)
-        cr.line_to(self._pointer - 10, 10)
+        start_y = self.WINDOW_HEIGHT
+        start_x = 300
+        
+        cr.move_to(start_x, start_y)
+        cr.line_to(start_x - 10, start_y - 10)
+        cr.line_to(start_x + 10, start_y - 10)
         cr.fill()
+
 
     def confirm(self, message_id):
         dialog = gtk.Dialog("Confirmation", self._parent._parent, gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT)

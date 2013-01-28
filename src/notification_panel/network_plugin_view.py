@@ -5,7 +5,7 @@ from panel_constants import PanelConstants
 class NetworkPluginView(AbstractNotifier, IconPlugin):
     ICON_NAMES = ['wifi_off.png', 'wifi_low.png', 'wifi_med.png', 'wifi_full.png'] 
 
-    HORIZONTAL_MARGIN = 4
+    HORIZONTAL_MARGIN = 0
      
     def __init__(self, parent, icon_size):
         super(NetworkPluginView, self).__init__(icon_size, self.ICON_NAMES, None)
