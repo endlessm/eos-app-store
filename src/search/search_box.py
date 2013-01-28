@@ -4,7 +4,6 @@ import gettext
 
 from eos_util import image_util
 from eos_util.image_util import load_pixbuf
-from osapps.app_launcher import AppLauncher
 from search.search_box_presenter import SearchBoxPresenter
 
 gettext.install('endless_desktop', '/usr/share/locale', unicode = True, names=['ngettext'])
@@ -28,16 +27,17 @@ class SearchBox(gtk.EventBox):
         self.set_size_request(self.WIDTH, self.HEIGHT)
         self.set_visible_window(False)
 
-        self._presenter = SearchBoxPresenter(AppLauncher())
+        self._presenter = SearchBoxPresenter()
 
-        self.connect('button-press-event', self.gain_focus)
+        self.connect('button-release-event', self.gain_focus)
+
         self._content = gtk.Fixed()
 
         self._label = SearchBoxLabel(self.DEFAULT_TEXT, self.WIDTH, self.LEFT_MARGIN, self.RIGHT_PADDING, self.RIGHT_MARGIN_LABEL)
         self._button = SearchBoxButton()
         self._frame = SearchBoxFrame()
 
-        self._button.connect('button-press-event', lambda w, e : self._launch_browser(w))
+        self._button.connect('button-release-event', lambda w, e : self._launch_browser())
 
         self._container = SearchBoxContainer(self._button, self._label, self._frame, self.LEFT_MARGIN, self.TOP_MARGIN)
 
@@ -52,7 +52,6 @@ class SearchBox(gtk.EventBox):
             return
 
         self._text_view = gtk.TextView()
-        
 
         self._text_view.set_wrap_mode(gtk.WRAP_NONE)
         self._text_view.modify_text(gtk.STATE_NORMAL, gtk.gdk.Color('#fff'))
@@ -88,7 +87,7 @@ class SearchBox(gtk.EventBox):
         else:
             self._set_label_text(self.DEFAULT_TEXT)
 
-    def _launch_browser(self, widget):
+    def _launch_browser(self):
         self.add_text_entry("")
 
         text_buffer = self._text_view.get_buffer()
@@ -100,12 +99,13 @@ class SearchBox(gtk.EventBox):
 
     def handle_keystrokes(self, widget, event):
         if(event.keyval == gtk.keysyms.Escape):
-            self._text_buffer.set_text("")
+            text_buffer = self._text_view.get_buffer()
+            text_buffer.set_text("")
             self._text_view.hide()
             self._set_label_text(self.DEFAULT_TEXT)
             return True
         elif(event.keyval == gtk.keysyms.Return or event.keyval == gtk.keysyms.KP_Enter):
-            self._launch_browser(widget)
+            self._launch_browser()
             return True
         return False
 
@@ -159,16 +159,20 @@ class SearchBoxLabel(gtk.Label):
                 break
 
         super(SearchBoxLabel, self).set_text(shown_text)
-#        self.set_text(shown_text)
 
-class SearchBoxButton(gtk.Image):
+class SearchBoxButton(gtk.EventBox):
 
     def __init__(self):
-        gtk.Image.__init__(self)
+        gtk.EventBox.__init__(self)
 
+        self.set_visible_window(False)
         internet_pixbuf = load_pixbuf(image_util.image_path("button_browser_google.png"))
-        self.set_from_pixbuf(internet_pixbuf)
-        self.set_padding(10, 0)
+
+        image = gtk.Image()
+        image.set_from_pixbuf(internet_pixbuf)
+        image.set_padding(10, 0)
+        self.add(image)
+        self.connect('button-release-event', lambda w, e: doit)
 
 class SearchBoxContainer(gtk.Fixed):
 
