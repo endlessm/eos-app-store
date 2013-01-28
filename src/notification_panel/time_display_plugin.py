@@ -11,7 +11,7 @@ class TimeDisplayPlugin(NotificationPlugin):
     LEFT_MARGIN = 3
     RIGHT_MARGIN = 3
     # TODO Properly center vertically within taskbar; for now, we hard-code an offset
-    CENTER_Y_OFFSET = 10
+    CENTER_Y_OFFSET = 11
     
     def __init__(self, icon_size, time_display_plugin_model=TimeDisplayPluginModel()):
         super(TimeDisplayPlugin, self).__init__(self.COMMAND)

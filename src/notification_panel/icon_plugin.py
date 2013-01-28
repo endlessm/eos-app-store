@@ -9,7 +9,7 @@ from notification_plugin import NotificationPlugin
 class IconPlugin(NotificationPlugin):
 
     # TODO Properly center vertically within taskbar; for now, we hard-code an offset
-    CENTER_Y_OFFSET = 8
+    CENTER_Y_OFFSET = 9
     
     def __init__(self, icon_size, icon_names, command, init_index = 0):
         super(IconPlugin, self).__init__(command)
