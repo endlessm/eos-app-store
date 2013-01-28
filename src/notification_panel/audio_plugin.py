@@ -7,11 +7,10 @@ from icon_plugin import IconPlugin
 class AudioSettingsPlugin(IconPlugin, threading.Thread):
     COMMAND = 'gnome-control-center --class=eos-audio-manager sound'
     # TODO add hover/down states
-    # TODO need assets for muted, low, medium, high (in that order)
-    ICON_NAMES = ['volume_normal.png',
-                  'volume_normal.png',
-                  'volume_normal.png',
-                  'volume_normal.png']
+    ICON_NAMES = ['volume-muted_normal.png',
+                  'volume-low_normal.png',
+                  'volume-medium_normal.png',
+                  'volume-high_normal.png']
 
     VOLUME_MUTED = 0
     VOLUME_LOW = 1
