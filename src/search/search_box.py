@@ -49,6 +49,10 @@ class SearchBox(gtk.EventBox):
 
     def add_text_entry(self, text):
         if hasattr(self, "_text_view"):
+            text_buffer = gtk.TextBuffer()
+            text_buffer.set_text(text)
+            self._text_view.set_buffer(text_buffer)
+
             return
 
         self._text_view = gtk.TextView()
@@ -69,8 +73,13 @@ class SearchBox(gtk.EventBox):
         self._content.put(self._text_view, self._label._LEFT_MARGIN + self.LEFT_PADDING, self.TOP_MARGIN)
 
     def gain_focus(self, widget, event):
+        self._frame.disable_roll_over()
 
-        self.add_text_entry("")
+        search_text = self._label.get_label()
+        if search_text == self.DEFAULT_TEXT:
+            search_text = ""
+
+        self.add_text_entry(search_text)
 
         self._set_label_text("")
         self._text_view.show()
@@ -83,7 +92,7 @@ class SearchBox(gtk.EventBox):
     def _update_label(self, widget):
         text_buffer = self._text_view.get_buffer()
         search_text = text_buffer.get_text(text_buffer.get_start_iter(), text_buffer.get_end_iter(), False)
-        self._text_view.hide()
+        self.reset_text_field()
         if len(search_text) > 0:
             self._set_label_text(search_text)
         else:
@@ -94,17 +103,19 @@ class SearchBox(gtk.EventBox):
 
         text_buffer = self._text_view.get_buffer()
         search_text = text_buffer.get_text(text_buffer.get_start_iter(), text_buffer.get_end_iter(), False)
+        self._presenter.launch_search(search_text)
+        self.reset_text_field()
+
+    def reset_text_field(self):
+        text_buffer = self._text_view.get_buffer()
         text_buffer.set_text("")
         self._text_view.hide()
         self._set_label_text(self.DEFAULT_TEXT)
-        self._presenter.launch_search(search_text)
+        self._frame.enable_roll_over()
 
     def handle_keystrokes(self, widget, event):
         if(event.keyval == gtk.keysyms.Escape):
-            text_buffer = self._text_view.get_buffer()
-            text_buffer.set_text("")
-            self._text_view.hide()
-            self._set_label_text(self.DEFAULT_TEXT)
+            self.reset_text_field()
             return True
         elif(event.keyval == gtk.keysyms.Return or event.keyval == gtk.keysyms.KP_Enter):
             self._launch_browser()
@@ -120,17 +131,41 @@ class SearchBoxFrame(gtk.EventBox):
 
         search_normal = load_pixbuf(image_util.image_path("search-box_normal.png"))
         search_hover = load_pixbuf(image_util.image_path("search-box_hover.png"))
-        search_focus = load_pixbuf(image_util.image_path("search-box_focus.png"))
+        self._search_focus = load_pixbuf(image_util.image_path("search-box_focus.png"))
 
-        image = gtk.Image()
-        self.add(image)
-        image.set_from_pixbuf(search_normal)
+        self._image = gtk.Image()
+        self.add(self._image)
+        self._image.set_from_pixbuf(search_normal)
 
-        self.connect("enter-notify-event", lambda w, e: self._toggle_image(image, search_hover))
-        self.connect("leave-notify-event", lambda w, e: self._toggle_image(image, search_normal))
+        self._on_enter = lambda w, e: self._image.set_from_pixbuf(search_hover)
+        self._on_leave = lambda w, e: self._image.set_from_pixbuf(search_normal)
 
-    def _toggle_image(self, image, pixbuf):
-        image.set_from_pixbuf(pixbuf)
+        self._enter_notify_handler_id = None
+        self._leave_notify_handler_id = None
+
+        self.enable_roll_over()
+
+    def _on_focus(self):
+        self._image.set_from_pixbuf(self._search_focus)
+
+    def disable_roll_over(self):
+        if self._enter_notify_handler_id:
+           self.disconnect(self._enter_notify_handler_id)
+           self._enter_notify_handler_id = None
+
+        if self._leave_notify_handler_id:
+           self.disconnect(self._leave_notify_handler_id)
+           self._leave_notify_handler_id = None
+
+        self._on_focus()
+
+    def enable_roll_over(self):
+        if not self._enter_notify_handler_id:
+            self._enter_notify_handler_id = self.connect("enter-notify-event", self._on_enter)
+        if not self._leave_notify_handler_id:
+            self._leave_notify_handler_id = self.connect("leave-notify-event", self._on_leave)
+
+        self._on_leave(None, None)
 
 class SearchBoxLabel(gtk.Label):
 
@@ -174,7 +209,6 @@ class SearchBoxButton(gtk.EventBox):
         image.set_from_pixbuf(internet_pixbuf)
         image.set_padding(10, 0)
         self.add(image)
-        self.connect('button-release-event', lambda w, e: doit)
 
 class SearchBoxContainer(gtk.Fixed):
 
