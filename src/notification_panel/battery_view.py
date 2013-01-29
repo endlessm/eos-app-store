@@ -21,7 +21,8 @@ class BatteryView(AbstractNotifier, IconPlugin):
     
     POWER_SETTINGS = "power_settings"
 
-    ICON_NAMES = ['battery_charging.png','battery_empty.png', 'battery_10.png', 'battery_25.png', 'battery_60.png', 'battery_full.png']
+    # TODO Add hover and down states
+    ICON_NAMES = ['battery_charging_normal.png','battery_zero_normal.png', 'battery_30_normal.png', 'battery_60_normal.png', 'battery_full_normal.png']
      
     _last_focus_out = datetime.datetime.min
     _focus_out_period = datetime.timedelta(milliseconds=250)
@@ -58,16 +59,14 @@ class BatteryView(AbstractNotifier, IconPlugin):
     def _set_battery_image(self, level, is_charging):
         if is_charging:
             self._set_index(0)
-        elif level < 5:
+        elif level < 10:
             self._set_index(1)
-        elif level < 15:
-            self._set_index(2)    
-        elif level < 30:
-            self._set_index(3)
+        elif level < 40:
+            self._set_index(2)
         elif level < 75:
-            self._set_index(4)
+            self._set_index(3)
         else:
-            self._set_index(5)
+            self._set_index(4)
         
     def _create_menu(self):
         self._button_power_settings = gtk.Button(_('Power Settings'))

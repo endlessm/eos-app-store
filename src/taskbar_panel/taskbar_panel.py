@@ -39,7 +39,7 @@ class TaskbarPanel(gtk.EventBox):
         return browser_button_holder
 
     def _draw_taskbar(self, width, taskbar_panel_items, browser_button, application_list_plugin_holder):
-        self._raw_taskbar_bg_pixbuf = load_pixbuf(image_util.image_path('taskbar.png'))
+        self._raw_taskbar_bg_pixbuf = load_pixbuf(image_util.image_path('bottom-shadow.png'))
         self._taskbar_bg_pixbuf = self._raw_taskbar_bg_pixbuf.scale_simple(width, 38, gdk.INTERP_TILES)
         del self._raw_taskbar_bg_pixbuf
         taskbar_panel_items.pack_start(browser_button, False, True, 0)

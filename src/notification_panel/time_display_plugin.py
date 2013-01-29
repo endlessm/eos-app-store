@@ -10,6 +10,8 @@ class TimeDisplayPlugin(NotificationPlugin):
     COMMAND = 'sudo gnome-control-center --class=eos-network-manager datetime'
     LEFT_MARGIN = 3
     RIGHT_MARGIN = 3
+    # TODO Properly center vertically within taskbar; for now, we hard-code an offset
+    CENTER_Y_OFFSET = 12
     
     def __init__(self, icon_size, time_display_plugin_model=TimeDisplayPluginModel()):
         super(TimeDisplayPlugin, self).__init__(self.COMMAND)
@@ -26,11 +28,11 @@ class TimeDisplayPlugin(NotificationPlugin):
     def _update_time(self):
         date = self._time_display_plugin_model.get_date_text()
 
-        attributes = pango.parse_markup('<span color="#f6f6f6" size="large" weight="light">' + date + '</span>', u'\x00')[0]
+        attributes = pango.parse_markup('<span color="#f6f6f6" size="medium" weight="medium">' + date + '</span>', u'\x00')[0]
         self._text_layout = self.create_pango_layout(date)
         self._text_layout.set_attributes(attributes)
         
-        shadow_attributes = pango.parse_markup('<span size="large" weight="light">' + date + '</span>', u'\x00')[0]
+        shadow_attributes = pango.parse_markup('<span size="medium" weight="medium">' + date + '</span>', u'\x00')[0]
         self._shadow_layout = self.create_pango_layout(date)
         self._shadow_layout.set_attributes(shadow_attributes)
 
@@ -55,12 +57,12 @@ class TimeDisplayPlugin(NotificationPlugin):
         widget_area = widget.get_allocation()
 
         cr.set_source_rgba(0.0, 0.0, 0.0, NotificationPanelConfig.SHADOW_ALPHA);
-        cr.move_to(widget_area.x + self.SHADOW_OFFSET + self.LEFT_MARGIN, widget_area.y + self.SHADOW_OFFSET)
+        cr.move_to(widget_area.x + self.SHADOW_OFFSET + self.LEFT_MARGIN, widget_area.y + self.CENTER_Y_OFFSET + self.SHADOW_OFFSET)
         
         cr.set_operator(cairo.OPERATOR_DEST_OUT);
         cr.show_layout(self._shadow_layout)
 
-        cr.move_to(widget_area.x + self.LEFT_MARGIN, widget_area.y)
+        cr.move_to(widget_area.x + self.LEFT_MARGIN, widget_area.y + self.CENTER_Y_OFFSET)
         cr.set_operator(cairo.OPERATOR_ATOP);
         cr.show_layout(self._text_layout)
         

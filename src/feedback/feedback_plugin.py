@@ -13,16 +13,16 @@ from util.feedback_manager import FeedbackManager
 
 
 class FeedbackPlugin(gtk.EventBox):
-    def __init__(self, parent, icon_size):
+    def __init__(self, parent):
         super(FeedbackPlugin, self).__init__()
 
         self._parent = parent
 
         self._presenter = FeedbackPluginPresenter(FeedbackPluginModel(FeedbackManager(), TimeProvider()))
 
-        self._pixbuf_normal = Image.from_name('report-icon_normal.png').scale(icon_size, icon_size)
-        self._pixbuf_hover = Image.from_name('report-icon_hover.png').scale(icon_size, icon_size)
-        self._pixbuf_down = Image.from_name('report-icon_down.png').scale(icon_size, icon_size)
+        self._pixbuf_normal = Image.from_name('bugs_normal.png')
+        self._pixbuf_hover = Image.from_name('bugs_hover.png')
+        self._pixbuf_down = Image.from_name('bugs_down.png')
 
         self._feedback_icon = gtk.Image()
 
