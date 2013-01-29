@@ -59,7 +59,8 @@ class SearchBox(gtk.EventBox):
 
         self._text_view.set_wrap_mode(gtk.WRAP_NONE)
         self._text_view.modify_text(gtk.STATE_NORMAL, gtk.gdk.Color('#fff'))
-        self._text_view.modify_base(gtk.STATE_NORMAL, gtk.gdk.Color('#030303'))
+        # TODO Make the text background transparent -- for now, use a solid color that is similar to the default background
+        self._text_view.modify_base(gtk.STATE_NORMAL, gtk.gdk.Color('#383020'))
 
         self._text_view.set_size_request(self.WIDTH-self.RIGHT_MARGIN - self.LEFT_MARGIN, self.HEIGHT-self.BOTTOM_MARGIN)
         self._text_view.set_left_margin(5)
@@ -101,8 +102,8 @@ class SearchBox(gtk.EventBox):
     def _launch_browser(self):
         search_text = ""
         if hasattr(self, "_text_view"):
-           text_buffer = self._text_view.get_buffer()
-           search_text = text_buffer.get_text(text_buffer.get_start_iter(), text_buffer.get_end_iter(), False)
+            text_buffer = self._text_view.get_buffer()
+            search_text = text_buffer.get_text(text_buffer.get_start_iter(), text_buffer.get_end_iter(), False)
         self._presenter.launch_search(search_text)
 
         self.add_text_entry("")
@@ -152,12 +153,12 @@ class SearchBoxFrame(gtk.EventBox):
 
     def disable_roll_over(self):
         if self._enter_notify_handler_id:
-           self.disconnect(self._enter_notify_handler_id)
-           self._enter_notify_handler_id = None
+            self.disconnect(self._enter_notify_handler_id)
+            self._enter_notify_handler_id = None
 
         if self._leave_notify_handler_id:
-           self.disconnect(self._leave_notify_handler_id)
-           self._leave_notify_handler_id = None
+            self.disconnect(self._leave_notify_handler_id)
+            self._leave_notify_handler_id = None
 
         self._on_focus()
 
