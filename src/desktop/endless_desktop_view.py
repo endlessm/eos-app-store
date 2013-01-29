@@ -152,7 +152,7 @@ class EndlessDesktopView(gtk.Window):
             down=(Image.from_name("button_arrow_desktop_left_down.png"), ), 
             invisible=hide_page_buttons)
         self.prev_button.connect("clicked", lambda w:self._presenter.previous_desktop())
-        self.prev_button.set_size_request(50, 420)
+        self.prev_button.set_size_request(50, 460)
         self.prev_button_wrap = Button.align_it(self.prev_button)
         self.next_button = Button(
             normal=(), 
@@ -160,7 +160,7 @@ class EndlessDesktopView(gtk.Window):
             down=(Image.from_name("button_arrow_desktop_right_down.png"), ), 
             invisible=hide_page_buttons)
         self.next_button.connect("clicked", lambda w:self._presenter.next_desktop())
-        self.next_button.set_size_request(50, 420)
+        self.next_button.set_size_request(50, 460)
         self.next_button_wrap = Button.align_it(self.next_button)
 
     def add_widgets_to_desktop(self, shortcuts):
@@ -176,7 +176,7 @@ class EndlessDesktopView(gtk.Window):
 
     def _setup_searchbar(self, parent_container):
         searchbox_holder = gtk.Alignment(0.5, 0.5, 0, 1.0)
-#searchbox_holder.set_padding(0, 150, 0, 0)
+        searchbox_holder.set_padding(60, 0, 0, 0)
         searchbox = SearchBox()
         searchbox_holder.add(searchbox)
         parent_container.add(searchbox_holder)
@@ -231,7 +231,7 @@ class EndlessDesktopView(gtk.Window):
     def _create_bottom_vbox(self):
         vbox = gtk.VBox()
         
-        self.desktop_vbox.pack_end(vbox, expand=True, fill=False, padding=0)
+        self.desktop_vbox.pack_end(vbox, expand=True, fill=True, padding=0)
         vbox.show()
         return vbox
         
