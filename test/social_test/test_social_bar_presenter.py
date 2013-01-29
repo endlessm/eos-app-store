@@ -13,7 +13,7 @@ class TestSocialBarPresenter(unittest.TestCase):
     def tearDown(self):
         pass
 
-    def test_launch_search_launches_search(self):
+    def test_launch_social_launches_social(self):
         social_path = "/usr/bin/eos-social"
 
         self.testObject.launch()
