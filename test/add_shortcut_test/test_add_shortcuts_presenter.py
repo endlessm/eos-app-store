@@ -152,7 +152,9 @@ class TestAddShortcutsPresenter(unittest.TestCase):
         url = 'facebook.com'
         facebook_model = LinkModel(url, url, "http://"+url)
         self.mock_recommended_sites_provider.get_recommended_sites = Mock(return_value=[facebook_model])
+        self.test_object._url_opener = Mock()
         result = self.test_object.create_link_model(url)
+        self.test_object._url_opener.assert_called_once_with("http://facebook.com")
         self.assertEquals(result, facebook_model)
 
     def test_strip_protocol(self):
