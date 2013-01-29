@@ -99,11 +99,13 @@ class SearchBox(gtk.EventBox):
             self._set_label_text(self.DEFAULT_TEXT)
 
     def _launch_browser(self):
-        self.add_text_entry("")
-
-        text_buffer = self._text_view.get_buffer()
-        search_text = text_buffer.get_text(text_buffer.get_start_iter(), text_buffer.get_end_iter(), False)
+        search_text = ""
+        if hasattr(self, "_text_view"):
+           text_buffer = self._text_view.get_buffer()
+           search_text = text_buffer.get_text(text_buffer.get_start_iter(), text_buffer.get_end_iter(), False)
         self._presenter.launch_search(search_text)
+
+        self.add_text_entry("")
         self.reset_text_field()
 
     def reset_text_field(self):
