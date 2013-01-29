@@ -86,9 +86,9 @@ class TestEndlessDesktopPresenter(unittest.TestCase):
     def test_rename_shortcut(self):
         shortcut = AppShortcut(123, "App 1", "", [])
         new_name = 'Blah'
-        self.mock_model.get_shortcuts = Mock(return_value=[shortcut])
+        self.mock_model.get_all_shortcuts = Mock(return_value=[shortcut])
         changed_shortcut = self.testObject.rename_shortcut(shortcut, new_name)
-        self.mock_model.get_shortcuts.assert_called_once()
+        self.mock_model.get_all_shortcuts.assert_called_once()
         self.mock_model.set_shortcuts.assert_called_once()
         self.assertEqual(changed_shortcut.name(), new_name)
 
@@ -119,7 +119,7 @@ class TestEndlessDesktopPresenter(unittest.TestCase):
         app2.name = Mock(return_value='app 2')
         app3 = Mock()
         app3.name = Mock(return_value='app 3')
-        self.testObject._model.get_shortcuts = Mock(return_value=[app1, app2, app3])
+        self.testObject._model.get_all_shortcuts = Mock(return_value=[app1, app2, app3])
 
         app_ret = self.testObject.get_shortcut_by_name('app 1')
         self.assertEqual(app_ret, app1)
@@ -156,7 +156,7 @@ class TestEndlessDesktopPresenter(unittest.TestCase):
 
     def test_rearrange_shortcuts_left_destination(self):
         all_shortcuts = Mock()
-        self.testObject._model.get_shortcuts = Mock(return_value=all_shortcuts)
+        self.testObject._model.get_all_shortcuts = Mock(return_value=all_shortcuts)
         source_shortcut = Mock()
         source_shortcut.parent = Mock(return_value = None)
         left_shortcut = Mock()
@@ -172,7 +172,7 @@ class TestEndlessDesktopPresenter(unittest.TestCase):
 
     def test_rearrange_shortcuts_right_destination(self):
         all_shortcuts = Mock()
-        self.testObject._model.get_shortcuts = Mock(return_value=all_shortcuts)
+        self.testObject._model.get_all_shortcuts = Mock(return_value=all_shortcuts)
         source_shortcut = Mock()
         source_shortcut.parent = Mock(return_value = None)
         right_shortcut = Mock()

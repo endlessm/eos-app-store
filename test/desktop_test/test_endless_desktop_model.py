@@ -248,4 +248,15 @@ class DesktopModelTestCase(unittest.TestCase):
         self.mock_paginator.number_of_pages.assert_called_once_with()
 
         
+    def test_get_all_shorcuts(self):
+        app1 = AppShortcut('', 'app1', '')
+        app2 = AppShortcut('', 'app2', '')
+        app3 = AppShortcut('', 'app3', '')
+        all_shortcuts = [app1, app2, app3]
+        self.mock_desktop_locale_datastore.get_all_shortcuts = Mock(return_value=all_shortcuts)
+
+        shortcuts = self.testObject.get_all_shortcuts()
         
+        self.mock_desktop_locale_datastore.get_all_shortcuts.assert_called_once_with(force=False)
+        
+        self.assertEquals(shortcuts, all_shortcuts)
