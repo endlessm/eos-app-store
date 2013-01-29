@@ -148,13 +148,14 @@ class TestAddShortcutsPresenter(unittest.TestCase):
         result = self.test_object.create_link_model(url)
         self.assertFalse(result)
 
-# TODO Why is this not working?  I commented out so that the build can proceed. - Roddy
-#    def test_get_custom_site_shortcut_when_known_site(self):
-#        url = 'facebook.com'
-#        facebook_model = LinkModel(url, url, "http://"+url)
-#        self.mock_recommended_sites_provider.get_recommended_sites = Mock(return_value=[facebook_model])
-#        result = self.test_object.create_link_model(url)
-#        self.assertEquals(result, facebook_model)
+    def test_get_custom_site_shortcut_when_known_site(self):
+        url = 'facebook.com'
+        facebook_model = LinkModel(url, url, "http://"+url)
+        self.mock_recommended_sites_provider.get_recommended_sites = Mock(return_value=[facebook_model])
+        self.test_object._url_opener = Mock()
+        result = self.test_object.create_link_model(url)
+        self.test_object._url_opener.assert_called_once_with("http://facebook.com")
+        self.assertEquals(result, facebook_model)
 
     def test_strip_protocol(self):
         full = 'http://facebook.com'
