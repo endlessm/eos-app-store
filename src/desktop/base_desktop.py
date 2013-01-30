@@ -29,13 +29,15 @@ class BaseDesktop(gtk.VBox):
         self._taskbar_widget = taskbar_widget
         self._top_taskbar_padding = gtk.HBox()
 
-        width, height = self._taskbar_widget.size_request()
+        self.pack_end(self._taskbar_widget, False, False, 0)
+
+        width = self._taskbar_widget.allocation.width
+        height = self._taskbar_widget.allocation.height
         import sys
-        print >> sys.stderr, self._taskbar_widget.size_request()
+        print >> sys.stderr, width, height
         self._top_taskbar_padding.set_size_request(width, height)
         
-        self.pack_start(self._taskbar_widget, False, False, 0)
-        self.pack_end(self._top_taskbar_padding, False, False, 0)
+        self.pack_start(self._top_taskbar_padding, False, False, 0)
         
     def set_icon_holder_widget(self, icon_holder_widget):
         self._remove_child(self._icon_holder_widget)

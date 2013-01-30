@@ -16,10 +16,9 @@ from add_shortcuts_module.add_shortcuts_view import AddShortcutsView
 from eos_util.image import Image
 from shortcut.desktop_shortcut import DesktopShortcut
 from desktop_page.desktop_page_view import DesktopPageView
-from desktop_page.responsive import Button
 from search.search_box import SearchBox
 from desktop.base_desktop import BaseDesktop
-
+from desktop_nav_button import DesktopNavButton
 
 gettext.install('endless_desktop', '/usr/share/locale', unicode=True, names=['ngettext'])
 gtk.gdk.threads_init()
@@ -47,7 +46,14 @@ class EndlessDesktopView(gtk.Window, object):
         self.maximize()
         self.set_app_paintable(True)
 
-        # -----------WORKSPACE-----------
+        self._max_icons_in_row, self._max_rows_in_page = self._calculate_max_icons()
+
+        screen = gtk.gdk.Screen() #@UndefinedVariable
+        screen.connect('size-changed', lambda s: self._set_background(self.BACKGROUND_NAME))
+
+        self.set_up_desktop(width)
+
+    def set_up_desktop(self, width):
         self._taskbar_panel = TaskbarPanel(self, width)
         taskbar_alignment = gtk.Alignment(0.5, 0.5, 1.0, 1.0)
         taskbar_alignment.add(self._taskbar_panel)
@@ -56,39 +62,39 @@ class EndlessDesktopView(gtk.Window, object):
         self._desktop.set_taskbar_widget(taskbar_alignment)        
 
         self._desktop_alignment = gtk.Alignment(0.5, 0.5, 1.0, 1.0)
-
         self.desktop_vbox = gtk.VBox()
+
+        self.desktop_container = gtk.HBox(False, spacing=0)
+        self.desktop_container_wraper = gtk.Alignment(1.0, 0.5, 1.0, 0.0)
+        self.desktop_container_wraper.add(self.desktop_container)
+
+        self.left_page_button = DesktopNavButton('left', lambda w:self._presenter.previous_desktop())
+        self.right_page_button = DesktopNavButton('right', lambda w:self._presenter.next_desktop())
+
+        self.desktop_container.pack_start(self.left_page_button, expand=False, fill=False, padding=0)
+        self.desktop_container.pack_end(self.right_page_button, expand=False, fill=False, padding=0)
 
         self.add(self._desktop)
         self.show_all()
 
-        self._max_icons_in_row, self._max_rows_in_page = self._calculate_max_icons()
-
-        screen = gtk.gdk.Screen() #@UndefinedVariable
-        screen.connect('size-changed', lambda s: self._set_background(self.BACKGROUND_NAME))
-
-    def set_up_base_desktop(self):
-        self.desk_container = gtk.HBox(False, spacing=0)
-        self.desk_container_wraper = gtk.Alignment(1.0, 0.5, 1.0, 0.0)
-        self.desk_container_wraper.add(self.desk_container)
-        self.icons_alignment = gtk.Alignment(0.5, 0.5, 0.0, 0.0)
-
     def add_widgets_to_desktop(self, shortcuts):
-        self.desk_container.pack_start(self.prev_button_wrap, expand=False, fill=False, padding=0)
         desktop_page = DesktopPageView(shortcuts, self._max_icons_in_row, self._create_row)
+
+        self.icons_alignment = gtk.Alignment(0.5, 0.5, 0.0, 0.0)
         self.icons_alignment.add(desktop_page)
-        self.desk_container.pack_start(self.icons_alignment, expand=True, fill=True, padding=0)
-        self.desk_container.pack_end(self.next_button_wrap, expand=False, fill=False, padding=0)
+
+        self.desktop_container.pack_start(self.icons_alignment, expand=True, fill=True, padding=0)
         
-        self._desktop.set_icon_holder_widget(self.desk_container_wraper)       
+        self._desktop.set_icon_holder_widget(self.desktop_container_wraper)       
         self._desktop.show_all()
 
     def refresh(self, shortcuts, page_number=0, pages=1, force=False):
         self.clean_up_legacy_page()
-        hide_page_buttons = pages == 1
-        self.set_up_base_desktop()
+        show_page_buttons = pages > 1
         
-        self.setup_left_right_page_buttons(hide_page_buttons)
+        self.left_page_button.set_is_visible(show_page_buttons)
+        self.right_page_button.set_is_visible(show_page_buttons)
+
         self.add_widgets_to_desktop(shortcuts)
 #        bottom_vbox = self._create_bottom_vbox()
 #        self._setup_searchbar(bottom_vbox)
@@ -163,25 +169,6 @@ class EndlessDesktopView(gtk.Window, object):
         image = Image(pixbuf)
         image.scale_to_best_fit(screen_width, screen_height)
         return image.pixbuf
-
-    def setup_left_right_page_buttons(self, hide_page_buttons):
-        self.prev_button = Button(
-            normal=(), 
-            hover=(Image.from_name("button_arrow_desktop_left_hover.png"), ), 
-            down=(Image.from_name("button_arrow_desktop_left_down.png"), ), 
-            invisible=hide_page_buttons)
-        self.prev_button.connect("clicked", lambda w:self._presenter.previous_desktop())
-        self.prev_button.set_size_request(50, 460)
-        self.prev_button_wrap = Button.align_it(self.prev_button)
-        self.next_button = Button(
-            normal=(), 
-            hover=(Image.from_name("button_arrow_desktop_right_hover.png"), ), 
-            down=(Image.from_name("button_arrow_desktop_right_down.png"), ), 
-            invisible=hide_page_buttons)
-        self.next_button.connect("clicked", lambda w:self._presenter.next_desktop())
-        self.next_button.set_size_request(50, 460)
-        self.next_button_wrap = Button.align_it(self.next_button)
-
 
     def _setup_searchbar(self, parent_container):
         searchbox_holder = gtk.Alignment(0.5, 0.5, 0, 1.0)
