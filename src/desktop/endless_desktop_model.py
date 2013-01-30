@@ -17,6 +17,9 @@ class EndlessDesktopModel(object):
         self._paginator.adjust_list_of_items(all_shortcuts)
         return self._paginator.current_page()
 
+    def get_all_shortcuts(self):
+        return self._app_desktop_datastore.get_all_shortcuts(force=False)
+
     def set_shortcuts_by_name(self, shortcuts_names):
         self._app_desktop_datastore.set_all_shortcuts_by_name(shortcuts_names)
 

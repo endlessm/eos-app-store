@@ -1,3 +1,5 @@
+import sys
+
 class DesktopPresenter(object):
     def __init__(self, view, model):
         self._model = model
@@ -10,7 +12,7 @@ class DesktopPresenter(object):
         self.refresh_view()
 
     def get_shortcut_by_name(self, shortcut_name):
-        all_shortcuts = self._model.get_shortcuts()
+        all_shortcuts = self._model.get_all_shortcuts()
         for shortcut in all_shortcuts:
             if shortcut_name == shortcut.name():
                 return shortcut
@@ -33,8 +35,7 @@ class DesktopPresenter(object):
             source_shortcut,
             folder_shortcut
             )
-        all_shortcuts = self._model.get_shortcuts(force=True)
-        self._view.refresh(all_shortcuts, self._model.get_page_number(), self._model.get_total_pages(), force=True)
+        self._view.refresh(self._model.get_shortcuts(force=True), self._model.get_page_number(), self._model.get_total_pages(), force=True)
         if success:
             if folder_shortcut is not None:
                 self._view.show_folder_window_by_name(folder_shortcut.name())
@@ -60,7 +61,7 @@ class DesktopPresenter(object):
             right_shortcut
             ):
 
-        all_shortcuts = self._model.get_shortcuts()
+        all_shortcuts = self._model.get_all_shortcuts()
         if source_shortcut.parent() is not None:
             self.relocate_item(source_shortcut, None)
 
@@ -94,7 +95,8 @@ class DesktopPresenter(object):
         self._view.refresh(self._model.get_shortcuts(force=True), self._model.get_page_number(), self._model.get_total_pages())
 
     def rename_shortcut(self, shortcut_obj, new_name):
-        all_shortcuts = self._model.get_shortcuts()
+        all_shortcuts = self._model.get_all_shortcuts()
+
         if not shortcut_obj._name == new_name.strip():
             new_name = self.check_shortcut_name(new_name, all_shortcuts)
             shortcut_obj._name = new_name

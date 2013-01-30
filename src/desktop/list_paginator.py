@@ -35,3 +35,6 @@ class ListPaginator:
         self._list_of_items = list_of_items
         if self._page_index >= self.number_of_pages():
             self._page_index = self.number_of_pages() - 1
+
+    def all_items(self):
+       return self._list_of_items
