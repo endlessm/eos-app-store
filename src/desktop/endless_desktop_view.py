@@ -57,6 +57,8 @@ class EndlessDesktopView(gtk.Window, object):
 
         self._desktop_alignment = gtk.Alignment(0.5, 0.5, 1.0, 1.0)
 
+        self.desktop_vbox = gtk.VBox()
+
         self.add(self._desktop)
         self.show_all()
 

@@ -41,7 +41,7 @@ class BaseDesktop(gtk.VBox):
         self._remove_child(self._icon_holder_widget)
         
         self._icon_holder_widget = icon_holder_widget
-        self.pack_start(self._icon_holder_padding_widget, True, True, 0)
+        self.pack_start(self._icon_holder_widget, True, True, 0)
         
     # Private methods
     def _remove_child(self, child):
