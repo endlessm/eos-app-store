@@ -23,7 +23,6 @@ class DesktopPresenter(object):
         self._model.execute_app(app_key, params)
 
     def move_item(self, shortcuts):
-        print >> sys.stderr, "move item: ", repr(len(shortcuts))
         self._model.set_shortcuts(shortcuts)
         self._view.refresh(self._model.get_shortcuts(force=True), self._model.get_page_number(), self._model.get_total_pages(), force=True)
 
@@ -44,12 +43,9 @@ class DesktopPresenter(object):
         return False
 
     def move_item_right(self, source_shortcut, right_shortcut, all_shortcuts):
-        print >> sys.stderr, "move item: ",source_shortcut, right_shortcut,all_shortcuts
         if source_shortcut in all_shortcuts:
             all_shortcuts.remove(source_shortcut)
-            print >> sys.stderr, "found shortcut: "
         index = all_shortcuts.index(right_shortcut)
-        print >> sys.stderr, "move item right: ",index
         all_shortcuts.insert(index, source_shortcut)
 
     def move_item_left(self, source_shortcut, left_shortcut, all_shortcuts):
