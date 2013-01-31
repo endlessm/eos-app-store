@@ -8,4 +8,4 @@ class AllSettingsPresenter(object):
         self._app_launcher.launch(self.get_path())
         
     def get_path(self):
-        return "/usr/bin/eos-settings"
+        return "/usr/bin/endless-settings"

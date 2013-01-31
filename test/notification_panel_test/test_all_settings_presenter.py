@@ -14,7 +14,7 @@ class TestAllSettingsPresenter(unittest.TestCase):
         pass
 
     def test_launch_settings_launches_settings(self):
-        settings_path = "/usr/bin/eos-settings"
+        settings_path = "/usr/bin/endless-settings"
 
         self.testObject.launch()
 
