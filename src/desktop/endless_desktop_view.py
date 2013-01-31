@@ -24,7 +24,6 @@ gettext.install('endless_desktop', '/usr/share/locale', unicode=True, names=['ng
 gtk.gdk.threads_init()
 
 class EndlessDesktopView(gtk.Window, object):
-    
     _app_shortcuts = {}
 
     def __init__(self):
@@ -32,30 +31,30 @@ class EndlessDesktopView(gtk.Window, object):
         
         width, height = self._get_net_work_area()
         self.resize(width, height)
+
+        self.set_app_paintable(True)
         self.set_can_focus(False)
         self.set_type_hint(gdk.WINDOW_TYPE_HINT_DESKTOP) #@UndefinedVariable
         self.set_decorated(False)
         self.add_events(gtk.gdk.BUTTON_PRESS_MASK)
+
         self.connect('button-press-event', self.unfocus_widget)
         self.connect('destroy', lambda w: gtk.main_quit())
+        self.connect('delete-event', lambda w, e: True) # Prevents <Alt>F4
 
-        # The following prevents propagation of signals that close
-        # the dektop (<Alt>F4)
-        self.connect('delete-event', lambda w, e: True)
-
-        self.maximize()
         self._max_icons_in_row, self._max_rows_in_page = self._calculate_max_icons()
 
-        screen = gtk.gdk.Screen() #@UndefinedVariable
-        screen.connect('size-changed', lambda s: self._set_background(self.BACKGROUND_NAME))
+#        screen = gtk.gdk.Screen() #@UndefinedVariable
+#        screen.connect('size-changed', lambda s: return) # Finish this
 
-        self.set_up_desktop(width)
+        self._set_up_desktop(width)
 
-    def set_up_desktop(self, width):
+    def _set_up_desktop(self, width):
+        self._desktop_page = None
+
         self._taskbar_panel = TaskbarPanel(self, width)
         taskbar_alignment = gtk.Alignment(0.5, 0.5, 1.0, 1.0)
         taskbar_alignment.add(self._taskbar_panel)
-
 
 #self._desktop_alignment = gtk.Alignment(0.5, 0.5, 1.0, 1.0)
 #self.desktop_vbox = gtk.VBox()
@@ -77,23 +76,29 @@ class EndlessDesktopView(gtk.Window, object):
         self._base_desktop = BaseDesktop()
         self._base_desktop.set_taskbar_widget(taskbar_alignment)        
         self._base_desktop.set_main_content_widget(self._main_content)       
-        self._base_desktop.show_all()
 
         self.add(self._base_desktop)
         self.show_all()
 
     def refresh(self, shortcuts, page_number=0, pages=1, force=False):
-        import sys
-        print >> sys.stderr, "Refreshing**************************"
-
 #self.clean_up_legacy_page()
+
         show_page_buttons = pages > 1
         self.left_page_button.set_is_visible(show_page_buttons)
         self.right_page_button.set_is_visible(show_page_buttons)
 
-        desktop_page = DesktopPageView(shortcuts, self._max_icons_in_row, self._create_row)
-        self.icons_alignment.add(desktop_page)
-        desktop_page.show_all()
+        if self._desktop_page:
+            self.icons_alignment.remove(self._desktop_page)
+            self._desktop_page.destroy()
+
+        self._desktop_page = DesktopPageView(shortcuts, self._max_icons_in_row, self._create_row)
+        self.icons_alignment.add(self._desktop_page)
+
+        self._desktop_page.show()
+
+        import sys
+        print >> sys.stderr, "Refreshing**************************"
+
         
 #        def _create_bottom_vbox(self):
 #        vbox = gtk.VBox()
@@ -106,12 +111,6 @@ class EndlessDesktopView(gtk.Window, object):
 #        bottom_vbox.show_all()
 #self.align_and_display_desktop()
 
-#def align_and_display_desktop(self):
-#self.desktop_vbox.show()
-#self._desktop_alignment.add(self.desktop_vbox)
-#self.desktop_vbox.show()
-#self._desktop_alignment.show()
-            
     #TODO: this fixes one symptom of performance and memory leaks by cleaning up callbacks, please refactor
     def clean_up_legacy_page(self):
 #child = self._desktop_alignment.get_child()
@@ -136,42 +135,10 @@ class EndlessDesktopView(gtk.Window, object):
         width, height = self._get_net_work_area()
         image.scale_to_best_fit(width, height)
         
-        pixmap, mask = image.pixbuf.render_pixmap_and_mask()
-
+        pixmap = image.pixbuf.render_pixmap_and_mask()[0]
         self.window.set_back_pixmap(pixmap, False)
-        del pixmap
-        del mask
 
         self.window.invalidate_rect((0, 0, width, height), False)
-
-    def populate_popups(self, all_applications):
-        self.popup = gtk.Menu()
-        apps_menu = gtk.MenuItem(_("Apps"))
-        if (len(all_applications) == 0):
-            apps_menu.set_sensitive(False)
-        else:
-            sub_menu = gtk.Menu()
-            for item in all_applications:
-                menu_item = gtk.MenuItem(item.display_name())
-                menu_item.item = item
-                menu_item.connect("button-release-event", lambda w, e: self._presenter.add_item(w.item))
-                sub_menu.add(menu_item)
-            apps_menu.set_submenu(sub_menu)
-
-        website_menu = gtk.MenuItem(_("Websites"))
-        folder_menu = gtk.MenuItem(_("Folder"))
-
-        website_menu.set_sensitive(False)
-        folder_menu.set_sensitive(False)
-
-        self.popup.add(apps_menu)
-        self.popup.add(website_menu)
-        self.popup.add(folder_menu)
-
-    def _resize_background(self, screen_width, screen_height, pixbuf):
-        image = Image(pixbuf)
-        image.scale_to_best_fit(screen_width, screen_height)
-        return image.pixbuf
 
     def _setup_searchbar(self, parent_container):
         searchbox_holder = gtk.Alignment(0.5, 0.5, 0, 1.0)
