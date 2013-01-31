@@ -3,10 +3,10 @@ from startup.startup_tasks import StartupTasks
 from mock import Mock #@UnresolvedImport
 
 from eos_log import log
-from startup.auto_updates.force_install import ForceInstall
+from endless_core.auto_updates.force_install import ForceInstall
 from startup.remove_extra_directories_task import RemoveExtraDirectoriesTask
 from startup.remove_extra_files_task import RemoveExtraFilesTask
-from startup.auto_updates.update_manager import UpdateManager
+from endless_core.auto_updates.update_manager import UpdateManager
 
 class StartupTasksTest(unittest.TestCase):
 	

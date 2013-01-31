@@ -4,7 +4,7 @@ from mock import Mock
 from notification_panel.battery_presenter import BatteryPresenter
 from notification_panel.battery_view import BatteryView
 from notification_panel.battery_model import BatteryModel
-from ui.abstract_notifier import AbstractNotifier
+from eos_widgets.abstract_notifier import AbstractNotifier
 
 class BatteryPresenterTestCase(unittest.TestCase):
     def setUp(self):

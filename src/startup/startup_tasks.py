@@ -1,5 +1,5 @@
-from endless.auto_updates.update_manager import UpdateManager
-from endless.auto_updates.force_install import ForceInstall
+from endless_core.auto_updates.update_manager import UpdateManager
+from endless_core.auto_updates.force_install import ForceInstall
 from eos_log import log
 
 

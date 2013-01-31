@@ -4,7 +4,7 @@ import os
 from mock import Mock
 from mock import call
 from startup.delete_install_lock_task import DeleteInstallLockTask
-from startup.auto_updates.force_install import ForceInstall
+from endless_core.auto_updates.force_install import ForceInstall
 
 class DeleteInstallLockTaskTest(unittest.TestCase):
     def setUp(self):
