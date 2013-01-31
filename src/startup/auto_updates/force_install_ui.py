@@ -1,4 +1,5 @@
 import gtk
+from ui import glade_ui_elements
 
 class ForceInstallUI():
     def launch_ui(self):

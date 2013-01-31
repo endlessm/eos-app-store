@@ -1,21 +1,24 @@
 from startup.auto_updates.force_install_checker import ForceInstallChecker
 from eos_installer.endless_installer import EndlessInstaller
 from startup.auto_updates.force_install_ui import ForceInstallUI
-from eos_installer.endless_downloader import EndlessDownloader
 from threading import Thread
 from eos_log import log
 from eos_installer import endpoint_provider
 from osapps.os_util import OsUtil
+from startup.auto_updates.update_lock import UpdateLock
 
 class ForceInstall():
+    UPGRADE_LOCK = "/tmp/endless_upgrade.lock" 
+    
     def __init__(self, force_install_checker=ForceInstallChecker(), 
             endless_installer=EndlessInstaller(), 
             force_install_ui=ForceInstallUI(),
-            os_util=OsUtil()):
+            os_util=OsUtil(), update_lock=UpdateLock(UPGRADE_LOCK)):
         self._force_install_checker = force_install_checker
         self._endless_installer = endless_installer
         self._force_install_ui = force_install_ui
         self._os_util = os_util
+        self._update_lock = update_lock
 
     def execute(self):
         if self._force_install_checker.should_force_install():
@@ -26,11 +29,19 @@ class ForceInstall():
 
     def install_in_background(self):
         log.info("launching installer in thread")
-        self._thread = Thread(target=self._background_installation_task)
-        self._thread.start()
-
-        self._force_install_ui.launch_ui()
-
+        
+        if not self._update_lock.is_locked():
+            self._update_lock.acquire()
+            
+            self._thread = Thread(target=self._background_installation_task)
+            self._thread.start()
+    
+            self._force_install_ui.launch_ui()
+            
+            self._update_lock.release()
+        else:
+            log.print_stack("Erroneous upgrade attempted")
+        
     def _background_installation_task(self):
         self._endless_installer.install_all_packages()
 

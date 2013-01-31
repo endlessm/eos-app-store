@@ -84,6 +84,7 @@ class ShortcutCategoryBox(gtk.EventBox):
             label = gtk.Label()
             label.set_markup(markup)
             label.set_alignment(0, 0.5)
+            label.uat_id = section.category.lower() + "_tab"
             hbox.pack_start(label, True, True, 20)
             vbox.pack_start(image_start)
             vbox.pack_start(hbox, True, True, 15)
@@ -92,8 +93,12 @@ class ShortcutCategoryBox(gtk.EventBox):
                     if category.active:
                         self._active_subcategory = category.category
             
-            if section.subcategories and section.active:
-                self._fill_subcategories(section, vbox)
+            # For now, we only support a single subcategory,
+            # so hide the display of the word "ALL"
+            # Re-enable the lines below once subcategory support
+            # is added back into the design.
+            # if section.subcategories and section.active:
+            #     self._fill_subcategories(section, vbox)
             
             vbox.pack_end(image_end)
             box.add(vbox)

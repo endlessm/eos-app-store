@@ -8,7 +8,10 @@ from eos_widgets.desktop_transparent_window import DesktopTransparentWindow
 from add_website_box import AddWebsiteBox
 import cairo
 from eos_util import image_util
+from eos_util import screen_util
 
+import sys
+import gc
 class AddShortcutsView():
     def __init__(self, parent=None, width=0, height=0):
         self._add_button_box_width = 120
@@ -39,8 +42,11 @@ class AddShortcutsView():
         self.event_box = gtk.EventBox()
         self.event_box.set_visible_window(False)
         self.event_box.connect('button-press-event', self.destroy)
-        self.event_box.add(self.add_remove_vbox)
+        self.event_box.uat_id = 'close_app_store'
+        self.event_box.uat_offset = (0, -50)
         
+        self.event_box.add(self.add_remove_vbox)
+
         self.hbox1 = gtk.HBox()
         self.hbox1.set_size_request(self._tree_view_width, self._height)
 
@@ -50,8 +56,8 @@ class AddShortcutsView():
         self.hbox1.pack_start(self.tree)
         self.hbox2 = gtk.HBox()
         self.hbox2.set_size_request(self._width - self._tree_view_width - self._add_button_box_width, self._height)
-        
-        self.scrolled_window = AddFolderBox(self)
+
+        self.scrolled_window = AddApplicationBox(self, self._presenter, screen_util.get_width(self._parent), screen_util.get_height(self._parent))
         self.hbox2.pack_start(self.scrolled_window)
         self.scrolled_window.show()
         self.hbox.pack_start(self.event_box)
@@ -59,6 +65,18 @@ class AddShortcutsView():
         self.hbox.pack_end(self.hbox2)
         self.window.add(self.hbox)
         self.show()
+
+    @property
+    def add_button_box_width(self):
+        return self._add_button_box_width
+
+    @property
+    def tree_view_width(self):
+        return self._tree_view_width
+
+    @property
+    def parent(self):
+        return self._parent
 
     def show(self):
         self.window.show_all()
@@ -71,16 +89,16 @@ class AddShortcutsView():
         
     def create_folder(self, folder_name, image_file):
         self._presenter.create_directory(folder_name, image_file)
-    
+
     def install_app(self, application_model):
         shortcut = self._presenter.build_shortcut_from_application_model(application_model)
         self._presenter.install_app(application_model)
         self.install_shortcut(shortcut)
-    
+
     def install_site(self, link_model):
         shortcut = self._presenter.build_shortcut_from_link_model(link_model)
         self.install_shortcut(shortcut)
-    
+
     def install_shortcut(self, shortcut):
         self._presenter.add_shortcut(shortcut)
     
@@ -94,19 +112,22 @@ class AddShortcutsView():
         ctx.set_source_surface(image_surface)
         ctx.paint()
         ctx.restore()
-    
+
     def set_scrolled_window(self, widget):
-        self.hbox2.remove(self.hbox2.get_children()[0])
+        old_widget = self.hbox2.get_children()[0]
+        self.hbox2.remove(old_widget)
+        old_widget.destroy()
+
         self.scrolled_window = widget
-        self.hbox2.pack_start(self.scrolled_window)        
+        self.hbox2.pack_start(self.scrolled_window)
         self.scrolled_window.show()
-    
+
     def set_add_shortcuts_box(self, category, subcategory=''):
         if category == _('APP'):
-            widget = AddApplicationBox(self, default_category=subcategory)
+            widget = AddApplicationBox(self, self._presenter, screen_util.get_width(self._parent), screen_util.get_height(self._parent), default_category=subcategory)
         elif category == _('WEB'):
             widget = AddWebsiteBox(self)
         else:
             widget = AddFolderBox(self)
-        
+
         self.set_scrolled_window(widget)

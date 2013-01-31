@@ -7,7 +7,7 @@ class AddShortcutsModel():
 
     def get_category_data(self):
         data = []
-        section_app = ShortcutCategory(_('APP'))
+        section_app = ShortcutCategory(_('APP'), True)
 #        section_app.subcategories = [ShortcutCategory(_('POPULAR')),
 #                                     ShortcutCategory(_('PRODUCTIVITY')),
 #                                     ShortcutCategory(_('ENTERTAINMENT')),
@@ -17,7 +17,7 @@ class AddShortcutsModel():
 #                                     ShortcutCategory(_('SOCIAL')),
 #                                     ShortcutCategory(_('MY TOWN'))]
         section_web = ShortcutCategory(_('WEB'))
-        section_folder = ShortcutCategory(_('FOLDER'), True)
+        section_folder = ShortcutCategory(_('FOLDER'))
 
         data.append(section_app)
         data.append(section_web)
@@ -34,7 +34,7 @@ class AddShortcutsModel():
         #        os.makedirs(full_path)
         #        return full_path
         #    except:
-        #        print 'ERROR occured while trying to make directory', full_path
+        #        print 'ERROR occurred while trying to make directory', full_path
         #        return ''
 
     def get_folder_icons(self, path, prefix='', suffix=''):

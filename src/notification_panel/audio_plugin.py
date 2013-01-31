@@ -6,10 +6,11 @@ from icon_plugin import IconPlugin
 
 class AudioSettingsPlugin(IconPlugin, threading.Thread):
     COMMAND = 'gnome-control-center --class=eos-audio-manager sound'
-    ICON_NAMES = ['audio-volume-muted.png',
-                  'audio-volume-low.png',
-                  'audio-volume-medium.png',
-                  'audio-volume-high.png']
+    # TODO add hover/down states
+    ICON_NAMES = ['volume-muted_normal.png',
+                  'volume-low_normal.png',
+                  'volume-medium_normal.png',
+                  'volume-high_normal.png']
 
     VOLUME_MUTED = 0
     VOLUME_LOW = 1
@@ -19,6 +20,8 @@ class AudioSettingsPlugin(IconPlugin, threading.Thread):
     VOLUME_THRESH_LOW = 55
     VOLUME_THRESH_HIGH = 85
     
+    HORIZONTAL_MARGIN = 6
+    
     card_index = 0
     
     def __init__(self, icon_size):
@@ -26,7 +29,9 @@ class AudioSettingsPlugin(IconPlugin, threading.Thread):
         if AudioSettingsPlugin.is_plugin_enabled():
             self._volume = self._get_volume()
             super(AudioSettingsPlugin, self).__init__(icon_size, self.ICON_NAMES, self.COMMAND, self._volume)
+            self.set_margin(self.HORIZONTAL_MARGIN)
             self._init_thread()
+            
 
     @staticmethod
     def is_plugin_enabled():

@@ -3,7 +3,7 @@
   <requires lib="gtk+" version="2.16"/>
   <!-- interface-naming-policy toplevel-contextual -->
   <object class="GtkTextBuffer" id="Bugbuffer1">
-    <property name="text" translatable="yes">Please let us know how the problem occured and we will resolve it as soon as possible.</property>
+    <property name="text" translatable="yes">Please let us know how the problem occurred and we will resolve it as soon as possible.</property>
   </object>
   <object class="GtkAction" id="action1"/>
   <object class="GtkWindow" id="main_window">

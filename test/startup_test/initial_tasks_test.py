@@ -7,11 +7,11 @@ import os.path
 from startup.shotwell_tasks import ShotwellTasks
 from startup.beatbox_tasks import BeatboxTasks
 from startup.windows_migration_tasks import WindowsMigrationTasks
-from startup.delete_desktop_state_task import DeleteDesktopStateTask
 from startup.remove_extra_directories_task import RemoveExtraDirectoriesTask
 from startup.remove_extra_files_task import RemoveExtraFilesTask
 
 from eos_log import log
+from startup.delete_install_lock_task import DeleteInstallLockTask
 
 class InitialTasksTest(unittest.TestCase):
     ENDLESS_DIR = os.path.expanduser("~/.endlessm")
@@ -33,7 +33,7 @@ class InitialTasksTest(unittest.TestCase):
         test_object = InitialTasks()
 
         self.assertEquals(6, len(test_object.TASK_PLUGINS))
-        self.assertIsInstance(test_object.TASK_PLUGINS[0](), DeleteDesktopStateTask)
+        self.assertIsInstance(test_object.TASK_PLUGINS[0](), DeleteInstallLockTask)
         self.assertIsInstance(test_object.TASK_PLUGINS[1](), ShotwellTasks)
         self.assertIsInstance(test_object.TASK_PLUGINS[2](), BeatboxTasks)
         self.assertIsInstance(test_object.TASK_PLUGINS[3](), WindowsMigrationTasks)

@@ -1,59 +1,11 @@
-from all_settings_view import AllSettingsView
-from all_settings_model import AllSettingsModel
-from background_chooser_launcher import BackgroundChooserLauncher
+from osapps.app_launcher import AppLauncher
 
-class AllSettingsPresenter():
-    def __init__(self, view, model, backgroundChooserLauncher=BackgroundChooserLauncher()):
-        view.add_listener(AllSettingsView.DESKTOP_BACKGROUND, 
-                lambda: self._desktop_background(view, model, backgroundChooserLauncher))
-        view.add_listener(AllSettingsView.UPDATE_SOFTWARE, 
-                lambda: self._update_software(view, model))
-        view.add_listener(AllSettingsView.SETTINGS, 
-                lambda: self._open_settings(view, model))
-        view.add_listener(AllSettingsView.LOGOUT, lambda: self._logout(view, model))
-        view.add_listener(AllSettingsView.RESTART, lambda: self._restart(view, model))
-        view.add_listener(AllSettingsView.SHUTDOWN, lambda: self._shutdown(view, model))
-        
-        model.add_listener(AllSettingsModel.UPDATE_LOCK, lambda: self._modify_update_button(view, model))
-        model.add_listener(AllSettingsModel.UPDATE_STARTED, lambda: self._inform_user_of_update(view, model))
+class AllSettingsPresenter(object):
+    def __init__(self, app_launcher=AppLauncher()):
+        self._app_launcher = app_launcher
 
-        self._modify_update_button(view, model)
+    def launch(self):
+        self._app_launcher.launch(self.get_path())
         
-        view.set_current_version(model.get_current_version())
-        view.display()
-
-    def _modify_update_button(self, view, model):
-        if model.can_update():
-            view.enable_update_button()
-        else:
-            view.disable_update_button()
-
-    def _update_software(self, view, model):
-        view.hide_window()
-        model.update_software()
-
-    def _inform_user_of_update(self, view, model):
-        view.inform_user_of_update()
-
-    def _open_settings(self, view, model):
-        view.hide_window()
-        model.open_settings()
-        
-    def _desktop_background(self, view, model, backgroundChooserLauncher):
-        view.hide_window()
-        backgroundChooserLauncher.launch(view)
-        
-    def _logout(self, view, model):
-        view.hide_window()
-        if view.confirm(AllSettingsView.LOGOUT_MESSAGE):
-            model.logout()
-        
-    def _restart(self, view, model):
-        view.hide_window()
-        if view.confirm(AllSettingsView.RESTART_MESSAGE):
-            model.restart()
-        
-    def _shutdown(self, view, model):
-        view.hide_window()
-        if view.confirm(AllSettingsView.SHUTDOWN_MESSAGE):
-            model.shutdown()
+    def get_path(self):
+        return "/usr/bin/eos-settings"

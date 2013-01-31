@@ -7,6 +7,10 @@ from notification_panel_config import NotificationPanelConfig
 from notification_plugin import NotificationPlugin
 
 class IconPlugin(NotificationPlugin):
+
+    # TODO Properly center vertically within taskbar; for now, we hard-code an offset
+    CENTER_Y_OFFSET = 9
+    
     def __init__(self, icon_size, icon_names, command, init_index = 0):
         super(IconPlugin, self).__init__(command)
 
@@ -20,7 +24,7 @@ class IconPlugin(NotificationPlugin):
         index = 0
         for icon_name in icon_names:
             pixbuf = load_pixbuf(icon_name)
-            self._scaled_pixbufs[index] = pixbuf.scale_simple(icon_size, icon_size, gdk.INTERP_BILINEAR)
+            self._scaled_pixbufs[index] = pixbuf
             index += 1
 
             del pixbuf
@@ -50,12 +54,12 @@ class IconPlugin(NotificationPlugin):
         widget_area = widget.get_allocation()
 
         # Draw shadow
-        cr.set_source_pixbuf(self._scaled_pixbufs[self._index], widget_area.x + self._horizontal_margin + self.SHADOW_OFFSET, widget_area.y + self.SHADOW_OFFSET)
+        cr.set_source_pixbuf(self._scaled_pixbufs[self._index], widget_area.x + self._horizontal_margin + self.SHADOW_OFFSET, widget_area.y + self.CENTER_Y_OFFSET + self.SHADOW_OFFSET)
         cr.set_operator(cairo.OPERATOR_DEST_OUT);
         cr.paint_with_alpha(NotificationPanelConfig.SHADOW_ALPHA)
 
         # Draw icon
-        cr.set_source_pixbuf(self._scaled_pixbufs[self._index], widget_area.x + self._horizontal_margin, widget_area.y)
+        cr.set_source_pixbuf(self._scaled_pixbufs[self._index], widget_area.x + self._horizontal_margin, widget_area.y + self.CENTER_Y_OFFSET)
         cr.set_operator(cairo.OPERATOR_ATOP);
         cr.paint()
 

@@ -1,5 +1,6 @@
 import gettext
 import gtk
+import datetime
 
 from icon_plugin import IconPlugin
 from panel_constants import PanelConstants
@@ -10,17 +11,22 @@ gettext.install('endless_desktop', '/usr/share/locale', unicode = True, names=['
 
 class BatteryView(AbstractNotifier, IconPlugin):
     X_OFFSET = 13
+    
     WINDOW_WIDTH = 330
     WINDOW_HEIGHT = 160
     SMALLER_HEIGHT = 100
     WINDOW_BORDER = 10
     
-    HORIZONTAL_MARGIN = 4
+    HORIZONTAL_MARGIN = 3
     
     POWER_SETTINGS = "power_settings"
 
-    ICON_NAMES = ['battery_charging.png','battery_empty.png', 'battery_10.png', 'battery_25.png', 'battery_60.png', 'battery_full.png']
+    # TODO Add hover and down states
+    ICON_NAMES = ['battery_charging_normal.png','battery_zero_normal.png', 'battery_30_normal.png', 'battery_60_normal.png', 'battery_full_normal.png']
      
+    _last_focus_out = datetime.datetime.min
+    _focus_out_period = datetime.timedelta(milliseconds=250)
+
     def __init__(self, parent, icon_size):
         super(BatteryView, self).__init__(icon_size, self.ICON_NAMES, None)
        
@@ -53,16 +59,14 @@ class BatteryView(AbstractNotifier, IconPlugin):
     def _set_battery_image(self, level, is_charging):
         if is_charging:
             self._set_index(0)
-        elif level < 5:
+        elif level < 10:
             self._set_index(1)
-        elif level < 15:
-            self._set_index(2)    
-        elif level < 30:
-            self._set_index(3)
+        elif level < 40:
+            self._set_index(2)
         elif level < 75:
-            self._set_index(4)
+            self._set_index(3)
         else:
-            self._set_index(5)
+            self._set_index(4)
         
     def _create_menu(self):
         self._button_power_settings = gtk.Button(_('Power Settings'))
@@ -112,6 +116,11 @@ class BatteryView(AbstractNotifier, IconPlugin):
             self._vbox.remove(component)
 
     def display_menu(self, level, time):
+        # If we just had the focus out event (within the focus out period),
+        # don't display the menu, as it was most likely due to clicking
+        # on the battery icon to close the menu.
+        if (datetime.datetime.now() - BatteryView._last_focus_out) < BatteryView._focus_out_period:
+            return
         
         # In order to ensure we read the current background for the transparency,
         # let's always re-create the menu here.
@@ -130,10 +139,6 @@ class BatteryView(AbstractNotifier, IconPlugin):
         self._percentage_label.set_text(str(level)+'%')
         self._remove_if_exists(self._time_to_depletion_label)
 
-        desktop_size = self._parent.get_toplevel().get_size()    
-        x = desktop_size[0] - self.WINDOW_WIDTH - self.X_OFFSET
-        y = PanelConstants.DEFAULT_POPUP_VERTICAL_MARGIN
-
         height = 0
         if time:
             if self._charging:
@@ -147,13 +152,25 @@ class BatteryView(AbstractNotifier, IconPlugin):
         else:
             height = self.SMALLER_HEIGHT
 
-        self._window.set_location((x, y))
+        self._window.set_location(self._calc_window_location())
         self._window.set_size_request(self.WINDOW_WIDTH, height)
 
         self._window.show_all()
         self.display()
 
-    # TODO make the triangle position configurable
+    def _calc_window_location(self):
+        desktop_size_x, desktop_size_y = self._parent.get_toplevel().get_size()    
+        x = desktop_size_x - self.WINDOW_WIDTH - self.X_OFFSET
+        y = desktop_size_y - self.WINDOW_HEIGHT
+        return (x, y)
+
+    def _calc_triangle_location(self):
+        window_x = self._calc_window_location()[0]
+        icon_x = self._parent.get_allocation().x
+        icon_width = self._parent.get_allocation().width
+        
+        return icon_x + (icon_width / 2) - window_x, self.SMALLER_HEIGHT
+
     def _expose(self, widget, event):
         cr = widget.window.cairo_create()
 
@@ -161,10 +178,10 @@ class BatteryView(AbstractNotifier, IconPlugin):
         # Use the same color as the default event box background
         # TODO eliminate need for these "magic" numbers
         cr.set_source_rgba(0xf2/255.0, 0xf1/255.0, 0xf0/255.0, 1.0)
-        self._pointer = 110
-        cr.move_to(self._pointer, 0)
-        cr.line_to(self._pointer + 10, 10)
-        cr.line_to(self._pointer - 10, 10)
+        start_x, start_y = self._calc_triangle_location()
+        cr.move_to(start_x, start_y)
+        cr.line_to(start_x - 10, start_y - 10)
+        cr.line_to(start_x + 10, start_y - 10)
         cr.fill()
         return False
 
@@ -174,6 +191,8 @@ class BatteryView(AbstractNotifier, IconPlugin):
         self._window.set_focus(self._window)
 
     def hide_window(self):
+        # Keep track of when the focus out event occurred most recently
+        BatteryView._last_focus_out = datetime.datetime.now()
+        
         self._window.set_visible(False)
         self._window.hide()
-

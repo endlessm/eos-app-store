@@ -1,9 +1,9 @@
 [Desktop Entry]
 Version=1.0
 Type=Application
-Name=qBittorrent
-Name[en_US]=qBittorrent
-Name[pt_BR]=qBittorrent
+Name=BitTorrent
+Name[en_US]=BitTorrent
+Name[pt_BR]=BitTorrent
 Comment=qBittorrent
 TryExec=qbittorrent %U
 Exec=qbittorrent %U

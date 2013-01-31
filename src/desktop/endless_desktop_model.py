@@ -1,23 +1,28 @@
-import sys
 from eos_util import image_util
-from osapps.app_shortcut import AppShortcut
 from eos_log import log
 from application_store.installed_applications_model import InstalledApplicationsModel
+from desktop.list_paginator import ListPaginator
 
 class EndlessDesktopModel(object):
-    def __init__(self, app_desktop_datastore, preferences_provider, app_datastore, app_launcher, feedback_manager, time_provider, installed_app_model=InstalledApplicationsModel()):
+    def __init__(self, app_desktop_datastore, preferences_provider, app_datastore, app_launcher, installed_app_model=InstalledApplicationsModel(), paginator=ListPaginator(page_size=27)):
         self._app_launcher = app_launcher
-        self._feedback_manager = feedback_manager
-        self._time_provider = time_provider
         self._app_desktop_datastore = app_desktop_datastore
         self._app_datastore = app_datastore
         self._preferences_provider = preferences_provider
         self._installed_applications_model = installed_app_model
+        self._paginator = paginator
 
     def get_shortcuts(self):
-        return self._app_desktop_datastore.get_all_shortcuts()
+        return self._get_page(self._app_desktop_datastore.get_all_shortcuts())
 
     def get_shortcuts_from_cache(self):
+        return self._get_page(self._app_desktop_datastore.get_all_shortcuts_from_cache())
+
+    def _get_page(self, all_shortcuts):
+        self._paginator.adjust_list_of_items(all_shortcuts)
+        return self._paginator.current_page()
+
+    def get_all_shortcuts(self):
         return self._app_desktop_datastore.get_all_shortcuts_from_cache()
 
     def set_shortcuts_by_name(self, shortcuts_names):
@@ -69,13 +74,6 @@ class EndlessDesktopModel(object):
 
     def execute_app(self, app_key, params):
         self._app_launcher.launch_desktop(app_key, params)
-
-    def submit_feedback(self, message, bug):
-        data = {"message":message, "timestamp":self._time_provider.get_current_time(), "bug":bug}
-        self._feedback_manager.write_data(data)
-
-    def launch_search(self, search_string):
-        self._app_launcher.launch_browser(search_string)
 
     def set_background(self, filename):
         new_image_path = image_util.image_path(filename)
@@ -137,4 +135,18 @@ class EndlessDesktopModel(object):
         except Exception as e:
             log.error("no shortcut on desktop!", e)
         return False
+    
+    def get_page_number(self):
+        return self._paginator.current_page_number()
+    
+    def next_page(self):
+        self._paginator.next()
 
+    def previous_page(self):
+        self._paginator.prev()
+        
+    def go_to_page(self, page_index):
+        self._paginator.go_to_page(page_index)
+        
+    def get_total_pages(self):
+        return self._paginator.number_of_pages()
