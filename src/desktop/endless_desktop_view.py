@@ -19,6 +19,8 @@ from desktop_page.desktop_page_view import DesktopPageView
 from search.search_box import SearchBox
 from desktop.base_desktop import BaseDesktop
 from desktop_nav_button import DesktopNavButton
+from ui.padding_widget import PaddingWidget
+from desktop_page.button import Button
 
 gettext.install('endless_desktop', '/usr/share/locale', unicode=True, names=['ngettext'])
 gtk.gdk.threads_init()
@@ -45,7 +47,7 @@ class EndlessDesktopView(gtk.Window, object):
         self._max_icons_in_row, self._max_rows_in_page = self._calculate_max_icons()
 
 #        screen = gtk.gdk.Screen() #@UndefinedVariable
-#        screen.connect('size-changed', lambda s: return) # Finish this
+#        screen.connect('size-changed', lambda s: return) # TODO refresh background and screen content
 
         self._set_up_desktop(width)
 
@@ -53,15 +55,12 @@ class EndlessDesktopView(gtk.Window, object):
         self._desktop_page = None
 
         self._taskbar_panel = TaskbarPanel(self, width)
-        taskbar_alignment = gtk.Alignment(0.5, 0.5, 1.0, 1.0)
+        taskbar_alignment = PaddingWidget(0.5, 0.5, 1.0, 1.0)
         taskbar_alignment.add(self._taskbar_panel)
-
-#self._desktop_alignment = gtk.Alignment(0.5, 0.5, 1.0, 1.0)
-#self.desktop_vbox = gtk.VBox()
 
         self.desktop_container = gtk.HBox(False, spacing=0)
 
-        self._main_content = gtk.Alignment(1.0, 0.5, 1.0, 0.0)
+        self._main_content = PaddingWidget(1.0, 0.5, 1.0, 0.0)
         self._main_content.add(self.desktop_container)
 
         self.left_page_button = DesktopNavButton('left', lambda w:self._presenter.previous_desktop())
@@ -75,6 +74,8 @@ class EndlessDesktopView(gtk.Window, object):
 
         self._base_desktop = BaseDesktop()
         self._base_desktop.set_taskbar_widget(taskbar_alignment)        
+        self._base_desktop.set_page_buttons_widget(PaddingWidget(0.5, 0.5, 1.0, 0.0))
+        self._base_desktop.set_searchbar_widget(self._create_searchbar())        
         self._base_desktop.set_main_content_widget(self._main_content)       
 
         self.add(self._base_desktop)
@@ -95,8 +96,20 @@ class EndlessDesktopView(gtk.Window, object):
 
         self._desktop_page.show()
 
+        self._update_bottom_page_buttons(self._base_desktop.get_page_buttons_widget(), page_number, pages, show_page_buttons)
+        self._base_desktop.recalculate_padding()
+
         import sys
         print >> sys.stderr, "Refreshing**************************"
+
+    def _create_searchbar(self):
+        searchbox_holder = PaddingWidget(0.5, 0.0, 0, 1.0)
+        middle_point = 60
+        searchbox_holder.set_padding(0, middle_point, 0, 0)
+        searchbox = SearchBox()
+        searchbox_holder.add(searchbox)
+
+        return searchbox_holder
 
     def unfocus_widget(self, widget, event):
         widget.set_focus(None)
@@ -118,21 +131,17 @@ class EndlessDesktopView(gtk.Window, object):
 
         self.window.invalidate_rect((0, 0, width, height), False)
 
-    def _setup_searchbar(self, parent_container):
-        searchbox_holder = gtk.Alignment(0.5, 0.5, 0, 1.0)
-        searchbox_holder.set_padding(60, 0, 0, 0)
-        searchbox = SearchBox()
-        searchbox_holder.add(searchbox)
-        parent_container.add(searchbox_holder)
-
-    def setup_bottom_page_buttons(self, parent_container, page_number, pages, hide_page_buttons):
-        self.bottom_hbox = gtk.HBox(spacing=7)
-        wrapper = gtk.Alignment(0.5, 0.5, 0.0, 0.0)
-        wrapper.set_size_request(0, 39)
-        wrapper.add(self.bottom_hbox)
-        wrapper.show()
+    def _update_bottom_page_buttons(self, parent_container, page_number, pages, show_page_buttons):
+        if hasattr(self,'_page_buttons_wrapper'):
+            parent_container.remove(self._page_buttons_wrapper)
+            self._page_buttons_wrapper.destroy()
+        page_buttons_holder = gtk.HBox(spacing=7)
+        self._page_buttons_wrapper = PaddingWidget(0.5, 0.5, 0.0, 0.0)
+        self._page_buttons_wrapper.set_size_request(0, 39)
+        self._page_buttons_wrapper.add(page_buttons_holder)
+        self._page_buttons_wrapper.show()
         
-        self._page_buttons = []
+        page_buttons = []
         
         for page_num in range(0, pages): 
             btn = Button(
@@ -140,23 +149,25 @@ class EndlessDesktopView(gtk.Window, object):
                 hover=(Image.from_name("button_mini_desktop__hover_active.png"), ), 
                 down=(Image.from_name("button_mini_desktop_down.png"), ), 
                 select=(Image.from_name("button_mini_desktop__active.png"), ), 
-                invisible=hide_page_buttons)
-            self._page_buttons.append(btn)
-            btn.connect("clicked", self.desktop_page_navigate)
-            #btn.modify_bg(gtk.STATE_NORMAL, gtk.gdk.Color(65535,0,0))
+                invisible=not show_page_buttons)
+            page_buttons.append(btn)
+
+            def create_callback(index):
+                    return lambda w: self.desktop_page_navigate(index)
+            btn.connect("clicked", create_callback(page_num))
+
             btn.set_size_request(21, 13)
-            self.bottom_hbox.pack_start(btn, expand=False, fill=False, padding=0)
+            page_buttons_holder.pack_start(btn, expand=False, fill=False, padding=0)
         
-        for button in self._page_buttons:
+        for button in page_buttons:
             button.unselected()
         
-        self._page_buttons[page_number - 1].selected()
-        parent_container.pack_end(wrapper, expand=False, fill=False, padding=0)
-        self.bottom_hbox.show_all()
-    
+        page_buttons[page_number - 1].selected()
+        parent_container.add(self._page_buttons_wrapper)
+        page_buttons_holder.show_all()
         
-    def desktop_page_navigate(self, widget):
-        self._presenter.desktop_page_navigate(self._page_buttons.index(widget) + 1)
+    def desktop_page_navigate(self, index):
+        self._presenter.desktop_page_navigate(index + 1)
 
     def _add_icon_clicked_callback(self, widget, event):
         self.popup.show_all()

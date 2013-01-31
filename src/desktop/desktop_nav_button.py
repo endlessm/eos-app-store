@@ -1,7 +1,7 @@
 import gtk
 
 from eos_util.image import Image
-from desktop_page.responsive import Button
+from desktop_page.button import Button
 
 class DesktopNavButton(gtk.Alignment):
     def __init__(self, img_id, on_click):
