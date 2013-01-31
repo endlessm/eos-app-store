@@ -166,7 +166,7 @@ class TestEndlessDesktopPresenter(unittest.TestCase):
 
     def test_rearrange_shortcuts_left_destination(self):
         all_shortcuts = Mock()
-        self.testObject._model.get_shortcuts = Mock(return_value=all_shortcuts)
+        self.testObject._model.get_shortcuts_from_cache = Mock(return_value=all_shortcuts)
         source_shortcut = Mock()
         source_shortcut.parent = Mock(return_value = None)
         left_shortcut = Mock()
@@ -182,7 +182,7 @@ class TestEndlessDesktopPresenter(unittest.TestCase):
 
     def test_rearrange_shortcuts_right_destination(self):
         all_shortcuts = Mock()
-        self.testObject._model.get_shortcuts = Mock(return_value=all_shortcuts)
+        self.testObject._model.get_shortcuts_from_cache = Mock(return_value=all_shortcuts)
         source_shortcut = Mock()
         source_shortcut.parent = Mock(return_value = None)
         right_shortcut = Mock()

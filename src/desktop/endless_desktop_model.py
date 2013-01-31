@@ -15,10 +15,10 @@ class EndlessDesktopModel(object):
         self._installed_applications_model = installed_app_model
 
     def get_shortcuts(self):
-        return self._app_desktop_datastore.get_all_shortcuts(force=True)
+        return self._app_desktop_datastore.get_all_shortcuts()
 
     def get_shortcuts_from_cache(self):
-        return self._app_desktop_datastore.get_all_shortcuts(force=False)
+        return self._app_desktop_datastore.get_all_shortcuts_from_cache()
 
     def set_shortcuts_by_name(self, shortcuts_names):
         self._app_desktop_datastore.set_all_shortcuts_by_name(shortcuts_names)
@@ -88,7 +88,7 @@ class EndlessDesktopModel(object):
         return self._preferences_provider.get_default_background()
 
     def delete_shortcut(self, shortcut):
-        all_shortcuts = self._app_desktop_datastore.get_all_shortcuts()
+        all_shortcuts = self._app_desktop_datastore.get_all_shortcuts_from_cache()
         parent = shortcut.parent()
 
         success = False

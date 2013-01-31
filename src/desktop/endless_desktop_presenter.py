@@ -60,7 +60,7 @@ class DesktopPresenter(object):
             right_shortcut
             ):
             
-        all_shortcuts = self._model.get_shortcuts()
+        all_shortcuts = self._model.get_shortcuts_from_cache()
         if source_shortcut.parent() is not None:
             self.relocate_item(source_shortcut, None)
             
