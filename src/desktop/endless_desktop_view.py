@@ -44,8 +44,6 @@ class EndlessDesktopView(gtk.Window, object):
         self.connect('delete-event', lambda w, e: True)
 
         self.maximize()
-        self.set_app_paintable(True)
-
         self._max_icons_in_row, self._max_rows_in_page = self._calculate_max_icons()
 
         screen = gtk.gdk.Screen() #@UndefinedVariable
@@ -58,15 +56,14 @@ class EndlessDesktopView(gtk.Window, object):
         taskbar_alignment = gtk.Alignment(0.5, 0.5, 1.0, 1.0)
         taskbar_alignment.add(self._taskbar_panel)
 
-        self._desktop = BaseDesktop()
-        self._desktop.set_taskbar_widget(taskbar_alignment)        
 
-        self._desktop_alignment = gtk.Alignment(0.5, 0.5, 1.0, 1.0)
-        self.desktop_vbox = gtk.VBox()
+#self._desktop_alignment = gtk.Alignment(0.5, 0.5, 1.0, 1.0)
+#self.desktop_vbox = gtk.VBox()
 
         self.desktop_container = gtk.HBox(False, spacing=0)
-        self.desktop_container_wraper = gtk.Alignment(1.0, 0.5, 1.0, 0.0)
-        self.desktop_container_wraper.add(self.desktop_container)
+
+        self._main_content = gtk.Alignment(1.0, 0.5, 1.0, 0.0)
+        self._main_content.add(self.desktop_container)
 
         self.left_page_button = DesktopNavButton('left', lambda w:self._presenter.previous_desktop())
         self.right_page_button = DesktopNavButton('right', lambda w:self._presenter.next_desktop())
@@ -74,48 +71,54 @@ class EndlessDesktopView(gtk.Window, object):
         self.desktop_container.pack_start(self.left_page_button, expand=False, fill=False, padding=0)
         self.desktop_container.pack_end(self.right_page_button, expand=False, fill=False, padding=0)
 
-        self.add(self._desktop)
+        self.icons_alignment = gtk.Alignment(0.5, 0.5, 0.0, 0.0)
+        self.desktop_container.pack_start(self.icons_alignment, expand=True, fill=True, padding=0)
+
+        self._base_desktop = BaseDesktop()
+        self._base_desktop.set_taskbar_widget(taskbar_alignment)        
+        self._base_desktop.set_main_content_widget(self._main_content)       
+        self._base_desktop.show_all()
+
+        self.add(self._base_desktop)
         self.show_all()
 
-    def add_widgets_to_desktop(self, shortcuts):
-        desktop_page = DesktopPageView(shortcuts, self._max_icons_in_row, self._create_row)
-
-        self.icons_alignment = gtk.Alignment(0.5, 0.5, 0.0, 0.0)
-        self.icons_alignment.add(desktop_page)
-
-        self.desktop_container.pack_start(self.icons_alignment, expand=True, fill=True, padding=0)
-        
-        self._desktop.set_icon_holder_widget(self.desktop_container_wraper)       
-        self._desktop.show_all()
-
     def refresh(self, shortcuts, page_number=0, pages=1, force=False):
-        self.clean_up_legacy_page()
+        import sys
+        print >> sys.stderr, "Refreshing**************************"
+
+#self.clean_up_legacy_page()
         show_page_buttons = pages > 1
-        
         self.left_page_button.set_is_visible(show_page_buttons)
         self.right_page_button.set_is_visible(show_page_buttons)
 
-        self.add_widgets_to_desktop(shortcuts)
+        desktop_page = DesktopPageView(shortcuts, self._max_icons_in_row, self._create_row)
+        self.icons_alignment.add(desktop_page)
+        desktop_page.show_all()
+        
+#        def _create_bottom_vbox(self):
+#        vbox = gtk.VBox()
+#        self.desktop_vbox.pack_end(vbox, expand=True, fill=True, padding=0)
+#        vbox.show()
+#        return vbox
 #        bottom_vbox = self._create_bottom_vbox()
 #        self._setup_searchbar(bottom_vbox)
 #        self.setup_bottom_page_buttons(bottom_vbox, page_number, pages, hide_page_buttons)
 #        bottom_vbox.show_all()
-        self.align_and_display_desktop()
+#self.align_and_display_desktop()
 
-    def align_and_display_desktop(self):
-        self.desktop_vbox.show()
-        self._desktop_alignment.add(self.desktop_vbox)
-        self.desktop_vbox.show()
-        self._desktop_alignment.show()
+#def align_and_display_desktop(self):
+#self.desktop_vbox.show()
+#self._desktop_alignment.add(self.desktop_vbox)
+#self.desktop_vbox.show()
+#self._desktop_alignment.show()
             
     #TODO: this fixes one symptom of performance and memory leaks by cleaning up callbacks, please refactor
     def clean_up_legacy_page(self):
-        child = self._desktop_alignment.get_child()
-        if child:
-            child.parent.remove(child)
-            child.destroy()
-            del child
-        
+#child = self._desktop_alignment.get_child()
+#if child:
+#child.parent.remove(child)
+#child.destroy()
+#del child
         DesktopShortcut._clear_callbacks()
         
     def unfocus_widget(self, widget, event):
@@ -206,11 +209,6 @@ class EndlessDesktopView(gtk.Window, object):
         parent_container.pack_end(wrapper, expand=False, fill=False, padding=0)
         self.bottom_hbox.show_all()
     
-    def _create_bottom_vbox(self):
-        vbox = gtk.VBox()
-        self.desktop_vbox.pack_end(vbox, expand=True, fill=True, padding=0)
-        vbox.show()
-        return vbox
         
     def desktop_page_navigate(self, widget):
         self._presenter.desktop_page_navigate(self._page_buttons.index(widget) + 1)

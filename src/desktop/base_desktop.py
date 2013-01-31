@@ -5,7 +5,7 @@ class BaseDesktop(gtk.VBox):
 
         self._top_taskbar_padding = None
         self._taskbar_widget = None
-        self._icon_holder_widget = None
+        self._main_content_widget = None
         
     def get_taskbar(self):
         return self._taskbar_widget
@@ -19,8 +19,8 @@ class BaseDesktop(gtk.VBox):
 #    def get_searchbar_padding(self):
 #        return self._searchbar_padding_widget
     
-    def get_icon_holder(self):
-        return self._icon_holder_widget
+    def get_main_content(self):
+        return self._main_content_widget
     
     def set_taskbar_widget(self, taskbar_widget):
         self._remove_child(self._taskbar_widget)
@@ -39,11 +39,11 @@ class BaseDesktop(gtk.VBox):
         
         self.pack_start(self._top_taskbar_padding, False, False, 0)
         
-    def set_icon_holder_widget(self, icon_holder_widget):
-        self._remove_child(self._icon_holder_widget)
+    def set_main_content_widget(self, main_content_widget):
+        self._remove_child(self._main_content_widget)
         
-        self._icon_holder_widget = icon_holder_widget
-        self.pack_start(self._icon_holder_widget, True, True, 0)
+        self._main_content_widget = main_content_widget
+        self.pack_start(self._main_content_widget, True, True, 0)
         
     # Private methods
     def _remove_child(self, child):
