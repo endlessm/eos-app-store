@@ -81,13 +81,12 @@ class EndlessDesktopView(gtk.Window, object):
         self.show_all()
 
     def refresh(self, shortcuts, page_number=0, pages=1, force=False):
-#self.clean_up_legacy_page()
-
         show_page_buttons = pages > 1
         self.left_page_button.set_is_visible(show_page_buttons)
         self.right_page_button.set_is_visible(show_page_buttons)
 
         if self._desktop_page:
+            DesktopShortcut._clear_callbacks()
             self.icons_alignment.remove(self._desktop_page)
             self._desktop_page.destroy()
 
@@ -99,27 +98,6 @@ class EndlessDesktopView(gtk.Window, object):
         import sys
         print >> sys.stderr, "Refreshing**************************"
 
-        
-#        def _create_bottom_vbox(self):
-#        vbox = gtk.VBox()
-#        self.desktop_vbox.pack_end(vbox, expand=True, fill=True, padding=0)
-#        vbox.show()
-#        return vbox
-#        bottom_vbox = self._create_bottom_vbox()
-#        self._setup_searchbar(bottom_vbox)
-#        self.setup_bottom_page_buttons(bottom_vbox, page_number, pages, hide_page_buttons)
-#        bottom_vbox.show_all()
-#self.align_and_display_desktop()
-
-    #TODO: this fixes one symptom of performance and memory leaks by cleaning up callbacks, please refactor
-    def clean_up_legacy_page(self):
-#child = self._desktop_alignment.get_child()
-#if child:
-#child.parent.remove(child)
-#child.destroy()
-#del child
-        DesktopShortcut._clear_callbacks()
-        
     def unfocus_widget(self, widget, event):
         widget.set_focus(None)
         self.close_folder_window()
