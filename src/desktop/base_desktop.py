@@ -1,4 +1,6 @@
 import gtk
+from ui.padding_widget import PaddingWidget
+
 class BaseDesktop(gtk.VBox):
     def __init__(self):
         super(BaseDesktop, self).__init__(False, 3)
@@ -27,7 +29,8 @@ class BaseDesktop(gtk.VBox):
         self._remove_child(self._top_taskbar_padding)
         
         self._taskbar_widget = taskbar_widget
-        self._top_taskbar_padding = gtk.HBox()
+        self._top_taskbar_padding = PaddingWidget(outline=True)
+        self._top_taskbar_padding.set_size_request(1600,250)
 
         self.pack_end(self._taskbar_widget, False, False, 0)
 
@@ -35,7 +38,7 @@ class BaseDesktop(gtk.VBox):
         height = self._taskbar_widget.allocation.height
         import sys
         print >> sys.stderr, width, height
-        self._top_taskbar_padding.set_size_request(width, height)
+#self._top_taskbar_padding.set_size_request(width, height)
         
         self.pack_start(self._top_taskbar_padding, False, False, 0)
         
