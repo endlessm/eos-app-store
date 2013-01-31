@@ -1,7 +1,7 @@
 import gobject
 from battery_provider import BatteryProvider
 from osapps.app_launcher import AppLauncher
-from ui.abstract_notifier import AbstractNotifier
+from eos_widgets.abstract_notifier import AbstractNotifier
 
 class BatteryModel(AbstractNotifier):
     SETTINGS_COMMAND = "gksudo gnome-control-center power"

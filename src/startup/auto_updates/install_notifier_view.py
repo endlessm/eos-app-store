@@ -1,6 +1,6 @@
 import gtk
 
-from ui.abstract_notifier import AbstractNotifier
+from eos_widgets.abstract_notifier import AbstractNotifier
 from ui import glade_ui_elements
 
 class InstallNotifierView(AbstractNotifier):

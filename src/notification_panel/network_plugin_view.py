@@ -1,5 +1,5 @@
 from icon_plugin import IconPlugin
-from ui.abstract_notifier import AbstractNotifier
+from eos_widgets.abstract_notifier import AbstractNotifier
 from panel_constants import PanelConstants
 
 class NetworkPluginView(AbstractNotifier, IconPlugin):

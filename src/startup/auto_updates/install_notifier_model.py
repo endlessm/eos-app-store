@@ -1,4 +1,4 @@
-from ui.abstract_notifier import AbstractNotifier
+from eos_widgets.abstract_notifier import AbstractNotifier
 from startup.auto_updates.latest_version_provider import LatestVersionProvider
 
 class InstallNotifierModel(AbstractNotifier):

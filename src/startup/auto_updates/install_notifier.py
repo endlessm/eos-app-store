@@ -1,7 +1,7 @@
 from startup.auto_updates.install_notifier_view import InstallNotifierView
 from startup.auto_updates.install_notifier_model import InstallNotifierModel
 from startup.auto_updates.install_notifier_presenter import InstallNotifierPresenter
-from ui.abstract_notifier import AbstractNotifier
+from eos_widgets.abstract_notifier import AbstractNotifier
 
 class InstallNotifier(AbstractNotifier):
     USER_RESPONSE = "user.response"
