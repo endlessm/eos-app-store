@@ -59,8 +59,9 @@ class TestAddShortcutsPresenter(unittest.TestCase):
     def test_create_directory(self):
         mock_datastore = Mock()
         mock_datastore.get_all_shortcuts = Mock(return_value=self.available_app_shortcuts)
+        self.test_object._app_desktop_datastore = mock_datastore
         dir_name = 'blah'
-        self.test_object.create_directory(dir_name, '/tmp/image.svg', mock_datastore)
+        self.test_object.create_directory(dir_name, '/tmp/image.svg')
         self.mock_model.create_directory.assert_called_once_with(dir_name)
         mock_datastore.get_all_shortcuts.assert_called_once_with(True)
         mock_datastore.add_shortcut.assert_called_once()
@@ -68,8 +69,9 @@ class TestAddShortcutsPresenter(unittest.TestCase):
         
     def test_add_shortcut(self):
         mock_datastore = Mock()
+        self.test_object._app_desktop_datastore = mock_datastore
         shortcut = Mock()
-        self.test_object.add_shortcut(shortcut, mock_datastore)
+        self.test_object.add_shortcut(shortcut)
         mock_datastore.add_shortcut.called_once_with(shortcut)
         self._mock_view.close.assert_called_once_with()
         

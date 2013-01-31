@@ -147,6 +147,6 @@ class EndlessDesktopModel(object):
         
     def go_to_page(self, page_index):
         self._paginator.go_to_page(page_index)
-        
+       
     def get_total_pages(self):
         return self._paginator.number_of_pages()
