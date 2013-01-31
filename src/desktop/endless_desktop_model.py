@@ -12,13 +12,18 @@ class EndlessDesktopModel(object):
         self._installed_applications_model = installed_app_model
         self._paginator = paginator
 
-    def get_shortcuts(self, force=False):
-        all_shortcuts = self._app_desktop_datastore.get_all_shortcuts(force=force)
+    def get_shortcuts(self):
+        return self._get_page(self._app_desktop_datastore.get_all_shortcuts())
+
+    def get_shortcuts_from_cache(self):
+        return self._get_page(self._app_desktop_datastore.get_all_shortcuts_from_cache())
+
+    def _get_page(self, all_shortcuts):
         self._paginator.adjust_list_of_items(all_shortcuts)
         return self._paginator.current_page()
 
     def get_all_shortcuts(self):
-        return self._app_desktop_datastore.get_all_shortcuts(force=False)
+        return self._app_desktop_datastore.get_all_shortcuts_from_cache()
 
     def set_shortcuts_by_name(self, shortcuts_names):
         self._app_desktop_datastore.set_all_shortcuts_by_name(shortcuts_names)
@@ -37,7 +42,7 @@ class EndlessDesktopModel(object):
 
     def _relocate_shortcut_to_folder(self, source_shortcut, folder_shortcut):
         source_parent = source_shortcut.parent()
-        all_shortcuts = self._app_desktop_datastore.get_all_shortcuts()
+        all_shortcuts = self._app_desktop_datastore.get_all_shortcuts_from_cache()
 
         if (source_parent is None) and (source_shortcut in all_shortcuts):
             all_shortcuts.remove(source_shortcut)
@@ -81,7 +86,7 @@ class EndlessDesktopModel(object):
         return self._preferences_provider.get_default_background()
 
     def delete_shortcut(self, shortcut):
-        all_shortcuts = self._app_desktop_datastore.get_all_shortcuts()
+        all_shortcuts = self._app_desktop_datastore.get_all_shortcuts_from_cache()
         parent = shortcut.parent()
 
         success = False
@@ -142,6 +147,6 @@ class EndlessDesktopModel(object):
         
     def go_to_page(self, page_index):
         self._paginator.go_to_page(page_index)
-        
+       
     def get_total_pages(self):
         return self._paginator.number_of_pages()

@@ -44,6 +44,8 @@ class TestEndlessDesktopPresenter(unittest.TestCase):
         self.mock_model.get_total_pages = Mock(return_value=total_pages)
 
         self.testObject.refresh_view()
+        
+        self.mock_model.get_shortcuts.assert_called_once_with()
 
         self.mock_view.refresh.assert_called_once_with(mock_shortcuts, page_index, total_pages)
 
@@ -86,9 +88,8 @@ class TestEndlessDesktopPresenter(unittest.TestCase):
     def test_rename_shortcut(self):
         shortcut = AppShortcut(123, "App 1", "", [])
         new_name = 'Blah'
-        self.mock_model.get_all_shortcuts = Mock(return_value=[shortcut])
+        self.mock_model.get_shortcuts_from_cache = Mock(return_value=[shortcut])
         changed_shortcut = self.testObject.rename_shortcut(shortcut, new_name)
-        self.mock_model.get_all_shortcuts.assert_called_once()
         self.mock_model.set_shortcuts.assert_called_once()
         self.assertEqual(changed_shortcut.name(), new_name)
 
@@ -156,7 +157,7 @@ class TestEndlessDesktopPresenter(unittest.TestCase):
 
     def test_rearrange_shortcuts_left_destination(self):
         all_shortcuts = Mock()
-        self.testObject._model.get_all_shortcuts = Mock(return_value=all_shortcuts)
+        self.testObject._model.get_shortcuts_from_cache = Mock(return_value=all_shortcuts)
         source_shortcut = Mock()
         source_shortcut.parent = Mock(return_value = None)
         left_shortcut = Mock()
@@ -172,7 +173,7 @@ class TestEndlessDesktopPresenter(unittest.TestCase):
 
     def test_rearrange_shortcuts_right_destination(self):
         all_shortcuts = Mock()
-        self.testObject._model.get_all_shortcuts = Mock(return_value=all_shortcuts)
+        self.testObject._model.get_shortcuts_from_cache = Mock(return_value=all_shortcuts)
         source_shortcut = Mock()
         source_shortcut.parent = Mock(return_value = None)
         right_shortcut = Mock()

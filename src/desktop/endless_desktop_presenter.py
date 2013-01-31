@@ -24,8 +24,8 @@ class DesktopPresenter(object):
 
     def move_item(self, shortcuts):
         self._model.set_shortcuts(shortcuts)
-        self._view.refresh(self._model.get_shortcuts(force=True), self._model.get_page_number(), self._model.get_total_pages(), force=True)
-
+        self._view.refresh(self._model.get_shortcuts(), self._model.get_page_number(), self._model.get_total_pages(), force=True)
+        
     def _page_change_callback(self):
         self._view.refresh(self._model.get_shortcuts(), self._model.get_page_number(), self._model.get_total_pages())
 
@@ -35,7 +35,7 @@ class DesktopPresenter(object):
             source_shortcut,
             folder_shortcut
             )
-        self._view.refresh(self._model.get_shortcuts(force=True), self._model.get_page_number(), self._model.get_total_pages(), force=True)
+        self._view.refresh(self._model.get_shortcuts(), self._model.get_page_number(), self._model.get_total_pages(), force=True)
         if success:
             if folder_shortcut is not None:
                 self._view.show_folder_window_by_name(folder_shortcut.name())
@@ -60,8 +60,7 @@ class DesktopPresenter(object):
     def rearrange_shortcuts(self, source_shortcut, left_shortcut,
             right_shortcut
             ):
-
-        all_shortcuts = self._model.get_all_shortcuts()
+        all_shortcuts = self._model.get_shortcuts_from_cache()
         if source_shortcut.parent() is not None:
             self.relocate_item(source_shortcut, None)
 
@@ -92,10 +91,10 @@ class DesktopPresenter(object):
 
     def delete_shortcut(self, what):
         self._model.delete_shortcut(what)
-        self._view.refresh(self._model.get_shortcuts(force=True), self._model.get_page_number(), self._model.get_total_pages())
-
+        self._view.refresh(self._model.get_shortcuts(), self._model.get_page_number(), self._model.get_total_pages())
+    
     def rename_shortcut(self, shortcut_obj, new_name):
-        all_shortcuts = self._model.get_all_shortcuts()
+        all_shortcuts = self._model.get_shortcuts_from_cache()
 
         if not shortcut_obj._name == new_name.strip():
             new_name = self.check_shortcut_name(new_name, all_shortcuts)

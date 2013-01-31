@@ -15,13 +15,13 @@ from add_shortcuts_module.name_format_util import NameFormatUtil
 class AddShortcutsPresenter():
     IMAGE_CACHE_PATH = '/tmp/'  #maybe /tmp/endless-image-cache/ ?
     
-    def __init__(self, url_opener = urllib2.urlopen, pixbuf_loader = image_util.load_pixbuf):
+    def __init__(self, url_opener = urllib2.urlopen, pixbuf_loader = image_util.load_pixbuf, view=None):
         self._model = AddShortcutsModel()
         self._url_opener = url_opener
         self._pixbuf_loader = pixbuf_loader
         self._app_desktop_datastore = DesktopLocaleDatastore()
         self._app_store_model = ApplicationStoreModel()
-        self._add_shortcuts_view = None #AddShortcutsView()
+        self._add_shortcuts_view = view
         self._sites_provider = RecommendedSitesProvider()
         self._name_format_util = NameFormatUtil()
 
@@ -36,8 +36,8 @@ class AddShortcutsPresenter():
         return category_data
 
 
-    def create_directory(self, dir_name, image_file, presenter):
-        shortcuts = presenter._model._app_desktop_datastore.get_all_shortcuts(True)
+    def create_directory(self, dir_name, image_file):
+        shortcuts = self._app_desktop_datastore.get_all_shortcuts(True)
         dir_name = self.check_dir_name(dir_name, shortcuts)
         path = self._model.create_directory(dir_name)
         if path:
@@ -49,7 +49,12 @@ class AddShortcutsPresenter():
             else:
                 icon_dict = {'normal':image_file}
             shortcut = AppShortcut(key='', name=dir_name, icon=icon_dict)
-            presenter._model._app_desktop_datastore.add_shortcut(shortcut)
+            self._app_desktop_datastore.add_shortcut(shortcut)
+        self._add_shortcuts_view.close()
+            
+    def add_shortcut(self, shortcut):
+        self._app_desktop_datastore.add_shortcut(shortcut)
+        self._add_shortcuts_view.close()
 
     def get_folder_icons(self, path, prefix='', suffix=''):
         return self._model.get_folder_icons(path, prefix, suffix)
@@ -83,9 +88,6 @@ class AddShortcutsPresenter():
 
     def set_add_shortcuts_box(self, category, subcategory=''):
         self._add_shortcuts_view.set_add_shortcuts_box(category, subcategory)
-
-    def set_add_shortcuts_view(self, view):
-        self._add_shortcuts_view = view
 
     def install_app(self, application_model):
         self._app_store_model.install(application_model)

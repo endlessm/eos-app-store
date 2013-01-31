@@ -13,22 +13,18 @@ from eos_util import screen_util
 import sys
 import gc
 class AddShortcutsView():
-    def __init__(self, parent=None, add_remove_widget=None, width=0, height=0):
+    def __init__(self, parent=None, width=0, height=0):
         self._add_button_box_width = 120
         self._tree_view_width = 214
 
         self._width = width or parent.allocation.width
         self._height = height or parent.allocation.height
 
-        if not add_remove_widget:
-            self._add_remove_widget = AddRemoveShortcut(callback=lambda a, b:False)
-            self._add_remove_widget.show()
-        else:
-            self._add_remove_widget = add_remove_widget
+        self._add_remove_widget = AddRemoveShortcut(callback=lambda a, b:False)
+        self._add_remove_widget.show()
 
         self._parent = parent
-        self._presenter = AddShortcutsPresenter()
-        self._presenter.set_add_shortcuts_view(self)
+        self._presenter = AddShortcutsPresenter(view=self)
         self.window = DesktopTransparentWindow(self._parent, (0, 0), (self._width, self._height))
         self.window.connect("delete-event", self.destroy)
         self.window.connect("expose-event", self._draw_triangle)
@@ -86,12 +82,13 @@ class AddShortcutsView():
         self.window.show_all()
 
     def destroy(self, window, event):
-        self.window.destroy()
         self._parent.get_presenter().refresh_view()
 
+    def close(self):
+        self.window.destroy()
+        
     def create_folder(self, folder_name, image_file):
-        presenter = self._parent.get_presenter()
-        self._presenter.create_directory(folder_name, image_file, presenter)
+        self._presenter.create_directory(folder_name, image_file)
 
     def install_app(self, application_model):
         shortcut = self._presenter.build_shortcut_from_application_model(application_model)
@@ -103,9 +100,8 @@ class AddShortcutsView():
         self.install_shortcut(shortcut)
 
     def install_shortcut(self, shortcut):
-        parent_presenter = self._parent.get_presenter()
-        parent_presenter._model._app_desktop_datastore.add_shortcut(shortcut)
-
+        self._presenter.add_shortcut(shortcut)
+    
     def _draw_triangle(self, widget, event):
         ctx = self.add_remove_vbox.window.cairo_create()
         image_surface = cairo.ImageSurface.create_from_png(image_util.image_path("inactive_triangle.png"))
