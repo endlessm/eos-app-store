@@ -19,7 +19,6 @@ class BaseDesktop(gtk.VBox):
     
     def set_taskbar_widget(self, taskbar_widget):
         self._remove_child(self._taskbar_widget)
-#self._remove_child(self._top_page_padding_widget)
         
         self._taskbar_widget = taskbar_widget
 

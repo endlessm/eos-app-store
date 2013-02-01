@@ -102,9 +102,6 @@ class EndlessDesktopView(gtk.Window, object):
         if not self._base_desktop.is_initialized():
             self._base_desktop.recalculate_padding(self.desktop_container)
 
-        import sys
-        print >> sys.stderr, "Refreshing**************************"
-
     def _create_searchbar(self):
         searchbox_holder = PaddingWidget(0.5, 0.0, 0, 1.0)
         searchbox = SearchBox()
