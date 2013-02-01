@@ -2,8 +2,9 @@ from threading import Thread
 import dbus
 import dbus.service
 import dbus.mainloop.glib
-
 import gobject
+
+from eos_log import log
 
 class EndlessDesktopService(dbus.service.Object):
     def __init__(self, desktop_presenter):
