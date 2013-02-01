@@ -69,7 +69,7 @@ class EndlessDesktopView(gtk.Window, object):
         self.desktop_container.pack_start(self.left_page_button, expand=False, fill=False, padding=0)
         self.desktop_container.pack_end(self.right_page_button, expand=False, fill=False, padding=0)
 
-        self.icons_alignment = gtk.Alignment(0.5, 0.5, 0.0, 0.0)
+        self.icons_alignment = PaddingWidget(0.5, 0.5, 0.0, 0.0)
         self.desktop_container.pack_start(self.icons_alignment, expand=True, fill=True, padding=0)
 
         self._base_desktop = BaseDesktop()
@@ -95,17 +95,17 @@ class EndlessDesktopView(gtk.Window, object):
         self.icons_alignment.add(self._desktop_page)
 
         self._desktop_page.show()
+        self._desktop_page.realize()
+
 
         self._update_bottom_page_buttons(self._base_desktop.get_page_buttons_widget(), page_number, pages, show_page_buttons)
-        self._base_desktop.recalculate_padding()
+        self._base_desktop.recalculate_padding(self.icons_alignment)
 
         import sys
         print >> sys.stderr, "Refreshing**************************"
 
     def _create_searchbar(self):
         searchbox_holder = PaddingWidget(0.5, 0.0, 0, 1.0)
-        middle_point = 60
-        searchbox_holder.set_padding(0, middle_point, 0, 0)
         searchbox = SearchBox()
         searchbox_holder.add(searchbox)
 
