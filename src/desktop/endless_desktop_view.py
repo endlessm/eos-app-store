@@ -95,11 +95,12 @@ class EndlessDesktopView(gtk.Window, object):
         self.icons_alignment.add(self._desktop_page)
 
         self._desktop_page.show()
-        self._desktop_page.realize()
-
+        self.queue_draw()
 
         self._update_bottom_page_buttons(self._base_desktop.get_page_buttons_widget(), page_number, pages, show_page_buttons)
-        self._base_desktop.recalculate_padding(self.icons_alignment)
+
+        if not self._base_desktop.is_initialized():
+            self._base_desktop.recalculate_padding(self.desktop_container)
 
         import sys
         print >> sys.stderr, "Refreshing**************************"

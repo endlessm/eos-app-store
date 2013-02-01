@@ -2,7 +2,7 @@ import gtk
 import operator
 
 class PaddingWidget(gtk.Alignment):
-    def __init__(self, xalign=0.0, yalign=0.0, xscale=0.0, yscale=0.0, outline=True):
+    def __init__(self, xalign=0.0, yalign=0.0, xscale=0.0, yscale=0.0, outline=False):
         super(PaddingWidget, self).__init__(xalign, yalign, xscale, yscale)
         self.connect("expose-event", self.do_expose_event)
         self._outline = outline

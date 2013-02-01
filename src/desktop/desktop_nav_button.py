@@ -15,7 +15,7 @@ class DesktopNavButton(gtk.Alignment):
                 down=(Image.from_name(pressed_image), ), 
                 invisible=True)
         self._button.connect("clicked", on_click)
-        self._button.set_size_request(50, 460)
+        self._button.set_size_request(50, 550)
 
         self.add(self._button)
 
