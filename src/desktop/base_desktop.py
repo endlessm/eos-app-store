@@ -41,6 +41,11 @@ class BaseDesktop(gtk.VBox):
         return self._is_initialized
 
     def recalculate_padding(self, icon_layout):
+        #TODO: hacky fix, on the second call the position of the widget would change
+        # couldn't figure out why
+        if self._is_initialized:
+            return
+
         middle_point = self._calculate_middle_point(icon_layout)
         self._searchbar_widget.set_size_request(0, middle_point)
 

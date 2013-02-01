@@ -99,8 +99,7 @@ class EndlessDesktopView(gtk.Window, object):
 
         self._update_bottom_page_buttons(self._base_desktop.get_page_buttons_widget(), page_number, pages, show_page_buttons)
 
-        if not self._base_desktop.is_initialized():
-            self._base_desktop.recalculate_padding(self.desktop_container)
+        self._base_desktop.recalculate_padding(self.desktop_container)
 
     def _create_searchbar(self):
         searchbox_holder = PaddingWidget(0.5, 0.0, 0, 1.0)
