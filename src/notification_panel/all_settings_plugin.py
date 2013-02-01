@@ -11,7 +11,7 @@ class AllSettingsPlugin(NotificationPlugin, TaskbarShortcut):
         if not self.is_launcher_present(self.get_path()):
             icon_size = 0
         
-        super(AllSettingsPlugin, self).__init__(icon_size)
+        NotificationPlugin.__init__(self, self._presenter.get_path())
         
         self._icon_size = icon_size
 
@@ -32,13 +32,9 @@ class AllSettingsPlugin(NotificationPlugin, TaskbarShortcut):
         self.connect('button-press-event', lambda w, e: self.toggle_image(self._settings_icon, self._pixbuf_down))
         self.connect('button-release-event',lambda w, e: self.toggle_image(self._settings_icon, self._pixbuf_normal))
 
-        self.connect('button-press-event', lambda w, e: self._settings_icon_clicked_callback())
-
     def get_path(self):
         return self._presenter.get_path()
 
     def toggle_image(self, image, pixbuf):
         pixbuf.draw(image.set_from_pixbuf)
 
-    def _settings_icon_clicked_callback(self):
-        self._presenter.launch()
