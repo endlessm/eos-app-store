@@ -11,19 +11,19 @@ class BaseDesktop(gtk.VBox):
         self._main_content_widget = None
 
         self._is_initialized = False
+        self._top_page_padding_widget = PaddingWidget()
+        self.pack_start(self._top_page_padding_widget, False, False, 0)
         
     def get_main_content(self):
         return self._main_content_widget
     
     def set_taskbar_widget(self, taskbar_widget):
         self._remove_child(self._taskbar_widget)
-        self._remove_child(self._top_page_padding_widget)
+#self._remove_child(self._top_page_padding_widget)
         
         self._taskbar_widget = taskbar_widget
-        self._top_page_padding_widget = PaddingWidget()
 
         self.pack_end(self._taskbar_widget, False, False, 0)
-        self.pack_start(self._top_page_padding_widget, False, False, 0)
 
     def set_searchbar_widget(self, searchbar_widget):
         self._remove_child(self._searchbar_widget)
