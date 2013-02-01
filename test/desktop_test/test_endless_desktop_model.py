@@ -44,6 +44,7 @@ class DesktopModelTestCase(unittest.TestCase):
         self.mock_desktop_locale_datastore.get_all_shortcuts.assert_called_once_with()
 
     def test_get_shortcuts_from_cache(self):
+        self.mock_desktop_locale_datastore.get_all_shortcuts_from_cache = Mock(return_value = [])
         self.testObject.get_shortcuts_from_cache()
         self.mock_desktop_locale_datastore.get_all_shortcuts_from_cache.assert_called_once_with()
 
