@@ -4,6 +4,8 @@ import dbus.service
 import dbus.mainloop.glib
 import gobject
 
+from endless_core.auto_updates.update_manager import UpdateManager
+
 from eos_log import log
 
 class EndlessDesktopService(dbus.service.Object):
@@ -31,3 +33,8 @@ class EndlessDesktopService(dbus.service.Object):
     @dbus.service.method("com.endless.Desktop", in_signature='', out_signature='')
     def revert_background(self):
         self._desktop_presenter.revert_background()
+
+    @dbus.service.method("com.endless.UpdateManager", in_signature='', out_signature='')
+    def update_os(self):
+        UpdateManager().update_os()
+
