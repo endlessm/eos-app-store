@@ -7,14 +7,16 @@ from endless_core.auto_updates.force_install import ForceInstall
 from startup.remove_extra_directories_task import RemoveExtraDirectoriesTask
 from startup.remove_extra_files_task import RemoveExtraFilesTask
 from endless_core.auto_updates.update_manager import UpdateManager
+from eos_settings.delete_settings_run_file import DeleteSettingsRunFile
 
 class StartupTasksTest(unittest.TestCase):
 	
 	def test_correct_default_tasks_exist(self):
 		test_object = StartupTasks()
-		self.assertEquals(2, len(test_object._all_tasks))
+		self.assertEquals(3, len(test_object._all_tasks))
 		self.assertIsInstance(test_object._all_tasks[0](), ForceInstall)
 		self.assertIsInstance(test_object._all_tasks[1](), UpdateManager)
+		self.assertIsInstance(test_object._all_tasks[2](), DeleteSettingsRunFile)
 
 	def test_correct_tasks_are_called_when_perform_tasks_is_called(self):
 		mock_task1 = Mock()
