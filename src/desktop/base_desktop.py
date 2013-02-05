@@ -54,7 +54,7 @@ class BaseDesktop(gtk.VBox):
         taskbar_height = self._taskbar_widget.allocation.height
         searchbar_height = self._searchbar_widget.size_request()[1]
         page_buttons_height = self._page_buttons_widget.size_request()[1] 
-        total_top_padding = taskbar_height + searchbar_height + page_buttons_height
+        total_top_padding = taskbar_height + searchbar_height + page_buttons_height - 50
 
         self._top_page_padding_widget.set_size_request(taskbar_width, total_top_padding)
 
