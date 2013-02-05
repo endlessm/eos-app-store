@@ -166,10 +166,6 @@ class EndlessDesktopView(gtk.Window, object):
     def desktop_page_navigate(self, index):
         self._presenter.desktop_page_navigate(index + 1)
 
-    def _add_icon_clicked_callback(self, widget, event):
-        self.popup.show_all()
-        self.popup.popup(None, None, None, event.button, event.time)
-
     def hide_folder_window(self):
         if hasattr(self, '_folder_window') and self._folder_window:
             self._folder_window.hide()
