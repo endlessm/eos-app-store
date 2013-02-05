@@ -112,3 +112,9 @@ class TestListPaginator(unittest.TestCase):
         test_object.adjust_list_of_items([1, 2])
         
         self.assertEquals(test_object.number_of_pages(), test_object.current_page_number())
+
+    def test_return_all_items(self):
+        test_object = ListPaginator([1, 2], 1)
+
+        self.assertEquals([1, 2], test_object.all_items())
+
