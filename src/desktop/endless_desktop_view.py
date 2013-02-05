@@ -42,12 +42,13 @@ class EndlessDesktopView(gtk.Window, object):
 
         self.connect('button-press-event', self.unfocus_widget)
         self.connect('destroy', lambda w: gtk.main_quit())
-        self.connect('delete-event', lambda w, e: True) # Prevents <Alt>F4
+        self.prevent_alt_f4()
 
-#        screen = gtk.gdk.Screen() #@UndefinedVariable
-#        screen.connect('size-changed', lambda s: return) # TODO refresh background and screen content
-
+        self.maximize()
         self._set_up_desktop(width)
+
+    def prevent_alt_f4(self):
+        self.connect('delete-event', lambda w, e: True)
 
     def _set_up_desktop(self, width):
         self._desktop_page = None
