@@ -1,10 +1,10 @@
 
-PYINSTALLER_VERSION=1.5.1
+PYINSTALLER_VERSION=2.0
 PYINSTALLER_PATH=$(HOME)/apps/pyinstaller-$(PYINSTALLER_VERSION)
 SPECFILE=endless_os_desktop_widget.spec
 
 all: clean
-	python $(PYINSTALLER_PATH)/Build.py $(SPECFILE)
+	python $(PYINSTALLER_PATH)/pyinstaller.py $(SPECFILE)
 
 clean:
 	rm -fR build dist

@@ -7,7 +7,7 @@ sudo easy_install nose
 pushd `dirname $0`
   script_dir=`pwd`
   apps_dir=~/apps
-  pyinstaller_dir="${apps_dir}/pyinstaller-1.5.1"
+  pyinstaller_dir="${apps_dir}/pyinstaller-2.0"
 
   # Clean up old deb packages
   set +e
@@ -20,15 +20,10 @@ pushd `dirname $0`
     mkdir -p ${apps_dir}
     pushd ${apps_dir}
       echo "Extracting from ${script_dir}"
-      tar -xjf ${script_dir}/tools/pyinstaller*.tar.bz2
+      unzip ${script_dir}/tools/pyinstaller*.zip -d ${apps_dir}
     popd 
   fi
 
-  if [[ ! -e ${pyinstaller_dir}/config.dat ]];then
-    echo "No configuration found. Configuring PyInstaller"
-    python ${pyinstaller_dir}/Configure.py
-  fi
-  
   echo "Converting glade files to .py files"
   pushd ui &> /dev/null
     ./convert.sh
