@@ -35,23 +35,23 @@ class DesktopShortcut(gtk.VBox):
     @classmethod
     def _add_motion_broadcast_callback(cls, widget, callback):
         cls._motion_callbacks.append(callback)
-        widget.connect("destroy", lambda w: cls._motion_callbacks.remove(callback))
+#widget.connect("destroy", lambda w: cls._motion_callbacks.remove(callback))
 
     @classmethod
     def _add_drag_end_broadcast_callback(cls, widget, callback):
         cls._drag_end_callbacks.append(callback) 
-        widget.connect("destroy", lambda w: cls._drag_end_callbacks.remove(callback))
+#widget.connect("destroy", lambda w: cls._drag_end_callbacks.remove(callback))
 
     @classmethod
     def _clear_callbacks(cls):
-        del cls._drag_end_callbacks[:]
-        del cls._drag_begin_callbacks[:]
-        del cls._motion_callbacks[:]
+        cls._drag_end_callbacks = []
+        cls._drag_begin_callbacks = []
+        cls._motion_callbacks = []
 
     @classmethod
     def _add_drag_begin_broadcast_callback(cls, widget, callback):
         cls._drag_begin_callbacks.append(callback)
-        widget.connect("destroy", lambda w: cls._drag_begin_callbacks.remove(callback))
+#widget.connect("destroy", lambda w: cls._drag_begin_callbacks.remove(callback))
 
     @classmethod
     def _motion_broadcast(cls, source, destination, x, y):

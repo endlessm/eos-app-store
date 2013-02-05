@@ -127,10 +127,7 @@ class EndlessDesktopModel(object):
     def delete_from_desktop(self, shortcut, all_shortcuts):
         try:
             log.info("delete shortcut: "+repr(shortcut.key()))
-            if shortcut in all_shortcuts:
-                all_shortcuts.remove(shortcut)
-            else:
-                log.info("didn't find shortcut in list: " + repr(shortcut))
+            all_shortcuts.remove(shortcut)
             return True
         except Exception as e:
             log.error("no shortcut on desktop!", e)
