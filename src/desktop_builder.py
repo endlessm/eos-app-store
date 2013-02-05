@@ -2,6 +2,7 @@ import sys
 
 from desktop.endless_desktop_presenter import DesktopPresenter
 from desktop.endless_desktop_view import EndlessDesktopView
+from desktop.endless_desktop_service import EndlessDesktopService
 
 from osapps.desktop_preferences_datastore import DesktopPreferencesDatastore
 from desktop.endless_desktop_model import EndlessDesktopModel
@@ -17,6 +18,7 @@ def build_desktop():
                               AppDatastore(),
                               AppLauncher())
     presenter = DesktopPresenter(view, model)
+    EndlessDesktopService(presenter).start_service()
 
     if len(sys.argv) > 1 and sys.argv[1] == 'uat':
         from uat.uat_helper import UatHelper

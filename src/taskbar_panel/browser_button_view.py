@@ -2,7 +2,7 @@ import gtk
 
 from eos_util import image_util
 from eos_util.image_util import load_pixbuf
-from ui.abstract_notifier import AbstractNotifier
+from eos_widgets.abstract_notifier import AbstractNotifier
 from browser_button_constants import BrowserButtonConstants
 
 class BrowserButtonView(gtk.EventBox, AbstractNotifier):

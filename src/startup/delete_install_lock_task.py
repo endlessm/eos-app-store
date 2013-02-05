@@ -1,7 +1,7 @@
 import os
 import shutil
 from eos_log import log 
-from startup.auto_updates.force_install import ForceInstall
+from endless_core.auto_updates.force_install import ForceInstall
 
 class DeleteInstallLockTask(object):
     def __init__(self, os_util=os):

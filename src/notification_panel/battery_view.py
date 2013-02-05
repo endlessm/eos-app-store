@@ -4,7 +4,7 @@ import datetime
 
 from icon_plugin import IconPlugin
 from panel_constants import PanelConstants
-from ui.abstract_notifier import AbstractNotifier
+from eos_widgets.abstract_notifier import AbstractNotifier
 from eos_widgets.desktop_transparent_window import DesktopTransparentWindow
 
 gettext.install('endless_desktop', '/usr/share/locale', unicode = True, names=['ngettext'])
