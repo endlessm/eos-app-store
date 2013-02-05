@@ -89,7 +89,7 @@ class EndlessDesktopView(gtk.Window, object):
             self.icons_alignment.remove(self._desktop_page)
             self._desktop_page.destroy()
 
-        self._desktop_page = DesktopPageView(shortcuts, DesktopLayout.calculate_max_columns, self._create_row)
+        self._desktop_page = DesktopPageView(shortcuts,self._create_row)
         self.icons_alignment.add(self._desktop_page)
 
         self._desktop_page.show()
