@@ -8,7 +8,7 @@ class DesktopLayout(object):
     VERTICAL_SPACING = 64
     MAX_ICONS_IN_ROW = 7
     MAX_ROWS_OF_ICONS = 4
-    TOP_PADDING_BUFFER = 25
+    TOP_PADDING_BUFFER = 50
 
     @classmethod
     def calculate_total_top_padding(cls, *widgets):
