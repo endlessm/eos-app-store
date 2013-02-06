@@ -2,9 +2,10 @@ from eos_util import image_util
 from eos_log import log
 from application_store.installed_applications_model import InstalledApplicationsModel
 from desktop.list_paginator import ListPaginator
+from desktop.desktop_layout import DesktopLayout
 
 class EndlessDesktopModel(object):
-    def __init__(self, app_desktop_datastore, preferences_provider, app_datastore, app_launcher, installed_app_model=InstalledApplicationsModel(), paginator=ListPaginator(page_size=27)):
+    def __init__(self, app_desktop_datastore, preferences_provider, app_datastore, app_launcher, installed_app_model=InstalledApplicationsModel(), paginator=ListPaginator(page_size_calulator=DesktopLayout.number_of_icons)):
         self._app_launcher = app_launcher
         self._app_desktop_datastore = app_desktop_datastore
         self._app_datastore = app_datastore
