@@ -9,10 +9,6 @@ class DesktopLayoutTest(unittest.TestCase):
         w2 = Mock()
         w3 = Mock()
 
-        w1.allocation = Mock()
-        w2.allocation = Mock()
-        w3.allocation = Mock()
-
         w1.allocation.height = 10
         w2.allocation.height = 20
         w3.allocation.height = 30
