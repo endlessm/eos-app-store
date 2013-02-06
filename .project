@@ -4,7 +4,9 @@
 	<comment></comment>
 	<projects>
 		<project>eos-common</project>
+		<project>eos-core</project>
 		<project>eos-installer</project>
+		<project>eos-settings</project>
 	</projects>
 	<buildSpec>
 		<buildCommand>
