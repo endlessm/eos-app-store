@@ -1,5 +1,3 @@
-import sys
-
 class DesktopPresenter(object):
     def __init__(self, view, model):
         self._model = model
@@ -60,16 +58,15 @@ class DesktopPresenter(object):
     def rearrange_shortcuts(self, source_shortcut, left_shortcut,
             right_shortcut
             ):
-        all_shortcuts = self._model.get_shortcuts_from_cache()
         if source_shortcut.parent() is not None:
             self.relocate_item(source_shortcut, None)
 
         if right_shortcut is not None:
-            self.move_item_right(source_shortcut, right_shortcut, all_shortcuts)
-            self.move_item(all_shortcuts)
+            self.move_item_right(source_shortcut, right_shortcut, self._model.get_all_shortcuts())
+            self.move_item(self._model.get_all_shortcuts())
         elif left_shortcut is not None:
-            self.move_item_left(source_shortcut, left_shortcut, all_shortcuts)
-            self.move_item(all_shortcuts)
+            self.move_item_left(source_shortcut, left_shortcut, self._model.get_all_shortcuts())
+            self.move_item(self._model.get_all_shortcuts())
         else:
             pass
 
@@ -94,7 +91,7 @@ class DesktopPresenter(object):
         self._view.refresh(self._model.get_shortcuts(), self._model.get_page_number(), self._model.get_total_pages())
     
     def rename_shortcut(self, shortcut_obj, new_name):
-        all_shortcuts = self._model.get_shortcuts_from_cache()
+        all_shortcuts = self._model.get_all_shortcuts()
 
         if not shortcut_obj._name == new_name.strip():
             new_name = self.check_shortcut_name(new_name, all_shortcuts)

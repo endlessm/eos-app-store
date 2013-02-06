@@ -15,43 +15,49 @@ class EndlessDesktopModel(object):
     def get_shortcuts(self):
         return self._get_page(self._app_desktop_datastore.get_all_shortcuts())
 
-    def get_shortcuts_from_cache(self):
-        return self._get_page(self._app_desktop_datastore.get_all_shortcuts_from_cache())
-
     def _get_page(self, all_shortcuts):
         self._paginator.adjust_list_of_items(all_shortcuts)
         return self._paginator.current_page()
 
     def get_all_shortcuts(self):
-        return self._app_desktop_datastore.get_all_shortcuts_from_cache()
-
-    def set_shortcuts_by_name(self, shortcuts_names):
-        self._app_desktop_datastore.set_all_shortcuts_by_name(shortcuts_names)
+        return self._app_desktop_datastore.get_all_shortcuts()
 
     def set_shortcuts(self, shortcuts):
         self._app_desktop_datastore.set_all_shortcuts(shortcuts)
 
     def _relocate_shortcut_to_root(self, source_shortcut):
-        source_parent = source_shortcut.parent()
-        source_parent.remove_child(source_shortcut)
 
         all_shortcuts = self._app_desktop_datastore.get_all_shortcuts()
+
+        i = all_shortcuts.index(source_shortcut.parent())
+        source_parent = all_shortcuts[i]
+        source_parent.remove_child(source_shortcut)
         all_shortcuts.append(source_shortcut)
         self._app_desktop_datastore.set_all_shortcuts(all_shortcuts)
+
         return True
 
     def _relocate_shortcut_to_folder(self, source_shortcut, folder_shortcut):
+        all_shortcuts = self._app_desktop_datastore.get_all_shortcuts()
+        index = all_shortcuts.index(source_shortcut)
+
+        source_shortcut = all_shortcuts[index]
         source_parent = source_shortcut.parent()
-        all_shortcuts = self._app_desktop_datastore.get_all_shortcuts_from_cache()
 
         if (source_parent is None) and (source_shortcut in all_shortcuts):
             all_shortcuts.remove(source_shortcut)
+            index = all_shortcuts.index(folder_shortcut)
+            folder_shortcut = all_shortcuts[index]
             folder_shortcut.add_child(source_shortcut)
             self._app_desktop_datastore.set_all_shortcuts(all_shortcuts)
             return True
         elif source_parent is not None:
             source_parent.remove_child(source_shortcut)
+            
+            index = all_shortcuts.index(folder_shortcut)
+            folder_shortcut = all_shortcuts[index]
             folder_shortcut.add_child(source_shortcut)
+
             self._app_desktop_datastore.set_all_shortcuts(all_shortcuts)
             return True
         else:
@@ -86,7 +92,7 @@ class EndlessDesktopModel(object):
         return self._preferences_provider.get_default_background()
 
     def delete_shortcut(self, shortcut):
-        all_shortcuts = self._app_desktop_datastore.get_all_shortcuts_from_cache()
+        all_shortcuts = self._app_desktop_datastore.get_all_shortcuts()
         parent = shortcut.parent()
 
         success = False
