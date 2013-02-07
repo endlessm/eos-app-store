@@ -9,6 +9,8 @@ from taskbar_icon import TaskbarIcon
 from eos_util.image_util import load_pixbuf
 from update_task_thread import UpdateTasksThread
 from xlib_helper import XlibHelper
+from desktop_files.desktop_file_utilities import DesktopFileUtilities
+from application_store.application_store_model import ApplicationStoreModel
 
 # DO NOT REMOVE!!! PyInstaller does not know that these are imported
 # on its own so we have to manually import them
@@ -17,9 +19,22 @@ from Xlib.ext import xtest, shape, xinerama, record, composite, randr
 # *****************
 
 class ApplicationListPlugin(gtk.HBox):
+    
     def __init__(self, icon_size, local_display = display.Display(), pixbuf_loader = load_pixbuf):
         super(ApplicationListPlugin, self).__init__()
-
+        
+        # Create a mapping from application key to minimized icon
+        # TODO Consider loading models once to serve both app store and task bar
+        # (currently, the app store re-loads the models every time it is run)
+        self._mini_icons = {}
+        desktop_file_utilities = DesktopFileUtilities()
+        file_models = desktop_file_utilities.get_desktop_file_models(ApplicationStoreModel.DEFAULT_APP_STORE_DIRECTORY)
+        for file_model in file_models:
+            application_key = file_model.class_name().lower()
+            icon_path = file_model.mini_icon()
+            icon_pixbuf = gdk.pixbuf_new_from_file(icon_path)
+            self._mini_icons[application_key] = icon_pixbuf
+        
         self._icon_size = icon_size
         pixbuf = pixbuf_loader('endless.png')
         self._default_icon = pixbuf.scale_simple(icon_size, icon_size, gdk.INTERP_BILINEAR)
@@ -79,30 +94,43 @@ class ApplicationListPlugin(gtk.HBox):
 
             window_name = self._xlib_helper.get_window_name(window)
 
+            # Get the window's icon
+
+            # Default icon if all else fails
             scaled_pixbuf = self._default_icon
-            # Get window's icons
+            
+            # First, see if we have a designer-provided icon for the application
+            # Note that the designer-provided icons are already at the proper scale
             try:
-                icon = window.get_full_property(self._NET_WM_ICON_ATOM_ID, Xatom.CARDINAL)
-                if icon is None or icon.format != 32:
-                    raise Exception("Icon is not in a good format. Using default")
-
-                # Extract icon data. We should also check other icons
-                width = icon.value[0]
-                height = icon.value[1]
-                data = icon.value[2:width * height + 2]
-                data_array = array.array('I', data)
-
-                # Convert ARGB to ABRG
-                for i, data in enumerate(data_array):
-                    data_array[i] = (data & 0xff00ff00) | ((data & 0xff) << 16) | ((data >> 16) & 0xff)
-
-                # Scale the icon
-                icon_pixbuf = gdk.pixbuf_new_from_data(data_array.tostring(), gdk.COLORSPACE_RGB, True, 8, width, height, width * 4)
-                scaled_pixbuf = icon_pixbuf.scale_simple(self._icon_size, self._icon_size, gdk.INTERP_BILINEAR)
-                del icon_pixbuf
+                application_key = self._xlib_helper.get_application_key(window)
+                scaled_pixbuf = self._mini_icons[application_key]
+                
             except:
-#                print "Error retrieving icon. Using default"
-                pass
+                # If look-up fails, get the icon provided by the application
+                # and scale it appropriately
+                try:
+                    icon = window.get_full_property(self._NET_WM_ICON_ATOM_ID, Xatom.CARDINAL)
+                    if icon is None or icon.format != 32:
+                        raise Exception("Icon is not in a good format. Using default")
+    
+                    # Extract icon data. We should also check other icons
+                    width = icon.value[0]
+                    height = icon.value[1]
+                    data = icon.value[2:width * height + 2]
+                    data_array = array.array('I', data)
+    
+                    # Convert ARGB to ABRG
+                    for i, data in enumerate(data_array):
+                        data_array[i] = (data & 0xff00ff00) | ((data & 0xff) << 16) | ((data >> 16) & 0xff)
+    
+                    # Scale the icon
+                    icon_pixbuf = gdk.pixbuf_new_from_data(data_array.tostring(), gdk.COLORSPACE_RGB, True, 8, width, height, width * 4)
+                    scaled_pixbuf = icon_pixbuf.scale_simple(self._icon_size, self._icon_size, gdk.INTERP_BILINEAR)
+                    del icon_pixbuf
+
+                except:
+                    # Unable to retreive icon.  Use the default.
+                    pass
 
             # Check if we are the selected task
             is_selected = (selected_window != None) & (len(selected_window) > 0) & (task == selected_window[0])
