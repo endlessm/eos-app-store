@@ -42,14 +42,13 @@ class EndlessDesktopView(gtk.Window, object):
 
         self.connect('button-press-event', self.unfocus_widget)
         self.connect('destroy', lambda w: gtk.main_quit())
-        self.connect('delete-event', lambda w, e: True) # Prevents <Alt>F4
+        self.prevent_alt_f4()
 
-        self._max_icons_in_row, self._max_rows_in_page = self._calculate_max_icons()
-
-#        screen = gtk.gdk.Screen() #@UndefinedVariable
-#        screen.connect('size-changed', lambda s: return) # TODO refresh background and screen content
-
+        self.maximize()
         self._set_up_desktop(width)
+
+    def prevent_alt_f4(self):
+        self.connect('delete-event', lambda w, e: True)
 
     def _set_up_desktop(self, width):
         self._desktop_page = None
@@ -91,7 +90,7 @@ class EndlessDesktopView(gtk.Window, object):
             self.icons_alignment.remove(self._desktop_page)
             self._desktop_page.destroy()
 
-        self._desktop_page = DesktopPageView(shortcuts, self._max_icons_in_row, self._create_row)
+        self._desktop_page = DesktopPageView(shortcuts,self._create_row)
         self.icons_alignment.add(self._desktop_page)
 
         self._desktop_page.show()
@@ -276,11 +275,6 @@ class EndlessDesktopView(gtk.Window, object):
             left_shortcut,
             right_shortcut
             )
-
-    def _calculate_max_icons(self):
-        # For now, these are hard-coded constants.
-        # TODO: Calculate based on available desktop size (scale with display resolution)
-        return (DesktopLayout.MAX_ICONS_IN_ROW, DesktopLayout.MAX_ROWS_OF_ICONS)
 
     def _get_net_work_area(self):
         """this section of code gets the net available area on the window (i.e. root window - panels)"""

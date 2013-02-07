@@ -1,10 +1,14 @@
 import math
 
 class ListPaginator:
-    def __init__(self, list_of_items=[], page_size=1):
+    def __init__(self, list_of_items=[], page_size_calulator=lambda: 1):
         self._list_of_items = list_of_items
-        self._page_size = page_size
+        self._page_size_calulator = page_size_calulator
         self._page_index = 0
+
+    @property
+    def _page_size(self):
+        return self._page_size_calulator()
         
     def number_of_pages(self):
         return int(math.ceil(len(self._list_of_items) / float(self._page_size)))
