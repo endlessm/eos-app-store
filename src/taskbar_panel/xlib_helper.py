@@ -57,4 +57,14 @@ class XlibHelper():
         
         return class_name
     
+    # Gets a key (all lower-case) for the application that can be used to retrieve details
+    # about the application's desktop file (such as its icon name) from a dictionary
+    def get_application_key(self, window):
+        key = self.get_class_name(window)
+        if key == 'Sol':
+            if 'Freecell' in self.get_window_name(window):
+                key = 'Sol-Freecell'
+        if not key:
+            key = self.get_window_name(window)
+        return key.lower()
     
