@@ -106,6 +106,8 @@ class EndlessDesktopModel(object):
 
         success = False
         if parent is not None:
+            index = all_shortcuts.index(parent)
+            parent = all_shortcuts[index]
             success = self.delete_from_folder(shortcut, parent)
         else:
             if shortcut in all_shortcuts:
