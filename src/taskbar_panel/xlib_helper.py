@@ -62,6 +62,11 @@ class XlibHelper():
     def get_application_key(self, window):
         key = self.get_class_name(window)
         if key == 'Sol':
+            # Special case for Freecell solitaire, which uses the same binary as Solitaire
+            # (with a different command line syntax) and is reported with the same class name
+            # Project management agreed that this hack is appropriate for now,
+            # especially since the desktop may switch to a different technology
+            # in the near future
             if 'Freecell' in self.get_window_name(window):
                 key = 'Sol-Freecell'
         if not key:
