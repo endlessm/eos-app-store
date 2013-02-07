@@ -1,3 +1,4 @@
+import sys
 class DesktopPresenter(object):
     def __init__(self, view, model):
         self._model = model
@@ -20,10 +21,6 @@ class DesktopPresenter(object):
         self._view.hide_folder_window()
         self._model.execute_app(app_key, params)
 
-    def move_item(self, shortcuts):
-        self._model.set_shortcuts(shortcuts)
-        self._view.refresh(self._model.get_shortcuts(), self._model.get_page_number(), self._model.get_total_pages(), force=True)
-        
     def _page_change_callback(self):
         self._view.refresh(self._model.get_shortcuts(), self._model.get_page_number(), self._model.get_total_pages())
 
@@ -33,6 +30,7 @@ class DesktopPresenter(object):
             source_shortcut,
             folder_shortcut
             )
+        print >> sys.stderr, "relocate shortcut status: ",success
         self._view.refresh(self._model.get_shortcuts(), self._model.get_page_number(), self._model.get_total_pages(), force=True)
         if success:
             if folder_shortcut is not None:
@@ -45,6 +43,7 @@ class DesktopPresenter(object):
             all_shortcuts.remove(source_shortcut)
         index = all_shortcuts.index(right_shortcut)
         all_shortcuts.insert(index, source_shortcut)
+        self._model.set_shortcuts(all_shortcuts)
 
     def move_item_left(self, source_shortcut, left_shortcut, all_shortcuts):
         if source_shortcut in all_shortcuts:
@@ -54,6 +53,7 @@ class DesktopPresenter(object):
             all_shortcuts.insert(index, source_shortcut)
         else:
             all_shortcuts.append(source_shortcut)
+        self._model.set_shortcuts(all_shortcuts)
 
     def rearrange_shortcuts(self, source_shortcut, left_shortcut,
             right_shortcut
@@ -63,10 +63,10 @@ class DesktopPresenter(object):
 
         if right_shortcut is not None:
             self.move_item_right(source_shortcut, right_shortcut, self._model.get_all_shortcuts())
-            self.move_item(self._model.get_all_shortcuts())
+            self.refresh_view()
         elif left_shortcut is not None:
             self.move_item_left(source_shortcut, left_shortcut, self._model.get_all_shortcuts())
-            self.move_item(self._model.get_all_shortcuts())
+            self.refresh_view()
         else:
             pass
 

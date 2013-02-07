@@ -2,6 +2,7 @@ from eos_util import image_util
 from eos_log import log
 from application_store.installed_applications_model import InstalledApplicationsModel
 from desktop.list_paginator import ListPaginator
+import sys
 
 class EndlessDesktopModel(object):
     def __init__(self, app_desktop_datastore, preferences_provider, app_datastore, app_launcher, installed_app_model=InstalledApplicationsModel(), paginator=ListPaginator(page_size=27)):
@@ -70,13 +71,16 @@ class EndlessDesktopModel(object):
         return False
 
     def relocate_shortcut(self, source_shortcut, folder_shortcut):
+        print >> sys.stderr, "relocate shortcut: ", source_shortcut
         if source_shortcut is not None:
             source_parent = source_shortcut.parent()
 
             if folder_shortcut is None:
                 if source_parent is not None:
+                    print >> sys.stderr, "relocate shortcut to root"
                     return self._relocate_shortcut_to_root(source_shortcut)
             else:
+                print >> sys.stderr, "relocate shortcut to folder"
                 return self._relocate_shortcut_to_folder(
                     source_shortcut,
                     folder_shortcut
