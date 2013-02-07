@@ -88,7 +88,7 @@ class TestEndlessDesktopPresenter(unittest.TestCase):
     def test_rename_shortcut(self):
         shortcut = AppShortcut(123, "App 1", "", [])
         new_name = 'Blah'
-        self.mock_model.get_shortcuts_from_cache = Mock(return_value=[shortcut])
+        self.mock_model.get_all_shortcuts = Mock(return_value=[shortcut])
         changed_shortcut = self.testObject.rename_shortcut(shortcut, new_name)
         self.mock_model.set_shortcuts.assert_called_once()
         self.assertEqual(changed_shortcut.name(), new_name)

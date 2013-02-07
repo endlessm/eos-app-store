@@ -39,12 +39,13 @@ class EndlessDesktopModel(object):
 
     def _relocate_shortcut_to_folder(self, source_shortcut, folder_shortcut):
         all_shortcuts = self._app_desktop_datastore.get_all_shortcuts()
-        index = all_shortcuts.index(source_shortcut)
 
-        source_shortcut = all_shortcuts[index]
         source_parent = source_shortcut.parent()
 
         if (source_parent is None) and (source_shortcut in all_shortcuts):
+            index = all_shortcuts.index(source_shortcut)
+            source_shortcut = all_shortcuts[index]
+
             all_shortcuts.remove(source_shortcut)
             index = all_shortcuts.index(folder_shortcut)
             folder_shortcut = all_shortcuts[index]
@@ -52,6 +53,10 @@ class EndlessDesktopModel(object):
             self._app_desktop_datastore.set_all_shortcuts(all_shortcuts)
             return True
         elif source_parent is not None:
+            index = all_shortcuts.index(source_shortcut)
+
+            source_shortcut = all_shortcuts[index]
+
             source_parent.remove_child(source_shortcut)
             
             index = all_shortcuts.index(folder_shortcut)

@@ -63,7 +63,7 @@ class TestAddShortcutsPresenter(unittest.TestCase):
         dir_name = 'blah'
         self.test_object.create_directory(dir_name, '/tmp/image.svg')
         self.mock_model.create_directory.assert_called_once_with(dir_name)
-        mock_datastore.get_all_shortcuts.assert_called_once_with(True)
+        mock_datastore.get_all_shortcuts.assert_called_once_with()
         mock_datastore.add_shortcut.assert_called_once()
         self._mock_view.close.assert_called_once_with()
         
