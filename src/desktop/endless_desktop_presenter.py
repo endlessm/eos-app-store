@@ -1,4 +1,3 @@
-import sys
 class DesktopPresenter(object):
     def __init__(self, view, model):
         self._model = model
@@ -30,7 +29,6 @@ class DesktopPresenter(object):
             source_shortcut,
             folder_shortcut
             )
-        print >> sys.stderr, "relocate shortcut status: ",success
         self._view.refresh(self._model.get_shortcuts(), self._model.get_page_number(), self._model.get_total_pages(), force=True)
         if success:
             if folder_shortcut is not None:

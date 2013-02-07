@@ -71,16 +71,16 @@ class EndlessDesktopModel(object):
         return False
 
     def relocate_shortcut(self, source_shortcut, folder_shortcut):
-        print >> sys.stderr, "relocate shortcut: ", source_shortcut
+#print >> sys.stderr, "relocate shortcut: ", source_shortcut
         if source_shortcut is not None:
             source_parent = source_shortcut.parent()
 
             if folder_shortcut is None:
                 if source_parent is not None:
-                    print >> sys.stderr, "relocate shortcut to root"
+#print >> sys.stderr, "relocate shortcut to root"
                     return self._relocate_shortcut_to_root(source_shortcut)
             else:
-                print >> sys.stderr, "relocate shortcut to folder"
+#print >> sys.stderr, "relocate shortcut to folder"
                 return self._relocate_shortcut_to_folder(
                     source_shortcut,
                     folder_shortcut

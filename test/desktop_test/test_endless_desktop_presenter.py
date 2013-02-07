@@ -157,34 +157,34 @@ class TestEndlessDesktopPresenter(unittest.TestCase):
 
     def test_rearrange_shortcuts_left_destination(self):
         all_shortcuts = Mock()
-        self.testObject._model.get_shortcuts_from_cache = Mock(return_value=all_shortcuts)
+        self.testObject._model.get_all_shortcuts = Mock(return_value=all_shortcuts)
         source_shortcut = Mock()
         source_shortcut.parent = Mock(return_value = None)
         left_shortcut = Mock()
         self.testObject.move_item_left = Mock()
-        self.testObject.move_item = Mock()
+        self.testObject.refresh_view = Mock()
         self.testObject.move_item_right = Mock()
 
         self.testObject.rearrange_shortcuts(source_shortcut, left_shortcut, None)
 
         self.testObject.move_item_left.assert_called_once_with(source_shortcut, left_shortcut, all_shortcuts)
-        self.testObject.move_item.assert_called_once_with(all_shortcuts)
+        self.testObject.refresh_view.assert_called_once_with()
         self.assertFalse(self.testObject.move_item_right.called)
 
     def test_rearrange_shortcuts_right_destination(self):
         all_shortcuts = Mock()
-        self.testObject._model.get_shortcuts_from_cache = Mock(return_value=all_shortcuts)
+        self.testObject._model.get_all_shortcuts = Mock(return_value=all_shortcuts)
         source_shortcut = Mock()
         source_shortcut.parent = Mock(return_value = None)
         right_shortcut = Mock()
         self.testObject.move_item_right = Mock()
-        self.testObject.move_item = Mock()
+        self.testObject.refresh_view = Mock()
         self.testObject.move_item_left = Mock()
 
         self.testObject.rearrange_shortcuts(source_shortcut, None, right_shortcut)
 
         self.testObject.move_item_right.assert_called_once_with(source_shortcut, right_shortcut, all_shortcuts)
-        self.testObject.move_item.assert_called_once_with(all_shortcuts)
+        self.testObject.refresh_view.assert_called_once_with()
         self.assertFalse(self.testObject.move_item_left.called)
 
     def test_move_item_right_source_on_desk(self):
