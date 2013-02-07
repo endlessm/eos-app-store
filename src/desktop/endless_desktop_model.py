@@ -54,9 +54,9 @@ class EndlessDesktopModel(object):
             self._app_desktop_datastore.set_all_shortcuts(all_shortcuts)
             return True
         elif source_parent is not None:
-            index = all_shortcuts.index(source_shortcut)
+            index = all_shortcuts.index(source_parent)
 
-            source_shortcut = all_shortcuts[index]
+            source_parent = all_shortcuts[index]
 
             source_parent.remove_child(source_shortcut)
             

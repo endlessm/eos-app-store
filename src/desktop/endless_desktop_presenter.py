@@ -29,7 +29,7 @@ class DesktopPresenter(object):
             source_shortcut,
             folder_shortcut
             )
-        self._view.refresh(self._model.get_shortcuts(), self._model.get_page_number(), self._model.get_total_pages(), force=True)
+        self._view.refresh(self._model.get_shortcuts(), self._model.get_page_number(), self._model.get_total_pages())
         if success:
             if folder_shortcut is not None:
                 self._view.show_folder_window_by_name(folder_shortcut.name())
