@@ -2,6 +2,7 @@ import gtk
 from osapps.desktop_preferences_datastore import DesktopPreferencesDatastore
 from eos_util import image_util
 from xdg.DesktopEntry import DesktopEntry
+from desktop_files.desktop_file_model import DesktopFileModel
 
 class ApplicationRowBox(gtk.EventBox):
     def __init__(self, item=None, parent=None, presenter=None, desktop_preference_class = DesktopPreferencesDatastore):
@@ -23,7 +24,10 @@ class ApplicationRowBox(gtk.EventBox):
         self._default_icon = image_util.image_path("endless.png")
         self._height = 80
 
-        self._icon_image = self._desktop_entry.get('X-EndlessM-Normal-Icon') or self._default_icon
+        # Use the DesktopFileModel class to provide the full path to the normal icon
+        icon = self._desktop_entry.getIcon()
+        desktop_file_model = DesktopFileModel(self._id, self._desktop_file_path, self._name, self._description, icon)
+        self._icon_image = desktop_file_model.normal_icon() or self._default_icon
 
         self._icon_width = 150
         self._plus_box_width = 80

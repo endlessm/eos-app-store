@@ -85,12 +85,12 @@ class TestDesktopModel(unittest.TestCase):
 
 
     def _build_desktop(self):
-        self._make_file(self._tmp_directory, 'link1.desktop', 
-                        '[Desktop Entry]\nCategories=Network\nType=Link\nName=link1\nURL=foo1\nComment=comment1\nX-EndlessM-Normal-Icon=iNorm\nX-EndlessM-Hover-Icon=iHover\nX-EndlessM-Down-Icon=iDown')        
-        self._make_file(self._tmp_directory, 'link2.desktop', 
-                        '[Desktop Entry]\nCategories=Network\nType=Link\nName=link2\nURL=foo2\nComment=comment2')        
-        self._make_file(self._tmp_directory, 'link3.desktop', 
-                        '[Desktop Entry]\nCategories=Network\nType=Application\nName=link3\nComment=comment3\nURL=foo3\nExec=firefox\nX-EndlessM-Normal-Icon=iNorm\nX-EndlessM-Hover-Icon=iHover\nX-EndlessM-Down-Icon=iDown')        
+        self._make_file(self._tmp_directory, 'link1.desktop',
+                        '[Desktop Entry]\nCategories=Network\nType=Link\nName=link1\nURL=foo1\nComment=comment1\nIcon=icon1\nX-EndlessM-Class-Name=class_name1')
+        self._make_file(self._tmp_directory, 'link2.desktop',
+                        '[Desktop Entry]\nCategories=Network\nType=Link\nName=link2\nURL=foo2\nComment=comment2')
+        self._make_file(self._tmp_directory, 'link3.desktop',
+                        '[Desktop Entry]\nCategories=Network\nType=Application\nName=link3\nComment=comment3\nURL=foo3\nExec=firefox\nIcon=icon3')
 
     def _make_file(self, dirname, filename, content):
         with open(os.path.join(dirname, filename), 'w') as f: 
