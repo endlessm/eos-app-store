@@ -80,7 +80,7 @@ class EndlessDesktopView(gtk.Window, object):
         self.add(self._base_desktop)
         self.show_all()
 
-    def refresh(self, shortcuts, page_number=0, pages=1, force=False):
+    def refresh(self, shortcuts, page_number=0, pages=1):
         show_page_buttons = pages > 1
         self.left_page_button.set_is_visible(show_page_buttons)
         self.right_page_button.set_is_visible(show_page_buttons)
