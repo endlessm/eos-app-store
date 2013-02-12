@@ -84,21 +84,3 @@ class TestXlibHelper(unittest.TestCase):
         self._test_object.get_window_name = Mock(return_value = window_name)
         
         self.assertEquals('windowname', self._test_object.get_application_key(window))
-        
-    def test_get_application_key_special_case_for_solitaire(self):
-        window = Mock()
-        class_name = 'Sol'
-        window_name = 'Solitaire'
-        self._test_object.get_class_name = Mock(return_value = class_name)
-        self._test_object.get_window_name = Mock(return_value = window_name)
-        
-        self.assertEquals('sol', self._test_object.get_application_key(window))
-
-    def test_get_application_key_special_case_for_freecell(self):
-        window = Mock()
-        class_name = 'Sol'
-        window_name = 'Freecell Solitaire'
-        self._test_object.get_class_name = Mock(return_value = class_name)
-        self._test_object.get_window_name = Mock(return_value = window_name)
-        
-        self.assertEquals('sol-freecell', self._test_object.get_application_key(window))
