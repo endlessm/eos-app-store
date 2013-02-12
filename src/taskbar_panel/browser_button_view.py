@@ -7,8 +7,8 @@ from browser_button_constants import BrowserButtonConstants
 
 class BrowserButtonView(gtk.EventBox, AbstractNotifier):
     
-    ICON_SIZE = 30
-    PADDED_WIDTH = 44
+    ICON_SIZE = BrowserButtonConstants.ICON_SIZE
+    PADDED_WIDTH = ICON_SIZE + BrowserButtonConstants.BROWSER_ICON_PADDING
 
     def __init__(self):
         gtk.EventBox.__init__(self)

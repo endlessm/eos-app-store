@@ -9,11 +9,12 @@ from application_list_plugin import ApplicationListPlugin
 from taskbar_shortcut import TaskbarShortcut
 from social_bar.social_bar_plugin import SocialBarPlugin
 from browser_button import BrowserButton
+from browser_button_constants import BrowserButtonConstants
 from notification_panel.notification_panel import NotificationPanel
 
 class TaskbarPanel(gtk.EventBox):
 
-    ICON_SIZE = 32
+    ICON_SIZE = BrowserButtonConstants.ICON_SIZE
 
     def __init__(self, parent, width):
         super(TaskbarPanel, self).__init__()

@@ -9,6 +9,7 @@ from taskbar_icon import TaskbarIcon
 from eos_util.image_util import load_pixbuf
 from update_task_thread import UpdateTasksThread
 from xlib_helper import XlibHelper
+from predefined_icons_provider import PredefinedIconsProvider
 
 # DO NOT REMOVE!!! PyInstaller does not know that these are imported
 # on its own so we have to manually import them
@@ -17,7 +18,7 @@ from Xlib.ext import xtest, shape, xinerama, record, composite, randr
 # *****************
 
 class ApplicationListPlugin(gtk.HBox):
-    def __init__(self, icon_size, local_display = display.Display(), pixbuf_loader = load_pixbuf):
+    def __init__(self, icon_size, local_display = display.Display(), pixbuf_loader = load_pixbuf, predefined_icons_provider = PredefinedIconsProvider()):
         super(ApplicationListPlugin, self).__init__()
 
         self._icon_size = icon_size
@@ -28,7 +29,8 @@ class ApplicationListPlugin(gtk.HBox):
 
         self._local_display = local_display
         self._screen = self._local_display.screen()
-        
+        self._predefined_icons_provider = predefined_icons_provider 
+
         self._xlib_helper = XlibHelper(local_display)
 
         self._NET_CLIENT_LIST_ATOM_ID       = self._xlib_helper.get_atom_id(XlibHelper.Atom.CLIENT_LIST)
@@ -40,7 +42,7 @@ class ApplicationListPlugin(gtk.HBox):
         self._NET_ACTIVE_WINDOW_ATOM_ID     = self._xlib_helper.get_atom_id(XlibHelper.Atom.ACTIVE_WINDOW)
         self._NET_WM_NAME_ATOM_ID           = self._xlib_helper.get_atom_id(XlibHelper.Atom.WINDOW_NAME)
         self._UTF8_ATOM_ID           	    = self._xlib_helper.get_atom_id(XlibHelper.Atom.UTF8)
-        
+
         watched_atom_ids = [self._NET_CLIENT_LIST_ATOM_ID,
                             self._NET_ACTIVE_WINDOW_ATOM_ID,
                             self._NET_WM_STATE_ATOM_ID,
@@ -78,47 +80,68 @@ class ApplicationListPlugin(gtk.HBox):
                 pass
 
             window_name = self._xlib_helper.get_window_name(window)
-
-            scaled_pixbuf = self._default_icon
-            # Get window's icons
-            try:
-                icon = window.get_full_property(self._NET_WM_ICON_ATOM_ID, Xatom.CARDINAL)
-                if icon is None or icon.format != 32:
-                    raise Exception("Icon is not in a good format. Using default")
-
-                # Extract icon data. We should also check other icons
-                width = icon.value[0]
-                height = icon.value[1]
-                data = icon.value[2:width * height + 2]
-                data_array = array.array('I', data)
-
-                # Convert ARGB to ABRG
-                for i, data in enumerate(data_array):
-                    data_array[i] = (data & 0xff00ff00) | ((data & 0xff) << 16) | ((data >> 16) & 0xff)
-
-                # Scale the icon
-                icon_pixbuf = gdk.pixbuf_new_from_data(data_array.tostring(), gdk.COLORSPACE_RGB, True, 8, width, height, width * 4)
-                scaled_pixbuf = icon_pixbuf.scale_simple(self._icon_size, self._icon_size, gdk.INTERP_BILINEAR)
-                del icon_pixbuf
-            except:
-#                print "Error retrieving icon. Using default"
-                pass
+            scaled_icon = self._get_window_icon(window)
 
             # Check if we are the selected task
             is_selected = (selected_window != None) & (len(selected_window) > 0) & (task == selected_window[0])
 
             if task not in self._taskbar_icons.keys():
-                self._application_event_box = TaskbarIcon(task, window_name, scaled_pixbuf, is_selected)
+                self._application_event_box = TaskbarIcon(task, window_name, scaled_icon, is_selected)
                 self._application_event_box.connect("button-press-event", self.toggle_state)
-                del scaled_pixbuf
 
                 self._taskbar_icons[task] = self._application_event_box
                 self.pack_start(self._application_event_box, False, False, 4)
             else:
-                self._taskbar_icons[task].update_task(window_name, scaled_pixbuf, is_selected)
+                self._taskbar_icons[task].update_task(window_name, scaled_icon, is_selected)
 
             self.show_all()
         gtk.threads_leave()
+
+    def _get_window_icon(self, window):
+        # Get the window's icon if it was predefined
+        icon = self._get_predefined_icon(window)
+
+        # Otherwise grab it from X11
+        if not icon:
+            icon = self._get_x11_icon(window)
+
+        # Default icon if all else fails
+        if not icon:
+            icon = self._default_icon
+
+        return icon
+
+    def _get_predefined_icon(self, window):
+        try:
+            application_key = self._xlib_helper.get_application_key(window)
+            return self._predefined_icons_provider.get_icon_for(application_key)
+        except:
+            return None
+
+    def _get_x11_icon(self, window):
+        try:
+            icon = window.get_full_property(self._NET_WM_ICON_ATOM_ID, Xatom.CARDINAL)
+            if icon is None or icon.format != 32:
+                raise Exception("Icon is not in a good format. Using default")
+
+            # Extract icon data. We should also check other icons
+            width = icon.value[0]
+            height = icon.value[1]
+            data = icon.value[2:width * height + 2]
+            data_array = array.array('I', data)
+
+            # Convert ARGB to ABRG
+            for index, data in enumerate(data_array):
+                data_array[index] = (data & 0xff00ff00) | ((data & 0xff) << 16) | ((data >> 16) & 0xff)
+
+            # Scale the icon
+            icon_pixbuf = gdk.pixbuf_new_from_data(data_array.tostring(), gdk.COLORSPACE_RGB, True, 8, width, height, width * 4)
+            scaled_pixbuf = icon_pixbuf.scale_simple(self._icon_size, self._icon_size, gdk.INTERP_BILINEAR)
+            del icon_pixbuf
+
+            return scaled_pixbuf
+        except:
+            return None
 
     def toggle_state(self, widget, event):
         try:

@@ -42,3 +42,26 @@ class XlibHelper():
             self._logger.error("Failed to get window name. Continuing", e)
             
         return window_name
+    
+    # Note: the class name may have mixed capitalization.
+    # If comparing with the name of the executable binary,
+    # it is recommended that the caller convert both to all lower case.
+    # Some applications might not report a WM_CLASS property,
+    # in which case the return value is a blank string.
+    def get_class_name(self, window):
+        class_name = ""
+        try:
+            class_name = window.get_wm_class()[1]
+        except Exception as e:
+            self._logger.error("Failed to get class name. Continuing", e)
+        
+        return class_name
+    
+    # Gets a key (all lower-case) for the application that can be used to retrieve details
+    # about the application's desktop file (such as its icon name) from a dictionary
+    def get_application_key(self, window):
+        key = self.get_class_name(window)
+        if not key:
+            key = self.get_window_name(window)
+        return key.lower()
+    
