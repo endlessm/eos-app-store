@@ -1,5 +1,6 @@
 import os.path
 
+from startup.firefox_tasks import FirefoxTasks
 from startup.shotwell_tasks import ShotwellTasks
 from startup.beatbox_tasks import BeatboxTasks
 from startup.windows_migration_tasks import WindowsMigrationTasks
@@ -11,6 +12,7 @@ from eos_log import log
 class InitialTasks():
 	TASK_PLUGINS = [
 				DeleteInstallLockTask,
+				FirefoxTasks, 
 				ShotwellTasks, 
 				BeatboxTasks,
 				WindowsMigrationTasks,

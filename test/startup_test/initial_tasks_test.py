@@ -4,6 +4,7 @@ from mock import Mock #@UnresolvedImport
 import shutil
 import os.path
 
+from startup.firefox_tasks import FirefoxTasks
 from startup.shotwell_tasks import ShotwellTasks
 from startup.beatbox_tasks import BeatboxTasks
 from startup.windows_migration_tasks import WindowsMigrationTasks
@@ -32,13 +33,14 @@ class InitialTasksTest(unittest.TestCase):
     def test_initialize_tasks_are_correct(self):
         test_object = InitialTasks()
 
-        self.assertEquals(6, len(test_object.TASK_PLUGINS))
+        self.assertEquals(7, len(test_object.TASK_PLUGINS))
         self.assertIsInstance(test_object.TASK_PLUGINS[0](), DeleteInstallLockTask)
-        self.assertIsInstance(test_object.TASK_PLUGINS[1](), ShotwellTasks)
-        self.assertIsInstance(test_object.TASK_PLUGINS[2](), BeatboxTasks)
-        self.assertIsInstance(test_object.TASK_PLUGINS[3](), WindowsMigrationTasks)
-        self.assertIsInstance(test_object.TASK_PLUGINS[4](), RemoveExtraDirectoriesTask)
-        self.assertIsInstance(test_object.TASK_PLUGINS[5](), RemoveExtraFilesTask)
+        self.assertIsInstance(test_object.TASK_PLUGINS[1](), FirefoxTasks)
+        self.assertIsInstance(test_object.TASK_PLUGINS[2](), ShotwellTasks)
+        self.assertIsInstance(test_object.TASK_PLUGINS[3](), BeatboxTasks)
+        self.assertIsInstance(test_object.TASK_PLUGINS[4](), WindowsMigrationTasks)
+        self.assertIsInstance(test_object.TASK_PLUGINS[5](), RemoveExtraDirectoriesTask)
+        self.assertIsInstance(test_object.TASK_PLUGINS[6](), RemoveExtraFilesTask)
 
     def test_correct_tasks_are_called_when_perform_tasks_is_called(self):
         mock_task1 = Mock()
