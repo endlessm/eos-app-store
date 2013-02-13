@@ -78,6 +78,10 @@ class ApplicationListPlugin(gtk.HBox):
                     continue
             except:
                 pass
+            
+            # Do not display Firefox in the taskbar
+            if self._xlib_helper.get_application_key(window) == 'firefox':
+                continue
 
             window_name = self._xlib_helper.get_window_name(window)
             scaled_icon = self._get_window_icon(window)
