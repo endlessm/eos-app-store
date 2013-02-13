@@ -15,7 +15,7 @@ class FirefoxTaskTest(unittest.TestCase):
         self.test_object = FirefoxTasks(self.home_directory_copier, self.os_util)
 
     def test_default_location_is_correct(self):
-        self.assertEquals("/etc/endlessm/mozilla",
+        self.assertEquals("/etc/eos-browser/mozilla",
                 self.test_object._default_config_folder_path())
 
     def test_target_dir_is_correct(self):

@@ -12,4 +12,4 @@ class FirefoxTasks():
         self._file_copier.copy_from(self._default_config_folder_path())
     
     def _default_config_folder_path(self):
-        return "/etc/endlessm/mozilla"
+        return "/etc/eos-browser/mozilla"
