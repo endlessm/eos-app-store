@@ -3,8 +3,8 @@ from startup.beatbox_tasks import BeatboxTasks
 from mock import Mock
 import shutil
 import os
-from startup.home_directory_file_copier import HomeDirectoryFileCopier
 from osapps.os_util import OsUtil
+from osapps.home_path_provider import HomePathProvider
 
 class BeatboxIntegrationTaskTest(unittest.TestCase):
     def setUp(self):
@@ -19,12 +19,9 @@ class BeatboxIntegrationTaskTest(unittest.TestCase):
 
         os.makedirs(self._destination)
 
-        self.home_path_provider = Mock()
-        self.home_path_provider.get_user_directory = Mock(return_value=self._destination)
-        self.home_directory_copier = HomeDirectoryFileCopier(self.home_path_provider)
-        self.os_util = Mock()
-
-        self.test_object = BeatboxTasks(self.home_directory_copier, self.home_path_provider, self.os_util)
+        home_path_provider = HomePathProvider()
+        home_path_provider.PREFIX = self._destination
+        self.test_object = BeatboxTasks(home_path_provider=home_path_provider, os_util=Mock())
 
     def tearDown(self):
         shutil.rmtree(self._source, True)
@@ -34,6 +31,6 @@ class BeatboxIntegrationTaskTest(unittest.TestCase):
         self.test_object.SOURCE_DIR = '/tmp/default_music'
         self.test_object.execute()
 
-        self.assertTrue(os.path.isfile("/tmp/destination/test.music"))
-        self.assertTrue(os.path.isfile("/tmp/destination/test2.music"))
+        self.assertTrue(os.path.isfile("/tmp/destination/Music/Endless/test.music"))
+        self.assertTrue(os.path.isfile("/tmp/destination/Music/Endless/test2.music"))
 
