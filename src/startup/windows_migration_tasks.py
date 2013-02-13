@@ -94,16 +94,16 @@ class WindowsMigrationTasks:
                         self._link_directory(user, docs_path, self._xp_video_dirs, self.videos_dir(), link_name)
     
     def pictures_dir(self):
-        return self._home_path_provider.get_user_directory("Pictures")
+        return self._home_path_provider.get_pictures_directory()
     
     def videos_dir(self):
-        return self._home_path_provider.get_user_directory("Videos")
+        return self._home_path_provider.get_videos_directory()
     
     def documents_dir(self):
-        return self._home_path_provider.get_user_directory("Documents")
+        return self._home_path_provider.get_documents_directory()
     
     def music_dir(self):
-        return self._home_path_provider.get_user_directory("Music")
+        return self._home_path_provider.get_music_directory()
     
     def _create_link(self, source, link):
         if not os.path.islink(link):
