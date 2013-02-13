@@ -1,15 +1,12 @@
-from osapps.os_util import OsUtil
-from simple_file_copier import SimpleFileCopier
+from home_directory_file_copier import HomeDirectoryFileCopier
 
 class FirefoxTasks():
     TARGET_DIR = ".mozilla"
-    
-    def __init__(self, file_copier=SimpleFileCopier(TARGET_DIR), os_util=OsUtil()):
+    SOURCE_DIR = "/etc/eos-browser/mozilla"
+
+    def __init__(self, file_copier=HomeDirectoryFileCopier()):
         self._file_copier = file_copier
-        self._os_util = os_util
 
     def execute(self):
-        self._file_copier.copy_from(self._default_config_folder_path())
-    
-    def _default_config_folder_path(self):
-        return "/etc/eos-browser/mozilla"
+       self._file_copier.copy(self.SOURCE_DIR, self.TARGET_DIR)
+

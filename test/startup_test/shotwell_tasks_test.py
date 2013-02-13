@@ -5,24 +5,21 @@ from startup.shotwell_tasks import ShotwellTasks
 
 class ShotwellTaskTest(unittest.TestCase):
     def setUp(self):
-        self.home_directory_copier = Mock()
-        self.os_util = Mock()
-        self.os_util.execute = Mock()
-        self.home_path = "home_path"
-        self.home_path_provider = Mock(return_value =
-                self.home_path)
+        mock_manager = Mock()
+        self.home_directory_copier = mock_manager.home_directory_copier
+        self.os_util = mock_manager.os_util
 
         self.test_object = ShotwellTasks(self.home_directory_copier, self.os_util)
 
     def test_default_location_is_correct(self):
-        self.assertEquals("/usr/share/endlessm-default-files/default_images",
-                self.test_object._default_images_folder_path())
+        self.assertEquals("/usr/share/endlessm-default-files/default_images", self.test_object.SOURCE_DIR)
 
     def test_target_dir_is_correct(self):
         self.assertEqual('Pictures', self.test_object.TARGET_DIR)
 
     def test_gsettings_are_set_for_shotwell(self):
         self.test_object.execute()
+
         self.os_util.execute.assert_has_calls([
                 call(["gsettings", "set", "org.yorba.shotwell.preferences.ui", "show-welcome-dialog", "false"]),
                 call(["gsettings", "set", "org.yorba.shotwell.preferences.files", "auto-import", "true"])
@@ -30,4 +27,5 @@ class ShotwellTaskTest(unittest.TestCase):
 
     def test_file_copier_is_called_with_default_images_folder(self):
         self.test_object.execute()
-        self.home_directory_copier.copy_from.assert_called_once_with(self.test_object._default_images_folder_path())
+
+        self.home_directory_copier.copy.assert_called_once_with(self.test_object.SOURCE_DIR, self.test_object.TARGET_DIR)

@@ -1,19 +1,17 @@
 from osapps.os_util import OsUtil
-from default_file_copier import DefaultFileCopier
+from home_directory_file_copier import HomeDirectoryFileCopier
 
 class ShotwellTasks():
+    SOURCE_DIR = "/usr/share/endlessm-default-files/default_images"
     TARGET_DIR = "Pictures"
     
-    def __init__(self, default_file_copier=DefaultFileCopier(TARGET_DIR), os_util=OsUtil()):
-        self._default_file_copier = default_file_copier
+    def __init__(self, home_directory_file_copier=HomeDirectoryFileCopier(), os_util=OsUtil()):
+        self._home_directory_file_copier = home_directory_file_copier
         self._os_util = os_util
 
     def execute(self):
-        self._default_file_copier.copy_from(self._default_images_folder_path())
+        self._home_directory_file_copier.copy(self.SOURCE_DIR, self.TARGET_DIR)
         self._initialize_shotwell_settings()
-    
-    def _default_images_folder_path(self):
-        return "/usr/share/endlessm-default-files/default_images"
     
     def _initialize_shotwell_settings(self):
         self._os_util.execute(["gsettings", "set",
