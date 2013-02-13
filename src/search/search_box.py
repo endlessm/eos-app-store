@@ -4,11 +4,14 @@ import gettext
 
 from eos_util import image_util
 from eos_util.image_util import load_pixbuf
+from search.search_box_model import SearchBoxModel
 from search.search_box_presenter import SearchBoxPresenter
+from search.search_box_constants import SearchBoxConstants
+from eos_widgets.abstract_notifier import AbstractNotifier
 
 gettext.install('endless_desktop', '/usr/share/locale', unicode = True, names=['ngettext'])
 
-class SearchBox(gtk.EventBox):
+class SearchBox(gtk.EventBox, AbstractNotifier):
     HEIGHT = 30
     WIDTH = 298
     LEFT_PADDING = 10
@@ -27,7 +30,7 @@ class SearchBox(gtk.EventBox):
         self.set_size_request(self.WIDTH, self.HEIGHT)
         self.set_visible_window(False)
 
-        self._presenter = SearchBoxPresenter()
+        SearchBoxPresenter(self, SearchBoxModel())
 
         self.connect('button-release-event', self.gain_focus)
 
@@ -37,7 +40,7 @@ class SearchBox(gtk.EventBox):
         self._button = SearchBoxButton()
         self._frame = SearchBoxFrame()
 
-        self._button.connect('button-release-event', lambda w, e : self._launch_browser())
+        self._button.connect('button-release-event', lambda w, e : self._notify(SearchBoxConstants.LAUNCH_BROWSER))
 
         self._container = SearchBoxContainer(self._button, self._label, self._frame, self.LEFT_MARGIN, self.TOP_MARGIN)
 
@@ -99,13 +102,14 @@ class SearchBox(gtk.EventBox):
         else:
             self._set_label_text(self.DEFAULT_TEXT)
 
-    def _launch_browser(self):
+    def get_search_text(self):
         search_text = ""
         if hasattr(self, "_text_view"):
             text_buffer = self._text_view.get_buffer()
             search_text = text_buffer.get_text(text_buffer.get_start_iter(), text_buffer.get_end_iter(), False)
-        self._presenter.launch_search(search_text)
+        return search_text
 
+    def reset_search(self):
         self.add_text_entry("")
         self.reset_text_field()
 
@@ -121,7 +125,7 @@ class SearchBox(gtk.EventBox):
             self.reset_text_field()
             return True
         elif(event.keyval == gtk.keysyms.Return or event.keyval == gtk.keysyms.KP_Enter):
-            self._launch_browser()
+            self._notify(SearchBoxConstants.LAUNCH_BROWSER)
             return True
         return False
 

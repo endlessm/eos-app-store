@@ -1,13 +1,10 @@
-from osapps.app_launcher import AppLauncher
+from search_box_constants import SearchBoxConstants
 
 class SearchBoxPresenter(object):
-    DEFAULT_URL = "www.google.com"
+    def __init__(self, view, model):
+        view.add_listener(SearchBoxConstants.LAUNCH_BROWSER, lambda: self._launch_browser(view, model))
 
-    def __init__(self, app_launcher=AppLauncher()):
-        self._app_launcher = app_launcher
-
-    def launch_search(self, search_string):
-        if search_string is None or len(search_string) == 0:
-           search_string = self.DEFAULT_URL
-        self._app_launcher.launch_browser(search_string)
+    def _launch_browser(self, view, model):
+        model.search(view.get_search_text())
+        view.reset_search()
 
