@@ -8,6 +8,6 @@ class SearchBoxPresenter(object):
 
     def launch_search(self, search_string):
         if search_string is None or len(search_string) == 0:
-           search_string = self.DEFAULT_URL
-        self._app_launcher.launch_browser(search_string)
-
+           self._app_launcher.launch_browser(self.DEFAULT_URL)
+        else:
+            self._app_launcher.launch_search(search_string)

@@ -18,7 +18,7 @@ class TestSearchBoxPresenter(unittest.TestCase):
 
         self.testObject.launch_search(search_string)
 
-        self.mock_app_launcher.launch_browser.assert_called_once_with(search_string)
+        self.mock_app_launcher.launch_search.assert_called_once_with(search_string)
 
     def test_launch_search_searches_google_if_empty_string_is_given(self):
         self.testObject.launch_search('')
