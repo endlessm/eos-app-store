@@ -125,7 +125,7 @@ class SearchBox(gtk.EventBox, AbstractNotifier):
             self.reset_text_field()
             return True
         elif(event.keyval == gtk.keysyms.Return or event.keyval == gtk.keysyms.KP_Enter):
-            self._notify(self.LAUNCH_BROWSER)
+            self._notify(SearchBoxConstants.LAUNCH_BROWSER)
             return True
         return False
 
