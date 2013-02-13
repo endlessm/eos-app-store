@@ -1,35 +1,33 @@
 import unittest
 from mock import Mock, patch
 from search.search_box_presenter import SearchBoxPresenter
-from osapps.app_shortcut import AppShortcut
+from search.search_box_constants import SearchBoxConstants
 
 class TestSearchBoxPresenter(unittest.TestCase):
 
     def setUp(self):
-        self.mock_app_launcher = Mock()
+        self.mock_manager = Mock()
+        self.view = self.mock_manager.view
+        self.model = self.mock_manager.model
 
-        self.testObject = SearchBoxPresenter(self.mock_app_launcher)
+        self.view.add_listener = Mock(side_effect=self._view_side_effect)
 
-    def tearDown(self):
-        pass
+        SearchBoxPresenter(self.view, self.model)
 
-    def test_launch_search_launches_search(self):
-        search_string = "blah"
+    def _view_side_effect(self, *args, **kwargs):
+        if args[0] == SearchBoxConstants.LAUNCH_BROWSER:
+            self._launch_browser = args[1]
 
-        self.testObject.launch_search(search_string)
+    def test_when_search_is_made_search_text_from_view_is_given_to_model(self):
+        search_text = "search text"
+        self.view.get_search_text = Mock(return_value=search_text)
 
-        self.mock_app_launcher.launch_search.assert_called_once_with(search_string)
+        self._launch_browser()
 
-    def test_launch_search_searches_google_if_empty_string_is_given(self):
-        self.testObject.launch_search('')
+        self.model.search.assert_called_once_with(search_text)
 
-        self.mock_app_launcher.launch_browser.assert_called_once_with("www.google.com")
+    def test_when_search_is_made_view_is_reset(self):
+        self._launch_browser()
 
-    def test_launch_search_searches_google_if_no_string_is_given(self):
-        self.testObject.launch_search(None)
-
-        self.mock_app_launcher.launch_browser.assert_called_once_with("www.google.com")
-
-
-
+        self.assertTrue(self.view.reset_search.called)
 
