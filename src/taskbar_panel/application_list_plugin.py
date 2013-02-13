@@ -72,12 +72,8 @@ class ApplicationListPlugin(gtk.HBox):
             # Get window object from ID
             window = self._local_display.create_resource_object('window', task)
 
-            # Check if the app is requesting not to be in taskbar
-            try:
-                if self._NET_WM_SKIP_TASKBAR_ATOM_ID in window.get_full_property(self._NET_WM_STATE_ATOM_ID, Xatom.ATOM).value:
-                    continue
-            except:
-                pass
+            if not self._should_app_be_in_taskbar(window):
+                continue
 
             window_name = self._xlib_helper.get_window_name(window)
             scaled_icon = self._get_window_icon(window)
@@ -97,6 +93,21 @@ class ApplicationListPlugin(gtk.HBox):
             self.show_all()
         gtk.threads_leave()
 
+    def _should_app_be_in_taskbar(self, window):
+        retval = True
+        # Check if the app is requesting not to be in taskbar
+        try:
+            if self._NET_WM_SKIP_TASKBAR_ATOM_ID in window.get_full_property(self._NET_WM_STATE_ATOM_ID, Xatom.ATOM).value:
+                retval = False
+        except:
+            pass
+        
+        # Do not display Firefox in the taskbar
+        if self._xlib_helper.get_application_key(window) == 'firefox':
+            retval = False
+            
+        return retval
+            
     def _get_window_icon(self, window):
         # Get the window's icon if it was predefined
         icon = self._get_predefined_icon(window)
