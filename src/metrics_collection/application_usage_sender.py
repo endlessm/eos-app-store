@@ -4,7 +4,7 @@ from metrics.metrics_connection import MetricsConnection
 
 class ApplicationUsageSender(AbstractSendProcess):
     FILENAME = 'application_usage.json'
-    def __init__(self, metrics_connection = MetricsConnection(), directory_name=AbstractSendProcess.DEFAULT_DIRNAME):
+    def __init__(self, metrics_connection = MetricsConnection(form_param_name="time_in_activities"), directory_name=AbstractSendProcess.DEFAULT_DIRNAME):
         super(ApplicationUsageSender, self).__init__(self.FILENAME, metrics_connection, directory_name)
         self._metrics_connection = metrics_connection
 

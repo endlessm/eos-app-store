@@ -1,4 +1,3 @@
-import json
 import unittest
 from datetime import datetime
 from mock import Mock
@@ -13,7 +12,7 @@ class ApplicationUsageMetricTest(unittest.TestCase):
         time_provider.get_current_time = Mock(return_value=expected_timestamp)
         test_object = ApplicationUsageMetric("app1", 12345, time_provider)
 
-        json_dict = json.loads(test_object.to_json())
+        json_dict = test_object.to_json_dict()
         self.assertEquals(json_dict["activityName"], "app1")
         self.assertEquals(json_dict["timeSpentInActivity"], 12345)
         self.assertEquals(json_dict["timestamp"], expected_timestamp)

@@ -8,5 +8,5 @@ class ApplicationUsageMetric():
         self._application = application
         self._total_time = total_time
 
-    def to_json(self):
-        return json.dumps({'activityName':self._application, 'timeSpentInActivity': self._total_time, 'timestamp': self._time_stamp})
+    def to_json_dict(self):
+        return {'activityName':self._application, 'timeSpentInActivity': self._total_time, 'timestamp': self._time_stamp}
