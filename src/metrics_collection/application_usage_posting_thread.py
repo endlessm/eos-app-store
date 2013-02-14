@@ -2,7 +2,7 @@ import time
 from threading import Thread
 
 class ApplicationUsagePostingThread(Thread):
-    SLEEP_TIME = 60
+    SLEEP_TIME = 5*60
 
     def __init__(self, application_usage_posting_util):
         super(ApplicationUsagePostingThread, self).__init__()
