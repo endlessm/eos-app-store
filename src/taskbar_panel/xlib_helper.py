@@ -1,3 +1,5 @@
+from Xlib import Xatom
+
 from eos_log import log
 
 class XlibHelper():
@@ -10,20 +12,22 @@ class XlibHelper():
             WINDOW_CHANGE_STATE = 'WM_CHANGE_STATE',
             WINDOW_STATE_HIDDEN = '_NET_WM_STATE_HIDDEN',
             ACTIVE_WINDOW       = '_NET_ACTIVE_WINDOW',
+            PROCESS_ID          = '_NET_ACTIVE_WINDOW',
             WINDOW_NAME         = '_NET_WM_NAME',
             UTF8                = 'UTF8_STRING',
             )
     Atom = type('Enum', (), _ATOMS)
-    
+
     def __init__(self, display, logger = log):
         self._display = display
         self._logger = log
         self._window_name_atom_id = self.get_atom_id(XlibHelper.Atom.WINDOW_NAME)
         self._utf8_atom_id = self.get_atom_id(XlibHelper.Atom.UTF8)
-    
+        self._active_window_atom_id = self.get_atom_id(XlibHelper.Atom.ACTIVE_WINDOW)
+
     def get_atom_id(self, atom_id):
         return self._display.intern_atom(atom_id) 
-    
+
     def get_window_name(self, window):
         window_name = ""
         try:
@@ -33,16 +37,28 @@ class XlibHelper():
                 pass
             except Exception as e:
                 self._logger.error("Could not retrieve window name by default means. Continuing.", e)
-    
+
             if window_name:
                 window_name = unicode(window_name, 'utf-8')
             else:
                 window_name = unicode(window.get_wm_name())
         except Exception as e:
             self._logger.error("Failed to get window name. Continuing", e)
-            
+
         return window_name
-    
+
+    def get_selected_window_class_name(self, root_window):
+        selected_window_name = None
+        try:
+            selected_window_id = root_window.get_full_property(self._active_window_atom_id, Xatom.WINDOW).value[0]
+            window = self._display.create_resource_object('window', selected_window_id)
+
+            selected_window_name = window.get_wm_class()[1]
+        except Exception as e:
+            self._logger.error("Failed to get window class. Continuing", e)
+
+        return selected_window_name
+
     # Note: the class name may have mixed capitalization.
     # If comparing with the name of the executable binary,
     # it is recommended that the caller convert both to all lower case.
@@ -54,9 +70,9 @@ class XlibHelper():
             class_name = window.get_wm_class()[1]
         except Exception as e:
             self._logger.error("Failed to get class name. Continuing", e)
-        
+
         return class_name
-    
+
     # Gets a key (all lower-case) for the application that can be used to retrieve details
     # about the application's desktop file (such as its icon name) from a dictionary
     def get_application_key(self, window):
@@ -64,4 +80,4 @@ class XlibHelper():
         if not key:
             key = self.get_window_name(window)
         return key.lower()
-    
+
