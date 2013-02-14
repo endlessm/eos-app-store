@@ -3,7 +3,6 @@ import os.path
 from startup.firefox_tasks import FirefoxTasks
 from startup.shotwell_tasks import ShotwellTasks
 from startup.beatbox_tasks import BeatboxTasks
-from startup.gimp_tasks import GimpTasks
 from startup.windows_migration_tasks import WindowsMigrationTasks
 from startup.remove_extra_directories_task import RemoveExtraDirectoriesTask
 from startup.remove_extra_files_task import RemoveExtraFilesTask
@@ -16,7 +15,6 @@ class InitialTasks():
                 FirefoxTasks, 
                 ShotwellTasks, 
                 BeatboxTasks,
-                GimpTasks,
                 WindowsMigrationTasks,
                 RemoveExtraDirectoriesTask,
                 RemoveExtraFilesTask
