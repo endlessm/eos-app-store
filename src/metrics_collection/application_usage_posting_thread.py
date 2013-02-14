@@ -1,4 +1,6 @@
+import time
 from threading import Thread
+
 class ApplicationUsagePostingThread(Thread):
     SLEEP_TIME = 60
 

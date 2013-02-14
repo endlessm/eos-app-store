@@ -56,7 +56,7 @@ class UpdateTasksThread(Thread):
                         log.error("Could not retrieve tasks. Continuing", e)
 
             # Collect app usage metrics
-            selected_window_process = self._xlib_helper.get_selected_window_process_name(self._screen.root)
+            selected_window_process = self._xlib_helper.get_selected_window_class_name(self._screen.root)
             if selected_window_process:
                 self._application_tracker.update_app_usage(selected_window_process, self.SLEEP_TIME)
 

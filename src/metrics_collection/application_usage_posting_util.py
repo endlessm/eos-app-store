@@ -16,6 +16,6 @@ class ApplicationUsagePostingUtil():
 
         json_items = [ json_item.to_json_dict() for json_item in usage_metrics] 
 
-        self._usage_sender.send_data(json_items)
+        self._usage_sender.send_data({'time_in_activities' : json_items})
 
         self._app_tracker.clear_tracking_data()

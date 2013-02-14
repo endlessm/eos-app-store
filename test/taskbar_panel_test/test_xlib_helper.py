@@ -1,5 +1,8 @@
 import unittest
-from mock import Mock
+import uuid
+from Xlib import Xatom
+from mock import Mock, call
+
 from taskbar_panel.xlib_helper import XlibHelper
 
 class TestXlibHelper(unittest.TestCase):
@@ -82,5 +85,37 @@ class TestXlibHelper(unittest.TestCase):
         window_name = 'WindowName'
         self._test_object.get_class_name = Mock(return_value = class_name)
         self._test_object.get_window_name = Mock(return_value = window_name)
-        
+
         self.assertEquals('windowname', self._test_object.get_application_key(window))
+
+    def test_getting_the_class_name_from_window(self):
+        active_window_atom_id = self._test_object.get_atom_id(XlibHelper.Atom.ACTIVE_WINDOW)
+
+        root_window = Mock()
+        active_window_id = Mock()
+        class_name = uuid.uuid4()
+
+        active_window = Mock()
+        active_window.get_wm_class = Mock(return_value = ["blah", class_name])
+
+        property_mock = Mock()
+        property_mock.value = [active_window_id, 0]
+
+        root_window.get_full_property = Mock(return_value = property_mock)
+        self._mock_display.create_resource_object = Mock(return_value = active_window)
+
+        self.assertEquals(class_name, self._test_object.get_selected_window_class_name(root_window))
+
+        self._mock_display.create_resource_object.assert_called_once_with('window', active_window_id)
+        root_window.get_full_property.assert_called_once_with(active_window_atom_id, Xatom.WINDOW)
+
+    def test_getting_the_class_name_from_window_returns_nothing_if_exception_occurs(self):
+        self._window_name_atom_id = self._test_object.get_atom_id(XlibHelper.Atom.ACTIVE_WINDOW)
+
+        root_window = Mock()
+        active_window_id = Mock()
+
+        property_mock = Mock()
+        root_window.get_full_property = Mock(return_value = property_mock)
+
+        self.assertEquals(None, self._test_object.get_selected_window_class_name(root_window))

@@ -35,9 +35,10 @@ class ApplicationUsagePostingUtilTest(unittest.TestCase):
             return usage_data
         self._mock_tracker.get_app_usages = get_usage_data
 
-        expected_dict = [{"activityName": "app1", "timeSpentInActivity": 123, "timestamp": 111}, \
+        expected_dict = { 'time_in_activities' : \
+                        [{"activityName": "app1", "timeSpentInActivity": 123, "timestamp": 111}, \
                         {"activityName": "app2", "timeSpentInActivity": 234, "timestamp": 222}, \
-                        {"activityName": "app3", "timeSpentInActivity": 345, "timestamp": 333}]
+                        {"activityName": "app3", "timeSpentInActivity": 345, "timestamp": 333}]}
 
         self._test_object.collect_and_send_data()
 
@@ -49,6 +50,4 @@ class ApplicationUsagePostingUtilTest(unittest.TestCase):
         self._test_object.collect_and_send_data()
 
         self.assertTrue(self._mock_tracker.clear_tracking_data.called)
-
-
 
