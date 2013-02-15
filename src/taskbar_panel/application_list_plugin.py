@@ -11,6 +11,10 @@ from update_task_thread import UpdateTasksThread
 from xlib_helper import XlibHelper
 from predefined_icons_provider import PredefinedIconsProvider
 
+from metrics_collection.application_usage_posting_thread import ApplicationUsagePostingThread
+from metrics_collection.application_usage_posting_util import ApplicationUsagePostingUtil
+from metrics_collection.time_in_application_tracker import TimeInApplicationTracker
+
 # DO NOT REMOVE!!! PyInstaller does not know that these are imported
 # on its own so we have to manually import them
 from Xlib.support import unix_connect
@@ -18,7 +22,7 @@ from Xlib.ext import xtest, shape, xinerama, record, composite, randr
 # *****************
 
 class ApplicationListPlugin(gtk.HBox):
-    def __init__(self, icon_size, local_display = display.Display(), pixbuf_loader = load_pixbuf, predefined_icons_provider = PredefinedIconsProvider()):
+    def __init__(self, icon_size, local_display = display.Display(), pixbuf_loader = load_pixbuf, predefined_icons_provider = PredefinedIconsProvider(), app_tracker = TimeInApplicationTracker()):
         super(ApplicationListPlugin, self).__init__()
 
         self._icon_size = icon_size
@@ -54,8 +58,13 @@ class ApplicationListPlugin(gtk.HBox):
                                           self._NET_CLIENT_LIST_ATOM_ID, 
                                           self._NET_ACTIVE_WINDOW_ATOM_ID,
                                           watched_atom_ids, 
-                                          self._draw_tasks)
+                                          self._draw_tasks,
+                                          app_tracker)
         update_thread.start()
+
+        # Start recording app data
+        application_usage_posting_thread = ApplicationUsagePostingThread(ApplicationUsagePostingUtil(app_tracker))
+        application_usage_posting_thread.start()
 
         self.show_all()
 

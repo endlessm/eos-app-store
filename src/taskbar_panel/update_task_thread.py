@@ -3,8 +3,13 @@ from Xlib import X, Xatom
 from threading import Thread
 from eos_log import log
 
+from metrics_collection.time_in_application_tracker import TimeInApplicationTracker
+from xlib_helper import XlibHelper
+
 class UpdateTasksThread(Thread):
-    def __init__(self, display, screen, client_list_atom_id, active_window_atom_id, watched_atom_ids, callback):
+    SLEEP_TIME = 0.25
+
+    def __init__(self, display, screen, client_list_atom_id, active_window_atom_id, watched_atom_ids, callback, application_tracker = TimeInApplicationTracker()):
         super(UpdateTasksThread, self).__init__()
         self.setDaemon(True)
 
@@ -13,6 +18,8 @@ class UpdateTasksThread(Thread):
         self._client_list_atom_id = client_list_atom_id
         self._active_window_atom_id = active_window_atom_id
         self._watched_atom_ids = watched_atom_ids
+        self._xlib_helper = XlibHelper(display)
+        self._application_tracker = application_tracker
 
         self._draw_tasks_callback = callback
 
@@ -48,7 +55,12 @@ class UpdateTasksThread(Thread):
                 except Exception as e:
                         log.error("Could not retrieve tasks. Continuing", e)
 
+            # Collect app usage metrics
+            selected_window_process = self._xlib_helper.get_selected_window_class_name(self._screen.root)
+            if selected_window_process:
+                self._application_tracker.update_app_usage(selected_window_process, self.SLEEP_TIME)
+
             needs_update = False
 
             # Sleep so that we don't waste CPU cycles
-            time.sleep(0.25)
+            time.sleep(self.SLEEP_TIME)
