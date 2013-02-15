@@ -9,7 +9,7 @@ from eos_util.image import Image
 
 
 from metrics.time_provider import TimeProvider
-from util.feedback_manager import FeedbackManager
+from metrics.feedback_manager import FeedbackManager
 
 
 class FeedbackPlugin(gtk.EventBox):
