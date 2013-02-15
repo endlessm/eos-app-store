@@ -7,6 +7,7 @@ from startup.windows_migration_tasks import WindowsMigrationTasks
 from startup.remove_extra_directories_task import RemoveExtraDirectoriesTask
 from startup.remove_extra_files_task import RemoveExtraFilesTask
 from startup.delete_install_lock_task import DeleteInstallLockTask
+from startup.delete_desktop_state_task import DeleteDesktopStateTask
 from eos_log import log
 
 class InitialTasks():
@@ -15,6 +16,7 @@ class InitialTasks():
 				FirefoxTasks, 
 				ShotwellTasks, 
 				BeatboxTasks,
+                DeleteDesktopStateTask,
 				WindowsMigrationTasks,
                 RemoveExtraDirectoriesTask,
                 RemoveExtraFilesTask
