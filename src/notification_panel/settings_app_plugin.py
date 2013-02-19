@@ -1,13 +1,13 @@
 import gtk
 
 from eos_util.image import Image
-from all_settings_presenter import AllSettingsPresenter
+from settings_app_presenter import SettingsAppPresenter
 from notification_plugin import NotificationPlugin
 from taskbar_panel.taskbar_shortcut import TaskbarShortcut
 
-class AllSettingsPlugin(NotificationPlugin, TaskbarShortcut):
+class SettingsAppPlugin(NotificationPlugin, TaskbarShortcut):
     def __init__(self, icon_size):
-        self._presenter = AllSettingsPresenter()
+        self._presenter = SettingsAppPresenter()
         if not self.is_launcher_present(self.get_path()):
             icon_size = 0
         

@@ -1,11 +1,8 @@
 import gtk
 
-from network_plugin import NetworkSettingsPlugin
 from time_display_plugin import TimeDisplayPlugin
-from bluetooth_plugin import BluetoothSettingsPlugin
-from printer_plugin import PrinterSettingsPlugin
 from battery_plugin import BatteryPlugin
-from all_settings_plugin import AllSettingsPlugin
+from settings_app_plugin import SettingsAppPlugin
 from audio_plugin import AudioSettingsPlugin
 
 from panel_constants import PanelConstants
@@ -16,14 +13,10 @@ from social_bar.social_bar_plugin import SocialBarPlugin
 class NotificationPanel(gtk.HBox):
     # Add plugins for notification panel here
     PLUGINS = [ TimeDisplayPlugin,
-                # BugsAndFeedbackPlugin, -- TODO need this!
-                # PrinterSettingsPlugin, -- TODO No longer on notification panel; add to settings dialog
-                # BluetoothSettingsPlugin, -- TODO No longer on notification panel; add to settings dialog
-                #BatteryPlugin, #-- TODO tempoarily disabled for demo
-                #NetworkSettingsPlugin, # TODO temporarily disabled for demo
+                BatteryPlugin,
                 AudioSettingsPlugin,
                 SocialBarPlugin,
-                AllSettingsPlugin
+                SettingsAppPlugin
               ]
     def __init__(self, parent):
         super(NotificationPanel, self).__init__(False, 2)
