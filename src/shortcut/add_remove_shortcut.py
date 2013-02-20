@@ -1,9 +1,13 @@
 import gobject
 import uuid
+import gettext
+
 from shortcut.desktop_shortcut import DesktopShortcut
 from removal_module.removal_confirmation_popup_window import RemovalConfirmationPopupWindow
 from removal_module.delete_not_possible_popup import DeleteNotPossiblePopupWindow
 from eos_util.image import Image
+
+gettext.install('endless_desktop', '/usr/share/locale', unicode = True, names=['ngettext'])
 
 class AddRemoveShortcut(DesktopShortcut):
     __gsignals__ = {

@@ -1,7 +1,11 @@
 import gtk
+import gettext
+
 from eos_widgets.image_eventbox import ImageEventBox
 from eos_util.image import Image
 from eos_widgets.desktop_transparent_window import DesktopTransparentWindow
+
+gettext.install('endless_desktop', '/usr/share/locale', unicode = True, names=['ngettext'])
 
 class DeleteNotPossiblePopupWindow():
     def __init__(self, parent, callback=None, widget=None):

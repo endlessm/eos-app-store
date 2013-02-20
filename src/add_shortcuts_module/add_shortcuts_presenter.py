@@ -2,6 +2,7 @@ import os
 import urllib2
 from eos_util import image_util
 import sys
+import gettext
 
 from add_shortcuts_model import AddShortcutsModel
 from osapps.app_shortcut import AppShortcut
@@ -11,6 +12,8 @@ from shortcut_category import ShortcutCategory
 from desktop_files.link_model import LinkModel
 from application_store.recommended_sites_provider import RecommendedSitesProvider
 from add_shortcuts_module.name_format_util import NameFormatUtil
+
+gettext.install('endless_desktop', '/usr/share/locale', unicode = True, names=['ngettext'])
 
 class AddShortcutsPresenter():
     IMAGE_CACHE_PATH = '/tmp/'  #maybe /tmp/endless-image-cache/ ?
