@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: dev 1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-11-22 13:07+0100\n"
+"POT-Creation-Date: 2013-02-19 20:20-0800\n"
 "PO-Revision-Date: 2012-05-31 11:54-0500\n"
 "Last-Translator: Automatically generated\n"
 "Language-Team: none\n"
@@ -18,183 +18,62 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
 
-#: src/notification_panel/battery_view.py:131
+#: src/notification_panel/battery_view.py:147
 msgid " remaining"
 msgstr " restante"
 
-#: src/notification_panel/battery_view.py:129
+#: src/notification_panel/battery_view.py:145
 msgid " until full"
 msgstr " até carga completa"
 
-#: src/add_shortcuts_module/add_folder_box.py:29
+#: src/add_shortcuts_module/add_folder_box.py:38
 msgid "1. NAME YOUR FOLDER"
 msgstr "1. O NOME DO SEU FOLDER"
 
-#: src/add_shortcuts_module/add_folder_box.py:31
+#: src/add_shortcuts_module/add_folder_box.py:40
 msgid "2. PICK A SYMBOL"
 msgstr "2. ESCOLHA UM SÍMBOLO"
 
+#: src/add_shortcuts_module/add_shortcuts_presenter.py:32
+#: src/add_shortcuts_module/add_shortcuts_view.py:126
 #: src/add_shortcuts_module/add_shortcuts_model.py:10
-#: src/add_shortcuts_module/add_shortcuts_presenter.py:27
-#: src/add_shortcuts_module/add_shortcuts_view.py:108
 msgid "APP"
 msgstr "APLICATIVO"
 
-#: src/add_shortcuts_module/add_shortcuts_view.py:31
-msgid "Add Shortcuts"
-msgstr "Adicionar Atalhos"
-
-#: src/desktop/endless_desktop_view.py:120
-msgid "Apps"
-msgstr "Aplicativos"
-
-#: src/notification_panel/all_settings_view.py:40
-msgid "Background"
-msgstr "Fundo"
-
-#: src/notification_panel/battery_view.py:86
-#: src/notification_panel/battery_view.py:87
+#: src/notification_panel/battery_view.py:93
+#: src/notification_panel/battery_view.py:94
 msgid "Battery Info"
 msgstr "Informações sobre bateria"
 
-#: ui/bugs_and_feedback.glade:76
-msgid "Bugbuffer1"
-msgstr ""
-
-#: ui/bugs_and_feedback.glade:10
-#: src/feedback_module/bugs_and_feedback_popup_window.py:16
-#, fuzzy
-msgid "Bugs And Feedback"
-msgstr "Feedback"
-
-#: src/repo_chooser/repo_chooser_view.py:51
-msgid "Choose Repository"
-msgstr "Escolha o repositório"
-
-#: src/shortcut/add_remove_shortcut.py:81
+#: src/shortcut/add_remove_shortcut.py:83
 msgid "Delete"
 msgstr "Excluir"
-
-#: src/repo_chooser/repo_chooser_view.py:83
-msgid ""
-"Downloading updates to the EndlessOS. We will notify you once the updates "
-"are ready to install."
-msgstr ""
-"Fazendo download das atualizações do EndlessOS. Informaremos assim que as "
-"atualizações estiverem prontas para instalação."
-
-#: src/repo_chooser/repo_chooser_view.py:22
-msgid "EndlessOS Installer"
-msgstr "Instalador do EndlessOS"
 
 #: src/add_shortcuts_module/add_shortcuts_model.py:20
 msgid "FOLDER"
 msgstr "PASTA"
 
-#: src/shortcut/add_remove_shortcut.py:98
-#: src/shortcut/add_remove_shortcut.py:106
-#: src/shortcut/add_remove_shortcut.py:114
-#: src/shortcut/add_remove_shortcut.py:128
+#: src/shortcut/add_remove_shortcut.py:99
+#: src/shortcut/add_remove_shortcut.py:107
+#: src/shortcut/add_remove_shortcut.py:115
+#: src/shortcut/add_remove_shortcut.py:131
 msgid "Files"
 msgstr "Files"
 
-#: src/folder/folder_window.py:60 src/desktop/endless_desktop_view.py:133
-msgid "Folder"
-msgstr "Diretórios"
+#: src/search/search_box.py:26
+msgid "Google or type website"
+msgstr "Busque ou digite o site"
 
-#: ui/bugs_and_feedback.glade:42
-#: src/feedback_module/bugs_and_feedback_popup_window.py:42
-msgid "Give us feedback"
-msgstr "Deixe seu comentário."
-
-#: src/notification_panel/all_settings_view.py:44
-msgid "Log Out"
-msgstr "Sair"
-
-#: src/notification_panel/all_settings_view.py:35
-msgid "Log Out?"
-msgstr "Sair?"
-
-#: src/repo_chooser/repo_chooser_view.py:55
-msgid "Password:"
-msgstr "Senha:"
-
-#: ui/bugs_and_feedback.glade:6
-#: src/feedback_module/bugs_and_feedback_popup_window.py:55
-msgid ""
-"Please let us know how the problem occurred and we will resolve it as soon as "
-"possible."
-msgstr ""
-"Por favor, deixe-nos saber como o problema ocorreu e vamos resolvê-lo como "
-"mais rapidamente possível."
-
-#: ui/force_install.glade:50
-msgid ""
-"Please wait while we install the updates for the latest version of EndlessOS."
-msgstr ""
-"Por favor aguarde enquanto fazemos a instalação das atualizações da última "
-"versão do EndlessOS."
-
-#: src/notification_panel/battery_view.py:69
+#: src/notification_panel/battery_view.py:72
 #, fuzzy
 msgid "Power Settings"
 msgstr "Configurações de energia"
 
-#: ui/bugs_and_feedback.glade:30
-#: src/feedback_module/bugs_and_feedback_popup_window.py:38
-msgid "Report a Bug"
-msgstr "Relatar um bug"
-
-#: src/notification_panel/all_settings_view.py:45
-msgid "Restart"
-msgstr "Reiniciar"
-
-#: src/notification_panel/all_settings_view.py:33
-msgid "Restart?"
-msgstr "Reiniciar?"
-
-#: src/add_shortcuts_module/add_website_box.py:30
+#: src/add_shortcuts_module/add_website_box.py:29
 msgid "TYPE WEBSITE"
 msgstr "DIGITE SITE"
 
-#: ui/bugs_and_feedback.glade:94
-#: src/feedback_module/bugs_and_feedback_popup_window.py:65
-msgid "SUBMIT"
-msgstr "ENVIAR"
-
-#: src/search/search_box.py:22
-msgid "Google or type website"
-msgstr "Busque ou digite o site"
-
-#: src/notification_panel/all_settings_view.py:43
-msgid "Settings"
-msgstr "Definições"
-
-#: src/notification_panel/all_settings_view.py:46
-msgid "Shut Down"
-msgstr "Desligar"
-
-#: src/notification_panel/all_settings_view.py:34
-msgid "Shutdown?"
-msgstr "Desligar?"
-
-#: src/feedback_module/feedback_response_dialog_view.py:9
-msgid "Thank You"
-msgstr "Obrigado"
-
-#: ui/feedback_response_dialog.glade:25
-#: src/feedback_module/feedback_response_dialog_view.py:8
-msgid "Thank you for your feedback."
-msgstr "Obrigado pelo seu feedback."
-
-#: ui/install_notifier.glade:72
-msgid ""
-"This is a really long sentence.  This is a really long sentence.  This is a "
-"really long sentence.  This is a really long sentence.  This is a really "
-"long sentence.  This is a really long sentence."
-msgstr ""
-
-#: src/removal_module/delete_not_possible_popup.py:44
+#: src/removal_module/delete_not_possible_popup.py:46
 msgid ""
 "To delete a folder you have to\n"
 "remove all of the items inside\n"
@@ -210,61 +89,124 @@ msgstr ""
 "Estamos apenas tentando mantê-lo\n"
 "seguro."
 
-#: src/add_shortcuts_module/add_website_box.py:43
-msgid "Type it here"
-msgstr ""
-
-#: src/notification_panel/all_settings_view.py:25
-msgid "Update"
-msgstr "Atualizar"
-
-#: ui/force_install.glade:10
-msgid "Updates are being installed"
-msgstr ""
-
-#: ui/install_notifier.glade:10
-msgid "Updates are ready to install"
-msgstr ""
-
-#: src/notification_panel/all_settings_view.py:26
-msgid "Updating..."
-msgstr "Atualizando..."
-
-#: src/removal_module/delete_not_possible_popup.py:15
-msgid "WARNING!"
-msgstr "AVISO!"
-
+#: src/add_shortcuts_module/add_shortcuts_view.py:128
 #: src/add_shortcuts_module/add_shortcuts_model.py:19
-#: src/add_shortcuts_module/add_shortcuts_view.py:110
 msgid "WEB"
 msgstr "SITES"
 
-#: src/desktop/endless_desktop_view.py:132
-msgid "Websites"
-msgstr "Páginas Web"
+#~ msgid "Add Shortcuts"
+#~ msgstr "Adicionar Atalhos"
 
-#: src/repo_chooser/repo_chooser_view.py:17
-msgid "Welcome to the EndlessOS installer."
-msgstr "Benvindo ao instalador do EndlessOS."
+#~ msgid "Apps"
+#~ msgstr "Aplicativos"
 
-#: src/repo_chooser/repo_chooser_view.py:10
-#, python-format
-msgid "Would you like to begin the Endless OS %supdate now?"
-msgstr "Gostaria de iniciar a atualização do EndlessOS %sagora?"
+#~ msgid "Background"
+#~ msgstr "Fundo"
 
-#: ui/feedback_response_dialog.glade:33
-msgid "button"
-msgstr ""
+#, fuzzy
+#~ msgid "Bugs And Feedback"
+#~ msgstr "Feedback"
 
-msgid "Version {0} of EndlessOS is ready to be installed. After installation, a restart is required.  Would you like to install and restart now?"
-msgstr "Versão {0} do EndlessOS está pronta para ser instalada. Após a instalação será necessário reiniciar o computador. Você deseja instalar e reiniciar o computador agora?"
+#~ msgid "Choose Repository"
+#~ msgstr "Escolha o repositório"
 
+#~ msgid ""
+#~ "Downloading updates to the EndlessOS. We will notify you once the updates "
+#~ "are ready to install."
+#~ msgstr ""
+#~ "Fazendo download das atualizações do EndlessOS. Informaremos assim que as "
+#~ "atualizações estiverem prontas para instalação."
 
-msgid "Restart Now"
-msgstr "Reiniciar agora"
+#~ msgid "EndlessOS Installer"
+#~ msgstr "Instalador do EndlessOS"
 
-msgid "Restart Later"
-msgstr "Reiniciar depois"
+#~ msgid "Folder"
+#~ msgstr "Diretórios"
+
+#~ msgid "Give us feedback"
+#~ msgstr "Deixe seu comentário."
+
+#~ msgid "Log Out"
+#~ msgstr "Sair"
+
+#~ msgid "Log Out?"
+#~ msgstr "Sair?"
+
+#~ msgid "Password:"
+#~ msgstr "Senha:"
+
+#~ msgid ""
+#~ "Please let us know how the problem occurred and we will resolve it as "
+#~ "soon as possible."
+#~ msgstr ""
+#~ "Por favor, deixe-nos saber como o problema ocorreu e vamos resolvê-lo "
+#~ "como mais rapidamente possível."
+
+#~ msgid ""
+#~ "Please wait while we install the updates for the latest version of "
+#~ "EndlessOS."
+#~ msgstr ""
+#~ "Por favor aguarde enquanto fazemos a instalação das atualizações da "
+#~ "última versão do EndlessOS."
+
+#~ msgid "Report a Bug"
+#~ msgstr "Relatar um bug"
+
+#~ msgid "Restart"
+#~ msgstr "Reiniciar"
+
+#~ msgid "Restart?"
+#~ msgstr "Reiniciar?"
+
+#~ msgid "SUBMIT"
+#~ msgstr "ENVIAR"
+
+#~ msgid "Settings"
+#~ msgstr "Definições"
+
+#~ msgid "Shut Down"
+#~ msgstr "Desligar"
+
+#~ msgid "Shutdown?"
+#~ msgstr "Desligar?"
+
+#~ msgid "Thank You"
+#~ msgstr "Obrigado"
+
+#~ msgid "Thank you for your feedback."
+#~ msgstr "Obrigado pelo seu feedback."
+
+#~ msgid "Update"
+#~ msgstr "Atualizar"
+
+#~ msgid "Updating..."
+#~ msgstr "Atualizando..."
+
+#~ msgid "WARNING!"
+#~ msgstr "AVISO!"
+
+#~ msgid "Websites"
+#~ msgstr "Páginas Web"
+
+#~ msgid "Welcome to the EndlessOS installer."
+#~ msgstr "Benvindo ao instalador do EndlessOS."
+
+#~ msgid "Would you like to begin the Endless OS %supdate now?"
+#~ msgstr "Gostaria de iniciar a atualização do EndlessOS %sagora?"
+
+#~ msgid ""
+#~ "Version {0} of EndlessOS is ready to be installed. After installation, a "
+#~ "restart is required.  Would you like to install and restart now?"
+#~ msgstr ""
+#~ "Versão {0} do EndlessOS está pronta para ser instalada. Após a instalação "
+#~ "será necessário reiniciar o computador. Você deseja instalar e reiniciar "
+#~ "o computador agora?"
+
+#~ msgid "Restart Now"
+#~ msgstr "Reiniciar agora"
+
+#~ msgid "Restart Later"
+#~ msgstr "Reiniciar depois"
 
 #~ msgid "GAMES"
 #~ msgstr "JOGOS"
