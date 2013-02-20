@@ -1,10 +1,14 @@
 import gtk
 import cairo
+import gettext
+
 from desktop.desktop_layout import DesktopLayout
 from eos_widgets.image_eventbox import ImageEventBox
 from eos_util.image import Image
 from eos_util import screen_util
 from osapps.desktop_preferences_datastore import DesktopPreferencesDatastore
+
+gettext.install('endless_desktop', '/usr/share/locale', unicode = True, names=['ngettext'])
 
 class AddFolderBox(gtk.VBox):
     _FOLDER_ICON_PATH = '/usr/share/endlessm/icons/folders/'

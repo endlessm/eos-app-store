@@ -1,9 +1,13 @@
 import gtk
 import cairo
+import gettext
+
 from eos_util import image_util
 from eos_util import screen_util
 from osapps.desktop_preferences_datastore import DesktopPreferencesDatastore
 from website_row_box import WebsiteRowBox
+
+gettext.install('endless_desktop', '/usr/share/locale', unicode = True, names=['ngettext'])
 
 class AddWebsiteBox(gtk.VBox):
     def __init__(self, parent=None, desktop_preference_class = DesktopPreferencesDatastore, default_category=''):

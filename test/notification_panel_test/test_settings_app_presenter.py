@@ -1,9 +1,9 @@
 import unittest
-from notification_panel.all_settings_presenter import AllSettingsPresenter
+from notification_panel.settings_app_presenter import SettingsAppPresenter
 
-class TestAllSettingsPresenter(unittest.TestCase):
+class TestSettingsAppPresenter(unittest.TestCase):
     def setUp(self):
-        self.testObject = AllSettingsPresenter()
+        self.testObject = SettingsAppPresenter()
 
     def test_path_is_correct(self):
         settings_path = "/usr/bin/endless-settings"

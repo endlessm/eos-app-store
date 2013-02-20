@@ -1,4 +1,6 @@
 import gtk
+import gettext
+
 from add_shortcuts_presenter import AddShortcutsPresenter
 from shortcut_category_box import ShortcutCategoryBox
 from add_folder_box import AddFolderBox
@@ -12,6 +14,9 @@ from eos_util import screen_util
 
 import sys
 import gc
+
+gettext.install('endless_desktop', '/usr/share/locale', unicode = True, names=['ngettext'])
+
 class AddShortcutsView():
     def __init__(self, parent=None, width=0, height=0):
         self._add_button_box_width = 120

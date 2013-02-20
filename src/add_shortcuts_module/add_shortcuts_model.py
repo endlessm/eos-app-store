@@ -1,5 +1,9 @@
 import os
+import gettext
+
 from shortcut_category import ShortcutCategory
+
+gettext.install('endless_desktop', '/usr/share/locale', unicode = True, names=['ngettext'])
 
 class AddShortcutsModel():
     def __init__(self):
