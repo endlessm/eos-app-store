@@ -24,11 +24,6 @@ pushd `dirname $0`
     popd 
   fi
 
-  echo "Converting glade files to .py files"
-  pushd ui &> /dev/null
-    ./convert.sh
-  popd &> /dev/null
-
   pushd ../eos-build &> /dev/null
   INSTALL_DIR=$(pwd)
   export GNUPGHOME=${INSTALL_DIR}/gnupg
