@@ -64,7 +64,6 @@ msgid "Google or type website"
 msgstr "Busque ou digite o site"
 
 #: src/notification_panel/battery_view.py:72
-#, fuzzy
 msgid "Power Settings"
 msgstr "Configurações de energia"
 

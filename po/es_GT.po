@@ -60,12 +60,10 @@ msgid "Files"
 msgstr "Fichero"
 
 #: src/search/search_box.py:26
-#, fuzzy
 msgid "Google or type website"
 msgstr "Busque o Entre Sitio de Internet"
 
 #: src/notification_panel/battery_view.py:72
-#, fuzzy
 msgid "Power Settings"
 msgstr "Configuraciones de energia"
 
