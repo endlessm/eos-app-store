@@ -2,6 +2,7 @@ from notification_plugin import NotificationPlugin
 from battery_view import BatteryView
 from battery_model import BatteryModel
 from battery_presenter import BatteryPresenter
+from battery_provider import BatteryProvider
 
 class BatteryPlugin(NotificationPlugin):
     def __init__(self, icon_size):
@@ -14,5 +15,6 @@ class BatteryPlugin(NotificationPlugin):
     def execute(self):
         self._presenter.display_menu() 
 
-        
-           
+    @staticmethod
+    def is_plugin_enabled():
+        return BatteryProvider().get_battery_info().level() is not None
