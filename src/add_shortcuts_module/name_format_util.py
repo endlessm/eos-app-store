@@ -53,4 +53,4 @@ class NameFormatUtil():
         return re.sub('[^a-zA-Z0-9]', ' ', name)
     
     def _tld_list(self):
-        return('.com','.edu','.gov','.int','.mil','.net','.org','.br','.ly','.se','co','uk')    
+        return('.com','.edu','.gov','.int','.mil','.net','.org','.br','.ly','.se','.co','.uk')    
