@@ -22,6 +22,7 @@ class TestNameFormatUtil(unittest.TestCase):
             ['www.test.com/name.html', 'Test Name'],
             ['www.test.com/name/extra', 'Test Name'],
             ['blogs.lancenet.com', 'Lancenet Blogs'],
+            ['www.economist.com', 'Economist'],
             
             # domains with a leading protocol
             ['https://test.com', 'Test'],
