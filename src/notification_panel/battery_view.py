@@ -28,8 +28,8 @@ class BatteryView(AbstractNotifier, IconPlugin):
     _focus_out_period = datetime.timedelta(milliseconds=250)
 
     def __init__(self, parent, icon_size):
-        super(BatteryView, self).__init__(icon_size, self.ICON_NAMES, None)
-       
+        IconPlugin.__init__(self, icon_size, self.ICON_NAMES, None)
+
         self.set_margin(self.HORIZONTAL_MARGIN)
 
         self._window = None
