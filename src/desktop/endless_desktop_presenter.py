@@ -93,7 +93,10 @@ class DesktopPresenter(object):
 
         if not shortcut_obj._name == new_name.strip():
             new_name = self.check_shortcut_name(new_name, all_shortcuts)
+            index = all_shortcuts.index(shortcut_obj)
+            shortcut_obj = all_shortcuts[index]
             shortcut_obj._name = new_name
+
             self._model._app_desktop_datastore.set_all_shortcuts(all_shortcuts)
         return shortcut_obj
 
