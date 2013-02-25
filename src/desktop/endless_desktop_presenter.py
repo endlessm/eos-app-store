@@ -97,6 +97,7 @@ class DesktopPresenter(object):
             shortcut_obj = all_shortcuts[index]
             shortcut_obj._name = new_name
 
+#TODO: the presenter should NOT be using a private model attribute directly
             self._model._app_desktop_datastore.set_all_shortcuts(all_shortcuts)
         return shortcut_obj
 

@@ -88,9 +88,16 @@ class TestEndlessDesktopPresenter(unittest.TestCase):
     def test_rename_shortcut(self):
         shortcut = AppShortcut(123, "App 1", "", [])
         new_name = 'Blah'
+
         self.mock_model.get_all_shortcuts = Mock(return_value=[shortcut])
+
+        self.mock_app_desktop_datastore = Mock()
+        
+#TODO: the presenter should NOT be using a private model attribute directly.
+        self.mock_model._app_desktop_datastore = self.mock_app_desktop_datastore
         changed_shortcut = self.testObject.rename_shortcut(shortcut, new_name)
-        self.mock_model.set_shortcuts.assert_called_once()
+
+        self.mock_app_desktop_datastore.set_all_shortcuts.assert_called_once_with([changed_shortcut])
         self.assertEqual(changed_shortcut.name(), new_name)
 
     def test_check_shortcut_name(self):
