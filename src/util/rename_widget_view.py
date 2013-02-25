@@ -21,7 +21,10 @@ class RenameWidgetView(AbstractNotifier):
         self._window.add(self._text_view)
         self._text_view.connect("key-release-event", self._handle_key_press)
         self._text_view.connect("button-press-event", self._handle_click)
-        self._text_view.connect("focus-out-event", lambda w, e: self._notify(RenameWidgetConstants.RETURN_PRESSED))
+        self._text_view.connect("focus-out-event", self._focus_out)
+
+    def _focus_out(self, widget, event):
+        self._notify(RenameWidgetConstants.RETURN_PRESSED)
 
     def resize_window(self):
         t_width = self._text_view.get_layout().get_pixel_size()[0]
