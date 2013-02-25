@@ -42,11 +42,12 @@ class ShadowedLabelBox(gtk.EventBox):
     
     def _click_handler(self, widget, event):
         if event.button == 1:
-#            # Label box needs the same x offset as the icon
-#            x_offset = (112-64)/2
             x_offset = 0
             y_offset = widget.get_toplevel().window.get_origin()[1]
-            RenameWidget(x=self._label.allocation.x + x_offset, y=self._label.allocation.y + y_offset,
+
+            # If we don't keep a reference to the rename widget, its instance variables get removed
+            # and callbacks break. This way, code works as expected and RenameWidget handles its own lifecycle
+            self._reference = RenameWidget(x=self._label.allocation.x + x_offset, y=self._label.allocation.y + y_offset,
                          caller=widget.parent, caller_width=DesktopLayout.LABEL_WIDTH_IN_PIXELS)
         return False
     
