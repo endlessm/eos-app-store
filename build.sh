@@ -33,8 +33,8 @@ pushd `dirname $0`
   debuild -k4EB55A92 -b
   
   # Move package to this directory and clean up
-  mv ../endless-os-desktop-widget*.deb .
-  mv ../endless-os-desktop-widget*.changes .
+  mv ../endlessos-base-desktop*.deb .
+  mv ../endlessos-base-desktop*.changes .
   rm -f ../*.build
 
     if [[ $(dpkg -c *.deb | egrep "py$") ]]
