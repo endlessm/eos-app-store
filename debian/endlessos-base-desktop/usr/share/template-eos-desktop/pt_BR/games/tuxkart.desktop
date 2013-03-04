@@ -1,0 +1,15 @@
+[Desktop Entry]
+Version=1.0
+Type=Application
+Name=Tux Kart
+Name[en_US]=Tux Kart
+Name[pt_BR]=Tux Kart
+Comment=Tux Kart
+TryExec=supertuxkart
+Exec=supertuxkart
+Icon=supertuxkart
+Categories=
+X-EndlessM-Normal-Icon=/usr/share/endlessm/icons/apps/supertuxkart_normal.png
+X-EndlessM-Hover-Icon=/usr/share/endlessm/icons/apps/supertuxkart_hover.png
+X-EndlessM-Down-Icon=/usr/share/endlessm/icons/apps/supertuxkart_down.png
+

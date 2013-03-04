@@ -1,0 +1,16 @@
+[Desktop Entry]
+Version=1.0
+Name=Twitter
+Name[en_US]=Twitter
+Name[pt-BR]=Twitter
+Comment=Twitter
+GenericName=Twitter
+Type=Link
+URL=http://www.twitter.com
+Icon=twitter
+Categories=Network
+X-EndlessM-Normal-Icon=/usr/share/endlessm/icons/apps/twitter_normal.png
+X-EndlessM-Hover-Icon=/usr/share/endlessm/icons/apps/twitter_hover.png
+X-EndlessM-Down-Icon=/usr/share/endlessm/icons/apps/twitter_down.png
+
+

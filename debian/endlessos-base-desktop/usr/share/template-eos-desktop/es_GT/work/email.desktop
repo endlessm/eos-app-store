@@ -1,0 +1,16 @@
+[Desktop Entry]
+Version=1.0
+Type=Application
+Name=E-mail
+Name[en_US]=E-mail
+Name[es_GT]=Correo Electrónico
+Name[pt_BR]=E-mail
+Comment=E-mail
+TryExec=evolution %U
+Exec=evolution %U
+Icon=email
+Categories=
+X-EndlessM-Normal-Icon=/usr/share/endlessm/icons/apps/email_normal.png
+X-EndlessM-Hover-Icon=/usr/share/endlessm/icons/apps/email_hover.png
+X-EndlessM-Down-Icon=/usr/share/endlessm/icons/apps/email_down.png
+

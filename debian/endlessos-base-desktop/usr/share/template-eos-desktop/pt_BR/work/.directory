@@ -1,0 +1,14 @@
+[Desktop Entry]
+Version=1.0
+Name=Work
+Name[en_US]=Work
+Name[pt_BR]=Trabalho
+Comment=Work
+GenericName=Work
+Type=Directory
+Icon=folder_work_normal
+X-EndlessM-Normal-Icon=/usr/share/endlessm/icons/folders/work_normal.png
+X-EndlessM-Hover-Icon=/usr/share/endlessm/icons/folders/work_hover.png
+X-EndlessM-Down-Icon=/usr/share/endlessm/icons/folders/work_down.png
+
+

@@ -1,0 +1,14 @@
+[Desktop Entry]
+Version=1.0
+Name=bol
+Comment=bol
+GenericName=bol
+Type=Link
+URL=http://bol.com.br
+Icon=firefox
+Categories=Network
+X-EndlessM-Normal-Icon=/usr/share/endlessm/icons/bol_normal.png
+X-EndlessM-Hover-Icon=/usr/share/endlessm/icons/bol_hover.png
+X-EndlessM-Down-Icon=/usr/share/endlessm/icons/bol_down.png
+
+

@@ -1,0 +1,15 @@
+[Desktop Entry]
+Version=1.0
+Type=Application
+Name=Super Tux
+Name[en_US]=Super Tux
+Name[pt_BR]=Super Tux
+Comment=Super Tux
+TryExec=supertux2
+Exec=supertux2
+Icon=supertux2
+Categories=
+X-EndlessM-Normal-Icon=/usr/share/endlessm/icons/apps/supertux_normal.png
+X-EndlessM-Hover-Icon=/usr/share/endlessm/icons/apps/supertux_hover.png
+X-EndlessM-Down-Icon=/usr/share/endlessm/icons/apps/supertux_down.png
+

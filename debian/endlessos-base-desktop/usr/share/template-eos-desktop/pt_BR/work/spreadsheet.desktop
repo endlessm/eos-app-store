@@ -1,0 +1,15 @@
+[Desktop Entry]
+Version=1.0
+Type=Application
+Name=Spreadsheet
+Name[en_US]=Spreadsheet
+Name[pt_BR]=Planilha
+Comment=Spreadsheet
+TryExec=libreoffice --calc %U
+Exec=libreoffice --calc %U
+Icon=spreadsheet
+Categories=
+X-EndlessM-Normal-Icon=/usr/share/endlessm/icons/apps/office_spreadsheet_normal.png
+X-EndlessM-Hover-Icon=/usr/share/endlessm/icons/apps/office_spreadsheet_hover.png
+X-EndlessM-Down-Icon=/usr/share/endlessm/icons/apps/office_spreadsheet_down.png
+

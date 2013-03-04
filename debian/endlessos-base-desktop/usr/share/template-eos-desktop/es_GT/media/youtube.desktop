@@ -1,0 +1,17 @@
+[Desktop Entry]
+Version=1.0
+Name=YouTube
+Name[en_US]=YouTube
+Name[es_GT]=YouTube
+Name[pt_BR]=YouTube
+Comment=YouTube
+GenericName=YouTube
+Type=Link
+URL=http://www.youtube.com
+Icon=youtube
+Categories=Network
+X-EndlessM-Normal-Icon=/usr/share/endlessm/icons/apps/youtube_normal.png
+X-EndlessM-Hover-Icon=/usr/share/endlessm/icons/apps/youtube_hover.png
+X-EndlessM-Down-Icon=/usr/share/endlessm/icons/apps/youtube_down.png
+
+

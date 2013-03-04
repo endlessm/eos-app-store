@@ -1,0 +1,16 @@
+[Desktop Entry]
+Version=1.0
+Type=Application
+Name=Solitaire
+Name[en_US]=Solitaire
+Name[es_GT]=Solitaire
+Name[pt_BR]=Solitaire
+Comment=Solitaire
+TryExec=/usr/games/sol
+Exec=/usr/games/sol
+Icon=solitaire
+Categories=
+X-EndlessM-Normal-Icon=/usr/share/endlessm/icons/apps/solitaire_normal.png
+X-EndlessM-Hover-Icon=/usr/share/endlessm/icons/apps/solitaire_hover.png
+X-EndlessM-Down-Icon=/usr/share/endlessm/icons/apps/solitaire_down.png
+
