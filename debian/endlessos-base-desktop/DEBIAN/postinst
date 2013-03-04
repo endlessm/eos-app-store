@@ -1,9 +1,0 @@
-#!/bin/bash -e
-
-# HACK: this was to get around the fact that the installer for 1.0.15 needs the endless_post_install script exist.
-# It was moved from the endless desktop to the endless installer so the filename changed but the existing auto 
-# update installer still expects the file to exist.
-# Remove this in v1.0.18+
-
-touch /usr/bin/endless_post_install.sh
-chmod +x /usr/bin/endless_post_install.sh

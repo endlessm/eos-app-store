@@ -2,13 +2,11 @@
 *.pyc
 dist
 build
-debian/endless-os-desktop-widget/
-warnendless_os_desktop_widget.txt
+debian/endlessos-base-desktop/
 *.log
 *.deb
 *.changes
 *~
-debian/endless-os-desktop-widget.substvars
 debian/files
 *.pyc
 .*.swp
