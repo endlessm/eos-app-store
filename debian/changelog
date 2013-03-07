@@ -1,3 +1,9 @@
+endlessos-base-desktop (1.0.19~rc2) unstable; urgency=low
+
+  * Updating version to 1.0.19~rc2
+
+ -- Asynchrony <matt.todd@asolutions.com>  Thu, 07 Mar 2013 08:52:38 -0600
+
 endlessos-base-desktop (1.0.19~rc1) unstable; urgency=low
 
   * Updating version to 1.0.19~rc1
