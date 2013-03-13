@@ -44,7 +44,7 @@ class UpdateTasksThread(Thread):
                             # Set needs update flag since it is something we care about
                             needs_update = True
                     except Exception as e:
-                        log.info("Could not retrieve change atom IDs. Continuing", e)
+                        log.info("Could not retrieve change atom IDs. Continuing. Error: " + e.message)
 
             # Taskbar needs updating
             if needs_update:
@@ -53,7 +53,7 @@ class UpdateTasksThread(Thread):
                     selected_window = self._screen.root.get_full_property(self._active_window_atom_id, Xatom.WINDOW).value
                     self._draw_tasks_callback(tasks, selected_window)
                 except Exception as e:
-                        log.info("Could not retrieve tasks. Continuing", e)
+                        log.info("Could not retrieve tasks. Continuing. Error: " + e.message)
 
             # Collect app usage metrics
             selected_window_process = self._xlib_helper.get_selected_window_class_name(self._screen.root)
