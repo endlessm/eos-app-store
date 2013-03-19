@@ -5,4 +5,4 @@ class BrowserButtonModel():
       self._locale_util = locale_util
 
    def get_exploration_center_url(self):
-      return "file:/usr/share/endlessm/exploration_center/index.html?lang={0}#newspaper".format(self._locale_util.get_locale())
+      return "file:/usr/share/endlessm/exploration_center/index.html?lang={0}#discover".format(self._locale_util.get_locale())
