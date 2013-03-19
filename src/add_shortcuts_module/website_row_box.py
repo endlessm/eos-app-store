@@ -16,15 +16,16 @@ class WebsiteRowBox(gtk.EventBox):
         self._icon_image_width = 32
         self._icon_image_height = 32
         self._default_icon_pixbuf = image_util.load_pixbuf(image_util.image_path("endless-browser.png"))
+        self._icon_pixbuf = image_util.load_pixbuf(image_util.image_path(self._link_model.normal_icon()))
         self._height = 60
         self._plus_offset_for_scrollbar = 30
-        
+
         # The current implementation of get_favicon is way too slow,
         # as it retrieves data from each site at run-time
         # For now, let's just use a default icon
         #self._icon_image = self._presenter.get_favicon(self._link_model._url) or self._default_icon_pixbuf
-        self._icon_image = self._default_icon_pixbuf
-        
+        self._icon_image = self._icon_pixbuf or self._default_icon_pixbuf
+
         self._icon_width = 150
         self._plus_box_width = 80
         
