@@ -24,4 +24,5 @@ class BrowserButtonPresenterTest(unittest.TestCase):
 
       self._handle_click_event()
 
-      self._mock_app_launcher.launch_browser.assert_called_once_with(url)
+      self.assertFalse(self._mock_model.get_exploration_center_url.called)
+      self._mock_app_launcher.launch_browser.assert_called_once_with()
