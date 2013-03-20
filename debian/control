@@ -11,6 +11,6 @@ Replaces: endless-os-desktop-widget
 Breaks: endless-os-desktop-widget
 Provides: endless-os-desktop-widget
 Architecture: any
-Depends: ${shlibs:Depends}, ${misc:Depends}, python(>=2.6), python-gtk2, python-setuptools, python-xlib, pcmanfm, beatbox, gstreamer0.10-ffmpeg, libreoffice, evolution, eog, gcalctool, gnome-utils, vlc, pidgin, endlessos-base-browser(>=1.0.20~rc2), shotwell, gwibber, contacts, qalculate, skype, hal, python-alsaaudio, gimp(>=2.8), endlessos-base-games(>=1.0.20~rc2), qbittorrent, endlessos-base-installer(>=1.0.20~rc2), stellarium, grub-customizer, endlessos-base-common(>=1.0.20~rc2), endlessos-base-core(>=1.0.20~rc2), endlessos-base-settings(>=1.0.20~rc2), endlessos-base-config(>=1.0.20~rc2)
+Depends: ${shlibs:Depends}, ${misc:Depends}, python(>=2.6), python-gtk2, python-setuptools, python-xlib, pcmanfm, beatbox, gstreamer0.10-ffmpeg, libreoffice, evolution, eog, gcalctool, gnome-utils, vlc, pidgin, endlessos-base-browser(>=1.0.20~rc3), shotwell, gwibber, contacts, qalculate, skype, hal, python-alsaaudio, gimp(>=2.8), endlessos-base-games(>=1.0.20~rc3), qbittorrent, endlessos-base-installer(>=1.0.20~rc3), stellarium, grub-customizer, endlessos-base-common(>=1.0.20~rc3), endlessos-base-core(>=1.0.20~rc3), endlessos-base-settings(>=1.0.20~rc3), endlessos-base-config(>=1.0.20~rc3)
 Description: Endless OS desktop widgets installation package
  This package will install the Endless OS desktop widgets
