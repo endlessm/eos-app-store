@@ -1,7 +1,15 @@
 #!/bin/bash -e
 
 # Install dependencies
-sudo apt-get install -y devscripts debhelper python-xlib python-alsaaudio hal
+DEPENDENCIES="devscripts debhelper python-xlib python-alsaaudio hal"
+set +e 
+  dpkg -s $DEPENDENCIES &> /dev/null
+  has_dependencies=$?
+set -e
+
+if [[ $has_dependencies -ne 0 ]]; then
+  sudo apt-get install -y $DEPENDENCIES
+fi
 sudo easy_install nose
 
 pushd `dirname $0`
