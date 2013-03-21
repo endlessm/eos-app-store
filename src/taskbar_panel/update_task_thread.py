@@ -4,7 +4,7 @@ from threading import Thread
 from eos_log import log
 
 from metrics_collection.time_in_application_tracker import TimeInApplicationTracker
-from xlib_helper import XlibHelper
+from osapps.xlib_helper import XlibHelper
 
 class UpdateTasksThread(Thread):
     SLEEP_TIME = 0.25

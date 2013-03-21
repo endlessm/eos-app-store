@@ -8,7 +8,7 @@ from eos_log import log
 from taskbar_icon import TaskbarIcon
 from eos_util.image_util import load_pixbuf
 from update_task_thread import UpdateTasksThread
-from xlib_helper import XlibHelper
+from osapps.xlib_helper import XlibHelper
 from predefined_icons_provider import PredefinedIconsProvider
 
 from metrics_collection.application_usage_posting_thread import ApplicationUsagePostingThread
