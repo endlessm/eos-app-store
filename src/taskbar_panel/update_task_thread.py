@@ -13,12 +13,12 @@ class UpdateTasksThread(Thread):
         super(UpdateTasksThread, self).__init__()
         self.setDaemon(True)
 
-        self._screen = screen
         self._display = display
+        self._screen = screen
         self._client_list_atom_id = client_list_atom_id
         self._active_window_atom_id = active_window_atom_id
         self._watched_atom_ids = watched_atom_ids
-        self._xlib_helper = XlibHelper(display)
+        self._xlib_helper = XlibHelper()
         self._application_tracker = application_tracker
 
         self._draw_tasks_callback = callback
