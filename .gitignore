@@ -13,4 +13,7 @@ debian/files
 .settings/
 po/*.pot
 exploration_center
+exploration-center
+icons
 debian/*.substvars
+
