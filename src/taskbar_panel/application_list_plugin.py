@@ -10,6 +10,7 @@ from eos_util.image_util import load_pixbuf
 from update_task_thread import UpdateTasksThread
 from osapps.xlib_helper import XlibHelper
 from predefined_icons_provider import PredefinedIconsProvider
+from osapps.display_provider import DisplayProvider
 
 from metrics_collection.application_usage_posting_thread import ApplicationUsagePostingThread
 from metrics_collection.application_usage_posting_util import ApplicationUsagePostingUtil
@@ -22,7 +23,7 @@ from Xlib.ext import xtest, shape, xinerama, record, composite, randr
 # *****************
 
 class ApplicationListPlugin(gtk.HBox):
-    def __init__(self, icon_size, local_display = display.Display(), pixbuf_loader = load_pixbuf, predefined_icons_provider = PredefinedIconsProvider(), app_tracker = TimeInApplicationTracker()):
+    def __init__(self, icon_size, display_provider = DisplayProvider(), pixbuf_loader = load_pixbuf, predefined_icons_provider = PredefinedIconsProvider(), app_tracker = TimeInApplicationTracker()):
         super(ApplicationListPlugin, self).__init__()
 
         self._icon_size = icon_size
@@ -31,11 +32,11 @@ class ApplicationListPlugin(gtk.HBox):
 
         self._taskbar_icons = {}
 
-        self._local_display = local_display
+        self._local_display = display_provider.display()
         self._screen = self._local_display.screen()
         self._predefined_icons_provider = predefined_icons_provider 
 
-        self._xlib_helper = XlibHelper(local_display)
+        self._xlib_helper = XlibHelper(display_provider)
 
         self._NET_CLIENT_LIST_ATOM_ID       = self._xlib_helper.get_atom_id(XlibHelper.Atom.CLIENT_LIST)
         self._NET_WM_SKIP_TASKBAR_ATOM_ID   = self._xlib_helper.get_atom_id(XlibHelper.Atom.SKIP_TASKBAR)
