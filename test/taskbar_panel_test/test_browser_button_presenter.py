@@ -9,10 +9,10 @@ class BrowserButtonPresenterTest(unittest.TestCase):
       mock_master = Mock()
       self._mock_view = mock_master.view()
       self._mock_model = mock_master.model()
-      self._mock_app_launcher = mock_master.app_launcher()
+      self._mock_browser_launcher = mock_master.browser_launcher()
       self._mock_view.add_listener = Mock(side_effect=self._view_add_listener_side_effect)
 
-      BrowserButtonPresenter(self._mock_view, self._mock_model, self._mock_app_launcher)
+      BrowserButtonPresenter(self._mock_view, self._mock_model, self._mock_browser_launcher)
 
    def _view_add_listener_side_effect(self, *args, **kwargs):
       if args[0] == BrowserButtonConstants.CLICK_EVENT:
@@ -25,4 +25,4 @@ class BrowserButtonPresenterTest(unittest.TestCase):
       self._handle_click_event()
 
       self.assertFalse(self._mock_model.get_exploration_center_url.called)
-      self._mock_app_launcher.launch_browser.assert_called_once_with()
+      self._mock_browser_launcher.launch_browser.assert_called_once_with()
