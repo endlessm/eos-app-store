@@ -1,4 +1,2 @@
 Endless OS - Desktop
 ====================
-
-asdf
