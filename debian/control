@@ -1,0 +1,16 @@
+Source: endlessos-base-desktop
+Section: non-free/misc
+Priority: standard
+Maintainer: Asynchrony Solutions, Inc <endlessmobile@gmail.com>
+Build-Depends: debhelper
+Standards-Version: 3.9.2
+Homepage: http://www.endlessm.com
+
+Package: endlessos-base-desktop
+Replaces: endless-os-desktop-widget
+Breaks: endless-os-desktop-widget
+Provides: endless-os-desktop-widget
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}, python(>=2.6), python-gtk2, python-setuptools, python-xlib, pcmanfm, beatbox, gstreamer0.10-ffmpeg, libreoffice, libreoffice-l10n-pt-br, libreoffice-help-pt-br, libreoffice-l10n-es, libreoffice-help-es, evolution, eog, gcalctool, gnome-utils, vlc, pidgin, endlessos-base-browser(>=1.0.20), shotwell, gwibber, contacts, qalculate, skype, hal, python-alsaaudio, gimp(>=2.8), endlessos-base-games(>=1.0.20), qbittorrent, endlessos-base-installer(>=1.0.20), stellarium, grub-customizer, endlessos-base-common(>=1.0.20), endlessos-base-core(>=1.0.20), endlessos-base-settings(>=1.0.20), endlessos-base-config(>=1.0.20)
+Description: Endless OS desktop widgets installation package
+ This package will install the Endless OS desktop widgets

@@ -1,35 +1,19 @@
-*.py[cod]
-
-# C extensions
-*.so
-
-# Packages
-*.egg
-*.egg-info
+.metadata
+*.pyc
 dist
 build
-eggs
-parts
-bin
-var
-sdist
-develop-eggs
-.installed.cfg
-lib
-lib64
+debian/endlessos-base-desktop/
+*.log
+*.deb
+*.changes
+*~
+debian/files
+*.pyc
+.*.swp
+.settings/
+po/*.pot
+exploration_center
+exploration-center
+icons
+debian/*.substvars
 
-# Installer logs
-pip-log.txt
-
-# Unit test / coverage reports
-.coverage
-.tox
-nosetests.xml
-
-# Translations
-*.mo
-
-# Mr Developer
-.mr.developer.cfg
-.project
-.pydevproject
