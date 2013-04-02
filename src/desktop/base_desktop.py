@@ -42,17 +42,7 @@ class BaseDesktop(gtk.VBox):
         return self._is_initialized
 
     def recalculate_padding(self, icon_layout):
-        #TODO: hacky fix, on the second call the position of the widget would change
-        # couldn't figure out why
-        if self._is_initialized:
-            return
-
         middle_point = self._calculate_middle_point(icon_layout)
-        self._searchbar_widget.set_size_request(0, middle_point)
-
-        total_top_padding = DesktopLayout.calculate_total_top_padding(self._taskbar_widget, self._searchbar_widget, self._page_buttons_widget)
-
-        self._top_page_padding_widget.set_size_request(self._taskbar_widget.allocation.width, total_top_padding)
 
         self._is_initialized = True
 
@@ -65,10 +55,9 @@ class BaseDesktop(gtk.VBox):
     # Private methods
     def _calculate_middle_point(self, icon_layout):
         icon_layout_bottom = self._get_absolute_y(icon_layout) + icon_layout.size_request()[1]
-        taskbar_top = self._get_absolute_y(self._taskbar_widget)
         page_buttons_height = self._page_buttons_widget.size_request()[1] 
 
-        return (taskbar_top - icon_layout_bottom - page_buttons_height) / 2
+        return (icon_layout_bottom - page_buttons_height) / 2
 
     def _get_absolute_y(self, widget):
         window_coords = widget.window.get_root_origin()[1]
