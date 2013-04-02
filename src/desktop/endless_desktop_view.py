@@ -34,65 +34,8 @@ class EndlessDesktopView(gtk.Window, object):
         width, height = self._get_net_work_area()
         self.resize(width, height)
 
-        self.set_app_paintable(True)
-        self.set_can_focus(False)
-        self.set_type_hint(gdk.WINDOW_TYPE_HINT_DESKTOP) #@UndefinedVariable
-        self.set_decorated(False)
-        self.add_events(gtk.gdk.BUTTON_PRESS_MASK)
-
-        self.connect('button-press-event', self.unfocus_widget)
-        self.connect('destroy', lambda w: gtk.main_quit())
-        self.maximize()
-
         add_shortcut_popup = AddShortcutsView(parent=self, width=width, height=height)
         add_shortcut_popup.show()
-
-
-    def unfocus_widget(self, widget, event):
-        widget.set_focus(None)
-        self.close_folder_window()
-
-    def set_presenter(self, presenter):
-        self._presenter = presenter
-
-    def get_presenter(self):
-        return self._presenter
-
-    def set_background_image(self, image):
-        width, height = self._get_net_work_area()
-        image.scale_to_best_fit(width, height)
-        
-        pixmap = image.pixbuf.render_pixmap_and_mask()[0]
-        self.window.set_back_pixmap(pixmap, False)
-
-        self.window.invalidate_rect((0, 0, width, height), False)
-
-    def desktop_page_navigate(self, index):
-        self._presenter.desktop_page_navigate(index + 1)
-
-    def hide_folder_window(self):
-        if hasattr(self, '_folder_window') and self._folder_window:
-            self._folder_window.hide()
-
-    def close_folder_window(self):
-        if hasattr(self, '_folder_window') and self._folder_window:
-            self._folder_window.destroy()
-            self._folder_window = None
-
-    def show_folder_window(self, shortcut):
-        self.close_folder_window()
-        self._folder_window = OpenFolderWindow(
-            self,
-            self._presenter.activate_item,
-            shortcut,
-            self._dnd_begin
-            )
-        self._folder_window.show()
-
-    def show_folder_window_by_name(self, shortcut_name):
-        shortcut = self._presenter.get_shortcut_by_name(shortcut_name)
-        if shortcut is not None:
-            self.show_folder_window(shortcut)
 
     def _get_net_work_area(self):
         """this section of code gets the net available area on the window (i.e. root window - panels)"""

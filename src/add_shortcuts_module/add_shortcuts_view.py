@@ -6,7 +6,6 @@ from shortcut_category_box import ShortcutCategoryBox
 from add_folder_box import AddFolderBox
 from add_application_box import AddApplicationBox
 from shortcut.add_remove_shortcut import AddRemoveShortcut
-from eos_widgets.desktop_transparent_window import DesktopTransparentWindow
 from add_website_box import AddWebsiteBox
 import cairo
 from eos_util import image_util
@@ -30,7 +29,9 @@ class AddShortcutsView():
 
         self._parent = parent
         self._presenter = AddShortcutsPresenter(view=self)
-        self.window = DesktopTransparentWindow(self._parent, (0, 0), (self._width, self._height))
+
+        self.window = self._get_transparent_window(self._width, self._height)
+        
         self.window.connect("delete-event", self.destroy)
         self.window.connect("expose-event", self._draw_triangle)
 
@@ -70,6 +71,17 @@ class AddShortcutsView():
         self.hbox.pack_end(self.hbox2)
         self.window.add(self.hbox)
         self.show()
+
+    def _get_transparent_window(self, width, height):
+        win = gtk.Window()
+        win.set_decorated(False)
+
+        win.set_app_paintable(True)
+        win.set_size_request(width, height)
+        screen = win.get_screen()
+        rgba = screen.get_rgba_colormap()
+        win.set_colormap(rgba)
+        return win
 
     @property
     def add_button_box_width(self):
