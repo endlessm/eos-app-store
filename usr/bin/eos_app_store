@@ -1,2 +1,2 @@
 #!/bin/bash
-python /usr/lib/eos-app-store/eos_app_store.pyc
+python /usr/lib/eos-app-store/eos_app_store_launcher.pyc
