@@ -4,44 +4,27 @@ import gtk
 class TransparentWindow(gtk.Window):
     def __init__(self, parent, background, location=(0,0), size=None, gradient_type=None):
         gtk.Window.__init__(self, gtk.WINDOW_TOPLEVEL)
-        self._background = background
-        self.gradient_type = gradient_type
-        self.set_wmclass("endless_os_desktop", "modal")
 
+        self.set_decorated(False)
+
+        # Makes the window paintable, so we can draw directly on it
+        self.set_app_paintable(True)
+        self.set_size_request(width, height)
+
+        # This sets the windows colormap, so it supports transparency.
+        # This will only work if the wm support alpha channel
+        screen = self.get_screen()
+        rgba = self.get_rgba_colormap()
+        self.set_colormap(rgba)
+        
+        self.gradient_type = gradient_type
+        
         self.set_property("accept-focus", True)
         self.set_property("destroy-with-parent", True)
         self.set_property("focus-on-map", True)
 
-        self.set_transient_for(parent)
-
-        self.set_can_focus(True)
-        self.set_can_default(True)
-
         self.connect("expose-event", self._handle_event)
         
-        self._origin_x, self._origin_y = parent.window.get_origin()
-        
-        self.set_location(location)
-        
-        self._background_x = self._x
-        self._background_y = self._y
-        
-        if not size:
-            size = parent.get_size()
-        self._width, self._height = size
-
-        self.set_app_paintable(True)
-        self.set_resizable(False)
-        self.set_decorated(False)
-        self.set_has_frame(False)
-        
-        # Prevent gnome desktop (e.g. on developer setup)
-        # from displaying an icon on the taskbar
-        self.set_type_hint(gtk.gdk.WINDOW_TYPE_HINT_POPUP_MENU)
-        
-        # Prevent our taksbar manager from displaying an icon
-        self.set_skip_taskbar_hint(True)
-
     def _handle_event(self, widget, event):
         cr = widget.window.cairo_create()
         
@@ -54,10 +37,6 @@ class TransparentWindow(gtk.Window):
         return False
 
     def draw(self, cr):
-        self._background.draw(lambda pixbuf: cr.set_source_pixbuf(pixbuf,
-                self._background_x - self._x,
-                self._background_y - self._y))
-
         if self.gradient_type is None:
             cr.paint()
         else:

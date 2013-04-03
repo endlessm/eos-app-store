@@ -30,7 +30,9 @@ class AddShortcutsView():
 
         self._parent = parent
         self._presenter = AddShortcutsPresenter(view=self)
-        self.window = DesktopTransparentWindow(self._parent, (0, 0), (self._width, self._height))
+    
+        self.window = self._create_transparent_window(self._width, self._height)
+#self.window = DesktopTransparentWindow(self._parent, (0, 0), (self._width, self._height))
         
         self.window.connect("delete-event", self.destroy)
         self.window.connect("expose-event", self._draw_triangle)
@@ -71,6 +73,23 @@ class AddShortcutsView():
         self.hbox.pack_end(self.hbox2)
         self.window.add(self.hbox)
         self.show()
+
+    def _create_transparent_window(self, width, height):
+        win = gtk.Window()
+
+        win.set_decorated(False)
+
+        # Makes the window paintable, so we can draw directly on it
+        win.set_app_paintable(True)
+        win.set_size_request(width, height)
+
+        # This sets the windows colormap, so it supports transparency.
+        # This will only work if the wm support alpha channel
+        screen = win.get_screen()
+        rgba = screen.get_rgba_colormap()
+        win.set_colormap(rgba)
+        
+        return win
 
     @property
     def add_button_box_width(self):
