@@ -1,10 +1,10 @@
 #!/usr/bin/env python
 import gtk
 import gobject
-from desktop.endless_desktop_view import EndlessDesktopView
+from app_store.eos_app_store import EosAppStore
 
 if __name__ == "__main__":
-   view = EndlessDesktopView()
+   EosAppStore()
 
    gobject.threads_init()
    gtk.threads_init()
