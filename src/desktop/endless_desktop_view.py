@@ -11,7 +11,6 @@ from shortcut.separator_shortcut import SeparatorShortcut
 from shortcut.add_remove_shortcut import AddRemoveShortcut
 from folder.folder_window import OpenFolderWindow
 from folder.folder_window import FULL_FOLDER_ITEMS_COUNT
-from taskbar_panel.taskbar_panel import TaskbarPanel
 from add_shortcuts_module.add_shortcuts_view import AddShortcutsView
 from eos_util.image import Image
 from shortcut.desktop_shortcut import DesktopShortcut
