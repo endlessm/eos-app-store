@@ -1,0 +1,11 @@
+[Desktop Entry]
+Version=1.0
+Type=Application
+Name=BlockOut 2
+Name[es]=BlockOut 2
+Name[pt]=BlockOut 2
+Comment=3D Tetris-style game
+TryExec=blockout2
+Exec=blockout2
+Icon=blockout2
+Categories=Games
