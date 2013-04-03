@@ -1,2 +1,2 @@
-python /usr/share/eos-app-store/endless_os_desktop.pyc
-
+#!/bin/bash
+python /usr/lib/eos-app-store/endless_os_desktop.pyc
