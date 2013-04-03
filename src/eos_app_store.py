@@ -1,12 +1,10 @@
 #!/usr/bin/env python
 import gtk
 import gobject
-
-from desktop_builder import build_desktop
+from desktop.endless_desktop_view import EndlessDesktopView
 
 if __name__ == "__main__":
-
-   build_desktop()
+   view = EndlessDesktopView()
 
    gobject.threads_init()
    gtk.threads_init()
