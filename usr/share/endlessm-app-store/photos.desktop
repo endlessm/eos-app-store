@@ -1,0 +1,12 @@
+[Desktop Entry]
+Version=1.0
+Type=Application
+Name=Photo Editor
+Name[es]=Editor de Fotos
+Name[pt]=Editor de Fotos
+Name[zh]=照片编辑器
+Comment=Endless Photo App
+TryExec=endless-os-photos
+Exec=endless-os-photos %f
+Icon=photo
+Categories=Photos

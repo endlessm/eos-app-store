@@ -1,0 +1,11 @@
+[Desktop Entry]
+Version=1.0
+Type=Application
+Name=YouTube
+Name[es]=YouTube
+Name[pt]=YouTube
+Comment=YouTube
+Exec=endless-os-youtube
+TryExec=endless-os-youtube
+Icon=youtube-app
+Categories=Media

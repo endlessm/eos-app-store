@@ -1,0 +1,11 @@
+[Desktop Entry]
+Version=1.0
+Type=Application
+Name=Media Download
+Name[es]=Descargar
+Name[pt]=Baixar Mídia
+Comment=qBittorrent
+TryExec=qbittorrent
+Exec=qbittorrent %U
+Icon=qbittorrent
+Categories=Network

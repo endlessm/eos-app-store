@@ -1,0 +1,9 @@
+[Desktop Entry]
+Version=1.0
+Name=翻译
+Comment=Google Translate
+GenericName=翻译
+Type=Link
+URL=http://translate.google.com
+Icon=googletranslate
+Categories=Network
