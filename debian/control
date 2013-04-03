@@ -1,4 +1,4 @@
-Source: endlessos-base-desktop
+Source: eos-app-store
 Section: non-free/misc
 Priority: standard
 Maintainer: Asynchrony Solutions, Inc <endlessmobile@gmail.com>
@@ -6,11 +6,8 @@ Build-Depends: debhelper
 Standards-Version: 3.9.2
 Homepage: http://www.endlessm.com
 
-Package: eos-app-store 
-Replaces: eos-app-store
-Breaks: eos-app-store
-Provides: eos-app-store
-Architecture: any
-Depends: ${shlibs:Depends}, ${misc:Depends}, python(>=2.6), python-gtk2, python-setuptools, python-xlib, eog, gnome-utils
+Package: eos-app-store
+Architecture: all
+Depends: ${shlibs:Depends}, ${misc:Depends}, python(>=2.6), python-gtk2, python-setuptools, python-xlib
 Description: Endless OS App Store installation package
  This package will install the Endless OS App Store

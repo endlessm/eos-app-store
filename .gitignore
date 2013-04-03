@@ -2,7 +2,7 @@
 *.pyc
 dist
 build
-debian/endlessos-base-desktop/
+debian/eos-app-store/
 *.log
 *.deb
 *.changes
