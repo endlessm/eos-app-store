@@ -3,7 +3,7 @@ from shutil import copyfile
 from eos_log import log
 
 class OsUtil(object):
-    VERSION_COMMAND = ["bash", "-c", "dpkg -s endlessos-base-desktop | grep ^Version: | awk \'{print $2}\'"] #| "
+    VERSION_COMMAND = ["bash", "-c", "dpkg -s eos-app-store | grep ^Version: | awk \'{print $2}\'"] #| "
     
     def execute(self, cmd_args):
         p = Popen(cmd_args, stdout=PIPE)
