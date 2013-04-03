@@ -1,7 +1,7 @@
 #!/bin/bash -e
 
 # Install dependencies
-DEPENDENCIES="devscripts debhelper python-xlib python-alsaaudio hal"
+DEPENDENCIES="devscripts debhelper python-xlib"
 set +e 
   dpkg -s $DEPENDENCIES &> /dev/null
   has_dependencies=$?
@@ -41,8 +41,8 @@ pushd `dirname $0`
   debuild -k4EB55A92 -b
   
   # Move package to this directory and clean up
-  mv ../endlessos-base-desktop*.deb .
-  mv ../endlessos-base-desktop*.changes .
+  mv ../eos-app-store*.deb .
+  mv ../eos-app-store*.changes .
   rm -f ../*.build
 
     if [[ $(dpkg -c *.deb | egrep "py$") ]]
