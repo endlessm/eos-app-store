@@ -13,7 +13,6 @@ class ApplicationTransparentWindow(transparent_window.TransparentWindow):
         width, height = size
         x, y = location
         
-        pixbuf = gtk.gdk.Pixbuf(gtk.gdk.COLORSPACE_RGB, False, 8, width, height)
-        background = Image(pixbuf.get_from_drawable(parent.window, parent.get_colormap(), x, y, 0, 0, width, height))
+        background = None 
         
         super(ApplicationTransparentWindow, self).__init__(parent, background, location, size, gradient_type)

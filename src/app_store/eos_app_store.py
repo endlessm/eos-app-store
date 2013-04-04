@@ -28,4 +28,3 @@ class EosAppStore(gtk.Window, object):
         height = geometry.height
 
         return width, height
-

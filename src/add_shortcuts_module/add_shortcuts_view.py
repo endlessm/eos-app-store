@@ -79,12 +79,9 @@ class AddShortcutsView():
 
         win.set_decorated(False)
 
-        # Makes the window paintable, so we can draw directly on it
         win.set_app_paintable(True)
         win.set_size_request(width, height)
 
-        # This sets the windows colormap, so it supports transparency.
-        # This will only work if the wm support alpha channel
         screen = win.get_screen()
         rgba = screen.get_rgba_colormap()
         win.set_colormap(rgba)
