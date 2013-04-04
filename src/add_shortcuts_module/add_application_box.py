@@ -61,8 +61,8 @@ class AddApplicationBox(gtk.VBox):
         # In the current implementation, things look better for the website box
         # without the check, so I'm disabling it here as well
         # if not self._refresh and event:
-        if event:
-            self._draw_gradient(cr, event.area.width, event.area.height, event.area.x, event.area.y)
+#        if event:
+#           self._draw_gradient(cr, event.area.width, event.area.height, event.area.x, event.area.y)
 
         return False
 

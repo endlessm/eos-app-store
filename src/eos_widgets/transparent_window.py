@@ -7,12 +7,9 @@ class TransparentWindow(gtk.Window):
 
         self.set_decorated(False)
 
-        # Makes the window paintable, so we can draw directly on it
         self.set_app_paintable(True)
         self.set_size_request(width, height)
 
-        # This sets the windows colormap, so it supports transparency.
-        # This will only work if the wm support alpha channel
         screen = self.get_screen()
         rgba = self.get_rgba_colormap()
         self.set_colormap(rgba)
@@ -36,19 +33,6 @@ class TransparentWindow(gtk.Window):
 
         return False
 
-    def draw(self, cr):
-        if self.gradient_type is None:
-            cr.paint()
-        else:
-            gradient = cairo.LinearGradient(0, 0, 0, self._height)
-            gradient.add_color_stop_rgba(0.005, 255, 255, 255, 0)
-            gradient.add_color_stop_rgba(0.006, 0, 0, 0, 0.7)
-            gradient.add_color_stop_rgba(0.994, 0, 0, 0, 0.0)
-            gradient.add_color_stop_rgba(0.995, 255, 255, 255, 0)
-            cr.mask(gradient)
-            cr.fill()
-        
-        return False
     
     def set_location(self, location):
         self._x, self._y = location
