@@ -3,7 +3,7 @@ import os
 
 class FolderModel(DesktopFileModel):
     
-    FOLDER_ICON_PATH = '/usr/share/endlessm/icons/folders'
+    FOLDER_ICON_PATH = '/home/endlessm/gnome/source/eos-app-store/usr/share/endlessm/icons/folders'
     
     def __init__(self, model_id, desktop_file_path, name=None, comment=None, icon=None, class_name=None):
         super(FolderModel, self).__init__(model_id, desktop_file_path, name, comment, icon, class_name,

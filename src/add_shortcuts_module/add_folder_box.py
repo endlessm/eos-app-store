@@ -11,7 +11,7 @@ from osapps.desktop_preferences_datastore import DesktopPreferencesDatastore
 gettext.install('endless_desktop', '/usr/share/locale', unicode = True, names=['ngettext'])
 
 class AddFolderBox(gtk.VBox):
-    _FOLDER_ICON_PATH = '/usr/share/endlessm/icons/folders/'
+    _FOLDER_ICON_PATH = '/home/endlessm/gnome/source/eos-app-store/usr/share/endlessm/icons/folders/'
 
     def __init__(self, parent, add_remove_widget=None, desktop_preference_class = DesktopPreferencesDatastore):
         super(AddFolderBox, self).__init__()

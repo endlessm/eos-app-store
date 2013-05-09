@@ -6,7 +6,7 @@ from desktop_files.desktop_file_utilities import DesktopFileUtilities
 from eos_log import log
 
 class ApplicationStoreModel():
-    DEFAULT_APP_STORE_DIRECTORY = '/usr/share/endlessm-app-store'
+    DEFAULT_APP_STORE_DIRECTORY = '/home/endlessm/gnome/source/eos-app-store/usr/share/endlessm-app-store'
 
     def __init__(self, directory=DEFAULT_APP_STORE_DIRECTORY, installed_apps_dir=os.path.expanduser("~/.endlessm"), installed_applications_model = InstalledApplicationsModel()):
         self._base_dir = directory
