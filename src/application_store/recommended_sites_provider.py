@@ -7,7 +7,7 @@ class RecommendedSitesProvider(object):
     This class provides recommended sites based on the locale
     '''
 
-    DEFAULT_SITES_DIRECTORY = '/usr/share/endlessm-sites'
+    DEFAULT_SITES_DIRECTORY = '/home/endlessm/gnome/source/eos-app-store/usr/share/endlessm-sites'
 
     def __init__(self, directory=DEFAULT_SITES_DIRECTORY, desktop_file_model = DesktopFileUtilities(), locale_util=LocaleUtil()):
         self._desktop_file_model = desktop_file_model
