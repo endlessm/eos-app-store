@@ -1,4 +1,4 @@
-import gtk
+from gi.repository import Gtk
 from eos_widgets.abstract_notifier import AbstractNotifier
 from rename_widget_view import RenameWidgetView
 from rename_widget_model import RenameWidgetModel

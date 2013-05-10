@@ -1,4 +1,4 @@
-import gtk
+from gi.repository import Gtk
 from eos_widgets.image_eventbox import ImageEventBox
 
 class ImageEventBox(ImageEventBox):

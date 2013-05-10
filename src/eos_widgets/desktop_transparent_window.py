@@ -1,5 +1,5 @@
 import transparent_window
-import gtk
+from gi.repository import Gtk
 from osapps.desktop_preferences_datastore import DesktopPreferencesDatastore
 
 # This type of transparent window extracts the background from the

@@ -1,4 +1,4 @@
-import gtk
+from gi.repository import Gtk
 from eos_widgets.image_eventbox import ImageEventBox
 from eos_util.image import Image
 from eos_widgets.desktop_transparent_window import DesktopTransparentWindow
@@ -18,7 +18,7 @@ class RemovalConfirmationPopupWindow():
         # upon the call to _move_window().
         self._window = DesktopTransparentWindow(parent)
         self._window.set_size_request(self._width,self._height)
-        self._window.set_position(gtk.WIN_POS_MOUSE)
+        self._window.set_position(Gtk.WIN_POS_MOUSE)
         
         if caller_widget:
             self._move_window(caller_widget)
@@ -28,11 +28,14 @@ class RemovalConfirmationPopupWindow():
         
         self._fancy_container = ImageEventBox(self._dialog_images)
         self._fancy_container.set_size_request(self._width,self._height)
-        self._bottom_center = gtk.Alignment(.5,.85,0,0)
+        self._bottom_center = Gtk.Alignment()
+        self._bottom_center.set(0.5,0.85,0,0)
         
-        self._container = gtk.VBox(False)
+        self._container = Gtk.Box(Gtk.Orientation.VERTICAL)
+        self._container.set_homogeneous(False)
         
-        self._button_box = gtk.HBox(True)
+        self._button_box = Gtk.Box(Gtk.Orientation.HORIZONTAL)
+        self._button_box.set_homogeneous(True)
         self._button_box.set_size_request(75,36)
         
         self._cancel_event_box = ImageEventBox(self._cancel_inactive_images)
@@ -73,6 +76,6 @@ class RemovalConfirmationPopupWindow():
         widget.show()
     
     def _move_window(self, caller_widget):
-        new_x = caller_widget.allocation.x - int((self._width - caller_widget.allocation.width)/2)
-        new_y = caller_widget.allocation.y - int((self._width - caller_widget.allocation.height)/2)
+        new_x = caller_widget.get_allocation().x - int((self._width - caller_widget.get_allocation().width)/2)
+        new_y = caller_widget.get_allocation().y - int((self._width - caller_widget.get_allocation().height)/2)
         self._window.set_location((new_x, new_y))

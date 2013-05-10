@@ -1,5 +1,6 @@
 import image_util
-from gtk import gdk
+from gi.repository import Gdk
+from gi.repository import GdkPixbuf
 
 class Image:
 
@@ -87,7 +88,7 @@ class Image:
         return self
 
     def scale(self, width, height):
-        self._pixbuf = self._pixbuf.scale_simple(width, height, gdk.INTERP_BILINEAR)
+        self._pixbuf = self._pixbuf.scale_simple(width, height, GdkPixbuf.InterpType.BILINEAR)
         return self
 
     def crop(self, x, y, width, height):

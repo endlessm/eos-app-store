@@ -1,9 +1,11 @@
-import gtk
+from gi.repository import Gtk
+from gi.repository import Gdk
+from gi.repository import GdkPixbuf
 from osapps.desktop_preferences_datastore import DesktopPreferencesDatastore
 from eos_util import image_util 
 
 
-class WebsiteRowBox(gtk.EventBox):
+class WebsiteRowBox(Gtk.EventBox):
     def __init__(self, item=None, parent=None, presenter=None, desktop_preference_class = DesktopPreferencesDatastore):
         super(WebsiteRowBox, self).__init__()
         self.set_visible_window(False)
@@ -30,32 +32,33 @@ class WebsiteRowBox(gtk.EventBox):
         self._plus_box_width = 80
         
         # -- DISPLAY ELEMENTS
-        self._vbox = gtk.VBox()
-        self._top_active_line = gtk.Image()
+        self._vbox = Gtk.Box(Gtk.Orientation.VERTICAL)
+        self._top_active_line = Gtk.Image()
         self._top_active_line.set_size_request(-1, 1)
-        self._bottom_active_line = gtk.Image()
+        self._bottom_active_line = Gtk.Image()
         self._bottom_active_line.set_size_request(-1, 1)
-        self._row = gtk.HBox()
+        self._row = Gtk.Box(Gtk.Orientation.HORIZONTAL)
         
         # icon
-        self.icon_alignment = gtk.Alignment(0.5, 0.5, 0, 0)
+        self.icon_alignment = Gtk.Alignment()
+        self.icon_alignment.set(0.5, 0.5, 0, 0)
         self.icon_alignment.set_size_request(self._icon_width, self._height-2)
-        self.icon_image_box = gtk.Image()
+        self.icon_image_box = Gtk.Image()
         self.icon_image_box.set_size_request(self._icon_image_width, self._icon_image_height)
         if not (self._icon_image.get_width() == self._icon_image_width and self._icon_image.get_height() == self._icon_image_height):
-            self._icon_image = self._icon_image.scale_simple(self._icon_image_width, self._icon_image_height, gtk.gdk.INTERP_BILINEAR)
+            self._icon_image = self._icon_image.scale_simple(self._icon_image_width, self._icon_image_height, GdkPixbuf.InterpType.BILINEAR)
         self.icon_image_box.set_from_pixbuf(self._icon_image)
         self.icon_alignment.add(self.icon_image_box)
 
         #textual data
-        self.name_label = gtk.Label()
+        self.name_label = Gtk.Label()
         self.name_label.set_markup('<span color="#aaaaaa" font="Novecento wide" font_weight="bold">' + self._name + '</span>')
         self.name_label.set_alignment(0, 0.5)
-        self.description_label = gtk.Label()
+        self.description_label = Gtk.Label()
         self.description_label.set_markup('<span color="#aaaaaa" font-style="italic">' + self._link_model._url + '</span>')
         self.description_label.set_alignment(0,0.5)
         
-        self.labels_box = gtk.HBox()
+        self.labels_box = Gtk.Box(Gtk.Orientation.HORIZONTAL)
         self.labels_box.pack_start(self.name_label, False, False, 20)
         self.labels_box.pack_start(self.description_label, False, False, 20)
         
@@ -68,10 +71,11 @@ class WebsiteRowBox(gtk.EventBox):
         self.labels_box.set_size_request(1, 1)
 
         #place for displaying + icon
-        self._plus_box_alignment = gtk.Alignment(0.5, 0.5, 0, 0)
+        self._plus_box_alignment = Gtk.Alignment()
+        self._plus_box_alignment.set(0.5, 0.5, 0, 0)
         self._plus_box_alignment.set_size_request(self._plus_box_width + self._plus_offset_for_scrollbar,
                                                   self._height - 2)
-        self._plus_image = gtk.Image()
+        self._plus_image = Gtk.Image()
         self._plus_box_alignment.add(self._plus_image)
         
         #pack it all
