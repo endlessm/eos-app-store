@@ -1,4 +1,4 @@
-import gtk
+from gi.repository import Gtk
 from eos_widgets.image_eventbox import ImageEventBox
 from eos_util.image import Image
 from eos_widgets.desktop_transparent_window import DesktopTransparentWindow
@@ -18,7 +18,7 @@ class RemovalConfirmationPopupWindow():
         # upon the call to _move_window().
         self._window = DesktopTransparentWindow(parent)
         self._window.set_size_request(self._width,self._height)
-        self._window.set_position(gtk.WIN_POS_MOUSE)
+        self._window.set_position(Gtk.WIN_POS_MOUSE)
         
         if caller_widget:
             self._move_window(caller_widget)
@@ -28,11 +28,11 @@ class RemovalConfirmationPopupWindow():
         
         self._fancy_container = ImageEventBox(self._dialog_images)
         self._fancy_container.set_size_request(self._width,self._height)
-        self._bottom_center = gtk.Alignment(.5,.85,0,0)
+        self._bottom_center = Gtk.Alignment(.5,.85,0,0)
         
-        self._container = gtk.VBox(False)
+        self._container = Gtk.VBox(False)
         
-        self._button_box = gtk.HBox(True)
+        self._button_box = Gtk.HBox(True)
         self._button_box.set_size_request(75,36)
         
         self._cancel_event_box = ImageEventBox(self._cancel_inactive_images)

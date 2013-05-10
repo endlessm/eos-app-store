@@ -1,14 +1,15 @@
-import gtk
+from gi.repository import Gtk
+from gi.repository import Gdk
 import cairo
 
 from util.rename_widget import RenameWidget
 from desktop.desktop_layout import DesktopLayout
 
-class ShadowedLabelBox(gtk.EventBox):
+class ShadowedLabelBox(Gtk.EventBox):
     def __init__(self, label):
         super(ShadowedLabelBox, self).__init__()
-        self.connect("expose-event", self.draw)
-        self.add_events(gtk.gdk.BUTTON_PRESS_MASK)
+        #self.connect("expose-event", self.draw)
+        self.add_events(Gdk.EventType.BUTTON_PRESS)
         if label.get_text():
             self.connect("button-press-event", self._click_handler)
         self._label = label

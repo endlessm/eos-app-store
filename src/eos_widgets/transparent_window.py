@@ -1,9 +1,9 @@
 import cairo
-import gtk
+from gi.repository import Gtk
 
-class TransparentWindow(gtk.Window):
+class TransparentWindow(Gtk.Window):
     def __init__(self, parent, background, location=(0,0), size=None, gradient_type=None):
-        gtk.Window.__init__(self, gtk.WINDOW_TOPLEVEL)
+        Gtk.Window.__init__(self, Gtk.WINDOW_TOPLEVEL)
 
         self.set_decorated(False)
 
@@ -46,5 +46,5 @@ class TransparentWindow(gtk.Window):
             del self._background
         except:
             pass
-        super(gtk.Window, self).destroy()
+        super(Gtk.Window, self).destroy()
     

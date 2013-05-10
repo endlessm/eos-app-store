@@ -1,4 +1,4 @@
-import gobject
+from gi.repository import GObject
 import uuid
 import gettext
 
@@ -11,9 +11,9 @@ gettext.install('endless_desktop', '/usr/share/locale', unicode = True, names=['
 
 class AddRemoveShortcut(DesktopShortcut):
     __gsignals__ = {
-        "application-shortcut-remove": (gobject.SIGNAL_RUN_FIRST, #@UndefinedVariable
-           gobject.TYPE_NONE,
-           (gobject.TYPE_PYOBJECT,)),
+        "application-shortcut-remove": (GObject.SIGNAL_RUN_FIRST, #@UndefinedVariable
+           GObject.TYPE_NONE,
+           (GObject.TYPE_PYOBJECT,)),
     }
     
     def __init__(self, label_text="", callback=None):

@@ -1,4 +1,4 @@
-import gtk
+from gi.repository import Gtk
 import cairo
 import gettext
 
@@ -10,7 +10,7 @@ from osapps.desktop_preferences_datastore import DesktopPreferencesDatastore
 
 gettext.install('endless_desktop', '/usr/share/locale', unicode = True, names=['ngettext'])
 
-class AddFolderBox(gtk.VBox):
+class AddFolderBox(Gtk.VBox):
     _FOLDER_ICON_PATH = '/home/endlessm/gnome/source/eos-app-store/usr/share/endlessm/icons/folders/'
 
     def __init__(self, parent, add_remove_widget=None, desktop_preference_class = DesktopPreferencesDatastore):
@@ -24,40 +24,40 @@ class AddFolderBox(gtk.VBox):
         # TODO should not rely on access to private member _parent of parent
         # Is there a better way to get access to the desktop window for its size?
 
-        self._scrolled_window = gtk.ScrolledWindow()
-        self._scrolled_window.set_policy(hscrollbar_policy=gtk.POLICY_NEVER, vscrollbar_policy=gtk.POLICY_AUTOMATIC)
+        self._scrolled_window = Gtk.ScrolledWindow()
+        self._scrolled_window.set_policy(hscrollbar_policy=Gtk.POLICY_NEVER, vscrollbar_policy=Gtk.POLICY_AUTOMATIC)
         self._scrolled_window.connect("show", self._on_show)
         self._scrolled_window.get_vscrollbar().connect("value-changed", self._on_scroll)
 
         self._scrolling = False
 
-        self._vbox = gtk.VBox()
+        self._vbox = Gtk.VBox()
         self._vbox.set_homogeneous(False)
         self._vbox.set_spacing(15)
         self._vbox.connect("expose-event", self._handle_event)
 
         label_1_text = _('1. NAME YOUR FOLDER')
-        self._label_1 = gtk.Label()
+        self._label_1 = Gtk.Label()
         label_2_text = _('2. PICK A SYMBOL')
-        self._label_2 = gtk.Label()
+        self._label_2 = Gtk.Label()
         self._label_1.set_markup('<span color="#aaaaaa" font="Novecento wide" font_weight="bold" size="16000">' + label_1_text + '</span>')
         self._label_2.set_markup('<span color="#aaaaaa" font="Novecento wide" font_weight="bold" size="16000">' + label_2_text + '</span>')
 
-        self._text_entry_align = gtk.Alignment(0.5, 0.5, 0, 0)
-        self._hbox = gtk.HBox()
+        self._text_entry_align = Gtk.Alignment(0.5, 0.5, 0, 0)
+        self._hbox = Gtk.HBox()
         self._hbox.set_size_request(186, 24)
-        self._text_entry = gtk.Entry(50)
+        self._text_entry = Gtk.Entry(50)
         self._text_entry.set_alignment(0.5)
         self._hbox.pack_start(self._text_entry)
         self._text_entry.set_text('')
         self._text_entry_align.add(self._hbox)
 
-        self.hbox_separator = gtk.HBox()
+        self.hbox_separator = Gtk.HBox()
         self.hbox_separator.set_size_request(-1, 15)
         self._vbox.pack_start(self.hbox_separator, True, True, 0)
         self._vbox.pack_start(self._label_1, True, True, 0)
         self._vbox.pack_start(self._text_entry_align, False, False, 0)
-        self.hbox_separator1 = gtk.HBox()
+        self.hbox_separator1 = Gtk.HBox()
         self.hbox_separator1.set_size_request(-1, 15)
         self.hbox_separator1.connect("expose-event", self._draw_divider_line)
         self._vbox.pack_start(self.hbox_separator1)
@@ -66,7 +66,7 @@ class AddFolderBox(gtk.VBox):
         self._fill_table()
 
         self._table.show()
-        self._bottom_center = gtk.Alignment(0.5, 0, 0, 0)
+        self._bottom_center = Gtk.Alignment(0.5, 0, 0, 0)
         self._bottom_center.add(self._table)
         self._vbox.pack_start(self._bottom_center)
         self._scrolled_window.add_with_viewport(self._vbox)
@@ -126,7 +126,7 @@ class AddFolderBox(gtk.VBox):
         return False
 
     def draw(self, cr, x, y, w, h):
-        self._scrolled_window.get_child().set_shadow_type(gtk.SHADOW_NONE)
+        self._scrolled_window.get_child().set_shadow_type(Gtk.SHADOW_NONE)
         # Only copy/crop the background the first time through
         # to avoid needless memory copies and image manipulation
         if not self._scrolling:
@@ -174,7 +174,7 @@ class AddFolderBox(gtk.VBox):
         available_width = screen_util.get_width(self._parent.parent.window) - self._parent.add_button_box_width - self._parent.tree_view_width
         columns = int(available_width/120)   # shold this be a fixed number like 5 as in pdf?
         rows = int(num_of_icons/columns) + 1
-        self._table = gtk.Table(rows, columns)
+        self._table = Gtk.Table(rows, columns)
         self._table.show()
         col = row = 0
 
@@ -186,7 +186,7 @@ class AddFolderBox(gtk.VBox):
             col = col + 1
 
     def _on_show(self, widget):
-        widget.get_child().set_shadow_type(gtk.SHADOW_NONE)
+        widget.get_child().set_shadow_type(Gtk.SHADOW_NONE)
         
     def _on_scroll(self, widget):
         self._scrolled_window.queue_draw()

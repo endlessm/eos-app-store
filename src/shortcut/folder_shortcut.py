@@ -2,17 +2,17 @@ from shortcut.desktop_shortcut import DesktopShortcut
 from shortcut.application_shortcut import ApplicationShortcut
 from eos_util import image_util
 from eos_util.image import Image
-import gtk
-import gobject
+from gi.repository import Gtk
+from gi.repository import GObject
 
 class FolderShortcut(DesktopShortcut):
     __gsignals__ = {
-        "folder-shortcut-activate": (gobject.SIGNAL_RUN_FIRST, #@UndefinedVariable
-                   gobject.TYPE_NONE,
-                   (gobject.TYPE_STRING,gobject.TYPE_PYOBJECT)),
-        "folder-shortcut-relocation": (gobject.SIGNAL_RUN_FIRST, #@UndefinedVariable
-                   gobject.TYPE_NONE,
-                   (gobject.TYPE_PYOBJECT, gobject.TYPE_PYOBJECT)),
+        "folder-shortcut-activate": (GObject.SIGNAL_RUN_FIRST, #@UndefinedVariable
+                   GObject.TYPE_NONE,
+                   (GObject.TYPE_STRING,GObject.TYPE_PYOBJECT)),
+        "folder-shortcut-relocation": (GObject.SIGNAL_RUN_FIRST, #@UndefinedVariable
+                   GObject.TYPE_NONE,
+                   (GObject.TYPE_PYOBJECT, GObject.TYPE_PYOBJECT)),
     }
 
 

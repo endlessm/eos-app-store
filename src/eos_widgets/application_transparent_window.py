@@ -1,6 +1,6 @@
 import transparent_window
 from eos_util.image import Image
-import gtk
+from gi.repository import Gtk
 
 # This type of transparent window extracts the background from the parent window
 # This is useful when the transparency should show the image from an application

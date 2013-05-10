@@ -1,10 +1,10 @@
-import gtk
+from gi.repository import Gtk
 from osapps.desktop_preferences_datastore import DesktopPreferencesDatastore
 from eos_util import image_util
 from xdg.DesktopEntry import DesktopEntry
 from desktop_files.desktop_file_model import DesktopFileModel
 
-class ApplicationRowBox(gtk.EventBox):
+class ApplicationRowBox(Gtk.EventBox):
     def __init__(self, item=None, parent=None, presenter=None, desktop_preference_class = DesktopPreferencesDatastore):
         super(ApplicationRowBox, self).__init__()
         self.set_visible_window(False)
@@ -33,37 +33,39 @@ class ApplicationRowBox(gtk.EventBox):
         self._plus_box_width = 80
 
         # -- DISPLAY ELEMENTS
-        self._vbox = gtk.VBox()
-        self._top_active_line = gtk.Image()
+        self._vbox = Gtk.VBox()
+        self._top_active_line = Gtk.Image()
         self._top_active_line.set_size_request(-1, 1)
-        self._bottom_active_line = gtk.Image()
+        self._bottom_active_line = Gtk.Image()
         self._bottom_active_line.set_size_request(-1, 1)
-        self._row = gtk.HBox()
+        self._row = Gtk.HBox()
 
         # icon
-        self.icon_alignment = gtk.Alignment(0.5, 0.5, 0, 0)
+        self.icon_alignment = Gtk.Alignment()
+        self.icon_alignment.set(0.5, 0.5, 0, 0)
         self.icon_alignment.set_size_request(self._icon_width, self._height-2)
-        self.icon_image_box = gtk.Image()
+        self.icon_image_box = Gtk.Image()
         self.icon_image_box.set_size_request(self._icon_image_width, self._icon_image_height)
         self.icon_image_box.set_from_file(self._icon_image)
         self.icon_alignment.add(self.icon_image_box)
 
         #textual data
-        self.name_label = gtk.Label()
+        self.name_label = Gtk.Label()
         self.name_label.set_markup('<span color="#aaaaaa" font="Novecento wide" font_weight="bold">' + self._name + '</span>')
         self.name_label.set_alignment(0, 0.5)
-        self.description_label = gtk.Label()
+        self.description_label = Gtk.Label()
         self.description_label.set_markup('<span color="#aaaaaa" font-style="italic">' + self._description + '</span>')
         self.description_label.set_alignment(0,0.5)
 
-        self.labels_box = gtk.VBox()
-        self.labels_box.pack_start(self.name_label)
-        self.labels_box.pack_start(self.description_label)
+        self.labels_box = Gtk.VBox()
+        self.labels_box.pack_start(self.name_label, True, True, 0)
+        self.labels_box.pack_start(self.description_label, True, True, 0)
 
         #place for displaying + icon
-        self._plus_box_alignment = gtk.Alignment(0.5, 0.5, 0, 0)
+        self._plus_box_alignment = Gtk.Alignment()
+        self._plus_box_alignment.set(0.5, 0.5, 0, 0)
         self._plus_box_alignment.set_size_request(self._plus_box_width, self._height-2)
-        self._plus_image = gtk.Image()
+        self._plus_image = Gtk.Image()
         self._plus_box_alignment.add(self._plus_image)
 
         #pack it all

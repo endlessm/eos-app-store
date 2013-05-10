@@ -1,9 +1,9 @@
-import gtk
+from gi.repository import Gtk
 import cairo
 from eos_widgets.image_eventbox import ImageEventBox
 from eos_util.image import Image
 
-class ShortcutCategoryBox(gtk.EventBox):
+class ShortcutCategoryBox(Gtk.EventBox):
     def __init__(self, model, parent, width, presenter):
         super(ShortcutCategoryBox, self).__init__()
         self.set_visible_window(False)
@@ -15,32 +15,34 @@ class ShortcutCategoryBox(gtk.EventBox):
         self._active_subcategory = None
         self._separator_active = Image.from_name('category_separator_active.png')
         self._separator_inactive = Image.from_name('category_separator_inactive.png')
-        self.top_align = gtk.Alignment(0.03, 0, 0, 0)
-        self.middle_align = gtk.Alignment(0, 0.5, 0, 0)
+        self.top_align = Gtk.Alignment()
+        self.top_align.set(0.03, 0, 0, 0)
+        self.middle_align = Gtk.Alignment()
+        self.middle_align.set(0, 0.5, 0, 0)
 
-        self.tree = gtk.VBox()
-        self.top = gtk.HBox()
+        self.tree = Gtk.VBox()
+        self.top = Gtk.HBox()
 
         self._close = ImageEventBox((Image.from_name("delete_no_unactive_24.png"),))
         self._close.set_size_request(24,24)
         self._close.connect("button-release-event", lambda w, e: self.destroy())
-        self.top.pack_start(self._close)
+        self.top.pack_start(self._close, True, True, 0)
         self.top_align.add(self.top)
         self.top_align.show()
 
-        self.middle = gtk.VBox()
+        self.middle = Gtk.VBox()
 
         self._fill_categories()
 
         self.middle_align.add(self.middle)
-        self.bottom = gtk.HBox()
+        self.bottom = Gtk.HBox()
         self.bottom.set_size_request(24, 24)
 
-        self.tree.pack_start(self.top_align)
-        self.tree.pack_start(self.middle_align)
-        self.tree.pack_start(self.bottom)
+        self.tree.pack_start(self.top_align, True, True, 0)
+        self.tree.pack_start(self.middle_align, True, True, 0)
+        self.tree.pack_start(self.bottom, True, True, 0)
         self.add(self.tree)
-        self.connect("expose-event", self._draw_gradient)
+        #self.connect("expose-event", self._draw_gradient)
         self.show_all()
 
     def _handle_click(self, widget, event, label, subcategory=''):
@@ -74,19 +76,19 @@ class ShortcutCategoryBox(gtk.EventBox):
 
     def _fill_categories(self):
         for section in self._model:
-            image_start = gtk.Image()
-            image_end = gtk.Image()
-            box = gtk.EventBox()
+            image_start = Gtk.Image()
+            image_end = Gtk.Image()
+            box = Gtk.EventBox()
             box.set_visible_window(False)
             markup = self._set_markup_and_separators(section, image_start, image_end, box)
-            vbox = gtk.VBox(False)
-            hbox = gtk.HBox()
-            label = gtk.Label()
+            vbox = Gtk.VBox(False)
+            hbox = Gtk.HBox()
+            label = Gtk.Label()
             label.set_markup(markup)
             label.set_alignment(0, 0.5)
             label.uat_id = section.category.lower() + "_tab"
             hbox.pack_start(label, True, True, 20)
-            vbox.pack_start(image_start)
+            vbox.pack_start(image_start, True, True, 0)
             vbox.pack_start(hbox, True, True, 15)
             if section.subcategories:
                 for category in section.subcategories:
@@ -100,11 +102,11 @@ class ShortcutCategoryBox(gtk.EventBox):
             # if section.subcategories and section.active:
             #     self._fill_subcategories(section, vbox)
             
-            vbox.pack_end(image_end)
+            vbox.pack_end(image_end, True, True, 0)
             box.add(vbox)
             box.connect("button-release-event", self._handle_click, label, self._active_subcategory)
             box.show()
-            self.middle.pack_start(box)
+            self.middle.pack_start(box, True, True, 0)
 
     def _handle_subcategory_click(self, widget, event, category, subcategory):
         for section in self._model:
@@ -130,11 +132,11 @@ class ShortcutCategoryBox(gtk.EventBox):
     
     def _fill_subcategories(self, section, vbox):
         for category in section.subcategories:
-            subcategories_vbox = gtk.VBox()
-            subcategory_hbox = gtk.HBox()
-            ebox = gtk.EventBox()
+            subcategories_vbox = Gtk.VBox()
+            subcategory_hbox = Gtk.HBox()
+            ebox = Gtk.EventBox()
             ebox.set_visible_window(False)
-            sub_label = gtk.Label()
+            sub_label = Gtk.Label()
             if category.active:
                 sub_label.set_markup('<span color="#ffffff"><b>' + category.category.upper() + '</b></span>')
             else:
@@ -152,7 +154,7 @@ class ShortcutCategoryBox(gtk.EventBox):
             self._active_category = section.category
             image_start.set_from_pixbuf(self._separator_active.pixbuf)
             image_end.set_from_pixbuf(self._separator_active.pixbuf)
-            box.connect("expose-event", self._draw_gradient, True)
+            #box.connect("expose-event", self._draw_gradient, True)
         else:
             markup = '<span color="#aaaaaa"><b>' + section.category.upper() + '</b></span>'
             image_start.set_from_pixbuf(self._separator_inactive.pixbuf)

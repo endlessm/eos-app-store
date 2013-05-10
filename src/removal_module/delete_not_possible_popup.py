@@ -1,4 +1,4 @@
-import gtk
+from gi.repository import Gtk
 import gettext
 
 from eos_widgets.image_eventbox import ImageEventBox
@@ -14,7 +14,7 @@ class DeleteNotPossiblePopupWindow():
         
         # Since the TransparentWindow class does not have an option to force centered,
         # for now let's manually calculate the centered position
-        # self._window.set_position(gtk.WIN_POS_CENTER_ALWAYS)
+        # self._window.set_position(Gtk.WIN_POS_CENTER_ALWAYS)
         desktop_size = parent.get_size()
         x = (desktop_size[0] - self._width) / 2
         y = (desktop_size[1] - self._height) / 2
@@ -29,22 +29,22 @@ class DeleteNotPossiblePopupWindow():
         self._close.set_size_request(24,24)
         self._close.connect("button-release-event", lambda w, e: self.destroy())
         
-        self._container = gtk.VBox(False)
-        self._title_label = gtk.Label()
+        self._container = Gtk.VBox(False)
+        self._title_label = Gtk.Label()
         self._title_label.set_markup('<span color="#FFFFFF">WARNING!</span>')
         self._title_label.set_alignment(0.6, 0.5)
         self._title_label.set_size_request(220, 24)
-        self._close_box = gtk.HBox(False)
+        self._close_box = Gtk.HBox(False)
         self._close_box.pack_end(self._close, False, False, 10)
         self._close_box.pack_start(self._title_label, False, False, 0)
         
         self._close_box.set_size_request(24, 24)
         self._container.pack_start(self._close_box, True, False, 0)
-        self._bottom_center = gtk.Alignment(0.5, 1.0, 0, 0)
-        self._label_box = gtk.HBox(False)
+        self._bottom_center = Gtk.Alignment(0.5, 1.0, 0, 0)
+        self._label_box = Gtk.HBox(False)
         
         self._label_box.set_size_request(220, 160)
-        self._label = gtk.Label()
+        self._label = Gtk.Label()
         self._label.set_line_wrap(True)
         
         text = _('To delete a folder you have to\nremove all of the items inside\nof it first.\n\nWe are just trying to\nkeep you safe.')

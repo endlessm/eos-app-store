@@ -1,7 +1,7 @@
 from mock import Mock
 import unittest
 from eos_util.image import Image
-from gtk import gdk
+from gi.repository import Gdk
 
 class TestImage(unittest.TestCase):
     def setUp(self):
@@ -42,7 +42,7 @@ class TestImage(unittest.TestCase):
 
         self.assertEquals(self.test_object._pixbuf, scaled_pixbuf)
 
-        self.pixbuf.scale_simple.assert_called_once_with(width, height, gdk.INTERP_BILINEAR)
+        self.pixbuf.scale_simple.assert_called_once_with(width, height, Gdk.INTERP_BILINEAR)
     
 
     def test_scale_from_width(self):
@@ -56,7 +56,7 @@ class TestImage(unittest.TestCase):
 
         self.assertEquals(self.test_object._pixbuf, scaled_pixbuf)
 
-        self.pixbuf.scale_simple.assert_called_once_with(width, 12, gdk.INTERP_BILINEAR)
+        self.pixbuf.scale_simple.assert_called_once_with(width, 12, Gdk.INTERP_BILINEAR)
     
     def test_scale_from_height(self):
         scaled_pixbuf = Mock()
@@ -69,7 +69,7 @@ class TestImage(unittest.TestCase):
 
         self.assertEquals(self.test_object._pixbuf, scaled_pixbuf)
 
-        self.pixbuf.scale_simple.assert_called_once_with(12, height, gdk.INTERP_BILINEAR)
+        self.pixbuf.scale_simple.assert_called_once_with(12, height, Gdk.INTERP_BILINEAR)
 
     def test_scale_to_best_fit_for_landscape_image_smaller_than_screen(self):
         self.pixbuf.get_width = Mock(return_value=450)
@@ -109,5 +109,5 @@ class TestImage(unittest.TestCase):
 
         self.assertEquals(self.test_object._pixbuf, scaled_pixbuf)
 
-        self.pixbuf.scale_simple.assert_called_once_with(width, 6, gdk.INTERP_BILINEAR)
+        self.pixbuf.scale_simple.assert_called_once_with(width, 6, Gdk.INTERP_BILINEAR)
 

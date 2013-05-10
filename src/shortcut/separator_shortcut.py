@@ -1,15 +1,15 @@
-import gobject
+from gi.repository GObject
 from shortcut.desktop_shortcut import DesktopShortcut
 
 class SeparatorShortcut(DesktopShortcut):
     __gsignals__ = {
         "application-shortcut-move": (
-            gobject.SIGNAL_RUN_FIRST, #@UndefinedVariable
-            gobject.TYPE_NONE,
+            GObject.SIGNAL_RUN_FIRST, #@UndefinedVariable
+            GObject.TYPE_NONE,
                 (
-                    gobject.TYPE_PYOBJECT, 
-                    gobject.TYPE_PYOBJECT, 
-                    gobject.TYPE_PYOBJECT
+                    GObject.TYPE_PYOBJECT,
+                    GObject.TYPE_PYOBJECT,
+                    GObject.TYPE_PYOBJECT
                     )
             ),
         }

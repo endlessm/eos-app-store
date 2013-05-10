@@ -1,11 +1,12 @@
 #!/usr/bin/env python
-import gtk
-import gobject
+from gi.repository import Gtk
+from gi.repository import Gdk
+from gi.repository import GObject
 from app_store.eos_app_store import EosAppStore
 
 if __name__ == "__main__":
    EosAppStore()
 
-   gobject.threads_init()
-   gtk.threads_init()
-   gtk.main()
+   GObject.threads_init()
+   Gdk.threads_init()
+   Gtk.main()

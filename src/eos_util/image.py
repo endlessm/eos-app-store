@@ -1,5 +1,5 @@
 import image_util
-from gtk import gdk
+from gi.repository import Gdk
 
 class Image:
 

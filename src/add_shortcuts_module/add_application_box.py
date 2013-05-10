@@ -1,10 +1,10 @@
-import gtk
+from gi.repository import Gtk
 import cairo
 from eos_util import image_util
 from osapps.desktop_preferences_datastore import DesktopPreferencesDatastore
 from application_row_box import ApplicationRowBox
 
-class AddApplicationBox(gtk.VBox):
+class AddApplicationBox(Gtk.VBox):
     def __init__(self, parent, presenter, width, height, add_remove_widget=None, desktop_preference_class = DesktopPreferencesDatastore, default_category='All'):
         super(AddApplicationBox, self).__init__()
         self.set_homogeneous(False)
@@ -17,8 +17,8 @@ class AddApplicationBox(gtk.VBox):
         self._refresh = True
         self._scrolling = False
 
-        self._scrolled_window = gtk.ScrolledWindow()
-        self._scrolled_window.set_policy(hscrollbar_policy=gtk.POLICY_NEVER, vscrollbar_policy=gtk.POLICY_AUTOMATIC)
+        self._scrolled_window = Gtk.ScrolledWindow()
+        self._scrolled_window.set_policy(hscrollbar_policy=Gtk.PolicyType.NEVER, vscrollbar_policy=Gtk.PolicyType.AUTOMATIC)
         self._scrolled_window.connect("show", self._on_show)
         self._scrolled_window.get_vscrollbar().connect("value-changed", self._on_scroll)
 
@@ -28,13 +28,13 @@ class AddApplicationBox(gtk.VBox):
 
         self._vbox.set_homogeneous(False)
 
-        self._vbox.connect("expose-event", self._handle_expose_event)
+        #self._vbox.connect("expose-event", self._handle_expose_event)
         self._scrolled_window.add_with_viewport(self._vbox)
         self.add(self._scrolled_window)
         self.show_all()
 
     def _fill_applications(self, apps):
-        self._vbox = gtk.VBox()
+        self._vbox = Gtk.VBox()
         if apps:
             for app in apps:
                 self._display_application(app)
@@ -46,7 +46,7 @@ class AddApplicationBox(gtk.VBox):
         self._vbox.pack_start(row, False, False, 0)
 
     def _on_show(self, widget):
-        widget.get_child().set_shadow_type(gtk.SHADOW_NONE)
+        widget.get_child().set_shadow_type(Gtk.ShadowType.NONE)
 
     def _on_scroll(self, widget):
         self._scrolled_window.queue_draw()
@@ -67,7 +67,7 @@ class AddApplicationBox(gtk.VBox):
         return False
 
     def draw(self, cr, x, y, w, h):
-        self._scrolled_window.get_child().set_shadow_type(gtk.SHADOW_NONE)
+        self._scrolled_window.get_child().set_shadow_type(Gtk.SHADOW_NONE)
         # Only copy/crop the background the first time through
         # to avoid needless memory copies and image manipulation
         if not self._scrolling:
@@ -91,7 +91,7 @@ class AddApplicationBox(gtk.VBox):
         widget._plus_image.set_from_file(image_util.image_path("add_folder_icon.png"))
         widget._plus_image.show()
         pixbuf = image_util.load_pixbuf(image_util.image_path('category_separator_inactive.png'))
-        pixbuf = pixbuf.scale_simple(self.allocation.width, pixbuf.get_height(), gtk.gdk.INTERP_BILINEAR)
+        pixbuf = pixbuf.scale_simple(self.allocation.width, pixbuf.get_height(), Gdk.INTERP_BILINEAR)
         widget._bottom_active_line.set_from_pixbuf(pixbuf)
         widget._top_active_line.set_from_pixbuf(pixbuf)
         widget.draw(widget.get_allocation())

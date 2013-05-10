@@ -1,9 +1,11 @@
-import gtk
+from gi.repository import Gtk
 
-class ImageEventBox(gtk.EventBox):
+class ImageEventBox(Gtk.EventBox):
     def __init__(self, images):
-        gtk.EventBox.__init__(self)
-        self.connect("expose-event", self.do_expose_event)
+        Gtk.EventBox.__init__(self)
+	area = Gtk.DrawingArea();
+	self.add(area);
+        #area.connect("expose-event", self.do_expose_event)
         self._images = images
         self.set_visible_window(False)
 
