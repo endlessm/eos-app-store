@@ -5,16 +5,11 @@ class ImageEventBox(Gtk.EventBox):
         Gtk.EventBox.__init__(self)
 	area = Gtk.DrawingArea();
 	self.add(area);
-        #area.connect("expose-event", self.do_expose_event)
+        area.connect("draw", self.do_draw)
         self._images = images
         self.set_visible_window(False)
 
-    def do_expose_event(self, widget, event):
-        cr = widget.window.cairo_create()
-        self.draw(cr)
-        return False
-
-    def draw(self, cr):
+    def do_draw(self, cr):
         # Get the size and location of the region where the image is to be drawn
         area = self.get_allocation()
         x = area.x
@@ -32,6 +27,7 @@ class ImageEventBox(Gtk.EventBox):
             self._draw_image(image, _draw_method, x, y, w, h)
 
             cr.paint()
+        return False
 
     def _draw_image(self, image, _draw_method, x, y, w, h):
         image.draw_centered(_draw_method, x, y, w, h)

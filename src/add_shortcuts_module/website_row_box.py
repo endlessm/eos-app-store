@@ -30,12 +30,12 @@ class WebsiteRowBox(Gtk.EventBox):
         self._plus_box_width = 80
         
         # -- DISPLAY ELEMENTS
-        self._vbox = Gtk.VBox()
+        self._vbox = Gtk.Box(Gtk.Orientation.VERTICAL)
         self._top_active_line = Gtk.Image()
         self._top_active_line.set_size_request(-1, 1)
         self._bottom_active_line = Gtk.Image()
         self._bottom_active_line.set_size_request(-1, 1)
-        self._row = Gtk.HBox()
+        self._row = Gtk.Box(Gtk.Orientation.HORIZONTAL)
         
         # icon
         self.icon_alignment = Gtk.Alignment(0.5, 0.5, 0, 0)
@@ -55,7 +55,7 @@ class WebsiteRowBox(Gtk.EventBox):
         self.description_label.set_markup('<span color="#aaaaaa" font-style="italic">' + self._link_model._url + '</span>')
         self.description_label.set_alignment(0,0.5)
         
-        self.labels_box = Gtk.HBox()
+        self.labels_box = Gtk.Box(Gtk.Orientation.HORIZONTAL)
         self.labels_box.pack_start(self.name_label, False, False, 20)
         self.labels_box.pack_start(self.description_label, False, False, 20)
         

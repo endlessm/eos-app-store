@@ -9,7 +9,7 @@ from eos_widgets.image_eventbox import ImageEventBox
 from desktop.desktop_layout import DesktopLayout
 from util import label_util
 
-class DesktopShortcut(Gtk.VBox):
+class DesktopShortcut(Gtk.Box):
     DND_TARGET_TYPE_TEXT = 80
     DND_TRANSFER_TYPE = [("text/plain", Gtk.TargetFlags.SAME_APP, DND_TARGET_TYPE_TEXT)]
     ICON_STATE_NORMAL = 'normal'
@@ -71,7 +71,7 @@ class DesktopShortcut(Gtk.VBox):
 
     def __init__(self, label_text="", draggable=True, highlightable=True, has_icon=True,
                  width=DesktopLayout.LABEL_WIDTH_IN_PIXELS, height=DesktopLayout.ICON_HEIGHT):
-        super(DesktopShortcut, self).__init__()
+        super(DesktopShortcut, self).__init__(Gtk.Orientation.VERTICAL)
         self.__dnd_enter_flag = False
         
         self._width = width
@@ -99,13 +99,13 @@ class DesktopShortcut(Gtk.VBox):
         
         self._icon_event_box = self._create_icon(self.get_images(self.ICON_STATE_NORMAL))
         
-        self._centered_icon_hbox = Gtk.HBox()
+        self._centered_icon_hbox = Gtk.Box(Gtk.Orientation.HORIZONTAL)
         self._centered_icon_hbox.set_size_request(width, height)
         
         if has_icon:
             # Add spacers to center the icon within the shortcut
-            self._left_spacer = Gtk.VBox()
-            self._right_spacer = Gtk.VBox()
+            self._left_spacer = Gtk.Box(Gtk.Orientation.VERTICAL)
+            self._right_spacer = Gtk.Box(Gtk.Orientation.VERTICAL)
             self._left_spacer.set_size_request(DesktopLayout.get_spacer_width(), height)
             self._right_spacer.set_size_request(DesktopLayout.get_spacer_width(), height)
             self._centered_icon_hbox.pack_start(self._left_spacer, False, False, 0)
@@ -120,7 +120,7 @@ class DesktopShortcut(Gtk.VBox):
         self._icon_event_box._identifier = label_text
 
         new_style = self._label.get_style().copy()
-        #new_style.fg[Gtk.STATE_NORMAL] = self._label.get_colormap().alloc('#f0f0f0')
+        new_style.fg[Gtk.STATE_NORMAL] = self._label.get_colormap().alloc('#f0f0f0')
         self._label.set_style(new_style)
 
         text = string.strip(label_text)
@@ -146,13 +146,13 @@ class DesktopShortcut(Gtk.VBox):
         self._icon_event_box.connect("drag_end", self.dnd_drag_end)
         self._icon_event_box.connect("drag_begin", self.dnd_drag_begin)
         self._icon_event_box.connect("drag_leave", self.dnd_drag_leave)
-        #self._icon_event_box.drag_dest_set(
-            #Gtk.DEST_DEFAULT_HIGHLIGHT |
-        #    Gtk.DestDefaults.MOTION |
-        #    Gtk.DestDefaults.DROP,
-        #    self.DND_TRANSFER_TYPE,
-        #    Gdk.DragAction.MOVE
-        #    )
+        self._icon_event_box.drag_dest_set(
+            Gtk.DEST_DEFAULT_HIGHLIGHT |
+            Gtk.DestDefaults.MOTION |
+            Gtk.DestDefaults.DROP,
+            self.DND_TRANSFER_TYPE,
+            Gdk.DragAction.MOVE
+            )
 
     def __str__(self):
         return self._icon_event_box._identifier

@@ -2,7 +2,7 @@ from gi.repository import Gtk
 from gi.repository import GObject
 from shortcut.application_shortcut import ApplicationShortcut
 
-class FolderIcons(Gtk.HBox):
+class FolderIcons(Gtk.Box):
     __gsignals__ = {
         "application-shortcut-activate": (
             GObject.SIGNAL_RUN_FIRST, #@UndefinedVariable
@@ -22,8 +22,9 @@ class FolderIcons(Gtk.HBox):
     }
     
     def __init__(self, shortcuts, spacing=0):
-        Gtk.HBox.__init__(self)
-        super(FolderIcons, self).__init__(homogeneous=False, spacing=spacing)
+        Gtk.Box.__init__(self, Gtk.Orientation.HORIZONTAL)
+        super(FolderIcons, self).__init__(Gtk.Orientation.HORIZONTAL, spacing=spacing)
+        super(FolderIcons, self).set_homogeneous(False)
         
         for shortcut in shortcuts:
             app_shortcut = ApplicationShortcut(shortcut, False)

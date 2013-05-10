@@ -22,11 +22,9 @@ class EosAppStore(Gtk.Window, object):
         """this section of code gets the net available area on the window (i.e. root window - panels)"""
         self.realize()
         screen = Gdk.Screen() #@UndefinedVariable
-        #monitor = screen.get_monitor_at_window(Gdk.Window)
-        #geometry = screen.get_monitor_geometry(monitor)
-        #width = geometry.width
-        #height = geometry.height
-	height=600
-	width=800
+        monitor = screen.get_monitor_at_window(Gdk.Window)
+        geometry = screen.get_monitor_geometry(monitor)
+        width = geometry.width
+        height = geometry.height
 
         return width, height

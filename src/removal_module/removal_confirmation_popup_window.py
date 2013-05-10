@@ -30,9 +30,11 @@ class RemovalConfirmationPopupWindow():
         self._fancy_container.set_size_request(self._width,self._height)
         self._bottom_center = Gtk.Alignment(.5,.85,0,0)
         
-        self._container = Gtk.VBox(False)
+        self._container = Gtk.Box(Gtk.Orientation.VERTICAL)
+        self._container.set_homogeneous(False)
         
-        self._button_box = Gtk.HBox(True)
+        self._button_box = Gtk.Box(Gtk.Orientation.HORIZONTAL)
+        self._button_box.set_homogeneous(True)
         self._button_box.set_size_request(75,36)
         
         self._cancel_event_box = ImageEventBox(self._cancel_inactive_images)
@@ -73,6 +75,6 @@ class RemovalConfirmationPopupWindow():
         widget.show()
     
     def _move_window(self, caller_widget):
-        new_x = caller_widget.allocation.x - int((self._width - caller_widget.allocation.width)/2)
-        new_y = caller_widget.allocation.y - int((self._width - caller_widget.allocation.height)/2)
+        new_x = caller_widget.get_allocation().x - int((self._width - caller_widget.get_allocation().width)/2)
+        new_y = caller_widget.get_allocation().y - int((self._width - caller_widget.get_allocation().height)/2)
         self._window.set_location((new_x, new_y))

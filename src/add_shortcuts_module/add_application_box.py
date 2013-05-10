@@ -4,9 +4,9 @@ from eos_util import image_util
 from osapps.desktop_preferences_datastore import DesktopPreferencesDatastore
 from application_row_box import ApplicationRowBox
 
-class AddApplicationBox(Gtk.VBox):
+class AddApplicationBox(Gtk.Box):
     def __init__(self, parent, presenter, width, height, add_remove_widget=None, desktop_preference_class = DesktopPreferencesDatastore, default_category='All'):
-        super(AddApplicationBox, self).__init__()
+        super(AddApplicationBox, self).__init__(Gtk.Orientation.VERTICAL)
         self.set_homogeneous(False)
 
         #self._presenter = parent._presenter
@@ -28,13 +28,13 @@ class AddApplicationBox(Gtk.VBox):
 
         self._vbox.set_homogeneous(False)
 
-        #self._vbox.connect("expose-event", self._handle_expose_event)
+        self._vbox.connect("draw", self._handle_draw)
         self._scrolled_window.add_with_viewport(self._vbox)
         self.add(self._scrolled_window)
         self.show_all()
 
     def _fill_applications(self, apps):
-        self._vbox = Gtk.VBox()
+        self._vbox = Gtk.Box(Gtk.Orientation.VERTICAL)
         if apps:
             for app in apps:
                 self._display_application(app)
@@ -51,11 +51,10 @@ class AddApplicationBox(Gtk.VBox):
     def _on_scroll(self, widget):
         self._scrolled_window.queue_draw()
 
-    def _handle_expose_event(self, widget, event):
-        cr = widget.window.cairo_create()
-        x, y = self._vbox.window.get_origin()
-        top_x, top_y = self._scrolled_window.window.get_toplevel().get_origin()
-        self.draw(cr, x - top_x, y - top_y, self.allocation.width, self.allocation.height)
+    def _handle_draw(self, cr):
+        x, y, _ = self._vbox.get_window().get_origin()
+        top_x, top_y, _ = self._scrolled_window.get_window().get_toplevel().get_origin()
+        self.draw(cr, x - top_x, y - top_y, self.get_allocation().width, self.get_allocation().height)
 
         # TODO what is the purpose of self._refresh?
         # In the current implementation, things look better for the website box
@@ -67,7 +66,7 @@ class AddApplicationBox(Gtk.VBox):
         return False
 
     def draw(self, cr, x, y, w, h):
-        self._scrolled_window.get_child().set_shadow_type(Gtk.SHADOW_NONE)
+        self._scrolled_window.get_child().set_shadow_type(Gtk.ShadowType.NONE)
         # Only copy/crop the background the first time through
         # to avoid needless memory copies and image manipulation
         if not self._scrolling:
@@ -91,7 +90,7 @@ class AddApplicationBox(Gtk.VBox):
         widget._plus_image.set_from_file(image_util.image_path("add_folder_icon.png"))
         widget._plus_image.show()
         pixbuf = image_util.load_pixbuf(image_util.image_path('category_separator_inactive.png'))
-        pixbuf = pixbuf.scale_simple(self.allocation.width, pixbuf.get_height(), Gdk.INTERP_BILINEAR)
+        pixbuf = pixbuf.scale_simple(self.get_allocation().width, pixbuf.get_height(), Gdk.INTERP_BILINEAR)
         widget._bottom_active_line.set_from_pixbuf(pixbuf)
         widget._top_active_line.set_from_pixbuf(pixbuf)
         widget.draw(widget.get_allocation())

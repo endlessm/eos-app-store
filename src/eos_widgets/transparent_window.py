@@ -20,11 +20,9 @@ class TransparentWindow(Gtk.Window):
         self.set_property("destroy-with-parent", True)
         self.set_property("focus-on-map", True)
 
-        self.connect("expose-event", self._handle_event)
+        self.connect("draw", self._handle_event)
         
-    def _handle_event(self, widget, event):
-        cr = widget.window.cairo_create()
-        
+    def _handle_event(self, cr):
         cr.set_source_rgba(0, 0, 0, 255)
         cr.set_operator(cairo.OPERATOR_SOURCE)
         cr.paint()

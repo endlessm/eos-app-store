@@ -24,8 +24,8 @@ class AddShortcutsView():
         self._add_button_box_width = 120
         self._tree_view_width = 214
 
-        self._width = width or parent.allocation.width
-        self._height = height or parent.allocation.height
+        self._width = width or parent.get_allocation().width
+        self._height = height or parent.get_allocation().height
 
         self._add_remove_widget = AddRemoveShortcut(callback=lambda a, b:False)
         self._add_remove_widget.show()
@@ -37,10 +37,10 @@ class AddShortcutsView():
 #self.window = DesktopTransparentWindow(self._parent, (0, 0), (self._width, self._height))
         
         self.window.connect("delete-event", self.destroy)
-        #self.window.connect("expose-event", self._draw_triangle)
+        self.window.connect("draw", self._draw_triangle)
 
-        self.hbox = Gtk.HBox()
-        self.add_remove_vbox = Gtk.VBox()
+        self.hbox = Gtk.Box(Gtk.Orientation.HORIZONTAL)
+        self.add_remove_vbox = Gtk.Box(Gtk.Orientation.VERTICAL)
         self.add_remove_vbox.set_size_request(self._add_button_box_width, self._height)
 
         self._lc = Gtk.Alignment()
@@ -58,14 +58,14 @@ class AddShortcutsView():
         
         self.event_box.add(self.add_remove_vbox)
 
-        self.hbox1 = Gtk.HBox()
+        self.hbox1 = Gtk.Box(Gtk.Orientation.HORIZONTAL)
         self.hbox1.set_size_request(self._tree_view_width, self._height)
 
         self.data = self._presenter.get_category_data()
         self.tree = ShortcutCategoryBox(self.data, self.window, self._tree_view_width, self._presenter)
 
         self.hbox1.pack_start(self.tree, True, True, 0)
-        self.hbox2 = Gtk.HBox()
+        self.hbox2 = Gtk.Box(Gtk.Orientation.HORIZONTAL)
         self.hbox2.set_size_request(self._width - self._tree_view_width - self._add_button_box_width, self._height)
 
         self.scrolled_window = AddApplicationBox(self, self._presenter, screen_util.get_width(self._parent), screen_util.get_height(self._parent))
@@ -86,8 +86,8 @@ class AddShortcutsView():
         win.set_size_request(width, height)
 
         screen = win.get_screen()
-        #rgba = screen.get_rgba_colormap()
-        #win.set_colormap(rgba)
+        rgba = screen.get_rgba_colormap()
+        win.set_colormap(rgba)
         
         return win
 
@@ -128,11 +128,11 @@ class AddShortcutsView():
     def install_shortcut(self, shortcut):
         self._presenter.add_shortcut(shortcut)
     
-    def _draw_triangle(self, widget, event):
-        ctx = self.add_remove_vbox.window.cairo_create()
+    def _draw_triangle(self, cr):
+        ctx = self.add_remove_vbox.get_window().cairo_create()
         image_surface = cairo.ImageSurface.create_from_png(image_util.image_path("inactive_triangle.png"))
-        x = self.add_remove_vbox.allocation.width - image_surface.get_width()
-        y = int(self.add_remove_vbox.allocation.height/2 - image_surface.get_height()/2) + 1
+        x = self.add_remove_vbox.get_allocation().width - image_surface.get_width()
+        y = int(self.add_remove_vbox.get_allocation().height/2 - image_surface.get_height()/2) + 1
         ctx.save()
         ctx.translate(x, y)
         ctx.set_source_surface(image_surface)

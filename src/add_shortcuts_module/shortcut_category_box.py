@@ -20,8 +20,8 @@ class ShortcutCategoryBox(Gtk.EventBox):
         self.middle_align = Gtk.Alignment()
         self.middle_align.set(0, 0.5, 0, 0)
 
-        self.tree = Gtk.VBox()
-        self.top = Gtk.HBox()
+        self.tree = Gtk.Box(Gtk.Orientation.VERTICAL)
+        self.top = Gtk.Box(Gtk.Orientation.HORIZONTAL)
 
         self._close = ImageEventBox((Image.from_name("delete_no_unactive_24.png"),))
         self._close.set_size_request(24,24)
@@ -30,19 +30,19 @@ class ShortcutCategoryBox(Gtk.EventBox):
         self.top_align.add(self.top)
         self.top_align.show()
 
-        self.middle = Gtk.VBox()
+        self.middle = Gtk.Box(Gtk.Orientation.VERTICAL)
 
         self._fill_categories()
 
         self.middle_align.add(self.middle)
-        self.bottom = Gtk.HBox()
+        self.bottom = Gtk.Box(Gtk.Orientation.HORIZONTAL)
         self.bottom.set_size_request(24, 24)
 
         self.tree.pack_start(self.top_align, True, True, 0)
         self.tree.pack_start(self.middle_align, True, True, 0)
         self.tree.pack_start(self.bottom, True, True, 0)
         self.add(self.tree)
-        #self.connect("expose-event", self._draw_gradient)
+        self.connect("draw", self._draw_gradient)
         self.show_all()
 
     def _handle_click(self, widget, event, label, subcategory=''):
@@ -55,15 +55,13 @@ class ShortcutCategoryBox(Gtk.EventBox):
         self.refresh_categories()
         self._presenter.set_add_shortcuts_box(label.get_text(), subcategory)
 
-    def _draw_gradient(self, widget, event, active=False):
-        cr = widget.window.cairo_create()
-
+    def _draw_gradient(self, cr, active=False):
         if not active:
-            pat = cairo.LinearGradient (0.0, 0.0, widget.allocation.width, 0.0)
-            cr.rectangle(widget.allocation.x, widget.allocation.y, widget.allocation.width, widget.allocation.height)
+            pat = cairo.LinearGradient (0.0, 0.0, widget.get_allocation().width, 0.0)
+            cr.rectangle(widget.get_allocation().x, widget.get_allocation().y, widget.get_allocation().width, widget.get_allocation().height)
         else:
             pat = cairo.LinearGradient (0.0, 0.0, self._width, 0.0)
-            cr.rectangle(widget.allocation.x, widget.allocation.y, self._width, widget.allocation.height)
+            cr.rectangle(widget.get_allocation().x, widget.get_allocation().y, self._width, widget.get_allocation().height)
 
         pat.add_color_stop_rgba (0.001, 0.0, 0.0, 0.0, 0.8)
         pat.add_color_stop_rgba (1, 0.2, 0.2, 0.2, 0.8)
@@ -81,8 +79,9 @@ class ShortcutCategoryBox(Gtk.EventBox):
             box = Gtk.EventBox()
             box.set_visible_window(False)
             markup = self._set_markup_and_separators(section, image_start, image_end, box)
-            vbox = Gtk.VBox(False)
-            hbox = Gtk.HBox()
+            vbox = Gtk.Box(Gtk.Orientation.VERTICAL)
+            vbox.set_homogeneous(False);
+            hbox = Gtk.Box(Gtk.Orientation.HORIZONTAL)
             label = Gtk.Label()
             label.set_markup(markup)
             label.set_alignment(0, 0.5)
@@ -132,8 +131,8 @@ class ShortcutCategoryBox(Gtk.EventBox):
     
     def _fill_subcategories(self, section, vbox):
         for category in section.subcategories:
-            subcategories_vbox = Gtk.VBox()
-            subcategory_hbox = Gtk.HBox()
+            subcategories_vbox = Gtk.Box(Gtk.Orientation.VERTICAL)
+            subcategory_hbox = Gtk.Box(Gtk.Orientation.HORIZONTAL)
             ebox = Gtk.EventBox()
             ebox.set_visible_window(False)
             sub_label = Gtk.Label()
@@ -154,7 +153,7 @@ class ShortcutCategoryBox(Gtk.EventBox):
             self._active_category = section.category
             image_start.set_from_pixbuf(self._separator_active.pixbuf)
             image_end.set_from_pixbuf(self._separator_active.pixbuf)
-            #box.connect("expose-event", self._draw_gradient, True)
+            box.connect("draw", self._draw_gradient, True)
         else:
             markup = '<span color="#aaaaaa"><b>' + section.category.upper() + '</b></span>'
             image_start.set_from_pixbuf(self._separator_inactive.pixbuf)
