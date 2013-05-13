@@ -130,7 +130,7 @@ class AddShortcutsView(Gtk.ApplicationWindow):
         self.close()
 
     def close(self):
-        self.destroy()
+        Gtk.ApplicationWindow.destroy(self)
         
     def create_folder(self, folder_name, image_file):
         self._presenter.create_directory(folder_name, image_file)
