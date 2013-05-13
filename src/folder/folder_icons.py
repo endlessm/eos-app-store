@@ -22,8 +22,8 @@ class FolderIcons(Gtk.Box):
     }
     
     def __init__(self, shortcuts, spacing=0):
-        Gtk.Box.__init__(self, Gtk.Orientation.HORIZONTAL)
-        super(FolderIcons, self).__init__(Gtk.Orientation.HORIZONTAL, spacing=spacing)
+        Gtk.Box.__init__(self, orientation=Gtk.Orientation.HORIZONTAL)
+        super(FolderIcons, self).__init__(orientation=Gtk.Orientation.HORIZONTAL, spacing=spacing)
         super(FolderIcons, self).set_homogeneous(False)
         
         for shortcut in shortcuts:
