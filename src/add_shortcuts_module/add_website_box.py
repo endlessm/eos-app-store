@@ -90,8 +90,7 @@ class AddWebsiteBox(Gtk.Box):
         # TODO what is the purpose of self._refresh?
         # In the current implementation, things look better without the check
         # if not self._refresh and event:
-        if event:
-            self._draw_gradient(cr, event.area.width, event.area.height, event.area.x, event.area.y)
+        self._draw_gradient(cr, self.get_allocated_width(), self.get_allocated_height(), 0, 0)
 
         return False
 
