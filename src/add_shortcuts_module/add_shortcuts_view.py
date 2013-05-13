@@ -126,10 +126,9 @@ class AddShortcutsView(Gtk.ApplicationWindow):
 
     def show(self):
         print ("show window")
-        #self.window.show_all()
+        self.window.show_all()
 
     def destroy(self, window, event):
-        #self._parent.get_presenter().refresh_view()
         self.close()
 
     def close(self):
