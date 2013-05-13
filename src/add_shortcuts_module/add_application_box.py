@@ -8,7 +8,7 @@ from application_row_box import ApplicationRowBox
 class AddApplicationBox(Gtk.Box):
     def __init__(self, parent, presenter, width, height, add_remove_widget=None, desktop_preference_class = DesktopPreferencesDatastore, default_category='All'):
         super(AddApplicationBox, self).__init__(orientation=Gtk.Orientation.VERTICAL)
-        self.set_homogeneous(False)
+        self.set_homogeneous(True)
 
         #self._presenter = parent._presenter
         self._presenter = presenter

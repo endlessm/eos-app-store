@@ -15,7 +15,7 @@ class AddFolderBox(Gtk.Box):
 
     def __init__(self, parent, add_remove_widget=None, desktop_preference_class = DesktopPreferencesDatastore):
         super(AddFolderBox, self).__init__(orientation=Gtk.Orientation.VERTICAL)
-        self.set_homogeneous(False)
+        self.set_homogeneous(True)
 
         self._parent = parent
 

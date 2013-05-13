@@ -13,7 +13,7 @@ gettext.install('endless_desktop', '/usr/share/locale', unicode = True, names=['
 class AddWebsiteBox(Gtk.Box):
     def __init__(self, parent=None, desktop_preference_class = DesktopPreferencesDatastore, default_category=''):
         super(AddWebsiteBox, self).__init__(orientation=Gtk.Orientation.VERTICAL)
-        self.set_homogeneous(False)
+        self.set_homogeneous(True)
 
         self._presenter = parent._presenter
         self._parent = parent
