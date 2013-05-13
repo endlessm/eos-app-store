@@ -20,17 +20,16 @@ class AddApplicationBox(Gtk.Box):
 
         self._scrolled_window = Gtk.ScrolledWindow()
         self._scrolled_window.set_policy(hscrollbar_policy=Gtk.PolicyType.NEVER, vscrollbar_policy=Gtk.PolicyType.AUTOMATIC)
-        #self._scrolled_window.connect("show", self._on_show)
-        #self._scrolled_window.get_vscrollbar().connect("value-changed", self._on_scroll)
+        self._scrolled_window.connect("show", self._on_show)
+        self._scrolled_window.get_vscrollbar().connect("value-changed", self._on_scroll)
 
         self._active_category = default_category
         apps = self._presenter.get_category(self._active_category)
         self._fill_applications(apps)
 
-        #self._vbox.set_homogeneous(False)
-
-        #self._vbox.connect("draw", self._handle_draw)
-        #self._scrolled_window.add_with_viewport(self._vbox)
+        self._vbox.set_homogeneous(False)
+        self._vbox.connect("draw", self._handle_draw)
+        self._scrolled_window.add_with_viewport(self._vbox)
         self.add(self._scrolled_window)
         self.show_all()
 
@@ -44,7 +43,7 @@ class AddApplicationBox(Gtk.Box):
         row = ApplicationRowBox(app, parent=self, presenter=self._presenter)
         row.connect("enter-notify-event", self._draw_active, row)
         row.connect("leave-notify-event", self._draw_inactive, row)
-        self._vbox.pack_start(row, False, False, 0)
+        self._vbox.pack_start(row, True, True, 0)
 
     def _on_show(self, widget):
         widget.get_child().set_shadow_type(Gtk.ShadowType.NONE)
@@ -61,7 +60,7 @@ class AddApplicationBox(Gtk.Box):
         # In the current implementation, things look better for the website box
         # without the check, so I'm disabling it here as well
         # if not self._refresh and event:
-#        if event:
+        #if event:
 #           self._draw_gradient(cr, event.area.width, event.area.height, event.area.x, event.area.y)
 
         return False
