@@ -50,7 +50,7 @@ class AddFolderBox(Gtk.Box):
         self._text_entry = Gtk.Entry()
         self._text_entry.set_max_length(50)
         self._text_entry.set_alignment(0.5)
-        self._hbox.pack_start(self._text_entry, False, False, 0)
+        self._hbox.pack_start(self._text_entry, True, True, 0)
         self._text_entry.set_text('')
         self._text_entry_align.add(self._hbox)
 

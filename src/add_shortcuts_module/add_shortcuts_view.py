@@ -22,9 +22,11 @@ gettext.install('endless_desktop', '/usr/share/locale', unicode = True, names=['
 class AddShortcutsView(Gtk.ApplicationWindow):
     def __init__(self, app):
         Gtk.ApplicationWindow.__init__(self, title="Application Store", application=app)
+        self.set_app_paintable(True)
+
         self._add_button_box_width = 120
         self._tree_view_width = 214
-        
+
         width, height = self._get_net_work_area()
         self._width = width
         self._height = height
@@ -35,7 +37,7 @@ class AddShortcutsView(Gtk.ApplicationWindow):
         self._presenter = AddShortcutsPresenter(view=self)
         self.data = self._presenter.get_category_data()
         self.tree = ShortcutCategoryBox(self.data, self, self._tree_view_width, self._presenter)
-    
+
         self._lc = Gtk.Alignment()
         self._lc.set(0.5,0.5,0,0)
         self._lc.add(self._add_remove_widget)
@@ -53,16 +55,17 @@ class AddShortcutsView(Gtk.ApplicationWindow):
 
         self.hbox1 = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL)
         self.hbox1.set_size_request(self._tree_view_width, self._height)
-        self.hbox1.pack_start(self.tree, True, True, 0)
+        self.hbox1.pack_start(self.tree, True, False, 0)
 
         self.hbox2 = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL)
+        self.hbox2.set_homogeneous(False)
         self.hbox2.set_size_request(self._width - self._tree_view_width - self._add_button_box_width, self._height)
         self.scrolled_window = AddApplicationBox(self, self._presenter, screen_util.get_width(self), screen_util.get_height(self))
         self.hbox2.pack_start(self.scrolled_window, True, True, 0)
 
         self.hbox = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL)
-        self.hbox.pack_start(self.event_box, True, True, 0)
-        self.hbox.pack_start(self.hbox1, True, True, 0)
+        self.hbox.pack_start(self.event_box, True, False, 0)
+        self.hbox.pack_start(self.hbox1, False, False, 0)
         self.hbox.pack_end(self.hbox2, True, True, 0)
 
         self.add(self.hbox)
@@ -75,33 +78,14 @@ class AddShortcutsView(Gtk.ApplicationWindow):
 
         return
 
-        #self._parent = self
-    
-        #self.window = self._create_transparent_window(self._width, self._height)
-#self.window = DesktopTransparentWindow(self._parent, (0, 0), (self._width, self._height))
-       
-        #self.window.connect("delete-event", self.destroy)
-        #self.window.connect("draw", self._draw_triangle)
-
         self._add_remove_widget.show()
-
         self.add_remove_vbox.show()
 
-
         #self.tree = ShortcutCategoryBox(self.data, self.window, self._tree_view_width, self._presenter)
-
 
         self.scrolled_window.show()
         #self.window.add(self.hbox)
         self.show_all()
-
-    def _create_transparent_window(self, width, height):
-        win = Gtk.Window()
-
-        #win.set_decorated(False)
-
-        #win.set_app_paintable(True)
-        #win.set_size_request(width, height)
 
         # screen = win.get_screen()
         # visual = screen.get_rgba_visual()
@@ -109,8 +93,6 @@ class AddShortcutsView(Gtk.ApplicationWindow):
         #     visual = screen.get_system_visual()
 
         #win.set_visual(visual)
-        
-        return win
 
     @property
     def add_button_box_width(self):
@@ -119,10 +101,6 @@ class AddShortcutsView(Gtk.ApplicationWindow):
     @property
     def tree_view_width(self):
         return self._tree_view_width
-
-    # @property
-    # def parent(self):
-    #     return self._parent
 
     def show(self):
         print ("show window")
@@ -167,7 +145,7 @@ class AddShortcutsView(Gtk.ApplicationWindow):
         old_widget.destroy()
 
         self.scrolled_window = widget
-        self.hbox2.pack_start(self.scrolled_window, False, False, 0)
+        self.hbox2.pack_start(self.scrolled_window, True, True, 0)
         self.scrolled_window.show()
 
     def set_add_shortcuts_box(self, category, subcategory=''):

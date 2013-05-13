@@ -73,7 +73,7 @@ class ApplicationRowBox(Gtk.EventBox):
         self._row.pack_start(self.labels_box, True, True, 0)
         self._row.pack_start(self._plus_box_alignment, False, False, 0)
         self._vbox.pack_start(self._top_active_line, False, False, 0)
-        self._vbox.pack_start(self._row, False, False, 0)
+        self._vbox.pack_start(self._row, True, False, 0)
         self._vbox.pack_start(self._bottom_active_line, False, False, 0)
         self.add(self._vbox)
         self.connect("button-release-event", self.install_app)
