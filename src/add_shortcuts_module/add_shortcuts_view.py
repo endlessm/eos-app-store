@@ -25,9 +25,11 @@ class AddShortcutsView(Gtk.ApplicationWindow):
         self._add_button_box_width = 120
         self._tree_view_width = 214
         
-        self._width = 640
-        self._height = 480
+        width, height = self._get_net_work_area()
+        self._width = width
+        self._height = height
         self.set_default_size(self._width, self._height)
+#self.resize(self._width, self._height)
 
         self._add_remove_widget = AddRemoveShortcut(callback=lambda a, b:False)
         self._presenter = AddShortcutsPresenter(view=self)
@@ -35,7 +37,7 @@ class AddShortcutsView(Gtk.ApplicationWindow):
         self.tree = ShortcutCategoryBox(self.data, self, self._tree_view_width, self._presenter)
     
         self._lc = Gtk.Alignment()
-	self._lc.set(0.5,0.5,0,0)
+        self._lc.set(0.5,0.5,0,0)
         self._lc.add(self._add_remove_widget)
 
         self.add_remove_vbox = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
@@ -70,6 +72,7 @@ class AddShortcutsView(Gtk.ApplicationWindow):
         print("connected")
 
         self.show_all()
+
         return
 
         #self._parent = self
@@ -177,3 +180,14 @@ class AddShortcutsView(Gtk.ApplicationWindow):
             widget = AddFolderBox(self)
 
         self.set_scrolled_window(widget)
+
+    def _get_net_work_area(self):
+        """this section of code gets the net available area on the window (i.e. root window - panels)"""
+        screen = self.get_screen()
+        monitor = screen.get_monitor_geometry(0)
+        width = monitor.width
+        height = monitor.height
+        print ("geometry is " + str(width) + "x" + str(height))
+
+        return width, height
+
