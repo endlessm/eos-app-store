@@ -19,75 +19,93 @@ import gc
 
 gettext.install('endless_desktop', '/usr/share/locale', unicode = True, names=['ngettext'])
 
-class AddShortcutsView():
-    def __init__(self, parent=None, width=0, height=0):
+class AddShortcutsView(Gtk.ApplicationWindow):
+    def __init__(self, app):
+        Gtk.ApplicationWindow.__init__(self, title="Application Store", application=app)
         self._add_button_box_width = 120
         self._tree_view_width = 214
-
-        self._width = width or parent.get_allocation().width
-        self._height = height or parent.get_allocation().height
+        
+        self._width = 640
+        self._height = 480
+        self.set_default_size(self._width, self._height)
 
         self._add_remove_widget = AddRemoveShortcut(callback=lambda a, b:False)
-        self._add_remove_widget.show()
-
-        self._parent = parent
         self._presenter = AddShortcutsPresenter(view=self)
+        self.data = self._presenter.get_category_data()
+        self.tree = ShortcutCategoryBox(self.data, self, self._tree_view_width, self._presenter)
     
-        self.window = self._create_transparent_window(self._width, self._height)
-#self.window = DesktopTransparentWindow(self._parent, (0, 0), (self._width, self._height))
-        
-        self.window.connect("delete-event", self.destroy)
-        self.window.connect("draw", self._draw_triangle)
-
-        self.hbox = Gtk.Box(Gtk.Orientation.HORIZONTAL)
-        self.add_remove_vbox = Gtk.Box(Gtk.Orientation.VERTICAL)
-        self.add_remove_vbox.set_size_request(self._add_button_box_width, self._height)
-
         self._lc = Gtk.Alignment()
 	self._lc.set(0.5,0.5,0,0)
-        self._add_remove_widget.show()
         self._lc.add(self._add_remove_widget)
 
+        self.add_remove_vbox = Gtk.Box(Gtk.Orientation.VERTICAL)
+        self.add_remove_vbox.set_size_request(self._add_button_box_width, self._height)
         self.add_remove_vbox.pack_start(self._lc, True, True, 0)
-        self.add_remove_vbox.show()
+
         self.event_box = Gtk.EventBox()
         self.event_box.set_visible_window(False)
         self.event_box.connect('button-press-event', self.destroy)
         self.event_box.uat_id = 'close_app_store'
         self.event_box.uat_offset = (0, -50)
-        
         self.event_box.add(self.add_remove_vbox)
 
         self.hbox1 = Gtk.Box(Gtk.Orientation.HORIZONTAL)
         self.hbox1.set_size_request(self._tree_view_width, self._height)
-
-        self.data = self._presenter.get_category_data()
-        self.tree = ShortcutCategoryBox(self.data, self.window, self._tree_view_width, self._presenter)
-
         self.hbox1.pack_start(self.tree, True, True, 0)
+
         self.hbox2 = Gtk.Box(Gtk.Orientation.HORIZONTAL)
         self.hbox2.set_size_request(self._width - self._tree_view_width - self._add_button_box_width, self._height)
-
-        self.scrolled_window = AddApplicationBox(self, self._presenter, screen_util.get_width(self._parent), screen_util.get_height(self._parent))
+        self.scrolled_window = AddApplicationBox(self, self._presenter, screen_util.get_width(self), screen_util.get_height(self))
         self.hbox2.pack_start(self.scrolled_window, True, True, 0)
-        self.scrolled_window.show()
+
+        self.hbox = Gtk.Box(Gtk.Orientation.HORIZONTAL)
         self.hbox.pack_start(self.event_box, True, True, 0)
         self.hbox.pack_start(self.hbox1, True, True, 0)
         self.hbox.pack_end(self.hbox2, True, True, 0)
-        self.window.add(self.hbox)
-        self.show()
+
+        self.add(self.hbox)
+
+        self.connect("delete-event", self.destroy)
+        self.connect("draw", self._draw_triangle)
+        print("connected")
+
+        self.show_all()
+        return
+
+        #self._parent = self
+    
+        #self.window = self._create_transparent_window(self._width, self._height)
+#self.window = DesktopTransparentWindow(self._parent, (0, 0), (self._width, self._height))
+       
+        #self.window.connect("delete-event", self.destroy)
+        #self.window.connect("draw", self._draw_triangle)
+
+        self._add_remove_widget.show()
+
+        self.add_remove_vbox.show()
+
+
+        #self.tree = ShortcutCategoryBox(self.data, self.window, self._tree_view_width, self._presenter)
+
+
+        self.scrolled_window.show()
+        #self.window.add(self.hbox)
+        self.show_all()
 
     def _create_transparent_window(self, width, height):
         win = Gtk.Window()
 
-        win.set_decorated(False)
+        #win.set_decorated(False)
 
-        win.set_app_paintable(True)
-        win.set_size_request(width, height)
+        #win.set_app_paintable(True)
+        #win.set_size_request(width, height)
 
-        screen = win.get_screen()
-        rgba = screen.get_rgba_colormap()
-        win.set_colormap(rgba)
+        # screen = win.get_screen()
+        # visual = screen.get_rgba_visual()
+        # if not visual:
+        #     visual = screen.get_system_visual()
+
+        #win.set_visual(visual)
         
         return win
 
@@ -99,19 +117,20 @@ class AddShortcutsView():
     def tree_view_width(self):
         return self._tree_view_width
 
-    @property
-    def parent(self):
-        return self._parent
+    # @property
+    # def parent(self):
+    #     return self._parent
 
     def show(self):
-        self.window.show_all()
+        print ("show window")
+        #self.window.show_all()
 
     def destroy(self, window, event):
-        self._parent.get_presenter().refresh_view()
+        #self._parent.get_presenter().refresh_view()
         self.close()
 
     def close(self):
-        self.window.destroy()
+        self.destroy()
         
     def create_folder(self, folder_name, image_file):
         self._presenter.create_directory(folder_name, image_file)
@@ -128,7 +147,8 @@ class AddShortcutsView():
     def install_shortcut(self, shortcut):
         self._presenter.add_shortcut(shortcut)
     
-    def _draw_triangle(self, cr):
+    def _draw_triangle(self, widget, cr):
+        print ("_draw_triangle")
         ctx = self.add_remove_vbox.get_window().cairo_create()
         image_surface = cairo.ImageSurface.create_from_png(image_util.image_path("inactive_triangle.png"))
         x = self.add_remove_vbox.get_allocation().width - image_surface.get_width()
@@ -145,12 +165,12 @@ class AddShortcutsView():
         old_widget.destroy()
 
         self.scrolled_window = widget
-        self.hbox2.pack_start(self.scrolled_window)
+        self.hbox2.pack_start(self.scrolled_window, False, False, 0)
         self.scrolled_window.show()
 
     def set_add_shortcuts_box(self, category, subcategory=''):
         if category == _('APP'):
-            widget = AddApplicationBox(self, self._presenter, screen_util.get_width(self._parent), screen_util.get_height(self._parent), default_category=subcategory)
+            widget = AddApplicationBox(self, self._presenter, screen_util.get_width(self), screen_util.get_height(self), default_category=subcategory)
         elif category == _('WEB'):
             widget = AddWebsiteBox(self)
         else:

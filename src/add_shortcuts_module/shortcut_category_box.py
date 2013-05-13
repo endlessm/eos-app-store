@@ -55,7 +55,7 @@ class ShortcutCategoryBox(Gtk.EventBox):
         self.refresh_categories()
         self._presenter.set_add_shortcuts_box(label.get_text(), subcategory)
 
-    def _draw_gradient(self, cr, active=False):
+    def _draw_gradient(self, widget, cr, active=False):
         if not active:
             pat = cairo.LinearGradient (0.0, 0.0, widget.get_allocation().width, 0.0)
             cr.rectangle(widget.get_allocation().x, widget.get_allocation().y, widget.get_allocation().width, widget.get_allocation().height)

@@ -77,7 +77,7 @@ class ApplicationShortcut(DesktopShortcut):
         self.text_view.connect("focus-out-event", self.lost_focus)
         self.text_view.connect("key-press-event", self.handle_keystrokes)
         
-        self.pack_start(self.text_view, False, False)
+        self.pack_start(self.text_view, False, False, 0)
         
     def rename_icon(self, widget, event):
         self._label.hide()

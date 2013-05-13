@@ -25,7 +25,7 @@ class AddFolderBox(Gtk.Box):
         # Is there a better way to get access to the desktop window for its size?
 
         self._scrolled_window = Gtk.ScrolledWindow()
-        self._scrolled_window.set_policy(hscrollbar_policy=Gtk.POLICY_NEVER, vscrollbar_policy=Gtk.POLICY_AUTOMATIC)
+        self._scrolled_window.set_policy(hscrollbar_policy=Gtk.PolicyType.NEVER, vscrollbar_policy=Gtk.PolicyType.AUTOMATIC)
         self._scrolled_window.connect("show", self._on_show)
         self._scrolled_window.get_vscrollbar().connect("value-changed", self._on_scroll)
 
@@ -43,12 +43,14 @@ class AddFolderBox(Gtk.Box):
         self._label_1.set_markup('<span color="#aaaaaa" font="Novecento wide" font_weight="bold" size="16000">' + label_1_text + '</span>')
         self._label_2.set_markup('<span color="#aaaaaa" font="Novecento wide" font_weight="bold" size="16000">' + label_2_text + '</span>')
 
-        self._text_entry_align = Gtk.Alignment(0.5, 0.5, 0, 0)
+        self._text_entry_align = Gtk.Alignment()
+        self._text_entry_align.set(0.5, 0.5, 0, 0)
         self._hbox = Gtk.Box(Gtk.Orientation.HORIZONTAL)
         self._hbox.set_size_request(186, 24)
-        self._text_entry = Gtk.Entry(50)
+        self._text_entry = Gtk.Entry()
+        self._text_entry.set_max_length(50)
         self._text_entry.set_alignment(0.5)
-        self._hbox.pack_start(self._text_entry)
+        self._hbox.pack_start(self._text_entry, False, False, 0)
         self._text_entry.set_text('')
         self._text_entry_align.add(self._hbox)
 
@@ -59,16 +61,17 @@ class AddFolderBox(Gtk.Box):
         self._vbox.pack_start(self._text_entry_align, False, False, 0)
         self.hbox_separator1 = Gtk.Box(Gtk.Orientation.HORIZONTAL)
         self.hbox_separator1.set_size_request(-1, 15)
-        self.hbox_separator1.connect("draw", self._draw_divider_line)
-        self._vbox.pack_start(self.hbox_separator1)
+        #self.hbox_separator1.connect("draw", self._draw_divider_line)
+        self._vbox.pack_start(self.hbox_separator1, False, False, 0)
         self._vbox.pack_start(self._label_2, True, True, 0)
 
         self._fill_table()
 
         self._table.show()
-        self._bottom_center = Gtk.Alignment(0.5, 0, 0, 0)
+        self._bottom_center = Gtk.Alignment()
+        self._bottom_center.set(0.5, 0, 0, 0)
         self._bottom_center.add(self._table)
-        self._vbox.pack_start(self._bottom_center)
+        self._vbox.pack_start(self._bottom_center, False, False, 0)
         self._scrolled_window.add_with_viewport(self._vbox)
         self.add(self._scrolled_window)
 
@@ -114,13 +117,13 @@ class AddFolderBox(Gtk.Box):
         else:
             print 'FOLDER MUST HAVE A NAME!'
 
-    def _handle_event(self, cr):
+    def _handle_event(self, widget, cr):
         x, y, _ = self._vbox.get_window().get_origin()
         top_x, top_y, _ = self._scrolled_window.get_window().get_toplevel().get_origin()
         self.draw(cr, x - top_x, y - top_y, self.get_allocation().width, self.get_allocation().height)
-        
-        if event:
-            self._draw_gradient(cr, event.area.width, event.area.height, event.area.x, event.area.y)
+
+        # if event:
+        #     self._draw_gradient(cr, event.area.width, event.area.height, event.area.x, event.area.y)
 
         return False
 
@@ -145,7 +148,7 @@ class AddFolderBox(Gtk.Box):
         cr.set_source(pat)
         cr.fill()
 
-    def _draw_divider_line(self, cr):
+    def _draw_divider_line(self, widget, cr):
         cr.rectangle(event.area.x, event.area.y, event.area.width, 1)
         cr.set_source_rgba(0.08, 0.08, 0.08, 0.8)
         cr.fill()
@@ -169,7 +172,7 @@ class AddFolderBox(Gtk.Box):
         files = self._get_folder_icons(self._FOLDER_ICON_PATH, suffix='_normal')
         self._append_icons(icons, files, self._FOLDER_ICON_PATH)
         num_of_icons = len(icons)
-        available_width = screen_util.get_width(self._parent.parent.window) - self._parent.add_button_box_width - self._parent.tree_view_width
+        available_width = screen_util.get_width(self._parent) - self._parent.add_button_box_width - self._parent.tree_view_width
         columns = int(available_width/120)   # shold this be a fixed number like 5 as in pdf?
         rows = int(num_of_icons/columns) + 1
         self._table = Gtk.Table(rows, columns)

@@ -1,4 +1,6 @@
 from gi.repository import Gtk
+from gi.repository import Gdk
+from gi.repository import GdkPixbuf
 from osapps.desktop_preferences_datastore import DesktopPreferencesDatastore
 from eos_util import image_util 
 
@@ -38,12 +40,13 @@ class WebsiteRowBox(Gtk.EventBox):
         self._row = Gtk.Box(Gtk.Orientation.HORIZONTAL)
         
         # icon
-        self.icon_alignment = Gtk.Alignment(0.5, 0.5, 0, 0)
+        self.icon_alignment = Gtk.Alignment()
+        self.icon_alignment.set(0.5, 0.5, 0, 0)
         self.icon_alignment.set_size_request(self._icon_width, self._height-2)
         self.icon_image_box = Gtk.Image()
         self.icon_image_box.set_size_request(self._icon_image_width, self._icon_image_height)
         if not (self._icon_image.get_width() == self._icon_image_width and self._icon_image.get_height() == self._icon_image_height):
-            self._icon_image = self._icon_image.scale_simple(self._icon_image_width, self._icon_image_height, Gdk.INTERP_BILINEAR)
+            self._icon_image = self._icon_image.scale_simple(self._icon_image_width, self._icon_image_height, GdkPixbuf.InterpType.BILINEAR)
         self.icon_image_box.set_from_pixbuf(self._icon_image)
         self.icon_alignment.add(self.icon_image_box)
 
@@ -68,7 +71,8 @@ class WebsiteRowBox(Gtk.EventBox):
         self.labels_box.set_size_request(1, 1)
 
         #place for displaying + icon
-        self._plus_box_alignment = Gtk.Alignment(0.5, 0.5, 0, 0)
+        self._plus_box_alignment = Gtk.Alignment()
+        self._plus_box_alignment.set(0.5, 0.5, 0, 0)
         self._plus_box_alignment.set_size_request(self._plus_box_width + self._plus_offset_for_scrollbar,
                                                   self._height - 2)
         self._plus_image = Gtk.Image()

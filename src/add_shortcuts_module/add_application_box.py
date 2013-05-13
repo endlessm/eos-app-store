@@ -1,4 +1,5 @@
 from gi.repository import Gtk
+from gi.repository import GdkPixbuf
 import cairo
 from eos_util import image_util
 from osapps.desktop_preferences_datastore import DesktopPreferencesDatastore
@@ -19,17 +20,17 @@ class AddApplicationBox(Gtk.Box):
 
         self._scrolled_window = Gtk.ScrolledWindow()
         self._scrolled_window.set_policy(hscrollbar_policy=Gtk.PolicyType.NEVER, vscrollbar_policy=Gtk.PolicyType.AUTOMATIC)
-        self._scrolled_window.connect("show", self._on_show)
-        self._scrolled_window.get_vscrollbar().connect("value-changed", self._on_scroll)
+        #self._scrolled_window.connect("show", self._on_show)
+        #self._scrolled_window.get_vscrollbar().connect("value-changed", self._on_scroll)
 
         self._active_category = default_category
         apps = self._presenter.get_category(self._active_category)
         self._fill_applications(apps)
 
-        self._vbox.set_homogeneous(False)
+        #self._vbox.set_homogeneous(False)
 
-        self._vbox.connect("draw", self._handle_draw)
-        self._scrolled_window.add_with_viewport(self._vbox)
+        #self._vbox.connect("draw", self._handle_draw)
+        #self._scrolled_window.add_with_viewport(self._vbox)
         self.add(self._scrolled_window)
         self.show_all()
 
@@ -51,7 +52,7 @@ class AddApplicationBox(Gtk.Box):
     def _on_scroll(self, widget):
         self._scrolled_window.queue_draw()
 
-    def _handle_draw(self, cr):
+    def _handle_draw(self, widget, cr):
         x, y, _ = self._vbox.get_window().get_origin()
         top_x, top_y, _ = self._scrolled_window.get_window().get_toplevel().get_origin()
         self.draw(cr, x - top_x, y - top_y, self.get_allocation().width, self.get_allocation().height)
@@ -90,7 +91,7 @@ class AddApplicationBox(Gtk.Box):
         widget._plus_image.set_from_file(image_util.image_path("add_folder_icon.png"))
         widget._plus_image.show()
         pixbuf = image_util.load_pixbuf(image_util.image_path('category_separator_inactive.png'))
-        pixbuf = pixbuf.scale_simple(self.get_allocation().width, pixbuf.get_height(), Gdk.INTERP_BILINEAR)
+        pixbuf = pixbuf.scale_simple(self.get_allocation().width, pixbuf.get_height(), GdkPixbuf.InterpType.BILINEAR)
         widget._bottom_active_line.set_from_pixbuf(pixbuf)
         widget._top_active_line.set_from_pixbuf(pixbuf)
         widget.draw(widget.get_allocation())

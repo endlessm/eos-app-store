@@ -42,7 +42,8 @@ class DeleteNotPossiblePopupWindow():
         
         self._close_box.set_size_request(24, 24)
         self._container.pack_start(self._close_box, True, False, 0)
-        self._bottom_center = Gtk.Alignment(0.5, 1.0, 0, 0)
+        self._bottom_center = Gtk.Alignment()
+        self._bottom_center.set(0.5, 1.0, 0, 0)
         self._label_box = Gtk.Box(Gtk.Orientation.HORIZONTAL)
         self._label_box.set_homogeneous(False)
         

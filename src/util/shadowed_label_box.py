@@ -1,5 +1,6 @@
 from gi.repository import Gtk
 from gi.repository import Gdk
+from gi.repository import PangoCairo
 import cairo
 
 from util.rename_widget import RenameWidget
@@ -23,7 +24,7 @@ class ShadowedLabelBox(Gtk.EventBox):
         
         self.set_visible_window(False)
     
-    def draw(self, cr):
+    def draw(self, widget, cr):
         text_size_x, text_size_y = self._text_layout.get_pixel_size()
         left_margin = int((self.get_allocation().width - text_size_x)/2)
         cr.save()
@@ -36,7 +37,7 @@ class ShadowedLabelBox(Gtk.EventBox):
                    self._label.get_allocation().y + self.SHADOW_OFFSET)
         
         cr.set_operator(cairo.OPERATOR_DEST_OUT);
-        cr.show_layout(self._shadow_layout)
+        PangoCairo.show_layout(cr, self._shadow_layout)
         
         cr.restore()
     

@@ -11,7 +11,7 @@ from util import label_util
 
 class DesktopShortcut(Gtk.Box):
     DND_TARGET_TYPE_TEXT = 80
-    DND_TRANSFER_TYPE = [("text/plain", Gtk.TargetFlags.SAME_APP, DND_TARGET_TYPE_TEXT)]
+    DND_TRANSFER_TYPE = [ Gtk.TargetEntry.new("text/plain", Gtk.TargetFlags.SAME_APP, DND_TARGET_TYPE_TEXT) ]
     ICON_STATE_NORMAL = 'normal'
     ICON_STATE_PRESSED = 'pressed'
     ICON_STATE_MOUSEOVER = 'mouseover'
@@ -119,9 +119,9 @@ class DesktopShortcut(Gtk.Box):
         self._centered_icon_hbox._identifier = label_text
         self._icon_event_box._identifier = label_text
 
-        new_style = self._label.get_style().copy()
-        new_style.fg[Gtk.STATE_NORMAL] = self._label.get_colormap().alloc('#f0f0f0')
-        self._label.set_style(new_style)
+        #new_style = self._label.get_style().copy()
+        #new_style.fg[Gtk.STATE_NORMAL] = self._label.get_colormap().alloc('#f0f0f0')
+        #self._label.set_style(new_style)
 
         text = string.strip(label_text)
         self._label.set_text(label_util.wrap_text(self._label, text))
@@ -139,7 +139,7 @@ class DesktopShortcut(Gtk.Box):
             self._icon_event_box.drag_source_set(
                 Gdk.BUTTON1_MASK,
                 self.DND_TRANSFER_TYPE,
-                Gdk.ACTION_MOVE
+                Gdk.DragAction.MOVE
                 )
         self._icon_event_box.connect("drag_data_received", self.dnd_receive_data)
         self._icon_event_box.connect("drag_motion", self.dnd_motion_data)
@@ -147,7 +147,7 @@ class DesktopShortcut(Gtk.Box):
         self._icon_event_box.connect("drag_begin", self.dnd_drag_begin)
         self._icon_event_box.connect("drag_leave", self.dnd_drag_leave)
         self._icon_event_box.drag_dest_set(
-            Gtk.DEST_DEFAULT_HIGHLIGHT |
+            Gtk.DestDefaults.HIGHLIGHT |
             Gtk.DestDefaults.MOTION |
             Gtk.DestDefaults.DROP,
             self.DND_TRANSFER_TYPE,

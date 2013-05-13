@@ -22,7 +22,7 @@ class TransparentWindow(Gtk.Window):
 
         self.connect("draw", self._handle_event)
         
-    def _handle_event(self, cr):
+    def _handle_event(self, widget, cr):
         cr.set_source_rgba(0, 0, 0, 255)
         cr.set_operator(cairo.OPERATOR_SOURCE)
         cr.paint()

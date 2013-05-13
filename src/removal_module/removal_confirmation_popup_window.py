@@ -28,7 +28,8 @@ class RemovalConfirmationPopupWindow():
         
         self._fancy_container = ImageEventBox(self._dialog_images)
         self._fancy_container.set_size_request(self._width,self._height)
-        self._bottom_center = Gtk.Alignment(.5,.85,0,0)
+        self._bottom_center = Gtk.Alignment()
+        self._bottom_center.set(0.5,0.85,0,0)
         
         self._container = Gtk.Box(Gtk.Orientation.VERTICAL)
         self._container.set_homogeneous(False)
