@@ -31,10 +31,10 @@ class RemovalConfirmationPopupWindow():
         self._bottom_center = Gtk.Alignment()
         self._bottom_center.set(0.5,0.85,0,0)
         
-        self._container = Gtk.Box(Gtk.Orientation.VERTICAL)
+        self._container = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
         self._container.set_homogeneous(False)
         
-        self._button_box = Gtk.Box(Gtk.Orientation.HORIZONTAL)
+        self._button_box = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL)
         self._button_box.set_homogeneous(True)
         self._button_box.set_size_request(75,36)
         

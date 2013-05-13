@@ -71,7 +71,7 @@ class DesktopShortcut(Gtk.Box):
 
     def __init__(self, label_text="", draggable=True, highlightable=True, has_icon=True,
                  width=DesktopLayout.LABEL_WIDTH_IN_PIXELS, height=DesktopLayout.ICON_HEIGHT):
-        super(DesktopShortcut, self).__init__(Gtk.Orientation.VERTICAL)
+        super(DesktopShortcut, self).__init__(orientation=Gtk.Orientation.VERTICAL)
         self.__dnd_enter_flag = False
         
         self._width = width
@@ -99,13 +99,13 @@ class DesktopShortcut(Gtk.Box):
         
         self._icon_event_box = self._create_icon(self.get_images(self.ICON_STATE_NORMAL))
         
-        self._centered_icon_hbox = Gtk.Box(Gtk.Orientation.HORIZONTAL)
+        self._centered_icon_hbox = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL)
         self._centered_icon_hbox.set_size_request(width, height)
         
         if has_icon:
             # Add spacers to center the icon within the shortcut
-            self._left_spacer = Gtk.Box(Gtk.Orientation.VERTICAL)
-            self._right_spacer = Gtk.Box(Gtk.Orientation.VERTICAL)
+            self._left_spacer = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
+            self._right_spacer = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
             self._left_spacer.set_size_request(DesktopLayout.get_spacer_width(), height)
             self._right_spacer.set_size_request(DesktopLayout.get_spacer_width(), height)
             self._centered_icon_hbox.pack_start(self._left_spacer, False, False, 0)

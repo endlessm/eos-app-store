@@ -33,12 +33,12 @@ class ApplicationRowBox(Gtk.EventBox):
         self._plus_box_width = 80
 
         # -- DISPLAY ELEMENTS
-        self._vbox = Gtk.Box(Gtk.Orientation.VERTICAL)
+        self._vbox = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
         self._top_active_line = Gtk.Image()
         self._top_active_line.set_size_request(-1, 1)
         self._bottom_active_line = Gtk.Image()
         self._bottom_active_line.set_size_request(-1, 1)
-        self._row = Gtk.Box(Gtk.Orientation.HORIZONTAL)
+        self._row = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL)
 
         # icon
         self.icon_alignment = Gtk.Alignment()
@@ -57,7 +57,7 @@ class ApplicationRowBox(Gtk.EventBox):
         self.description_label.set_markup('<span color="#aaaaaa" font-style="italic">' + self._description + '</span>')
         self.description_label.set_alignment(0,0.5)
 
-        self.labels_box = Gtk.Box(Gtk.Orientation.VERTICAL)
+        self.labels_box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
         self.labels_box.pack_start(self.name_label, True, True, 0)
         self.labels_box.pack_start(self.description_label, True, True, 0)
 

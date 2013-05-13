@@ -20,8 +20,8 @@ class ShortcutCategoryBox(Gtk.EventBox):
         self.middle_align = Gtk.Alignment()
         self.middle_align.set(0, 0.5, 0, 0)
 
-        self.tree = Gtk.Box(Gtk.Orientation.VERTICAL)
-        self.top = Gtk.Box(Gtk.Orientation.HORIZONTAL)
+        self.tree = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
+        self.top = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL)
 
         self._close = ImageEventBox((Image.from_name("delete_no_unactive_24.png"),))
         self._close.set_size_request(24,24)
@@ -30,12 +30,12 @@ class ShortcutCategoryBox(Gtk.EventBox):
         self.top_align.add(self.top)
         self.top_align.show()
 
-        self.middle = Gtk.Box(Gtk.Orientation.VERTICAL)
+        self.middle = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
 
         self._fill_categories()
 
         self.middle_align.add(self.middle)
-        self.bottom = Gtk.Box(Gtk.Orientation.HORIZONTAL)
+        self.bottom = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL)
         self.bottom.set_size_request(24, 24)
 
         self.tree.pack_start(self.top_align, True, True, 0)
@@ -79,9 +79,9 @@ class ShortcutCategoryBox(Gtk.EventBox):
             box = Gtk.EventBox()
             box.set_visible_window(False)
             markup = self._set_markup_and_separators(section, image_start, image_end, box)
-            vbox = Gtk.Box(Gtk.Orientation.VERTICAL)
+            vbox = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
             vbox.set_homogeneous(False);
-            hbox = Gtk.Box(Gtk.Orientation.HORIZONTAL)
+            hbox = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL)
             label = Gtk.Label()
             label.set_markup(markup)
             label.set_alignment(0, 0.5)
@@ -131,8 +131,8 @@ class ShortcutCategoryBox(Gtk.EventBox):
     
     def _fill_subcategories(self, section, vbox):
         for category in section.subcategories:
-            subcategories_vbox = Gtk.Box(Gtk.Orientation.VERTICAL)
-            subcategory_hbox = Gtk.Box(Gtk.Orientation.HORIZONTAL)
+            subcategories_vbox = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
+            subcategory_hbox = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL)
             ebox = Gtk.EventBox()
             ebox.set_visible_window(False)
             sub_label = Gtk.Label()

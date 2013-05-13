@@ -38,7 +38,7 @@ class AddShortcutsView(Gtk.ApplicationWindow):
 	self._lc.set(0.5,0.5,0,0)
         self._lc.add(self._add_remove_widget)
 
-        self.add_remove_vbox = Gtk.Box(Gtk.Orientation.VERTICAL)
+        self.add_remove_vbox = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
         self.add_remove_vbox.set_size_request(self._add_button_box_width, self._height)
         self.add_remove_vbox.pack_start(self._lc, True, True, 0)
 
@@ -49,16 +49,16 @@ class AddShortcutsView(Gtk.ApplicationWindow):
         self.event_box.uat_offset = (0, -50)
         self.event_box.add(self.add_remove_vbox)
 
-        self.hbox1 = Gtk.Box(Gtk.Orientation.HORIZONTAL)
+        self.hbox1 = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL)
         self.hbox1.set_size_request(self._tree_view_width, self._height)
         self.hbox1.pack_start(self.tree, True, True, 0)
 
-        self.hbox2 = Gtk.Box(Gtk.Orientation.HORIZONTAL)
+        self.hbox2 = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL)
         self.hbox2.set_size_request(self._width - self._tree_view_width - self._add_button_box_width, self._height)
         self.scrolled_window = AddApplicationBox(self, self._presenter, screen_util.get_width(self), screen_util.get_height(self))
         self.hbox2.pack_start(self.scrolled_window, True, True, 0)
 
-        self.hbox = Gtk.Box(Gtk.Orientation.HORIZONTAL)
+        self.hbox = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL)
         self.hbox.pack_start(self.event_box, True, True, 0)
         self.hbox.pack_start(self.hbox1, True, True, 0)
         self.hbox.pack_end(self.hbox2, True, True, 0)

@@ -12,12 +12,12 @@ gettext.install('endless_desktop', '/usr/share/locale', unicode = True, names=['
 
 class AddWebsiteBox(Gtk.Box):
     def __init__(self, parent=None, desktop_preference_class = DesktopPreferencesDatastore, default_category=''):
-        super(AddWebsiteBox, self).__init__(Gtk.Orientation.VERTICAL)
+        super(AddWebsiteBox, self).__init__(orientation=Gtk.Orientation.VERTICAL)
         self.set_homogeneous(False)
 
         self._presenter = parent._presenter
         self._parent = parent
-        self._vbox = Gtk.Box(Gtk.Orientation.VERTICAL)
+        self._vbox = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
         self._vbox.set_homogeneous(False)
         self._scrolling = False
         self._refresh = True
@@ -35,7 +35,7 @@ class AddWebsiteBox(Gtk.Box):
 
         self._text_entry_align = Gtk.Alignment()
         self._text_entry_align.set(0.5, 0.5, 0, 0)
-        self._hbox = Gtk.Box(Gtk.Orientation.HORIZONTAL)
+        self._hbox = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL)
         self._hbox.set_size_request(286, 24)
         self._text_entry = Gtk.Entry()
         self._text_entry.set_max_length(50)
@@ -47,12 +47,12 @@ class AddWebsiteBox(Gtk.Box):
         self._text_entry_align.add(self._hbox)
 
 
-        self.hbox_separator = Gtk.Box(Gtk.Orientation.HORIZONTAL)
+        self.hbox_separator = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL)
         self.hbox_separator.set_size_request(-1, 15)
         self._vbox.pack_start(self.hbox_separator, False, False, 0)
         self._vbox.pack_start(self._label, False, False, 0)
         self._vbox.pack_start(self._text_entry_align, False, False, 20)
-        self.hbox_separator1 = Gtk.Box(Gtk.Orientation.HORIZONTAL)
+        self.hbox_separator1 = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL)
         self.hbox_separator1.set_size_request(-1, 15)
         self.hbox_separator1.connect("draw", self._draw_divider_line)
         self._vbox.pack_start(self.hbox_separator1, False, False, 0)

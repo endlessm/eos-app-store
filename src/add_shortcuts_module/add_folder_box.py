@@ -14,7 +14,7 @@ class AddFolderBox(Gtk.Box):
     _FOLDER_ICON_PATH = '/home/endlessm/gnome/source/eos-app-store/usr/share/endlessm/icons/folders/'
 
     def __init__(self, parent, add_remove_widget=None, desktop_preference_class = DesktopPreferencesDatastore):
-        super(AddFolderBox, self).__init__(Gtk.Orientation.VERTICAL)
+        super(AddFolderBox, self).__init__(orientation=Gtk.Orientation.VERTICAL)
         self.set_homogeneous(False)
 
         self._parent = parent
@@ -31,7 +31,7 @@ class AddFolderBox(Gtk.Box):
 
         self._scrolling = False
 
-        self._vbox = Gtk.Box(Gtk.Orientation.VERTICAL)
+        self._vbox = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
         self._vbox.set_homogeneous(False)
         self._vbox.set_spacing(15)
         self._vbox.connect("draw", self._handle_event)
@@ -45,7 +45,7 @@ class AddFolderBox(Gtk.Box):
 
         self._text_entry_align = Gtk.Alignment()
         self._text_entry_align.set(0.5, 0.5, 0, 0)
-        self._hbox = Gtk.Box(Gtk.Orientation.HORIZONTAL)
+        self._hbox = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL)
         self._hbox.set_size_request(186, 24)
         self._text_entry = Gtk.Entry()
         self._text_entry.set_max_length(50)
@@ -54,12 +54,12 @@ class AddFolderBox(Gtk.Box):
         self._text_entry.set_text('')
         self._text_entry_align.add(self._hbox)
 
-        self.hbox_separator = Gtk.Box(Gtk.Orientation.HORIZONTAL)
+        self.hbox_separator = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL)
         self.hbox_separator.set_size_request(-1, 15)
         self._vbox.pack_start(self.hbox_separator, True, True, 0)
         self._vbox.pack_start(self._label_1, True, True, 0)
         self._vbox.pack_start(self._text_entry_align, False, False, 0)
-        self.hbox_separator1 = Gtk.Box(Gtk.Orientation.HORIZONTAL)
+        self.hbox_separator1 = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL)
         self.hbox_separator1.set_size_request(-1, 15)
         #self.hbox_separator1.connect("draw", self._draw_divider_line)
         self._vbox.pack_start(self.hbox_separator1, False, False, 0)
