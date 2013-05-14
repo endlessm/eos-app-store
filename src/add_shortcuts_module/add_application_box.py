@@ -11,6 +11,9 @@ class AddApplicationBox(Gtk.Box):
         self.set_homogeneous(True)
 
         #self._presenter = parent._presenter
+        self._vbox = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
+        self._vbox.set_homogeneous(False)
+
         self._presenter = presenter
         self._parent = parent
         self.x = 0
@@ -27,14 +30,13 @@ class AddApplicationBox(Gtk.Box):
         apps = self._presenter.get_category(self._active_category)
         self._fill_applications(apps)
 
-        self._vbox.set_homogeneous(False)
         self._vbox.connect("draw", self._handle_draw)
         self._scrolled_window.add_with_viewport(self._vbox)
         self.add(self._scrolled_window)
         self.show_all()
 
     def _fill_applications(self, apps):
-        self._vbox = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
+
         if apps:
             for app in apps:
                 self._display_application(app)
@@ -43,7 +45,7 @@ class AddApplicationBox(Gtk.Box):
         row = ApplicationRowBox(app, parent=self, presenter=self._presenter)
         row.connect("enter-notify-event", self._draw_active, row)
         row.connect("leave-notify-event", self._draw_inactive, row)
-        self._vbox.pack_start(row, True, True, 0)
+        self._vbox.pack_start(row, False, False, 0)
 
     def _on_show(self, widget):
         widget.get_child().set_shadow_type(Gtk.ShadowType.NONE)
@@ -61,12 +63,12 @@ class AddApplicationBox(Gtk.Box):
         # without the check, so I'm disabling it here as well
         # if not self._refresh and event:
         #if event:
-#           self._draw_gradient(cr, event.area.width, event.area.height, event.area.x, event.area.y)
+        self._draw_gradient(cr, self.get_allocated_width(), self.get_allocated_height(), 0, 0)
 
         return False
 
     def draw(self, cr, x, y, w, h):
-        self._scrolled_window.get_child().set_shadow_type(Gtk.ShadowType.NONE)
+        #self._scrolled_window.get_child().set_shadow_type(Gtk.ShadowType.NONE)
         # Only copy/crop the background the first time through
         # to avoid needless memory copies and image manipulation
         if not self._scrolling:
@@ -90,7 +92,7 @@ class AddApplicationBox(Gtk.Box):
         widget._plus_image.set_from_file(image_util.image_path("add_folder_icon.png"))
         widget._plus_image.show()
         pixbuf = image_util.load_pixbuf(image_util.image_path('category_separator_inactive.png'))
-        pixbuf = pixbuf.scale_simple(self.get_allocation().width, pixbuf.get_height(), GdkPixbuf.InterpType.BILINEAR)
+        pixbuf = pixbuf.scale_simple(widget.get_allocation().width, pixbuf.get_height(), GdkPixbuf.InterpType.BILINEAR)
         widget._bottom_active_line.set_from_pixbuf(pixbuf)
         widget._top_active_line.set_from_pixbuf(pixbuf)
         widget.queue_draw()
