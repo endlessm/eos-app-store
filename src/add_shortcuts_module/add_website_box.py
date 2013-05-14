@@ -137,10 +137,10 @@ class AddWebsiteBox(Gtk.Box):
         return False
 
     def _draw_divider_line(self, widget, cr):
-        cr.rectangle(event.area.x, event.area.y, event.area.width, 1)
+        cr.rectangle(0, 0, widget.get_allocation().width, 1)
         cr.set_source_rgba(0.08, 0.08, 0.08, 0.8)
         cr.fill()
-        cr.rectangle(event.area.x, event.area.y+1, event.area.width, 1)
+        cr.rectangle(0, 1, widget.get_allocation().width, 1)
         cr.set_source_rgba(0.5, 0.5, 0.5, 0.8)
         cr.fill()
 
