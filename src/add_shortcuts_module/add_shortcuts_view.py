@@ -31,7 +31,6 @@ class AddShortcutsView(Gtk.ApplicationWindow):
         self._width = width
         self._height = height
         self.set_default_size(self._width, self._height)
-#self.resize(self._width, self._height)
 
         self._add_remove_widget = AddRemoveShortcut(callback=lambda a, b:False)
         self._presenter = AddShortcutsPresenter(view=self)
@@ -74,6 +73,7 @@ class AddShortcutsView(Gtk.ApplicationWindow):
         self.connect("draw", self._draw_triangle)
 
         self.show_all()
+        self.fullscreen()
 
         return
 
