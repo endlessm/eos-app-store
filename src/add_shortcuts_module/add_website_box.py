@@ -121,7 +121,7 @@ class AddWebsiteBox(Gtk.Box):
         pixbuf = pixbuf.scale_simple(widget.get_allocation().width, pixbuf.get_height(), GdkPixbuf.InterpType.BILINEAR)
         widget._bottom_active_line.set_from_pixbuf(pixbuf)
         widget._top_active_line.set_from_pixbuf(pixbuf)
-        widget.draw(widget.get_allocation())
+        widget.queue_draw()
 
         return False
 
@@ -132,7 +132,7 @@ class AddWebsiteBox(Gtk.Box):
         widget._plus_image.hide()
         widget._bottom_active_line.set_from_pixbuf(None)
         widget._top_active_line.set_from_pixbuf(None)
-        widget.draw(widget.get_allocation())
+        widget.queue_draw()
 
         return False
 
