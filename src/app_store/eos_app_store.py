@@ -10,10 +10,8 @@ class EosAppStore(Gtk.Application):
         Gtk.Application.__init__(self)
 
     def do_activate(self):
-        print("do activate")
         win = AddShortcutsView(self)
         win.show_all()
 
     def do_startup(self):
-        print ("do startup")
         Gtk.Application.do_startup(self)

@@ -72,7 +72,6 @@ class AddShortcutsView(Gtk.ApplicationWindow):
 
         self.connect("delete-event", self.destroy)
         self.connect("draw", self._draw_triangle)
-        print("connected")
 
         self.show_all()
 
@@ -103,7 +102,6 @@ class AddShortcutsView(Gtk.ApplicationWindow):
         return self._tree_view_width
 
     def show(self):
-        print ("show window")
         self.window.show_all()
 
     def destroy(self, window, event):
@@ -128,7 +126,6 @@ class AddShortcutsView(Gtk.ApplicationWindow):
         self._presenter.add_shortcut(shortcut)
     
     def _draw_triangle(self, widget, cr):
-        print ("_draw_triangle")
         ctx = self.add_remove_vbox.get_window().cairo_create()
         image_surface = cairo.ImageSurface.create_from_png(image_util.image_path("inactive_triangle.png"))
         x = self.add_remove_vbox.get_allocation().width - image_surface.get_width()
@@ -164,7 +161,6 @@ class AddShortcutsView(Gtk.ApplicationWindow):
         monitor = screen.get_monitor_geometry(0)
         width = monitor.width
         height = monitor.height
-        print ("geometry is " + str(width) + "x" + str(height))
 
         return width, height
 
