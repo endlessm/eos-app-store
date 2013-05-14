@@ -27,9 +27,9 @@ class AddShortcutsView(Gtk.ApplicationWindow):
         self._add_button_box_width = 120
         self._tree_view_width = 214
 
-        width, height = self._get_net_work_area()
-        self._width = width
-        self._height = height
+        # Hardcode size. Not a real problem, as application will run maximized
+        self._width = 640
+        self._height = 480
         self.set_default_size(self._width, self._height)
 
         self._add_remove_widget = AddRemoveShortcut(callback=lambda a, b:False)
@@ -63,7 +63,7 @@ class AddShortcutsView(Gtk.ApplicationWindow):
         self.hbox2.pack_start(self.scrolled_window, True, True, 0)
 
         self.hbox = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL)
-        self.hbox.pack_start(self.event_box, True, False, 0)
+        self.hbox.pack_start(self.event_box, False, True, 0)
         self.hbox.pack_start(self.hbox1, False, False, 0)
         self.hbox.pack_end(self.hbox2, True, True, 0)
 
@@ -72,8 +72,8 @@ class AddShortcutsView(Gtk.ApplicationWindow):
         self.connect("delete-event", self.destroy)
         self.connect("draw", self._draw_triangle)
 
+        self.maximize()
         self.show_all()
-        self.fullscreen()
 
         return
 
@@ -154,13 +154,4 @@ class AddShortcutsView(Gtk.ApplicationWindow):
             widget = AddFolderBox(self)
 
         self.set_scrolled_window(widget)
-
-    def _get_net_work_area(self):
-        """this section of code gets the net available area on the window (i.e. root window - panels)"""
-        screen = self.get_screen()
-        monitor = screen.get_monitor_geometry(0)
-        width = monitor.width
-        height = monitor.height
-
-        return width, height
 
