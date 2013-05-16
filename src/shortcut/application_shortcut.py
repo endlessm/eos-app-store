@@ -1,6 +1,5 @@
 from gi.repository import GObject
 import string
-from gi.repository import Gtk.keysyms
 from gi.repository import Gtk
 from eos_util.image import Image
 from util import label_util
@@ -115,13 +114,13 @@ class ApplicationShortcut(DesktopShortcut):
         super(ApplicationShortcut, self).remove_shortcut()
         
     def handle_keystrokes(self, widget, event):
-        if(event.keyval == Gtk.keysyms.Escape):
+        if(event.keyval == Gtk.Keysyms.Escape):
             self.rename_flag = True
             self.text_buffer.set_text(self.original_entry_text)
             self.text_view.hide()
             self._label.show()
             return True
-        elif(event.keyval == Gtk.keysyms.Return):
+        elif(event.keyval == Gtk.Keysyms.Return):
             self.rename_label(widget)
             return True
         return False
