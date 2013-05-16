@@ -56,7 +56,7 @@ class AddShortcutsPresenter():
         self._add_shortcuts_view.close()
             
     def add_shortcut(self, shortcut):
-        self._app_desktop_datastore.add_shortcut(shortcut)
+        #self._app_desktop_datastore.add_shortcut(shortcut)
         self._add_shortcuts_view.close()
 
     def get_folder_icons(self, path, prefix='', suffix=''):
