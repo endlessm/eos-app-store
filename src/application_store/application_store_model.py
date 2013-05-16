@@ -6,7 +6,8 @@ from desktop_files.desktop_file_utilities import DesktopFileUtilities
 from eos_log import log
 
 class ApplicationStoreModel():
-    DEFAULT_APP_STORE_DIRECTORY = '/home/endlessm/gnome/source/eos-app-store/usr/share/endlessm-app-store'
+    DEFAULT_APP_STORE_DIRECTORY = os.environ["XDG_DATA_DIRS"].split(":")[0] + '/applications'
+    EOS_APP_PREFIX = 'eos-app-'
 
     def __init__(self, directory=DEFAULT_APP_STORE_DIRECTORY, installed_apps_dir=os.path.expanduser("~/.endlessm"), installed_applications_model = InstalledApplicationsModel()):
         self._base_dir = directory
@@ -30,11 +31,10 @@ class ApplicationStoreModel():
     def _refresh(self):
         categories = CategoriesModel()
         files_model = DesktopFileUtilities()
-        
         try:
             for desktop_filename in files_model.get_desktop_files(self._base_dir):                    
                 desktop_file_path = os.path.join(self._base_dir, desktop_filename)
-                if not self._installed_applications_model.is_installed(desktop_filename):
+                if desktop_filename.startswith(self.EOS_APP_PREFIX) and not self._installed_applications_model.is_installed(desktop_filename):
                     application = files_model.create_model(desktop_file_path, desktop_filename)
                     categories.add_application(application)
         except OSError as e:
