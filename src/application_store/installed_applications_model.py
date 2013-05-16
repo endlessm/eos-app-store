@@ -1,8 +1,13 @@
 import os
 import json
 from eos_log import log
+from gi.repository import GLib
+from gi.repository import Gio
 
 class InstalledApplicationsModel():
+    EOS_SHELL_SCHEMA = 'org.gnome.shell'
+    ICON_GRID_LAYOUT_SETTING = 'icon-grid-layout'
+
     def __init__(self, filename = 'installed_applications.json'):
         self._installed_applications = []
         self._filename = filename
@@ -12,19 +17,24 @@ class InstalledApplicationsModel():
         self._full_path = os.path.join(file_location, self._filename)
 
     def _load_data(self):
-        if os.path.isfile(self._full_path):
-            with open(self._full_path, 'r') as fp:
-               json_data = json.load(fp)
-               if json_data is not None:
-                   self._installed_applications = json_data
+        settings = Gio.Settings.new(self.EOS_SHELL_SCHEMA);
+        value = settings.get_value(self.ICON_GRID_LAYOUT_SETTING);
+        layout = value.unpack();
+        self._installed_applications = [item for sublist in layout.values() for item in sublist]
 
     def installed_applications(self):
         self._load_data()
         return self._installed_applications
 
     def install(self, application):
-        self._load_data()
-        self.install_at(application, len(self._installed_applications))
+        settings = Gio.Settings.new(self.EOS_SHELL_SCHEMA);
+        value = settings.get_value(self.ICON_GRID_LAYOUT_SETTING);
+        layout = value.unpack();
+        entries = layout[""];
+        entries.append(application)
+        layout[""] = entries
+        settings.set_value(self.ICON_GRID_LAYOUT_SETTING, GLib.Variant("a{sas}", layout))
+        settings.sync()
 
     def uninstall(self, application):
         self._load_data()
