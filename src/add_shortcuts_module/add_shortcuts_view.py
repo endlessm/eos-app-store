@@ -120,6 +120,7 @@ class AddShortcutsView(Gtk.ApplicationWindow):
 
     def install_site(self, link_model):
         shortcut = self._presenter.build_shortcut_from_link_model(link_model)
+        self._presenter.install_app(link_model)
         self.install_shortcut(shortcut)
 
     def install_shortcut(self, shortcut):

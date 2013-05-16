@@ -27,8 +27,9 @@ class DesktopFileUtilities:
         icon = desktop_entry.getIcon()
         class_name = self._get_class_name(desktop_entry)
         if desktop_entry.getType() == 'Application':
+            executable = desktop_entry.getExec();
             categories = desktop_entry.getCategories()
-            return ApplicationModel(model_id, file_path, categories, name, comment, icon, class_name)
+            return ApplicationModel(model_id, file_path, categories, name, comment, icon, class_name, executable)
         elif desktop_entry.getType() == 'Link':
             url = desktop_entry.getURL()
             return LinkModel(file_path, name, url, comment, icon, class_name)

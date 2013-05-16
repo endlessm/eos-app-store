@@ -3,7 +3,7 @@ from gi.repository import Gdk
 from gi.repository import GdkPixbuf
 from osapps.desktop_preferences_datastore import DesktopPreferencesDatastore
 from eos_util import image_util 
-
+import cgi
 
 class WebsiteRowBox(Gtk.EventBox):
     def __init__(self, item=None, parent=None, presenter=None, desktop_preference_class = DesktopPreferencesDatastore):
@@ -55,7 +55,7 @@ class WebsiteRowBox(Gtk.EventBox):
         self.name_label.set_markup('<span color="#aaaaaa" font="Novecento wide" font_weight="bold">' + self._name + '</span>')
         self.name_label.set_alignment(0, 0.5)
         self.description_label = Gtk.Label()
-        self.description_label.set_markup('<span color="#aaaaaa" font-style="italic">' + self._link_model._url + '</span>')
+        self.description_label.set_markup('<span color="#aaaaaa" font-style="italic">' + cgi.escape(self._link_model._url) + '</span>')
         self.description_label.set_alignment(0,0.5)
         
         self.labels_box = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL)

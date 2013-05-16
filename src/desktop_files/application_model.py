@@ -2,9 +2,12 @@ from desktop_files.desktop_file_model import DesktopFileModel
 import os
 
 class ApplicationModel(DesktopFileModel):
-    def __init__(self, model_id, desktop_file_path, categories, name=None, comment=None, icon=None, class_name=None):
+    BROWSER_APP = 'epiphany-browser '
+
+    def __init__(self, model_id, desktop_file_path, categories, name=None, comment=None, icon=None, class_name=None, executable=None):
         super(ApplicationModel, self).__init__(model_id, desktop_file_path, name, comment, icon, class_name)
         self._categories = categories
+        self._url = self._remove_prefix(executable, self.BROWSER_APP)
 
     def get_categories(self):
         return ['All']
@@ -25,3 +28,6 @@ class ApplicationModel(DesktopFileModel):
 
     def uninstall(self):
         os.unlink(self.file_path())    
+
+    def _remove_prefix(self, text, prefix):
+        return text[len(prefix):] if text.startswith(prefix) else text

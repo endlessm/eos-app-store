@@ -2,6 +2,7 @@ from gi.repository import Gtk
 from gi.repository import GdkPixbuf
 import cairo
 import gettext
+import cgi
 
 from eos_util import image_util
 from eos_util import screen_util
@@ -114,7 +115,7 @@ class AddWebsiteBox(Gtk.Box):
     def _draw_active(self, widget, event, row):
         self._refresh = False
         widget.name_label.set_markup('<span color="#ffffff" font="Novecento wide" font_weight="bold">' + widget._name + '</span>')
-        widget.description_label.set_markup('<span color="#ffffff" font-style="italic">' + widget._link_model._url + '</span>')
+        widget.description_label.set_markup('<span color="#ffffff" font-style="italic">' + cgi.escape(widget._link_model._url) + '</span>')
         widget._plus_image.set_from_file(image_util.image_path("add_folder_icon.png"))
         widget._plus_image.show()
         pixbuf = image_util.load_pixbuf(image_util.image_path('category_separator_inactive.png'))
@@ -128,7 +129,7 @@ class AddWebsiteBox(Gtk.Box):
     def _draw_inactive(self, widget, event, row):
         self._refresh = True
         widget.name_label.set_markup('<span color="#aaaaaa" font="Novecento wide" font_weight="bold">' + widget._name + '</span>')
-        widget.description_label.set_markup('<span color="#aaaaaa" font-style="italic">' + widget._link_model._url + '</span>')
+        widget.description_label.set_markup('<span color="#aaaaaa" font-style="italic">' + cgi.escape(widget._link_model._url) + '</span>')
         widget._plus_image.hide()
         widget._bottom_active_line.set_from_pixbuf(None)
         widget._top_active_line.set_from_pixbuf(None)
