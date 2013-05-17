@@ -14,7 +14,7 @@ class DesktopLayout(object):
     def calculate_total_top_padding(cls, *widgets):
         total = 0
         for widget in widgets:
-            total += widget.allocation.height
+            total += widget.get_allocation().height
         return total - cls.TOP_PADDING_BUFFER
 
     @classmethod

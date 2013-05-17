@@ -1,0 +1,9 @@
+[Desktop Entry]
+Version=1.0
+Type=Application
+Name=Tux Kart
+Comment=Tux Kart
+TryExec=supertuxkart
+Exec=supertuxkart --fullscreen
+Icon=supertuxkart
+Categories=Games
