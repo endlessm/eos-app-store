@@ -8,7 +8,8 @@ class RecommendedSitesProvider(object):
     This class provides recommended sites based on the locale
     '''
 
-    DEFAULT_SITES_DIRECTORY = os.environ["XDG_DATA_DIRS"].split(":")[0] + '/applications'
+    BASEPATH = os.environ["XDG_DATA_DIRS"].split(":")[0] if os.environ["XDG_DATA_DIRS"] else "/usr/share"
+    DEFAULT_SITES_DIRECTORY = BASEPATH + '/applications'
     EOS_LINK_PREFIX = 'eos-link-'
 
     def __init__(self, directory=DEFAULT_SITES_DIRECTORY, desktop_file_model = DesktopFileUtilities(), locale_util=LocaleUtil()):

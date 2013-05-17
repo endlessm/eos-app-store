@@ -3,7 +3,8 @@ import os
 
 class FolderModel(DesktopFileModel):
     
-    FOLDER_ICON_PATH = os.environ["XDG_DATA_DIRS"].split(":")[0] + '/icons/EndlessOS/64x64/folders'
+    BASEPATH = os.environ["XDG_DATA_DIRS"].split(":")[0] if os.environ["XDG_DATA_DIRS"] else "/usr/share"
+    FOLDER_ICON_PATH = BASEPATH + '/icons/EndlessOS/64x64/folders'
     
     def __init__(self, model_id, desktop_file_path, name=None, comment=None, icon=None, class_name=None):
         super(FolderModel, self).__init__(model_id, desktop_file_path, name, comment, icon, class_name,

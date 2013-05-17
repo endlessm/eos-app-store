@@ -6,7 +6,8 @@ from desktop_files.desktop_file_utilities import DesktopFileUtilities
 from eos_log import log
 
 class ApplicationStoreModel():
-    DEFAULT_APP_STORE_DIRECTORY = os.environ["XDG_DATA_DIRS"].split(":")[0] + '/applications'
+    BASEPATH = os.environ["XDG_DATA_DIRS"].split(":")[0] if os.environ["XDG_DATA_DIRS"] else "/usr/share"
+    DEFAULT_APP_STORE_DIRECTORY = BASEPATH + '/applications'
     EOS_APP_PREFIX = 'eos-app-'
 
     def __init__(self, directory=DEFAULT_APP_STORE_DIRECTORY, installed_apps_dir=os.path.expanduser("~/.endlessm"), installed_applications_model = InstalledApplicationsModel()):

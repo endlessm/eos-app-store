@@ -12,7 +12,8 @@ from osapps.desktop_preferences_datastore import DesktopPreferencesDatastore
 gettext.install('endless_desktop', '/usr/share/locale', unicode = True, names=['ngettext'])
 
 class AddFolderBox(Gtk.Box):
-    _FOLDER_ICON_PATH = os.environ["XDG_DATA_DIRS"].split(":")[0] + '/icons/EndlessOS/64x64/folders'
+    BASEPATH = os.environ["XDG_DATA_DIRS"].split(":")[0] if os.environ["XDG_DATA_DIRS"] else "/usr/share"
+    _FOLDER_ICON_PATH = BASEPATH + '/icons/EndlessOS/64x64/folders'
 
     def __init__(self, parent, add_remove_widget=None, desktop_preference_class = DesktopPreferencesDatastore):
         super(AddFolderBox, self).__init__(orientation=Gtk.Orientation.VERTICAL)
