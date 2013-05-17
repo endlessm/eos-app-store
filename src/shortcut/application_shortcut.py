@@ -1,22 +1,21 @@
-import gobject
+from gi.repository import GObject
 import string
-import gtk.keysyms
-import gtk
+from gi.repository import Gtk
 from eos_util.image import Image
 from util import label_util
 from shortcut.desktop_shortcut import DesktopShortcut
 
 class ApplicationShortcut(DesktopShortcut):
     __gsignals__ = {
-    "application-shortcut-rename": (gobject.SIGNAL_RUN_FIRST, #@UndefinedVariable
-                       gobject.TYPE_NONE,
-                       (gobject.TYPE_PYOBJECT, gobject.TYPE_STRING,)),
-    "application-shortcut-activate": (gobject.SIGNAL_RUN_FIRST, #@UndefinedVariable
-                       gobject.TYPE_NONE,
-                       (gobject.TYPE_STRING,gobject.TYPE_PYOBJECT,)),
-    "application-shortcut-drag": (gobject.SIGNAL_RUN_FIRST, #@UndefinedVariable
-                       gobject.TYPE_NONE,
-                       (gobject.TYPE_BOOLEAN,)),    
+    "application-shortcut-rename": (GObject.SIGNAL_RUN_FIRST, #@UndefinedVariable
+                       GObject.TYPE_NONE,
+                       (GObject.TYPE_PYOBJECT, GObject.TYPE_STRING,)),
+    "application-shortcut-activate": (GObject.SIGNAL_RUN_FIRST, #@UndefinedVariable
+                       GObject.TYPE_NONE,
+                       (GObject.TYPE_STRING,GObject.TYPE_PYOBJECT,)),
+    "application-shortcut-drag": (GObject.SIGNAL_RUN_FIRST, #@UndefinedVariable
+                       GObject.TYPE_NONE,
+                       (GObject.TYPE_BOOLEAN,)),
     }
     
     def __init__(self, shortcut, show_background=True):
@@ -57,12 +56,12 @@ class ApplicationShortcut(DesktopShortcut):
         return self._shortcut
         
     def add_rename_entry(self, text):
-        self.text_view = gtk.TextView()
+        self.text_view = Gtk.TextView()
         self.text_buffer = self.text_view.get_buffer()
-        self.text_view.set_wrap_mode(gtk.WRAP_WORD_CHAR)
-        self.text_view.set_justification(gtk.JUSTIFY_CENTER)
-        self.text_view.modify_text(gtk.STATE_NORMAL, gtk.gdk.Color('#000000'))
-        self.text_view.modify_base(gtk.STATE_NORMAL, gtk.gdk.Color('#cccccc')) 
+        self.text_view.set_wrap_mode(Gtk.WRAP_WORD_CHAR)
+        self.text_view.set_justification(Gtk.JUSTIFY_CENTER)
+        self.text_view.modify_text(Gtk.STATE_NORMAL, Gdk.Color('#000000'))
+        self.text_view.modify_base(Gtk.STATE_NORMAL, Gdk.Color('#cccccc'))
         self.text_view.set_left_margin(5)
         self.text_view.set_right_margin(5)
         self.text_view.hide()
@@ -77,7 +76,7 @@ class ApplicationShortcut(DesktopShortcut):
         self.text_view.connect("focus-out-event", self.lost_focus)
         self.text_view.connect("key-press-event", self.handle_keystrokes)
         
-        self.pack_start(self.text_view, False, False)
+        self.pack_start(self.text_view, False, False, 0)
         
     def rename_icon(self, widget, event):
         self._label.hide()
@@ -115,13 +114,13 @@ class ApplicationShortcut(DesktopShortcut):
         super(ApplicationShortcut, self).remove_shortcut()
         
     def handle_keystrokes(self, widget, event):
-        if(event.keyval == gtk.keysyms.Escape):
+        if(event.keyval == Gtk.Keysyms.Escape):
             self.rename_flag = True
             self.text_buffer.set_text(self.original_entry_text)
             self.text_view.hide()
             self._label.show()
             return True
-        elif(event.keyval == gtk.keysyms.Return):
+        elif(event.keyval == Gtk.Keysyms.Return):
             self.rename_label(widget)
             return True
         return False
@@ -137,7 +136,7 @@ class ApplicationShortcut(DesktopShortcut):
         return False
     
     def mouse_press_callback(self, widget, event):
-        if event.button == 1: # and event.type == gtk.gdk._2BUTTON_PRESS:
+        if event.button == 1: # and event.type == Gdk._2BUTTON_PRESS:
             self._icon_event_box.set_images(self.get_images(self.ICON_STATE_PRESSED))
             self._icon_event_box.hide()
             self._icon_event_box.show()

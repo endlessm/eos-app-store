@@ -1,0 +1,12 @@
+[Desktop Entry]
+Version=1.0
+Type=Application
+Name=Writer
+Name[es]=Escritor
+Name[pt]=Redator
+Comment=Writer
+TryExec=libreoffice
+Exec=libreoffice --writer %U
+Icon=office_text
+Categories=Office
+X-EndlessM-Class-Name=libreoffice-writer

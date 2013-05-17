@@ -1,4 +1,4 @@
-import gtk
+from gi.repository import Gtk
 from eos_widgets.abstract_notifier import AbstractNotifier
 from rename_widget_constants import RenameWidgetConstants
 
@@ -8,16 +8,16 @@ class RenameWidgetView(AbstractNotifier):
         self.x = x
         self.y = y
 
-        self._window = gtk.Window(gtk.WINDOW_TOPLEVEL)
+        self._window = Gtk.Window(Gtk.WINDOW_TOPLEVEL)
         self._window.set_decorated(False)
         self._window.set_border_width(0)
         self._window.set_skip_taskbar_hint(True)
 
-        self._text_view = gtk.Entry()
+        self._text_view = Gtk.Entry()
         self._text_view.set_alignment(0.5)
         self._text_view.set_has_frame(False)
         self._text_view.set_editable(False)
-        self._text_view.set_state(gtk.STATE_SELECTED)
+        self._text_view.set_state(Gtk.STATE_SELECTED)
         self._window.add(self._text_view)
         self._text_view.connect("key-release-event", self._handle_key_press)
         self._text_view.connect("button-press-event", self._handle_click)
@@ -43,16 +43,16 @@ class RenameWidgetView(AbstractNotifier):
         self._text_view.select_region(0, -1)
 
     def _handle_key_press(self, widget, event):
-        if gtk.gdk.keyval_name(event.keyval) == 'Escape':
+        if Gdk.keyval_name(event.keyval) == 'Escape':
             self._notify(RenameWidgetConstants.ESCAPE_PRESSED)
-        elif gtk.gdk.keyval_name(event.keyval) == 'Return':
+        elif Gdk.keyval_name(event.keyval) == 'Return':
             self._notify(RenameWidgetConstants.RETURN_PRESSED)
 
     def get_new_name(self):
         return self._text_view.get_text().strip()
 
     def _handle_click(self, widget, event):
-        widget.set_state(gtk.STATE_NORMAL)
+        widget.set_state(Gtk.STATE_NORMAL)
         widget.set_editable(True)
 
     def close_window(self):

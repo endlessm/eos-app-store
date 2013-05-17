@@ -1,29 +1,30 @@
-import gtk
-import gobject
+from gi.repository import Gtk
+from gi.repository import GObject
 from shortcut.application_shortcut import ApplicationShortcut
 
-class FolderIcons(gtk.HBox):
+class FolderIcons(Gtk.Box):
     __gsignals__ = {
         "application-shortcut-activate": (
-            gobject.SIGNAL_RUN_FIRST, #@UndefinedVariable
-            gobject.TYPE_NONE,
-            (gobject.TYPE_STRING, gobject.TYPE_PYOBJECT, )
+            GObject.SIGNAL_RUN_FIRST, #@UndefinedVariable
+            GObject.TYPE_NONE,
+            (GObject.TYPE_STRING, GObject.TYPE_PYOBJECT, )
             ), 
         "desktop-shortcut-dnd-begin": (
-            gobject.SIGNAL_RUN_FIRST, #@UndefinedVariable
-            gobject.TYPE_NONE,
+            GObject.SIGNAL_RUN_FIRST, #@UndefinedVariable
+            GObject.TYPE_NONE,
             ()
             ),
          "desktop-shortcut-rename": (
-            gobject.SIGNAL_RUN_FIRST, #@UndefinedVariable
-            gobject.TYPE_NONE,
-            (gobject.TYPE_PYOBJECT, gobject.TYPE_PYOBJECT),
+            GObject.SIGNAL_RUN_FIRST, #@UndefinedVariable
+            GObject.TYPE_NONE,
+            (GObject.TYPE_PYOBJECT, GObject.TYPE_PYOBJECT),
             ),
     }
     
     def __init__(self, shortcuts, spacing=0):
-        gtk.HBox.__init__(self)
-        super(FolderIcons, self).__init__(homogeneous=False, spacing=spacing)
+        Gtk.Box.__init__(self, orientation=Gtk.Orientation.HORIZONTAL)
+        super(FolderIcons, self).__init__(orientation=Gtk.Orientation.HORIZONTAL, spacing=spacing)
+        super(FolderIcons, self).set_homogeneous(False)
         
         for shortcut in shortcuts:
             app_shortcut = ApplicationShortcut(shortcut, False)

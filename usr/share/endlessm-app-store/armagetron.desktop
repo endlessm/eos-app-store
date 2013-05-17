@@ -1,0 +1,11 @@
+[Desktop Entry]
+Version=1.0
+Type=Application
+Name=Armagetron
+Name[es]=Armagetron
+Name[pt]=Armagetron
+Comment=3d light cycle game
+TryExec=armagetronad
+Exec=armagetronad
+Icon=armagetron-adv
+Categories=Games

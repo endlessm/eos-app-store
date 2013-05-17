@@ -1,0 +1,12 @@
+[Desktop Entry]
+Version=1.0
+Type=Application
+Name=Spreadsheet
+Name[es]=Hoja de Cálculo
+Name[pt]=Planilha
+Comment=Spreadsheet
+TryExec=libreoffice
+Exec=libreoffice --calc %U
+Icon=office_spreadsheet
+Categories=Office
+X-EndlessM-Class-Name=libreoffice-calc

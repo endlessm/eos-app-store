@@ -1,0 +1,11 @@
+[Desktop Entry]
+Version=1.0
+Type=Application
+Name=Billiards
+Name[es]=Billar
+Name[pt]=Sinuca
+Comment=BillardGL
+TryExec=billard-gl
+Exec=billard-gl
+Icon=billardgl
+Categories=Games

@@ -56,4 +56,7 @@ class AddShortcutsModel():
         return icons
 
     def get_icon_list(self, path):
-        return os.listdir(path)
+        if os.path.exists(path):
+            return os.listdir(path)
+
+        return []
