@@ -2,8 +2,8 @@ import os
 
 class DesktopFileModel(object):
     
-    APP_ICON_PATH = '/home/endlessm/gnome/source/eos-app-store/usr/share/endlessm/icons/apps'
-    MINI_ICON_PATH = '/home/endlessm/gnome/source/eos-app-store/usr/share/endlessm/icons/mini'
+    APP_ICON_PATH = os.environ["XDG_DATA_DIRS"].split(":")[0] + '/icons/EndlessOS/64x64/apps'
+    MINI_ICON_PATH = os.environ["XDG_DATA_DIRS"].split(":")[0] + '/icons/EndlessOS/64x64/mini'
     NORMAL_EXT = '_normal.png'
     DOWN_EXT = '_down.png'
     HOVER_EXT = '_hover.png'

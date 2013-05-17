@@ -1,6 +1,7 @@
 from gi.repository import Gtk
 import cairo
 import gettext
+import os
 
 from desktop.desktop_layout import DesktopLayout
 from eos_widgets.image_eventbox import ImageEventBox
@@ -11,7 +12,7 @@ from osapps.desktop_preferences_datastore import DesktopPreferencesDatastore
 gettext.install('endless_desktop', '/usr/share/locale', unicode = True, names=['ngettext'])
 
 class AddFolderBox(Gtk.Box):
-    _FOLDER_ICON_PATH = '/home/endlessm/gnome/source/eos-app-store/usr/share/endlessm/icons/folders/'
+    _FOLDER_ICON_PATH = os.environ["XDG_DATA_DIRS"].split(":")[0] + '/icons/EndlessOS/64x64/folders'
 
     def __init__(self, parent, add_remove_widget=None, desktop_preference_class = DesktopPreferencesDatastore):
         super(AddFolderBox, self).__init__(orientation=Gtk.Orientation.VERTICAL)
