@@ -7,7 +7,7 @@ install:
 	cp -R src/* $(LIBDIR)
 	python -m compileall -d $(LIBDIR) $(LIBDIR)
 	find $(LIBDIR) -name '*.py' -delete
-	sed -i "s|EOSAPPSTOREPATH|$(LIBDIR)|g" eos_app_store
+	sed "s|%EOSAPPSTOREPATH%|$(LIBDIR)|g" eos_app_store.in > eos_app_store
 	cp eos_app_store $(BINDIR)
 uninstall:
 	rm -f $(BINDIR)/eos_app_store
