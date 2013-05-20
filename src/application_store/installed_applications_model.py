@@ -12,15 +12,14 @@ class InstalledApplicationsModel():
         self._installed_applications = []
         self._filename = filename
         self._full_path = os.path.join(os.path.expanduser("~/.endlessm"), self._filename)
-        self._settings = Gio.Settings.new(self.EOS_SHELL_SCHEMA);
+        self._settings = Gio.Settings.new(schema_id = self.EOS_SHELL_SCHEMA)
 
     def set_data_dir(self, file_location):
         self._full_path = os.path.join(file_location, self._filename)
 
     def _load_data(self):
-        settings = Gio.Settings.new(self.EOS_SHELL_SCHEMA);
-        value = settings.get_value(self.ICON_GRID_LAYOUT_SETTING);
-        layout = value.unpack();
+        value = self._settings.get_value(self.ICON_GRID_LAYOUT_SETTING)
+        layout = value.unpack()
         self._installed_applications = [item for sublist in layout.values() for item in sublist]
 
     def installed_applications(self):
@@ -28,9 +27,9 @@ class InstalledApplicationsModel():
         return self._installed_applications
 
     def install(self, application):
-        value = self._settings.get_value(self.ICON_GRID_LAYOUT_SETTING);
-        layout = value.unpack();
-        entries = layout[""];
+        value = self._settings.get_value(self.ICON_GRID_LAYOUT_SETTING)
+        layout = value.unpack()
+        entries = layout[""]
         entries.append(application)
         layout[""] = entries
         self._settings.set_value(self.ICON_GRID_LAYOUT_SETTING, GLib.Variant("a{sas}", layout))
