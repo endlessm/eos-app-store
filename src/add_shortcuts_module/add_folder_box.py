@@ -161,9 +161,14 @@ class AddFolderBox(Gtk.Box):
     def _append_icons(self, icons, files, path):
         for fi in files:
             image_file = os.path.join(path, fi)
-            image_box = ImageEventBox(None)
+            # ImageEventBox is currently broken,
+            # so bypassing to use a Gtk.Image directly
+            # image_box = ImageEventBox(None)
+            image_box = Gtk.Image()
             image_box.set_size_request(DesktopLayout.ICON_WIDTH, DesktopLayout.ICON_HEIGHT)
-            image_box.set_images(self.get_images(image_file))
+            # image_box.set_images(self.get_images(image_file))
+            image_box.set_from_file(image_file)
+
             image_box.connect("enter-notify-event", self._display_plus, self._parent._add_remove_widget)
             image_box.connect("leave-notify-event", self._remove_plus, self._parent._add_remove_widget)
             image_box.connect("button-release-event", self._create_folder, image_file)
