@@ -46,10 +46,3 @@ class InstalledApplicationsModel():
     def is_installed(self, application):
         self._load_data()
         return application in self._installed_applications
-
-    def install_at(self, application, index):
-        self._load_data()
-        self._installed_applications.insert(index, application)
-        # TODO Actually install the application on issue 434
-        with open(self._full_path, "w") as f:
-            json.dump(self._installed_applications, f)
