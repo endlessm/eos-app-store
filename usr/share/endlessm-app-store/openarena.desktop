@@ -1,9 +1,0 @@
-[Desktop Entry]
-Version=1.0
-Type=Application
-Name=Open Arena
-Comment=Open Arena
-TryExec=/usr/games/openarena
-Exec=/usr/games/openarena
-Icon=openarena
-Categories=Games

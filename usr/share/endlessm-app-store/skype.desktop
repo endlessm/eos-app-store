@@ -1,9 +1,0 @@
-[Desktop Entry]
-Version=1.0
-Type=Application
-Name=Skype
-Comment=Skype
-TryExec=skype
-Exec=skype %U
-Icon=skype
-Categories=Network

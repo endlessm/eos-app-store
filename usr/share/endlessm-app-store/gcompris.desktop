@@ -1,9 +1,0 @@
-[Desktop Entry]
-Version=1.0
-Type=Application
-Name=GCompris
-Comment=Childrens games
-TryExec=gcompris
-Exec=gcompris
-Icon=gcompris
-Categories=Games;Education
