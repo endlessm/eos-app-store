@@ -63,7 +63,9 @@ class AddApplicationBox(Gtk.Box):
         # without the check, so I'm disabling it here as well
         # if not self._refresh and event:
         #if event:
-        self._draw_gradient(cr, self.get_allocated_width(), self.get_allocated_height(), 0, 0)
+
+        # Disable the gradient, since it does not handle scrolling properly
+        # self._draw_gradient(cr, self.get_allocated_width(), self.get_allocated_height(), 0, 0)
 
         return False
 
