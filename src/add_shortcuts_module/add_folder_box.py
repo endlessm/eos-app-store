@@ -87,7 +87,7 @@ class AddFolderBox(Gtk.Box):
 
     def get_images(self, image_path):
         return (
-            Image.from_name(image_path),
+            Image.from_path(image_path),
             )
 
     def _display_plus(self, widget, event, add_remove_widget):
@@ -160,18 +160,19 @@ class AddFolderBox(Gtk.Box):
 
     def _append_icons(self, icons, files, path):
         for fi in files:
+            image_file = os.path.join(path, fi)
             image_box = ImageEventBox(None)
             image_box.set_size_request(DesktopLayout.ICON_WIDTH, DesktopLayout.ICON_HEIGHT)
-            image_box.set_images(self.get_images(path + fi))
+            image_box.set_images(self.get_images(image_file))
             image_box.connect("enter-notify-event", self._display_plus, self._parent._add_remove_widget)
             image_box.connect("leave-notify-event", self._remove_plus, self._parent._add_remove_widget)
-            image_box.connect("button-release-event", self._create_folder, path + fi)
+            image_box.connect("button-release-event", self._create_folder, image_file)
             image_box.show()
             icons.append(image_box)
         
     def _fill_table(self):
         icons = []
-        files = self._get_folder_icons(self._FOLDER_ICON_PATH, suffix='_normal')
+        files = self._get_folder_icons(self._FOLDER_ICON_PATH, suffix='')
         self._append_icons(icons, files, self._FOLDER_ICON_PATH)
         num_of_icons = len(icons)
         available_width = screen_util.get_width(self._parent) - self._parent.add_button_box_width - self._parent.tree_view_width
