@@ -1,9 +1,0 @@
-[Desktop Entry]
-Version=1.0
-Type=Application
-Name=Super Tux
-Comment=Super Tux
-TryExec=supertux2
-Exec=supertux2 --fullscreen
-Icon=supertux
-Categories=Games

@@ -5,9 +5,9 @@ class DesktopFileModel(object):
     BASEPATH = os.environ["XDG_DATA_DIRS"].split(":")[0] if os.environ["XDG_DATA_DIRS"] else "/usr/share"
     APP_ICON_PATH = BASEPATH + '/icons/EndlessOS/64x64/apps'
     MINI_ICON_PATH = BASEPATH + '/icons/EndlessOS/64x64/mini'
-    NORMAL_EXT = '_normal.png'
-    DOWN_EXT = '_down.png'
-    HOVER_EXT = '_hover.png'
+    NORMAL_EXT = '.png'
+    DOWN_EXT = '.png'
+    HOVER_EXT = '.png'
     
     def __init__(self, id, file_path, name=None, comment=None, icon=None, class_name=None,
                  icon_path=APP_ICON_PATH, mini_icon_path=MINI_ICON_PATH):

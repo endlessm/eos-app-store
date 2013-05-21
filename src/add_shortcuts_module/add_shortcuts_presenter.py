@@ -101,7 +101,7 @@ class AddShortcutsPresenter():
             key = app_model.id()
 
             icon = {}
-            backup_image = image_util.image_path("endless.png")
+            backup_image = image_util.image_path("generic-app.png")
             icon['normal'] = app_model.normal_icon() or backup_image
             icon['mouseover'] = app_model.hover_icon() or backup_image
             icon['pressed'] = app_model.down_icon() or backup_image
