@@ -12,7 +12,7 @@ def load_pixbuf(image_name):
         return Pixbuf.new_from_file(image_path(image_name))
     except Exception as e:
         log.error("An error occurred trying to load image. Loading default", e)
-        return Pixbuf.new_from_file(image_path('endless.png'))
+        return Pixbuf.new_from_file(image_path('generic-app.png'))
 
 def image_path(image_name):
     path = os.path.abspath(os.path.join(SHARED_IMAGES_DIRECTORY, image_name))

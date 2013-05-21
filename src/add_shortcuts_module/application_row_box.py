@@ -21,7 +21,7 @@ class ApplicationRowBox(Gtk.EventBox):
         self._type = self._desktop_entry.getType()
         self._icon_image_width = 48
         self._icon_image_height = 48
-        self._default_icon = image_util.image_path("endless.png")
+        self._default_icon = image_util.image_path("generic-app.png")
         self._height = 80
 
         # Use the DesktopFileModel class to provide the full path to the normal icon
