@@ -8,6 +8,7 @@ install:
 	python -m compileall -d $(LIBDIR) $(LIBDIR)
 	find $(LIBDIR) -name '*.py' -delete
 	sed "s|%EOSAPPSTOREPATH%|$(LIBDIR)|g" eos_app_store.in > eos_app_store
+	chmod +x eos_app_store
 	cp eos_app_store $(BINDIR)
 uninstall:
 	rm -f $(BINDIR)/eos_app_store
