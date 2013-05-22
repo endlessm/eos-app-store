@@ -1,6 +1,6 @@
 LIBDIR = $(DESTDIR)/lib/eos-app-store
 BINDIR = $(DESTDIR)/bin
-IMAGEDIR = $(DESTDIR)/share/EndlessOS/images
+IMAGEDIR = $(DESTDIR)/share/eos-app-store/images
 clean:
 	rm -f *.py[co] */*.py[co]
 install:

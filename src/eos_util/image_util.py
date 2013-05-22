@@ -5,7 +5,7 @@ from eos_log import log
 
 SHARED_DATA_DIRECTORY = os.environ["XDG_DATA_DIRS"].split(":")[0] if os.environ["XDG_DATA_DIRS"] else "/usr/share"
 
-SHARED_IMAGES_DIRECTORY = os.path.join (SHARED_DATA_DIRECTORY,"EndlessOS/images")
+SHARED_IMAGES_DIRECTORY = os.path.join (SHARED_DATA_DIRECTORY,"eos-app-store/images")
 
 def load_pixbuf(image_name):
     try:
