@@ -1,7 +1,16 @@
 Endless OS Application Store
 ====================
 
-To install it:
+To install to /usr/share:
+```
+./autogen.sh --datadir=/usr/share
+make
+make install
+```
 
-$ make DESTDIR=<destination-path> install
-
+Or to install via jhbuild:
+```
+./autogen.sh --prefix=$HOME/gnome/install
+make
+make install
+```
