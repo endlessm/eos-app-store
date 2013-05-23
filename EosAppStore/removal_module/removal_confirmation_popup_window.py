@@ -1,7 +1,7 @@
 from gi.repository import Gtk
-from eos_widgets.image_eventbox import ImageEventBox
-from eos_util.image import Image
-from eos_widgets.desktop_transparent_window import DesktopTransparentWindow
+from EosAppStore.eos_widgets.image_eventbox import ImageEventBox
+from EosAppStore.eos_util.image import Image
+from EosAppStore.eos_widgets.desktop_transparent_window import DesktopTransparentWindow
 
 class RemovalConfirmationPopupWindow():
     def __init__(self, callback, parent, widget=None, label=None, caller_widget=None):

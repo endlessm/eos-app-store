@@ -2,10 +2,10 @@ from gi.repository import GObject
 import uuid
 import gettext
 
-from shortcut.desktop_shortcut import DesktopShortcut
-from removal_module.removal_confirmation_popup_window import RemovalConfirmationPopupWindow
-from removal_module.delete_not_possible_popup import DeleteNotPossiblePopupWindow
-from eos_util.image import Image
+from EosAppStore.shortcut.desktop_shortcut import DesktopShortcut
+from EosAppStore.removal_module.removal_confirmation_popup_window import RemovalConfirmationPopupWindow
+from EosAppStore.removal_module.delete_not_possible_popup import DeleteNotPossiblePopupWindow
+from EosAppStore.eos_util.image import Image
 
 gettext.install('endless_desktop', '/usr/share/locale', unicode = True, names=['ngettext'])
 

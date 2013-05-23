@@ -1,6 +1,6 @@
 from gi.repository import Gtk
 from gi.repository import GObject
-from shortcut.application_shortcut import ApplicationShortcut
+from EosAppStore.shortcut.application_shortcut import ApplicationShortcut
 
 class FolderIcons(Gtk.Box):
     __gsignals__ = {

@@ -1,9 +1,9 @@
 from gi.repository import GObject
 import string
 from gi.repository import Gtk
-from eos_util.image import Image
-from util import label_util
-from shortcut.desktop_shortcut import DesktopShortcut
+from EosAppStore.eos_util.image import Image
+from EosAppStore.util import label_util
+from EosAppStore.shortcut.desktop_shortcut import DesktopShortcut
 
 class ApplicationShortcut(DesktopShortcut):
     __gsignals__ = {

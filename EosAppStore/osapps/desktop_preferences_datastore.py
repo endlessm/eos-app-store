@@ -1,8 +1,8 @@
 import json
 import os
-from osapps.os_util import OsUtil
-from eos_log import log
-from eos_util.image import Image
+from EosAppStore.osapps.os_util import OsUtil
+from EosAppStore.eos_log import log
+from EosAppStore.eos_util.image import Image
 
 class DesktopPreferencesDatastore(object):
     PREF_DIRNAME = os.path.expanduser('~/.endlessm')

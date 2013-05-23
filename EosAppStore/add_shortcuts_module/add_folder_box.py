@@ -3,11 +3,11 @@ import cairo
 import gettext
 import os
 
-from desktop.desktop_layout import DesktopLayout
-from eos_widgets.image_eventbox import ImageEventBox
-from eos_util.image import Image
-from eos_util import screen_util
-from osapps.desktop_preferences_datastore import DesktopPreferencesDatastore
+from EosAppStore.desktop.desktop_layout import DesktopLayout
+from EosAppStore.eos_widgets.image_eventbox import ImageEventBox
+from EosAppStore.eos_util.image import Image
+from EosAppStore.eos_util import screen_util
+from EosAppStore.osapps.desktop_preferences_datastore import DesktopPreferencesDatastore
 
 gettext.install('endless_desktop', '/usr/share/locale', unicode = True, names=['ngettext'])
 

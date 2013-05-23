@@ -7,12 +7,12 @@ from add_shortcuts_presenter import AddShortcutsPresenter
 from shortcut_category_box import ShortcutCategoryBox
 from add_folder_box import AddFolderBox
 from add_application_box import AddApplicationBox
-from eos_widgets.desktop_transparent_window import DesktopTransparentWindow
-from shortcut.add_remove_shortcut import AddRemoveShortcut
+from EosAppStore.eos_widgets.desktop_transparent_window import DesktopTransparentWindow
+from EosAppStore.shortcut.add_remove_shortcut import AddRemoveShortcut
 from add_website_box import AddWebsiteBox
 import cairo
-from eos_util import image_util
-from eos_util import screen_util
+from EosAppStore.eos_util import image_util
+from EosAppStore.eos_util import screen_util
 
 import sys
 import gc

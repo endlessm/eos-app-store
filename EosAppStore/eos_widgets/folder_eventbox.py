@@ -1,4 +1,4 @@
-from eos_widgets.image_eventbox import ImageEventBox
+from EosAppStore.eos_widgets.image_eventbox import ImageEventBox
 
 class FolderEventBox(ImageEventBox):
 

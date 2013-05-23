@@ -1,5 +1,5 @@
-from application_store.application_store_model import ApplicationStoreModel
-from application_store.application_store_view import ApplicationStoreView
+from EosAppStore.application_store.application_store_model import ApplicationStoreModel
+from EosAppStore.application_store.application_store_view import ApplicationStoreView
 
 class ApplicationStorePresenter():
     def __init__(self, view = ApplicationStoreView(), model = ApplicationStoreModel()):

@@ -1,7 +1,7 @@
 from Xlib import Xatom, display, X, protocol, Xutil
 
-from eos_log import log
-from osapps.display_provider import DisplayProvider
+from EosAppStore.eos_log import log
+from EosAppStore.osapps.display_provider import DisplayProvider
 
 class XlibHelper():
     # Xlib atom names

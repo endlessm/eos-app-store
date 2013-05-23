@@ -2,7 +2,7 @@ from app_datastore import AppDatastore
 from file_app_associator import FileAppAssociator
 from app_launcher import AppLauncher
 
-from eos_log import log
+from EosAppStore.eos_log import log
 
 class AppUtil(object):
     def __init__(self, datastore=AppDatastore(), launcher=AppLauncher, 

@@ -1,5 +1,5 @@
 from gi.repository import GObject
-from shortcut.desktop_shortcut import DesktopShortcut
+from EosAppStore.shortcut.desktop_shortcut import DesktopShortcut
 
 class SeparatorShortcut(DesktopShortcut):
     __gsignals__ = {

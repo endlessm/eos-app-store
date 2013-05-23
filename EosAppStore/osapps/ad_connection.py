@@ -4,7 +4,7 @@ import sys
 import json
 import socket
 
-from eos_log import log
+from EosAppStore.eos_log import log
 
 class AdConnection():
 	ENDPOINT_SERVER = "http://localhost:3000"

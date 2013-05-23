@@ -1,4 +1,4 @@
-from desktop_files.desktop_file_model import DesktopFileModel
+from EosAppStore.desktop_files.desktop_file_model import DesktopFileModel
 import os
 
 class FolderModel(DesktopFileModel):

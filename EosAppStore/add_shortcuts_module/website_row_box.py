@@ -1,8 +1,8 @@
 from gi.repository import Gtk
 from gi.repository import Gdk
 from gi.repository import GdkPixbuf
-from osapps.desktop_preferences_datastore import DesktopPreferencesDatastore
-from eos_util import image_util 
+from EosAppStore.osapps.desktop_preferences_datastore import DesktopPreferencesDatastore
+from EosAppStore.eos_util import image_util 
 import cgi
 
 class WebsiteRowBox(Gtk.EventBox):

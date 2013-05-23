@@ -4,7 +4,7 @@ import json
 import copy
 from desktop_filetype_util import DesktopFiletypeUtil
 from launchable_app import LaunchableApp
-from eos_log import log
+from EosAppStore.eos_log import log
 
 class AppDatastore(object):
         

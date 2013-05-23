@@ -1,6 +1,6 @@
 from subprocess import PIPE, Popen, call
 from shutil import copyfile
-from eos_log import log
+from EosAppStore.eos_log import log
 
 class OsUtil(object):
     VERSION_COMMAND = ["bash", "-c", "dpkg -s eos-app-store | grep ^Version: | awk \'{print $2}\'"] #| "

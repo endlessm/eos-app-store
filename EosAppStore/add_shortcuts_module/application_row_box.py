@@ -1,8 +1,8 @@
 from gi.repository import Gtk
-from osapps.desktop_preferences_datastore import DesktopPreferencesDatastore
-from eos_util import image_util
+from EosAppStore.osapps.desktop_preferences_datastore import DesktopPreferencesDatastore
+from EosAppStore.eos_util import image_util
 from xdg.DesktopEntry import DesktopEntry
-from desktop_files.desktop_file_model import DesktopFileModel
+from EosAppStore.desktop_files.desktop_file_model import DesktopFileModel
 
 class ApplicationRowBox(Gtk.EventBox):
     def __init__(self, item=None, parent=None, presenter=None, desktop_preference_class = DesktopPreferencesDatastore):

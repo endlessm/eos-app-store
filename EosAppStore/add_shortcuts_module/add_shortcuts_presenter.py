@@ -1,17 +1,17 @@
 import os
 import urllib2
-from eos_util import image_util
+from EosAppStore.eos_util import image_util
 import sys
 import gettext
 
 from add_shortcuts_model import AddShortcutsModel
-from osapps.app_shortcut import AppShortcut
-from osapps.desktop_locale_datastore import DesktopLocaleDatastore
-from application_store.application_store_model import ApplicationStoreModel
+from EosAppStore.osapps.app_shortcut import AppShortcut
+from EosAppStore.osapps.desktop_locale_datastore import DesktopLocaleDatastore
+from EosAppStore.application_store.application_store_model import ApplicationStoreModel
 from shortcut_category import ShortcutCategory
-from desktop_files.link_model import LinkModel
-from application_store.recommended_sites_provider import RecommendedSitesProvider
-from add_shortcuts_module.name_format_util import NameFormatUtil
+from EosAppStore.desktop_files.link_model import LinkModel
+from EosAppStore.application_store.recommended_sites_provider import RecommendedSitesProvider
+from EosAppStore.add_shortcuts_module.name_format_util import NameFormatUtil
 
 gettext.install('endless_desktop', '/usr/share/locale', unicode = True, names=['ngettext'])
 

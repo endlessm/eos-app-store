@@ -1,7 +1,7 @@
 import os
-from eos_util.locale_util import LocaleUtil
-from desktop_files.desktop_file_utilities import DesktopFileUtilities
-from application_store.installed_applications_model import InstalledApplicationsModel
+from EosAppStore.eos_util.locale_util import LocaleUtil
+from EosAppStore.desktop_files.desktop_file_utilities import DesktopFileUtilities
+from EosAppStore.application_store.installed_applications_model import InstalledApplicationsModel
 
 class RecommendedSitesProvider(object):
     '''

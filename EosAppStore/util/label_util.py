@@ -1,5 +1,5 @@
 import string
-from desktop.desktop_layout import DesktopLayout
+from EosAppStore.desktop.desktop_layout import DesktopLayout
 
 def wrap_text(widget, text):
     return_text = text

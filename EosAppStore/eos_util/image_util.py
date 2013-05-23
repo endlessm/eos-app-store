@@ -1,7 +1,7 @@
 import os
 from gi.repository.GdkPixbuf import Pixbuf
 
-from eos_log import log
+from EosAppStore.eos_log import log
 
 SHARED_DATA_DIRECTORY = os.environ["XDG_DATA_DIRS"].split(":")[0] if os.environ["XDG_DATA_DIRS"] else "/usr/share"
 

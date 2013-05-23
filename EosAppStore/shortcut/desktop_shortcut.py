@@ -4,10 +4,10 @@ import gc
 import string
 from gi.repository import GObject
 
-from util.shadowed_label_box import ShadowedLabelBox
-from eos_widgets.image_eventbox import ImageEventBox
-from desktop.desktop_layout import DesktopLayout
-from util import label_util
+from EosAppStore.util.shadowed_label_box import ShadowedLabelBox
+from EosAppStore.eos_widgets.image_eventbox import ImageEventBox
+from EosAppStore.desktop.desktop_layout import DesktopLayout
+from EosAppStore.util import label_util
 
 class DesktopShortcut(Gtk.Box):
     DND_TARGET_TYPE_TEXT = 80

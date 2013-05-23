@@ -1,5 +1,5 @@
 from gi.repository import Gtk
-from eos_widgets.abstract_notifier import AbstractNotifier
+from EosAppStore.eos_widgets.abstract_notifier import AbstractNotifier
 from rename_widget_constants import RenameWidgetConstants
 
 class RenameWidgetView(AbstractNotifier):

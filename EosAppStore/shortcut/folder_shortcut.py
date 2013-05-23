@@ -1,7 +1,7 @@
-from shortcut.desktop_shortcut import DesktopShortcut
-from shortcut.application_shortcut import ApplicationShortcut
-from eos_util import image_util
-from eos_util.image import Image
+from EosAppStore.shortcut.desktop_shortcut import DesktopShortcut
+from EosAppStore.shortcut.application_shortcut import ApplicationShortcut
+from EosAppStore.eos_util import image_util
+from EosAppStore.eos_util.image import Image
 from gi.repository import Gtk
 from gi.repository import GObject
 

@@ -1,5 +1,5 @@
 import uuid
-from osapps.shortcuts import Shortcuts
+from EosAppStore.osapps.shortcuts import Shortcuts
 
 class AppShortcut(object):
 

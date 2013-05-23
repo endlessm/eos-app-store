@@ -1,7 +1,7 @@
 from gi.repository import Gtk
 import cairo
-from eos_widgets.image_eventbox import ImageEventBox
-from eos_util.image import Image
+from EosAppStore.eos_widgets.image_eventbox import ImageEventBox
+from EosAppStore.eos_util.image import Image
 
 class ShortcutCategoryBox(Gtk.EventBox):
     def __init__(self, model, parent, width, presenter):

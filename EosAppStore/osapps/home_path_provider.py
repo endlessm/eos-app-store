@@ -1,4 +1,4 @@
-from osapps.os_util import OsUtil
+from EosAppStore.osapps.os_util import OsUtil
 import os.path
 
 class HomePathProvider():

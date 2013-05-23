@@ -1,9 +1,9 @@
 import os
-from application_store.application_store_errors import ApplicationStoreWrappedException
-from application_store.categories_model import CategoriesModel
-from application_store.installed_applications_model import InstalledApplicationsModel
-from desktop_files.desktop_file_utilities import DesktopFileUtilities
-from eos_log import log
+from EosAppStore.application_store.application_store_errors import ApplicationStoreWrappedException
+from EosAppStore.application_store.categories_model import CategoriesModel
+from EosAppStore.application_store.installed_applications_model import InstalledApplicationsModel
+from EosAppStore.desktop_files.desktop_file_utilities import DesktopFileUtilities
+from EosAppStore.eos_log import log
 
 class ApplicationStoreModel():
     BASEPATH = os.environ["XDG_DATA_DIRS"].split(":")[0] if os.environ["XDG_DATA_DIRS"] else "/usr/share"

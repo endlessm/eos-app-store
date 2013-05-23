@@ -1,8 +1,8 @@
 from gi.repository import Gtk
 from gi.repository import GdkPixbuf
 import cairo
-from eos_util import image_util
-from osapps.desktop_preferences_datastore import DesktopPreferencesDatastore
+from EosAppStore.eos_util import image_util
+from EosAppStore.osapps.desktop_preferences_datastore import DesktopPreferencesDatastore
 from application_row_box import ApplicationRowBox
 
 class AddApplicationBox(Gtk.Box):

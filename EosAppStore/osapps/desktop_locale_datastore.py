@@ -5,8 +5,8 @@ import shutil
 import uuid
 from shortcuts import Shortcuts
 
-from eos_log import log
-from eos_util.locale_util import LocaleUtil
+from EosAppStore.eos_log import log
+from EosAppStore.eos_util.locale_util import LocaleUtil
 
 
 class DesktopLocaleDatastore(object):

@@ -3,8 +3,8 @@ from gi.repository import Gdk
 from gi.repository import PangoCairo
 import cairo
 
-from util.rename_widget import RenameWidget
-from desktop.desktop_layout import DesktopLayout
+from EosAppStore.util.rename_widget import RenameWidget
+from EosAppStore.desktop.desktop_layout import DesktopLayout
 
 class ShadowedLabelBox(Gtk.EventBox):
     def __init__(self, label):

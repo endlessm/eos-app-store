@@ -1,6 +1,6 @@
 from os_util import OsUtil
 from xdg.DesktopEntry import DesktopEntry
-from eos_util.locale_util import LocaleUtil
+from EosAppStore.eos_util.locale_util import LocaleUtil
 from xlib_helper import XlibHelper
 import os
 

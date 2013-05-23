@@ -1,8 +1,8 @@
 import os
 from xdg.DesktopEntry import DesktopEntry
-from desktop_files.application_model import ApplicationModel
-from desktop_files.link_model import LinkModel
-from desktop_files.folder_model import FolderModel
+from EosAppStore.desktop_files.application_model import ApplicationModel
+from EosAppStore.desktop_files.link_model import LinkModel
+from EosAppStore.desktop_files.folder_model import FolderModel
 
 
 class DesktopFileUtilities:

@@ -2,7 +2,7 @@ from dbus.glib import DBusGMainLoop
 import dbus
 import re
 
-from eos_log import log
+from EosAppStore.eos_log import log
 
 class DbusUtils:
     HAL_DBUS_PATH = 'org.freedesktop.Hal'

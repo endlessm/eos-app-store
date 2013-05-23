@@ -1,4 +1,4 @@
-from application_store.category_model import CategoryModel
+from EosAppStore.application_store.category_model import CategoryModel
 
 class CategoriesModel():
     def __init__(self):

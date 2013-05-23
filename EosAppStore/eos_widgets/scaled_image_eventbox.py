@@ -1,5 +1,5 @@
 from gi.repository import Gtk
-from eos_widgets.image_eventbox import ImageEventBox
+from EosAppStore.eos_widgets.image_eventbox import ImageEventBox
 
 class ImageEventBox(ImageEventBox):
     def __init__(self, images):

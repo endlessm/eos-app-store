@@ -1,6 +1,6 @@
 import os
 import json
-from eos_log import log
+from EosAppStore.eos_log import log
 from gi.repository import GLib
 from gi.repository import Gio
 

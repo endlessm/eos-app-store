@@ -1,6 +1,6 @@
 import transparent_window
 from gi.repository import Gtk
-from osapps.desktop_preferences_datastore import DesktopPreferencesDatastore
+from EosAppStore.osapps.desktop_preferences_datastore import DesktopPreferencesDatastore
 
 # This type of transparent window extracts the background from the
 # underlying desktop background, ignoring any decorations
