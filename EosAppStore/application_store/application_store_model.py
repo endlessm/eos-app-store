@@ -3,14 +3,12 @@ from EosAppStore.application_store.application_store_errors import ApplicationSt
 from EosAppStore.application_store.categories_model import CategoriesModel
 from EosAppStore.application_store.installed_applications_model import InstalledApplicationsModel
 from EosAppStore.desktop_files.desktop_file_utilities import DesktopFileUtilities
+from EosAppStore.eos_util import path_util
 from EosAppStore.eos_log import log
 
 class ApplicationStoreModel():
-    BASEPATH = os.environ["XDG_DATA_DIRS"].split(":")[0] if os.environ["XDG_DATA_DIRS"] else "/usr/share"
-    DEFAULT_APP_STORE_DIRECTORY = BASEPATH + '/applications'
-    EOS_APP_PREFIX = 'eos-app-'
 
-    def __init__(self, directory=DEFAULT_APP_STORE_DIRECTORY, installed_apps_dir=os.path.expanduser("~/.endlessm"), installed_applications_model = InstalledApplicationsModel()):
+    def __init__(self, directory=path_util.DEFAULT_APP_STORE_DIRECTORY, installed_apps_dir=os.path.expanduser("~/.endlessm"), installed_applications_model = InstalledApplicationsModel()):
         self._base_dir = directory
         self._current_category = None
         self._installed_applications_model = installed_applications_model
@@ -35,7 +33,7 @@ class ApplicationStoreModel():
         try:
             for desktop_filename in files_model.get_desktop_files(self._base_dir):                    
                 desktop_file_path = os.path.join(self._base_dir, desktop_filename)
-                if desktop_filename.startswith(self.EOS_APP_PREFIX) and not self._installed_applications_model.is_installed(desktop_filename):
+                if desktop_filename.startswith(path_util.EOS_APP_PREFIX) and not self._installed_applications_model.is_installed(desktop_filename):
                     application = files_model.create_model(desktop_file_path, desktop_filename)
                     categories.add_application(application)
         except OSError as e:

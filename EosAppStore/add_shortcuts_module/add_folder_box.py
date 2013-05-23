@@ -6,15 +6,13 @@ import os
 from EosAppStore.desktop.desktop_layout import DesktopLayout
 from EosAppStore.eos_widgets.image_eventbox import ImageEventBox
 from EosAppStore.eos_util.image import Image
+from EosAppStore.eos_util import path_util
 from EosAppStore.eos_util import screen_util
 from EosAppStore.osapps.desktop_preferences_datastore import DesktopPreferencesDatastore
 
 gettext.install('endless_desktop', '/usr/share/locale', unicode = True, names=['ngettext'])
 
 class AddFolderBox(Gtk.Box):
-    BASEPATH = os.environ["XDG_DATA_DIRS"].split(":")[0] if os.environ["XDG_DATA_DIRS"] else "/usr/share"
-    _FOLDER_ICON_PATH = BASEPATH + '/icons/EndlessOS/64x64/folders'
-
     def __init__(self, parent, add_remove_widget=None, desktop_preference_class = DesktopPreferencesDatastore):
         super(AddFolderBox, self).__init__(orientation=Gtk.Orientation.VERTICAL)
         self.set_homogeneous(True)
@@ -177,8 +175,8 @@ class AddFolderBox(Gtk.Box):
         
     def _fill_table(self):
         icons = []
-        files = self._get_folder_icons(self._FOLDER_ICON_PATH, suffix='')
-        self._append_icons(icons, files, self._FOLDER_ICON_PATH)
+        files = self._get_folder_icons(path_util.FOLDER_ICON_PATH, suffix='')
+        self._append_icons(icons, files, path_util.FOLDER_ICON_PATH)
         num_of_icons = len(icons)
         available_width = screen_util.get_width(self._parent) - self._parent.add_button_box_width - self._parent.tree_view_width
         columns = int(available_width/120)   # shold this be a fixed number like 5 as in pdf?

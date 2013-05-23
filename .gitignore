@@ -9,3 +9,4 @@ install-sh
 missing
 py-compile
 stamp-h1
+path_util.py

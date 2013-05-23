@@ -1,14 +1,12 @@
 from EosAppStore.desktop_files.desktop_file_model import DesktopFileModel
+from EosAppStore.eos_util import path_util
 import os
 
 class FolderModel(DesktopFileModel):
     
-    BASEPATH = os.environ["XDG_DATA_DIRS"].split(":")[0] if os.environ["XDG_DATA_DIRS"] else "/usr/share"
-    FOLDER_ICON_PATH = BASEPATH + '/icons/EndlessOS/64x64/folders'
-    
     def __init__(self, model_id, desktop_file_path, name=None, comment=None, icon=None, class_name=None):
         super(FolderModel, self).__init__(model_id, desktop_file_path, name, comment, icon, class_name,
-                                          icon_path=self.FOLDER_ICON_PATH)
+                                          icon_path=path_util.FOLDER_ICON_PATH)
 
     def install(self):
         os.mkdir(self.file_path())

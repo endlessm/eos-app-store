@@ -1,11 +1,7 @@
 import os
 from gi.repository.GdkPixbuf import Pixbuf
-
+from EosAppStore.eos_util import path_util
 from EosAppStore.eos_log import log
-
-SHARED_DATA_DIRECTORY = os.environ["XDG_DATA_DIRS"].split(":")[0] if os.environ["XDG_DATA_DIRS"] else "/usr/share"
-
-SHARED_IMAGES_DIRECTORY = os.path.join (SHARED_DATA_DIRECTORY,"eos-app-store/images")
 
 def load_pixbuf(image_name):
     try:
@@ -15,7 +11,7 @@ def load_pixbuf(image_name):
         return Pixbuf.new_from_file(image_path('generic-app.png'))
 
 def image_path(image_name):
-    path = os.path.abspath(os.path.join(SHARED_IMAGES_DIRECTORY, image_name))
+    path = os.path.abspath(os.path.join(path_util.SHARED_IMAGES_DIRECTORY, image_name))
     return path
 
 def scrub_image_path(path):
