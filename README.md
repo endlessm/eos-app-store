@@ -3,7 +3,7 @@ Endless OS Application Store
 
 To install to /usr/share:
 ```
-./autogen.sh --datadir=/usr/share
+./autogen.sh --prefix=/usr
 make
 make install
 ```
