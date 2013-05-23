@@ -1,0 +1,7 @@
+eos-app-store.debhelper.log
+eos-app-store.substvars
+files
+stamp-autotools
+stamp-autotools-files
+stamp-makefile-build
+stamp-makefile-install
