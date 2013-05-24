@@ -1,0 +1,93 @@
+# Translations for the Endless OS Browser
+# Copyright (C) 2012 Endless Mobile
+# This file is distributed under the same license as the Endless OS Desktop package.
+# Automatically generated, 2012
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: dev 1\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2013-02-19 20:20-0800\n"
+"PO-Revision-Date: 2012-05-31 11:54-0500\n"
+"Last-Translator: Automatically generated\n"
+"Language-Team: none\n"
+"Language: pt_BR\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n > 1);\n"
+
+#: src/notification_panel/battery_view.py:147
+msgid " remaining"
+msgstr " restante"
+
+#: src/notification_panel/battery_view.py:145
+msgid " until full"
+msgstr " até carga completa"
+
+#: src/add_shortcuts_module/add_folder_box.py:38
+msgid "1. NAME YOUR FOLDER"
+msgstr "1. O NOME DO SEU FOLDER"
+
+#: src/add_shortcuts_module/add_folder_box.py:40
+msgid "2. PICK A SYMBOL"
+msgstr "2. ESCOLHA UM SÍMBOLO"
+
+#: src/add_shortcuts_module/add_shortcuts_presenter.py:32
+#: src/add_shortcuts_module/add_shortcuts_view.py:126
+#: src/add_shortcuts_module/add_shortcuts_model.py:10
+msgid "APP"
+msgstr "APLICATIVO"
+
+#: src/notification_panel/battery_view.py:93
+#: src/notification_panel/battery_view.py:94
+msgid "Battery Info"
+msgstr "Informações sobre bateria"
+
+#: src/shortcut/add_remove_shortcut.py:83
+msgid "Delete"
+msgstr "Excluir"
+
+#: src/add_shortcuts_module/add_shortcuts_model.py:20
+msgid "FOLDER"
+msgstr "PASTA"
+
+#: src/shortcut/add_remove_shortcut.py:99
+#: src/shortcut/add_remove_shortcut.py:107
+#: src/shortcut/add_remove_shortcut.py:115
+#: src/shortcut/add_remove_shortcut.py:131
+msgid "Files"
+msgstr "Files"
+
+#: src/search/search_box.py:26
+msgid "Google or type website"
+msgstr "Busque ou digite o site"
+
+#: src/notification_panel/battery_view.py:72
+msgid "Power Settings"
+msgstr "Configurações de energia"
+
+#: src/add_shortcuts_module/add_website_box.py:29
+msgid "TYPE WEBSITE"
+msgstr "DIGITE SITE"
+
+#: src/removal_module/delete_not_possible_popup.py:46
+msgid ""
+"To delete a folder you have to\n"
+"remove all of the items inside\n"
+"of it first.\n"
+"\n"
+"We are just trying to\n"
+"keep you safe."
+msgstr ""
+"Para apagar uma pasta que você\n"
+"tem que remover todos os itens\n"
+"dentro do primeiro.\n"
+"\n"
+"Estamos apenas tentando mantê-lo\n"
+"seguro."
+
+#: src/add_shortcuts_module/add_shortcuts_view.py:128
+#: src/add_shortcuts_module/add_shortcuts_model.py:19
+msgid "WEB"
+msgstr "SITES"
