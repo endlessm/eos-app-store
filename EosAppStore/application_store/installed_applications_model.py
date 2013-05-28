@@ -46,3 +46,15 @@ class InstalledApplicationsModel():
     def is_installed(self, application):
         self._load_data()
         return application in self._installed_applications
+
+    def create_folder(self, folder_name):
+        self._load_data()
+        if not self.is_installed(folder_name):
+            value = self._settings.get_value(self.ICON_GRID_LAYOUT_SETTING)
+            layout = value.unpack()
+            entries = layout[""]
+            entries.append(folder_name)
+            layout[""] = entries
+            layout[folder_name] = []
+            self._settings.set_value(self.ICON_GRID_LAYOUT_SETTING, GLib.Variant("a{sas}", layout))
+            self._settings.sync()
