@@ -111,7 +111,7 @@ class AddShortcutsView(Gtk.ApplicationWindow):
         Gtk.ApplicationWindow.destroy(self)
         
     def create_folder(self, folder_name, image_file):
-        self._presenter.create_directory(folder_name, image_file)
+        self._presenter.install_folder(folder_name);
 
     def install_app(self, application_model):
         shortcut = self._presenter.build_shortcut_from_application_model(application_model)

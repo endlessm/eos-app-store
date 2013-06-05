@@ -88,29 +88,7 @@ class AddFolderBox(Gtk.Box):
             Image.from_path(image_path),
             )
 
-    def _display_plus(self, widget, event, add_remove_widget):
-        images_tuple = widget._images
-        images_list = list(images_tuple)
-        images_list.append(Image.from_name("add_folder_icon.png"))
-        widget.set_images(tuple(images_list))
-        widget.hide()
-        widget.show()
-        add_remove_widget._icon_event_box.set_images(images_tuple)
-        add_remove_widget._label.set_text(self._text_entry.get_text())
-        add_remove_widget.hide()
-        add_remove_widget.show()
-
-    def _remove_plus(self, widget, event, add_remove_widget):
-        images = list(widget._images)
-        widget.set_images(tuple(images[:-1]))
-        widget.hide()
-        widget.show()
-        add_remove_widget._icon_event_box.set_images(add_remove_widget.get_images('normal'))
-        add_remove_widget._label.set_text('')
-        add_remove_widget.hide()
-        add_remove_widget.show()
-
-    def _create_folder(self, widget, event, image_file):
+    def _create_folder(self, widget, image_file):
         if self._text_entry.get_text() != 'Untitled' and self._text_entry.get_text():
             self._parent.create_folder(self._text_entry.get_text(), image_file)
             self._parent.destroy(None, None)
@@ -159,37 +137,31 @@ class AddFolderBox(Gtk.Box):
     def _append_icons(self, icons, files, path):
         for fi in files:
             image_file = os.path.join(path, fi)
-            # ImageEventBox is currently broken,
-            # so bypassing to use a Gtk.Image directly
-            # image_box = ImageEventBox(None)
             image_box = Gtk.Image()
             image_box.set_size_request(DesktopLayout.ICON_WIDTH, DesktopLayout.ICON_HEIGHT)
-            # image_box.set_images(self.get_images(image_file))
             image_box.set_from_file(image_file)
-
-            image_box.connect("enter-notify-event", self._display_plus, self._parent._add_remove_widget)
-            image_box.connect("leave-notify-event", self._remove_plus, self._parent._add_remove_widget)
-            image_box.connect("button-release-event", self._create_folder, image_file)
-            image_box.show()
-            icons.append(image_box)
+            button = Gtk.Button();
+            button.set_image(image_box);
+            button.connect("clicked", self._create_folder, image_file)
+            button.show();
+            icons.append(button)
         
     def _fill_table(self):
         icons = []
         files = self._get_folder_icons(path_util.FOLDER_ICON_PATH, suffix='')
         self._append_icons(icons, files, path_util.FOLDER_ICON_PATH)
         num_of_icons = len(icons)
-        available_width = screen_util.get_width(self._parent) - self._parent.add_button_box_width - self._parent.tree_view_width
-        columns = int(available_width/120)   # shold this be a fixed number like 5 as in pdf?
+        columns = 7;
         rows = int(num_of_icons/columns) + 1
-        self._table = Gtk.Table(rows, columns)
+        self._table = Gtk.Grid(row_homogeneous=True, column_homogeneous=True, column_spacing=25, row_spacing=25)
         self._table.show()
-        col = row = 0
-
+        col = 0
+        row = -1
         for num in range(len(icons)):
             if (num)%columns == 0:
                 col = 0
                 row = row + 1
-            self._table.attach(icons[num], col, col+1, row, row+1, ypadding=25, xpadding=25)
+            self._table.attach(icons[num], col, row, 1, 1);
             col = col + 1
 
     def _on_show(self, widget):
