@@ -7,8 +7,10 @@ Build-Depends: cdbs (>= 0.4.90~),
                autotools-dev,
                debhelper (>= 0.7),
                gnome-pkg-tools,
-               pkg-config
-               python (>= 2.6.6-3~),
+               gobject-introspection,
+               libgtk-3-dev,
+               pkg-config,
+               python (>= 2.6.6-3~)
 X-Python-Version: >= 2.4
 Standards-Version: 3.9.2
 Homepage: http://www.endlessm.com
