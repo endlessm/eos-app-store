@@ -1,4 +1,4 @@
-SUBDIRS = EosAppStore images
+SUBDIRS = data EosAppStore images
 
 bin_SCRIPTS = eos-app-store
 
