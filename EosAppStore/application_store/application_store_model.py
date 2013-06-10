@@ -27,8 +27,8 @@ class ApplicationStoreModel():
         self._installed_applications_model.install(application.id())
         self._refresh()
 
-    def create_folder(self, folder_name):
-        self._installed_applications_model.create_folder(folder_name)
+    def create_folder(self, folder_name, icon_name):
+        self._installed_applications_model.create_folder(folder_name, icon_name)
 
     def _refresh(self):
         categories = CategoriesModel()
