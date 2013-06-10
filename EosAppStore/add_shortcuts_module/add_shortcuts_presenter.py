@@ -95,8 +95,8 @@ class AddShortcutsPresenter():
     def install_app(self, application_model):
         self._app_store_model.install(application_model)
 
-    def install_folder(self, folder_name):
-        self._app_store_model.create_folder(folder_name);
+    def install_folder(self, folder_name, icon_name):
+        self._app_store_model.create_folder(folder_name, icon_name);
 
     def build_shortcut_from_application_model(self, app_model):
         try:

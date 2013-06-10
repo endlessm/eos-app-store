@@ -88,9 +88,9 @@ class AddFolderBox(Gtk.Box):
             Image.from_path(image_path),
             )
 
-    def _create_folder(self, widget, image_file):
+    def _create_folder(self, widget, icon_name):
         if self._text_entry.get_text() != 'Untitled' and self._text_entry.get_text():
-            self._parent.create_folder(self._text_entry.get_text(), image_file)
+            self._parent.create_folder(self._text_entry.get_text(), icon_name)
             self._parent.destroy(None, None)
         else:
             print 'FOLDER MUST HAVE A NAME!'
@@ -142,7 +142,8 @@ class AddFolderBox(Gtk.Box):
             image_box.set_from_file(image_file)
             button = Gtk.Button();
             button.set_image(image_box);
-            button.connect("clicked", self._create_folder, image_file)
+            icon_name = os.path.splitext(fi)[0]
+            button.connect("clicked", self._create_folder, icon_name)
             button.show();
             icons.append(button)
         

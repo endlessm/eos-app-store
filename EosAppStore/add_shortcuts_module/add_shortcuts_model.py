@@ -7,7 +7,7 @@ gettext.install('endless_desktop', '/usr/share/locale', unicode = True, names=['
 
 class AddShortcutsModel():
     def __init__(self):
-        self._DEFAULT_ICON_PATH = '/usr/share/endlessm/icons/folders'
+        self._DEFAULT_ICON_PATH = '/usr/share/endlessm/icons/categories'
 
     def get_category_data(self):
         data = []
