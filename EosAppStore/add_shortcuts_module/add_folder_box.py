@@ -140,11 +140,11 @@ class AddFolderBox(Gtk.Box):
             image_box = Gtk.Image()
             image_box.set_size_request(DesktopLayout.ICON_WIDTH, DesktopLayout.ICON_HEIGHT)
             image_box.set_from_file(image_file)
-            button = Gtk.Button();
-            button.set_image(image_box);
+            button = Gtk.Button()
+            button.set_image(image_box)
             icon_name = os.path.splitext(fi)[0]
             button.connect("clicked", self._create_folder, icon_name)
-            button.show();
+            button.show()
             icons.append(button)
         
     def _fill_table(self):
@@ -152,7 +152,7 @@ class AddFolderBox(Gtk.Box):
         files = self._get_folder_icons(path_util.FOLDER_ICON_PATH, suffix='')
         self._append_icons(icons, files, path_util.FOLDER_ICON_PATH)
         num_of_icons = len(icons)
-        columns = 7;
+        columns = 7
         rows = int(num_of_icons/columns) + 1
         self._table = Gtk.Grid(row_homogeneous=True, column_homogeneous=True, column_spacing=25, row_spacing=25)
         self._table.show()
@@ -162,7 +162,7 @@ class AddFolderBox(Gtk.Box):
             if (num)%columns == 0:
                 col = 0
                 row = row + 1
-            self._table.attach(icons[num], col, row, 1, 1);
+            self._table.attach(icons[num], col, row, 1, 1)
             col = col + 1
 
     def _on_show(self, widget):
