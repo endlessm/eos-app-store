@@ -142,6 +142,7 @@ class AddFolderBox(Gtk.Box):
             image_box.set_from_file(image_file)
             button = Gtk.Button()
             button.set_image(image_box)
+            button.set_relief(Gtk.ReliefStyle.NONE)
             icon_name = os.path.splitext(fi)[0]
             button.connect("clicked", self._create_folder, icon_name)
             button.show()
@@ -154,7 +155,7 @@ class AddFolderBox(Gtk.Box):
         num_of_icons = len(icons)
         columns = 7
         rows = int(num_of_icons/columns) + 1
-        self._table = Gtk.Grid(row_homogeneous=True, column_homogeneous=True, column_spacing=25, row_spacing=25)
+        self._table = Gtk.Grid(row_homogeneous=True, column_homogeneous=True, column_spacing=40, row_spacing=40)
         self._table.show()
         col = 0
         row = -1
