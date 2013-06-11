@@ -9,12 +9,15 @@ AM_INIT_AUTOMAKE([1.9 no-dist-gzip dist-xz foreign])
 
 AM_PATH_PYTHON_VERSION(2.7, 2.7.0, 2.6, 2.6.0, 2.5, 2.5.0, 2.4, 2.4.0)
 
+IT_PROG_INTLTOOL(0.40.0)
+
 PKG_CHECK_MODULES(EOS_APP_STORE,
                   gio-2.0
                   gtk+-3.0)
 
 AC_CONFIG_FILES([
         Makefile
+        data/Makefile
         images/Makefile
         EosAppStore/Makefile
         EosAppStore/add_shortcuts_module/Makefile
@@ -29,6 +32,7 @@ AC_CONFIG_FILES([
         EosAppStore/removal_module/Makefile
         EosAppStore/shortcut/Makefile
         EosAppStore/util/Makefile
+        po/Makefile.in
         ])
 
 AC_OUTPUT
