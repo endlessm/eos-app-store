@@ -11,6 +11,6 @@ EOS_LINK_PREFIX = 'eos-link-'
 
 APP_ICON_PATH = os.path.join(DATA_DIR, 'icons/EndlessOS/64x64/apps')
 MINI_ICON_PATH = os.path.join(DATA_DIR, 'icons/EndlessOS/21x21/apps')
-FOLDER_ICON_PATH = os.path.join(DATA_DIR, 'icons/EndlessOS/64x64/folders')
+FOLDER_ICON_PATH = os.path.join(DATA_DIR, 'icons/EndlessOS/64x64/categories')
 
 SHARED_IMAGES_DIRECTORY = os.path.join(PKG_DATA_DIR, 'images')

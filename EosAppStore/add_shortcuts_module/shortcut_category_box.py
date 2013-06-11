@@ -80,7 +80,7 @@ class ShortcutCategoryBox(Gtk.EventBox):
             box.set_visible_window(False)
             markup = self._set_markup_and_separators(section, image_start, image_end, box)
             vbox = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
-            vbox.set_homogeneous(False);
+            vbox.set_homogeneous(False)
             hbox = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL)
             label = Gtk.Label()
             label.set_markup(markup)
