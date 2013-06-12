@@ -2,6 +2,12 @@ eos-app-store (1.1.1~dev5) unstable; urgency=low
 
   * Updating version to 1.1.1~dev5
 
+ -- Roddy Shuler <roddy@endlessm.com>  Wed, 12 Jun 2013 13:59:26 -0500
+
+eos-app-store (1.1.1~dev5) unstable; urgency=low
+
+  * Updating version to 1.1.1~dev5
+
  -- Roddy Shuler <roddy@endlessm.com>  Wed, 12 Jun 2013 13:35:04 -0500
 
 eos-app-store (1.1.1~dev5) unstable; urgency=low
