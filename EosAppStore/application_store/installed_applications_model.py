@@ -7,6 +7,8 @@ from gi.repository import Gio
 class InstalledApplicationsModel():
     EOS_SHELL_SCHEMA = 'org.gnome.shell'
     ICON_GRID_LAYOUT_SETTING = 'icon-grid-layout'
+    USER_DESKTOP_DIRECTORY_HOME = \
+        os.path.expanduser('~/.local/share/desktop-directories')
 
     def __init__(self, filename = 'installed_applications.json'):
         self._installed_applications = []
@@ -47,14 +49,36 @@ class InstalledApplicationsModel():
         self._load_data()
         return application in self._installed_applications
 
-    def create_folder(self, folder_name):
+    def create_folder(self, folder_name, icon_name):
         self._load_data()
-        if not self.is_installed(folder_name):
-            value = self._settings.get_value(self.ICON_GRID_LAYOUT_SETTING)
-            layout = value.unpack()
-            entries = layout[""]
-            entries.append(folder_name)
-            layout[""] = entries
-            layout[folder_name] = []
-            self._settings.set_value(self.ICON_GRID_LAYOUT_SETTING, GLib.Variant("a{sas}", layout))
-            self._settings.sync()
+        index = 0
+        directory_name = self._directory_name(index)
+        # Check in sequence for a unique .directory file name not in use
+        while self.is_installed(directory_name):
+            index += 1
+            directory_name = self._directory_name(index)
+        self._generate_directory_file(directory_name, folder_name, icon_name)
+        value = self._settings.get_value(self.ICON_GRID_LAYOUT_SETTING)
+        layout = value.unpack()
+        entries = layout[""]
+        entries.append(directory_name)
+        layout[""] = entries
+        layout[directory_name] = []
+        self._settings.set_value(self.ICON_GRID_LAYOUT_SETTING, GLib.Variant("a{sas}", layout))
+        self._settings.sync()
+
+    def _directory_name(self, index):
+        return 'userdir-eos-folder-' + str(index) + '.directory'
+
+    def _generate_directory_file(self, directory_name, folder_name, icon_name):
+        if not os.path.exists(self.USER_DESKTOP_DIRECTORY_HOME):
+            os.makedirs(self.USER_DESKTOP_DIRECTORY_HOME)
+        directory_path = os.path.join(self.USER_DESKTOP_DIRECTORY_HOME,
+                                      directory_name)
+        f = open(directory_path, 'w')
+        f.write('[Desktop Entry]\n')
+        f.write('Version=1.0\n')
+        f.write('Name=' + folder_name + '\n')
+        f.write('Type=Directory\n')
+        f.write('Icon=' + icon_name + '\n')
+        f.close()
