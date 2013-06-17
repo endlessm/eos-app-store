@@ -5,6 +5,8 @@ autom4te.cache
 config.*
 configure
 eos-app-store
+eos-fill-desktop
+eos-reset-desktop
 install-sh
 missing
 py-compile
