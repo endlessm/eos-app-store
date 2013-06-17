@@ -19,12 +19,12 @@ entries = layout['']
 
 files_model = DesktopFileUtilities()
 
-for desktop_filename in files_model.get_desktop_files(path_util.DEFAULT_APP_STORE_DIRECTORY):
+for desktop_filename in sorted(files_model.get_desktop_files(path_util.DEFAULT_APP_STORE_DIRECTORY)):
     if desktop_filename.startswith(path_util.EOS_APP_PREFIX):
         if not desktop_filename.startswith('eos-app-store'):
             entries.append(desktop_filename)
 
-for desktop_filename in files_model.get_desktop_files(path_util.DEFAULT_SITES_DIRECTORY):
+for desktop_filename in sorted(files_model.get_desktop_files(path_util.DEFAULT_SITES_DIRECTORY)):
     if desktop_filename.startswith(path_util.EOS_LINK_PREFIX):
         entries.append(desktop_filename)
 
