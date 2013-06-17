@@ -1,0 +1,16 @@
+#! @PYTHON@ @PYOPTIONS@
+# -*- python -*-
+# -*- coding: utf-8 -*-
+
+#!/usr/bin/python
+
+# Reset the desktop to the default installed apps and links
+
+from gi.repository import Gio
+
+EOS_SHELL_SCHEMA = 'org.gnome.shell'
+ICON_GRID_LAYOUT_SETTING = 'icon-grid-layout'
+
+settings = Gio.Settings.new(schema_id = EOS_SHELL_SCHEMA)
+settings.reset(ICON_GRID_LAYOUT_SETTING)
+settings.sync()

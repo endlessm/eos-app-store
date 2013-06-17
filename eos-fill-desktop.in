@@ -1,0 +1,33 @@
+#! @PYTHON@ @PYOPTIONS@
+# -*- python -*-
+# -*- coding: utf-8 -*-
+
+# Fill the desktop with all the apps and links from the app store
+
+from gi.repository import GLib
+from gi.repository import Gio
+from EosAppStore.eos_util import path_util
+from EosAppStore.desktop_files.desktop_file_utilities import DesktopFileUtilities
+
+EOS_SHELL_SCHEMA = 'org.gnome.shell'
+ICON_GRID_LAYOUT_SETTING = 'icon-grid-layout'
+
+settings = Gio.Settings.new(schema_id = EOS_SHELL_SCHEMA)
+value = settings.get_value(ICON_GRID_LAYOUT_SETTING)
+layout = value.unpack()
+entries = layout['']
+
+files_model = DesktopFileUtilities()
+
+for desktop_filename in sorted(files_model.get_desktop_files(path_util.DEFAULT_APP_STORE_DIRECTORY)):
+    if desktop_filename.startswith(path_util.EOS_APP_PREFIX):
+        if not desktop_filename.startswith('eos-app-store'):
+            entries.append(desktop_filename)
+
+for desktop_filename in sorted(files_model.get_desktop_files(path_util.DEFAULT_SITES_DIRECTORY)):
+    if desktop_filename.startswith(path_util.EOS_LINK_PREFIX):
+        entries.append(desktop_filename)
+
+layout[''] = entries
+settings.set_value(ICON_GRID_LAYOUT_SETTING, GLib.Variant('a{sas}', layout))
+settings.sync()
