@@ -23,6 +23,8 @@ class InstalledApplicationsModel():
         value = self._settings.get_value(self.ICON_GRID_LAYOUT_SETTING)
         layout = value.unpack()
         self._installed_applications = [item for sublist in layout.values() for item in sublist]
+        # Include eos-app-store as an installed application
+        self._installed_applications.append("eos-app-store.desktop")
 
     def installed_applications(self):
         self._load_data()
