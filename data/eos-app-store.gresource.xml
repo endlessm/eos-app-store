@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gresources>
+  <gresource prefix="/com/endlessm/appstore">
+    <file>eos-app-store.css</file>
+    <file compressed="true">eos-app-store-main-window.ui</file>
+  </gresource>
+</gresources>

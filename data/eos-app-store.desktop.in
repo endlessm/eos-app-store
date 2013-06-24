@@ -1,6 +1,0 @@
-[Desktop Entry]
-_Name=Add
-_Comment=Add applications to EOS
-Exec=eos-app-store
-Type=Application
-Icon=eos-app-store

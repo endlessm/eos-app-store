@@ -1,27 +1,14 @@
-SUBDIRS = data EosAppStore images po
+SUBDIRS = EosAppStore data
 
-bin_SCRIPTS = eos-app-store eos-fill-desktop eos-reset-desktop
+bin_SCRIPTS = eos-app-store
+
+do_subst = sed -e 's|@pkglibdir[@]|$(pkglibdir)|g' \
+               -e 's|@pkgdatadir[@]|$(pkgdatadir)|g' \
+               -e 's|@GJS_CONSOLE[@]|$(GJS_CONSOLE)|g'
 
 eos-app-store: eos-app-store.in Makefile
-	$(AM_V_GEN)sed -e s!\@PYTHON\@!@PYTHON@!	\
-	    -e s!\@PYOPTIONS\@!-OOt!			\
-	    -e s!\@DATADIR\@!${datadir}!		\
-	    < $< > $@
+	$(AM_V_GEN) $(do_subst) $< > $@
 	chmod +x $@
 
-eos-fill-desktop: eos-fill-desktop.in Makefile
-	$(AM_V_GEN)sed -e s!\@PYTHON\@!@PYTHON@!	\
-	    -e s!\@PYOPTIONS\@!-OOt!			\
-	    -e s!\@DATADIR\@!${datadir}!		\
-	    < $< > $@
-	chmod +x $@
-
-eos-reset-desktop: eos-reset-desktop.in Makefile
-	$(AM_V_GEN)sed -e s!\@PYTHON\@!@PYTHON@!	\
-	    -e s!\@PYOPTIONS\@!-OOt!			\
-	    -e s!\@DATADIR\@!${datadir}!		\
-	    < $< > $@
-	chmod +x $@
-
-CLEANFILES = eos-app-store eos-fill-desktop eos-reset-desktop
-EXTRA_DIST = eos-app-store.in eos-fill-desktop.in eos-reset-desktop.in
+CLEANFILES = eos-app-store
+EXTRA_DIST = eos-app-store.in

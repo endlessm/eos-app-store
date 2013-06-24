@@ -1,19 +1,22 @@
-SUBDIRS = \
-	add_shortcuts_module \
-	application_store \
-	desktop \
-	desktop_files \
-	eos_log \
-	eos_util \
-	eos_widgets \
-	folder \
-	osapps \
-	removal_module \
-	shortcut \
-	util
+jsdir = $(pkgdatadir)/js/
+dist_js_DATA = \
+	$(BUILT_SOURCES) \
+	appStoreWindow.js \
+	appStore.js \
+	builder.js \
+	frameClock.js \
+	main.js \
+	params.js \
+	$(NULL)
 
-appdir = $(pythondir)/EosAppStore
-app_PYTHON = \
-	__init__.py \
-	app_store.py \
+do_subst = sed -e 's|@pkgdatadir[@]|$(pkgdatadir)|g'
+path.js: Makefile path.js.in
+	$(AM_V_GEN) $(do_subst) $(srcdir)/path.js.in > $@
+
+BUILT_SOURCES = \
+	path.js \
+	$(NULL)
+
+EXTRA_DIST = \
+	path.js.in \
 	$(NULL)
