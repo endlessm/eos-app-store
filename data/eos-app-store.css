@@ -1,22 +1,23 @@
 .background {
-  background-color: rgba(22, 22, 22, 0.8);
+  background-color: rgb(22, 22, 22);
 }
 
-#side-pane-box {
+.sidepane-frame {
   margin-right: 18px;
   padding-left: 12px;
 }
 
-#side-pane-box > GtkButton {
+.sidebar-frame > GtkButton {
   color: gray;
 }
 
-#side-pane-box > GtkButton:hover {
+.sidebar-frame > GtkButton:hover {
   color: white;
 }
 
-#content-box {
-  margin-left: 12px;
+.content-frame {
+  padding-left: 12px;
+  box-shadow: 4px 0 2px rgba(0, 0, 0, 0.85) inset;
 }
 
 .header-title {
