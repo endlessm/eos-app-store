@@ -2,19 +2,24 @@ const Gdk = imports.gi.Gdk;
 const Gio = imports.gi.Gio;
 const GLib = imports.gi.GLib;
 const Gtk = imports.gi.Gtk;
+
 const Lang = imports.lang;
+const Signals = imports.signals;
 
 const AppStoreWindow = imports.appStoreWindow;
 const Path = imports.path;
+const StoreModel = imports.storeModel;
 
 const APP_STORE_NAME = 'com.endlessm.AppStore';
 
-const AppStore = Lang.Class({
+const AppStore = new Lang.Class({
     Name: 'AppStore',
     Extends: Gtk.Application,
 
     _init: function() {
         this.parent({ application_id: APP_STORE_NAME, });
+
+        this._storeModel = new StoreModel.StoreModel();
     },
 
     vfunc_startup: function() {
@@ -30,7 +35,7 @@ const AppStore = Lang.Class({
                                                  Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION);
 
         // the main window
-        this._mainWindow = new AppStoreWindow.AppStoreWindow(this);
+        this._mainWindow = new AppStoreWindow.AppStoreWindow(this, this._storeModel);
     },
 
     vfunc_activate: function() {

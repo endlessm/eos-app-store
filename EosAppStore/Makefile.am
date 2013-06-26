@@ -7,6 +7,7 @@ dist_js_DATA = \
 	frameClock.js \
 	main.js \
 	params.js \
+	storeModel.js \
 	$(NULL)
 
 do_subst = sed -e 's|@pkgdatadir[@]|$(pkgdatadir)|g'
