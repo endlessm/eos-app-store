@@ -48,7 +48,9 @@ function _initTemplate(params) {
 
     if (params.connectSignals) {
         builder.connect_signals_full(Lang.bind(this, function(builder, object, signal, handler) {
-            object.connect(signal, Lang.bind(this, this[handler]));
+            if (typeof(this[handler]) === 'function') {
+                object.connect(signal, Lang.bind(this, this[handler]));
+            }
         }));
     }
 }
