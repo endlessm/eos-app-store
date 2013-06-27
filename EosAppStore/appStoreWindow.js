@@ -35,6 +35,7 @@ const AppStoreWindow = new Lang.Class({
 
         this.initTemplate({ templateRoot: 'main-box', bindChildren: true, connectSignals: true, });
         this.set_default_size(600, 400);
+        // bug: https://bugzilla.gnome.org/show_bug.cgi?id=703154
         this.connect('realize', Lang.bind(this, function() { this.opacity = 0.95; }));
         this.add(this.main_box);
 
