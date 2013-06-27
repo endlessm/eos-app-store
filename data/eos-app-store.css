@@ -2,21 +2,21 @@
   background-color: rgb(22, 22, 22);
 }
 
-.sidepane-frame {
-  margin-right: 18px;
-  padding-left: 12px;
+.sidebar-frame {
+  padding-right: 64px;
+  margin-left: 6px;
 }
 
-.sidebar-frame > GtkButton {
-  color: gray;
-}
-
-.sidebar-frame > GtkButton:hover {
+.sidebar-button {
   color: white;
 }
 
+.sidebar-button:hover {
+  color: black;
+}
+
 .content-frame {
-  padding-left: 12px;
+  padding-left: 18px;
   box-shadow: 4px 0 2px rgba(0, 0, 0, 0.85) inset;
 }
 
