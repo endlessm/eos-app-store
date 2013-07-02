@@ -6,7 +6,6 @@ dist_js_DATA = \
 	builder.js \
 	frameClock.js \
 	main.js \
-	params.js \
 	storeModel.js \
 	$(NULL)
 

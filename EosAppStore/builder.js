@@ -1,16 +1,26 @@
 const Gtk = imports.gi.Gtk;
 
 const Lang = imports.lang;
-const Params = imports.params;
+
+const defaultParams = {
+    templateRoot: null,
+    bindChildren: false,
+    connectSignals: false,
+};
 
 function _initTemplate(params) {
-    params = Params.parse(params, { templateRoot: null,
-                                    bindChildren: false,
-                                  connectSignals: false,
-                                  });
-
     if ('_compositeChildren' in this) {
         throw new Error("composeChildren() can only be called once");        
+    }
+
+    if (!params) {
+        params = {};
+    }
+
+    for (let p in defaultParams) {
+        if (!(p in params)) {
+            params[p] = defaultParams[p];
+        }
     }
 
     let uiResource = Object.getPrototypeOf(this).templateResource;
