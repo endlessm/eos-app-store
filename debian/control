@@ -22,6 +22,7 @@ Depends: ${python:Depends},
 	 python-gi (>= 3.0),
 	 gir1.2-glib-2.0,
 	 gir1.2-gtk-3.0,
-	 python-setuptools
+	 python-setuptools,
+	 xdg-utils
 Description: Endless OS App Store installation package
  This package will install the Endless OS App Store
