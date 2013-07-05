@@ -1,3 +1,4 @@
+// -*- mode: js; js-indent-level: 4; indent-tabs-mode: nil -*-
 const Gdk = imports.gi.Gdk;
 const Gio = imports.gi.Gio;
 const GLib = imports.gi.GLib;
@@ -39,8 +40,7 @@ const AppStore = new Lang.Class({
     },
 
     vfunc_activate: function() {
-        this._mainWindow.show();
-        this._mainWindow.present();
+        this._mainWindow.toggle();
     },
 
     get mainWindow() {

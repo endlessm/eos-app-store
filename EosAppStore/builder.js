@@ -73,7 +73,7 @@ function _getTemplateChild(child_name) {
     return null;
 }
 
-function bindChildrenById(proto) {
+function bindTemplateChildren(proto) {
     if (!proto.templateResource || typeof(proto.templateResource) !== 'string') {
         throw new Error("When binding children the prototype must contain a 'templateResource' string element");
     }

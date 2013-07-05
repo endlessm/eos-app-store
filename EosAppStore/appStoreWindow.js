@@ -1,3 +1,4 @@
+// -*- mode: js; js-indent-level: 4; indent-tabs-mode: nil -*-
 //const Endless = imports.gi.Endless;
 const Gdk = imports.gi.Gdk;
 const GdkX11 = imports.gi.GdkX11;
@@ -8,9 +9,117 @@ const Gtk = imports.gi.Gtk;
 const Lang = imports.lang;
 const Signals = imports.signals;
 
-const UIBuilder = imports.builder;
 const FrameClock = imports.frameClock;
 const StoreModel = imports.storeModel;
+const UIBuilder = imports.builder;
+
+const APP_STORE_WIDTH = 600;
+const MAX_FRACTION_OF_DISPLAY_WIDTH = 0.35;
+const ANIMATION_TIME = (500 * 1000); // half a second
+
+const AppStoreSlider = new Lang.Class({
+    Name: 'AppStoreSlider',
+    Extends: FrameClock.FrameClockAnimator,
+
+    _init: function(widget) {
+        this._showing = false;
+        this.parent(widget, ANIMATION_TIME);
+    },
+
+    _getX: function(forVisibility) {
+        let [width, height] = this._getSize();
+        let workarea = this._getWorkarea();
+        let x = workarea.x - width;
+
+        if (forVisibility) {
+            x += width;
+        }
+
+        return x;
+    },
+
+    _getInitialValue: function() {
+        return this._getX(!this.showing);
+    },
+
+    setValue: function(newX) {
+        let [, oldY] = this._widget.get_position();
+        this._widget.move(newX, oldY);
+    },
+
+    _getWorkarea: function() {
+        let screen = Gdk.Screen.get_default();
+        let monitor = screen.get_primary_monitor();
+        let workarea = screen.get_monitor_workarea(monitor);
+
+        return workarea;
+    },
+
+    _getSize: function() {
+        let workarea = this._getWorkarea();
+        let maxWidth = workarea.width;
+        return [Math.min(APP_STORE_WIDTH, maxWidth), workarea.height];
+    },
+
+    _updateGeometry: function() {
+        let workarea = this._getWorkarea();
+        let [width, height] = this._getSize();
+        let x = this._getX(this.showing);
+
+        let geometry = { x: x,
+                         y: workarea.y,
+                         width: width,
+                         height: height };
+
+        log("geometry: '{ x:" + geometry.x + ", w:" + geometry.width + "}', showing: " + this.showing);
+
+        this._widget.move(geometry.x, geometry.y);
+        this._widget.set_size_request(geometry.width, geometry.height);
+    },
+
+    setInitialValue: function() {
+        this.stop();
+        this._updateGeometry();
+    },
+
+    slideIn: function() {
+        if (this.showing) {
+            return;
+        }
+
+        log('slideIn');
+
+        this.setInitialValue();
+        this._widget.show();
+
+        this.showing = true;
+        this.start(this._getX(true));
+    },
+
+    slideOut: function() {
+        if (!this.showing) {
+            return;
+        }
+
+        log('slideOut');
+
+        this.showing = false;
+        this.start(this._getX(false), Lang.bind(this,
+            function() {
+                this._widget.hide();
+            }));
+    },
+
+    set showing(value) {
+        this._showing = value;
+        this.emit('visibility-changed');
+    },
+
+    get showing() {
+        return this._showing;
+    },
+});
+Signals.addSignalMethods(AppStoreSlider.prototype);
 
 const AppStoreWindow = new Lang.Class({
     Name: 'AppStoreWindow',
@@ -30,14 +139,38 @@ const AppStoreWindow = new Lang.Class({
 
     _init: function(app, storeModel) {
         this.parent({ application: app,
+                        type_hint: Gdk.WindowTypeHint.DOCK,
                              type: Gtk.WindowType.TOPLEVEL,
                     });
 
         this.initTemplate({ templateRoot: 'main-box', bindChildren: true, connectSignals: true, });
+        this.stick();
         this.set_default_size(600, 400);
+        this.set_decorated(false);
+        // do not destroy, just hide
+        this.connect('delete-event', Lang.bind(this, function() {
+            this.toggle();
+            return true;
+        }));
         // bug: https://bugzilla.gnome.org/show_bug.cgi?id=703154
         this.connect('realize', Lang.bind(this, function() { this.opacity = 0.95; }));
         this.add(this.main_box);
+
+        // update position when workarea changes
+        let screen = Gdk.Screen.get_default();
+        screen.connect('monitors-changed',
+                       Lang.bind(this, this._onMonitorsChanged));
+
+        let visual = screen.get_rgba_visual();
+        if (visual) {
+            this.set_visual(visual);
+        }
+
+        // initialize animator
+        this._animator = new AppStoreSlider(this);
+        this._animator.connect('visibility-changed', Lang.bind(this, this._onVisibilityChanged));
+        this._animator.setInitialValue();
+        this._animator.showing = false;
 
         this._storeModel = storeModel;
         this._storeModel.connect('page-changed', Lang.bind(this, this._onStorePageChanged));
@@ -45,7 +178,7 @@ const AppStoreWindow = new Lang.Class({
     },
 
     _onCloseClicked: function() {
-        this.hide();
+        this.toggle();
     },
 
     _onAppsClicked: function() {
@@ -81,6 +214,27 @@ const AppStoreWindow = new Lang.Class({
                 break;
         }
     },
+
+    _onMonitorsChanged: function() {
+        this._animator.setInitialValue();
+    },
+
+    _onVisibilityChanged: function() {
+    },
+
+    getVisible: function() {
+        return this._animator.showing;
+    },
+
+    toggle: function() {
+        if (this._animator.showing) {
+            this._animator.slideOut();
+        }
+        else {
+            this._animator.slideIn();
+            this.present();
+        }
+    },
 });
 
-UIBuilder.bindChildrenById(AppStoreWindow.prototype);
+UIBuilder.bindTemplateChildren(AppStoreWindow.prototype);
