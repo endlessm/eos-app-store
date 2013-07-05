@@ -139,7 +139,7 @@ const AppStoreWindow = new Lang.Class({
 
         this.initTemplate({ templateRoot: 'main-box', bindChildren: true, connectSignals: true, });
         this.stick();
-        this.set_default_size(600, 400);
+        this.set_default_size(720, -1);
         this.set_decorated(false);
         // do not destroy, just hide
         this.connect('delete-event', Lang.bind(this, function() {
