@@ -32,10 +32,10 @@ function _initTemplate(params) {
 
     try {
         if (params.templateRoot) {
-                builder.add_objects_from_resource(uiResource, [ params.templateRoot ]);
+            builder.add_objects_from_resource(uiResource, [ params.templateRoot ]);
         }
         else {
-                builder.add_from_resource(uiResource);
+            builder.add_from_resource(uiResource);
         }
     }
     catch (e) {
@@ -57,11 +57,12 @@ function _initTemplate(params) {
     }
 
     if (params.connectSignals) {
-        builder.connect_signals_full(Lang.bind(this, function(builder, object, signal, handler) {
-            if (typeof(this[handler]) === 'function') {
-                object.connect(signal, Lang.bind(this, this[handler]));
-            }
-        }));
+        builder.connect_signals_full(Lang.bind(this,
+            function(builder, object, signal, handler) {
+                if (typeof(this[handler]) === 'function') {
+                    object.connect(signal, Lang.bind(this, this[handler]));
+                }
+            }));
     }
 }
 
