@@ -71,8 +71,6 @@ const AppStoreSlider = new Lang.Class({
                          width: width,
                          height: height };
 
-        log("geometry: '{ x:" + geometry.x + ", w:" + geometry.width + "}', showing: " + this.showing);
-
         this._widget.move(geometry.x, geometry.y);
         this._widget.set_size_request(geometry.width, geometry.height);
     },
@@ -87,8 +85,6 @@ const AppStoreSlider = new Lang.Class({
             return;
         }
 
-        log('slideIn');
-
         this.setInitialValue();
         this._widget.show();
 
@@ -100,8 +96,6 @@ const AppStoreSlider = new Lang.Class({
         if (!this.showing) {
             return;
         }
-
-        log('slideOut');
 
         this.showing = false;
         this.start(this._getX(false), Lang.bind(this,
