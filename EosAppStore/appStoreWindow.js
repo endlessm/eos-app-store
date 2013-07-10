@@ -13,8 +13,8 @@ const FrameClock = imports.frameClock;
 const StoreModel = imports.storeModel;
 const UIBuilder = imports.builder;
 
-const APP_STORE_WIDTH = 600;
-const MAX_FRACTION_OF_DISPLAY_WIDTH = 0.35;
+const APP_STORE_WIDTH = 512;
+const MAX_FRACTION_OF_DISPLAY_WIDTH = 0.65;
 const ANIMATION_TIME = (500 * 1000); // half a second
 
 const AppStoreSlider = new Lang.Class({
@@ -57,8 +57,8 @@ const AppStoreSlider = new Lang.Class({
 
     _getSize: function() {
         let workarea = this._getWorkarea();
-        let maxWidth = workarea.width;
-        return [Math.min(APP_STORE_WIDTH, maxWidth), workarea.height];
+        let maxWidth = workarea.width * MAX_FRACTION_OF_DISPLAY_WIDTH;
+        return [Math.max(APP_STORE_WIDTH, maxWidth), workarea.height];
     },
 
     _updateGeometry: function() {
