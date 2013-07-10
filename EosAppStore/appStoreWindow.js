@@ -193,18 +193,18 @@ const AppStoreWindow = new Lang.Class({
 
         switch (newPage) {
             case StoreModel.StorePage.APPS:
-                title.set_text("INSTALL APPLICATIONS");
-                desc.set_text("A list of many free applications you can install and update");
+                title.set_text(_("INSTALL APPLICATIONS"));
+                desc.set_text(_("A list of many free applications you can install and update"));
                 break;
 
             case StoreModel.StorePage.WEB:
-                title.set_text("WEB");
-                desc.set_text("A descriptive label for the Web section");
+                title.set_text(_("WEB"));
+                desc.set_text(_("A descriptive label for the Web section"));
                 break;
 
             case StoreModel.StorePage.FOLDERS:
-                title.set_text("FOLDERS");
-                desc.set_text("A descriptive label for the Folders section");
+                title.set_text(_("FOLDERS"));
+                desc.set_text(_("A descriptive label for the Folders section"));
                 break;
         }
     },

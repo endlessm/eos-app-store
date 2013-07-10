@@ -7,11 +7,19 @@ AC_CONFIG_SRCDIR([EosAppStore/main.js])
 AC_CONFIG_HEADERS([config.h])
 AM_INIT_AUTOMAKE([1.9 no-dist-gzip dist-xz foreign])
 
+AC_PROG_SED
+
+GETTEXT_PACKAGE=AC_PACKAGE_NAME
+AC_SUBST(GETTEXT_PACKAGE)
+AC_DEFINE_UNQUOTED(GETTEXT_DOMAIN,"$GETTEXT_PACKAGE",[The name of the gettext domain])
+IT_PROG_INTLTOOL(0.40.0)
+
+PKG_PROG_PKG_CONFIG([0.22])
+
 PKG_CHECK_MODULES(EOS_APP_STORE,
                   gjs-1.0
                   gio-2.0
                   gtk+-3.0)
-
 
 GJS_CONSOLE=`$PKG_CONFIG --variable=gjs_console gjs-1.0`
 AC_SUBST(GJS_CONSOLE)
@@ -19,10 +27,15 @@ AC_SUBST(GJS_CONSOLE)
 GLIB_COMPILE_RESOURCES=`$PKG_CONFIG --variable glib_compile_resources gio-2.0`
 AC_SUBST(GLIB_COMPILE_RESOURCES)
 
+AM_GNU_GETTEXT([external])
+AM_GNU_GETTEXT_VERSION([0.17])
+
+
 AC_CONFIG_FILES([
         Makefile
         data/Makefile
         EosAppStore/Makefile
+        po/Makefile.in
         ])
 
 AC_OUTPUT

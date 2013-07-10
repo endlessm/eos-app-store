@@ -1,1 +1,2 @@
-let RESOURCE_DIR = '@pkgdatadir@';
+const RESOURCE_DIR = '@pkgdatadir@';
+const LOCALE_DIR = "@localedir@";

@@ -4,10 +4,13 @@ const Gio = imports.gi.Gio;
 const GLib = imports.gi.GLib;
 const Gtk = imports.gi.Gtk;
 
+const Gettext = imports.gettext;
 const Lang = imports.lang;
 const Signals = imports.signals;
+const _ = imports.gettext.gettext;
 
 const AppStoreWindow = imports.appStoreWindow;
+const Config = imports.config;
 const Path = imports.path;
 const StoreModel = imports.storeModel;
 
@@ -18,6 +21,12 @@ const AppStore = new Lang.Class({
     Extends: Gtk.Application,
 
     _init: function() {
+        Gettext.bindtextdomain(Config.GETTEXT_DOMAIN, Path.LOCALE_DIR);
+        Gettext.textdomain(Config.GETTEXT_DOMAIN);
+
+        GLib.set_prgname('eos-app-store');
+        GLib.set_application_name(_("Application Store"));
+
         this.parent({ application_id: APP_STORE_NAME, });
 
         this._storeModel = new StoreModel.StoreModel();

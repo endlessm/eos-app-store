@@ -79,7 +79,7 @@ function bindTemplateChildren(proto) {
         throw new Error("When binding children the prototype must contain a 'templateResource' string element");
     }
 
-    if (!proto.templateChildren || typeof(proto.templateChildren) != 'object') {
+    if (!proto.templateChildren || typeof(proto.templateChildren) !== 'object') {
         throw new Error("When binding children the prototype must contain a 'templateChildren' array element");
     }
 
