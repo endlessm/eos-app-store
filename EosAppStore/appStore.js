@@ -15,6 +15,15 @@ const Path = imports.path;
 const StoreModel = imports.storeModel;
 
 const APP_STORE_NAME = 'com.endlessm.AppStore';
+const APP_STORE_PATH = '/com/endlessm/AppStore';
+const APP_STORE_IFACE = 'com.endlessm.AppStore';
+
+const AppStoreIface = <interface name={APP_STORE_NAME}>
+  <method name="toggle">
+    <arg type="u" direction="in" name="timestamp"/>
+  </method>
+  <property name="Visible" type="b" access="read"/>
+</interface>;
 
 const AppStore = new Lang.Class({
     Name: 'AppStore',
@@ -30,6 +39,9 @@ const AppStore = new Lang.Class({
         this.parent({ application_id: APP_STORE_NAME, });
 
         this._storeModel = new StoreModel.StoreModel();
+
+        this._dbusImpl = Gio.DBusExportedObject.wrapJSObject(AppStoreIface, this);
+        this._dbusImpl.export(Gio.DBus.session, APP_STORE_PATH);
     },
 
     vfunc_startup: function() {
@@ -49,10 +61,14 @@ const AppStore = new Lang.Class({
     },
 
     vfunc_activate: function() {
-        this._mainWindow.toggle();
+        this._mainWindow.toggle(0);
     },
 
     get mainWindow() {
         return this._mainWindow;
     },
+
+    toggle: function(timestamp) {
+        this._mainWindow.toggle(timestamp);
+    }
 });

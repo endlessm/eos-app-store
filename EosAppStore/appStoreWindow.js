@@ -220,13 +220,13 @@ const AppStoreWindow = new Lang.Class({
         return this._animator.showing;
     },
 
-    toggle: function() {
+    toggle: function(timestamp) {
         if (this._animator.showing) {
             this._animator.slideOut();
         }
         else {
             this._animator.slideIn();
-            this.present();
+            this.present_with_time(timestamp);
         }
     },
 });
