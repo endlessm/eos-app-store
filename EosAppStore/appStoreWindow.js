@@ -14,7 +14,7 @@ const StoreModel = imports.storeModel;
 const UIBuilder = imports.builder;
 
 const APP_STORE_WIDTH = 512;
-const MAX_FRACTION_OF_DISPLAY_WIDTH = 0.65;
+const FRACTION_OF_DISPLAY_WIDTH = 0.65;
 const ANIMATION_TIME = (500 * 1000); // half a second
 
 const AppStoreSlider = new Lang.Class({
@@ -57,8 +57,8 @@ const AppStoreSlider = new Lang.Class({
 
     _getSize: function() {
         let workarea = this._getWorkarea();
-        let maxWidth = workarea.width * MAX_FRACTION_OF_DISPLAY_WIDTH;
-        return [Math.max(APP_STORE_WIDTH, maxWidth), workarea.height];
+        let defaultWidth = workarea.width * FRACTION_OF_DISPLAY_WIDTH;
+        return [Math.max(APP_STORE_WIDTH, defaultWidth), workarea.height];
     },
 
     _updateGeometry: function() {
@@ -139,7 +139,6 @@ const AppStoreWindow = new Lang.Class({
 
         this.initTemplate({ templateRoot: 'main-box', bindChildren: true, connectSignals: true, });
         this.stick();
-        this.set_default_size(720, -1);
         this.set_decorated(false);
         // do not destroy, just hide
         this.connect('delete-event', Lang.bind(this, function() {
