@@ -6,10 +6,12 @@ const Gio = imports.gi.Gio;
 const GLib = imports.gi.GLib;
 const GObject = imports.gi.GObject;
 const Gtk = imports.gi.Gtk;
+const PLib = imports.gi.PLib;
 
 const Lang = imports.lang;
 const Signals = imports.signals;
 
+const AppFrame = imports.appFrame;
 const FrameClock = imports.frameClock;
 const StoreModel = imports.storeModel;
 const UIBuilder = imports.builder;
@@ -170,9 +172,24 @@ const AppStoreWindow = new Lang.Class({
         this._animator.setInitialValue();
         this._animator.showing = false;
 
+        // the model that handles page changes
         this._storeModel = storeModel;
         this._storeModel.connect('page-changed', Lang.bind(this, this._onStorePageChanged));
-        this._onStorePageChanged(this._storeModel, initialPage);
+
+        // the stack that holds the pages
+        this._stack = new PLib.Stack();
+        this._stack.set_transition_duration(250);
+        this._stack.set_transition_type(PLib.StackTransitionType.SLIDE_RIGHT);
+        this.content_box.add(this._stack);
+        this._stack.show();
+
+        // add the pages
+        this._pages = {};
+        this._pages.apps = new AppFrame.AppFrame();
+        this._stack.add_named(this._pages.apps, 'apps');
+
+        // switch to the 'Applications' page
+        this._onStorePageChanged(this._storeModel, StoreModel.StorePage.APPS);
     },
 
     _onCloseClicked: function() {
@@ -194,11 +211,17 @@ const AppStoreWindow = new Lang.Class({
     _onStorePageChanged: function(model, newPage) {
         let title = this.header_bar_title_label;
         let desc = this.header_bar_description_label;
+        let stack = this._stack;
+
+        for (let p in this._pages) {
+            this._pages[p].hide();
+        }
 
         switch (newPage) {
             case StoreModel.StorePage.APPS:
                 title.set_text(_("INSTALL APPLICATIONS"));
                 desc.set_text(_("A list of many free applications you can install and update"));
+                stack.set_visible_child(this._pages.apps);
                 break;
 
             case StoreModel.StorePage.WEB:

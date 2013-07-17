@@ -19,7 +19,8 @@ PKG_PROG_PKG_CONFIG([0.22])
 PKG_CHECK_MODULES(EOS_APP_STORE,
                   gjs-1.0
                   gio-2.0
-                  gtk+-3.0)
+                  gtk+-3.0
+                  pstack)
 
 GJS_CONSOLE=`$PKG_CONFIG --variable=gjs_console gjs-1.0`
 AC_SUBST(GJS_CONSOLE)
