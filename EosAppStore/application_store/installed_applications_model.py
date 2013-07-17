@@ -70,7 +70,7 @@ class InstalledApplicationsModel():
         self._settings.sync()
 
     def _directory_name(self, index):
-        return 'userdir-eos-folder-' + str(index) + '.directory'
+        return 'eos-folder-user-' + str(index) + '.directory'
 
     def _generate_directory_file(self, directory_name, folder_name, icon_name):
         if not os.path.exists(self.USER_DESKTOP_DIRECTORY_HOME):
