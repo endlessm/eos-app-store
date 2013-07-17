@@ -248,8 +248,8 @@ const AppStoreWindow = new Lang.Class({
                 break;
 
             case StoreModel.StorePage.WEB:
-                title.set_text(_("WEB"));
-                desc.set_text(_("A descriptive label for the Web section"));
+                title.set_text(_("INSTALL SITES"));
+                desc.set_text(_("A list of many sites you can add"));
                 break;
 
             case StoreModel.StorePage.FOLDERS:
