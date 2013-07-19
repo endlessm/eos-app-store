@@ -20,15 +20,33 @@ const AppListBoxRow = new Lang.Class({
         '_appIcon',
         '_appNameLabel',
         '_appDescriptionLabel',
-        '_appState',
+        '_appStateButton',
     ],
 
     _init: function() {
         this.parent();
 
-        this.initTemplate({ templateRoot: 'mainBox', bindChildren: true, connectSignals: true, });
+        this.initTemplate({ templateRoot: '_mainBox', bindChildren: true, connectSignals: true, });
         this.add(this._mainBox);
         this._mainBox.show();
+    },
+
+    set appName(name) {
+        this._appNameLabel.set_text(name);
+    },
+
+    set appDescription(description) {
+        this._appDescriptionLabel.set_text(description);
+    },
+
+    set appState(state) {
+        if (state == 'installed') {
+            this._appStateButton.set_label('INSTALLED');
+            this._appStateButton.show();
+            return;
+        }
+
+        this._appStateButton.hide();
     },
 });
 Builder.bindTemplateChildren(AppListBoxRow.prototype);
@@ -58,6 +76,8 @@ const AppFrame = new Lang.Class({
 
         this.initTemplate({ templateRoot: '_mainBox', bindChildren: true, connectSignals: true, });
         this.add(this._mainBox);
+        this._mainBox.hexpand = true;
+        this._mainBox.vexpand = true;
         this._mainBox.show();
 
         this._listBox = new AppListBox();
@@ -65,9 +85,30 @@ const AppFrame = new Lang.Class({
         this._listBox.show_all();
 
         this._appListModel = new AppListModel.AppList();
+        this._appListModel.connect('changed', Lang.bind(this, this._onListModelChange));
+    },
+
+    _onListModelChange: function(model, apps) {
+        this._listBox.foreach(function(child) { child.destroy(); });
+
+        for (let a in apps) {
+            if (model.getNoDisplay(a) || !model.getAppName(a)) {
+                continue;
+            }
+
+            let row = new AppListBoxRow();
+
+            row.appName = model.getAppName(a);
+            row.appDescription = model.getAppDescription(a);
+            row.appState = 'installed'
+
+            this._listBox.add(row);
+            row.show();
+        }
     },
 
     update: function() {
+        this._appListModel.update();
     },
 });
 Builder.bindTemplateChildren(AppFrame.prototype);
