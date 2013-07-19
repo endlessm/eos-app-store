@@ -5,6 +5,7 @@ const GLib = imports.gi.GLib;
 const Gtk = imports.gi.Gtk;
 const PLib = imports.gi.PLib;
 
+const AppListModel = imports.appListModel;
 const Builder = imports.builder;
 const Lang = imports.lang;
 const Signals = imports.signals;
@@ -62,6 +63,8 @@ const AppFrame = new Lang.Class({
         this._listBox = new AppListBox();
         this._viewport.add(this._listBox);
         this._listBox.show_all();
+
+        this._appListModel = new AppListModel.AppList();
     },
 
     update: function() {

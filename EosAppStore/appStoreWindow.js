@@ -212,6 +212,7 @@ const AppStoreWindow = new Lang.Class({
         let title = this.header_bar_title_label;
         let desc = this.header_bar_description_label;
         let stack = this._stack;
+        let page = null;
 
         for (let p in this._pages) {
             this._pages[p].hide();
@@ -221,7 +222,8 @@ const AppStoreWindow = new Lang.Class({
             case StoreModel.StorePage.APPS:
                 title.set_text(_("INSTALL APPLICATIONS"));
                 desc.set_text(_("A list of many free applications you can install and update"));
-                stack.set_visible_child(this._pages.apps);
+                this._pages.apps.update();
+                page = this._pages.apps;
                 break;
 
             case StoreModel.StorePage.WEB:
@@ -234,6 +236,8 @@ const AppStoreWindow = new Lang.Class({
                 desc.set_text(_("A descriptive label for the Folders section"));
                 break;
         }
+
+        stack.set_visible_child(page);
     },
 
     _onMonitorsChanged: function() {
