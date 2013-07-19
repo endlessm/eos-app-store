@@ -1,2 +1,2 @@
-msgmerge po/pt_BR.po po/endless_template.pot -o po/pt_BR.po
-msgmerge po/es_GT.po po/endless_template.pot -o po/es_GT.po
+msgmerge po/pt.po po/endless_template.pot -o po/pt.po
+msgmerge po/es.po po/endless_template.pot -o po/es.po
