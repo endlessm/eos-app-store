@@ -1,0 +1,103 @@
+# Portuguese translations for the Endless OS App Store
+# Copyright (C) 2012 Endless Mobile
+# This file is distributed under the same license as the Endless OS Desktop package.
+# Automatically generated, 2012
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: dev 1\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2013-07-09 16:10-0700\n"
+"PO-Revision-Date: 2012-05-31 11:54-0500\n"
+"Last-Translator: Automatically generated\n"
+"Language-Team: none\n"
+"Language: pt\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n > 1);\n"
+
+#: ../data/eos-app-store.desktop.in.h:1
+msgid "Add"
+msgstr "Adicionar"
+
+#: ../data/eos-app-store.desktop.in.h:2
+msgid "Add applications to EOS"
+msgstr ""
+
+#: ../EosAppStore/add_shortcuts_module/add_folder_box.py:39
+msgid "1. NAME YOUR FOLDER"
+msgstr "1. O NOME DO SEU FOLDER"
+
+#: ../EosAppStore/add_shortcuts_module/add_folder_box.py:41
+msgid "2. PICK A SYMBOL"
+msgstr "2. ESCOLHA UM SÍMBOLO"
+
+#: ../EosAppStore/add_shortcuts_module/add_shortcuts_view.py:150
+#: ../EosAppStore/add_shortcuts_module/add_shortcuts_model.py:14
+#: ../EosAppStore/add_shortcuts_module/add_shortcuts_presenter.py:35
+msgid "APP"
+msgstr "APLICATIVO"
+
+#. section_app.subcategories = [ShortcutCategory(_('POPULAR')),
+#. ShortcutCategory(_('PRODUCTIVITY')),
+#. ShortcutCategory(_('ENTERTAINMENT')),
+#. ShortcutCategory(_('GAMES')),
+#. ShortcutCategory(_('HEALTH')),
+#. ShortcutCategory(_('WORK')),
+#. ShortcutCategory(_('SOCIAL')),
+#. ShortcutCategory(_('MY TOWN'))]
+#: ../EosAppStore/add_shortcuts_module/add_shortcuts_view.py:152
+#: ../EosAppStore/add_shortcuts_module/add_shortcuts_model.py:23
+msgid "WEB"
+msgstr "SITES"
+
+#: ../EosAppStore/add_shortcuts_module/add_shortcuts_model.py:24
+msgid "FOLDER"
+msgstr "PASTA"
+
+#: ../EosAppStore/add_shortcuts_module/add_website_box.py:33
+msgid "TYPE WEBSITE"
+msgstr "DIGITE SITE"
+
+#: ../EosAppStore/shortcut/add_remove_shortcut.py:87
+msgid "Delete"
+msgstr "Excluir"
+
+#: ../EosAppStore/shortcut/add_remove_shortcut.py:103
+#: ../EosAppStore/shortcut/add_remove_shortcut.py:111
+#: ../EosAppStore/shortcut/add_remove_shortcut.py:119
+#: ../EosAppStore/shortcut/add_remove_shortcut.py:135
+msgid "Files"
+msgstr "Files"
+
+#: ../EosAppStore/removal_module/delete_not_possible_popup.py:54
+msgid ""
+"To delete a folder you have to\n"
+"remove all of the items inside\n"
+"of it first.\n"
+"\n"
+"We are just trying to\n"
+"keep you safe."
+msgstr ""
+"Para apagar uma pasta que você\n"
+"tem que remover todos os itens\n"
+"dentro do primeiro.\n"
+"\n"
+"Estamos apenas tentando mantê-lo\n"
+"seguro."
+
+#~ msgid " remaining"
+#~ msgstr " restante"
+
+#~ msgid " until full"
+#~ msgstr " até carga completa"
+
+#~ msgid "Battery Info"
+#~ msgstr "Informações sobre bateria"
+
+#~ msgid "Google or type website"
+#~ msgstr "Busque ou digite o site"
+
+#~ msgid "Power Settings"
+#~ msgstr "Configurações de energia"
