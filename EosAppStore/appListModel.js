@@ -20,41 +20,29 @@ const AppList = new Lang.Class({
     },
 
     _onLoadComplete: function(model, res) {
-        let apps = model.load_finish(res);
-
-        this._apps = apps;
-        this.emit('changed', this._apps);
-    },
-
-    getAppInfo: function(id) {
-        if (!this._apps || !this._apps[id]) {
-            return null;
+        try {
+            let apps = model.load_finish(res);
+            this.emit('changed', apps);
         }
-
-        let entry = this._apps[id];
-        return entry.get_app_info();
+        catch (e) {
+            log("Unable to load the application list: " + e);
+        }
     },
 
     getAppName: function(id) {
-        let info = this.getAppInfo(id);
-        if (!info) {
-            return "Unknown";
-        }
-
-        return info.get_generic_name(info);
+        return this._model.get_app_name(id);
     },
 
     getAppDescription: function(id) {
-        return "Generic application description to be filled out by the manifest";
+        return this._model.get_app_description(id);
     },
 
-    getNoDisplay: function(id) {
-        let info = this.getAppInfo(id);
-        if (!info) {
-            return true;
-        }
+    getAppIcon: function(id) {
+        return this._model.get_app_icon_name(id, EosAppStorePrivate.AppIconState.NORMAL);
+    },
 
-        return info.get_nodisplay() || info.get_is_hidden();
+    getAppVisible: function(id) {
+        return this._model.get_app_visible(id);
     },
 });
 Signals.addSignalMethods(AppList.prototype);

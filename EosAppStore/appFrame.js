@@ -32,11 +32,24 @@ const AppListBoxRow = new Lang.Class({
     },
 
     set appName(name) {
+        if (!name)
+            name = _("Unknown application");
+
         this._appNameLabel.set_text(name);
     },
 
     set appDescription(description) {
+        if (!description)
+            description = "";
+
         this._appDescriptionLabel.set_text(description);
+    },
+
+    set appIcon(name) {
+        if (!name)
+            name = "gtk-missing-image";
+
+        this._appIcon.set_from_icon_name(name, Gtk.IconSize.DIALOG);
     },
 
     set appState(state) {
@@ -91,20 +104,17 @@ const AppFrame = new Lang.Class({
     _onListModelChange: function(model, apps) {
         this._listBox.foreach(function(child) { child.destroy(); });
 
-        for (let a in apps) {
-            if (model.getNoDisplay(a) || !model.getAppName(a)) {
-                continue;
-            }
-
+        apps.forEach(Lang.bind(this, function(item) {
             let row = new AppListBoxRow();
 
-            row.appName = model.getAppName(a);
-            row.appDescription = model.getAppDescription(a);
+            row.appName = model.getAppName(item);
+            row.appDescription = model.getAppDescription(item);
+            row.appIcon = model.getAppIcon(item);
             row.appState = 'installed'
 
             this._listBox.add(row);
             row.show();
-        }
+        }));
     },
 
     update: function() {

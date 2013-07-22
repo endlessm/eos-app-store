@@ -2,6 +2,7 @@
 #define __EOS_APP_LIST_MODEL_H__
 
 #include <gio/gio.h>
+#include "eos-app-enums.h"
 
 G_BEGIN_DECLS
 
@@ -20,9 +21,16 @@ void eos_app_list_model_load (EosAppListModel *model,
                               GCancellable    *cancellable,
                               GAsyncReadyCallback  callback,
                               gpointer             user_data);
-GHashTable *eos_app_list_model_load_finish (EosAppListModel  *model,
-                                            GAsyncResult     *result,
-                                            GError          **error);
+GList *eos_app_list_model_load_finish (EosAppListModel  *model,
+                                       GAsyncResult     *result,
+                                       GError          **error);
+
+const char *eos_app_list_model_get_app_name (EosAppListModel *model, const char *app_id);
+const char *eos_app_list_model_get_app_description (EosAppListModel *model, const char *app_id);
+const char *eos_app_list_model_get_app_icon_name (EosAppListModel *model,
+                                                  const char *app_id,
+                                                  EosAppIconState icon_state);
+gboolean eos_app_list_model_get_app_visible (EosAppListModel *model, const char *app_id);
 
 G_END_DECLS
 
