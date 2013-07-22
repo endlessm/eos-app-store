@@ -9,7 +9,20 @@ AM_INIT_AUTOMAKE([1.9 no-dist-gzip dist-xz foreign])
 
 AM_PATH_PYTHON_VERSION(2.7, 2.7.0, 2.6, 2.6.0, 2.5, 2.5.0, 2.4, 2.4.0)
 
-IT_PROG_INTLTOOL(0.40.0)
+# Initialize libtool
+LT_PREREQ([2.2.6])
+LT_INIT([disable-static])
+
+# i18n
+IT_PROG_INTLTOOL([0.40])
+
+AM_GNU_GETTEXT([external])
+AM_GNU_GETTEXT_VERSION([0.17])
+
+GETTEXT_PACKAGE=eos-app-store
+AC_SUBST(GETTEXT_PACKAGE)
+AC_DEFINE_UNQUOTED(GETTEXT_PACKAGE, "$GETTEXT_PACKAGE",
+                   [The prefix for our gettext translation domains.])
 
 PKG_CHECK_MODULES(EOS_APP_STORE,
                   gio-2.0
