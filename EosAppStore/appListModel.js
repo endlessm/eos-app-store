@@ -44,5 +44,9 @@ const AppList = new Lang.Class({
     getAppVisible: function(id) {
         return this._model.get_app_visible(id);
     },
+
+    getAppState: function(id) {
+        return this._model.get_app_state(id);
+    },
 });
 Signals.addSignalMethods(AppList.prototype);

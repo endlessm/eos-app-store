@@ -31,6 +31,7 @@ const char *eos_app_list_model_get_app_icon_name (EosAppListModel *model,
                                                   const char *app_id,
                                                   EosAppIconState icon_state);
 gboolean eos_app_list_model_get_app_visible (EosAppListModel *model, const char *app_id);
+EosAppState eos_app_list_model_get_app_state (EosAppListModel *model, const char *app_id);
 
 G_END_DECLS
 

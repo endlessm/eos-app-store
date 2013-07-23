@@ -3,6 +3,8 @@
 #include "eos-app-list-model.h"
 
 #include <glib-object.h>
+#include <gio/gio.h>
+#include <json-glib/json-glib.h>
 
 #define GMENU_I_KNOW_THIS_IS_UNSTABLE
 #include <gmenu-tree.h>
@@ -11,10 +13,14 @@ struct _EosAppListModel
 {
   GObject parent_instance;
 
+  GSettings *settings;
+
+  GFileMonitor *monitor;
+
   GMenuTree *app_tree;
 
-  GMutex apps_by_id_lock;
   GHashTable *apps_by_id;
+  GHashTable *installed_apps;
 };
 
 struct _EosAppListModelClass
@@ -28,6 +34,28 @@ static void
 on_app_tree_changed (GMenuTree       *tree,
                      EosAppListModel *self)
 {
+  if (self->apps_by_id != NULL)
+    {
+      g_hash_table_unref (self->apps_by_id);
+      self->apps_by_id = NULL;
+    }
+
+  /* emit ::changed */
+}
+
+static void
+on_installed_apps_changed (GFileMonitor    *monitor,
+                           GFile           *file,
+                           GFile           *other_file,
+                           EosAppListModel *self)
+{
+  if (self->installed_apps != NULL)
+    {
+      g_hash_table_unref (self->installed_apps);
+      self->installed_apps = NULL;
+    }
+
+  /* emit ::changed */
 }
 
 static void
@@ -35,9 +63,11 @@ eos_app_list_model_finalize (GObject *gobject)
 {
   EosAppListModel *self = EOS_APP_LIST_MODEL (gobject);
 
+  g_clear_object (&self->monitor);
+  g_clear_object (&self->settings);
   g_clear_object (&self->app_tree);
-  g_mutex_clear (&self->apps_by_id_lock);
   g_hash_table_unref (self->apps_by_id);
+  g_hash_table_unref (self->installed_apps);
 
   G_OBJECT_CLASS (eos_app_list_model_parent_class)->finalize (gobject);
 }
@@ -51,16 +81,97 @@ eos_app_list_model_class_init (EosAppListModelClass *klass)
 static void
 eos_app_list_model_init (EosAppListModel *self)
 {
+  char *installed_apps;
+  GFile *file;
+
+  self->settings = g_settings_new ("org.gnome.shell");
+
   self->app_tree =
     gmenu_tree_new ("gnome-applications.menu", GMENU_TREE_FLAGS_INCLUDE_NODISPLAY);
 
-  g_mutex_init (&self->apps_by_id_lock);
+  installed_apps = g_build_filename (g_get_home_dir (),
+                                     ".endlessm",
+                                     "installed_applications.json",
+                                     NULL);
+
+  file = g_file_new_for_path (installed_apps);
+  self->monitor = g_file_monitor_file (file, 0, NULL, NULL);
+  g_signal_connect (self->monitor, "changed",
+                    G_CALLBACK (on_installed_apps_changed),
+                    self);
+  g_object_unref (file);
+  g_free (installed_apps);
 }
 
 EosAppListModel *
 eos_app_list_model_new (void)
 {
   return g_object_new (EOS_TYPE_APP_LIST_MODEL, NULL);
+}
+
+static void
+add_to_set (JsonArray *array,
+            guint      index_,
+            JsonNode  *element,
+            gpointer   data)
+{
+  GHashTable *set = data;
+
+  if (JSON_NODE_HOLDS_VALUE (element) &&
+      json_node_get_string (element) != NULL)
+    {
+      g_hash_table_add (set, json_node_dup_string (element));
+    }
+}
+
+static GHashTable *
+load_installed_apps (void)
+{
+  JsonParser *parser;
+  GError *internal_error;
+  GHashTable *retval;
+  JsonNode *root;
+  char *file;
+
+  retval = g_hash_table_new_full (g_str_hash, g_str_equal,
+                                  g_free,
+                                  NULL);
+
+  file = g_build_filename (g_get_home_dir (),
+                           ".endlessm",
+                           "installed_applications.json",
+                           NULL);
+
+  parser = json_parser_new ();
+
+  internal_error = NULL;
+  json_parser_load_from_file (parser, file, &internal_error);
+  if (internal_error != NULL)
+    {
+      if (!(internal_error->domain == G_FILE_ERROR &&
+            internal_error->code == G_FILE_ERROR_NOENT))
+        {
+          g_critical (G_STRLOC ": Unable to load installed_applications.json: %s",
+                      internal_error->message);
+        }
+
+      g_error_free (internal_error);
+      goto out;
+    }
+
+  root = json_parser_get_root (parser);
+  if (JSON_NODE_HOLDS_ARRAY (root))
+    {
+      JsonArray *array = json_node_get_array (root);
+
+      json_array_foreach_element (array, add_to_set, retval);
+    }
+
+out:
+  g_object_unref (parser);
+  g_free (file);
+
+  return retval;
 }
 
 static void
@@ -111,8 +222,6 @@ tree_load_in_thread (GTask        *task,
   GHashTable *set;
   GList *app_list;
 
-  g_mutex_lock (&model->apps_by_id_lock);
-
   if (model->apps_by_id != NULL)
     {
       g_hash_table_unref (model->apps_by_id);
@@ -121,7 +230,6 @@ tree_load_in_thread (GTask        *task,
 
   if (!gmenu_tree_load_sync (model->app_tree, &error))
     {
-      g_mutex_unlock (&model->apps_by_id_lock);
       g_task_return_error (task, error);
       return;
     }
@@ -133,7 +241,6 @@ tree_load_in_thread (GTask        *task,
   root = gmenu_tree_get_root_directory (model->app_tree);
   if (root == NULL)
     {
-      g_mutex_unlock (&model->apps_by_id_lock);
       g_task_return_pointer (task, NULL, NULL);
       return;
     }
@@ -143,8 +250,8 @@ tree_load_in_thread (GTask        *task,
   gmenu_tree_item_unref (root);
 
   model->apps_by_id = set;
+  model->installed_apps = load_installed_apps ();
 
-  g_mutex_unlock (&model->apps_by_id_lock);
   g_task_return_pointer (task, NULL, NULL);
 }
 
@@ -193,6 +300,13 @@ eos_app_list_model_load_finish (EosAppListModel  *model,
   return g_hash_table_get_keys (model->apps_by_id);
 }
 
+static gboolean
+is_app_installed (EosAppListModel *model,
+                  const char *app_id)
+{
+  return g_hash_table_lookup (model->installed_apps, app_id) != NULL;
+}
+
 static GDesktopAppInfo *
 eos_app_list_model_get_app_info (EosAppListModel *model,
                                  const char *app_id)
@@ -206,17 +320,14 @@ eos_app_list_model_get_app_info (EosAppListModel *model,
       return NULL;
     }
 
-  g_mutex_lock (&model->apps_by_id_lock);
   entry = g_hash_table_lookup (model->apps_by_id, app_id);
   if (entry == NULL)
     {
-      g_mutex_unlock (&model->apps_by_id_lock);
       g_critical ("No application '%s' was found.", app_id);
       return NULL;
     }
 
   res = gmenu_tree_entry_get_app_info (entry);
-  g_mutex_unlock (&model->apps_by_id_lock);
 
   return res;
 }
@@ -260,6 +371,22 @@ eos_app_list_model_get_app_icon_name (EosAppListModel *model,
   return g_desktop_app_info_get_string (info, G_KEY_FILE_DESKTOP_KEY_ICON);
 }
 
+EosAppState
+eos_app_list_model_get_app_state (EosAppListModel *model,
+                                  const char *app_id)
+{
+  g_return_val_if_fail (EOS_IS_APP_LIST_MODEL (model), EOS_APP_STATE_UNKNOWN);
+  g_return_val_if_fail (app_id != NULL, EOS_APP_STATE_UNKNOWN);
+
+  if (is_app_installed (model, app_id))
+    return EOS_APP_STATE_INSTALLED;
+
+  if (eos_app_list_model_get_app_info (model, app_id) != NULL)
+    return EOS_APP_STATE_UNINSTALLED;
+
+  return EOS_APP_STATE_UNKNOWN;
+}
+
 gboolean
 eos_app_list_model_get_app_visible (EosAppListModel *model,
                                     const char *app_id)
@@ -274,4 +401,16 @@ eos_app_list_model_get_app_visible (EosAppListModel *model,
 
   return !(g_desktop_app_info_get_nodisplay (info) ||
            g_desktop_app_info_get_is_hidden (info));
+}
+
+void
+eos_app_list_model_install_app (EosAppListModel *model,
+                                const char *app_id)
+{
+}
+
+void
+eos_app_list_model_uninstall_app (EosAppListModel *model,
+                                  const char *app_id)
+{
 }

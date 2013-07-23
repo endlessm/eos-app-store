@@ -3,6 +3,7 @@ const Gdk = imports.gi.Gdk;
 const Gio = imports.gi.Gio;
 const GLib = imports.gi.GLib;
 const Gtk = imports.gi.Gtk;
+const EosAppStorePrivate = imports.gi.EosAppStorePrivate;
 const PLib = imports.gi.PLib;
 
 const AppListModel = imports.appListModel;
@@ -53,13 +54,22 @@ const AppListBoxRow = new Lang.Class({
     },
 
     set appState(state) {
-        if (state == 'installed') {
-            this._appStateButton.set_label('INSTALLED');
+        if (state == EosAppStorePrivate.AppState.UNINSTALLED) {
+            this._appStateButton.set_label('INSTALL');
+            this._appStateButton.show();
+            return;
+        }
+
+        if (state == EosAppStorePrivate.AppState.UPDATABLE) {
+            this._appStateButton.set_label('UPDATE');
             this._appStateButton.show();
             return;
         }
 
         this._appStateButton.hide();
+    },
+
+    _onAppStateButtonClicked: function() {
     },
 });
 Builder.bindTemplateChildren(AppListBoxRow.prototype);
@@ -105,12 +115,17 @@ const AppFrame = new Lang.Class({
         this._listBox.foreach(function(child) { child.destroy(); });
 
         apps.forEach(Lang.bind(this, function(item) {
+            if (!model.getAppVisible(item))
+              return;
+
+            log('app: ' + item + ' state: ' + model.getAppState(item));
+
             let row = new AppListBoxRow();
 
             row.appName = model.getAppName(item);
             row.appDescription = model.getAppDescription(item);
             row.appIcon = model.getAppIcon(item);
-            row.appState = 'installed'
+            row.appState = model.getAppState(item);
 
             this._listBox.add(row);
             row.show();
