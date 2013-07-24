@@ -171,6 +171,11 @@ const AppFrame = new Lang.Class({
         this._listBox.foreach(function(child) { child.destroy(); });
 
         apps.forEach(Lang.bind(this, function(item) {
+            // skip ourselves
+            if (item == 'eos-app-store.desktop')
+              return;
+
+            // skip invisible items
             if (!model.getAppVisible(item))
               return;
 
