@@ -33,6 +33,10 @@ const char *eos_app_list_model_get_app_icon_name (EosAppListModel *model,
 gboolean eos_app_list_model_get_app_visible (EosAppListModel *model, const char *app_id);
 EosAppState eos_app_list_model_get_app_state (EosAppListModel *model, const char *app_id);
 
+void eos_app_list_model_install_app (EosAppListModel *model, const char *app_id);
+void eos_app_list_model_uninstall_app (EosAppListModel *model, const char *app_id);
+void eos_app_list_model_update_app (EosAppListModel *mode, const char *app_id);
+
 G_END_DECLS
 
 #endif /* __EOS_APP_LIST_MODEL_H__ */

@@ -237,8 +237,10 @@ const AppStoreWindow = new Lang.Class({
                 break;
         }
 
-        page.show_all();
-        stack.set_visible_child(page);
+        if (page) {
+            page.show_all();
+            stack.set_visible_child(page);
+        }
     },
 
     _onMonitorsChanged: function() {
@@ -263,5 +265,4 @@ const AppStoreWindow = new Lang.Class({
         }
     },
 });
-
 UIBuilder.bindTemplateChildren(AppStoreWindow.prototype);

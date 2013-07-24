@@ -28,6 +28,14 @@ struct _EosAppListModelClass
   GObjectClass parent_class;
 };
 
+enum {
+  CHANGED,
+
+  LAST_SIGNAL
+};
+
+static guint eos_app_list_model_signals[LAST_SIGNAL] = { 0, };
+
 G_DEFINE_TYPE (EosAppListModel, eos_app_list_model, G_TYPE_OBJECT)
 
 static void
@@ -40,14 +48,15 @@ on_app_tree_changed (GMenuTree       *tree,
       self->apps_by_id = NULL;
     }
 
-  /* emit ::changed */
+  g_signal_emit (self, eos_app_list_model_signals[CHANGED], 0);
 }
 
 static void
-on_installed_apps_changed (GFileMonitor    *monitor,
-                           GFile           *file,
-                           GFile           *other_file,
-                           EosAppListModel *self)
+on_installed_apps_changed (GFileMonitor      *monitor,
+                           GFile             *file,
+                           GFile             *other_file,
+                           GFileMonitorEvent  event_type,
+                           EosAppListModel   *self)
 {
   if (self->installed_apps != NULL)
     {
@@ -55,7 +64,7 @@ on_installed_apps_changed (GFileMonitor    *monitor,
       self->installed_apps = NULL;
     }
 
-  /* emit ::changed */
+  g_signal_emit (self, eos_app_list_model_signals[CHANGED], 0);
 }
 
 static void
@@ -76,6 +85,24 @@ static void
 eos_app_list_model_class_init (EosAppListModelClass *klass)
 {
   G_OBJECT_CLASS (klass)->finalize = eos_app_list_model_finalize;
+
+  eos_app_list_model_signals[CHANGED] =
+    g_signal_new (g_intern_static_string ("changed"),
+                  G_OBJECT_CLASS_TYPE (klass),
+                  G_SIGNAL_RUN_LAST,
+                  0,
+                  NULL, NULL,
+                  g_cclosure_marshal_VOID__VOID,
+                  G_TYPE_NONE, 0);
+}
+
+static char *
+get_installed_apps_path (void)
+{
+  return g_build_filename (g_get_home_dir (),
+                           ".endlessm",
+                           "installed_applications.json",
+                           NULL);
 }
 
 static void
@@ -89,13 +116,9 @@ eos_app_list_model_init (EosAppListModel *self)
   self->app_tree =
     gmenu_tree_new ("gnome-applications.menu", GMENU_TREE_FLAGS_INCLUDE_NODISPLAY);
 
-  installed_apps = g_build_filename (g_get_home_dir (),
-                                     ".endlessm",
-                                     "installed_applications.json",
-                                     NULL);
-
+  installed_apps = get_installed_apps_path ();
   file = g_file_new_for_path (installed_apps);
-  self->monitor = g_file_monitor_file (file, 0, NULL, NULL);
+  self->monitor = g_file_monitor_file (file, G_FILE_MONITOR_SEND_MOVED, NULL, NULL);
   g_signal_connect (self->monitor, "changed",
                     G_CALLBACK (on_installed_apps_changed),
                     self);
@@ -122,6 +145,67 @@ add_to_set (JsonArray *array,
     {
       g_hash_table_add (set, json_node_dup_string (element));
     }
+}
+
+static void
+update_shell_settings (EosAppListModel *self)
+{
+#if 0
+  GVariant *v, *entries;
+  GVariantIter iter;
+  const char *id;
+
+  v = g_settings_get_value (self->settings, "icon-grid-layout");
+  if (v == NULL)
+    return;
+
+  entries = g_variant_lookup_value (v, "", G_VARIANT_TYPE ("as"));
+
+  g_variant_iter_init (&iter, entries);
+  while (g_variant_iter_next (&iter, "^s", &id))
+    {
+      g_print ("icon-grid-layout ['%s']\n", id);
+    }
+
+  g_variant_unref (entries);
+  g_variant_unref (v);
+#endif
+}
+
+static void
+save_installed_apps (EosAppListModel *self)
+{
+  JsonGenerator *gen;
+  JsonNode *node;
+  JsonArray *array;
+  GHashTableIter iter;
+  gpointer key;
+  char *path;
+  GError *error = NULL;
+
+  path = get_installed_apps_path ();
+
+  array = json_array_sized_new (g_hash_table_size (self->installed_apps));
+  g_hash_table_iter_init (&iter, self->installed_apps);
+  while (g_hash_table_iter_next (&iter, &key, NULL))
+    json_array_add_string_element (array, key);
+
+  node = json_node_init_array (json_node_alloc (), array);
+  json_array_unref (array);
+
+  gen = json_generator_new ();
+  json_generator_set_root (gen, node);
+  json_generator_to_file (gen, path, &error);
+  if (error != NULL)
+    {
+      g_critical (G_STRLOC ": Unable to save installed_applications.json: %s",
+                  error->message);
+      g_error_free (error);
+    }
+
+  json_node_free (node);
+  g_object_unref (gen);
+  g_free (path);
 }
 
 static GHashTable *
@@ -407,10 +491,28 @@ void
 eos_app_list_model_install_app (EosAppListModel *model,
                                 const char *app_id)
 {
+  if (is_app_installed (model, app_id))
+    return;
+
+  g_hash_table_add (model->installed_apps, g_strdup (app_id));
+  update_shell_settings (model);
+  save_installed_apps (model);
+}
+
+void
+eos_app_list_model_update_app (EosAppListModel *model,
+                               const char *app_id)
+{
 }
 
 void
 eos_app_list_model_uninstall_app (EosAppListModel *model,
                                   const char *app_id)
 {
+  if (!is_app_installed (model, app_id))
+    return;
+
+  g_hash_table_remove (model->installed_apps, app_id);
+  update_shell_settings (model);
+  save_installed_apps (model);
 }

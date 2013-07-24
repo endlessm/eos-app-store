@@ -13,6 +13,7 @@ const AppList = new Lang.Class({
 
     _init: function() {
         this._model = new EosAppStorePrivate.AppListModel();
+        this._model.connect('changed', Lang.bind(this, this._onAppListModelChanged));
     },
 
     update: function() {
@@ -27,6 +28,10 @@ const AppList = new Lang.Class({
         catch (e) {
             log("Unable to load the application list: " + e);
         }
+    },
+
+    _onAppListModelChanged: function() {
+        this.update();
     },
 
     getAppName: function(id) {
@@ -47,6 +52,18 @@ const AppList = new Lang.Class({
 
     getAppState: function(id) {
         return this._model.get_app_state(id);
+    },
+
+    installApp: function(id) {
+        this._model.install_app(id);
+    },
+
+    uninstallApp: function(id) {
+        this._model.uninstall_app(id);
+    },
+
+    updateApp: function(id) {
+        this._model.update_app(id);
     },
 });
 Signals.addSignalMethods(AppList.prototype);
