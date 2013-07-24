@@ -1,4 +1,5 @@
 [encoding: UTF-8]
+data/eos-app-store.desktop.in
 [type: gettext/glade]data/eos-app-store-main-window.ui
 EosAppStore/appStore.js
 EosAppStore/appStoreWindow.js
