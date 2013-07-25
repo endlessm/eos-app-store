@@ -13,6 +13,8 @@ struct _EosAppListModel
 {
   GObject parent_instance;
 
+  GDBusConnection *connection;
+
   GSettings *settings;
 
   GFileMonitor *monitor;
@@ -74,6 +76,7 @@ eos_app_list_model_finalize (GObject *gobject)
 
   g_clear_object (&self->monitor);
   g_clear_object (&self->settings);
+  g_clear_object (&self->connection);
   g_clear_object (&self->app_tree);
   g_hash_table_unref (self->apps_by_id);
   g_hash_table_unref (self->installed_apps);
@@ -113,6 +116,8 @@ eos_app_list_model_init (EosAppListModel *self)
 
   self->settings = g_settings_new ("org.gnome.shell");
 
+  self->connection = g_bus_get_sync (G_BUS_TYPE_SESSION, NULL, NULL);
+
   self->app_tree =
     gmenu_tree_new ("gnome-applications.menu", GMENU_TREE_FLAGS_INCLUDE_NODISPLAY);
 
@@ -132,6 +137,64 @@ eos_app_list_model_new (void)
   return g_object_new (EOS_TYPE_APP_LIST_MODEL, NULL);
 }
 
+static gboolean
+add_app_to_shell (EosAppListModel *self,
+                  const char *app_id)
+{
+  GError *error = NULL;
+
+  g_dbus_connection_call_sync (self->connection,
+                               "org.gnome.Shell",
+                               "/org/gnome/Shell",
+                               "org.gnome.Shell", "AddApplication",
+                               g_variant_new ("(s)", app_id),
+                               NULL,
+                               G_DBUS_CALL_FLAGS_NONE,
+                               -1,
+                               NULL,
+                               &error);
+  if (error != NULL)
+    {
+      g_critical ("Unable to add application '%s': %s",
+                  app_id,
+                  error->message);
+      g_error_free (error);
+
+      return FALSE;
+    }
+
+  return TRUE;
+}
+
+static gboolean
+remove_app_from_shell (EosAppListModel *self,
+                       const char *app_id)
+{
+  GError *error = NULL;
+
+  g_dbus_connection_call_sync (self->connection,
+                               "org.gnome.Shell",
+                               "/org/gnome/Shell",
+                               "org.gnome.Shell", "RemoveApplication",
+                               g_variant_new ("(s)", app_id),
+                               NULL,
+                               G_DBUS_CALL_FLAGS_NONE,
+                               -1,
+                               NULL,
+                               &error);
+  if (error != NULL)
+    {
+      g_critical ("Unable to add application '%s': %s",
+                  app_id,
+                  error->message);
+      g_error_free (error);
+
+      return FALSE;
+    }
+
+  return TRUE;
+}
+
 static void
 add_to_set (JsonArray *array,
             guint      index_,
@@ -145,31 +208,6 @@ add_to_set (JsonArray *array,
     {
       g_hash_table_add (set, json_node_dup_string (element));
     }
-}
-
-static void
-update_shell_settings (EosAppListModel *self)
-{
-#if 0
-  GVariant *v, *entries;
-  GVariantIter iter;
-  const char *id;
-
-  v = g_settings_get_value (self->settings, "icon-grid-layout");
-  if (v == NULL)
-    return;
-
-  entries = g_variant_lookup_value (v, "", G_VARIANT_TYPE ("as"));
-
-  g_variant_iter_init (&iter, entries);
-  while (g_variant_iter_next (&iter, "^s", &id))
-    {
-      g_print ("icon-grid-layout ['%s']\n", id);
-    }
-
-  g_variant_unref (entries);
-  g_variant_unref (v);
-#endif
 }
 
 static void
@@ -494,8 +532,10 @@ eos_app_list_model_install_app (EosAppListModel *model,
   if (is_app_installed (model, app_id))
     return;
 
+  if (!add_app_to_shell (model, app_id))
+    return;
+
   g_hash_table_add (model->installed_apps, g_strdup (app_id));
-  update_shell_settings (model);
   save_installed_apps (model);
 }
 
@@ -512,7 +552,9 @@ eos_app_list_model_uninstall_app (EosAppListModel *model,
   if (!is_app_installed (model, app_id))
     return;
 
+  if (!remove_app_from_shell (model, app_id))
+    return;
+
   g_hash_table_remove (model->installed_apps, app_id);
-  update_shell_settings (model);
   save_installed_apps (model);
 }
