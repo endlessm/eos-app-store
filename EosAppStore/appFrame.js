@@ -69,17 +69,17 @@ const AppListBoxRow = new Lang.Class({
 
         switch (this._appState) {
             case EosAppStorePrivate.AppState.INSTALLED:
-                this._appStateButton.set_label('UNINSTALL');
+                this._appStateButton.set_label(_('UNINSTALL'));
                 this._appStateButton.show();
                 break;
 
             case EosAppStorePrivate.AppState.UNINSTALLED:
-                this._appStateButton.set_label('INSTALL');
+                this._appStateButton.set_label(_('INSTALL'));
                 this._appStateButton.show();
                 break;
 
             case EosAppStorePrivate.AppState.UPDATABLE:
-                this._appStateButton.set_label('UPDATE');
+                this._appStateButton.set_label(_('UPDATE'));
                 this._appStateButton.show();
                 break;
 
@@ -110,8 +110,10 @@ const AppListBox = new Lang.Class({
     Name: 'AppListBox',
     Extends: PLib.ListBox,
 
-    _init: function() {
+    _init: function(model) {
         this.parent();
+
+        this._model = model;
     },
 });
 
@@ -154,7 +156,7 @@ const AppFrame = new Lang.Class({
         this._mainBox.vexpand = true;
         this._mainBox.show();
 
-        this._listBox = new AppListBox();
+        this._listBox = new AppListBox(this._appListModel);
         this._viewport.add(this._listBox);
         this._listBox.show_all();
 
@@ -180,7 +182,6 @@ const AppFrame = new Lang.Class({
               return;
 
             let row = new AppListBoxRow(this._appListModel, item);
-
             row.appName = model.getAppName(item);
             row.appDescription = model.getAppDescription(item);
             row.appIcon = model.getAppIcon(item);
