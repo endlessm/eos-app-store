@@ -9,12 +9,12 @@ Makefile.in
 /missing
 /stamp-h1
 /data/*.gresource
+/data/eos-app-store.desktop
 /EosAppStore/path.js
 /EosAppStore/config.js
 /ABOUT-NLS
 /m4
 /po/Makefile.in.in
-/po/Makefile.in.in~
 /po/Makevars.template
 /po/POTFILES
 /po/Rules-quot
@@ -26,3 +26,5 @@ Makefile.in
 /po/quot.sed
 /po/remove-potcdate.sin
 /po/stamp-it
+/po/.intltool-merge-cache
+/po/*.gmo
