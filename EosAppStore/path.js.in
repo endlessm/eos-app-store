@@ -1,0 +1,2 @@
+const RESOURCE_DIR = '@pkgdatadir@';
+const LOCALE_DIR = "@localedir@";

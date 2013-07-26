@@ -1,11 +1,6 @@
-# List of source files containing translatable strings.
-# Please keep this file sorted alphabetically.
 [encoding: UTF-8]
 data/eos-app-store.desktop.in
-EosAppStore/add_shortcuts_module/add_folder_box.py
-EosAppStore/add_shortcuts_module/add_shortcuts_model.py
-EosAppStore/add_shortcuts_module/add_shortcuts_presenter.py
-EosAppStore/add_shortcuts_module/add_shortcuts_view.py
-EosAppStore/add_shortcuts_module/add_website_box.py
-EosAppStore/removal_module/delete_not_possible_popup.py
-EosAppStore/shortcut/add_remove_shortcut.py
+[type: gettext/glade]data/eos-app-store-main-window.ui
+EosAppStore/appStore.js
+EosAppStore/appStoreWindow.js
+EosAppStore/storeModel.js

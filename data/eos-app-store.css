@@ -1,0 +1,31 @@
+.background {
+  background-color: rgb(22, 22, 22);
+}
+
+.sidebar-frame {
+  padding-right: 64px;
+  margin-left: 6px;
+}
+
+.sidebar-button {
+  color: white;
+}
+
+.sidebar-button:hover {
+  color: black;
+}
+
+.content-frame {
+  padding-left: 18px;
+  box-shadow: 4px 0 2px rgba(0, 0, 0, 0.85) inset;
+}
+
+.header-title {
+  font: Sans 24px;
+  color: white;
+}
+
+.header-description {
+  font: regular;
+  color: white;
+}
