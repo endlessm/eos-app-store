@@ -58,7 +58,8 @@ const AppStoreSlider = new Lang.Class({
     _getSize: function() {
         let workarea = this._getWorkarea();
         let defaultWidth = workarea.width * FRACTION_OF_DISPLAY_WIDTH;
-        return [Math.max(APP_STORE_WIDTH, defaultWidth), workarea.height];
+        let minWidth = Math.min(workarea.width, APP_STORE_WIDTH);
+        return [Math.max(minWidth, defaultWidth), workarea.height];
     },
 
     _updateGeometry: function() {
