@@ -7,6 +7,8 @@
 # Reset the desktop to the default installed apps and links
 
 from gi.repository import Gio
+from gi.repository import GLib
+import os
 
 EOS_SHELL_SCHEMA = 'org.gnome.shell'
 ICON_GRID_LAYOUT_SETTING = 'icon-grid-layout'
@@ -14,3 +16,17 @@ ICON_GRID_LAYOUT_SETTING = 'icon-grid-layout'
 settings = Gio.Settings.new(schema_id = EOS_SHELL_SCHEMA)
 settings.reset(ICON_GRID_LAYOUT_SETTING)
 settings.sync()
+
+# Remove any custom file or folder names
+
+user_dir = GLib.get_user_data_dir();
+app_dir = os.path.join(user_dir, 'applications');
+folder_dir = os.path.join(user_dir, 'desktop-directories');
+
+for file in os.listdir(app_dir):
+    if file.startswith('eos-app-') or file.startswith('eos-link-'):
+        os.remove(os.path.join(app_dir, file))
+
+for file in os.listdir(folder_dir):
+    if file.startswith('eos-folder-'):
+        os.remove(os.path.join(folder_dir, file))
