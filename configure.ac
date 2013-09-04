@@ -32,6 +32,7 @@ AC_CONFIG_FILES([
         Makefile
         data/Makefile
         images/Makefile
+        css/Makefile
         EosAppStore/Makefile
         EosAppStore/add_shortcuts_module/Makefile
         EosAppStore/application_store/Makefile

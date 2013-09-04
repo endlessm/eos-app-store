@@ -31,8 +31,8 @@ class AddWebsiteBox(Gtk.Box):
         self._scrolled_window.get_vscrollbar().connect("value-changed", self._on_scroll)
 
         label_text = _('TYPE WEBSITE')
-        self._label = Gtk.Label()
-        self._label.set_markup('<span color="#aaaaaa" font="Novecento wide" font_weight="bold" size="16000">' + label_text + '</span>')
+        self._label = Gtk.Label(label_text)
+        self._label.get_style_context().add_class('title')
 
         self._text_entry_align = Gtk.Alignment()
         self._text_entry_align.set(0.5, 0.5, 0, 0)

@@ -1,4 +1,4 @@
-SUBDIRS = data EosAppStore images po
+SUBDIRS = data EosAppStore images css po
 
 bin_SCRIPTS = eos-app-store eos-fill-desktop eos-reset-desktop
 

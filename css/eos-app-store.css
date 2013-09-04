@@ -1,0 +1,11 @@
+/* CSS for eos-app-store */
+
+.title {
+	font: "Novecento wide";
+	font-weight: bold;
+	color: #ffffff;
+	font-size: 16pt;
+	text-shadow: 1px 1px 1px alpha(black, 0.8);
+	padding-top: 40px;
+	padding-bottom: 20px;
+}
