@@ -36,12 +36,10 @@ class AddFolderBox(Gtk.Box):
         self._vbox.set_spacing(15)
         self._vbox.connect("draw", self._handle_event)
 
-        label_1_text = _('1. NAME YOUR FOLDER')
-        self._label_1 = Gtk.Label()
-        label_2_text = _('2. PICK A SYMBOL')
-        self._label_2 = Gtk.Label()
-        self._label_1.set_markup('<span color="#aaaaaa" font="Novecento wide" font_weight="bold" size="16000">' + label_1_text + '</span>')
-        self._label_2.set_markup('<span color="#aaaaaa" font="Novecento wide" font_weight="bold" size="16000">' + label_2_text + '</span>')
+        self._label_1 = Gtk.Label(_('1. NAME YOUR FOLDER'))
+        self._label_1.get_style_context().add_class('title')
+        self._label_2 = Gtk.Label(_('2. PICK A SYMBOL'))
+        self._label_2.get_style_context().add_class('title')
 
         self._text_entry_align = Gtk.Alignment()
         self._text_entry_align.set(0.5, 0.5, 0, 0)
