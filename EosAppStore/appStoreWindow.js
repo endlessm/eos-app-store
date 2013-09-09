@@ -132,7 +132,7 @@ const AppStoreWindow = new Lang.Class({
         'close-button',
     ],
 
-    _init: function(app, storeModel) {
+    _init: function(app, storeModel, initialPage) {
         this.parent({ application: app,
                         type_hint: Gdk.WindowTypeHint.DOCK,
                              type: Gtk.WindowType.TOPLEVEL,
@@ -168,7 +168,7 @@ const AppStoreWindow = new Lang.Class({
 
         this._storeModel = storeModel;
         this._storeModel.connect('page-changed', Lang.bind(this, this._onStorePageChanged));
-        this._onStorePageChanged(this._storeModel, StoreModel.StorePage.APPS);
+        this._onStorePageChanged(this._storeModel, initialPage);
     },
 
     _onCloseClicked: function() {
