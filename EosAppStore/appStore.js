@@ -27,8 +27,6 @@ const AppStoreIface = <interface name={APP_STORE_NAME}>
   <method name="ShowPage">
     <arg type="s" direction="in" name="page"/>
   </method>
-  <property name="Visible" type="b" access="read"/>
-  <property name="CurrentPage" type="s" access="read"/>
 </interface>;
 
 const AppStore = new Lang.Class({
