@@ -27,6 +27,7 @@ const AppStoreIface = <interface name={APP_STORE_NAME}>
   <method name="ShowPage">
     <arg type="s" direction="in" name="page"/>
   </method>
+  <property name="Visible" type="b" access="read"/>
 </interface>;
 
 const AppStore = new Lang.Class({
@@ -44,6 +45,7 @@ const AppStore = new Lang.Class({
 
         this._initialPage = initialPage;
         this._storeModel = new StoreModel.StoreModel();
+        this.Visible = false;
 
         this._dbusImpl = Gio.DBusExportedObject.wrapJSObject(AppStoreIface, this);
         this._dbusImpl.export(Gio.DBus.session, APP_STORE_PATH);
@@ -65,6 +67,8 @@ const AppStore = new Lang.Class({
         this._mainWindow = new AppStoreWindow.AppStoreWindow(this,
                                                              this._storeModel,
                                                              this._initialPage);
+        this._mainWindow.connect('visibility-changed',
+                                 Lang.bind(this, this._onVisibilityChanged));
     },
 
     vfunc_activate: function() {
@@ -93,4 +97,16 @@ const AppStore = new Lang.Class({
             return;
         }
     },
+
+    _onVisibilityChanged: function(proxy, visible) {
+        this.Visible = visible;
+
+        let propChangedVariant = new GLib.Variant('(sa{sv}as)',
+            [APP_STORE_IFACE, { 'Visible': new GLib.Variant('b', this.Visible) }, []]);
+
+        Gio.DBus.session.emit_signal(null, APP_STORE_PATH,
+                                     'org.freedesktop.DBus.Properties',
+                                     'PropertiesChanged',
+                                     propChangedVariant);
+    }
 });
