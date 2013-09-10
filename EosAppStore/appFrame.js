@@ -28,10 +28,10 @@ const AppListBoxRow = new Lang.Class({
     templateResource: '/com/endlessm/appstore/eos-app-store-list-row.ui',
     templateChildren: [
         '_mainBox',
-        '_appIcon',
-        '_appNameLabel',
-        '_appDescriptionLabel',
-        '_appStateButton',
+        '_icon',
+        '_nameLabel',
+        '_descriptionLabel',
+        '_stateButton',
     ],
 
     _init: function(model, appId) {
@@ -44,7 +44,7 @@ const AppListBoxRow = new Lang.Class({
         this.add(this._mainBox);
         this._mainBox.show();
 
-        this._appStateButton.connect('clicked', Lang.bind(this, this._onAppStateButtonClicked));
+        this._stateButton.connect('clicked', Lang.bind(this, this._onStateButtonClicked));
 
         this.appName = this._model.getAppName(this._appId);
         this.appDescription = this._model.getAppDescription(this._appId);
@@ -61,7 +61,7 @@ const AppListBoxRow = new Lang.Class({
             name = _("Unknown application");
         }
 
-        this._appNameLabel.set_text(name);
+        this._nameLabel.set_text(name);
     },
 
     set appDescription(description) {
@@ -69,7 +69,7 @@ const AppListBoxRow = new Lang.Class({
             description = "";
         }
 
-        this._appDescriptionLabel.set_text(description);
+        this._descriptionLabel.set_text(description);
     },
 
     set appIcon(name) {
@@ -77,27 +77,27 @@ const AppListBoxRow = new Lang.Class({
             name = "gtk-missing-image";
         }
 
-        this._appIcon.set_from_icon_name(name, Gtk.IconSize.DIALOG);
+        this._icon.set_from_icon_name(name, Gtk.IconSize.DIALOG);
     },
 
     set appState(state) {
         this._appState = state;
-        this._appStateButton.hide();
+        this._stateButton.hide();
 
         switch (this._appState) {
             case EosAppStorePrivate.AppState.INSTALLED:
-                this._appStateButton.set_label(_("UNINSTALL"));
-                this._appStateButton.show();
+                this._stateButton.set_label(_('UNINSTALL'));
+                this._stateButton.show();
                 break;
 
             case EosAppStorePrivate.AppState.UNINSTALLED:
-                this._appStateButton.set_label(_("INSTALL"));
-                this._appStateButton.show();
+                this._stateButton.set_label(_('INSTALL'));
+                this._stateButton.show();
                 break;
 
             case EosAppStorePrivate.AppState.UPDATABLE:
-                this._appStateButton.set_label(_("UPDATE"));
-                this._appStateButton.show();
+                this._stateButton.set_label(_('UPDATE'));
+                this._stateButton.show();
                 break;
 
             default:
@@ -105,7 +105,7 @@ const AppListBoxRow = new Lang.Class({
         }
     },
 
-    _onAppStateButtonClicked: function() {
+    _onStateButtonClicked: function() {
         switch (this._appState) {
             case EosAppStorePrivate.AppState.INSTALLED:
                 this._model.uninstallApp(this._appId);

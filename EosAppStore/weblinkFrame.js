@@ -1,4 +1,4 @@
-// -*- mode: js; js-indent-level: 4; indent-tabs-mode: nil -*-
+//: js; js-indent-level: 4; indent-tabs-mode: nil -*-
 const Gdk = imports.gi.Gdk;
 const Gio = imports.gi.Gio;
 const GLib = imports.gi.GLib;
@@ -7,7 +7,7 @@ const Gtk = imports.gi.Gtk;
 const EosAppStorePrivate = imports.gi.EosAppStorePrivate;
 const PLib = imports.gi.PLib;
 
-const AppListModel = imports.appListModel;
+const WeblinkListModel = imports.appListModel;
 const Builder = imports.builder;
 const Lang = imports.lang;
 const Signals = imports.signals;
@@ -19,68 +19,63 @@ const WeblinkListBoxRow = new Lang.Class({
     templateResource: '/com/endlessm/appstore/eos-app-store-list-row.ui',
     templateChildren: [
         '_mainBox',
-        '_appIcon',
-        '_appNameLabel',
-        '_appDescriptionLabel',
-        '_appStateButton',
+        '_icon',
+        '_nameLabel',
+        '_descriptionLabel',
+        '_stateButton',
     ],
 
-    _init: function(model, appId) {
+    _init: function(model, weblinkId) {
         this.parent();
 
         this._model = model;
-        this._appId = appId;
+        this._weblinkId = weblinkId;
 
         this.initTemplate({ templateRoot: '_mainBox', bindChildren: true, connectSignals: true, });
         this.add(this._mainBox);
         this._mainBox.show();
 
-        this._appStateButton.connect('clicked', Lang.bind(this, this._onAppStateButtonClicked));
+        this._stateButton.connect('clicked', Lang.bind(this, this._onStateButtonClicked));
     },
 
-    get appId() {
-        return this._appId;
+    get weblinkId() {
+        return this._weblinkId;
     },
 
-    set appName(name) {
+    set weblinkName(name) {
         if (!name)
-            name = _("Unknown application");
+            name = _("Unknown weblink");
 
-        this._appNameLabel.set_text(name);
+        this._nameLabel.set_text(name);
     },
 
-    set appDescription(description) {
+    set weblinkDescription(description) {
         if (!description)
             description = "";
 
-        this._appDescriptionLabel.set_text(description);
+        this._descriptionLabel.set_text(description);
     },
 
-    set appIcon(name) {
+    set weblinkIcon(name) {
         if (!name)
             name = "gtk-missing-image";
 
-        this._appIcon.set_from_icon_name(name, Gtk.IconSize.DIALOG);
+        this._icon.set_from_icon_name(name, Gtk.IconSize.DIALOG);
     },
 
-    set appState(state) {
-        this._appState = state;
-        this._appStateButton.hide();
+    set weblinkState(state) {
+        this._weblinkState = state;
+        this._stateButton.hide();
 
-        switch (this._appState) {
+        switch (this._weblinkState) {
             case EosAppStorePrivate.AppState.INSTALLED:
-                this._appStateButton.set_label(_('UNINSTALL'));
-                this._appStateButton.show();
+                this._stateButton.set_label(_('UNINSTALL'));
+                this._stateButton.show();
                 break;
 
             case EosAppStorePrivate.AppState.UNINSTALLED:
-                this._appStateButton.set_label(_('INSTALL'));
-                this._appStateButton.show();
-                break;
-
-            case EosAppStorePrivate.AppState.UPDATABLE:
-                this._appStateButton.set_label(_('UPDATE'));
-                this._appStateButton.show();
+                this._stateButton.set_label(_('INSTALL'));
+                this._stateButton.show();
                 break;
 
             default:
@@ -88,18 +83,14 @@ const WeblinkListBoxRow = new Lang.Class({
         }
     },
 
-    _onAppStateButtonClicked: function() {
-        switch (this._appState) {
+    _onStateButtonClicked: function() {
+        switch (this._weblinkState) {
             case EosAppStorePrivate.AppState.INSTALLED:
-                this._model.uninstallApp(this._appId);
+                this._model.uninstallWeblink(this._weblinkId);
                 break;
 
             case EosAppStorePrivate.AppState.UNINSTALLED:
-                this._model.installApp(this._appId);
-                break;
-
-            case EosAppStorePrivate.AppState.UPDATABLE:
-                this._model.updateApp(this._appId);
+                this._model.installWeblink(this._weblinkId);
                 break;
         }
     },
@@ -142,7 +133,7 @@ const WeblinkFrame = new Lang.Class({
 
         this.initTemplate({ templateRoot: '_mainBox', bindChildren: true, connectSignals: true, });
 
-        this._weblinkListModel = new AppListModel.AppList();
+        this._weblinkListModel = new WeblinkListModel.WeblinkList();
         this._weblinkListModel.connect('changed', Lang.bind(this, this._onListModelChange));
 
         this._stack = new PLib.Stack();
@@ -169,23 +160,15 @@ const WeblinkFrame = new Lang.Class({
         this._stack.set_visible_child_name('weblink-list');
     },
 
-    _onListModelChange: function(model, apps) {
+    _onListModelChange: function(model, weblinks) {
         this._listBox.foreach(function(child) { child.destroy(); });
 
-        apps.forEach(Lang.bind(this, function(item) {
-            // skip ourselves
-            if (item == 'eos-app-store.desktop')
-              return;
-
-            // skip invisible items
-            if (!model.getAppVisible(item))
-              return;
-
+        weblinks.forEach(Lang.bind(this, function(item) {
             let row = new WeblinkListBoxRow(this._weblinkListModel, item);
-            row.appName = model.getAppName(item);
-            row.appDescription = model.getAppDescription(item);
-            row.appIcon = model.getAppIcon(item);
-            row.appState = model.getAppState(item);
+            row.weblinkName = model.getWeblinkName(item);
+            row.weblinkDescription = model.getWeblinkDescription(item);
+            row.weblinkIcon = model.getWeblinkIcon(item);
+            row.weblinkState = model.getWeblinkState(item);
 
             this._listBox.add(row);
             row.show();

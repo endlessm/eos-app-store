@@ -12,6 +12,7 @@ const Lang = imports.lang;
 const Signals = imports.signals;
 
 const AppFrame = imports.appFrame;
+const WeblinkFrame = imports.weblinkFrame;
 const FrameClock = imports.frameClock;
 const StoreModel = imports.storeModel;
 const UIBuilder = imports.builder;
