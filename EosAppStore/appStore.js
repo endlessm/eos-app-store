@@ -14,6 +14,8 @@ const Config = imports.config;
 const Path = imports.path;
 const StoreModel = imports.storeModel;
 
+const APP_STORE_CSS = 'resource:///com/endlessm/appstore/eos-app-store.css';
+
 const APP_STORE_NAME = 'com.endlessm.AppStore';
 const APP_STORE_PATH = '/com/endlessm/AppStore';
 const APP_STORE_IFACE = 'com.endlessm.AppStore';
@@ -22,14 +24,16 @@ const AppStoreIface = <interface name={APP_STORE_NAME}>
   <method name="toggle">
     <arg type="u" direction="in" name="timestamp"/>
   </method>
-  <property name="Visible" type="b" access="read"/>
+  <method name="ShowPage">
+    <arg type="s" direction="in" name="page"/>
+  </method>
 </interface>;
 
 const AppStore = new Lang.Class({
     Name: 'AppStore',
     Extends: Gtk.Application,
 
-    _init: function() {
+    _init: function(initialPage) {
         Gettext.bindtextdomain(Config.GETTEXT_DOMAIN, Path.LOCALE_DIR);
         Gettext.textdomain(Config.GETTEXT_DOMAIN);
 
@@ -38,6 +42,7 @@ const AppStore = new Lang.Class({
 
         this.parent({ application_id: APP_STORE_NAME, });
 
+        this._initialPage = initialPage;
         this._storeModel = new StoreModel.StoreModel();
 
         this._dbusImpl = Gio.DBusExportedObject.wrapJSObject(AppStoreIface, this);
@@ -52,12 +57,14 @@ const AppStore = new Lang.Class({
 
         // main style provider
         let provider = new Gtk.CssProvider();
-        provider.load_from_file(Gio.File.new_for_uri('resource:///com/endlessm/appstore/eos-app-store.css'));
+        provider.load_from_file(Gio.File.new_for_uri(APP_STORE_CSS));
         Gtk.StyleContext.add_provider_for_screen(Gdk.Screen.get_default(), provider,
                                                  Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION);
 
         // the main window
-        this._mainWindow = new AppStoreWindow.AppStoreWindow(this, this._storeModel);
+        this._mainWindow = new AppStoreWindow.AppStoreWindow(this,
+                                                             this._storeModel,
+                                                             this._initialPage);
     },
 
     vfunc_activate: function() {
@@ -70,5 +77,20 @@ const AppStore = new Lang.Class({
 
     toggle: function(timestamp) {
         this._mainWindow.toggle(timestamp);
-    }
+    },
+
+    ShowPage: function(page) {
+        if (page == 'apps') {
+            this._storeModel.changePage(StoreModel.StorePage.APPS);
+            return;
+        }
+        if (page == 'folders') {
+            this._storeModel.changePage(StoreModel.StorePage.FOLDERS);
+            return;
+        }
+        if (page == 'web') {
+            this._storeModel.changePage(StoreModel.StorePage.WEB);
+            return;
+        }
+    },
 });
