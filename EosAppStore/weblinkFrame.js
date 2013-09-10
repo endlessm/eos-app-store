@@ -1,27 +1,42 @@
 //: js; js-indent-level: 4; indent-tabs-mode: nil -*-
 const Gdk = imports.gi.Gdk;
+const GdkPixbuf = imports.gi.GdkPixbuf;
 const Gio = imports.gi.Gio;
 const GLib = imports.gi.GLib;
 const GObject = imports.gi.GObject;
 const Gtk = imports.gi.Gtk;
 const EosAppStorePrivate = imports.gi.EosAppStorePrivate;
 const PLib = imports.gi.PLib;
+const WebKit = imports.gi.WebKit2;
 
 const WeblinkListModel = imports.appListModel;
 const Builder = imports.builder;
 const Lang = imports.lang;
 const Signals = imports.signals;
 
+const NEW_SITE_TITLE_LIMIT = 20;
+const NEW_SITE_DEFAULT_MESSAGE = "ex.: http://wwww.globoesporte.com";
+const NEW_SITE_ADDED_MESSAGE = "was added successfully";
+const NEW_SITE_SUCCESS_TIMEOUT = 3;
+
+const NewSiteAlertItem = {
+    NOTHING: 0,
+    SPINNER: 1,
+    CANCEL: 2,
+    ERROR: 3,
+};
+
 const WeblinkListBoxRow = new Lang.Class({
     Name: 'WeblinkListBoxRow',
     Extends: Gtk.Bin,
 
-    templateResource: '/com/endlessm/appstore/eos-app-store-list-row.ui',
+    templateResource: '/com/endlessm/appstore/eos-app-store-weblink-list-row.ui',
     templateChildren: [
         '_mainBox',
         '_icon',
         '_nameLabel',
         '_descriptionLabel',
+	'_urlLabel',
         '_stateButton',
     ],
 
@@ -49,11 +64,18 @@ const WeblinkListBoxRow = new Lang.Class({
         this._nameLabel.set_text(name);
     },
 
-    set weblinkDescription(description) {
+   set weblinkDescription(description) {
         if (!description)
             description = "";
 
         this._descriptionLabel.set_text(description);
+    },
+
+   set weblinkUrl(url) {
+        if (!url)
+            url = "";
+
+        this._urlLabel.set_text(url);
     },
 
     set weblinkIcon(name) {
@@ -124,40 +146,72 @@ const WeblinkFrame = new Lang.Class({
     templateResource: '/com/endlessm/appstore/eos-app-store-weblink-frame.ui',
     templateChildren: [
         '_mainBox',
+	'_newSiteBox',
+	'_newSiteIcon',
+	'_newSiteUrl',
+	'_newSiteAlertSpinner',
+	'_newSiteAlertCancel',
+	'_newSiteAlertError',
+	'_newSiteAlertLabel',
+	'_newSiteAddButton',
+	'_newSiteAddButtonImage',
+	'_listFrame',
         '_scrolledWindow',
         '_viewport',
     ],
 
     _init: function() {
         this.parent();
+	this._webkit = null;
+	this._newSiteError = false;
 
         this.initTemplate({ templateRoot: '_mainBox', bindChildren: true, connectSignals: true, });
+	this.add(this._mainBox);
+	this._mainBox.show_all();
 
         this._weblinkListModel = new WeblinkListModel.WeblinkList();
         this._weblinkListModel.connect('changed', Lang.bind(this, this._onListModelChange));
-
-        this._stack = new PLib.Stack();
-        this._stack.set_transition_duration(250);
-        this._stack.set_transition_type(PLib.StackTransitionType.SLIDE_RIGHT);
-        this.add(this._stack);
-        this._stack.show();
-
-        this._stack.add_named(this._mainBox, 'weblink-list');
-        this._mainBox.hexpand = true;
-        this._mainBox.vexpand = true;
-        this._mainBox.show();
 
         this._listBox = new WeblinkListBox(this._weblinkListModel);
         this._viewport.add(this._listBox);
         this._listBox.show_all();
 
-        this._descriptionBox = new WeblinkDescriptionBox();
-        this._descriptionBox.hexpand = true;
-        this._descriptionBox.vexpand = true;
-        this._stack.add_named(this._descriptionBox, 'weblink-description');
-        this._descriptionBox.show();
+	this._newSiteAlertSwitch(NewSiteAlertItem.NOTHING);
+    },
 
-        this._stack.set_visible_child_name('weblink-list');
+    _setVisibleNewSiteAlertSpinner: function(isVisible) {
+	if (isVisible) {
+	    this._newSiteAlertSpinner.opacity = 1;
+	    this._newSiteAlertSpinner.start();
+	} else {
+	    this._newSiteAlertSpinner.stop();
+	    this._newSiteAlertSpinner.opacity = 0;
+	}
+    },
+
+    _newSiteAlertSwitch: function(newItem) {
+	switch (newItem) {
+	case NewSiteAlertItem.NOTHING:
+	    this._setVisibleNewSiteAlertSpinner(false);
+	    this._newSiteAlertError.visible = false;
+	    this._newSiteAlertCancel.visible = false;
+	    break;
+	case NewSiteAlertItem.SPINNER:
+	    this._setVisibleNewSiteAlertSpinner(true);
+	    this._newSiteAlertError.visible = false;
+	    this._newSiteAlertCancel.visible = false;
+	    break;
+	case NewSiteAlertItem.CANCEL:
+	    this._setVisibleNewSiteAlertSpinner(false);
+	    this._newSiteAlertError.visible = false;
+	    this._newSiteAlertCancel.visible = true;
+	    break;
+	case NewSiteAlertItem.ERROR:
+	    this._setVisibleNewSiteAlertSpinner(false);
+	    this._newSiteAlertError.visible = true;
+	    this._newSiteAlertCancel.visible = false;
+	    break;
+	}
     },
 
     _onListModelChange: function(model, weblinks) {
@@ -166,13 +220,107 @@ const WeblinkFrame = new Lang.Class({
         weblinks.forEach(Lang.bind(this, function(item) {
             let row = new WeblinkListBoxRow(this._weblinkListModel, item);
             row.weblinkName = model.getWeblinkName(item);
-            row.weblinkDescription = model.getWeblinkDescription(item);
+            row.weblinkDescription = model.getWeblinkComment(item);
+	    row.weblinkUrl = model.getWeblinkUrl(item);
             row.weblinkIcon = model.getWeblinkIcon(item);
             row.weblinkState = model.getWeblinkState(item);
 
             this._listBox.add(row);
             row.show();
         }));
+    },
+
+    _onNewSiteUrlActivated: function() {
+	if (!this._webview) {
+	    this._webview = new WebKit.WebView();
+	    this._webview.connect('load-changed', Lang.bind(this, this._onUriLoadChanged));
+	    this._webview.connect('load-failed', Lang.bind(this, this._onUriLoadFailed));
+	}
+	let url = this._newSiteUrl.get_text();
+	this._webview.load_uri(url);
+    },
+
+    _onUriLoadChanged: function(webview, loadEvent) {
+	switch (loadEvent) {
+	case WebKit.LoadEvent.STARTED:
+	    this._newSiteAlertSwitch(NewSiteAlertItem.SPINNER);
+	    this._newSiteAlertLabel.set_text("searching");
+	    this._newSiteError = false;
+	    break;
+	case WebKit.LoadEvent.FINISHED:
+	    if (this._newSiteError) {
+		return;
+	    }
+
+	    this._newSiteAlertSwitch(NewSiteAlertItem.CANCEL);
+	    this._newSiteAddButton.visible = true;
+	    this._newSiteUrl.set_text(webview.get_title());
+	    this._newSiteAlertLabel.set_text(webview.get_uri());
+
+	    /* Narrow the entry and put the focus so user can change the title */
+	    let [entryWidth, entryHeight] = this._newSiteUrl.get_size_request();
+	    this._newSiteUrl.max_length = NEW_SITE_TITLE_LIMIT;
+	    this._newSiteUrl.halign = Gtk.Align.START;
+	    break;
+	default:
+	    break;
+	}
+    },
+
+    _onUriLoadFailed: function() {
+	this._newSiteError = true;
+	this._newSiteAlertLabel.set_text("the address written does not exist or is not available");
+	this._newSiteAlertSwitch(NewSiteAlertItem.ERROR);
+	return true;
+    },
+
+    _onNewSiteCancel: function() {
+	this._newSiteReset();
+    },
+
+    _onNewSiteAdd: function() {
+	let url = this._newSiteAlertLabel.get_text();
+	let title = this._newSiteUrl.get_text();
+	this._newSiteUrl.sensitive = false;
+	this._newSiteAlertSwitch(NewSiteAlertItem.NOTHING);
+	this._newSiteAlertLabel.set_text(NEW_SITE_ADDED_MESSAGE);
+	this._newSiteAddButton.sensitive = false;
+	let newSite = this._weblinkListModel.createWeblink(url, title, "browser");
+	this.update();
+	this._weblinkListModel.installWeblink(newSite);
+	GLib.timeout_add_seconds(GLib.PRIORITY_DEFAULT,
+				 NEW_SITE_SUCCESS_TIMEOUT,
+				 Lang.bind(this, function() {
+				     this._newSiteUrl.sensitive = true;
+				     this._newSiteAddButton.sensitive = true;
+				     this._newSiteReset();
+				     return false;
+				 }));
+    },
+
+    _newSiteReset: function() {
+	this._newSiteAddButton.visible = false;
+	this._newSiteAlertSwitch(NewSiteAlertItem.NOTHING);
+	this._newSiteAlertLabel.set_text(NEW_SITE_DEFAULT_MESSAGE);
+	this._newSiteUrl.set_text("");
+	this._newSiteUrl.max_length = 0;
+	this._newSiteUrl.halign = Gtk.Align.FILL;
+	this._newSiteUrl.grab_focus();
+    },
+
+    _getPixbufFromSurface: function(surface) {
+	if (!surface) {
+	    return null;
+	}
+
+	let surface_width = surface.get_width();
+	let surface_height = surface.get_height();
+	pixbuf = GdkPixbuf.get_from_surface(surface, 0, 0, surface_width, surface_height);
+	if (surface_width != width || surface_height != height) {
+	    pixbuf = pixbuf.scale_simple (width, height, Gdk.Interp.BILINEAR);
+	}
+
+	return pixbuf;
     },
 
     update: function() {
