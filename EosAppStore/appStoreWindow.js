@@ -4,6 +4,7 @@ const Gdk = imports.gi.Gdk;
 const GdkX11 = imports.gi.GdkX11;
 const Gio = imports.gi.Gio;
 const GLib = imports.gi.GLib;
+const GObject = imports.gi.GObject;
 const Gtk = imports.gi.Gtk;
 
 const Lang = imports.lang;
@@ -119,6 +120,9 @@ Signals.addSignalMethods(AppStoreSlider.prototype);
 const AppStoreWindow = new Lang.Class({
     Name: 'AppStoreWindow',
     Extends: Gtk.ApplicationWindow,
+    Signals: {
+        'visibility-changed': { param_types: [GObject.TYPE_BOOLEAN] },
+    },
 
     templateResource: '/com/endlessm/appstore/eos-app-store-main-window.ui',
     templateChildren: [
@@ -214,6 +218,7 @@ const AppStoreWindow = new Lang.Class({
     },
 
     _onVisibilityChanged: function() {
+        this.emit('visibility-changed', this._animator.showing);
     },
 
     getVisible: function() {
