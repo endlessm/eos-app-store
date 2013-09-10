@@ -208,6 +208,8 @@ const AppStoreWindow = new Lang.Class({
         this._pages = {};
         this._pages.apps = new AppFrame.AppFrame();
         this._stack.add_named(this._pages.apps, 'apps');
+        this._pages.weblinks = new WeblinkFrame.WeblinkFrame();
+        this._stack.add_named(this._pages.weblinks, 'weblinks');
 
         // switch to the 'Applications' page
         this._onStorePageChanged(this._storeModel, StoreModel.StorePage.APPS);
@@ -250,6 +252,8 @@ const AppStoreWindow = new Lang.Class({
             case StoreModel.StorePage.WEB:
                 title.set_text(_("INSTALL SITES"));
                 desc.set_text(_("A list of many sites you can add"));
+                this._pages.weblinks.update();
+                page = this._pages.weblinks;
                 break;
 
             case StoreModel.StorePage.FOLDERS:
