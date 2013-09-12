@@ -13,6 +13,7 @@ const Signals = imports.signals;
 
 const AppFrame = imports.appFrame;
 const WeblinkFrame = imports.weblinkFrame;
+const FolderFrame = imports.folderFrame;
 const FrameClock = imports.frameClock;
 const StoreModel = imports.storeModel;
 const UIBuilder = imports.builder;
@@ -211,6 +212,8 @@ const AppStoreWindow = new Lang.Class({
         this._stack.add_named(this._pages.apps, 'apps');
         this._pages.weblinks = new WeblinkFrame.WeblinkFrame();
         this._stack.add_named(this._pages.weblinks, 'weblinks');
+        this._pages.folders = new FolderFrame.FolderFrame();
+        this._stack.add_named(this._pages.folders, 'folders');
 
         // switch to the 'Applications' page
         this._onStorePageChanged(this._storeModel, StoreModel.StorePage.APPS);
@@ -260,6 +263,8 @@ const AppStoreWindow = new Lang.Class({
             case StoreModel.StorePage.FOLDERS:
                 title.set_text(_("FOLDERS"));
                 desc.set_text(_("A descriptive label for the Folders section"));
+                this._pages.apps.update();
+                page = this._pages.folders;
                 break;
         }
 

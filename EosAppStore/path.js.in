@@ -1,2 +1,3 @@
 const RESOURCE_DIR = '@pkgdatadir@';
 const LOCALE_DIR = "@localedir@";
+const FOLDER_ICONS_DIR = '/usr/share/icons/EndlessOS/64x64/categories';
