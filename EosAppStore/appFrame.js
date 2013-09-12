@@ -6,6 +6,7 @@ const GObject = imports.gi.GObject;
 const Gtk = imports.gi.Gtk;
 const EosAppStorePrivate = imports.gi.EosAppStorePrivate;
 const PLib = imports.gi.PLib;
+const Endless = imports.gi.Endless;
 
 const AppListModel = imports.appListModel;
 const Builder = imports.builder;
@@ -130,70 +131,101 @@ const AppFrame = new Lang.Class({
     Name: 'AppFrame',
     Extends: Gtk.Frame,
 
-    templateResource: '/com/endlessm/appstore/eos-app-store-app-frame.ui',
-    templateChildren: [
-        '_mainBox',
-        '_scrolledWindow',
-        '_viewport',
-    ],
-
     _init: function() {
         this.parent();
 
-        this.initTemplate({ templateRoot: '_mainBox', bindChildren: true, connectSignals: true, });
-
-        this._appListModel = new AppListModel.AppList();
-        this._appListModel.connect('changed', Lang.bind(this, this._onListModelChange));
-
-        this._stack = new PLib.Stack();
-        this._stack.set_transition_duration(250);
-        this._stack.set_transition_type(PLib.StackTransitionType.SLIDE_RIGHT);
-        this.add(this._stack);
-        this._stack.show();
-
-        this._stack.add_named(this._mainBox, 'app-list');
+        this._mainBox = new Gtk.Box({ orientation: Gtk.Orientation.VERTICAL, });
+        this.add(this._mainBox);
         this._mainBox.hexpand = true;
         this._mainBox.vexpand = true;
         this._mainBox.show();
 
-        this._listBox = new AppListBox(this._appListModel);
-        this._viewport.add(this._listBox);
-        this._listBox.show_all();
+        this._categoriesBox = new Gtk.Box({ orientation: Gtk.Orientation.HORIZONTAL, });
+        this._categoriesBox.hexpand = true;
+        this._mainBox.add(this._categoriesBox);
+        this._categoriesBox.show();
 
-        this._descriptionBox = new AppDescriptionBox();
-        this._descriptionBox.hexpand = true;
-        this._descriptionBox.vexpand = true;
-        this._stack.add_named(this._descriptionBox, 'app-description');
-        this._descriptionBox.show();
+        this._stack = new PLib.Stack();
+        this._stack.set_transition_duration(250);
+        this._stack.set_transition_type(PLib.StackTransitionType.SLIDE_RIGHT);
+        this._stack.hexpand = true;
+        this._stack.vexpand = true;
+        this._mainBox.add(this._stack);
+        this._stack.show();
 
-        this._stack.set_visible_child_name('app-list');
+        this._populateCategories();
     },
 
-    _onListModelChange: function(model, apps) {
-        this._listBox.foreach(function(child) { child.destroy(); });
+    _populateCategories: function() {
+        let categories = [
+            {
+                name: 'featured',
+                button: null,
+                grid: null,
+                label: "Featured",
+                id: EosAppStorePrivate.AppCategory.FEATURED,
+            },
+            {
+                name: 'education',
+                button: null,
+                grid: null,
+                label: "Education",
+                id: EosAppStorePrivate.AppCategory.EDUCATION,
+            },
+            {
+                name: 'leisure',
+                button: null,
+                grid: null,
+                label: "Leisure",
+                id: EosAppStorePrivate.AppCategory.LEISURE,
+            },
+            {
+                name: 'utilities',
+                button: null,
+                grid: null,
+                label: "Utilities",
+                id: EosAppStorePrivate.AppCategory.UTILITIES,
+            },
+        ];
 
-        apps.forEach(Lang.bind(this, function(item) {
-            // skip ourselves
-            if (item == 'eos-app-store.desktop')
-              return;
+        this._categories = categories;
 
-            // skip invisible items
-            if (!model.getAppVisible(item))
-              return;
+        for (let c in categories) {
+            categories[c].button = new Gtk.Button({ label: categories[c].label, });
+            categories[c].button.connect('clicked', Lang.bind(this, this._onCategoryClicked));
+            categories[c].button.show();
+            this._categoriesBox.add(categories[c].button);
 
-            let row = new AppListBoxRow(this._appListModel, item);
-            row.appName = model.getAppName(item);
-            row.appDescription = model.getAppDescription(item);
-            row.appIcon = model.getAppIcon(item);
-            row.appState = model.getAppState(item);
+            categories[c].grid = new Endless.FlexyGrid();
+            categories[c].grid.set_size_request(800, 600);
+            categories[c].grid.show();
+            this._stack.add_named(categories[c].grid, categories[c].name);
 
-            this._listBox.add(row);
-            row.show();
-        }));
+            let cells = EosAppStorePrivate.app_load_content(categories[c].grid, categories[c].id);
+            for (let cell in cells) {
+                categories[c].grid.add(cell);
+            }
+        }
+    },
+
+    _onCategoryClicked: function(button) {
+        let category = null;
+
+        for (let c in this._categories) {
+            if (this._categories[c].button == button) {
+                category = this._categories[c];
+                break;
+            }
+        }
+
+        if (!category) {
+            return;
+        }
+
+        log(category.name);
+        this._stack.set_visible_child_name(category.name);
     },
 
     update: function() {
-        this._appListModel.update();
     },
 });
-Builder.bindTemplateChildren(AppFrame.prototype);
