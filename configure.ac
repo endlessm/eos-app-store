@@ -56,6 +56,7 @@ AC_CACHE_SAVE
 
 AC_CONFIG_FILES([
         Makefile
+        content/Makefile
         data/Makefile
         EosAppStore/Makefile
         po/Makefile.in

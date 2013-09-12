@@ -1,0 +1,74 @@
+[
+{
+  "display_shape":"b2h",
+  "application-id":"com.endlessm.MarketPlace",
+  "title":"Comunidade",
+  "subtitle":"Faca negocios com gente do seu bairro!",
+  "desktop-id":"eos-market-app",
+  "img":null,
+  "color":"rgb(224, 244, 244)"
+},
+{
+  "display_shape":"b2v",
+  "application-id":"com.endlessm.KhanAcademy",
+  "title":"Khan Academy",
+  "subtitle":"Reforco escolar sem sair de casa",
+  "desktop-id":"eos-khan-academy-app",
+  "img":null,
+  "color":"rgb(138, 226, 54)"
+},
+{
+  "display_shape":"b1",
+  "application-id":"com.endlessm.Programming",
+  "title":"Aprenda a programar",
+  "subtitle":"Sintomas e doenças",
+  "desktop-id":"eos-programming-app",
+  "img":null,
+  "color":"rgb(128, 128, 0)"
+},
+{
+  "display_shape":"b1",
+  "application-id":"com.endlessm.Wikipedia",
+  "title":"Wikipedia",
+  "subtitle":"A Enciclopedia livre",
+  "desktop-id":"eos-wikipedia-app",
+  "img":null,
+  "color":"rgb(85, 87, 83)"
+},
+{
+  "display_shape":"b1",
+  "application-id":"com.endlessm.Health",
+  "title":"Saude",
+  "subtitle":"Sintomas e doenças",
+  "desktop-id":"eos-health-app",
+  "img":null,
+  "color":"rgb(173, 127, 168)"
+},
+{
+  "display_shape":"b2v",
+  "application-id":"com.endlessm.Recipes",
+  "title":"Receitas",
+  "subtitle":"Tem o que na geladeira?",
+  "desktop-id":"eos-recipes-app",
+  "img":null,
+  "color":"rgb(211, 215, 207)"
+},
+{
+  "display_shape":"b2h",
+  "application-id":"com.endlessm.Weather",
+  "title":"Previsao do Tempo",
+  "subtitle":"Saibe se vai chover ou fazer sol agora",
+  "desktop-id":"eos-weather-app",
+  "img":null,
+  "color":"rgb(114, 159, 207)"
+},
+{
+  "display_shape":"b1",
+  "application-id":"com.endlessm.Foo",
+  "title":"Compra & Venda",
+  "subtitle":"A Enciclopedia livre",
+  "desktop-id":"eos-foo-app",
+  "img":null,
+  "color":"rgb(85, 87, 83)"
+}
+]
