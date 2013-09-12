@@ -8,3 +8,4 @@ EosAppStore/appListModel.js
 EosAppStore/appStore.js
 EosAppStore/appStoreWindow.js
 EosAppStore/storeModel.js
+EosAppStore/lib/eos-app-utils.c

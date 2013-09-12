@@ -2,6 +2,7 @@ AM_CPPFLAGS = \
 	-I$(top_builddir) \
 	-I$(top_srcdir) \
 	-L$(top_srcdir)/EosAppStore \
+	-I$(top_srcdir)/EosAppStore/lib \
 	-DEOS_APP_STORE_LIBDIR=\"$(libdir)\" \
 	-DEOS_APP_STORE_DATADIR=\"$(datadir)\" \
 	-DEOS_APP_STORE_PKGDATADIR=\"$(pkgdatadir)\" \

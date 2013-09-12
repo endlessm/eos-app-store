@@ -3,6 +3,8 @@
 #include "eos-app-enums.h"
 #include <glib.h>
 
+#ifndef EOS_DEFINE_ENUM_TYPE
+
 #define EOS_ENUM_VALUE(value, nick)     { value, #value, #nick },
 
 #define EOS_DEFINE_ENUM_TYPE(EnumType, enum_type, values) \
@@ -24,6 +26,8 @@ enum_type##_get_type (void) \
   return g_define_type_id__volatile; \
 }
 
+#endif
+
 EOS_DEFINE_ENUM_TYPE (EosAppIconState, eos_app_icon_state,
                       EOS_ENUM_VALUE (EOS_APP_ICON_STATE_NORMAL, normal)
                       EOS_ENUM_VALUE (EOS_APP_ICON_STATE_ACTIVE, active)
@@ -34,3 +38,11 @@ EOS_DEFINE_ENUM_TYPE (EosAppState, eos_app_state,
                       EOS_ENUM_VALUE (EOS_APP_STATE_INSTALLED, installed)
                       EOS_ENUM_VALUE (EOS_APP_STATE_UNINSTALLED, uninstalled)
                       EOS_ENUM_VALUE (EOS_APP_STATE_UPDATABLE, updatable))
+
+EOS_DEFINE_ENUM_TYPE (EosAppCategory, eos_app_category,
+                      EOS_ENUM_VALUE (EOS_APP_CATEGORY_FEATURED, featured)
+                      EOS_ENUM_VALUE (EOS_APP_CATEGORY_EDUCATION, education)
+                      EOS_ENUM_VALUE (EOS_APP_CATEGORY_LEISURE, leisure)
+                      EOS_ENUM_VALUE (EOS_APP_CATEGORY_UTILITIES, utilities)
+                      EOS_ENUM_VALUE (EOS_APP_CATEGORY_MY_APPLICATIONS, my-applications))
+

@@ -3,17 +3,20 @@ eaprivate_cflags = \
 	-I$(top_srcdir)/EosAppStore/lib \
 	-DPREFIX=\"$(prefix)\" \
 	-DLIBDIR=\"$(libdir)\" \
+	-DDATADIR=\"$(datadir)\" \
 	-DG_LOG_DOMAIN=\"EosAppPrivate\" \
 	-DG_DISABLE_DEPRECATED \
 	$(EOS_APP_STORE_CFLAGS)
 
 eaprivate_source_h = \
 	lib/eos-app-list-model.h \
-	lib/eos-app-enums.h
+	lib/eos-app-enums.h \
+	lib/eos-app-utils.h
 
 eaprivate_source_c = \
 	lib/eos-app-list-model.c \
-	lib/eos-app-enums.c
+	lib/eos-app-enums.c \
+	lib/eos-app-utils.c
 
 pkglib_LTLIBRARIES += libeaprivate-1.0.la
 
