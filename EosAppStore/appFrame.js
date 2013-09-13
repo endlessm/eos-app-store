@@ -196,15 +196,19 @@ const AppFrame = new Lang.Class({
             categories[c].button.show();
             this._categoriesBox.add(categories[c].button);
 
+            let scrollWindow = new Gtk.ScrolledWindow();
+            this._stack.add_named(scrollWindow, categories[c].name);
+
             categories[c].grid = new Endless.FlexyGrid();
             categories[c].grid.set_size_request(800, 600);
-            categories[c].grid.show();
-            this._stack.add_named(categories[c].grid, categories[c].name);
+            scrollWindow.add_with_viewport(categories[c].grid);
 
             let cells = EosAppStorePrivate.app_load_content(categories[c].grid, categories[c].id);
             for (let cell in cells) {
                 categories[c].grid.add(cell);
             }
+
+            scrollWindow.show_all();
         }
     },
 
