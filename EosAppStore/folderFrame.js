@@ -10,7 +10,7 @@ const Lang = imports.lang;
 
 const FolderModel = imports.folderModel;
 
-const _FOLDER_BUTTON_SIZE = 100;
+const _FOLDER_BUTTON_SIZE = 96;
 
 const FolderIconButton = new Lang.Class({
     Name: 'FolderIconButton',
@@ -30,16 +30,19 @@ const FolderIconButton = new Lang.Class({
     },
     
     _show_name_bubble: function() {
-        let dialog = new Gtk.Dialog({modal: true,
+        let dialog = new Gtk.Dialog({
+            modal: true,
             'transient-for': this.get_toplevel(),
             'focus-on-map': false,
             title: '',
             resizable: false });
 
         let grid = new Gtk.Grid({orientation: Gtk.Orientation.HORIZONTAL});
-        let entry = new Gtk.Entry({'placeholder-text': 'Enter the name of the folder',
-                                   'width-chars': 30 });
-        let addButton = new Endless.ActionButton({name: 'add',
+        let entry = new Gtk.Entry({
+            'placeholder-text': 'Enter the name of the folder',
+            'width-chars': 30 });
+        let addButton = new Endless.ActionButton({
+            name: 'add',
             'icon-id': 'list-add-symbolic' });
 
         grid.add(entry);
