@@ -16,9 +16,16 @@ const FrameClock = imports.frameClock;
 const StoreModel = imports.storeModel;
 const UIBuilder = imports.builder;
 
-const APP_STORE_WIDTH = 512;
-const FRACTION_OF_DISPLAY_WIDTH = 0.65;
+const APP_STORE_MIN_WIDTH = 800;
+const FRACTION_OF_DISPLAY_WIDTH = 0.75;
 const ANIMATION_TIME = (500 * 1000); // half a second
+
+const AppStoreSizes = {
+  SVGA: { screenWidth:  800, windowWidth:  800 },
+   XGA: { screenWidth: 1024, windowWidth:  800 },
+  WXGA: { screenWidth: 1366, windowWidth: 1024 },
+    HD: { screenWidth: 1920, windowWidth: 1366 },
+};
 
 const AppStoreSlider = new Lang.Class({
     Name: 'AppStoreSlider',
@@ -60,9 +67,23 @@ const AppStoreSlider = new Lang.Class({
 
     _getSize: function() {
         let workarea = this._getWorkarea();
-        let defaultWidth = workarea.width * FRACTION_OF_DISPLAY_WIDTH;
-        let minWidth = Math.min(workarea.width, APP_STORE_WIDTH);
-        return [Math.max(minWidth, defaultWidth), workarea.height];
+
+        let windowWidth = null;
+        for (let i in AppStoreSizes) {
+            let res = AppStoreSizes[i];
+
+            if (windowWidth || workarea.width > res.screenWidth) {
+                continue;
+            }
+
+            windowWidth = res.windowWidth;
+        }
+
+        if (!windowWidth) {
+            windowWidth = APP_STORE_MIN_WIDTH;
+        }
+
+        return [windowWidth, workarea.height];
     },
 
     _updateGeometry: function() {
