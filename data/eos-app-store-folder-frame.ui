@@ -18,6 +18,7 @@
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
                 <property name="shadow_type">in</property>
+                <property name="hscrollbar-policy">never</property>
                 <child>
                   <object class="GtkViewport" id="_viewport">
                     <property name="visible">True</property>

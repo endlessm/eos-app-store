@@ -1,17 +1,14 @@
 // -*- mode: js; js-indent-level: 4; indent-tabs-mode: nil -*-
-const Gdk = imports.gi.Gdk;
-const Gio = imports.gi.Gio;
 const GLib = imports.gi.GLib;
 const GObject = imports.gi.GObject;
 const Gtk = imports.gi.Gtk;
-const EosAppStorePrivate = imports.gi.EosAppStorePrivate;
 const Endless = imports.gi.Endless;
 const PLib = imports.gi.PLib;
 
 const Builder = imports.builder;
 const Lang = imports.lang;
-const Signals = imports.signals;
-const Path = imports.path;
+
+const FolderModel = imports.folderModel;
 
 const _FOLDER_BUTTON_SIZE = 100;
 
@@ -19,7 +16,7 @@ const FolderIconButton = new Lang.Class({
     Name: 'FolderIconButton',
     Extends: Gtk.ToggleButton,
 
-    _init : function(iconPath) {
+    _init : function(iconName) {
         this.parent({
             active: false,
             'draw-indicator': false,
@@ -27,19 +24,21 @@ const FolderIconButton = new Lang.Class({
             'width-request': _FOLDER_BUTTON_SIZE,
             'height-request': _FOLDER_BUTTON_SIZE,
             halign: Gtk.Align.START,
-            image: new Gtk.Image({file: iconPath}) });
+            image: new Gtk.Image({'icon-name': iconName}) });
 
-        this._iconPath = iconPath;
+        this._iconName = iconName;
     },
     
     _show_name_bubble: function() {
         let dialog = new Gtk.Dialog({modal: true,
             'transient-for': this.get_toplevel(),
             'focus-on-map': false,
-            title: '' });
+            title: '',
+            resizable: false });
 
         let grid = new Gtk.Grid({orientation: Gtk.Orientation.HORIZONTAL});
-        let entry = new Gtk.Entry({'placeholder-text': 'Enter the name of the folder'});
+        let entry = new Gtk.Entry({'placeholder-text': 'Enter the name of the folder',
+                                   'width-chars': 30 });
         let addButton = new Endless.ActionButton({name: 'add',
             'icon-id': 'list-add-symbolic' });
 
@@ -48,9 +47,13 @@ const FolderIconButton = new Lang.Class({
         dialog.get_content_area().add(grid);
 
         addButton.connect('clicked', Lang.bind(this, function(button) {
-            print('Add folder '+entry.get_text()+' with icon '+this._iconPath);
+            FolderModel.createFolder(entry.get_text(), this._iconName);
+            
             dialog.destroy();
             this.set_active(false);
+            
+            // hide the app store window
+            this.get_toplevel().emit('delete-event', null);
         }));
         
         dialog.show_all();
@@ -82,8 +85,8 @@ const FolderIconGrid = new Lang.Class({
         let base = this._path + '/'; 
         let columns = Math.max(1, Math.floor(allocatedWidth / _FOLDER_BUTTON_SIZE));
 
-        for (let i = 0; i < this._iconFiles.length; i++) {
-            let button = new FolderIconButton(base + this._iconFiles[i].get_name());
+        for (let i = 0; i < this._iconList.length; i++) {
+            let button = new FolderIconButton(this._iconList[i]);
 
             button.connect('toggled', Lang.bind(this, this._on_button_toggled));
             
@@ -94,18 +97,7 @@ const FolderIconGrid = new Lang.Class({
     },
 
     _get_icons: function() {
-        let dir =  Gio.File.new_for_path(this._path);
-        this._iconFiles = [];
-        
-        let enumerator = dir.enumerate_children('standard::name,standard::display-name',
-                                                Gio.FileQueryInfoFlags.NONE,
-                                                null, null);
-        
-        for (let f = enumerator.next_file(null, null); f != null; f = enumerator.next_file(null, null)) {
-            // TODO : check the type of the file, it should be an image
-            this._iconFiles.push(f)
-        }
-        enumerator.close(null);
+        this._iconList = FolderModel.getIconList();
         
         // TODO better solution needed here
         // wait for allocation to know how many columns the grid should have
@@ -128,7 +120,6 @@ const FolderIconGrid = new Lang.Class({
     _init: function(path) {
         this.parent();
 
-        this._path = path;
         this._get_icons();
     }
 });
@@ -155,7 +146,7 @@ const FolderFrame = new Lang.Class({
 
         this.add(this._mainBox);
 
-        this._grid = new FolderIconGrid(Path.FOLDER_ICONS_DIR);
+        this._grid = new FolderIconGrid();
         this._viewport.add(this._grid);
 
         this.show_all();
