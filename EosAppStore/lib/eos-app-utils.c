@@ -66,9 +66,6 @@ get_shape_from_id (const char *p)
   if (p[0] != 'b')
     return EOS_FLEXY_SHAPE_SMALL;
 
-  if (strlen (p) != 2 || strlen (p) != 3)
-    return EOS_FLEXY_SHAPE_SMALL;
-
   if (p[1] == '1' && p[2] == '\0')
     return EOS_FLEXY_SHAPE_SMALL;
 
