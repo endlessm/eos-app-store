@@ -20,11 +20,11 @@ const NEW_SITE_ADDED_MESSAGE = "was added successfully";
 const NEW_SITE_SUCCESS_TIMEOUT = 3;
 const NEW_SITE_UNAVAILABLE = "the address written does not exist or is not available";
 
-const NewSiteAlertItem = {
-    NOTHING: 0,
-    SPINNER: 1,
-    CANCEL: 2,
-    ERROR: 3,
+const AlertIcon = {
+    SPINNER: 0,
+    CANCEL: 1,
+    ERROR: 2,
+    NOTHING: 3,
 };
 
 const NewSiteBox = new Lang.Class({
@@ -36,9 +36,7 @@ const NewSiteBox = new Lang.Class({
 	'_mainBox',
 	'_siteIcon',
 	'_siteEntry',
-	'_siteAlertSpinner',
-	'_siteAlertCancel',
-	'_siteAlertIcon',
+	'_siteAlertIconFrame',
 	'_siteAlertLabel',
 	'_siteAddButton',
     ],
@@ -46,22 +44,36 @@ const NewSiteBox = new Lang.Class({
     _init: function(weblinkListModel) {
 	this.parent();
 
+	this._weblinkListModel = weblinkListModel;
+	this._newSiteError = false;
+	this._webView = null;
+	this._alertIcon = null
+	this._currentAlertIcon = AlertIcon.NOTHING;
+
 	this.initTemplate({ templateRoot: '_mainBox',
 			    bindChildren: true,
 			    connectSignals: true });
 	this.add(this._mainBox);
 	this._mainBox.show_all();
 
-	this._switchAlert(NewSiteAlertItem.NOTHING);
+	this._createAlertIcons();
+	this._switchAlertIcon(AlertIcon.NOTHING);
+    },
 
-	this._weblinkListModel = weblinkListModel;
-	this._newSiteError = false;
-	this._webView = null;
+    _createAlertIcons: function() {
+	this._siteAlertIconFrame.set_size_request(16, 16);
+	this._alertIcon = [ new Gtk.Spinner(),
+			    new Gtk.Button({ child: new Gtk.Image({ stock: Gtk.STOCK_CLOSE }) }),
+			    new Gtk.Image({ stock: Gtk.STOCK_DIALOG_WARNING }),
+			    null ];
+
+	this._alertIcon[AlertIcon.CANCEL].show_all();
+	this._alertIcon[AlertIcon.CANCEL].connect('clicked', Lang.bind(this, this._onEditSiteCancel));
     },
 
     _reset: function() {
 	this._siteAddButton.visible = false;
-	this._switchAlert(NewSiteAlertItem.NOTHING);
+	this._switchAlertIcon(AlertIcon.NOTHING);
 	this._siteAlertLabel.set_text(NEW_SITE_DEFAULT_MESSAGE);
 	this._siteEntry.set_text("");
 	this._siteEntry.max_length = 0;
@@ -69,43 +81,29 @@ const NewSiteBox = new Lang.Class({
 	this._siteEntry.grab_focus();
     },
 
-    _showAlertSpinner: function(show) {
-	if (show) {
-	    this._siteAlertSpinner.opacity = 1;
-	    this._siteAlertSpinner.start();
-	} else {
-	    this._siteAlertSpinner.stop();
-	    this._siteAlertSpinner.opacity = 0;
+    _switchAlertIcon: function(newItem) {
+	if (this._currentAlertIcon == AlertIcon.SPINNER) {
+	    this._alertIcon[AlertIcon.SPINNER].stop();
 	}
-    },
 
-    _switchAlert: function(newItem) {
-	switch (newItem) {
-	case NewSiteAlertItem.NOTHING:
-	    this._showAlertSpinner(false);
-	    this._siteAlertIcon.visible = false;
-	    this._siteAlertCancel.visible = false;
-	    break;
-	case NewSiteAlertItem.SPINNER:
-	    this._showAlertSpinner(true);
-	    this._siteAlertIcon.visible = false;
-	    this._siteAlertCancel.visible = false;
-	    break;
-	case NewSiteAlertItem.CANCEL:
-	    this._showAlertSpinner(false);
-	    this._siteAlertIcon.visible = false;
-	    this._siteAlertCancel.visible = true;
-	    break;
-	case NewSiteAlertItem.ERROR:
-	    this._showAlertSpinner(false);
-	    this._siteAlertIcon.visible = true;
-	    this._siteAlertCancel.visible = false;
-	    break;
+	if (this._currentAlertIcon != AlertIcon.NOTHING) {
+	    this._siteAlertIconFrame.remove(this._alertIcon[this._currentAlertIcon]);
+	}
+
+	this._currentAlertIcon = newItem;
+
+	if (this._currentAlertIcon != AlertIcon.NOTHING) {
+	    this._siteAlertIconFrame.add(this._alertIcon[this._currentAlertIcon]);
+	    this._alertIcon[this._currentAlertIcon].show();
+	}
+
+	if (this._currentAlertIcon == AlertIcon.SPINNER) {
+	    this._alertIcon[AlertIcon.SPINNER].start();
 	}
     },
 
     _editSite: function() {
-	this._switchAlert(NewSiteAlertItem.CANCEL);
+	this._switchAlertIcon(AlertIcon.CANCEL);
 	this._siteAddButton.visible = true;
 	this._siteEntry.set_text(this._webView.get_title());
 	this._siteAlertLabel.set_text(this._webView.get_uri());
@@ -128,7 +126,7 @@ const NewSiteBox = new Lang.Class({
 	this._siteEntry.sensitive = false;
 	this._siteAlertLabel.set_text(NEW_SITE_ADDED_MESSAGE);
 	this._siteAddButton.sensitive = false;
-	this._switchAlert(NewSiteAlertItem.NOTHING);
+	this._switchAlertIcon(AlertIcon.NOTHING);
 
 	let newSite = this._weblinkListModel.createWeblink(url, title, "browser");
 	this._weblinkListModel.update();
@@ -157,7 +155,7 @@ const NewSiteBox = new Lang.Class({
     _onLoadChanged: function(webview, loadEvent) {
 	switch (loadEvent) {
 	case WebKit.LoadEvent.STARTED:
-	    this._switchAlert(NewSiteAlertItem.SPINNER);
+	    this._switchAlertIcon(AlertIcon.SPINNER);
 	    this._siteAlertLabel.set_text("searching");
 	    this._newSiteError = false;
 	    break;
@@ -175,7 +173,7 @@ const NewSiteBox = new Lang.Class({
     _onLoadFailed: function() {
 	this._newSiteError = true;
 	this._siteAlertLabel.set_text(NEW_SITE_UNAVAILABLE);
-	this._switchAlert(NewSiteAlertItem.ERROR);
+	this._switchAlertIcon(AlertIcon.ERROR);
 	return true;
     },
 });
