@@ -18,6 +18,7 @@ const NEW_SITE_TITLE_LIMIT = 20;
 const NEW_SITE_DEFAULT_MESSAGE = "ex.: http://wwww.globoesporte.com";
 const NEW_SITE_ADDED_MESSAGE = "was added successfully";
 const NEW_SITE_SUCCESS_TIMEOUT = 3;
+const NEW_SITE_UNAVAILABLE = "the address written does not exist or is not available";
 
 const NewSiteAlertItem = {
     NOTHING: 0,
@@ -25,6 +26,160 @@ const NewSiteAlertItem = {
     CANCEL: 2,
     ERROR: 3,
 };
+
+const NewSiteBox = new Lang.Class({
+    Name: 'NewSiteBox',
+    Extends: Gtk.Bin,
+
+    templateResource: '/com/endlessm/appstore/eos-app-store-weblink-new-site-frame.ui',
+    templateChildren: [
+	'_mainBox',
+	'_siteIcon',
+	'_siteEntry',
+	'_siteAlertSpinner',
+	'_siteAlertCancel',
+	'_siteAlertIcon',
+	'_siteAlertLabel',
+	'_siteAddButton',
+    ],
+
+    _init: function(weblinkListModel) {
+	this.parent();
+
+	this.initTemplate({ templateRoot: '_mainBox',
+			    bindChildren: true,
+			    connectSignals: true });
+	this.add(this._mainBox);
+	this._mainBox.show_all();
+
+	this._switchAlert(NewSiteAlertItem.NOTHING);
+
+	this._weblinkListModel = weblinkListModel;
+	this._newSiteError = false;
+	this._webView = null;
+    },
+
+    _reset: function() {
+	this._siteAddButton.visible = false;
+	this._switchAlert(NewSiteAlertItem.NOTHING);
+	this._siteAlertLabel.set_text(NEW_SITE_DEFAULT_MESSAGE);
+	this._siteEntry.set_text("");
+	this._siteEntry.max_length = 0;
+	this._siteEntry.halign = Gtk.Align.FILL;
+	this._siteEntry.grab_focus();
+    },
+
+    _showAlertSpinner: function(show) {
+	if (show) {
+	    this._siteAlertSpinner.opacity = 1;
+	    this._siteAlertSpinner.start();
+	} else {
+	    this._siteAlertSpinner.stop();
+	    this._siteAlertSpinner.opacity = 0;
+	}
+    },
+
+    _switchAlert: function(newItem) {
+	switch (newItem) {
+	case NewSiteAlertItem.NOTHING:
+	    this._showAlertSpinner(false);
+	    this._siteAlertIcon.visible = false;
+	    this._siteAlertCancel.visible = false;
+	    break;
+	case NewSiteAlertItem.SPINNER:
+	    this._showAlertSpinner(true);
+	    this._siteAlertIcon.visible = false;
+	    this._siteAlertCancel.visible = false;
+	    break;
+	case NewSiteAlertItem.CANCEL:
+	    this._showAlertSpinner(false);
+	    this._siteAlertIcon.visible = false;
+	    this._siteAlertCancel.visible = true;
+	    break;
+	case NewSiteAlertItem.ERROR:
+	    this._showAlertSpinner(false);
+	    this._siteAlertIcon.visible = true;
+	    this._siteAlertCancel.visible = false;
+	    break;
+	}
+    },
+
+    _editSite: function() {
+	this._switchAlert(NewSiteAlertItem.CANCEL);
+	this._siteAddButton.visible = true;
+	this._siteEntry.set_text(this._webView.get_title());
+	this._siteAlertLabel.set_text(this._webView.get_uri());
+
+	/* Narrow the entry and put the focus so user can change the title */
+	let [entryWidth, entryHeight] = this._siteEntry.get_size_request();
+	this._siteEntry.max_length = NEW_SITE_TITLE_LIMIT;
+	this._siteEntry.halign = Gtk.Align.START;
+    },
+
+    _onEditSiteCancel: function() {
+	this._reset();
+    },
+
+
+    _onSiteAdd: function() {
+	let url = this._siteAlertLabel.get_text();
+	let title = this._siteEntry.get_text();
+
+	this._siteEntry.sensitive = false;
+	this._siteAlertLabel.set_text(NEW_SITE_ADDED_MESSAGE);
+	this._siteAddButton.sensitive = false;
+	this._switchAlert(NewSiteAlertItem.NOTHING);
+
+	let newSite = this._weblinkListModel.createWeblink(url, title, "browser");
+	this._weblinkListModel.update();
+	this._weblinkListModel.installWeblink(newSite);
+
+	GLib.timeout_add_seconds(GLib.PRIORITY_DEFAULT,
+				 NEW_SITE_SUCCESS_TIMEOUT,
+				 Lang.bind(this, function() {
+				     this._siteEntry.sensitive = true;
+				     this._siteAddButton.sensitive = true;
+				     this._reset();
+				     return false;
+				 }));
+    },
+
+    _onSiteEntryActivated: function() {
+	if (!this._webView) {
+	    this._webView = new WebKit.WebView();
+	    this._webView.connect('load-changed', Lang.bind(this, this._onLoadChanged));
+	    this._webView.connect('load-failed', Lang.bind(this, this._onLoadFailed));
+	}
+	let url = this._siteEntry.get_text();
+	this._webView.load_uri(url);
+    },
+
+    _onLoadChanged: function(webview, loadEvent) {
+	switch (loadEvent) {
+	case WebKit.LoadEvent.STARTED:
+	    this._switchAlert(NewSiteAlertItem.SPINNER);
+	    this._siteAlertLabel.set_text("searching");
+	    this._newSiteError = false;
+	    break;
+	case WebKit.LoadEvent.FINISHED:
+	    /* Error this was processed on "load-failed" handler*/
+	    if (this._newSiteError) {
+		return;
+	    }
+
+	    this._editSite();
+	    break;
+	}
+    },
+
+    _onLoadFailed: function() {
+	this._newSiteError = true;
+	this._siteAlertLabel.set_text(NEW_SITE_UNAVAILABLE);
+	this._switchAlert(NewSiteAlertItem.ERROR);
+	return true;
+    },
+});
+Builder.bindTemplateChildren(NewSiteBox.prototype);
 
 const WeblinkListBoxRow = new Lang.Class({
     Name: 'WeblinkListBoxRow',
@@ -146,25 +301,13 @@ const WeblinkFrame = new Lang.Class({
     templateResource: '/com/endlessm/appstore/eos-app-store-weblink-frame.ui',
     templateChildren: [
         '_mainBox',
-	'_newSiteBox',
-	'_newSiteIcon',
-	'_newSiteUrl',
-	'_newSiteAlertSpinner',
-	'_newSiteAlertCancel',
-	'_newSiteAlertError',
-	'_newSiteAlertLabel',
-	'_newSiteAddButton',
-	'_newSiteAddButtonImage',
-	'_listFrame',
+	'_newSiteFrame',
         '_scrolledWindow',
         '_viewport',
     ],
 
     _init: function() {
         this.parent();
-	this._webkit = null;
-	this._newSiteError = false;
-
         this.initTemplate({ templateRoot: '_mainBox', bindChildren: true, connectSignals: true, });
 	this.add(this._mainBox);
 	this._mainBox.show_all();
@@ -172,46 +315,11 @@ const WeblinkFrame = new Lang.Class({
         this._weblinkListModel = new WeblinkListModel.WeblinkList();
         this._weblinkListModel.connect('changed', Lang.bind(this, this._onListModelChange));
 
+	this._newSiteBox = new NewSiteBox(this._weblinkListModel);
+	this._newSiteFrame.add(this._newSiteBox);
         this._listBox = new WeblinkListBox(this._weblinkListModel);
         this._viewport.add(this._listBox);
         this._listBox.show_all();
-
-	this._newSiteAlertSwitch(NewSiteAlertItem.NOTHING);
-    },
-
-    _setVisibleNewSiteAlertSpinner: function(isVisible) {
-	if (isVisible) {
-	    this._newSiteAlertSpinner.opacity = 1;
-	    this._newSiteAlertSpinner.start();
-	} else {
-	    this._newSiteAlertSpinner.stop();
-	    this._newSiteAlertSpinner.opacity = 0;
-	}
-    },
-
-    _newSiteAlertSwitch: function(newItem) {
-	switch (newItem) {
-	case NewSiteAlertItem.NOTHING:
-	    this._setVisibleNewSiteAlertSpinner(false);
-	    this._newSiteAlertError.visible = false;
-	    this._newSiteAlertCancel.visible = false;
-	    break;
-	case NewSiteAlertItem.SPINNER:
-	    this._setVisibleNewSiteAlertSpinner(true);
-	    this._newSiteAlertError.visible = false;
-	    this._newSiteAlertCancel.visible = false;
-	    break;
-	case NewSiteAlertItem.CANCEL:
-	    this._setVisibleNewSiteAlertSpinner(false);
-	    this._newSiteAlertError.visible = false;
-	    this._newSiteAlertCancel.visible = true;
-	    break;
-	case NewSiteAlertItem.ERROR:
-	    this._setVisibleNewSiteAlertSpinner(false);
-	    this._newSiteAlertError.visible = true;
-	    this._newSiteAlertCancel.visible = false;
-	    break;
-	}
     },
 
     _onListModelChange: function(model, weblinks) {
@@ -228,99 +336,6 @@ const WeblinkFrame = new Lang.Class({
             this._listBox.add(row);
             row.show();
         }));
-    },
-
-    _onNewSiteUrlActivated: function() {
-	if (!this._webview) {
-	    this._webview = new WebKit.WebView();
-	    this._webview.connect('load-changed', Lang.bind(this, this._onUriLoadChanged));
-	    this._webview.connect('load-failed', Lang.bind(this, this._onUriLoadFailed));
-	}
-	let url = this._newSiteUrl.get_text();
-	this._webview.load_uri(url);
-    },
-
-    _onUriLoadChanged: function(webview, loadEvent) {
-	switch (loadEvent) {
-	case WebKit.LoadEvent.STARTED:
-	    this._newSiteAlertSwitch(NewSiteAlertItem.SPINNER);
-	    this._newSiteAlertLabel.set_text("searching");
-	    this._newSiteError = false;
-	    break;
-	case WebKit.LoadEvent.FINISHED:
-	    if (this._newSiteError) {
-		return;
-	    }
-
-	    this._newSiteAlertSwitch(NewSiteAlertItem.CANCEL);
-	    this._newSiteAddButton.visible = true;
-	    this._newSiteUrl.set_text(webview.get_title());
-	    this._newSiteAlertLabel.set_text(webview.get_uri());
-
-	    /* Narrow the entry and put the focus so user can change the title */
-	    let [entryWidth, entryHeight] = this._newSiteUrl.get_size_request();
-	    this._newSiteUrl.max_length = NEW_SITE_TITLE_LIMIT;
-	    this._newSiteUrl.halign = Gtk.Align.START;
-	    break;
-	default:
-	    break;
-	}
-    },
-
-    _onUriLoadFailed: function() {
-	this._newSiteError = true;
-	this._newSiteAlertLabel.set_text("the address written does not exist or is not available");
-	this._newSiteAlertSwitch(NewSiteAlertItem.ERROR);
-	return true;
-    },
-
-    _onNewSiteCancel: function() {
-	this._newSiteReset();
-    },
-
-    _onNewSiteAdd: function() {
-	let url = this._newSiteAlertLabel.get_text();
-	let title = this._newSiteUrl.get_text();
-	this._newSiteUrl.sensitive = false;
-	this._newSiteAlertSwitch(NewSiteAlertItem.NOTHING);
-	this._newSiteAlertLabel.set_text(NEW_SITE_ADDED_MESSAGE);
-	this._newSiteAddButton.sensitive = false;
-	let newSite = this._weblinkListModel.createWeblink(url, title, "browser");
-	this.update();
-	this._weblinkListModel.installWeblink(newSite);
-	GLib.timeout_add_seconds(GLib.PRIORITY_DEFAULT,
-				 NEW_SITE_SUCCESS_TIMEOUT,
-				 Lang.bind(this, function() {
-				     this._newSiteUrl.sensitive = true;
-				     this._newSiteAddButton.sensitive = true;
-				     this._newSiteReset();
-				     return false;
-				 }));
-    },
-
-    _newSiteReset: function() {
-	this._newSiteAddButton.visible = false;
-	this._newSiteAlertSwitch(NewSiteAlertItem.NOTHING);
-	this._newSiteAlertLabel.set_text(NEW_SITE_DEFAULT_MESSAGE);
-	this._newSiteUrl.set_text("");
-	this._newSiteUrl.max_length = 0;
-	this._newSiteUrl.halign = Gtk.Align.FILL;
-	this._newSiteUrl.grab_focus();
-    },
-
-    _getPixbufFromSurface: function(surface) {
-	if (!surface) {
-	    return null;
-	}
-
-	let surface_width = surface.get_width();
-	let surface_height = surface.get_height();
-	pixbuf = GdkPixbuf.get_from_surface(surface, 0, 0, surface_width, surface_height);
-	if (surface_width != width || surface_height != height) {
-	    pixbuf = pixbuf.scale_simple (width, height, Gdk.Interp.BILINEAR);
-	}
-
-	return pixbuf;
     },
 
     update: function() {
