@@ -7,6 +7,9 @@
       <object class="GtkBox" id="_mainBox">
         <property name="visible">True</property>
         <property name="can_focus">False</property>
+        <style>
+          <class name="new-site-frame"/>
+        </style>
         <child>
           <object class="GtkImage" id="_siteIcon">
             <property name="visible">True</property>
@@ -34,6 +37,9 @@
                 <property name="invisible_char_set">True</property>
                 <property name="placeholder_text">Write here the address you wish to add</property>
                 <property name="input_purpose">url</property>
+                <style>
+                  <class name="url-entry"/>
+                </style>
                 <signal name="activate" handler="_onSiteEntryActivated" swapped="no"/>
               </object>
               <packing>
@@ -70,6 +76,9 @@
                     <property name="visible">True</property>
                     <property name="can_focus">False</property>
                     <property name="label" translatable="yes">ex.: http://www.globoesporte.com</property>
+                    <style>
+                      <class name="alert-label"/>
+                    </style>
                   </object>
                   <packing>
                     <property name="expand">False</property>

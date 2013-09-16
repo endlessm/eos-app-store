@@ -29,3 +29,14 @@
   font: regular;
   color: white;
 }
+
+.new-site-frame .url-entry {
+  font: Sans 15px;
+  color: rgb(51,51,51);
+  text-shadow: white 0px 1px 0px;
+}
+    
+.new-site-frame .alert-label {
+  font: regular 14px;
+  color: rgb(153,153,153);
+}
