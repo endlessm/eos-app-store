@@ -228,12 +228,15 @@ const AppStoreWindow = new Lang.Class({
     toggle: function(timestamp) {
         if (this._animator.showing) {
             this._animator.slideOut();
-        }
-        else {
-            this._animator.slideIn();
-            this.present_with_time(timestamp);
+        } else {
+            this.showPage(timestamp);
         }
     },
+
+    showPage: function(timestamp) {
+        this._animator.slideIn();
+        this.present_with_time(timestamp);
+    }
 });
 
 UIBuilder.bindTemplateChildren(AppStoreWindow.prototype);

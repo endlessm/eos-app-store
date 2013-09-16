@@ -26,6 +26,7 @@ const AppStoreIface = <interface name={APP_STORE_NAME}>
   </method>
   <method name="ShowPage">
     <arg type="s" direction="in" name="page"/>
+    <arg type="u" direction="in" name="timestamp"/>
   </method>
   <property name="Visible" type="b" access="read"/>
 </interface>;
@@ -119,19 +120,19 @@ const AppStore = new Lang.Class({
         this._mainWindow.toggle(timestamp);
     },
 
-    ShowPage: function(page) {
+    ShowPage: function(page, timestamp) {
+        let valid = true;
         if (page == 'apps') {
             this._storeModel.changePage(StoreModel.StorePage.APPS);
-            return;
-        }
-        if (page == 'folders') {
+        } else if (page == 'folders') {
             this._storeModel.changePage(StoreModel.StorePage.FOLDERS);
-            return;
-        }
-        if (page == 'web') {
+        } else if (page == 'web') {
             this._storeModel.changePage(StoreModel.StorePage.WEB);
-            return;
+        } else {
+            log("Unrecognized page '" + page + "'");
         }
+
+        this._mainWindow.showPage(timestamp);
     },
 
     _onVisibilityChanged: function(proxy, visible) {
