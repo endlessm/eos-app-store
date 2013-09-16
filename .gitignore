@@ -16,6 +16,7 @@ Makefile.in
 /ABOUT-NLS
 /m4
 /po/Makefile.in.in
+/po/Makefile.in.in~
 /po/Makevars.template
 /po/POTFILES
 /po/Rules-quot
