@@ -35,7 +35,7 @@ const NewSiteBox = new Lang.Class({
     templateChildren: [
 	'_mainBox',
 	'_siteIcon',
-	'_siteEntry',
+	'_siteUrlFrame',
 	'_siteAlertIconFrame',
 	'_siteAlertLabel',
 	'_siteAddButton',
@@ -58,6 +58,11 @@ const NewSiteBox = new Lang.Class({
 
 	this._createAlertIcons();
 	this._switchAlertIcon(AlertIcon.NOTHING);
+
+	this._urlEntry = new Gtk.Entry();
+	this._urlEntry.get_style_context().add_class("url-entry");
+	this._urlEntry.connect('activate', Lang.bind(this, this._onUrlEntryActivated));
+	this._siteUrlFrame.add(this._urlEntry);
     },
 
     _createAlertIcons: function() {
@@ -75,10 +80,10 @@ const NewSiteBox = new Lang.Class({
 	this._siteAddButton.visible = false;
 	this._switchAlertIcon(AlertIcon.NOTHING);
 	this._siteAlertLabel.set_text(NEW_SITE_DEFAULT_MESSAGE);
-	this._siteEntry.set_text("");
-	this._siteEntry.max_length = 0;
-	this._siteEntry.halign = Gtk.Align.FILL;
-	this._siteEntry.grab_focus();
+	this._urlEntry.set_text("");
+	this._urlEntry.max_length = 0;
+	this._urlEntry.halign = Gtk.Align.FILL;
+	this._urlEntry.grab_focus();
     },
 
     _switchAlertIcon: function(newItem) {
@@ -105,13 +110,13 @@ const NewSiteBox = new Lang.Class({
     _editSite: function() {
 	this._switchAlertIcon(AlertIcon.CANCEL);
 	this._siteAddButton.visible = true;
-	this._siteEntry.set_text(this._webView.get_title());
+	this._urlEntry.set_text(this._webView.get_title());
 	this._siteAlertLabel.set_text(this._webView.get_uri());
 
 	/* Narrow the entry and put the focus so user can change the title */
-	let [entryWidth, entryHeight] = this._siteEntry.get_size_request();
-	this._siteEntry.max_length = NEW_SITE_TITLE_LIMIT;
-	this._siteEntry.halign = Gtk.Align.START;
+	let [entryWidth, entryHeight] = this._urlEntry.get_size_request();
+	this._urlEntry.max_length = NEW_SITE_TITLE_LIMIT;
+	this._urlEntry.halign = Gtk.Align.START;
     },
 
     _onEditSiteCancel: function() {
@@ -121,9 +126,15 @@ const NewSiteBox = new Lang.Class({
 
     _onSiteAdd: function() {
 	let url = this._siteAlertLabel.get_text();
-	let title = this._siteEntry.get_text();
+	let title = this._urlEntry.get_text();
 
-	this._siteEntry.sensitive = false;
+	let urlLabel = new Gtk.Label({ label: title });
+	urlLabel.get_style_context().add_class('url-label');
+	urlLabel.set_alignment(0, 0.5);
+	this._siteUrlFrame.remove(this._urlEntry);
+	this._siteUrlFrame.add(urlLabel);
+	this._siteUrlFrame.show_all();
+
 	this._siteAlertLabel.set_text(NEW_SITE_ADDED_MESSAGE);
 	this._siteAddButton.sensitive = false;
 	this._switchAlertIcon(AlertIcon.NOTHING);
@@ -135,20 +146,22 @@ const NewSiteBox = new Lang.Class({
 	GLib.timeout_add_seconds(GLib.PRIORITY_DEFAULT,
 				 NEW_SITE_SUCCESS_TIMEOUT,
 				 Lang.bind(this, function() {
-				     this._siteEntry.sensitive = true;
+				     this._siteUrlFrame.remove(urlLabel);
+				     this._siteUrlFrame.add(this._urlEntry);
+				     this._urlEntry.sensitive = true;
 				     this._siteAddButton.sensitive = true;
 				     this._reset();
 				     return false;
 				 }));
     },
 
-    _onSiteEntryActivated: function() {
+    _onUrlEntryActivated: function() {
 	if (!this._webView) {
 	    this._webView = new WebKit.WebView();
 	    this._webView.connect('load-changed', Lang.bind(this, this._onLoadChanged));
 	    this._webView.connect('load-failed', Lang.bind(this, this._onLoadFailed));
 	}
-	let url = this._siteEntry.get_text();
+	let url = this._urlEntry.get_text();
 	this._webView.load_uri(url);
     },
 
