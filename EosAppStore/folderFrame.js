@@ -16,7 +16,7 @@ const FolderIconButton = new Lang.Class({
     Name: 'FolderIconButton',
     Extends: Gtk.ToggleButton,
 
-    _init : function(iconName) {
+    _init : function(iconName, folderModel) {
         this.parent({
             active: false,
             'draw-indicator': false,
@@ -27,6 +27,7 @@ const FolderIconButton = new Lang.Class({
             image: new Gtk.Image({'icon-name': iconName}) });
 
         this._iconName = iconName;
+        this._folderModel = folderModel;
     },
 
     _show_name_bubble: function() {
@@ -50,7 +51,7 @@ const FolderIconButton = new Lang.Class({
         dialog.get_content_area().add(grid);
 
         addButton.connect('clicked', Lang.bind(this, function(button) {
-            FolderModel.createFolder(entry.get_text(), this._iconName);
+            this._folderModel.createFolder(entry.get_text(), this._iconName);
 
             dialog.destroy();
             this.set_active(false);
@@ -89,7 +90,7 @@ const FolderIconGrid = new Lang.Class({
         let columns = Math.max(1, Math.floor(allocatedWidth / _FOLDER_BUTTON_SIZE));
 
         for (let i = 0; i < this._iconList.length; i++) {
-            let button = new FolderIconButton(this._iconList[i]);
+            let button = new FolderIconButton(this._iconList[i], this._folderModel);
 
             button.connect('toggled', Lang.bind(this, this._on_button_toggled));
 
@@ -100,7 +101,7 @@ const FolderIconGrid = new Lang.Class({
     },
 
     _get_icons: function() {
-        this._iconList = FolderModel.getIconList();
+        this._iconList = this._folderModel.getIconList();
 
         // TODO better solution needed here
         // wait for allocation to know how many columns the grid should have
@@ -123,6 +124,7 @@ const FolderIconGrid = new Lang.Class({
     _init: function(path) {
         this.parent();
 
+        this._folderModel = new FolderModel.FolderModel();
         this._get_icons();
     }
 });
