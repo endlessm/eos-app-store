@@ -74,10 +74,11 @@ const AppStore = new Lang.Class({
     },
 
     vfunc_activate: function() {
-        this._mainWindow.toggle(0);
+        this._mainWindow.showPage(0);
     },
 
     vfunc_command_line: function(cmdline) {
+        let noDefaultWindow = false;
         let initialPage = StoreModel.StorePage.APPS;
         let args = cmdline.get_arguments();
         for (let i = 0; i < args.length; i++) {
@@ -101,6 +102,11 @@ const AppStore = new Lang.Class({
                 break;
             }
 
+            if (arg == '--no-default-window' || arg == '-n') {
+                noDefaultWindow = true;
+                args.splice(i, 1);
+            }
+
             log("Unrecognized argument '" + arg + "'\n" +
                 "Usage: eos-app-store [--apps|--folders|--web-links]");
             return -1;
@@ -108,7 +114,10 @@ const AppStore = new Lang.Class({
 
         this._storeModel.changePage(initialPage);
 
-        this.activate();
+        if (!noDefaultWindow) {
+            this.activate();
+        }
+
         return 0;
     },
 
