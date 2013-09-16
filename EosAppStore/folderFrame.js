@@ -28,7 +28,7 @@ const FolderIconButton = new Lang.Class({
 
         this._iconName = iconName;
     },
-    
+
     _show_name_bubble: function() {
         let dialog = new Gtk.Dialog({
             modal: true,
@@ -51,14 +51,14 @@ const FolderIconButton = new Lang.Class({
 
         addButton.connect('clicked', Lang.bind(this, function(button) {
             FolderModel.createFolder(entry.get_text(), this._iconName);
-            
+
             dialog.destroy();
             this.set_active(false);
-            
+
             // hide the app store window
             this.get_toplevel().emit('delete-event', null);
         }));
-        
+
         dialog.show_all();
         dialog.run();
         dialog.destroy();
@@ -73,7 +73,7 @@ const FolderIconGrid = new Lang.Class({
         if (toggleButton.get_active()) {
             for (let i = 0; i < this._toggleButtons.length; i++) {
                 let button = this._toggleButtons[i];
-        
+
                 if (button != toggleButton && button.get_active()) {
                     button.set_active(false);
                 }
@@ -81,18 +81,18 @@ const FolderIconGrid = new Lang.Class({
             toggleButton._show_name_bubble();
         }
     },
-    
+
     _populate: function(allocatedWidth) {
         this._toggleButtons = [];
 
-        let base = this._path + '/'; 
+        let base = this._path + '/';
         let columns = Math.max(1, Math.floor(allocatedWidth / _FOLDER_BUTTON_SIZE));
 
         for (let i = 0; i < this._iconList.length; i++) {
             let button = new FolderIconButton(this._iconList[i]);
 
             button.connect('toggled', Lang.bind(this, this._on_button_toggled));
-            
+
             this.attach(button, i % columns, Math.floor(i/columns), 1, 1);
             this._toggleButtons.push(button);
         }
@@ -101,7 +101,7 @@ const FolderIconGrid = new Lang.Class({
 
     _get_icons: function() {
         this._iconList = FolderModel.getIconList();
-        
+
         // TODO better solution needed here
         // wait for allocation to know how many columns the grid should have
         if (this.get_realized()) {

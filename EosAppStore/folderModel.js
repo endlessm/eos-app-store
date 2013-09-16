@@ -24,18 +24,18 @@ function getIconList() {
 
 function createFolder(name, iconName) {
     let keyFile = new GLib.KeyFile();
-    
+
     keyFile.set_value(GLib.KEY_FILE_DESKTOP_GROUP,
                      GLib.KEY_FILE_DESKTOP_KEY_NAME, name);
-    
+
     keyFile.set_value(GLib.KEY_FILE_DESKTOP_GROUP,
                      GLib.KEY_FILE_DESKTOP_KEY_ICON, iconName);
-    
+
     keyFile.set_value(GLib.KEY_FILE_DESKTOP_GROUP,
                      GLib.KEY_FILE_DESKTOP_KEY_TYPE, GLib.KEY_FILE_DESKTOP_TYPE_DIRECTORY);
-    
+
     let dir = GLib.get_user_data_dir()+'/desktop-directories';
-    
+
     // apparently, octal literals are deprecated in JS
     if (GLib.mkdir_with_parents(dir, 0755, null) < 0) {
         log('could not create the directory '+dir);
@@ -49,9 +49,9 @@ function createFolder(name, iconName) {
         log('could not create a new file in '+dir);
         return;
     }
-    
+
     let buf = keyFile.to_data();
-    
+
     let channel = GLib.IOChannel.unix_new(fd);
     channel.write_chars(buf[0], buf[1]);
     channel.shutdown(true);
