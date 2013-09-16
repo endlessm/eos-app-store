@@ -9,6 +9,7 @@ Makefile.in
 /missing
 /stamp-h1
 /data/*.gresource
+/data/com.endlessm.AppStore.service
 /data/eos-app-store.desktop
 /EosAppStore/path.js
 /EosAppStore/config.js

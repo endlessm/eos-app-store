@@ -24,3 +24,14 @@ desktop_DATA = eos-app-store.desktop
 
 EXTRA_DIST += eos-app-store.desktop.in
 CLEANFILES += $(desktop_DATA)
+
+servicedir = $(datadir)/dbus-1/services
+service_DATA = $(service_in_files:.service.in=.service)
+service_in_files = \
+	com.endlessm.AppStore.service.in
+
+com.endlessm.AppStore.service: com.endlessm.AppStore.service.in Makefile
+	$(AM_V_GEN) sed -e "s|\@bindir\@|$(bindir)|" $< > $@
+
+EXTRA_DIST += $(service_in_files)
+CLEANFILES += $(service_DATA)
