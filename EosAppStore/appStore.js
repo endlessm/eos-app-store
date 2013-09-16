@@ -21,11 +21,12 @@ const APP_STORE_PATH = '/com/endlessm/AppStore';
 const APP_STORE_IFACE = 'com.endlessm.AppStore';
 
 const AppStoreIface = <interface name={APP_STORE_NAME}>
-  <method name="toggle">
+  <method name="Toggle">
     <arg type="u" direction="in" name="timestamp"/>
   </method>
   <method name="ShowPage">
     <arg type="s" direction="in" name="page"/>
+    <arg type="u" direction="in" name="timestamp"/>
   </method>
   <property name="Visible" type="b" access="read"/>
 </interface>;
@@ -73,10 +74,11 @@ const AppStore = new Lang.Class({
     },
 
     vfunc_activate: function() {
-        this._mainWindow.toggle(0);
+        this._mainWindow.showPage(0);
     },
 
     vfunc_command_line: function(cmdline) {
+        let noDefaultWindow = false;
         let initialPage = StoreModel.StorePage.APPS;
         let args = cmdline.get_arguments();
         for (let i = 0; i < args.length; i++) {
@@ -100,6 +102,11 @@ const AppStore = new Lang.Class({
                 break;
             }
 
+            if (arg == '--no-default-window' || arg == '-n') {
+                noDefaultWindow = true;
+                args.splice(i, 1);
+            }
+
             log("Unrecognized argument '" + arg + "'\n" +
                 "Usage: eos-app-store [--apps|--folders|--web-links]");
             return -1;
@@ -107,7 +114,10 @@ const AppStore = new Lang.Class({
 
         this._storeModel.changePage(initialPage);
 
-        this.activate();
+        if (!noDefaultWindow) {
+            this.activate();
+        }
+
         return 0;
     },
 
@@ -115,23 +125,23 @@ const AppStore = new Lang.Class({
         return this._mainWindow;
     },
 
-    toggle: function(timestamp) {
+    Toggle: function(timestamp) {
         this._mainWindow.toggle(timestamp);
     },
 
-    ShowPage: function(page) {
+    ShowPage: function(page, timestamp) {
+        let valid = true;
         if (page == 'apps') {
             this._storeModel.changePage(StoreModel.StorePage.APPS);
-            return;
-        }
-        if (page == 'folders') {
+        } else if (page == 'folders') {
             this._storeModel.changePage(StoreModel.StorePage.FOLDERS);
-            return;
-        }
-        if (page == 'web') {
+        } else if (page == 'web') {
             this._storeModel.changePage(StoreModel.StorePage.WEB);
-            return;
+        } else {
+            log("Unrecognized page '" + page + "'");
         }
+
+        this._mainWindow.showPage(timestamp);
     },
 
     _onVisibilityChanged: function(proxy, visible) {
