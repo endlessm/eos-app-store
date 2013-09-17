@@ -2,6 +2,7 @@
 const Gio = imports.gi.Gio;
 const GLib = imports.gi.GLib;
 const Gtk = imports.gi.Gtk;
+const AppListModel = imports.appListModel;
 
 const Lang = imports.lang;
 
@@ -72,9 +73,12 @@ const FolderModel = new Lang.Class({
         let channel = GLib.IOChannel.new_file(dirpath + '/' + filename, 'w');
         channel.write_chars(buf[0], buf[1]);
         channel.shutdown(true);
+
+        this._model.installApp(filename);
     },
 
     _init: function() {
-
+        this._model = new AppListModel.AppList();
+        this._model.update();
     }
 });

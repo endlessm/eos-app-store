@@ -121,10 +121,10 @@ const FolderIconGrid = new Lang.Class({
         }
     },
 
-    _init: function(path) {
+    _init: function(folderModel) {
         this.parent();
 
-        this._folderModel = new FolderModel.FolderModel();
+        this._folderModel = folderModel;
         this._get_icons();
     }
 });
@@ -143,6 +143,8 @@ const FolderFrame = new Lang.Class({
     _init: function() {
         this.parent();
 
+        this._folderModel = new FolderModel.FolderModel();
+
         this.initTemplate({ templateRoot: '_mainBox', bindChildren: true, connectSignals: true, });
         this.get_style_context().add_class('folder-frame');
 
@@ -151,7 +153,7 @@ const FolderFrame = new Lang.Class({
 
         this.add(this._mainBox);
 
-        this._grid = new FolderIconGrid();
+        this._grid = new FolderIconGrid(this._folderModel);
         this._viewport.add(this._grid);
 
         this.show_all();
