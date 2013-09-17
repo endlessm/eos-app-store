@@ -62,6 +62,17 @@ const NewSiteBox = new Lang.Class({
 	this._urlEntry = new Gtk.Entry();
 	this._urlEntry.get_style_context().add_class("url-entry");
 	this._urlEntry.connect('activate', Lang.bind(this, this._onUrlEntryActivated));
+
+	this._urlEntry.connect('enter-notify-event',
+			       Lang.bind(this, function() {
+				   this._urlEntry.set_state_flags(Gtk.StateFlags.PRELIGHT, false);
+			       }));
+
+	this._urlEntry.connect('leave-notify-event',
+			       Lang.bind(this, function() {
+				   this._urlEntry.unset_state_flags(Gtk.StateFlags.PRELIGHT);
+			       }));
+
 	this._siteUrlFrame.add(this._urlEntry);
     },
 
@@ -161,6 +172,7 @@ const NewSiteBox = new Lang.Class({
 	    this._webView.connect('load-changed', Lang.bind(this, this._onLoadChanged));
 	    this._webView.connect('load-failed', Lang.bind(this, this._onLoadFailed));
 	}
+	this._urlEntry.get_style_context().remove_class("url-entry-error");
 	let url = this._urlEntry.get_text();
 	this._webView.load_uri(url);
     },
@@ -187,6 +199,7 @@ const NewSiteBox = new Lang.Class({
 	this._newSiteError = true;
 	this._siteAlertLabel.set_text(NEW_SITE_UNAVAILABLE);
 	this._switchAlertIcon(AlertIcon.ERROR);
+	this._urlEntry.get_style_context().add_class("url-entry-error");
 	return true;
     },
 });
