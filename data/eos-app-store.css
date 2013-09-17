@@ -30,6 +30,21 @@
   color: white;
 }
 
+.new-site-frame {
+  background: rgba(0,0,0,0.25);
+  border-radius: 4px;
+  box-shadow: 0px 2px 2px 0px rgba(0,0,0,1);
+}
+
+.new-site-frame .url-icon {
+    background: rgba(0,0,0,0.12);
+    border-right: 1px solid rgba(0,0,0,0.8);
+}
+
+.new-site-frame .url-frame {
+    background: transparent;
+}
+
 .new-site-frame .url-entry {
   font: Sans 15px;
   color: rgb(51,51,51);
@@ -50,4 +65,8 @@
 .new-site-frame .alert-label {
   font: regular 14px;
   color: rgb(153,153,153);
+}
+
+.new-site-frame .alert-icon {
+    background: transparent;
 }

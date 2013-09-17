@@ -4,58 +4,51 @@
   <object class="GtkWindow" id="window1">
     <property name="can_focus">False</property>
     <child>
-      <object class="GtkBox" id="_mainBox">
+      <object class="GtkFrame" id="_mainBox">
         <property name="visible">True</property>
         <property name="can_focus">False</property>
+        <property name="label_xalign">0</property>
+        <property name="shadow_type">none</property>
         <style>
           <class name="new-site-frame"/>
         </style>
         <child>
-          <object class="GtkImage" id="_siteIcon">
+          <object class="GtkBox" id="box">
             <property name="visible">True</property>
             <property name="can_focus">False</property>
-            <property name="icon_name">browser</property>
-          </object>
-          <packing>
-            <property name="expand">False</property>
-            <property name="fill">True</property>
-            <property name="position">0</property>
-          </packing>
-        </child>
-        <child>
-          <object class="GtkBox" id="box1">
-            <property name="visible">True</property>
-            <property name="can_focus">False</property>
-            <property name="orientation">vertical</property>
             <child>
-              <object class="GtkFrame" id="_siteUrlFrame">
+              <object class="GtkImage" id="_siteIcon">
+                <property name="width_request">128</property>
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
-                <property name="label_xalign">0</property>
-                <property name="shadow_type">none</property>
-                <child>
-                  <placeholder/>
-                </child>
-                <child type="label_item">
-                  <placeholder/>
-                </child>
+                <property name="icon_name">browser</property>
+                <style>
+                  <class name="url-icon"/>
+                </style>
               </object>
               <packing>
                 <property name="expand">False</property>
                 <property name="fill">True</property>
-                <property name="position">1</property>
+                <property name="position">0</property>
               </packing>
             </child>
             <child>
               <object class="GtkBox" id="box2">
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
+                <property name="margin_left">22</property>
+                <property name="margin_right">22</property>
+                <property name="margin_top">17</property>
+                <property name="orientation">vertical</property>
                 <child>
-                  <object class="GtkFrame" id="_siteAlertIconFrame">
+                  <object class="GtkFrame" id="_siteUrlFrame">
                     <property name="visible">True</property>
                     <property name="can_focus">False</property>
                     <property name="label_xalign">0</property>
                     <property name="shadow_type">none</property>
+                    <style>
+                      <class name="url-frame"/>
+                    </style>
                     <child>
                       <placeholder/>
                     </child>
@@ -66,23 +59,78 @@
                   <packing>
                     <property name="expand">False</property>
                     <property name="fill">True</property>
-                    <property name="position">0</property>
+                    <property name="position">1</property>
                   </packing>
                 </child>
                 <child>
-                  <object class="GtkLabel" id="_siteAlertLabel">
+                  <object class="GtkBox" id="box3">
                     <property name="visible">True</property>
                     <property name="can_focus">False</property>
-                    <property name="label" translatable="yes">ex.: http://www.globoesporte.com</property>
-                    <style>
-                      <class name="alert-label"/>
-                    </style>
+                    <child>
+                      <object class="GtkFrame" id="_siteAlertIconFrame">
+                        <property name="width_request">16</property>
+                        <property name="height_request">16</property>
+                        <property name="visible">True</property>
+                        <property name="can_focus">False</property>
+                        <property name="label_xalign">0</property>
+                        <property name="shadow_type">none</property>
+                        <style>
+                          <class name="alert-icon"/>
+                        </style>
+                        <child>
+                          <placeholder/>
+                        </child>
+                        <child type="label_item">
+                          <placeholder/>
+                        </child>
+                      </object>
+                      <packing>
+                        <property name="expand">False</property>
+                        <property name="fill">True</property>
+                        <property name="position">0</property>
+                      </packing>
+                    </child>
+                    <child>
+                      <object class="GtkLabel" id="_siteAlertLabel">
+                        <property name="visible">True</property>
+                        <property name="can_focus">False</property>
+                        <property name="label" translatable="yes">ex.: http://www.globoesporte.com</property>
+                        <style>
+                          <class name="alert-label"/>
+                        </style>
+                      </object>
+                      <packing>
+                        <property name="expand">False</property>
+                        <property name="fill">True</property>
+                        <property name="position">1</property>
+                      </packing>
+                    </child>
                   </object>
                   <packing>
                     <property name="expand">False</property>
                     <property name="fill">True</property>
-                    <property name="position">1</property>
+                    <property name="position">2</property>
                   </packing>
+                </child>
+              </object>
+              <packing>
+                <property name="expand">True</property>
+                <property name="fill">True</property>
+                <property name="position">1</property>
+              </packing>
+            </child>
+            <child>
+              <object class="GtkButton" id="_siteAddButton">
+                <property name="can_focus">False</property>
+                <property name="receives_default">True</property>
+                <property name="no_show_all">True</property>
+                <signal name="clicked" handler="_onSiteAdd" swapped="no"/>
+                <child>
+                  <object class="GtkImage" id="_siteAddButtonImage">
+                    <property name="visible">True</property>
+                    <property name="can_focus">False</property>
+                    <property name="stock">gtk-apply</property>
+                  </object>
                 </child>
               </object>
               <packing>
@@ -92,31 +140,9 @@
               </packing>
             </child>
           </object>
-          <packing>
-            <property name="expand">True</property>
-            <property name="fill">True</property>
-            <property name="position">1</property>
-          </packing>
         </child>
-        <child>
-          <object class="GtkButton" id="_siteAddButton">
-            <property name="can_focus">False</property>
-            <property name="receives_default">True</property>
-            <property name="no_show_all">True</property>
-            <signal name="clicked" handler="_onSiteAdd" swapped="no"/>
-            <child>
-              <object class="GtkImage" id="_siteAddButtonImage">
-                <property name="visible">True</property>
-                <property name="can_focus">False</property>
-                <property name="stock">gtk-apply</property>
-              </object>
-            </child>
-          </object>
-          <packing>
-            <property name="expand">False</property>
-            <property name="fill">True</property>
-            <property name="position">2</property>
-          </packing>
+        <child type="label_item">
+          <placeholder/>
         </child>
       </object>
     </child>
