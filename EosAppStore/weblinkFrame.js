@@ -25,6 +25,7 @@ const AlertIcon = {
     CANCEL: 1,
     ERROR: 2,
     NOTHING: 3,
+    HIDE: 4,
 };
 
 const NewSiteBox = new Lang.Class({
@@ -102,15 +103,21 @@ const NewSiteBox = new Lang.Class({
 	    this._alertIcon[AlertIcon.SPINNER].stop();
 	}
 
-	if (this._currentAlertIcon != AlertIcon.NOTHING) {
+	if (this._currentAlertIcon != AlertIcon.NOTHING &&
+	    this._currentAlertIcon != AlertIcon.HIDDEN) {
 	    this._siteAlertIconFrame.remove(this._alertIcon[this._currentAlertIcon]);
 	}
 
 	this._currentAlertIcon = newItem;
 
-	if (this._currentAlertIcon != AlertIcon.NOTHING) {
-	    this._siteAlertIconFrame.add(this._alertIcon[this._currentAlertIcon]);
-	    this._alertIcon[this._currentAlertIcon].show();
+	if (this._currentAlertIcon == AlertIcon.HIDDEN) {
+	    this._siteAlertIconFrame.visible = false;
+	} else {
+	    this._siteAlertIconFrame.visible = true;
+	    if (this._currentAlertIcon != AlertIcon.NOTHING) {
+		this._siteAlertIconFrame.add(this._alertIcon[this._currentAlertIcon]);
+		this._alertIcon[this._currentAlertIcon].show();
+	    }
 	}
 
 	if (this._currentAlertIcon == AlertIcon.SPINNER) {
@@ -148,7 +155,7 @@ const NewSiteBox = new Lang.Class({
 
 	this._siteAlertLabel.set_text(NEW_SITE_ADDED_MESSAGE);
 	this._siteAddButton.sensitive = false;
-	this._switchAlertIcon(AlertIcon.NOTHING);
+	this._switchAlertIcon(AlertIcon.HIDDEN);
 
 	let newSite = this._weblinkListModel.createWeblink(url, title, "browser");
 	this._weblinkListModel.update();
