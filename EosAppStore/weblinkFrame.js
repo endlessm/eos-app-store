@@ -19,6 +19,7 @@ const NEW_SITE_DEFAULT_MESSAGE = "ex.: http://wwww.globoesporte.com";
 const NEW_SITE_ADDED_MESSAGE = "was added successfully";
 const NEW_SITE_SUCCESS_TIMEOUT = 3;
 const NEW_SITE_UNAVAILABLE = "the address written does not exist or is not available";
+const NEW_SITE_PLACEHOLDER = "Write the site address you want to add";
 
 const AlertIcon = {
     SPINNER: 0,
@@ -61,6 +62,7 @@ const NewSiteBox = new Lang.Class({
 	this._switchAlertIcon(AlertIcon.NOTHING);
 
 	this._urlEntry = new Gtk.Entry();
+	this._urlEntry.set_placeholder_text(NEW_SITE_PLACEHOLDER);
 	this._urlEntry.get_style_context().add_class("url-entry");
 	this._urlEntry.connect('activate', Lang.bind(this, this._onUrlEntryActivated));
 
