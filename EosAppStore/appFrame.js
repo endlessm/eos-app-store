@@ -13,6 +13,13 @@ const Builder = imports.builder;
 const Lang = imports.lang;
 const Signals = imports.signals;
 
+const CATEGORY_TRANSITION_MS = 500;
+
+// If the area available for the grid is less than this minimium size,
+// scroll bars will be added.
+const MIN_GRID_WIDTH = 800;
+const MIN_GRID_HEIGHT = 600;
+
 const AppListBoxRow = new Lang.Class({
     Name: 'AppListBoxRow',
     Extends: Gtk.Bin,
@@ -44,22 +51,25 @@ const AppListBoxRow = new Lang.Class({
     },
 
     set appName(name) {
-        if (!name)
+        if (!name) {
             name = _("Unknown application");
+        }
 
         this._appNameLabel.set_text(name);
     },
 
     set appDescription(description) {
-        if (!description)
+        if (!description) {
             description = "";
+        }
 
         this._appDescriptionLabel.set_text(description);
     },
 
     set appIcon(name) {
-        if (!name)
+        if (!name) {
             name = "gtk-missing-image";
+        }
 
         this._appIcon.set_from_icon_name(name, Gtk.IconSize.DIALOG);
     },
@@ -70,17 +80,17 @@ const AppListBoxRow = new Lang.Class({
 
         switch (this._appState) {
             case EosAppStorePrivate.AppState.INSTALLED:
-                this._appStateButton.set_label(_('UNINSTALL'));
+                this._appStateButton.set_label(_("UNINSTALL"));
                 this._appStateButton.show();
                 break;
 
             case EosAppStorePrivate.AppState.UNINSTALLED:
-                this._appStateButton.set_label(_('INSTALL'));
+                this._appStateButton.set_label(_("INSTALL"));
                 this._appStateButton.show();
                 break;
 
             case EosAppStorePrivate.AppState.UPDATABLE:
-                this._appStateButton.set_label(_('UPDATE'));
+                this._appStateButton.set_label(_("UPDATE"));
                 this._appStateButton.show();
                 break;
 
@@ -146,7 +156,7 @@ const AppFrame = new Lang.Class({
         this._categoriesBox.show();
 
         this._stack = new PLib.Stack();
-        this._stack.set_transition_duration(250);
+        this._stack.set_transition_duration(CATEGORY_TRANSITION_MS);
         this._stack.set_transition_type(PLib.StackTransitionType.SLIDE_RIGHT);
         this._stack.hexpand = true;
         this._stack.vexpand = true;
@@ -162,28 +172,28 @@ const AppFrame = new Lang.Class({
                 name: 'featured',
                 button: null,
                 grid: null,
-                label: "Featured",
+                label: _("Featured"),
                 id: EosAppStorePrivate.AppCategory.FEATURED,
             },
             {
                 name: 'education',
                 button: null,
                 grid: null,
-                label: "Education",
+                label: _("Education"),
                 id: EosAppStorePrivate.AppCategory.EDUCATION,
             },
             {
                 name: 'leisure',
                 button: null,
                 grid: null,
-                label: "Leisure",
+                label: _("Leisure"),
                 id: EosAppStorePrivate.AppCategory.LEISURE,
             },
             {
                 name: 'utilities',
                 button: null,
                 grid: null,
-                label: "Utilities",
+                label: _("Utilities"),
                 id: EosAppStorePrivate.AppCategory.UTILITIES,
             },
         ];
@@ -200,7 +210,7 @@ const AppFrame = new Lang.Class({
             this._stack.add_named(scrollWindow, categories[c].name);
 
             categories[c].grid = new Endless.FlexyGrid();
-            categories[c].grid.set_size_request(800, 600);
+            categories[c].grid.set_size_request(MIN_GRID_WIDTH, MIN_GRID_HEIGHT);
             scrollWindow.add_with_viewport(categories[c].grid);
 
             let cells = EosAppStorePrivate.app_load_content(categories[c].grid, categories[c].id);
@@ -226,7 +236,6 @@ const AppFrame = new Lang.Class({
             return;
         }
 
-        log(category.name);
         this._stack.set_visible_child_name(category.name);
     },
 

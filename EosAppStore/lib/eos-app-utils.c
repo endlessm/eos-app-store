@@ -51,7 +51,7 @@ eos_app_get_content_dir (EosAppCategory category)
                                 APP_STORE_CONTENT_DIR,
                                 locale,
                                 get_category_dir (category),
-                                 NULL);
+                                NULL);
   g_free (locale);
 
   return res;

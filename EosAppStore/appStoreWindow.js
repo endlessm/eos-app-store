@@ -16,11 +16,12 @@ const FrameClock = imports.frameClock;
 const StoreModel = imports.storeModel;
 const UIBuilder = imports.builder;
 
-const APP_STORE_MIN_WIDTH = 800;
-const FRACTION_OF_DISPLAY_WIDTH = 0.75;
 const ANIMATION_TIME = (500 * 1000); // half a second
 
+const PAGE_TRANSITION_MS = 500;
+
 const AppStoreSizes = {
+  // Note: must be listed in order of increasing screenWidth
   SVGA: { screenWidth:  800, windowWidth:  800 },
    XGA: { screenWidth: 1024, windowWidth:  800 },
   WXGA: { screenWidth: 1366, windowWidth: 1024 },
@@ -68,19 +69,18 @@ const AppStoreSlider = new Lang.Class({
     _getSize: function() {
         let workarea = this._getWorkarea();
 
-        let windowWidth = null;
+        // If the work area is smaller than any defined resolution,
+        // use the full width of the work area
+        let windowWidth = workarea.width;
+
+        // Find the largest defined resolution that does not exceed
+        // the work area width
         for (let i in AppStoreSizes) {
             let res = AppStoreSizes[i];
 
-            if (windowWidth || workarea.width > res.screenWidth) {
-                continue;
+            if (workarea.width >= res.screenWidth) {
+                windowWidth = res.windowWidth;
             }
-
-            windowWidth = res.windowWidth;
-        }
-
-        if (!windowWidth) {
-            windowWidth = APP_STORE_MIN_WIDTH;
         }
 
         return [windowWidth, workarea.height];
@@ -199,7 +199,7 @@ const AppStoreWindow = new Lang.Class({
 
         // the stack that holds the pages
         this._stack = new PLib.Stack();
-        this._stack.set_transition_duration(250);
+        this._stack.set_transition_duration(PAGE_TRANSITION_MS);
         this._stack.set_transition_type(PLib.StackTransitionType.SLIDE_RIGHT);
         this.content_box.add(this._stack);
         this._stack.show();

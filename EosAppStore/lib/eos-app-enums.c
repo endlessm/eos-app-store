@@ -16,7 +16,7 @@ enum_type##_get_type (void) \
     { \
       static const GEnumValue v[] = { \
         values \
-	{ 0, NULL, NULL }, \
+        { 0, NULL, NULL }, \
       }; \
       GType g_define_type_id = \
         g_enum_register_static (g_intern_static_string (#EnumType), v); \
