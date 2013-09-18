@@ -38,12 +38,12 @@
                 <property name="can_focus">False</property>
                 <property name="margin_left">22</property>
                 <property name="margin_right">22</property>
-                <property name="margin_top">17</property>
                 <property name="orientation">vertical</property>
                 <child>
                   <object class="GtkFrame" id="_siteUrlFrame">
                     <property name="visible">True</property>
                     <property name="can_focus">False</property>
+                    <property name="margin_top">17</property>
                     <property name="label_xalign">0</property>
                     <property name="shadow_type">none</property>
                     <style>
@@ -66,6 +66,7 @@
                   <object class="GtkBox" id="box3">
                     <property name="visible">True</property>
                     <property name="can_focus">False</property>
+                    <property name="margin_bottom">14</property>
                     <child>
                       <object class="GtkFrame" id="_siteAlertIconFrame">
                         <property name="width_request">16</property>
@@ -94,14 +95,16 @@
                       <object class="GtkLabel" id="_siteAlertLabel">
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
+                        <property name="halign">start</property>
                         <property name="label" translatable="yes">ex.: http://www.globoesporte.com</property>
+                        <property name="ellipsize">end</property>
                         <style>
                           <class name="alert-label"/>
                         </style>
                       </object>
                       <packing>
                         <property name="expand">False</property>
-                        <property name="fill">True</property>
+                        <property name="fill">False</property>
                         <property name="position">1</property>
                       </packing>
                     </child>
