@@ -144,6 +144,9 @@ const AppFrame = new Lang.Class({
     _init: function() {
         this.parent();
 
+        // initialize the applications model
+        this._model = new AppListModel.AppList();
+
         this._mainBox = new Gtk.Box({ orientation: Gtk.Orientation.VERTICAL, });
         this.add(this._mainBox);
         this._mainBox.hexpand = true;

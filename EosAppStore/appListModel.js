@@ -1,7 +1,4 @@
 // -*- mode: js; js-indent-level: 4; indent-tabs-mode: nil -*-
-const Gio = imports.gi.Gio;
-const GLib = imports.gi.GLib;
-const GMenu = imports.gi.GMenu;
 const EosAppStorePrivate = imports.gi.EosAppStorePrivate;
 
 const Lang = imports.lang;
@@ -14,6 +11,9 @@ const AppList = new Lang.Class({
     _init: function() {
         this._model = new EosAppStorePrivate.AppListModel();
         this._model.connect('changed', Lang.bind(this, this._onAppListModelChanged));
+
+        // initialize model state
+        this.update();
     },
 
     update: function() {
