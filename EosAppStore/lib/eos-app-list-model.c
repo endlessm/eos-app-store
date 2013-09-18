@@ -120,6 +120,9 @@ eos_app_list_model_init (EosAppListModel *self)
 
   self->app_tree =
     gmenu_tree_new ("gnome-applications.menu", GMENU_TREE_FLAGS_INCLUDE_NODISPLAY);
+  g_signal_connect (self->app_tree, "changed",
+                    G_CALLBACK (on_app_tree_changed),
+                    self);
 
   installed_apps = get_installed_apps_path ();
   file = g_file_new_for_path (installed_apps);
