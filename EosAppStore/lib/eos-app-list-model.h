@@ -1,3 +1,5 @@
+/* -*- mode: C; c-file-style: "gnu"; indent-tabs-mode: nil; -*- */
+
 #ifndef __EOS_APP_LIST_MODEL_H__
 #define __EOS_APP_LIST_MODEL_H__
 
