@@ -230,7 +230,7 @@ const WeblinkList = new Lang.Class({
 
         while (GLib.file_test(availableFullFilename, GLib.FileTest.EXISTS)) {
             i++;
-            availableFilename = filename + '-"' + i + '.desktop';
+            availableFilename = filename + '-' + i + '.desktop';
             availableFullFilename = GLib.build_filenamev([path, availableFilename]);
         }
 

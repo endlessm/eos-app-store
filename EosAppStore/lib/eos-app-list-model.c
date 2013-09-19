@@ -478,7 +478,7 @@ eos_app_list_model_get_app_name (EosAppListModel *model,
 
 const char *
 eos_app_list_model_get_app_executable (EosAppListModel *model,
-				       const char *app_id)
+                                       const char *app_id)
 {
   GDesktopAppInfo *info;
 
@@ -501,7 +501,7 @@ eos_app_list_model_get_app_description (EosAppListModel *model,
 
 const char *
 eos_app_list_model_get_app_comment (EosAppListModel *model,
-				    const char *app_id)
+                                    const char *app_id)
 {
   GDesktopAppInfo *info;
 

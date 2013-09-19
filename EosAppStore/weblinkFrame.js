@@ -89,7 +89,7 @@ const NewSiteBox = new Lang.Class({
     _reset: function() {
         this._siteAddButton.visible = false;
         this._switchAlertIcon(AlertIcon.NOTHING);
-        this._siteAlertLabel.set_text(_("ex.: http://wwww.globoesporte.com"));
+        this._siteAlertLabel.set_text(_("e.g.: http://wwww.globoesporte.com"));
         this._urlEntry.set_text("");
         this._urlEntry.max_length = 0;
         this._urlEntry.halign = Gtk.Align.FILL;
@@ -241,29 +241,33 @@ const WeblinkListBoxRow = new Lang.Class({
     },
 
     set weblinkName(name) {
-        if (!name)
+        if (!name) {
             name = _("Unknown weblink");
+        }
 
         this._nameLabel.set_text(name);
     },
 
-   set weblinkDescription(description) {
-        if (!description)
-            description = "";
+    set weblinkDescription(description) {
+        if (!description) {
+            description = '';
+        }
 
         this._descriptionLabel.set_text(description);
     },
 
-   set weblinkUrl(url) {
-        if (!url)
-            url = "";
+    set weblinkUrl(url) {
+        if (!url) {
+            url = '';
+        }
 
         this._urlLabel.set_text(url);
     },
 
     set weblinkIcon(name) {
-        if (!name)
+        if (!name) {
             name = 'gtk-missing-image';
+        }
 
         this._icon.set_from_icon_name(name, Gtk.IconSize.DIALOG);
     },

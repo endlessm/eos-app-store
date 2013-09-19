@@ -96,7 +96,7 @@
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
                         <property name="halign">start</property>
-                        <property name="label" translatable="yes">ex.: http://www.globoesporte.com</property>
+                        <property name="label" translatable="yes">e.g.: http://www.globoesporte.com</property>
                         <property name="ellipsize">end</property>
                         <style>
                           <class name="alert-label"/>

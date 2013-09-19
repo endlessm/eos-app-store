@@ -26,7 +26,7 @@ msgid "Add applications to EOS"
 msgstr ""
 
 #: ../data/eos-app-store-weblink-new-site-frame.ui.h:1
-msgid "ex.: http://www.globoesporte.com"
+msgid "e.g.: http://www.globoesporte.com"
 msgstr ""
 
 #: ../data/eos-app-store-list-row.ui.h:1
@@ -117,7 +117,7 @@ msgid "Write the site address you want to add"
 msgstr ""
 
 #: ../EosAppStore/weblinkFrame.js:92
-msgid "ex.: http://wwww.globoesporte.com"
+msgid "e.g.: http://wwww.globoesporte.com"
 msgstr ""
 
 #: ../EosAppStore/weblinkFrame.js:153
