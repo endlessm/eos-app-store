@@ -15,8 +15,6 @@ struct _EosAppListModel
 
   GDBusConnection *connection;
 
-  GSettings *settings;
-
   GFileMonitor *monitor;
 
   GMenuTree *app_tree;
@@ -75,7 +73,6 @@ eos_app_list_model_finalize (GObject *gobject)
   EosAppListModel *self = EOS_APP_LIST_MODEL (gobject);
 
   g_clear_object (&self->monitor);
-  g_clear_object (&self->settings);
   g_clear_object (&self->connection);
   g_clear_object (&self->app_tree);
   g_hash_table_unref (self->apps_by_id);
@@ -113,8 +110,6 @@ eos_app_list_model_init (EosAppListModel *self)
 {
   char *installed_apps;
   GFile *file;
-
-  self->settings = g_settings_new ("org.gnome.shell");
 
   self->connection = g_bus_get_sync (G_BUS_TYPE_SESSION, NULL, NULL);
 
