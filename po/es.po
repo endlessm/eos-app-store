@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: dev 1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-09-19 16:36+0200\n"
+"POT-Creation-Date: 2013-09-19 18:50+0200\n"
 "PO-Revision-Date: 2012-05-31 11:54-0500\n"
 "Last-Translator: Automatically generated\n"
 "Language-Team: none\n"
@@ -37,7 +37,8 @@ msgstr ""
 msgid "description"
 msgstr ""
 
-#: ../data/eos-app-store-list-row.ui.h:3
+#: ../data/eos-app-store-list-row.ui.h:3 ../EosAppStore/appFrame.js:94
+#: ../EosAppStore/weblinkFrame.js:282
 msgid "INSTALL"
 msgstr ""
 
@@ -55,6 +56,14 @@ msgstr ""
 
 #: ../EosAppStore/appFrame.js:61
 msgid "Unknown application"
+msgstr ""
+
+#: ../EosAppStore/appFrame.js:89 ../EosAppStore/weblinkFrame.js:277
+msgid "UNINSTALL"
+msgstr ""
+
+#: ../EosAppStore/appFrame.js:99
+msgid "UPDATE"
 msgstr ""
 
 #. Translators: use the same string used to install the app store content JSON
@@ -113,6 +122,10 @@ msgstr ""
 
 #: ../EosAppStore/weblinkFrame.js:153
 msgid "was added successfully"
+msgstr ""
+
+#: ../EosAppStore/weblinkFrame.js:188
+msgid "searching"
 msgstr ""
 
 #: ../EosAppStore/weblinkFrame.js:204

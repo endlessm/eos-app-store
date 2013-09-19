@@ -185,7 +185,7 @@ const NewSiteBox = new Lang.Class({
 	switch (loadEvent) {
 	case WebKit.LoadEvent.STARTED:
 	    this._switchAlertIcon(AlertIcon.SPINNER);
-	    this._siteAlertLabel.set_text("searching");
+	    this._siteAlertLabel.set_text(_("searching"));
 	    this._newSiteError = false;
 	    break;
 	case WebKit.LoadEvent.FINISHED:
