@@ -1,3 +1,5 @@
+/* -*- mode: C; c-file-style: "gnu"; indent-tabs-mode: nil; -*- */
+
 #include "config.h"
 
 #include "eos-app-list-model.h"
@@ -477,10 +479,42 @@ eos_app_list_model_get_app_name (EosAppListModel *model,
 }
 
 const char *
+eos_app_list_model_get_app_executable (EosAppListModel *model,
+                                       const char *app_id)
+{
+  GDesktopAppInfo *info;
+
+  g_return_val_if_fail (EOS_IS_APP_LIST_MODEL (model), NULL);
+  g_return_val_if_fail (app_id != NULL, NULL);
+
+  info = eos_app_list_model_get_app_info (model, app_id);
+  if (info == NULL)
+    return NULL;
+
+  return g_desktop_app_info_get_string (info, G_KEY_FILE_DESKTOP_KEY_EXEC);
+}
+
+const char *
 eos_app_list_model_get_app_description (EosAppListModel *model,
                                         const char *app_id)
 {
   return NULL;
+}
+
+const char *
+eos_app_list_model_get_app_comment (EosAppListModel *model,
+                                    const char *app_id)
+{
+  GDesktopAppInfo *info;
+
+  g_return_val_if_fail (EOS_IS_APP_LIST_MODEL (model), NULL);
+  g_return_val_if_fail (app_id != NULL, NULL);
+
+  info = eos_app_list_model_get_app_info (model, app_id);
+  if (info == NULL)
+    return NULL;
+
+  return g_desktop_app_info_get_string (info, G_KEY_FILE_DESKTOP_KEY_COMMENT);
 }
 
 const char *

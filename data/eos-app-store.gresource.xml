@@ -3,7 +3,10 @@
   <gresource prefix="/com/endlessm/appstore">
     <file>eos-app-store.css</file>
     <file compressed="true">eos-app-store-app-frame.ui</file>
+    <file compressed="true">eos-app-store-weblink-frame.ui</file>
+    <file compressed="true">eos-app-store-weblink-new-site-frame.ui</file>
     <file compressed="true">eos-app-store-list-row.ui</file>
     <file compressed="true">eos-app-store-main-window.ui</file>
+    <file compressed="true">eos-app-store-weblink-list-row.ui</file>
   </gresource>
 </gresources>

@@ -1,3 +1,5 @@
+/* -*- mode: C; c-file-style: "gnu"; indent-tabs-mode: nil; -*- */
+
 #ifndef __EOS_APP_ENUMS_H__
 #define __EOS_APP_ENUMS_H__
 
