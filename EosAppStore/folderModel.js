@@ -78,7 +78,6 @@ const FolderModel = new Lang.Class({
     },
 
     _init: function() {
-        this._model = new AppListModel.AppList();
-        this._model.update();
+        this._model = AppListModel.model;
     }
 });

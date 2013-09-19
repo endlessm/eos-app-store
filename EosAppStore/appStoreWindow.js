@@ -263,7 +263,6 @@ const AppStoreWindow = new Lang.Class({
             case StoreModel.StorePage.FOLDERS:
                 title.set_text(_("FOLDERS"));
                 desc.set_text(_("A descriptive label for the Folders section"));
-                this._pages.apps.update();
                 page = this._pages.folders;
                 break;
         }
