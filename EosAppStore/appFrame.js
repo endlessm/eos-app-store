@@ -13,6 +13,7 @@ const Builder = imports.builder;
 const Lang = imports.lang;
 const Signals = imports.signals;
 
+const APP_TRANSITION_MS = 500;
 const CATEGORY_TRANSITION_MS = 500;
 
 // If the area available for the grid is less than this minimium size,
@@ -44,6 +45,11 @@ const AppListBoxRow = new Lang.Class({
         this._mainBox.show();
 
         this._appStateButton.connect('clicked', Lang.bind(this, this._onAppStateButtonClicked));
+
+        this.appName = this._model.getAppName(this._appId);
+        this.appDescription = this._model.getAppDescription(this._appId);
+        this.appIcon = this._model.getAppIcon(this._appId);
+        this.appState = this._model.getAppState(this._appId);
     },
 
     get appId() {
@@ -147,8 +153,16 @@ const AppFrame = new Lang.Class({
         // initialize the applications model
         this._model = new AppListModel.AppList();
 
+        this._mainStack = new PLib.Stack();
+        this._mainStack.set_transition_duration(APP_TRANSITION_MS);
+        this._mainStack.set_transition_type(PLib.StackTransitionType.SLIDE_RIGHT);
+        this._mainStack.hexpand = true;
+        this._mainStack.vexpand = true;
+        this.add(this._mainStack);
+        this._mainStack.show();
+
         this._mainBox = new Gtk.Box({ orientation: Gtk.Orientation.VERTICAL, });
-        this.add(this._mainBox);
+        this._mainStack.add_named(this._mainBox, 'main-box');
         this._mainBox.hexpand = true;
         this._mainBox.vexpand = true;
         this._mainBox.show();
@@ -221,8 +235,18 @@ const AppFrame = new Lang.Class({
                 categories[c].grid.add(cell);
             }
 
+            categories[c].grid.connect('cell-activated', Lang.bind(this, this._onCellActivated));
+
             scrollWindow.show_all();
         }
+    },
+
+    _onCellActivated: function(grid, cell) {
+        let appBox = new AppListBoxRow(this._model, cell.desktop_id);
+        appBox.show_all();
+
+        this._mainStack.add_named(appBox, cell.desktop_id);
+        this._mainStack.set_visible_child_name(cell.desktop_id);
     },
 
     _onCategoryClicked: function(button) {
