@@ -1,3 +1,5 @@
+/* -*- mode: C; c-file-style: "gnu"; indent-tabs-mode: nil; -*- */
+
 #ifndef __EOS_APP_LIST_MODEL_H__
 #define __EOS_APP_LIST_MODEL_H__
 
@@ -27,6 +29,8 @@ GList *eos_app_list_model_load_finish (EosAppListModel  *model,
 
 const char *eos_app_list_model_get_app_name (EosAppListModel *model, const char *app_id);
 const char *eos_app_list_model_get_app_description (EosAppListModel *model, const char *app_id);
+const char *eos_app_list_model_get_app_comment (EosAppListModel *model, const char *app_id);
+const char *eos_app_list_model_get_app_executable (EosAppListModel *model, const char *app_id);
 const char *eos_app_list_model_get_app_icon_name (EosAppListModel *model,
                                                   const char *app_id,
                                                   EosAppIconState icon_state);

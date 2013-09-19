@@ -9,6 +9,7 @@ dist_js_DATA = \
 	frameClock.js \
 	main.js \
 	storeModel.js \
+	weblinkFrame.js \
 	$(NULL)
 
 BUILT_SOURCES += $(js_built_sources)

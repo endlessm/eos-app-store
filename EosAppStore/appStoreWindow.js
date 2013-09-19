@@ -12,6 +12,7 @@ const Lang = imports.lang;
 const Signals = imports.signals;
 
 const AppFrame = imports.appFrame;
+const WeblinkFrame = imports.weblinkFrame;
 const FrameClock = imports.frameClock;
 const StoreModel = imports.storeModel;
 const UIBuilder = imports.builder;
@@ -208,6 +209,8 @@ const AppStoreWindow = new Lang.Class({
         this._pages = {};
         this._pages.apps = new AppFrame.AppFrame();
         this._stack.add_named(this._pages.apps, 'apps');
+        this._pages.weblinks = new WeblinkFrame.WeblinkFrame();
+        this._stack.add_named(this._pages.weblinks, 'weblinks');
 
         // switch to the 'Applications' page
         this._onStorePageChanged(this._storeModel, StoreModel.StorePage.APPS);
@@ -248,8 +251,10 @@ const AppStoreWindow = new Lang.Class({
                 break;
 
             case StoreModel.StorePage.WEB:
-                title.set_text(_("WEB"));
-                desc.set_text(_("A descriptive label for the Web section"));
+                title.set_text(_("INSTALL SITES"));
+                desc.set_text(_("A list of many sites you can add"));
+                this._pages.weblinks.update();
+                page = this._pages.weblinks;
                 break;
 
             case StoreModel.StorePage.FOLDERS:

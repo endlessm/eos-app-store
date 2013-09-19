@@ -34,10 +34,10 @@
                         <property name="receives_default">True</property>
                         <property name="relief">none</property>
                         <property name="xalign">0</property>
-                        <signal name="clicked" handler="_onAppsClicked" swapped="no"/>
                         <style>
                           <class name="sidebar-button"/>
                         </style>
+                        <signal name="clicked" handler="_onAppsClicked" swapped="no"/>
                       </object>
                       <packing>
                         <property name="expand">False</property>
@@ -53,10 +53,10 @@
                         <property name="receives_default">True</property>
                         <property name="relief">none</property>
                         <property name="xalign">0</property>
-                        <signal name="clicked" handler="_onWebClicked" swapped="no"/>
                         <style>
                           <class name="sidebar-button"/>
                         </style>
+                        <signal name="clicked" handler="_onWebClicked" swapped="no"/>
                       </object>
                       <packing>
                         <property name="expand">False</property>
@@ -72,10 +72,10 @@
                         <property name="receives_default">True</property>
                         <property name="relief">none</property>
                         <property name="xalign">0</property>
-                        <signal name="clicked" handler="_onFolderClicked" swapped="no"/>
                         <style>
                           <class name="sidebar-button"/>
                         </style>
+                        <signal name="clicked" handler="_onFolderClicked" swapped="no"/>
                       </object>
                       <packing>
                         <property name="expand">False</property>

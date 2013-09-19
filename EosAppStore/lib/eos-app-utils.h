@@ -1,3 +1,5 @@
+/* -*- mode: C; c-file-style: "gnu"; indent-tabs-mode: nil; -*- */
+
 #ifndef EOS_APP_UTILS_H
 #define EOS_APP_UTILS_H
 

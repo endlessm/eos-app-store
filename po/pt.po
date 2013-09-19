@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: dev 1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-07-09 16:10-0700\n"
+"POT-Creation-Date: 2013-09-19 18:50+0200\n"
 "PO-Revision-Date: 2012-05-31 11:54-0500\n"
 "Last-Translator: Automatically generated\n"
 "Language-Team: none\n"
@@ -25,67 +25,152 @@ msgstr "Adicionar"
 msgid "Add applications to EOS"
 msgstr ""
 
-#: ../EosAppStore/add_shortcuts_module/add_folder_box.py:39
-msgid "1. NAME YOUR FOLDER"
-msgstr "1. O NOME DO SEU FOLDER"
+#: ../data/eos-app-store-weblink-new-site-frame.ui.h:1
+msgid "e.g.: http://www.globoesporte.com"
+msgstr ""
 
-#: ../EosAppStore/add_shortcuts_module/add_folder_box.py:41
-msgid "2. PICK A SYMBOL"
-msgstr "2. ESCOLHA UM SÍMBOLO"
+#: ../data/eos-app-store-list-row.ui.h:1
+msgid "NAME"
+msgstr ""
 
-#: ../EosAppStore/add_shortcuts_module/add_shortcuts_view.py:150
-#: ../EosAppStore/add_shortcuts_module/add_shortcuts_model.py:14
-#: ../EosAppStore/add_shortcuts_module/add_shortcuts_presenter.py:35
-msgid "APP"
-msgstr "APLICATIVO"
+#: ../data/eos-app-store-list-row.ui.h:2
+msgid "description"
+msgstr ""
 
-#. section_app.subcategories = [ShortcutCategory(_('POPULAR')),
-#. ShortcutCategory(_('PRODUCTIVITY')),
-#. ShortcutCategory(_('ENTERTAINMENT')),
-#. ShortcutCategory(_('GAMES')),
-#. ShortcutCategory(_('HEALTH')),
-#. ShortcutCategory(_('WORK')),
-#. ShortcutCategory(_('SOCIAL')),
-#. ShortcutCategory(_('MY TOWN'))]
-#: ../EosAppStore/add_shortcuts_module/add_shortcuts_view.py:152
-#: ../EosAppStore/add_shortcuts_module/add_shortcuts_model.py:23
-msgid "WEB"
-msgstr "SITES"
+#: ../data/eos-app-store-list-row.ui.h:3 ../EosAppStore/appFrame.js:94
+#: ../EosAppStore/weblinkFrame.js:282
+msgid "INSTALL"
+msgstr ""
 
-#: ../EosAppStore/add_shortcuts_module/add_shortcuts_model.py:24
-msgid "FOLDER"
+#: ../data/eos-app-store-main-window.ui.h:1
+msgid "Applications"
+msgstr ""
+
+#: ../data/eos-app-store-main-window.ui.h:2
+msgid "Websites"
+msgstr ""
+
+#: ../data/eos-app-store-main-window.ui.h:3
+msgid "Folders"
+msgstr ""
+
+#: ../EosAppStore/appFrame.js:61
+msgid "Unknown application"
+msgstr ""
+
+#: ../EosAppStore/appFrame.js:89 ../EosAppStore/weblinkFrame.js:277
+msgid "UNINSTALL"
+msgstr ""
+
+#: ../EosAppStore/appFrame.js:99
+msgid "UPDATE"
+msgstr ""
+
+#. Translators: use the same string used to install the app store content JSON
+#: ../EosAppStore/appFrame.js:172 ../EosAppStore/lib/eos-app-utils.c:17
+msgid "Featured"
+msgstr ""
+
+#: ../EosAppStore/appFrame.js:179 ../EosAppStore/lib/eos-app-utils.c:18
+msgid "Education"
+msgstr ""
+
+#: ../EosAppStore/appFrame.js:186 ../EosAppStore/lib/eos-app-utils.c:19
+msgid "Leisure"
+msgstr ""
+
+#: ../EosAppStore/appFrame.js:193 ../EosAppStore/lib/eos-app-utils.c:20
+msgid "Utilities"
+msgstr ""
+
+#: ../EosAppStore/appStore.js:43
+msgid "Application Store"
+msgstr ""
+
+#: ../EosAppStore/appStoreWindow.js:247
+msgid "INSTALL APPLICATIONS"
+msgstr ""
+
+#: ../EosAppStore/appStoreWindow.js:248
+msgid "A list of many free applications you can install and update"
+msgstr ""
+
+#: ../EosAppStore/appStoreWindow.js:254
+msgid "INSTALL SITES"
+msgstr ""
+
+#: ../EosAppStore/appStoreWindow.js:255
+msgid "A list of many sites you can add"
+msgstr ""
+
+#: ../EosAppStore/appStoreWindow.js:261
+#, fuzzy
+msgid "FOLDERS"
 msgstr "PASTA"
 
-#: ../EosAppStore/add_shortcuts_module/add_website_box.py:33
-msgid "TYPE WEBSITE"
-msgstr "DIGITE SITE"
-
-#: ../EosAppStore/shortcut/add_remove_shortcut.py:87
-msgid "Delete"
-msgstr "Excluir"
-
-#: ../EosAppStore/shortcut/add_remove_shortcut.py:103
-#: ../EosAppStore/shortcut/add_remove_shortcut.py:111
-#: ../EosAppStore/shortcut/add_remove_shortcut.py:119
-#: ../EosAppStore/shortcut/add_remove_shortcut.py:135
-msgid "Files"
-msgstr "Files"
-
-#: ../EosAppStore/removal_module/delete_not_possible_popup.py:54
-msgid ""
-"To delete a folder you have to\n"
-"remove all of the items inside\n"
-"of it first.\n"
-"\n"
-"We are just trying to\n"
-"keep you safe."
+#: ../EosAppStore/appStoreWindow.js:262
+msgid "A descriptive label for the Folders section"
 msgstr ""
-"Para apagar uma pasta que você\n"
-"tem que remover todos os itens\n"
-"dentro do primeiro.\n"
-"\n"
-"Estamos apenas tentando mantê-lo\n"
-"seguro."
+
+#: ../EosAppStore/weblinkFrame.js:61
+msgid "Write the site address you want to add"
+msgstr ""
+
+#: ../EosAppStore/weblinkFrame.js:92
+msgid "e.g.: http://wwww.globoesporte.com"
+msgstr ""
+
+#: ../EosAppStore/weblinkFrame.js:153
+msgid "was added successfully"
+msgstr ""
+
+#: ../EosAppStore/weblinkFrame.js:188
+msgid "searching"
+msgstr ""
+
+#: ../EosAppStore/weblinkFrame.js:204
+msgid "the address written does not exist or is not available"
+msgstr ""
+
+#: ../EosAppStore/weblinkFrame.js:245
+msgid "Unknown weblink"
+msgstr ""
+
+#~ msgid "1. NAME YOUR FOLDER"
+#~ msgstr "1. O NOME DO SEU FOLDER"
+
+#~ msgid "2. PICK A SYMBOL"
+#~ msgstr "2. ESCOLHA UM SÍMBOLO"
+
+#~ msgid "APP"
+#~ msgstr "APLICATIVO"
+
+#~ msgid "WEB"
+#~ msgstr "SITES"
+
+#~ msgid "TYPE WEBSITE"
+#~ msgstr "DIGITE SITE"
+
+#~ msgid "Delete"
+#~ msgstr "Excluir"
+
+#~ msgid "Files"
+#~ msgstr "Files"
+
+#~ msgid ""
+#~ "To delete a folder you have to\n"
+#~ "remove all of the items inside\n"
+#~ "of it first.\n"
+#~ "\n"
+#~ "We are just trying to\n"
+#~ "keep you safe."
+#~ msgstr ""
+#~ "Para apagar uma pasta que você\n"
+#~ "tem que remover todos os itens\n"
+#~ "dentro do primeiro.\n"
+#~ "\n"
+#~ "Estamos apenas tentando mantê-lo\n"
+#~ "seguro."
 
 #~ msgid " remaining"
 #~ msgstr " restante"
