@@ -123,26 +123,6 @@ const AppListBoxRow = new Lang.Class({
 });
 Builder.bindTemplateChildren(AppListBoxRow.prototype);
 
-const AppListBox = new Lang.Class({
-    Name: 'AppListBox',
-    Extends: PLib.ListBox,
-
-    _init: function(model) {
-        this.parent();
-
-        this._model = model;
-    },
-});
-
-const AppDescriptionBox = new Lang.Class({
-    Name: 'AppDescriptionBox',
-    Extends: Gtk.Frame,
-
-    _init: function() {
-        this.parent();
-    },
-});
-
 const AppFrame = new Lang.Class({
     Name: 'AppFrame',
     Extends: Gtk.Frame,
