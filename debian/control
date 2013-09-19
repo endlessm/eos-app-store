@@ -10,7 +10,9 @@ Build-Depends: cdbs (>= 0.4.90~),
                gobject-introspection,
                libgtk-3-dev,
                pkg-config,
-               libgjs-dev
+               libgjs-dev,
+               libjson-glib-dev,
+               libgnome-menu-3-dev
 X-Python-Version: >= 2.4
 Standards-Version: 3.9.2
 Homepage: http://www.endlessm.com
