@@ -15,18 +15,18 @@ const Lang = imports.lang;
 const Signals = imports.signals;
 
 const NEW_SITE_TITLE_LIMIT = 20;
-const NEW_SITE_DEFAULT_MESSAGE = "ex.: http://wwww.globoesporte.com";
-const NEW_SITE_ADDED_MESSAGE = "was added successfully";
+const NEW_SITE_DEFAULT_MESSAGE = _("ex.: http://wwww.globoesporte.com");
+const NEW_SITE_ADDED_MESSAGE = _("was added successfully");
 const NEW_SITE_SUCCESS_TIMEOUT = 3;
-const NEW_SITE_UNAVAILABLE = "the address written does not exist or is not available";
-const NEW_SITE_PLACEHOLDER = "Write the site address you want to add";
+const NEW_SITE_UNAVAILABLE = _("the address written does not exist or is not available");
+const NEW_SITE_PLACEHOLDER = _("Write the site address you want to add");
 
 const AlertIcon = {
     SPINNER: 0,
     CANCEL: 1,
     ERROR: 2,
     NOTHING: 3,
-    HIDE: 4,
+    HIDDEN: 4
 };
 
 const NewSiteBox = new Lang.Class({
@@ -40,7 +40,7 @@ const NewSiteBox = new Lang.Class({
 	'_siteUrlFrame',
 	'_siteAlertIconFrame',
 	'_siteAlertLabel',
-	'_siteAddButton',
+	'_siteAddButton'
     ],
 
     _init: function(weblinkListModel) {
@@ -49,7 +49,7 @@ const NewSiteBox = new Lang.Class({
 	this._weblinkListModel = weblinkListModel;
 	this._newSiteError = false;
 	this._webView = null;
-	this._alertIcon = null
+	this._alertIcon = null;
 	this._currentAlertIcon = AlertIcon.NOTHING;
 
 	this.initTemplate({ templateRoot: '_mainBox',
@@ -143,7 +143,6 @@ const NewSiteBox = new Lang.Class({
 	this._reset();
     },
 
-
     _onSiteAdd: function() {
 	let url = this._siteAlertLabel.get_text();
 	let title = this._urlEntry.get_text();
@@ -210,7 +209,7 @@ const NewSiteBox = new Lang.Class({
 	this._switchAlertIcon(AlertIcon.ERROR);
 	this._urlEntry.get_style_context().add_class("url-entry-error");
 	return true;
-    },
+    }
 });
 Builder.bindTemplateChildren(NewSiteBox.prototype);
 
@@ -225,7 +224,7 @@ const WeblinkListBoxRow = new Lang.Class({
         '_nameLabel',
         '_descriptionLabel',
 	'_urlLabel',
-        '_stateButton',
+        '_stateButton'
     ],
 
     _init: function(model, weblinkId) {
@@ -303,7 +302,7 @@ const WeblinkListBoxRow = new Lang.Class({
                 this._model.installWeblink(this._weblinkId);
                 break;
         }
-    },
+    }
 });
 Builder.bindTemplateChildren(WeblinkListBoxRow.prototype);
 
@@ -315,16 +314,7 @@ const WeblinkListBox = new Lang.Class({
         this.parent();
 
         this._model = model;
-    },
-});
-
-const WeblinkDescriptionBox = new Lang.Class({
-    Name: 'WeblinkDescriptionBox',
-    Extends: Gtk.Frame,
-
-    _init: function() {
-        this.parent();
-    },
+    }
 });
 
 const WeblinkFrame = new Lang.Class({
@@ -336,7 +326,7 @@ const WeblinkFrame = new Lang.Class({
         '_mainBox',
 	'_newSiteFrame',
         '_scrolledWindow',
-        '_viewport',
+        '_viewport'
     ],
 
     _init: function() {
@@ -373,6 +363,6 @@ const WeblinkFrame = new Lang.Class({
 
     update: function() {
         this._weblinkListModel.update();
-    },
+    }
 });
 Builder.bindTemplateChildren(WeblinkFrame.prototype);

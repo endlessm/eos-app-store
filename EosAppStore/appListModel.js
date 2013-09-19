@@ -1,5 +1,6 @@
 // -*- mode: js; js-indent-level: 4; indent-tabs-mode: nil -*-
 const EosAppStorePrivate = imports.gi.EosAppStorePrivate;
+const GLib = imports.gi.GLib;
 
 const Lang = imports.lang;
 const Path = imports.path;
@@ -132,7 +133,7 @@ const WeblinkList = new Lang.Class({
     _getLocalizedExec: function(args) {
         let languages = GLib.get_language_names();
 
-        //First value is the default one
+        // First value is the default one
         let defaultExec = this._replaceAll("^\'|^\"|\'$|\"$", "", args[0]);
 
         for (let a in args.slice(1)) {
@@ -150,6 +151,7 @@ const WeblinkList = new Lang.Class({
 
         return defaultExec;
     },
+
     update: function() {
         storeList.update();
     },
