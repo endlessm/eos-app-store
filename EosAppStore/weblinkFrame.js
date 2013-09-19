@@ -1,4 +1,4 @@
-//: js; js-indent-level: 4; indent-tabs-mode: nil -*-
+// -*- mode: js; js-indent-level: 4; indent-tabs-mode: nil -*-
 const Gdk = imports.gi.Gdk;
 const GdkPixbuf = imports.gi.GdkPixbuf;
 const Gio = imports.gi.Gio;
