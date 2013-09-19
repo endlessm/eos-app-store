@@ -59,7 +59,7 @@ const NewSiteBox = new Lang.Class({
 
 	this._urlEntry = new Gtk.Entry();
 	this._urlEntry.set_placeholder_text(_("Write the site address you want to add"));
-	this._urlEntry.get_style_context().add_class("url-entry");
+	this._urlEntry.get_style_context().add_class('url-entry');
 	this._urlEntry.connect('activate', Lang.bind(this, this._onUrlEntryActivated));
 
 	this._urlEntry.connect('enter-notify-event',
@@ -154,7 +154,7 @@ const NewSiteBox = new Lang.Class({
 	this._siteAddButton.sensitive = false;
 	this._switchAlertIcon(AlertIcon.HIDDEN);
 
-	let newSite = this._weblinkListModel.createWeblink(url, title, "browser");
+	let newSite = this._weblinkListModel.createWeblink(url, title, 'browser');
 	this._weblinkListModel.update();
 	this._weblinkListModel.installWeblink(newSite);
 
@@ -176,7 +176,7 @@ const NewSiteBox = new Lang.Class({
 	    this._webView.connect('load-changed', Lang.bind(this, this._onLoadChanged));
 	    this._webView.connect('load-failed', Lang.bind(this, this._onLoadFailed));
 	}
-	this._urlEntry.get_style_context().remove_class("url-entry-error");
+	this._urlEntry.get_style_context().remove_class('url-entry-error');
 	let url = this._urlEntry.get_text();
 	this._webView.load_uri(url);
     },
@@ -189,7 +189,7 @@ const NewSiteBox = new Lang.Class({
 	    this._newSiteError = false;
 	    break;
 	case WebKit.LoadEvent.FINISHED:
-	    // Error this was processed on "load-failed" handler
+	    // Error this was processed on 'load-failed' handler
 	    if (this._newSiteError) {
 		return;
 	    }
@@ -203,7 +203,7 @@ const NewSiteBox = new Lang.Class({
 	this._newSiteError = true;
 	this._siteAlertLabel.set_text(_("the address written does not exist or is not available"));
 	this._switchAlertIcon(AlertIcon.ERROR);
-	this._urlEntry.get_style_context().add_class("url-entry-error");
+	this._urlEntry.get_style_context().add_class('url-entry-error');
 	return true;
     }
 });
@@ -263,7 +263,7 @@ const WeblinkListBoxRow = new Lang.Class({
 
     set weblinkIcon(name) {
         if (!name)
-            name = "gtk-missing-image";
+            name = 'gtk-missing-image';
 
         this._icon.set_from_icon_name(name, Gtk.IconSize.DIALOG);
     },

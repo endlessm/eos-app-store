@@ -7,8 +7,8 @@ const Path = imports.path;
 const Signals = imports.signals;
 
 const EOS_LINK_PREFIX = 'eos-link-';
-const EOS_BROWSER = "chromium-browser ";
-const EOS_LOCALIZED = "eos-exec-localized ";
+const EOS_BROWSER = 'chromium-browser ';
+const EOS_LOCALIZED = 'eos-exec-localized ';
 
 const DESKTOP_KEY_SPLASH = 'X-Endless-Splash-Screen';
 
@@ -42,7 +42,7 @@ const StoreList = new Lang.Class({
             this.emit('changed', apps);
         }
         catch (e) {
-            log("Unable to load the application list: " + e);
+            log('Unable to load the application list: ' + e);
         }
     },
 
@@ -134,13 +134,13 @@ const WeblinkList = new Lang.Class({
         let languages = GLib.get_language_names();
 
         // First value is the default one
-        let defaultExec = this._replaceAll("^\'|^\"|\'$|\"$", "", args[0]);
+        let defaultExec = this._replaceAll('^\'|^\"|\'$|\"$', '', args[0]);
 
         for (let a in args.slice(1)) {
             let arg = args[a];
             let tokens = arg.split(':');
             let key = tokens.shift();
-            let value = this._replaceAll("^\'|^\"|\'$|\"$", "", tokens.join(':'));
+            let value = this._replaceAll('^\'|^\"|\'$|\"$', '', tokens.join(':'));
             for (let l in languages) {
                 let language = languages[l];
                 if (language == key) {
@@ -206,36 +206,36 @@ const WeblinkList = new Lang.Class({
         // Skip scheme
         let scheme = GLib.uri_parse_scheme(filename);
         if (scheme) {
-            filename = filename.substr((scheme+"://").length);
+            filename = filename.substr((scheme+'://').length);
         }
 
         // Get only the hostname part
-        let tokens = filename.split("/");
+        let tokens = filename.split('/');
         filename = tokens[0];
 
         // Get only domain name
-        tokens = filename.split(".");
+        tokens = filename.split('.');
         if (tokens.length > 1) {
             filename = tokens[tokens.length-2];
         }
 
         // Prefix
-        filename = "eos-link-" + filename;
+        filename = 'eos-link-' + filename;
 
         // Append a number until we find a free slot
-        let availableFilename = filename + ".desktop";
-        let path = GLib.build_filenamev([GLib.get_user_data_dir(), "applications"]);
+        let availableFilename = filename + '.desktop';
+        let path = GLib.build_filenamev([GLib.get_user_data_dir(), 'applications']);
         let availableFullFilename = GLib.build_filenamev([path, availableFilename]);
         let i = 0;
 
         while (GLib.file_test(availableFullFilename, GLib.FileTest.EXISTS)) {
             i++;
-            availableFilename = filename + "-" + i + ".desktop";
+            availableFilename = filename + '-"' + i + '.desktop';
             availableFullFilename = GLib.build_filenamev([path, availableFilename]);
         }
 
-        desktop.set_string(GLib.KEY_FILE_DESKTOP_GROUP, GLib.KEY_FILE_DESKTOP_KEY_VERSION, "1.0");
-        desktop.set_string(GLib.KEY_FILE_DESKTOP_GROUP, GLib.KEY_FILE_DESKTOP_KEY_TYPE, "Application");
+        desktop.set_string(GLib.KEY_FILE_DESKTOP_GROUP, GLib.KEY_FILE_DESKTOP_KEY_VERSION, '1.0');
+        desktop.set_string(GLib.KEY_FILE_DESKTOP_GROUP, GLib.KEY_FILE_DESKTOP_KEY_TYPE, 'Application');
         desktop.set_string(GLib.KEY_FILE_DESKTOP_GROUP, GLib.KEY_FILE_DESKTOP_KEY_EXEC, EOS_BROWSER + url);
         desktop.set_string(GLib.KEY_FILE_DESKTOP_GROUP, GLib.KEY_FILE_DESKTOP_KEY_ICON, icon);
         desktop.set_boolean(GLib.KEY_FILE_DESKTOP_GROUP, DESKTOP_KEY_SPLASH, false);
