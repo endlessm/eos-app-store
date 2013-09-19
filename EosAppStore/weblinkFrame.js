@@ -274,12 +274,12 @@ const WeblinkListBoxRow = new Lang.Class({
 
         switch (this._weblinkState) {
             case EosAppStorePrivate.AppState.INSTALLED:
-                this._stateButton.set_label(_('UNINSTALL'));
+                this._stateButton.set_label(_("UNINSTALL"));
                 this._stateButton.show();
                 break;
 
             case EosAppStorePrivate.AppState.UNINSTALLED:
-                this._stateButton.set_label(_('INSTALL'));
+                this._stateButton.set_label(_("INSTALL"));
                 this._stateButton.show();
                 break;
 
