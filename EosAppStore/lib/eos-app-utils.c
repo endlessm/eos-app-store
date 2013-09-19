@@ -84,6 +84,98 @@ get_shape_from_id (const char *p)
   return EOS_FLEXY_SHAPE_SMALL;
 }
 
+enum {
+  PROP_0,
+  PROP_DESKTOP_ID,
+  NUM_PROPS
+};
+
+typedef struct {
+  EosFlexyGridCell parent;
+
+  gchar *desktop_id;
+} EosAppCell;
+
+typedef EosFlexyGridCellClass EosAppCellClass;
+
+static GType eos_app_cell_get_type (void) G_GNUC_CONST;
+G_DEFINE_TYPE (EosAppCell, eos_app_cell, EOS_TYPE_FLEXY_GRID_CELL);
+
+static GParamSpec *eos_app_cell_props[NUM_PROPS] = { NULL, };
+
+static void
+eos_app_cell_init (EosAppCell *obj)
+{
+}
+
+static void
+eos_app_cell_get_property (GObject    *gobject,
+                           guint       prop_id,
+                           GValue     *value,
+                           GParamSpec *pspec)
+{
+  EosAppCell *self = (EosAppCell *) gobject;
+
+  switch (prop_id)
+    {
+    case PROP_DESKTOP_ID:
+      g_value_set_string (value, self->desktop_id);
+      break;
+
+    default:
+      G_OBJECT_WARN_INVALID_PROPERTY_ID (gobject, prop_id, pspec);
+    }
+}
+
+static void
+eos_app_cell_set_property (GObject      *gobject,
+                           guint         prop_id,
+                           const GValue *value,
+                           GParamSpec   *pspec)
+{
+  EosAppCell *self = (EosAppCell *) gobject;
+
+  switch (prop_id)
+    {
+    case PROP_DESKTOP_ID:
+      g_free (self->desktop_id);
+      self->desktop_id = g_value_dup_string (value);
+      break;
+
+    default:
+      G_OBJECT_WARN_INVALID_PROPERTY_ID (gobject, prop_id, pspec);
+    }
+}
+
+static void
+eos_app_cell_finalize (GObject *gobject)
+{
+  EosAppCell *self = (EosAppCell *) gobject;
+
+  g_free (self->desktop_id);
+
+  G_OBJECT_CLASS (eos_app_cell_parent_class)->finalize (gobject);
+}
+
+static void
+eos_app_cell_class_init (EosAppCellClass *klass)
+{
+  GObjectClass *oclass = G_OBJECT_CLASS (klass);
+
+  oclass->set_property = eos_app_cell_set_property;
+  oclass->get_property = eos_app_cell_get_property;
+  oclass->finalize = eos_app_cell_finalize;
+
+  eos_app_cell_props[PROP_DESKTOP_ID] =
+    g_param_spec_string ("desktop-id",
+                         "Desktop ID",
+                         "The Desktop ID",
+                         "",
+                         G_PARAM_READWRITE);
+
+  g_object_class_install_properties (oclass, NUM_PROPS, eos_app_cell_props);
+}
+
 void
 eos_app_load_content (EosFlexyGrid *grid,
                       EosAppCategory category)
@@ -124,9 +216,11 @@ eos_app_load_content (EosFlexyGrid *grid,
       JsonObject *object = json_node_get_object (element);
 
       EosFlexyShape shape = get_shape_from_id (json_object_get_string_member (object, "display_shape"));
+      const gchar *desktop_id = json_object_get_string_member (object, "desktop-id");
 
-      GtkWidget *cell = g_object_new (EOS_TYPE_FLEXY_GRID_CELL,
+      GtkWidget *cell = g_object_new (eos_app_cell_get_type (),
                                       "shape", shape, 
+                                      "desktop-id", desktop_id,
                                       NULL);
 
       gtk_container_add (GTK_CONTAINER (grid), cell);
