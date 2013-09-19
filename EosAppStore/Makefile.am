@@ -1,33 +1,32 @@
-jsdir = $(pkgdatadir)/js/
-dist_js_DATA = \
-	$(BUILT_SOURCES) \
-	appStoreWindow.js \
-	appStore.js \
-	builder.js \
-	frameClock.js \
-	main.js \
-	storeModel.js \
-	$(NULL)
+AM_CPPFLAGS = \
+	-I$(top_builddir) \
+	-I$(top_srcdir) \
+	-L$(top_srcdir)/EosAppStore \
+	-I$(top_srcdir)/EosAppStore/lib \
+	-DEOS_APP_STORE_LIBDIR=\"$(libdir)\" \
+	-DEOS_APP_STORE_DATADIR=\"$(datadir)\" \
+	-DEOS_APP_STORE_PKGDATADIR=\"$(pkgdatadir)\" \
+	-DEOS_APP_STORE_TOP_SRCDIR=\"$(abs_top_srcdir)\" \
+	-DEOS_APP_STORE_BUILDDIR=\"$(abs_top_builddir)\"
 
-do_path_subst = $(SED) \
-	-e 's|@pkgdatadir[@]|$(pkgdatadir)|g' \
-	-e 's|@localedir[@]|$(localedir)|g'
-path.js: Makefile path.js.in
-	$(AM_V_GEN) $(do_path_subst) $(srcdir)/path.js.in > $@
+BUILT_SOURCES =
+EXTRA_DIST =
+CLEANFILES =
+pkglib_LTLIBRARIES =
+INTROSPECTION_GIRS =
+gir_DATA =
+typelib_DATA =
+libexec_PROGRAMS =
+libexec_SCRIPTS =
+js_built_sources =
+girdir = $(pkgdatadir)/gir-1.0
+typelibdir = $(pkglibdir)/girepository-1.0
 
-do_config_subst = sed \
-	-e 's|@PACKAGE_NAME[@]|$(PACKAGE)|g' \
-	-e 's|@PACKAGE_VERSION[@]|$(VERSION)|g' \
-	-e 's|@GETTEXT_PACKAGE[@]|$(GETTEXT_PACKAGE)|g'
-config.js: Makefile config.js.in
-	$(AM_V_GEN) $(do_config_subst) $(srcdir)/config.js.in > $@
+include $(INTROSPECTION_MAKEFILE)
+include Makefile-lib.am
+include Makefile-js.am
 
-BUILT_SOURCES = \
-	config.js \
-	path.js \
-	$(NULL)
+gir_DATA += $(INTROSPECTION_GIRS)
+typelib_DATA += $(gir_DATA:.gir=.typelib)
 
-EXTRA_DIST = \
-	config.js.in \
-	path.js.in \
-	$(NULL)
+CLEANFILES += $(gir_DATA) $(typelib_DATA)

@@ -1,0 +1,35 @@
+jsdir = $(pkgdatadir)/js/
+dist_js_DATA = \
+	$(js_built_sources) \
+	appFrame.js \
+	appListModel.js \
+	appStoreWindow.js \
+	appStore.js \
+	builder.js \
+	frameClock.js \
+	main.js \
+	storeModel.js \
+	$(NULL)
+
+BUILT_SOURCES += $(js_built_sources)
+
+do_path_subst = $(SED) \
+	-e 's|@pkgdatadir[@]|$(pkgdatadir)|g' \
+	-e 's|@localedir[@]|$(localedir)|g'
+path.js: Makefile path.js.in
+	$(AM_V_GEN) $(do_path_subst) $(srcdir)/path.js.in > $@
+
+EXTRA_DIST += path.js.in
+CLEANFILES += path.js
+js_built_sources += path.js
+
+do_config_subst = sed \
+	-e 's|@PACKAGE_NAME[@]|$(PACKAGE)|g' \
+	-e 's|@PACKAGE_VERSION[@]|$(VERSION)|g' \
+	-e 's|@GETTEXT_PACKAGE[@]|$(GETTEXT_PACKAGE)|g'
+config.js: Makefile config.js.in
+	$(AM_V_GEN) $(do_config_subst) $(srcdir)/config.js.in > $@
+
+EXTRA_DIST += config.js.in
+CLEANFILES += config.js
+js_built_sources += config.js
