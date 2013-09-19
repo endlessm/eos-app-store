@@ -200,29 +200,29 @@ const WeblinkList = new Lang.Class({
     createWeblink: function(url, title, icon) {
         let desktop = new GLib.KeyFile();
 
-        /* Let's compute a filename */
+        // Let's compute a filename
         let filename = url;
 
-        /* Skip scheme */
+        // Skip scheme
         let scheme = GLib.uri_parse_scheme(filename);
         if (scheme) {
             filename = filename.substr((scheme+"://").length);
         }
 
-        /* Get only the hostname part */
+        // Get only the hostname part
         let tokens = filename.split("/");
         filename = tokens[0];
 
-        /* Get only domain name */
+        // Get only domain name
         tokens = filename.split(".");
         if (tokens.length > 1) {
             filename = tokens[tokens.length-2];
         }
 
-        /* Prefix */
+        // Prefix
         filename = "eos-link-" + filename;
 
-        /* Append a number until we find a free slot */
+        // Append a number until we find a free slot
         let availableFilename = filename + ".desktop";
         let path = GLib.build_filenamev([GLib.get_user_data_dir(), "applications"]);
         let availableFullFilename = GLib.build_filenamev([path, availableFilename]);

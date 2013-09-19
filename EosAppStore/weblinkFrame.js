@@ -129,7 +129,7 @@ const NewSiteBox = new Lang.Class({
 	this._urlEntry.set_text(this._webView.get_title());
 	this._siteAlertLabel.set_text(this._webView.get_uri());
 
-	/* Narrow the entry and put the focus so user can change the title */
+	// Narrow the entry and put the focus so user can change the title
 	let [entryWidth, entryHeight] = this._urlEntry.get_size_request();
 	this._urlEntry.max_length = NEW_SITE_TITLE_LIMIT;
 	this._urlEntry.halign = Gtk.Align.START;
@@ -189,7 +189,7 @@ const NewSiteBox = new Lang.Class({
 	    this._newSiteError = false;
 	    break;
 	case WebKit.LoadEvent.FINISHED:
-	    /* Error this was processed on "load-failed" handler*/
+	    // Error this was processed on "load-failed" handler
 	    if (this._newSiteError) {
 		return;
 	    }
