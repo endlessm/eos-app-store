@@ -1,4 +1,6 @@
-SUBDIRS = EosAppStore data po
+ACLOCAL_AMFLAGS = -I m4 ${ACLOCAL_FLAGS}
+
+SUBDIRS = EosAppStore data content po
 
 # Preamble
 bin_SCRIPTS =

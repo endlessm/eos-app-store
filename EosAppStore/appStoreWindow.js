@@ -6,17 +6,27 @@ const Gio = imports.gi.Gio;
 const GLib = imports.gi.GLib;
 const GObject = imports.gi.GObject;
 const Gtk = imports.gi.Gtk;
+const PLib = imports.gi.PLib;
 
 const Lang = imports.lang;
 const Signals = imports.signals;
 
+const AppFrame = imports.appFrame;
 const FrameClock = imports.frameClock;
 const StoreModel = imports.storeModel;
 const UIBuilder = imports.builder;
 
-const APP_STORE_WIDTH = 512;
-const FRACTION_OF_DISPLAY_WIDTH = 0.65;
 const ANIMATION_TIME = (500 * 1000); // half a second
+
+const PAGE_TRANSITION_MS = 500;
+
+const AppStoreSizes = {
+  // Note: must be listed in order of increasing screenWidth
+  SVGA: { screenWidth:  800, windowWidth:  800 },
+   XGA: { screenWidth: 1024, windowWidth:  800 },
+  WXGA: { screenWidth: 1366, windowWidth: 1024 },
+    HD: { screenWidth: 1920, windowWidth: 1366 },
+};
 
 const AppStoreSlider = new Lang.Class({
     Name: 'AppStoreSlider',
@@ -58,9 +68,22 @@ const AppStoreSlider = new Lang.Class({
 
     _getSize: function() {
         let workarea = this._getWorkarea();
-        let defaultWidth = workarea.width * FRACTION_OF_DISPLAY_WIDTH;
-        let minWidth = Math.min(workarea.width, APP_STORE_WIDTH);
-        return [Math.max(minWidth, defaultWidth), workarea.height];
+
+        // If the work area is smaller than any defined resolution,
+        // use the full width of the work area
+        let windowWidth = workarea.width;
+
+        // Find the largest defined resolution that does not exceed
+        // the work area width
+        for (let i in AppStoreSizes) {
+            let res = AppStoreSizes[i];
+
+            if (workarea.width >= res.screenWidth) {
+                windowWidth = res.windowWidth;
+            }
+        }
+
+        return [windowWidth, workarea.height];
     },
 
     _updateGeometry: function() {
@@ -170,9 +193,24 @@ const AppStoreWindow = new Lang.Class({
         this._animator.setInitialValue();
         this._animator.showing = false;
 
+        // the model that handles page changes
         this._storeModel = storeModel;
         this._storeModel.connect('page-changed', Lang.bind(this, this._onStorePageChanged));
-        this._onStorePageChanged(this._storeModel, initialPage);
+
+        // the stack that holds the pages
+        this._stack = new PLib.Stack();
+        this._stack.set_transition_duration(PAGE_TRANSITION_MS);
+        this._stack.set_transition_type(PLib.StackTransitionType.SLIDE_RIGHT);
+        this.content_box.add(this._stack);
+        this._stack.show();
+
+        // add the pages
+        this._pages = {};
+        this._pages.apps = new AppFrame.AppFrame();
+        this._stack.add_named(this._pages.apps, 'apps');
+
+        // switch to the 'Applications' page
+        this._onStorePageChanged(this._storeModel, StoreModel.StorePage.APPS);
     },
 
     _onCloseClicked: function() {
@@ -194,11 +232,19 @@ const AppStoreWindow = new Lang.Class({
     _onStorePageChanged: function(model, newPage) {
         let title = this.header_bar_title_label;
         let desc = this.header_bar_description_label;
+        let stack = this._stack;
+        let page = null;
+
+        for (let p in this._pages) {
+            this._pages[p].hide();
+        }
 
         switch (newPage) {
             case StoreModel.StorePage.APPS:
                 title.set_text(_("INSTALL APPLICATIONS"));
                 desc.set_text(_("A list of many free applications you can install and update"));
+                this._pages.apps.update();
+                page = this._pages.apps;
                 break;
 
             case StoreModel.StorePage.WEB:
@@ -210,6 +256,11 @@ const AppStoreWindow = new Lang.Class({
                 title.set_text(_("FOLDERS"));
                 desc.set_text(_("A descriptive label for the Folders section"));
                 break;
+        }
+
+        if (page) {
+            page.show_all();
+            stack.set_visible_child(page);
         }
     },
 
@@ -238,5 +289,4 @@ const AppStoreWindow = new Lang.Class({
         this.present_with_time(timestamp);
     }
 });
-
 UIBuilder.bindTemplateChildren(AppStoreWindow.prototype);
