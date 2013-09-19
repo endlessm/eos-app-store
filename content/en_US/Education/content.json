@@ -13,7 +13,7 @@
   "application-id":"com.endlessm.KhanAcademy",
   "title":"Khan Academy",
   "subtitle":"Reforco escolar sem sair de casa",
-  "desktop-id":"eos-khan-academy-app",
+  "desktop-id":"eos-app-com.endlessm.khanacademy",
   "img":null,
   "color":"rgb(138, 226, 54)"
 },
@@ -31,7 +31,7 @@
   "application-id":"com.endlessm.Wikipedia",
   "title":"Wikipedia",
   "subtitle":"A Enciclopedia livre",
-  "desktop-id":"eos-wikipedia-app",
+  "desktop-id":"eos-app-com.endlessm.wikipedia",
   "img":null,
   "color":"rgb(85, 87, 83)"
 },
@@ -58,7 +58,7 @@
   "application-id":"com.endlessm.Weather",
   "title":"Previsao do Tempo",
   "subtitle":"Saibe se vai chover ou fazer sol agora",
-  "desktop-id":"eos-weather-app",
+  "desktop-id":"eos-app-com.endlessm.endless-weather",
   "img":null,
   "color":"rgb(114, 159, 207)"
 },
