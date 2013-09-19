@@ -15,11 +15,7 @@ const Lang = imports.lang;
 const Signals = imports.signals;
 
 const NEW_SITE_TITLE_LIMIT = 20;
-const NEW_SITE_DEFAULT_MESSAGE = _("ex.: http://wwww.globoesporte.com");
-const NEW_SITE_ADDED_MESSAGE = _("was added successfully");
 const NEW_SITE_SUCCESS_TIMEOUT = 3;
-const NEW_SITE_UNAVAILABLE = _("the address written does not exist or is not available");
-const NEW_SITE_PLACEHOLDER = _("Write the site address you want to add");
 
 const AlertIcon = {
     SPINNER: 0,
@@ -62,7 +58,7 @@ const NewSiteBox = new Lang.Class({
 	this._switchAlertIcon(AlertIcon.NOTHING);
 
 	this._urlEntry = new Gtk.Entry();
-	this._urlEntry.set_placeholder_text(NEW_SITE_PLACEHOLDER);
+	this._urlEntry.set_placeholder_text(_("Write the site address you want to add"));
 	this._urlEntry.get_style_context().add_class("url-entry");
 	this._urlEntry.connect('activate', Lang.bind(this, this._onUrlEntryActivated));
 
@@ -93,7 +89,7 @@ const NewSiteBox = new Lang.Class({
     _reset: function() {
 	this._siteAddButton.visible = false;
 	this._switchAlertIcon(AlertIcon.NOTHING);
-	this._siteAlertLabel.set_text(NEW_SITE_DEFAULT_MESSAGE);
+	this._siteAlertLabel.set_text(_("ex.: http://wwww.globoesporte.com"));
 	this._urlEntry.set_text("");
 	this._urlEntry.max_length = 0;
 	this._urlEntry.halign = Gtk.Align.FILL;
@@ -154,7 +150,7 @@ const NewSiteBox = new Lang.Class({
 	this._siteUrlFrame.add(urlLabel);
 	this._siteUrlFrame.show_all();
 
-	this._siteAlertLabel.set_text(NEW_SITE_ADDED_MESSAGE);
+	this._siteAlertLabel.set_text(_("was added successfully"));
 	this._siteAddButton.sensitive = false;
 	this._switchAlertIcon(AlertIcon.HIDDEN);
 
@@ -205,7 +201,7 @@ const NewSiteBox = new Lang.Class({
 
     _onLoadFailed: function() {
 	this._newSiteError = true;
-	this._siteAlertLabel.set_text(NEW_SITE_UNAVAILABLE);
+	this._siteAlertLabel.set_text(_("the address written does not exist or is not available"));
 	this._switchAlertIcon(AlertIcon.ERROR);
 	this._urlEntry.get_style_context().add_class("url-entry-error");
 	return true;
