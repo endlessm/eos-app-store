@@ -438,6 +438,7 @@ eos_app_list_model_get_app_info (EosAppListModel *model,
 {
   GMenuTreeEntry *entry;
   GDesktopAppInfo *res;
+  gchar *desktop_app_id;
 
   if (model->apps_by_id == NULL)
     {
@@ -445,7 +446,14 @@ eos_app_list_model_get_app_info (EosAppListModel *model,
       return NULL;
     }
 
-  entry = g_hash_table_lookup (model->apps_by_id, app_id);
+  if (!g_str_has_suffix (app_id, ".desktop"))
+    desktop_app_id = g_strconcat (app_id, ".desktop", NULL);
+  else
+    desktop_app_id = g_strdup (app_id);
+
+  entry = g_hash_table_lookup (model->apps_by_id, desktop_app_id);
+  g_free (desktop_app_id);
+
   if (entry == NULL)
     {
       g_critical ("No application '%s' was found.", app_id);
