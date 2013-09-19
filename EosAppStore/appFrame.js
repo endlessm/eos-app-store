@@ -203,11 +203,11 @@ const AppFrame = new Lang.Class({
             categories[c].button.show();
             this._categoriesBox.add(categories[c].button);
 
-            let scrollWindow = new Gtk.ScrolledWindow();
+            let scrollWindow = new Gtk.ScrolledWindow({ hscrollbar_policy: Gtk.PolicyType.NEVER,
+                                                        vscrollbar_policy: Gtk.PolicyType.AUTOMATIC });
             this._stack.add_named(scrollWindow, categories[c].name);
 
             categories[c].grid = new Endless.FlexyGrid();
-            categories[c].grid.set_size_request(MIN_GRID_WIDTH, MIN_GRID_HEIGHT);
             scrollWindow.add_with_viewport(categories[c].grid);
 
             let cells = EosAppStorePrivate.app_load_content(categories[c].grid, categories[c].id);
