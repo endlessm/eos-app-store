@@ -9,6 +9,7 @@ const Lang = imports.lang;
 const Signals = imports.signals;
 const _ = imports.gettext.gettext;
 
+const AppListModel = imports.appListModel;
 const AppStoreWindow = imports.appStoreWindow;
 const Config = imports.config;
 const Path = imports.path;
@@ -69,6 +70,9 @@ const AppStore = new Lang.Class({
         // the app store shell proxy
         this._shellProxy = new ShellAppStore.ShellAppStore();
 
+        // the backing app list model
+        this._appModel = new AppListModel.StoreModel();
+
         // the main window
         this._mainWindow = new AppStoreWindow.AppStoreWindow(this,
                                                              this._storeModel,
@@ -123,6 +127,10 @@ const AppStore = new Lang.Class({
         }
 
         return 0;
+    },
+
+    get appModel() {
+        return this._appModel;
     },
 
     get shellProxy() {

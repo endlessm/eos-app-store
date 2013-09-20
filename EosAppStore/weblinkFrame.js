@@ -9,7 +9,7 @@ const EosAppStorePrivate = imports.gi.EosAppStorePrivate;
 const PLib = imports.gi.PLib;
 const WebKit = imports.gi.WebKit2;
 
-const WeblinkListModel = imports.appListModel;
+const AppListModel = imports.appListModel;
 const Builder = imports.builder;
 const Lang = imports.lang;
 const Signals = imports.signals;
@@ -156,7 +156,7 @@ const NewSiteBox = new Lang.Class({
 
         let newSite = this._weblinkListModel.createWeblink(url, title, 'browser');
         this._weblinkListModel.update();
-        this._weblinkListModel.installWeblink(newSite);
+        this._weblinkListModel.install(newSite);
 
         GLib.timeout_add_seconds(GLib.PRIORITY_DEFAULT,
                                  NEW_SITE_SUCCESS_TIMEOUT,
@@ -295,11 +295,11 @@ const WeblinkListBoxRow = new Lang.Class({
     _onStateButtonClicked: function() {
         switch (this._weblinkState) {
             case EosAppStorePrivate.AppState.INSTALLED:
-                this._model.uninstallWeblink(this._weblinkId);
+                this._model.uninstall(this._weblinkId);
                 break;
 
             case EosAppStorePrivate.AppState.UNINSTALLED:
-                this._model.installWeblink(this._weblinkId);
+                this._model.install(this._weblinkId);
                 break;
         }
     }
@@ -335,7 +335,7 @@ const WeblinkFrame = new Lang.Class({
         this.add(this._mainBox);
         this._mainBox.show_all();
 
-        this._weblinkListModel = new WeblinkListModel.WeblinkList();
+        this._weblinkListModel = new AppListModel.WeblinkList();
         this._weblinkListModel.connect('changed', Lang.bind(this, this._onListModelChange));
 
         this._newSiteBox = new NewSiteBox(this._weblinkListModel);
@@ -350,11 +350,11 @@ const WeblinkFrame = new Lang.Class({
 
         weblinks.forEach(Lang.bind(this, function(item) {
             let row = new WeblinkListBoxRow(this._weblinkListModel, item);
-            row.weblinkName = model.getWeblinkName(item);
-            row.weblinkDescription = model.getWeblinkComment(item);
+            row.weblinkName = model.getName(item);
+            row.weblinkDescription = model.getComment(item);
             row.weblinkUrl = model.getWeblinkUrl(item);
-            row.weblinkIcon = model.getWeblinkIcon(item);
-            row.weblinkState = model.getWeblinkState(item);
+            row.weblinkIcon = model.getIcon(item);
+            row.weblinkState = model.getState(item);
 
             this._listBox.add(row);
             row.show();
