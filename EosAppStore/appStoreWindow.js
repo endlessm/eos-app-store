@@ -315,7 +315,7 @@ const AppStoreWindow = new Lang.Class({
         this.present_with_time(timestamp);
     },
 
-    getWindowWidth: function() {
+    getExpectedWidth: function() {
         return this._animator.expectedWidth;
     },
 });

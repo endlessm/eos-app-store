@@ -127,7 +127,7 @@ const AppStore = new Lang.Class({
 
     get mainWindowWidth() {
         if (this._mainWindow != null) {
-            return this._mainWindow.getResolution();
+            return this._mainWindow.getExpectedWidth();
         }
 
         return AppStoreWindow.AppStoreSizes.SVGA.windowWidth;
