@@ -16,6 +16,7 @@ const Signals = imports.signals;
 
 const NEW_SITE_TITLE_LIMIT = 20;
 const NEW_SITE_SUCCESS_TIMEOUT = 3;
+const SITE_CELL_MARGIN = 15;
 
 const AlertIcon = {
     SPINNER: 0,
@@ -311,8 +312,8 @@ const WeblinkListBox = new Lang.Class({
     Extends: PLib.ListBox,
 
     _init: function(model) {
-        this.parent();
-
+        this.parent({ selection_mode: Gtk.SelectionMode.NONE });
+        
         this._model = model;
     }
 });
@@ -326,28 +327,43 @@ const WeblinkFrame = new Lang.Class({
         '_mainBox',
         '_newSiteFrame',
         '_scrolledWindow',
-        '_viewport'
+        '_viewport',
+        '_columnsBox',
     ],
 
-    _init: function() {
+    _init: function(mainWindow) {
         this.parent();
         this.initTemplate({ templateRoot: '_mainBox', bindChildren: true, connectSignals: true, });
         this.add(this._mainBox);
         this._mainBox.show_all();
+
+        if (mainWindow.getExpectedWidth() <= 800) {
+            this._columns = 1;
+        } else {
+            this._columns = 2;
+        }
 
         this._weblinkListModel = new AppListModel.WeblinkList();
         this._weblinkListModel.connect('changed', Lang.bind(this, this._onListModelChange));
 
         this._newSiteBox = new NewSiteBox(this._weblinkListModel);
         this._newSiteFrame.add(this._newSiteBox);
-        this._listBox = new WeblinkListBox(this._weblinkListModel);
-        this._viewport.add(this._listBox);
-        this._listBox.show_all();
+
+        this._listBox = [];
+        for (let i = 0; i < this._columns; i++) {
+            this._listBox[i] = new WeblinkListBox(this._weblinkListModel);
+            this._columnsBox.add(this._listBox[i]);
+        }
+
+        this._viewport.show_all();
     },
 
     _onListModelChange: function(model, weblinks) {
-        this._listBox.foreach(function(child) { child.destroy(); });
+        for (let i = 0; i < this._columns; i++) {
+            this._listBox[i].foreach(function(child) { child.destroy(); });
+        }
 
+        let index = 0;
         weblinks.forEach(Lang.bind(this, function(item) {
             let row = new WeblinkListBoxRow(this._weblinkListModel, item);
             row.weblinkName = model.getName(item);
@@ -356,7 +372,7 @@ const WeblinkFrame = new Lang.Class({
             row.weblinkIcon = model.getIcon(item);
             row.weblinkState = model.getState(item);
 
-            this._listBox.add(row);
+            this._listBox[(index++)%this._columns].add(row);
             row.show();
         }));
     },
