@@ -40,8 +40,8 @@ const FolderModel = new Lang.Class({
 
         let dirpath = GLib.get_user_data_dir() + '/desktop-directories';
 
-        // octal literals are deprecated in JS: 0x1ED corresponds to 0755 permissions
-        if (GLib.mkdir_with_parents(dirpath, 0x1ED, null) < 0) {
+        // octal literals are deprecated in JS, so use parseInt
+        if (GLib.mkdir_with_parents(dirpath, parseInt('0755', 8), null) < 0) {
             log('could not create the directory ' + dirpath);
             return;
         }
