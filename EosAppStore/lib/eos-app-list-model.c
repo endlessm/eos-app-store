@@ -293,6 +293,9 @@ flatten_menu_tree_recursive (gpointer    directory,
           flatten_menu_tree_recursive (item, set);
           gmenu_tree_item_unref (item);
           break;
+
+        default:
+          break;
         }
 
       item_type = gmenu_tree_iter_next (iter);
@@ -311,7 +314,6 @@ tree_load_in_thread (GTask        *task,
   GMenuTreeDirectory *root;
   GError *error = NULL;
   GHashTable *set;
-  GList *app_list;
 
   if (model->apps_by_id != NULL)
     {
