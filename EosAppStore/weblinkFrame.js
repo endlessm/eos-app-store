@@ -76,12 +76,12 @@ const NewSiteBox = new Lang.Class({
     },
 
     _createAlertIcons: function() {
-        this._siteAlertIconFrame.set_size_request(16, 16);
-        this._alertIcon = [ new Gtk.Spinner(),
-                            new Gtk.Button({ child: new Gtk.Image({ stock: Gtk.STOCK_CLOSE }) }),
-                            new Gtk.Image({ stock: Gtk.STOCK_DIALOG_WARNING }),
+        this._alertIcon = [ new Gtk.Spinner({ name: 'spinner' }),
+                            new Gtk.Button({ name: 'cancel' }),
+                            new Gtk.Image({ name: 'alert' }),
                             null ];
 
+        this._alertIcon[AlertIcon.SPINNER].set_size_request(16, 16);
         this._alertIcon[AlertIcon.CANCEL].show_all();
         this._alertIcon[AlertIcon.CANCEL].connect('clicked', Lang.bind(this, this._onEditSiteCancel));
     },
