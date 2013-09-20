@@ -17,12 +17,12 @@ struct _EosAppListModel
 
   GDBusConnection *connection;
 
-  GFileMonitor *monitor;
-
   GMenuTree *app_tree;
 
   GHashTable *apps_by_id;
   GHashTable *installed_apps;
+
+  guint applications_changed_id;
 };
 
 struct _EosAppListModelClass
@@ -40,6 +40,39 @@ static guint eos_app_list_model_signals[LAST_SIGNAL] = { 0, };
 
 G_DEFINE_TYPE (EosAppListModel, eos_app_list_model, G_TYPE_OBJECT)
 
+static gchar *
+ensure_desktop_app_id (const gchar *app_id)
+{
+  gchar *desktop_app_id;
+
+  if (!g_str_has_suffix (app_id, ".desktop"))
+    desktop_app_id = g_strconcat (app_id, ".desktop", NULL);
+  else
+    desktop_app_id = g_strdup (app_id);
+
+  return desktop_app_id;
+}
+
+static GHashTable *
+load_installed_apps_from_gvariant (GVariant *apps)
+{
+  GHashTable *retval;
+  GVariantIter *iter;
+  gchar *application;
+
+  retval = g_hash_table_new_full (g_str_hash, g_str_equal,
+                                  g_free, NULL);
+
+  g_variant_get (apps, "(as)", &iter);
+
+  while (g_variant_iter_loop (iter, "s", &application))
+    g_hash_table_add (retval, g_strdup (application));
+
+  g_variant_iter_free (iter);
+
+  return retval;
+}
+
 static void
 on_app_tree_changed (GMenuTree       *tree,
                      EosAppListModel *self)
@@ -54,17 +87,23 @@ on_app_tree_changed (GMenuTree       *tree,
 }
 
 static void
-on_installed_apps_changed (GFileMonitor      *monitor,
-                           GFile             *file,
-                           GFile             *other_file,
-                           GFileMonitorEvent  event_type,
-                           EosAppListModel   *self)
+on_shell_applications_changed (GDBusConnection *connection,
+                               const gchar     *sender_name,
+                               const gchar     *object_path,
+                               const gchar     *interface_name,
+                               const gchar     *signal_name,
+                               GVariant        *parameters,
+                               gpointer         user_data)
 {
+  EosAppListModel *self = user_data;
+
   if (self->installed_apps != NULL)
     {
       g_hash_table_unref (self->installed_apps);
       self->installed_apps = NULL;
     }
+
+  self->installed_apps = load_installed_apps_from_gvariant (parameters);
 
   g_signal_emit (self, eos_app_list_model_signals[CHANGED], 0);
 }
@@ -74,7 +113,13 @@ eos_app_list_model_finalize (GObject *gobject)
 {
   EosAppListModel *self = EOS_APP_LIST_MODEL (gobject);
 
-  g_clear_object (&self->monitor);
+  if (self->applications_changed_id != 0)
+    {
+      g_dbus_connection_signal_unsubscribe (self->connection,
+                                            self->applications_changed_id);
+      self->applications_changed_id = 0;
+    }
+
   g_clear_object (&self->connection);
   g_clear_object (&self->app_tree);
   g_hash_table_unref (self->apps_by_id);
@@ -98,21 +143,9 @@ eos_app_list_model_class_init (EosAppListModelClass *klass)
                   G_TYPE_NONE, 0);
 }
 
-static char *
-get_installed_apps_path (void)
-{
-  return g_build_filename (g_get_home_dir (),
-                           ".endlessm",
-                           "installed_applications.json",
-                           NULL);
-}
-
 static void
 eos_app_list_model_init (EosAppListModel *self)
 {
-  char *installed_apps;
-  GFile *file;
-
   self->connection = g_bus_get_sync (G_BUS_TYPE_SESSION, NULL, NULL);
 
   self->app_tree =
@@ -121,14 +154,15 @@ eos_app_list_model_init (EosAppListModel *self)
                     G_CALLBACK (on_app_tree_changed),
                     self);
 
-  installed_apps = get_installed_apps_path ();
-  file = g_file_new_for_path (installed_apps);
-  self->monitor = g_file_monitor_file (file, G_FILE_MONITOR_SEND_MOVED, NULL, NULL);
-  g_signal_connect (self->monitor, "changed",
-                    G_CALLBACK (on_installed_apps_changed),
-                    self);
-  g_object_unref (file);
-  g_free (installed_apps);
+  self->applications_changed_id =
+    g_dbus_connection_signal_subscribe (self->connection,
+                                        "org.gnome.Shell",
+                                        "org.gnome.Shell.AppStore",
+                                        "ApplicationsChanged",
+                                        "/org/gnome/Shell",
+                                        NULL, G_DBUS_SIGNAL_FLAGS_NONE,
+                                        on_shell_applications_changed,
+                                        self, NULL);
 }
 
 EosAppListModel *
@@ -139,7 +173,7 @@ eos_app_list_model_new (void)
 
 static gboolean
 add_app_to_shell (EosAppListModel *self,
-                  const char *app_id)
+                  const char *desktop_app_id)
 {
   GError *error = NULL;
 
@@ -147,16 +181,17 @@ add_app_to_shell (EosAppListModel *self,
                                "org.gnome.Shell",
                                "/org/gnome/Shell",
                                "org.gnome.Shell.AppStore", "AddApplication",
-                               g_variant_new ("(s)", app_id),
+                               g_variant_new ("(s)", desktop_app_id),
                                NULL,
                                G_DBUS_CALL_FLAGS_NONE,
                                -1,
                                NULL,
                                &error);
+
   if (error != NULL)
     {
       g_critical ("Unable to add application '%s': %s",
-                  app_id,
+                  desktop_app_id,
                   error->message);
       g_error_free (error);
 
@@ -168,7 +203,7 @@ add_app_to_shell (EosAppListModel *self,
 
 static gboolean
 remove_app_from_shell (EosAppListModel *self,
-                       const char *app_id)
+                       const char *desktop_app_id)
 {
   GError *error = NULL;
 
@@ -176,16 +211,17 @@ remove_app_from_shell (EosAppListModel *self,
                                "org.gnome.Shell",
                                "/org/gnome/Shell",
                                "org.gnome.Shell.AppStore", "RemoveApplication",
-                               g_variant_new ("(s)", app_id),
+                               g_variant_new ("(s)", desktop_app_id),
                                NULL,
                                G_DBUS_CALL_FLAGS_NONE,
                                -1,
                                NULL,
                                &error);
+
   if (error != NULL)
     {
-      g_critical ("Unable to add application '%s': %s",
-                  app_id,
+      g_critical ("Unable to remove application '%s': %s",
+                  desktop_app_id,
                   error->message);
       g_error_free (error);
 
@@ -195,103 +231,36 @@ remove_app_from_shell (EosAppListModel *self,
   return TRUE;
 }
 
-static void
-add_to_set (JsonArray *array,
-            guint      index_,
-            JsonNode  *element,
-            gpointer   data)
+static GHashTable *
+load_installed_apps (EosAppListModel *self)
 {
-  GHashTable *set = data;
-
-  if (JSON_NODE_HOLDS_VALUE (element) &&
-      json_node_get_string (element) != NULL)
-    {
-      g_hash_table_add (set, json_node_dup_string (element));
-    }
-}
-
-static void
-save_installed_apps (EosAppListModel *self)
-{
-  JsonGenerator *gen;
-  JsonNode *node;
-  JsonArray *array;
-  GHashTableIter iter;
-  gpointer key;
-  char *path;
+  GVariant *applications;
   GError *error = NULL;
+  GHashTable *retval;
 
-  path = get_installed_apps_path ();
+  applications =
+    g_dbus_connection_call_sync (self->connection,
+                                 "org.gnome.Shell",
+                                 "/org/gnome/Shell",
+                                 "org.gnome.Shell.AppStore",
+                                 "ListApplications",
+                                 NULL, NULL,
+                                 G_DBUS_CALL_FLAGS_NONE,
+                                 -1,
+                                 NULL,
+                                 &error);
 
-  array = json_array_sized_new (g_hash_table_size (self->installed_apps));
-  g_hash_table_iter_init (&iter, self->installed_apps);
-  while (g_hash_table_iter_next (&iter, &key, NULL))
-    json_array_add_string_element (array, key);
-
-  node = json_node_init_array (json_node_alloc (), array);
-  json_array_unref (array);
-
-  gen = json_generator_new ();
-  json_generator_set_root (gen, node);
-  json_generator_to_file (gen, path, &error);
   if (error != NULL)
     {
-      g_critical (G_STRLOC ": Unable to save installed_applications.json: %s",
+      g_critical ("Unable to list applications: %s",
                   error->message);
       g_error_free (error);
+
+      return NULL;
     }
 
-  json_node_free (node);
-  g_object_unref (gen);
-  g_free (path);
-}
-
-static GHashTable *
-load_installed_apps (void)
-{
-  JsonParser *parser;
-  GError *internal_error;
-  GHashTable *retval;
-  JsonNode *root;
-  char *file;
-
-  retval = g_hash_table_new_full (g_str_hash, g_str_equal,
-                                  g_free,
-                                  NULL);
-
-  file = g_build_filename (g_get_home_dir (),
-                           ".endlessm",
-                           "installed_applications.json",
-                           NULL);
-
-  parser = json_parser_new ();
-
-  internal_error = NULL;
-  json_parser_load_from_file (parser, file, &internal_error);
-  if (internal_error != NULL)
-    {
-      if (!(internal_error->domain == G_FILE_ERROR &&
-            internal_error->code == G_FILE_ERROR_NOENT))
-        {
-          g_critical (G_STRLOC ": Unable to load installed_applications.json: %s",
-                      internal_error->message);
-        }
-
-      g_error_free (internal_error);
-      goto out;
-    }
-
-  root = json_parser_get_root (parser);
-  if (JSON_NODE_HOLDS_ARRAY (root))
-    {
-      JsonArray *array = json_node_get_array (root);
-
-      json_array_foreach_element (array, add_to_set, retval);
-    }
-
-out:
-  g_object_unref (parser);
-  g_free (file);
+  retval = load_installed_apps_from_gvariant (applications);
+  g_variant_unref (applications);
 
   return retval;
 }
@@ -372,7 +341,7 @@ tree_load_in_thread (GTask        *task,
   gmenu_tree_item_unref (root);
 
   model->apps_by_id = set;
-  model->installed_apps = load_installed_apps ();
+  model->installed_apps = load_installed_apps (model);
 
   g_task_return_pointer (task, NULL, NULL);
 }
@@ -424,9 +393,9 @@ eos_app_list_model_load_finish (EosAppListModel  *model,
 
 static gboolean
 is_app_installed (EosAppListModel *model,
-                  const char *app_id)
+                  const char      *desktop_app_id)
 {
-  return g_hash_table_lookup (model->installed_apps, app_id) != NULL;
+  return g_hash_table_contains (model->installed_apps, desktop_app_id);
 }
 
 static GDesktopAppInfo *
@@ -443,11 +412,7 @@ eos_app_list_model_get_app_info (EosAppListModel *model,
       return NULL;
     }
 
-  if (!g_str_has_suffix (app_id, ".desktop"))
-    desktop_app_id = g_strconcat (app_id, ".desktop", NULL);
-  else
-    desktop_app_id = g_strdup (app_id);
-
+  desktop_app_id = ensure_desktop_app_id (app_id);
   entry = g_hash_table_lookup (model->apps_by_id, desktop_app_id);
   g_free (desktop_app_id);
 
@@ -537,16 +502,29 @@ EosAppState
 eos_app_list_model_get_app_state (EosAppListModel *model,
                                   const char *app_id)
 {
+  gchar *desktop_app_id;
+  EosAppState retval = EOS_APP_STATE_UNKNOWN;
+
   g_return_val_if_fail (EOS_IS_APP_LIST_MODEL (model), EOS_APP_STATE_UNKNOWN);
   g_return_val_if_fail (app_id != NULL, EOS_APP_STATE_UNKNOWN);
 
-  if (is_app_installed (model, app_id))
-    return EOS_APP_STATE_INSTALLED;
+  desktop_app_id = ensure_desktop_app_id (app_id);
 
-  if (eos_app_list_model_get_app_info (model, app_id) != NULL)
-    return EOS_APP_STATE_UNINSTALLED;
+  if (is_app_installed (model, desktop_app_id))
+    {
+      retval = EOS_APP_STATE_INSTALLED;
+      goto out;
+    }
 
-  return EOS_APP_STATE_UNKNOWN;
+  if (eos_app_list_model_get_app_info (model, desktop_app_id) != NULL)
+    {
+      retval = EOS_APP_STATE_UNINSTALLED;
+      goto out;
+    }
+
+ out:
+  g_free (desktop_app_id);
+  return retval;
 }
 
 gboolean
@@ -569,14 +547,20 @@ void
 eos_app_list_model_install_app (EosAppListModel *model,
                                 const char *app_id)
 {
-  if (is_app_installed (model, app_id))
-    return;
+  gchar *desktop_app_id;
 
-  if (!add_app_to_shell (model, app_id))
-    return;
+  desktop_app_id = ensure_desktop_app_id (app_id);
 
-  g_hash_table_add (model->installed_apps, g_strdup (app_id));
-  save_installed_apps (model);
+  if (is_app_installed (model, desktop_app_id))
+    goto out;
+
+  if (!add_app_to_shell (model, desktop_app_id))
+    goto out;
+
+  g_hash_table_add (model->installed_apps, g_strdup (desktop_app_id));
+
+ out:
+  g_free (desktop_app_id);
 }
 
 void
@@ -589,12 +573,18 @@ void
 eos_app_list_model_uninstall_app (EosAppListModel *model,
                                   const char *app_id)
 {
-  if (!is_app_installed (model, app_id))
-    return;
+  gchar *desktop_app_id;
 
-  if (!remove_app_from_shell (model, app_id))
-    return;
+  desktop_app_id = ensure_desktop_app_id (app_id);
 
-  g_hash_table_remove (model->installed_apps, app_id);
-  save_installed_apps (model);
+  if (!is_app_installed (model, desktop_app_id))
+    goto out;
+
+  if (!remove_app_from_shell (model, desktop_app_id))
+    goto out;
+
+  g_hash_table_remove (model->installed_apps, desktop_app_id);
+
+ out:
+  g_free (desktop_app_id);
 }
