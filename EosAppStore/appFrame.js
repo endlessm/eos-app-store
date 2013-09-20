@@ -46,10 +46,10 @@ const AppListBoxRow = new Lang.Class({
 
         this._stateButton.connect('clicked', Lang.bind(this, this._onStateButtonClicked));
 
-        this.appName = this._model.getAppName(this._appId);
-        this.appDescription = this._model.getAppDescription(this._appId);
-        this.appIcon = this._model.getAppIcon(this._appId);
-        this.appState = this._model.getAppState(this._appId);
+        this.appName = this._model.getName(this._appId);
+        this.appDescription = this._model.getDescription(this._appId);
+        this.appIcon = this._model.getIcon(this._appId);
+        this.appState = this._model.getState(this._appId);
     },
 
     get appId() {
@@ -108,11 +108,11 @@ const AppListBoxRow = new Lang.Class({
     _onStateButtonClicked: function() {
         switch (this._appState) {
             case EosAppStorePrivate.AppState.INSTALLED:
-                this._model.uninstallApp(this._appId);
+                this._model.uninstall(this._appId);
                 break;
 
             case EosAppStorePrivate.AppState.UNINSTALLED:
-                this._model.installApp(this._appId);
+                this._model.install(this._appId);
                 break;
 
             case EosAppStorePrivate.AppState.UPDATABLE:
@@ -131,7 +131,7 @@ const AppFrame = new Lang.Class({
         this.parent();
 
         // initialize the applications model
-        this._model = AppListModel.model;
+        this._model = new AppListModel.AppList();
 
         this._mainStack = new PLib.Stack();
         this._mainStack.set_transition_duration(APP_TRANSITION_MS);

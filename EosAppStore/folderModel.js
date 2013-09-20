@@ -73,10 +73,8 @@ const FolderModel = new Lang.Class({
         channel.write_chars(buf[0], buf[1]);
         channel.shutdown(true);
 
-        this._model.installApp(filename);
-    },
-
-    _init: function() {
-        this._model = AppListModel.model;
+        let application = Gio.Application.get_default();
+        let shellProxy = application.shellProxy;
+        shellProxy.proxy.AddFolderRemote(filename);
     }
 });

@@ -9,9 +9,11 @@ const Lang = imports.lang;
 const Signals = imports.signals;
 const _ = imports.gettext.gettext;
 
+const AppListModel = imports.appListModel;
 const AppStoreWindow = imports.appStoreWindow;
 const Config = imports.config;
 const Path = imports.path;
+const ShellAppStore = imports.shellAppStore;
 const StoreModel = imports.storeModel;
 
 const APP_STORE_CSS = 'resource:///com/endlessm/appstore/eos-app-store.css';
@@ -64,6 +66,12 @@ const AppStore = new Lang.Class({
         provider.load_from_file(Gio.File.new_for_uri(APP_STORE_CSS));
         Gtk.StyleContext.add_provider_for_screen(Gdk.Screen.get_default(), provider,
                                                  Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION);
+
+        // the app store shell proxy
+        this._shellProxy = new ShellAppStore.ShellAppStore();
+
+        // the backing app list model
+        this._appModel = new AppListModel.StoreModel();
 
         // the main window
         this._mainWindow = new AppStoreWindow.AppStoreWindow(this,
@@ -119,6 +127,14 @@ const AppStore = new Lang.Class({
         }
 
         return 0;
+    },
+
+    get appModel() {
+        return this._appModel;
+    },
+
+    get shellProxy() {
+        return this._shellProxy;
     },
 
     get mainWindow() {
