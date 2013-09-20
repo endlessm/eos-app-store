@@ -113,7 +113,7 @@ const FolderIconGrid = new Lang.Class({
         }
         else {
             // we will populate it when it is allocated
-            let handler = this.connect("size-allocate",
+            let handler = this.connect('size-allocate',
                                        Lang.bind(this, function (widget, allocation) {
                                            this.disconnect(handler);
                                            this._populate(allocation.width);

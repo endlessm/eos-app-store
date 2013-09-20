@@ -38,11 +38,11 @@ const FolderModel = new Lang.Class({
         keyFile.set_value(GLib.KEY_FILE_DESKTOP_GROUP,
                           GLib.KEY_FILE_DESKTOP_KEY_TYPE, GLib.KEY_FILE_DESKTOP_TYPE_DIRECTORY);
 
-        let dirpath = GLib.get_user_data_dir()+'/desktop-directories';
+        let dirpath = GLib.get_user_data_dir() + '/desktop-directories';
 
-        // apparently, octal literals are deprecated in JS
-        if (GLib.mkdir_with_parents(dirpath, 0755, null) < 0) {
-            log('could not create the directory '+dirpath);
+        // octal literals are deprecated in JS: 0x1ED corresponds to 0755 permissions
+        if (GLib.mkdir_with_parents(dirpath, 0x1ED, null) < 0) {
+            log('could not create the directory ' + dirpath);
             return;
         }
 
@@ -53,14 +53,13 @@ const FolderModel = new Lang.Class({
 
         let prefix = 'eos-folder-user-';
         let suffix = '.directory';
-        let re = new RegExp(prefix + '[0-9]+' + suffix);
+        let re = new RegExp(prefix + '([0-9]+)' + suffix);
         let n = -1;
 
         for (let f = enumerator.next_file(null); f != null; f = enumerator.next_file(null)) {
-            let name = f.get_name();
-            if (re.test(name)) {
-                let new_n = name.slice(name.indexOf(prefix) + prefix.length,
-                                       name.indexOf(suffix));
+            let result = re.exec(f.get_name());
+            if (result != null) {
+                let new_n = result[1];
                 n = Math.max(n, parseInt(new_n));
             }
         }
