@@ -85,3 +85,16 @@
   border: 1px;
   border-radius: 30px;
 }
+
+.folder-frame GtkToggleButton {
+  border-radius: 4px;
+  border: none;
+  background: transparent;
+
+  -GtkWidget-focus-line-width: 0;
+}
+
+/* hover, focused ? */
+.folder-frame GtkToggleButton:active {
+  background: #e3e3e3;
+}

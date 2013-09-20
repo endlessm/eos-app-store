@@ -131,7 +131,7 @@ const AppFrame = new Lang.Class({
         this.parent();
 
         // initialize the applications model
-        this._model = new AppListModel.AppList();
+        this._model = AppListModel.model;
 
         this._mainStack = new PLib.Stack();
         this._mainStack.set_transition_duration(APP_TRANSITION_MS);
