@@ -109,6 +109,8 @@ const AppList = new Lang.Class({
 });
 Signals.addSignalMethods(AppList.prototype);
 
+var model = new AppList();
+
 const WeblinkList = new Lang.Class({
     Name: 'WeblinkList',
 
