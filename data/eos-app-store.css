@@ -77,13 +77,46 @@
   color: rgb(153,153,153);
 }
 
-.new-site-frame .alert-icon {
-  background: transparent;
+.new-site-frame #alert {
+  background-image: url("icon_alert.png");
+  background-size: 16px;
+  background-repeat: no-repeat;
+}
+
+.new-site-frame #cancel {
+  background-image: url("btn_edit_normal.png");
+  background-size: 22px;
+  background-repeat: no-repeat;
+  border: 1px;
+}
+
+.new-site-frame #cancel:active,
+.new-site-frame #cancel:hover:active {
+  background-image: url("btn_edit_pressed.png");
+}
+
+.new-site-frame #cancel:hover {
+  background-image: url("btn_edit_hover.png");
 }
 
 .new-site-frame .add-button {
+  background-image: url("btn_add-website_normal.png");
+  background-size: 49px;
   border: 1px;
-  border-radius: 30px;
+}
+
+.new-site-frame .add-button:active,
+.new-site-frame .add-button:hover:active {
+  background-image: url("btn_add-website_pressed.png");
+}
+
+.new-site-frame .add-button:hover {
+  background-image: url("btn_add-website_hover.png");
+}
+
+.new-site-frame .add-button:insensitive {
+  background-image: url("icon_installed_43x43.png");
+  background-color: transparent;
 }
 
 .folder-frame GtkToggleButton {
