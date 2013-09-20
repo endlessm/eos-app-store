@@ -1,5 +1,6 @@
 // -*- mode: js; js-indent-level: 4; indent-tabs-mode: nil -*-
 const EosAppStorePrivate = imports.gi.EosAppStorePrivate;
+const Gio = imports.gi.Gio;
 const GLib = imports.gi.GLib;
 
 const Lang = imports.lang;
@@ -12,14 +13,12 @@ const EOS_LOCALIZED = 'eos-exec-localized ';
 
 const DESKTOP_KEY_SPLASH = 'X-Endless-Splash-Screen';
 
-var storeList = null;
-
-const StoreList = new Lang.Class({
-    Name: 'StoreList',
+const StoreModel = new Lang.Class({
+    Name: 'StoreModel',
 
     _init: function() {
-        this.model = new EosAppStorePrivate.AppListModel();
-        this.model.connect('changed', Lang.bind(this, this._onAppListModelChanged));
+        this.model= new EosAppStorePrivate.AppListModel();
+        this.model.connect('changed', Lang.bind(this, this._onModelChanged));
 
         // initialize model state
         this._updating = false;
@@ -35,94 +34,98 @@ const StoreList = new Lang.Class({
         this.model.load(null, Lang.bind(this, this._onLoadComplete));
     },
 
-    _onLoadComplete: function(model, res) {
-        this._updating = false;
-        try {
-            let apps = model.load_finish(res);
-            this.emit('changed', apps);
-        }
-        catch (e) {
-            log('Unable to load the application list: ' + e);
-        }
-    },
-
-    _onAppListModelChanged: function() {
+    _onModelChanged: function() {
         this.update();
     },
 
+    _onLoadComplete: function(model, res) {
+        this._updating = false;
+        try {
+            let items = model.load_finish(res);
+            this.emit('changed', items);
+        } catch (e) {
+            logError('Unable to load the backing model storage: ' + e);
+        }
+    }
 });
-Signals.addSignalMethods(StoreList.prototype);
+Signals.addSignalMethods(StoreModel.prototype);
+
+const BaseList = new Lang.Class({
+    Name: 'BaseList',
+    Abstract: true,
+
+    _init: function() {
+        let application = Gio.Application.get_default();
+        this._storeModel = application.appModel;
+        this._model = this._storeModel.model;
+
+        this._storeModel.connect('changed', Lang.bind(this, this._onModelChanged));
+    },
+
+    _onModelChanged: function(appModel, items) {
+        // do nothing here
+    },
+
+    update: function() {
+        this._storeModel.update();
+    },
+
+    getName: function(id) {
+        return this._model.get_app_name(id);
+    },
+
+    getDescription: function(id) {
+        return this._model.get_app_description(id);
+    },
+
+    getIcon: function(id) {
+        return this._model.get_app_icon_name(id, EosAppStorePrivate.AppIconState.NORMAL);
+    },
+
+    getComment: function(id) {
+        return this._model.get_app_comment(id);
+    },
+
+    getState: function(id) {
+        return this._model.get_app_state(id);
+    },
+
+    getVisible: function(id) {
+        return this._model.get_app_visible(id);
+    },
+
+    install: function(id) {
+        this._model.install_app(id);
+    },
+
+    uninstall: function(id) {
+        this._model.uninstall_app(id);
+    }
+});
+Signals.addSignalMethods(BaseList.prototype);
 
 const AppList = new Lang.Class({
     Name: 'AppList',
+    Extends: BaseList,
 
-    _init: function() {
-        this._apps = null;
-        if (!storeList) {
-            storeList = new StoreList();
-        }
-        storeList.connect('changed', Lang.bind(this, this._onStoreListChanged));
-    },
-
-    _onStoreListChanged: function(store, allItems) {
-        let apps = allItems.filter(function(item) {
+    _onModelChanged: function(model, items) {
+        let apps = items.filter(function(item) {
             return item.indexOf(EOS_LINK_PREFIX) != 0;
         });
         this.emit('changed', apps);
     },
 
-    update: function() {
-        storeList.update();
-    },
-
-    getAppName: function(id) {
-        return storeList.model.get_app_name(id);
-    },
-
-    getAppDescription: function(id) {
-        return storeList.model.get_app_description(id);
-    },
-
-    getAppIcon: function(id) {
-        return storeList.model.get_app_icon_name(id, EosAppStorePrivate.AppIconState.NORMAL);
-    },
-
-    getAppVisible: function(id) {
-        return storeList.model.get_app_visible(id);
-    },
-
-    getAppState: function(id) {
-        return storeList.model.get_app_state(id);
-    },
-
-    installApp: function(id) {
-        storeList.model.install_app(id);
-    },
-
-    uninstallApp: function(id) {
-        storeList.model.uninstall_app(id);
-    },
-
     updateApp: function(id) {
-        storeList.model.update_app(id);
-    },
+        this._model.update_app(id);
+    }
 });
-Signals.addSignalMethods(AppList.prototype);
-
-var model = new AppList();
 
 const WeblinkList = new Lang.Class({
     Name: 'WeblinkList',
+    Extends: BaseList,
 
-    _init: function() {
-        if (!storeList) {
-            storeList = new StoreList();
-        }
-        storeList.connect('changed', Lang.bind(this, this._onStoreListChanged));
-    },
-
-    _onStoreListChanged: function(store, allItems) {
-        let weblinks = allItems.filter(function(item) {
+    _onModelChanged: function(model, items) {
+        let weblinks = items.filter(function(item) {
             return item.indexOf(EOS_LINK_PREFIX) == 0;
         });
         this.emit('changed', weblinks);
@@ -154,24 +157,8 @@ const WeblinkList = new Lang.Class({
         return defaultExec;
     },
 
-    update: function() {
-        storeList.update();
-    },
-
-    getWeblinkName: function(id) {
-        return storeList.model.get_app_name(id);
-    },
-
-    getWeblinkDescription: function(id) {
-        return storeList.model.get_app_description(id);
-    },
-
-    getWeblinkComment: function(id) {
-        return storeList.model.get_app_comment(id);
-    },
-
     getWeblinkUrl: function(id) {
-        let exec = storeList.model.get_app_executable(id);
+        let exec = this._model.get_app_executable(id);
         if (exec.indexOf(EOS_LOCALIZED) == 0) {
             exec = exec.substr(EOS_LOCALIZED.length);
             exec = this._getLocalizedExec(exec.match(/([\w-]+|'(\\'|[^'])*')/g));
@@ -181,22 +168,6 @@ const WeblinkList = new Lang.Class({
         }
 
         return exec;
-    },
-
-    getWeblinkIcon: function(id) {
-        return storeList.model.get_app_icon_name(id, EosAppStorePrivate.AppIconState.NORMAL);
-    },
-
-    getWeblinkState: function(id) {
-        return storeList.model.get_app_state(id);
-    },
-
-    installWeblink: function(id) {
-        storeList.model.install_app(id);
-    },
-
-    uninstallWeblink: function(id) {
-        storeList.model.uninstall_app(id);
     },
 
     createWeblink: function(url, title, icon) {
@@ -247,6 +218,5 @@ const WeblinkList = new Lang.Class({
         GLib.file_set_contents(availableFullFilename, data, length);
 
         return availableFilename;
-    },
+    }
 });
-Signals.addSignalMethods(WeblinkList.prototype);
