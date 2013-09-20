@@ -231,7 +231,7 @@ const AppStoreWindow = new Lang.Class({
         this._pages = {};
         this._pages.apps = new AppFrame.AppFrame();
         this._stack.add_named(this._pages.apps, 'apps');
-        this._pages.weblinks = new WeblinkFrame.WeblinkFrame();
+        this._pages.weblinks = new WeblinkFrame.WeblinkFrame(this);
         this._stack.add_named(this._pages.weblinks, 'weblinks');
         this._pages.folders = new FolderFrame.FolderFrame();
         this._stack.add_named(this._pages.folders, 'folders');
