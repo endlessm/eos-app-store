@@ -10,6 +10,7 @@ const PLib = imports.gi.PLib;
 const WebKit = imports.gi.WebKit2;
 
 const AppListModel = imports.appListModel;
+const AppStoreWindow = imports.appStoreWindow;
 const Builder = imports.builder;
 const Lang = imports.lang;
 const Signals = imports.signals;
@@ -336,7 +337,7 @@ const WeblinkFrame = new Lang.Class({
         this.add(this._mainBox);
         this._mainBox.show_all();
 
-        if (mainWindow.getExpectedWidth() <= 800) {
+        if (mainWindow.getExpectedWidth() <= AppStoreWindow.AppStoreSizes.XGA.windowWidth) {
             this._columns = 1;
         } else {
             this._columns = 2;
