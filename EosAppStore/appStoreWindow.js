@@ -67,12 +67,9 @@ const AppStoreSlider = new Lang.Class({
         return workarea;
     },
 
-    _getSize: function() {
+    _getResolution: function() {
         let workarea = this._getWorkarea();
-
-        // If the work area is smaller than any defined resolution,
-        // use the full width of the work area
-        let windowWidth = workarea.width;
+        let resolution = null;
 
         // Find the largest defined resolution that does not exceed
         // the work area width
@@ -80,11 +77,25 @@ const AppStoreSlider = new Lang.Class({
             let res = AppStoreSizes[i];
 
             if (workarea.width >= res.screenWidth) {
-                windowWidth = res.windowWidth;
+                resolution = res;
             }
         }
 
-        return [windowWidth, workarea.height];
+        return resolution;
+    },
+
+    _getSize: function() {
+        let workarea = this._getWorkarea();
+
+        let resolution = this._getResolution();
+
+        // If the work area is smaller than any defined resolution,
+        // use the full size of the work area
+        if (!resolution) {
+            return [workarea.width, workarea.height];
+        }
+
+        return [resolution.windowWidth, workarea.height];
     },
 
     _updateGeometry: function() {
@@ -140,21 +151,13 @@ const AppStoreSlider = new Lang.Class({
     },
 
     get resolution() {
-        let workarea = this._getWorkarea();
+        return this._getResolution();
+    },
 
-        let resolution = AppStoreSizes.SVGA;
+    get expectedWidth() {
+        let [width, height] = this._getSize();
 
-        // Find the largest defined resolution that does not exceed
-        // the work area width
-        for (let i in AppStoreSizes) {
-            let res = AppStoreSizes[i];
-
-            if (workarea.width >= res.screenWidth) {
-                resolution = res;
-            }
-        }
-
-        return resolution;
+        return width;
     },
 });
 Signals.addSignalMethods(AppStoreSlider.prototype);
@@ -313,7 +316,7 @@ const AppStoreWindow = new Lang.Class({
     },
 
     getWindowWidth: function() {
-        return this._animator.resolution.windowWidth;
+        return this._animator.expectedWidth;
     },
 });
 UIBuilder.bindTemplateChildren(AppStoreWindow.prototype);
