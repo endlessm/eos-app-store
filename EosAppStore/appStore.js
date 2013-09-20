@@ -125,6 +125,14 @@ const AppStore = new Lang.Class({
         return this._mainWindow;
     },
 
+    get mainWindowWidth() {
+        if (this._mainWindow != null) {
+            return this._mainWindow.getResolution();
+        }
+
+        return AppStoreWindow.AppStoreSizes.SVGA.windowWidth;
+    },
+
     Toggle: function(timestamp) {
         this._mainWindow.toggle(timestamp);
     },

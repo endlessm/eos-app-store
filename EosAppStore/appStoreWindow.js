@@ -138,6 +138,24 @@ const AppStoreSlider = new Lang.Class({
     get showing() {
         return this._showing;
     },
+
+    get resolution() {
+        let workarea = this._getWorkarea();
+
+        let resolution = AppStoreSizes.SVGA;
+
+        // Find the largest defined resolution that does not exceed
+        // the work area width
+        for (let i in AppStoreSizes) {
+            let res = AppStoreSizes[i];
+
+            if (workarea.width >= res.screenWidth) {
+                resolution = res;
+            }
+        }
+
+        return resolution;
+    },
 });
 Signals.addSignalMethods(AppStoreSlider.prototype);
 
@@ -292,6 +310,10 @@ const AppStoreWindow = new Lang.Class({
     showPage: function(timestamp) {
         this._animator.slideIn();
         this.present_with_time(timestamp);
-    }
+    },
+
+    getWindowWidth: function() {
+        return this._animator.resolution.windowWidth;
+    },
 });
 UIBuilder.bindTemplateChildren(AppStoreWindow.prototype);
