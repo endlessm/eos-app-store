@@ -67,12 +67,9 @@ const AppStoreSlider = new Lang.Class({
         return workarea;
     },
 
-    _getSize: function() {
+    _getResolution: function() {
         let workarea = this._getWorkarea();
-
-        // If the work area is smaller than any defined resolution,
-        // use the full width of the work area
-        let windowWidth = workarea.width;
+        let resolution = null;
 
         // Find the largest defined resolution that does not exceed
         // the work area width
@@ -80,11 +77,25 @@ const AppStoreSlider = new Lang.Class({
             let res = AppStoreSizes[i];
 
             if (workarea.width >= res.screenWidth) {
-                windowWidth = res.windowWidth;
+                resolution = res;
             }
         }
 
-        return [windowWidth, workarea.height];
+        return resolution;
+    },
+
+    _getSize: function() {
+        let workarea = this._getWorkarea();
+
+        let resolution = this._getResolution();
+
+        // If the work area is smaller than any defined resolution,
+        // use the full size of the work area
+        if (!resolution) {
+            return [workarea.width, workarea.height];
+        }
+
+        return [resolution.windowWidth, workarea.height];
     },
 
     _updateGeometry: function() {
@@ -137,6 +148,16 @@ const AppStoreSlider = new Lang.Class({
 
     get showing() {
         return this._showing;
+    },
+
+    get resolution() {
+        return this._getResolution();
+    },
+
+    get expectedWidth() {
+        let [width, height] = this._getSize();
+
+        return width;
     },
 });
 Signals.addSignalMethods(AppStoreSlider.prototype);
@@ -292,6 +313,10 @@ const AppStoreWindow = new Lang.Class({
     showPage: function(timestamp) {
         this._animator.slideIn();
         this.present_with_time(timestamp);
-    }
+    },
+
+    getExpectedWidth: function() {
+        return this._animator.expectedWidth;
+    },
 });
 UIBuilder.bindTemplateChildren(AppStoreWindow.prototype);
