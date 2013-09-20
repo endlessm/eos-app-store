@@ -348,10 +348,10 @@ const WeblinkFrame = new Lang.Class({
         this._newSiteBox = new NewSiteBox(this._weblinkListModel);
         this._newSiteFrame.add(this._newSiteBox);
 
-        this._listBox = [];
+        this._listBoxes = [];
         for (let i = 0; i < this._columns; i++) {
-            this._listBox[i] = new WeblinkListBox(this._weblinkListModel);
-            this._columnsBox.add(this._listBox[i]);
+            this._listBoxes[i] = new WeblinkListBox(this._weblinkListModel);
+            this._columnsBox.add(this._listBoxes[i]);
         }
 
         this._viewport.show_all();
@@ -359,7 +359,7 @@ const WeblinkFrame = new Lang.Class({
 
     _onListModelChange: function(model, weblinks) {
         for (let i = 0; i < this._columns; i++) {
-            this._listBox[i].foreach(function(child) { child.destroy(); });
+            this._listBoxes[i].foreach(function(child) { child.destroy(); });
         }
 
         let index = 0;
@@ -371,7 +371,7 @@ const WeblinkFrame = new Lang.Class({
             row.weblinkIcon = model.getIcon(item);
             row.weblinkState = model.getState(item);
 
-            this._listBox[(index++)%this._columns].add(row);
+            this._listBoxes[(index++)%this._columns].add(row);
             row.show();
         }));
     },
