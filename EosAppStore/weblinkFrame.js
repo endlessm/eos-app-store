@@ -16,7 +16,6 @@ const Signals = imports.signals;
 
 const NEW_SITE_TITLE_LIMIT = 20;
 const NEW_SITE_SUCCESS_TIMEOUT = 3;
-const SITE_CELL_MARGIN = 15;
 
 const AlertIcon = {
     SPINNER: 0,
