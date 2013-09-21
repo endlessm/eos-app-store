@@ -124,10 +124,17 @@ const WeblinkList = new Lang.Class({
     Name: 'WeblinkList',
     Extends: BaseList,
 
+    _init: function() {
+        this._weblinks = [];
+        this.parent();
+    },
+
     _onModelChanged: function(model, items) {
         let weblinks = items.filter(function(item) {
             return item.indexOf(EOS_LINK_PREFIX) == 0;
         });
+
+        this._weblinks = weblinks;
         this.emit('changed', weblinks);
     },
 
@@ -155,6 +162,10 @@ const WeblinkList = new Lang.Class({
         }
 
         return defaultExec;
+    },
+
+    getWeblinks: function() {
+        return this._weblinks;
     },
 
     getWeblinkUrl: function(id) {

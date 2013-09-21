@@ -344,7 +344,6 @@ const WeblinkFrame = new Lang.Class({
         }
 
         this._weblinkListModel = new AppListModel.WeblinkList();
-        this._weblinkListModel.connect('changed', Lang.bind(this, this._onListModelChange));
 
         this._newSiteBox = new NewSiteBox(this._weblinkListModel);
         this._newSiteFrame.add(this._newSiteBox);
@@ -356,16 +355,22 @@ const WeblinkFrame = new Lang.Class({
         }
 
         this._viewport.show_all();
+
+        this._weblinkListModel.connect('changed', Lang.bind(this, this._onListModelChange));
+        this._onListModelChange();
     },
 
-    _onListModelChange: function(model, weblinks) {
+    _onListModelChange: function() {
         for (let i = 0; i < this._columns; i++) {
             this._listBoxes[i].foreach(function(child) { child.destroy(); });
         }
 
+        let model = this._weblinkListModel;
+        let weblinks = model.getWeblinks();
         let index = 0;
+
         weblinks.forEach(Lang.bind(this, function(item) {
-            let row = new WeblinkListBoxRow(this._weblinkListModel, item);
+            let row = new WeblinkListBoxRow(model, item);
             row.weblinkName = model.getName(item);
             row.weblinkDescription = model.getComment(item);
             row.weblinkUrl = model.getWeblinkUrl(item);
@@ -375,10 +380,6 @@ const WeblinkFrame = new Lang.Class({
             this._listBoxes[(index++)%this._columns].add(row);
             row.show();
         }));
-    },
-
-    update: function() {
-        this._weblinkListModel.update();
     }
 });
 Builder.bindTemplateChildren(WeblinkFrame.prototype);
