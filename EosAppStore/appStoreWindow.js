@@ -270,14 +270,12 @@ const AppStoreWindow = new Lang.Class({
             case StoreModel.StorePage.APPS:
                 title.set_text(_("INSTALL APPLICATIONS"));
                 desc.set_text(_("A list of many free applications you can install and update"));
-                this._pages.apps.update();
                 page = this._pages.apps;
                 break;
 
             case StoreModel.StorePage.WEB:
                 title.set_text(_("INSTALL SITES"));
                 desc.set_text(_("A list of many sites you can add"));
-                this._pages.weblinks.update();
                 page = this._pages.weblinks;
                 break;
 
