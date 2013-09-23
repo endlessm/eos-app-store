@@ -1,9 +1,11 @@
 // -*- mode: js; js-indent-level: 4; indent-tabs-mode: nil -*-
 const GLib = imports.gi.GLib;
 const GObject = imports.gi.GObject;
+const Gdk = imports.gi.Gdk;
 const Gtk = imports.gi.Gtk;
 const Endless = imports.gi.Endless;
 const PLib = imports.gi.PLib;
+const Cairo = imports.cairo;
 
 const Builder = imports.builder;
 const Lang = imports.lang;
@@ -12,11 +14,86 @@ const FolderModel = imports.folderModel;
 
 const _FOLDER_BUTTON_SIZE = 96;
 
+const FolderNameBubble = new Lang.Class({
+    Name: 'FolderNameBubble',
+    Extends: PLib.BubbleWindow,
+
+    _init : function() {
+        this.parent();
+
+        let grid = new Gtk.Grid();
+
+        // entry and "add" button...
+
+        this._entry = new Gtk.Entry({
+            'placeholder-text': 'Enter the name of the folder',
+            'width-chars': 30,
+            hexpand: true,
+            halign: Gtk.Align.FILL,
+            vexpand: true,
+            valign: Gtk.Align.FILL,
+            'no-show-all': true });
+        this._addButton = new Endless.ActionButton({
+            name: 'add',
+            'icon-id': 'list-add-symbolic',
+            hexpand: true,
+            halign: Gtk.Align.FILL,
+            vexpand: true,
+            valign: Gtk.Align.CENTER,
+            'no-show-all': true });
+
+        // ... which will be replaced by "done" label and icon
+
+        this._doneLabel = new Gtk.Label({
+            label: 'The new folder has been added',
+            hexpand: true,
+            halign: Gtk.Align.CENTER,
+            vexpand: true,
+            valign: Gtk.Align.CENTER,
+            'no-show-all': true  });
+        this._addedIcon = new Gtk.Image({
+            'icon-name': 'gtk-ok',
+            'icon-size': Gtk.IconSize.BUTTON,
+            hexpand: true,
+            halign: Gtk.Align.CENTER,
+            vexpand: true,
+            valign: Gtk.Align.CENTER,
+            'no-show-all': true
+        });
+
+        grid.attach(this._entry, 0, 0, 1, 1);
+        grid.attach(this._addButton, 1, 0, 1, 1);
+
+        grid.attach(this._doneLabel, 0, 1, 1, 1);
+        grid.attach(this._addedIcon, 1, 1, 1, 1);
+
+        grid.show();
+        this.add(grid);
+        this.setEntryVisible(true);
+    },
+
+    setEntryVisible : function(visible) {
+        if (visible) {
+            this._doneLabel.hide();
+            this._addedIcon.hide();
+
+            this._entry.show();
+            this._addButton.show()
+        } else {
+            this._entry.hide();
+            this._addButton.hide()
+
+            this._doneLabel.show();
+            this._addedIcon.show();
+        }
+    }
+});
+
 const FolderIconButton = new Lang.Class({
     Name: 'FolderIconButton',
     Extends: Gtk.ToggleButton,
 
-    _init : function(iconName, folderModel) {
+    _init : function(iconName) {
         this.parent({
             active: false,
             'draw-indicator': false,
@@ -27,42 +104,6 @@ const FolderIconButton = new Lang.Class({
             image: new Gtk.Image({'icon-name': iconName}) });
 
         this._iconName = iconName;
-        this._folderModel = folderModel;
-    },
-
-    _show_name_bubble: function() {
-        let dialog = new Gtk.Dialog({
-            modal: true,
-            'transient-for': this.get_toplevel(),
-            'focus-on-map': false,
-            title: '',
-            resizable: false });
-
-        let grid = new Gtk.Grid({orientation: Gtk.Orientation.HORIZONTAL});
-        let entry = new Gtk.Entry({
-            'placeholder-text': 'Enter the name of the folder',
-            'width-chars': 30 });
-        let addButton = new Endless.ActionButton({
-            name: 'add',
-            'icon-id': 'list-add-symbolic' });
-
-        grid.add(entry);
-        grid.add(addButton);
-        dialog.get_content_area().add(grid);
-
-        addButton.connect('clicked', Lang.bind(this, function(button) {
-            this._folderModel.createFolder(entry.get_text(), this._iconName);
-
-            dialog.destroy();
-            this.set_active(false);
-
-            // hide the app store window
-            this.get_toplevel().emit('delete-event', null);
-        }));
-
-        dialog.show_all();
-        dialog.run();
-        dialog.destroy();
     }
 });
 
@@ -72,14 +113,30 @@ const FolderIconGrid = new Lang.Class({
 
     _on_button_toggled: function(toggleButton) {
         if (toggleButton.get_active()) {
-            for (let i = 0; i < this._toggleButtons.length; i++) {
-                let button = this._toggleButtons[i];
+            let oldToggle = this._activeToggle;
+            this._activeToggle = toggleButton;
 
-                if (button != toggleButton && button.get_active()) {
-                    button.set_active(false);
-                }
+            print('this._activeToggle = '+toggleButton._iconName);
+
+            // unset the previous one
+            if (oldToggle && oldToggle != toggleButton && oldToggle.get_active()) {
+                oldToggle.set_active(false);
             }
-            toggleButton._show_name_bubble();
+
+            // prepare the bubble window for showing...
+            this._bubble.setEntryVisible(true);
+            this._bubble._entry.set_text('');
+            this._bubble._iconName = toggleButton._iconName;
+
+            // ... and now we show the bubble and grab the input
+            this._bubble.popup(toggleButton.get_window(),
+                               toggleButton.get_allocation(),
+                               Gtk.PositionType.BOTTOM);
+
+            let display = Gdk.Display.get_default();
+            let devicemgr = display.get_device_manager();
+            let device = devicemgr.get_client_pointer();
+            this._bubble.grab(device, Gdk.CURRENT_TIME);
         }
     },
 
@@ -90,7 +147,7 @@ const FolderIconGrid = new Lang.Class({
         let columns = Math.max(1, Math.floor(allocatedWidth / _FOLDER_BUTTON_SIZE));
 
         for (let i = 0; i < this._iconList.length; i++) {
-            let button = new FolderIconButton(this._iconList[i], this._folderModel);
+            let button = new FolderIconButton(this._iconList[i]);
 
             button.connect('toggled', Lang.bind(this, this._on_button_toggled));
 
@@ -126,6 +183,24 @@ const FolderIconGrid = new Lang.Class({
 
         this._folderModel = folderModel;
         this._get_icons();
+        this._activeToggle = null;
+
+        // bubble window
+
+        this._bubble = new FolderNameBubble();
+
+        this._bubble._addButton.connect('clicked',
+                                        Lang.bind(this, function(button) {
+            this._folderModel.createFolder(this._bubble._entry.get_text(),
+                                           this._bubble._iconName);
+
+            this._bubble.setEntryVisible(false);
+        }));
+
+        this._bubble.connect('hide', Lang.bind(this, function() {
+            this._activeToggle.set_active(false);
+            this._activeToggle = null;
+        }));
     }
 });
 
