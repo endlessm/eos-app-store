@@ -226,15 +226,14 @@ const WeblinkListBoxRow = new Lang.Class({
 
     _init: function(model, weblinkId) {
         this.parent();
+        this._i=0;
 
         this._model = model;
         this._weblinkId = weblinkId;
 
         this.initTemplate({ templateRoot: '_mainBox', bindChildren: true, connectSignals: true, });
         this.add(this._mainBox);
-        this._mainBox.show();
-
-        this._stateButton.connect('clicked', Lang.bind(this, this._onStateButtonClicked));
+        this._mainBox.show_all();
     },
 
     get weblinkId() {
@@ -274,35 +273,23 @@ const WeblinkListBoxRow = new Lang.Class({
     },
 
     set weblinkState(state) {
-        this._weblinkState = state;
-        this._stateButton.hide();
+        switch (state) {
+        case EosAppStorePrivate.AppState.INSTALLED:
+            this._stateButton.sensitive = false;
+            break;
 
-        switch (this._weblinkState) {
-            case EosAppStorePrivate.AppState.INSTALLED:
-                this._stateButton.set_label(_("UNINSTALL"));
-                this._stateButton.show();
-                break;
+        case EosAppStorePrivate.AppState.UNINSTALLED:
+            this._stateButton.sensitive = true;
+            break;
 
-            case EosAppStorePrivate.AppState.UNINSTALLED:
-                this._stateButton.set_label(_("INSTALL"));
-                this._stateButton.show();
-                break;
-
-            default:
-                break;
+        default:
+            break;
         }
+        this._stateButton.show();
     },
 
     _onStateButtonClicked: function() {
-        switch (this._weblinkState) {
-            case EosAppStorePrivate.AppState.INSTALLED:
-                this._model.uninstall(this._weblinkId);
-                break;
-
-            case EosAppStorePrivate.AppState.UNINSTALLED:
-                this._model.install(this._weblinkId);
-                break;
-        }
+        this._model.install(this._weblinkId);
     }
 });
 Builder.bindTemplateChildren(WeblinkListBoxRow.prototype);
@@ -313,7 +300,7 @@ const WeblinkListBox = new Lang.Class({
 
     _init: function(model) {
         this.parent({ selection_mode: Gtk.SelectionMode.NONE });
-        
+        this.get_style_context().add_class("weblink-listbox");
         this._model = model;
     }
 });

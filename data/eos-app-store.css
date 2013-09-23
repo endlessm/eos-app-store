@@ -119,6 +119,46 @@
   background-color: transparent;
 }
 
+.weblink-row {
+  background: rgba(0,0,0,0.25);
+  border-radius: 3px;
+  box-shadow: 0px 2px 2px 0px rgba(0,0,0,0.3);
+}
+
+.weblink-listbox {
+  padding: 15px;
+}
+
+.weblink-listbox:hover {
+  background: rgba(249,248,248,0.95);
+  box-shadow: 0px 0px 12px 0px rgba(0,255,255,0.6);
+}
+
+.weblink-row GtkButton {
+  background-image: url("btn_add-website_disabled.png");
+  background-size: 49px;
+  border: 1px;
+}
+
+
+.weblink-row GtkButton:hover {
+  background-image: url("btn_add-website_hover.png");
+}
+
+.weblink-row GtkButton:active,
+.weblink-row GtkButton:hover:active {
+  background-image: url("btn_add-website_pressed.png");
+}
+
+.weblink-row GtkButton:insensitive {
+  background-image: url("icon_installed_43x43.png");
+  background-color: transparent;
+}
+
+.weblink-row GtkImage {
+  background: rgba(0,0,0,0.12);
+}
+
 .folder-frame GtkToggleButton {
   border-radius: 4px;
   border: none;
