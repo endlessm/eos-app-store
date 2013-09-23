@@ -123,12 +123,69 @@ const AppListBoxRow = new Lang.Class({
 });
 Builder.bindTemplateChildren(AppListBoxRow.prototype);
 
+const AppCategoryButton = new Lang.Class({
+    Name: 'AppCategoryButton',
+    Extends: Gtk.Button,
+    Properties: { 'category': GObject.ParamSpec.string('category',
+                                                       'Category',
+                                                       'The category name',
+                                                       GObject.ParamFlags.READABLE |
+                                                       GObject.ParamFlags.WRITABLE |
+                                                       GObject.ParamFlags.CONSTRUCT,
+                                                       '') },
+    _init: function(params) {
+        this._category = '';
+        this.parent(params);
+    },
+
+    get category() {
+        return this._category;
+    },
+
+    set category(c) {
+        if (this._category == c) {
+            return;
+        }
+
+        this._category = c;
+        this.notify('category');
+    }
+});
+
+
 const AppFrame = new Lang.Class({
     Name: 'AppFrame',
     Extends: Gtk.Frame,
 
     _init: function() {
         this.parent();
+
+        this._categories = [
+            {
+                name: 'featured',
+                widget: null,
+                label: _("Featured"),
+                id: EosAppStorePrivate.AppCategory.FEATURED,
+            },
+            {
+                name: 'education',
+                widget: null,
+                label: _("Education"),
+                id: EosAppStorePrivate.AppCategory.EDUCATION,
+            },
+            {
+                name: 'leisure',
+                widget: null,
+                label: _("Leisure"),
+                id: EosAppStorePrivate.AppCategory.LEISURE,
+            },
+            {
+                name: 'utilities',
+                widget: null,
+                label: _("Utilities"),
+                id: EosAppStorePrivate.AppCategory.UTILITIES,
+            },
+        ];
 
         // initialize the applications model
         this._model = new AppListModel.AppList();
@@ -160,62 +217,44 @@ const AppFrame = new Lang.Class({
         this._mainBox.add(this._stack);
         this._stack.show();
 
+        this._model.connect('changed', Lang.bind(this, this._populateCategories));
         this._populateCategories();
     },
 
     _populateCategories: function() {
-        let categories = [
-            {
-                name: 'featured',
-                button: null,
-                grid: null,
-                label: _("Featured"),
-                id: EosAppStorePrivate.AppCategory.FEATURED,
-            },
-            {
-                name: 'education',
-                button: null,
-                grid: null,
-                label: _("Education"),
-                id: EosAppStorePrivate.AppCategory.EDUCATION,
-            },
-            {
-                name: 'leisure',
-                button: null,
-                grid: null,
-                label: _("Leisure"),
-                id: EosAppStorePrivate.AppCategory.LEISURE,
-            },
-            {
-                name: 'utilities',
-                button: null,
-                grid: null,
-                label: _("Utilities"),
-                id: EosAppStorePrivate.AppCategory.UTILITIES,
-            },
-        ];
+        for (let c in this._categories) {
+            let category = this._categories[c];
 
-        this._categories = categories;
-
-        for (let c in categories) {
-            categories[c].button = new Gtk.Button({ label: categories[c].label, });
-            categories[c].button.connect('clicked', Lang.bind(this, this._onCategoryClicked));
-            categories[c].button.show();
-            this._categoriesBox.add(categories[c].button);
-
-            let scrollWindow = new Gtk.ScrolledWindow({ hscrollbar_policy: Gtk.PolicyType.NEVER,
-                                                        vscrollbar_policy: Gtk.PolicyType.AUTOMATIC });
-            this._stack.add_named(scrollWindow, categories[c].name);
-
-            categories[c].grid = new Endless.FlexyGrid();
-            scrollWindow.add_with_viewport(categories[c].grid);
-
-            let cells = EosAppStorePrivate.app_load_content(categories[c].grid, categories[c].id);
-            for (let cell in cells) {
-                categories[c].grid.add(cell);
+            if (!category.button) {
+                category.button = new AppCategoryButton({ label: category.label,
+                                                          category: category.name });
+                category.button.connect('clicked', Lang.bind(this, this._onCategoryClicked));
+                category.button.show();
+                this._categoriesBox.add(category.button);
             }
 
-            categories[c].grid.connect('cell-activated', Lang.bind(this, this._onCellActivated));
+            let scrollWindow;
+
+            if (!category.widget) {
+                scrollWindow = new Gtk.ScrolledWindow({ hscrollbar_policy: Gtk.PolicyType.NEVER,
+                                                        vscrollbar_policy: Gtk.PolicyType.AUTOMATIC });
+                this._stack.add_named(scrollWindow, category.name);
+                category.widget = scrollWindow;
+            } else {
+                scrollWindow = category.widget;
+                let child = scrollWindow.get_child();
+                child.destroy();
+            }
+
+            let grid = new Endless.FlexyGrid();
+            scrollWindow.add_with_viewport(grid);
+
+            let cells = EosAppStorePrivate.app_load_content(grid, category.id);
+            for (let cell in cells) {
+                grid.add(cell);
+            }
+
+            grid.connect('cell-activated', Lang.bind(this, this._onCellActivated));
 
             scrollWindow.show_all();
         }
@@ -230,22 +269,7 @@ const AppFrame = new Lang.Class({
     },
 
     _onCategoryClicked: function(button) {
-        let category = null;
-
-        for (let c in this._categories) {
-            if (this._categories[c].button == button) {
-                category = this._categories[c];
-                break;
-            }
-        }
-
-        if (!category) {
-            return;
-        }
-
-        this._stack.set_visible_child_name(category.name);
-    },
-
-    update: function() {
-    },
+        let category = button.category;
+        this._stack.set_visible_child_name(category);
+    }
 });
