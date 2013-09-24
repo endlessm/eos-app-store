@@ -134,28 +134,28 @@
   box-shadow: 0px 0px 12px 0px rgba(0,255,255,0.6);
 }
 
-.weblink-row GtkButton {
+.weblink-row .state-button {
   background-image: url("btn_add-website_disabled.png");
   background-size: 49px;
   border: 1px;
 }
 
 
-.weblink-row GtkButton:hover {
+.weblink-row .state-button:hover {
   background-image: url("btn_add-website_hover.png");
 }
 
-.weblink-row GtkButton:active,
-.weblink-row GtkButton:hover:active {
+.weblink-row .state-button:active,
+.weblink-row .state-button:hover:active {
   background-image: url("btn_add-website_pressed.png");
 }
 
-.weblink-row GtkButton:insensitive {
+.weblink-row .state-button:insensitive {
   background-image: url("icon_installed_43x43.png");
   background-color: transparent;
 }
 
-.weblink-row GtkImage {
+.weblink-row .icon {
   background: rgba(0,0,0,0.12);
 }
 
@@ -169,6 +169,7 @@
   font: regular;
   color: lightgray;
 }
+
 .weblink-row .url {
   font: Sans;
   color: orange;

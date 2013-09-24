@@ -221,6 +221,7 @@ const WeblinkListBoxRow = new Lang.Class({
         '_nameLabel',
         '_descriptionLabel',
         '_urlLabel',
+        '_urlIndicator',
         '_stateButton'
     ],
 
@@ -290,6 +291,20 @@ const WeblinkListBoxRow = new Lang.Class({
 
     _onStateButtonClicked: function() {
         this._model.install(this._weblinkId);
+    },
+
+    _onUrlClicked: function(widget, event) {
+        Gtk.show_uri(null, this._urlLabel.get_text(), event.time, null);
+        // hide the appstore to see the browser
+        this.get_toplevel().emit('delete-event', null);
+    },
+
+    _onStartHoveringLabel: function() {
+        this._urlIndicator.visible = true;
+    },
+
+    _onStopHoveringLabel: function() {
+        this._urlIndicator.visible = false;
     }
 });
 Builder.bindTemplateChildren(WeblinkListBoxRow.prototype);
