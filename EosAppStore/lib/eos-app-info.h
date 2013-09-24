@@ -4,6 +4,7 @@
 #include <glib-object.h>
 #include <gtk/gtk.h>
 #include <json-glib/json-glib.h>
+#include "eos-app-enums.h"
 
 G_BEGIN_DECLS
 
@@ -21,6 +22,13 @@ const char *    eos_app_info_get_title          (const EosAppInfo *info);
 const char *    eos_app_info_get_subtitle       (const EosAppInfo *info);
 const char *    eos_app_info_get_desktop_id     (const EosAppInfo *info);
 const char *    eos_app_info_get_description    (const EosAppInfo *info);
+
+gboolean        eos_app_info_is_featured        (const EosAppInfo *info);
+gboolean        eos_app_info_is_offline         (const EosAppInfo *info);
+EosAppCategory  eos_app_info_get_category       (const EosAppInfo *info);
+
+char *          eos_app_info_get_square_img     (const EosAppInfo *info);
+char *          eos_app_info_get_featured_img   (const EosAppInfo *info);
 
 GtkWidget *     eos_app_info_create_cell        (const EosAppInfo *info);
 

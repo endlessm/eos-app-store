@@ -2,7 +2,12 @@
 
 #include "eos-app-info.h"
 
+#include <locale.h>
+#include <glib/gi18n.h>
+#include <gdk-pixbuf/gdk-pixbuf.h>
 #include <endless/endless.h>
+
+#include "eos-app-utils.h"
 
 /*
  * EosAppCell
@@ -26,6 +31,8 @@ typedef struct {
   GtkWidget *subtitle_label;
 
   EosAppInfo *info;
+
+  GdkPixbuf *image;
 } EosAppCell;
 
 typedef EosFlexyGridCellClass EosAppCellClass;
@@ -35,33 +42,6 @@ static GParamSpec *eos_app_cell_props[NUM_PROPS] = { NULL, };
 static GType eos_app_cell_get_type (void) G_GNUC_CONST;
 
 G_DEFINE_TYPE (EosAppCell, eos_app_cell, EOS_TYPE_FLEXY_GRID_CELL)
-
-static void
-eos_app_cell_init (EosAppCell *self)
-{
-  GtkWidget *frame = gtk_frame_new (NULL);
-  gtk_container_add (GTK_CONTAINER (self), frame);
-  gtk_widget_show (frame);
-
-  GtkWidget *box = gtk_box_new (GTK_ORIENTATION_VERTICAL, 2);
-  gtk_widget_set_valign (box, GTK_ALIGN_END);
-  gtk_container_add (GTK_CONTAINER (frame), box);
-  gtk_widget_show (box);
-
-  self->title_label = gtk_label_new ("");
-  gtk_label_set_line_wrap (GTK_LABEL (self->title_label), TRUE);
-  gtk_widget_set_halign (self->title_label, GTK_ALIGN_START);
-  gtk_container_add (GTK_CONTAINER (box), self->title_label);
-  gtk_widget_show (self->title_label);
-
-  self->subtitle_label = gtk_label_new ("");
-  gtk_label_set_line_wrap (GTK_LABEL (self->subtitle_label), TRUE);
-  gtk_label_set_ellipsize (GTK_LABEL (self->subtitle_label), PANGO_ELLIPSIZE_END);
-  gtk_label_set_max_width_chars (GTK_LABEL (self->subtitle_label), 50);
-  gtk_widget_set_halign (self->subtitle_label, GTK_ALIGN_START);
-  gtk_container_add (GTK_CONTAINER (box), self->subtitle_label);
-  gtk_widget_show (self->subtitle_label);
-}
 
 static void
 eos_app_cell_get_property (GObject    *gobject,
@@ -118,8 +98,9 @@ eos_app_cell_set_property (GObject      *gobject,
       break;
 
     case PROP_APP_INFO:
-      eos_app_info_unref (self->info);
+      g_assert (self->info == NULL);
       self->info = eos_app_info_ref (g_value_get_boxed (value));
+      g_assert (self->info != NULL);
       break;
 
     default:
@@ -132,20 +113,84 @@ eos_app_cell_finalize (GObject *gobject)
 {
   EosAppCell *self = (EosAppCell *) gobject;
 
+  g_clear_object (&self->image);
   g_free (self->desktop_id);
   eos_app_info_unref (self->info);
 
   G_OBJECT_CLASS (eos_app_cell_parent_class)->finalize (gobject);
 }
 
+static gboolean
+eos_app_cell_draw (GtkWidget *widget,
+                   cairo_t   *cr)
+{
+  EosAppCell *self = (EosAppCell *) widget;
+  GtkAllocation allocation;
+  GdkPixbuf *pixbuf;
+  GError *error;
+  char *path;
+
+  GTK_WIDGET_CLASS (eos_app_cell_parent_class)->draw (widget, cr);
+
+  if (self->info == NULL)
+    {
+      g_critical ("No EosAppInfo found for cell %p", widget);
+      return FALSE;
+    }
+
+  if (self->image != NULL)
+    {
+      gdk_cairo_set_source_pixbuf (cr, self->image, 0.0, 0.0);
+      cairo_paint (cr);
+      return FALSE;
+    }
+
+  gtk_widget_get_allocation (widget, &allocation);
+
+  if (eos_app_info_is_featured (self->info))
+    path = eos_app_info_get_featured_img (self->info);
+  else
+    path = eos_app_info_get_square_img (self->info);
+
+  if (path == NULL)
+    return FALSE;
+
+  error = NULL;
+  self->image = gdk_pixbuf_new_from_file_at_size (path,
+                                                  allocation.width,
+                                                  allocation.height,
+                                                  &error);
+  if (self->image != NULL)
+    {
+      gdk_cairo_set_source_pixbuf (cr, self->image, 0.0, 0.0);
+      cairo_paint (cr);
+    }
+  else
+    {
+      if (error != NULL)
+        {
+          g_warning ("Unable to load image at path '%s': %s",
+                     path, error->message);
+          g_error_free (error);
+        }
+    }
+
+  g_free (path);
+
+  return FALSE;
+}
+
 static void
 eos_app_cell_class_init (EosAppCellClass *klass)
 {
   GObjectClass *oclass = G_OBJECT_CLASS (klass);
+  GtkWidgetClass *widget_class = GTK_WIDGET_CLASS (klass);
 
   oclass->set_property = eos_app_cell_set_property;
   oclass->get_property = eos_app_cell_get_property;
   oclass->finalize = eos_app_cell_finalize;
+
+  widget_class->draw = eos_app_cell_draw;
 
   eos_app_cell_props[PROP_DESKTOP_ID] =
     g_param_spec_string ("desktop-id",
@@ -178,6 +223,36 @@ eos_app_cell_class_init (EosAppCellClass *klass)
   g_object_class_install_properties (oclass, NUM_PROPS, eos_app_cell_props);
 }
 
+static void
+eos_app_cell_init (EosAppCell *self)
+{
+  gtk_widget_set_hexpand (GTK_WIDGET (self), TRUE);
+  gtk_widget_set_vexpand (GTK_WIDGET (self), TRUE);
+
+  GtkWidget *frame = gtk_frame_new (NULL);
+  gtk_container_add (GTK_CONTAINER (self), frame);
+  gtk_widget_show (frame);
+
+  GtkWidget *box = gtk_box_new (GTK_ORIENTATION_VERTICAL, 2);
+  gtk_widget_set_valign (box, GTK_ALIGN_END);
+  gtk_container_add (GTK_CONTAINER (frame), box);
+  gtk_widget_show (box);
+
+  self->title_label = gtk_label_new ("");
+  gtk_label_set_line_wrap (GTK_LABEL (self->title_label), TRUE);
+  gtk_widget_set_halign (self->title_label, GTK_ALIGN_START);
+  gtk_container_add (GTK_CONTAINER (box), self->title_label);
+  gtk_widget_show (self->title_label);
+
+  self->subtitle_label = gtk_label_new ("");
+  gtk_label_set_line_wrap (GTK_LABEL (self->subtitle_label), TRUE);
+  gtk_label_set_ellipsize (GTK_LABEL (self->subtitle_label), PANGO_ELLIPSIZE_END);
+  gtk_label_set_max_width_chars (GTK_LABEL (self->subtitle_label), 50);
+  gtk_widget_set_halign (self->subtitle_label, GTK_ALIGN_START);
+  gtk_container_add (GTK_CONTAINER (box), self->subtitle_label);
+  gtk_widget_show (self->subtitle_label);
+}
+
 /*
  * EosAppInfo
  */
@@ -185,13 +260,21 @@ struct _EosAppInfo
 {
   volatile int ref_count;
 
+  char *desktop_id;
+
   char *title;
   char *subtitle;
   char *description;
-  char *desktop_id;
-  char *image_url;
+
+  char *square_img;
+  char *featured_img;
 
   EosFlexyShape shape;
+
+  EosAppCategory category;
+
+  guint is_featured : 1;
+  guint is_offline  : 1;
 };
 
 G_DEFINE_BOXED_TYPE (EosAppInfo, eos_app_info, eos_app_info_ref, eos_app_info_unref)
@@ -199,7 +282,7 @@ G_DEFINE_BOXED_TYPE (EosAppInfo, eos_app_info, eos_app_info_ref, eos_app_info_un
 EosAppInfo *
 eos_app_info_new (void)
 {
-  EosAppInfo *info = g_slice_new (EosAppInfo);
+  EosAppInfo *info = g_slice_new0 (EosAppInfo);
 
   info->shape = EOS_FLEXY_SHAPE_SMALL;
   info->ref_count = 1;
@@ -210,9 +293,12 @@ eos_app_info_new (void)
 EosAppInfo *
 eos_app_info_ref (EosAppInfo *info)
 {
-  g_return_val_if_fail (info != NULL, NULL);
+  if (info == NULL)
+    return NULL;
 
-  g_atomic_int_add (&info->ref_count, 1);
+  g_atomic_int_inc (&(info->ref_count));
+
+  return info;
 }
 
 void
@@ -221,13 +307,14 @@ eos_app_info_unref (EosAppInfo *info)
   if (info == NULL)
     return;
 
-  if (g_atomic_int_dec_and_test (&info->ref_count))
+  if (g_atomic_int_dec_and_test (&(info->ref_count)))
     {
+      g_free (info->desktop_id);
       g_free (info->title);
       g_free (info->subtitle);
       g_free (info->description);
-      g_free (info->desktop_id);
-      g_free (info->image_url);
+      g_free (info->square_img);
+      g_free (info->featured_img);
 
       g_slice_free (EosAppInfo, info);
     }
@@ -265,6 +352,83 @@ eos_app_info_get_description (const EosAppInfo *info)
 {
   if (info != NULL)
     return info->description;
+
+  return "";
+}
+
+gboolean
+eos_app_info_is_featured (const EosAppInfo *info)
+{
+  if (info != NULL)
+    return info->is_featured;
+
+  return FALSE;
+}
+
+gboolean
+eos_app_info_is_offline (const EosAppInfo *info)
+{
+  if (info != NULL)
+    return info->is_offline;
+
+  return FALSE;
+}
+
+EosAppCategory
+eos_app_info_get_category (const EosAppInfo *info)
+{
+  if (info != NULL)
+    return info->category;
+
+  return EOS_APP_CATEGORY_UTILITIES;
+}
+
+/**
+ * eos_app_info_get_square_img:
+ * @info: ...
+ *
+ * ...
+ *
+ * Returns: (transfer full): ...
+ */
+char *
+eos_app_info_get_square_img (const EosAppInfo *info)
+{
+  char *path, *res;
+
+  if (info == NULL || info->square_img == NULL)
+    return NULL;
+
+  path = eos_app_get_content_dir ();
+  res = g_build_filename (path, "resources", "thumbnails", info->square_img, NULL);
+
+  g_free (path);
+
+  return res;
+}
+
+/**
+ * eos_app_info_get_featured_img:
+ * @info: ...
+ *
+ * ...
+ *
+ * Returns: (transfer full): ...
+ */
+char *
+eos_app_info_get_featured_img (const EosAppInfo *info)
+{
+  char *path, *res;
+
+  if (info == NULL || info->featured_img == NULL)
+    return NULL;
+
+  path = eos_app_get_content_dir ();
+  res = g_build_filename (path, "resources", "images", info->featured_img, NULL);
+
+  g_free (path);
+
+  return res;
 }
 
 /**
@@ -278,8 +442,10 @@ eos_app_info_get_description (const EosAppInfo *info)
 GtkWidget *
 eos_app_info_create_cell (const EosAppInfo *info)
 {
-  if (info != NULL)
+  if (info == NULL)
     return NULL;
+
+  g_print (G_STRLOC ": Creating cell for info '%s'[%p]\n", info->desktop_id, info);
 
   GtkWidget *res = g_object_new (eos_app_cell_get_type (),
                                  "shape", info->shape,
@@ -290,6 +456,36 @@ eos_app_info_create_cell (const EosAppInfo *info)
                                  NULL);
 
   return res;
+}
+
+/* Keep in the same order as the EosAppCategory enumeration */
+static const struct {
+  const EosAppCategory category;
+  const char *id;
+} categories[] = {
+  /* Translators: use the same string used to install the app store content JSON */
+  { EOS_APP_CATEGORY_EDUCATION, N_("Education") },
+  { EOS_APP_CATEGORY_LEISURE,   N_("Leisure") },
+  { EOS_APP_CATEGORY_UTILITIES, N_("Utilities") },
+};
+
+static const guint n_categories = G_N_ELEMENTS (categories);
+
+static EosAppCategory
+get_category_from_id (const char *p)
+{
+  guint i;
+
+  if (p == NULL || *p == '\0')
+    return EOS_APP_CATEGORY_UTILITIES;
+
+  for (i = 0; i < n_categories; i++)
+    {
+      if (strcmp (categories[i].id, p) == 0)
+        return categories[i].category;
+    }
+
+  return EOS_APP_CATEGORY_UTILITIES;
 }
 
 static EosFlexyShape
@@ -345,15 +541,43 @@ eos_app_info_create_from_json (JsonNode *node)
   else
     info->subtitle = g_strdup ("");
 
-  if (json_object_has_member (obj, "display_shape"))
+  if (json_object_has_member (obj, "displayShape"))
     {
-      const char *shape = json_object_get_string_member (obj, "display_shape");
+      const char *shape = json_object_get_string_member (obj, "displayShape");
 
       info->shape = get_shape_from_id (shape); 
     }
   else
     info->shape = EOS_FLEXY_SHAPE_SMALL;
 
+  if (json_object_has_member (obj, "square_img"))
+    info->square_img = json_node_dup_string (json_object_get_member (obj, "square_img"));
+  else
+    info->square_img = NULL;
+
+  if (json_object_has_member (obj, "featured_img"))
+    info->featured_img = json_node_dup_string (json_object_get_member (obj, "featured_img"));
+  else
+    info->featured_img = NULL;
+
+  if (json_object_has_member (obj, "is_featured"))
+    info->is_featured = TRUE;
+  else
+    info->is_featured = FALSE;
+
+  if (json_object_has_member (obj, "is_offline"))
+    info->is_offline = TRUE;
+  else
+    info->is_offline = FALSE;
+
+  if (json_object_has_member (obj, "category"))
+    {
+      const char *category = json_object_get_string_member (obj, "category");
+
+      info->category = get_category_from_id (category);
+    }
+  else
+    info->category = EOS_APP_CATEGORY_UTILITIES;
+
   return info;
 }
-

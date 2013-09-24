@@ -11,37 +11,15 @@
 
 #define APP_STORE_CONTENT_DIR   "application-store"
 
-/* Keep in the same order as the EosAppCategory enumeration */
-static const struct {
-  const EosAppCategory category;
-  const char *directory;
-} categories[] = {
-  /* Translators: use the same string used to install the app store content JSON */
-  { EOS_APP_CATEGORY_FEATURED,  N_("Featured") },
-  { EOS_APP_CATEGORY_EDUCATION, N_("Education") },
-  { EOS_APP_CATEGORY_LEISURE,   N_("Leisure") },
-  { EOS_APP_CATEGORY_UTILITIES, N_("Utilities") },
-};
-
-static const char *
-get_category_dir (EosAppCategory category)
-{
-  g_assert (category >= EOS_APP_CATEGORY_FEATURED &&
-            category <= EOS_APP_CATEGORY_UTILITIES);
-
-  return gettext (categories[category].directory);
-}
-
 /**
  * eos_app_get_content_dir:
  *
- * Retrieves the directory with the content for the given category, taking into account
- * the system locale.
+ * ...
  *
- * Returns: (transfer full):
+ * Returns: (transfer full): ...
  */
 char *
-eos_app_get_content_dir (EosAppCategory category)
+eos_app_get_content_dir (void)
 {
   char *locale = g_strdup (setlocale (LC_MESSAGES, NULL));
 
@@ -53,7 +31,7 @@ eos_app_get_content_dir (EosAppCategory category)
   char *res = g_build_filename (DATADIR,
                                 APP_STORE_CONTENT_DIR,
                                 locale,
-                                get_category_dir (category),
+                                "apps",
                                 NULL);
   g_free (locale);
 
@@ -68,7 +46,7 @@ eos_app_load_content (EosFlexyGrid *grid,
   g_return_if_fail (category >= EOS_APP_CATEGORY_FEATURED &&
                     category <= EOS_APP_CATEGORY_UTILITIES);
 
-  char *content_path = eos_app_get_content_dir (category);
+  char *content_path = eos_app_get_content_dir ();
   g_assert (content_path != NULL);
 
   char *content_file = g_build_filename (content_path, "content.json", NULL);
@@ -98,9 +76,29 @@ eos_app_load_content (EosFlexyGrid *grid,
       if (info == NULL)
         continue;
 
+      if (category != EOS_APP_CATEGORY_FEATURED)
+        {
+          if (category != eos_app_info_get_category (info))
+            {
+              eos_app_info_unref (info);
+              continue;
+            }
+        }
+      else
+        {
+          if (!eos_app_info_is_featured (info))
+            {
+              eos_app_info_unref (info);
+              continue;
+            }
+        }
+
       GtkWidget *cell = eos_app_info_create_cell (info);
       if (cell == NULL)
-        continue;
+        {
+          eos_app_info_unref (info);
+          continue;
+        }
 
       gtk_container_add (GTK_CONTAINER (grid), cell);
       gtk_widget_set_hexpand (cell, TRUE);
