@@ -50,11 +50,6 @@ AC_SUBST(GLIB_COMPILE_RESOURCES)
 
 AC_CACHE_SAVE
 
-AM_GNU_GETTEXT([external])
-AM_GNU_GETTEXT_VERSION([0.17])
-
-AC_CACHE_SAVE
-
 AC_CONFIG_FILES([
         Makefile
         content/Makefile
