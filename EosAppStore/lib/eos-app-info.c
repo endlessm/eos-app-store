@@ -564,9 +564,8 @@ eos_app_info_create_from_json (JsonNode *node)
   else
     info->square_img = NULL;
 
-  /* FIXME: featured */
-  if (json_object_has_member (obj, "fetured_img"))
-    info->featured_img = json_node_dup_string (json_object_get_member (obj, "fetured_img"));
+  if (json_object_has_member (obj, "featured_img"))
+    info->featured_img = json_node_dup_string (json_object_get_member (obj, "featured_img"));
   else
     info->featured_img = NULL;
 
