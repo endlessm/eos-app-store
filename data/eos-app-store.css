@@ -159,6 +159,21 @@
   background: rgba(0,0,0,0.12);
 }
 
+.weblink-row .title {
+  font: Sans;
+  font-weight: bold;
+  color: white;
+}
+
+.weblink-row .description {
+  font: regular;
+  color: lightgray;
+}
+.weblink-row .url {
+  font: Sans;
+  color: orange;
+}
+
 .folder-frame GtkToggleButton {
   border-radius: 4px;
   border: none;

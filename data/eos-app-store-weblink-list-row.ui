@@ -35,18 +35,24 @@
               <object class="GtkBox" id="box2">
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
+                <property name="margin_left">9</property>
+                <property name="margin_top">9</property>
                 <property name="orientation">vertical</property>
                 <child>
                   <object class="GtkLabel" id="_nameLabel">
                     <property name="visible">True</property>
                     <property name="can_focus">False</property>
+                    <property name="valign">start</property>
                     <property name="xalign">0</property>
                     <property name="label" translatable="yes">NAME</property>
                     <property name="ellipsize">end</property>
-                    <property name="width_chars">45</property>
+                    <property name="single_line_mode">True</property>
+                    <style>
+                      <class name="title"/>
+                    </style>
                   </object>
                   <packing>
-                    <property name="expand">True</property>
+                    <property name="expand">False</property>
                     <property name="fill">True</property>
                     <property name="position">0</property>
                   </packing>
@@ -55,13 +61,17 @@
                   <object class="GtkLabel" id="_descriptionLabel">
                     <property name="visible">True</property>
                     <property name="can_focus">False</property>
-                    <property name="halign">start</property>
+                    <property name="vexpand">True</property>
                     <property name="xalign">0</property>
                     <property name="yalign">0</property>
                     <property name="label" translatable="yes">DESCRIPTION</property>
-                    <property name="ellipsize">end</property>
+                    <property name="wrap">True</property>
+                    <property name="wrap_mode">word-char</property>
                     <property name="width_chars">45</property>
                     <property name="track_visited_links">False</property>
+                    <style>
+                      <class name="description"/>
+                    </style>
                   </object>
                   <packing>
                     <property name="expand">True</property>
@@ -73,13 +83,19 @@
                   <object class="GtkLabel" id="_urlLabel">
                     <property name="visible">True</property>
                     <property name="can_focus">False</property>
+                    <property name="valign">end</property>
                     <property name="xalign">0</property>
                     <property name="yalign">0.4699999988079071</property>
                     <property name="label" translatable="yes">URL</property>
+                    <property name="ellipsize">end</property>
                     <property name="width_chars">45</property>
+                    <property name="single_line_mode">True</property>
+                    <style>
+                      <class name="url"/>
+                    </style>
                   </object>
                   <packing>
-                    <property name="expand">True</property>
+                    <property name="expand">False</property>
                     <property name="fill">True</property>
                     <property name="position">2</property>
                   </packing>
