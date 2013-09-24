@@ -140,8 +140,11 @@ eos_app_cell_draw (GtkWidget *widget,
 
   if (self->image != NULL)
     {
+      cairo_save (cr);
+      cairo_set_operator (cr, CAIRO_OPERATOR_OVER);
       gdk_cairo_set_source_pixbuf (cr, self->image, 0.0, 0.0);
       cairo_paint (cr);
+      cairo_restore (cr);
       return FALSE;
     }
 
@@ -153,26 +156,32 @@ eos_app_cell_draw (GtkWidget *widget,
     path = eos_app_info_get_square_img (self->info);
 
   if (path == NULL)
-    return FALSE;
+    {
+      g_critical ("No image found for app info '%s'[%p]",
+                  eos_app_info_get_title (self->info),
+                  self->info);
+      return FALSE;
+    }
 
   error = NULL;
   self->image = gdk_pixbuf_new_from_file_at_size (path,
                                                   allocation.width,
                                                   allocation.height,
                                                   &error);
+  if (error != NULL)
+    {
+      g_warning ("Unable to load image at path '%s': %s",
+                 path, error->message);
+      g_error_free (error);
+    }
+
   if (self->image != NULL)
     {
+      cairo_save (cr);
+      cairo_set_operator (cr, CAIRO_OPERATOR_OVER);
       gdk_cairo_set_source_pixbuf (cr, self->image, 0.0, 0.0);
       cairo_paint (cr);
-    }
-  else
-    {
-      if (error != NULL)
-        {
-          g_warning ("Unable to load image at path '%s': %s",
-                     path, error->message);
-          g_error_free (error);
-        }
+      cairo_restore (cr);
     }
 
   g_free (path);
@@ -555,16 +564,19 @@ eos_app_info_create_from_json (JsonNode *node)
   else
     info->square_img = NULL;
 
-  if (json_object_has_member (obj, "featured_img"))
-    info->featured_img = json_node_dup_string (json_object_get_member (obj, "featured_img"));
+  /* FIXME: featured */
+  if (json_object_has_member (obj, "fetured_img"))
+    info->featured_img = json_node_dup_string (json_object_get_member (obj, "fetured_img"));
   else
     info->featured_img = NULL;
 
+  /* FIXME: needs to be a boolean */
   if (json_object_has_member (obj, "is_featured"))
     info->is_featured = TRUE;
   else
     info->is_featured = FALSE;
 
+  /* FIXME: needs to be a boolean */
   if (json_object_has_member (obj, "is_offline"))
     info->is_offline = TRUE;
   else
