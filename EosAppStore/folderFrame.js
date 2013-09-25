@@ -26,7 +26,7 @@ const FolderNameBubble = new Lang.Class({
         // entry and "add" button...
 
         this._entry = new Gtk.Entry({
-            'placeholder-text': 'Enter the name of the folder',
+            'placeholder-text': _('Enter the name of the folder'),
             'width-chars': 30,
             hexpand: true,
             halign: Gtk.Align.FILL,
@@ -45,7 +45,7 @@ const FolderNameBubble = new Lang.Class({
         // ... which will be replaced by "done" label and icon
 
         this._doneLabel = new Gtk.Label({
-            label: 'The new folder has been added',
+            label: _('The new folder has been added'),
             hexpand: true,
             halign: Gtk.Align.CENTER,
             vexpand: true,
@@ -115,8 +115,6 @@ const FolderIconGrid = new Lang.Class({
         if (toggleButton.get_active()) {
             let oldToggle = this._activeToggle;
             this._activeToggle = toggleButton;
-
-            print('this._activeToggle = '+toggleButton._iconName);
 
             // unset the previous one
             if (oldToggle && oldToggle != toggleButton && oldToggle.get_active()) {
