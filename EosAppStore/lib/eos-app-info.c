@@ -147,10 +147,10 @@ eos_app_cell_draw (GtkWidget *widget,
 
   if (path == NULL)
     {
-      g_critical ("No image found for app info '%s'[%p]",
-                  eos_app_info_get_title (self->info),
-                  self->info);
-      return FALSE;
+      g_warning ("No image found for app info '%s'[%p]",
+                 eos_app_info_get_title (self->info),
+                 self->info);
+      goto out;
     }
 
   int width = allocation.width;
