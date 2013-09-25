@@ -186,16 +186,21 @@
 }
 
 .folder-frame GtkToggleButton {
-  border-radius: 4px;
+  border-radius: 3px;
   border: none;
-  background: transparent;
+  background: none;
+  margin: 0px;
 
   -GtkWidget-focus-line-width: 0;
+  -GtkWidget-focus-line-padding: 0;
 }
 
-/* hover, focused ? */
+.folder-frame GtkToggleButton GtkImage:hover {
+  box-shadow: 0px 0px 6px #e3e3e3;
+}
+
 .folder-frame GtkToggleButton:active {
-  background: #e3e3e3;
+  background: alpha(#ffffff, 0.9);
 }
 
 PBubbleWindow {
