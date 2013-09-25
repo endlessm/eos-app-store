@@ -399,7 +399,7 @@ eos_app_info_get_square_img (const EosAppInfo *info)
 {
   char *path, *res;
 
-  if (info == NULL || info->square_img == NULL)
+  if (info == NULL || info->square_img == NULL || strlen (info->square_img) == 0)
     return NULL;
 
   path = eos_app_get_content_dir ();
@@ -423,7 +423,7 @@ eos_app_info_get_featured_img (const EosAppInfo *info)
 {
   char *path, *res;
 
-  if (info == NULL || info->featured_img == NULL)
+  if (info == NULL || info->featured_img == NULL || strlen (info->featured_img) == 0)
     return NULL;
 
   path = eos_app_get_content_dir ();
