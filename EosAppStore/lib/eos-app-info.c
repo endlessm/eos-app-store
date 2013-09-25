@@ -243,12 +243,16 @@ eos_app_cell_init (EosAppCell *self)
   gtk_widget_show (box);
 
   self->title_label = gtk_label_new ("");
+  gtk_style_context_add_class (gtk_widget_get_style_context (self->title_label),
+                               "app-cell-title");
   gtk_label_set_line_wrap (GTK_LABEL (self->title_label), TRUE);
   gtk_widget_set_halign (self->title_label, GTK_ALIGN_START);
   gtk_container_add (GTK_CONTAINER (box), self->title_label);
   gtk_widget_show (self->title_label);
 
   self->subtitle_label = gtk_label_new ("");
+  gtk_style_context_add_class (gtk_widget_get_style_context (self->subtitle_label),
+                               "app-cell-subtitle");
   gtk_label_set_line_wrap (GTK_LABEL (self->subtitle_label), TRUE);
   gtk_label_set_ellipsize (GTK_LABEL (self->subtitle_label), PANGO_ELLIPSIZE_END);
   gtk_label_set_max_width_chars (GTK_LABEL (self->subtitle_label), 50);
