@@ -234,6 +234,8 @@ const WeblinkListBoxRow = new Lang.Class({
         this.initTemplate({ templateRoot: '_mainBox', bindChildren: true, connectSignals: true, });
         this.add(this._mainBox);
         this._mainBox.show();
+
+        this._stateButton.connect('clicked', Lang.bind(this, this._onStateButtonClicked));
     },
 
     get weblinkId() {
