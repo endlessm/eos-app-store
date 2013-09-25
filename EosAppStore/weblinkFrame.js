@@ -234,7 +234,7 @@ const WeblinkListBoxRow = new Lang.Class({
 
         this.initTemplate({ templateRoot: '_mainBox', bindChildren: true, connectSignals: true, });
         this.add(this._mainBox);
-        this._mainBox.show_all();
+        this._mainBox.show();
     },
 
     get weblinkId() {
@@ -277,10 +277,15 @@ const WeblinkListBoxRow = new Lang.Class({
         switch (state) {
         case EosAppStorePrivate.AppState.INSTALLED:
             this._stateButton.sensitive = false;
+            this._descriptionLabel.set_text(_("has been added successfully!"));
+            this._nameLabel.vexpand = true;
+            this._urlLabel.visible = false;
             break;
 
         case EosAppStorePrivate.AppState.UNINSTALLED:
             this._stateButton.sensitive = true;
+            this._nameLabel.vexpand = false;
+            this._urlLabel.visible = true;
             break;
 
         default:

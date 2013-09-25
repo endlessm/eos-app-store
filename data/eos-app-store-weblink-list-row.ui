@@ -45,8 +45,8 @@
                   <object class="GtkLabel" id="_nameLabel">
                     <property name="visible">True</property>
                     <property name="can_focus">False</property>
-                    <property name="valign">start</property>
                     <property name="xalign">0</property>
+                    <property name="yalign">1</property>
                     <property name="label" translatable="yes">NAME</property>
                     <property name="ellipsize">end</property>
                     <property name="single_line_mode">True</property>
@@ -97,6 +97,7 @@
                           <object class="GtkLabel" id="_urlLabel">
                             <property name="visible">True</property>
                             <property name="can_focus">False</property>
+                            <property name="no_show_all">True</property>
                             <property name="valign">end</property>
                             <property name="xalign">0</property>
                             <property name="ellipsize">end</property>

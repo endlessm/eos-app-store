@@ -135,6 +135,7 @@
 }
 
 .weblink-row .state-button {
+  background-color: transparent;
   background-image: url("btn_add-website_disabled.png");
   background-size: 49px;
   border: 1px;
