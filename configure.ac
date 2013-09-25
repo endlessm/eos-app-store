@@ -54,7 +54,7 @@ AC_ARG_ENABLE([maintainer-cflags],
               [AS_HELP_STRING([--enable-maintainer-cflags],
                               [Enable more compiler warnings])],
               [],
-              [enable_maintainer_clags=yes])
+              [enable_maintainer_cflags=yes])
 
 MAINTAINER_CFLAGS="-std=c99"
 AS_IF([test "x$enable_maintainer_cflags" = "xyes"],
