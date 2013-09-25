@@ -227,7 +227,6 @@ const WeblinkListBoxRow = new Lang.Class({
 
     _init: function(model, weblinkId) {
         this.parent();
-        this._i=0;
 
         this._model = model;
         this._weblinkId = weblinkId;
