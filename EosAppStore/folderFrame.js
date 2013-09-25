@@ -26,7 +26,7 @@ const FolderNameBubble = new Lang.Class({
         // entry and "add" button...
 
         this._entry = new Gtk.Entry({
-            'placeholder-text': _('Enter the name of the folder'),
+            'placeholder-text': _("Enter the name of the folder"),
             'width-chars': 30,
             hexpand: true,
             halign: Gtk.Align.FILL,
@@ -45,7 +45,7 @@ const FolderNameBubble = new Lang.Class({
         // ... which will be replaced by "done" label and icon
 
         this._doneLabel = new Gtk.Label({
-            label: _('The new folder has been added'),
+            label: _("The new folder has been added"),
             hexpand: true,
             halign: Gtk.Align.CENTER,
             vexpand: true,
