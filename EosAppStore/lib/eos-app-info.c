@@ -449,8 +449,6 @@ eos_app_info_create_cell (const EosAppInfo *info)
   if (info == NULL)
     return NULL;
 
-  g_print (G_STRLOC ": Creating cell for info '%s'[%p]\n", info->desktop_id, info);
-
   GtkWidget *res = g_object_new (eos_app_cell_get_type (),
                                  "shape", info->shape,
                                  "title", info->title,
