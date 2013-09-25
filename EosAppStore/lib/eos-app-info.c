@@ -169,15 +169,10 @@ eos_app_cell_draw (GtkWidget *widget,
 
 out:
   if (self->image != NULL)
-    {
-      double x = allocation.x;
-      double y = allocation.y;
-
-      gtk_render_icon (gtk_widget_get_style_context (widget),
-                       cr,
-                       self->image,
-                       0.0, 0.0);
-    }
+    gtk_render_icon (gtk_widget_get_style_context (widget),
+                     cr,
+                     self->image,
+                     0.0, 0.0);
 
   GTK_WIDGET_CLASS (eos_app_cell_parent_class)->draw (widget, cr);
 
