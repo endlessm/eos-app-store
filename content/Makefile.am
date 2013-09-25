@@ -9,7 +9,11 @@ en_us_app_images = \
 	en_US/apps/resources/images/blockout2-featured.jpg \
 	en_US/apps/resources/images/chromium-bsu-featured.jpg \
 	en_US/apps/resources/images/english-featured.jpg \
+	en_US/apps/resources/images/gimp-featured.jpg \
 	en_US/apps/resources/images/khanacademy-featured.jpg \
+	en_US/apps/resources/images/libreoffice-calc-featured.jpg \
+	en_US/apps/resources/images/libreoffice-impress-featured.jpg \
+	en_US/apps/resources/images/libreoffice-writer-featured.jpg \
 	en_US/apps/resources/images/numptyphysics-featured.jpg \
 	en_US/apps/resources/images/photos-featured.jpg \
 	en_US/apps/resources/images/rhythmbox-featured.jpg \
@@ -25,47 +29,47 @@ en_us_app_images = \
 	$(NULL)
 
 en_us_app_thumbnails = \
-	en_US/apps/resources/thumbnails/armagetron_thumb.jpg \
-	en_US/apps/resources/thumbnails/audacity_thumb.jpg \
-	en_US/apps/resources/thumbnails/billard-gl_thumb.jpg \
-	en_US/apps/resources/thumbnails/blockout2_thumb.jpg \
-	en_US/apps/resources/thumbnails/chromium-bsu_thumb.jpg \
-	en_US/apps/resources/thumbnails/english_thumb.jpg \
-	en_US/apps/resources/thumbnails/evolution_thumb.jpg \
-	en_US/apps/resources/thumbnails/frostwire_thumb.jpg \
-	en_US/apps/resources/thumbnails/gcalctool_thumb.jpg \
-	en_US/apps/resources/thumbnails/gcompris_thumb.jpg \
-	en_US/apps/resources/thumbnails/gimp_thumb.jpg \
-	en_US/apps/resources/thumbnails/gnome-genius_thumb.jpg \
-	en_US/apps/resources/thumbnails/gnome-sudoku_thumb.jpg \
-	en_US/apps/resources/thumbnails/goldendict_thumb.jpg \
-	en_US/apps/resources/thumbnails/khanacademy_thumb.jpg \
-	en_US/apps/resources/thumbnails/kobodeluxe_thumb.jpg \
-	en_US/apps/resources/thumbnails/lbreakout2_thumb.jpg \
-	en_US/apps/resources/thumbnails/libreoffice-calc_thumb.jpg \
-	en_US/apps/resources/thumbnails/libreoffice-impress_thumb.jpg \
-	en_US/apps/resources/thumbnails/libreoffice-writer_thumb.jpg \
-	en_US/apps/resources/thumbnails/numptyphysics_thumb.jpg \
-	en_US/apps/resources/thumbnails/openarena_thumb.jpg \
-	en_US/apps/resources/thumbnails/photos_thumb.jpg \
-	en_US/apps/resources/thumbnails/pingus_thumb.jpg \
-	en_US/apps/resources/thumbnails/rhythmbox_thumb.jpg \
-	en_US/apps/resources/thumbnails/shotwell_thumb.jpg \
-	en_US/apps/resources/thumbnails/skype_thumb.jpg \
-	en_US/apps/resources/thumbnails/solitaire_thumb.jpg \
-	en_US/apps/resources/thumbnails/sol_thumb.jpg \
-	en_US/apps/resources/thumbnails/stellarium_thumb.jpg \
-	en_US/apps/resources/thumbnails/supertux2_thumb.jpg \
-	en_US/apps/resources/thumbnails/supertuxkart_thumb.jpg \
-	en_US/apps/resources/thumbnails/teeworlds_thumb.jpg \
+	en_US/apps/resources/thumbnails/armagetron-thumb.jpg \
+	en_US/apps/resources/thumbnails/audacity-thumb.jpg \
+	en_US/apps/resources/thumbnails/billard-gl-thumb.jpg \
+	en_US/apps/resources/thumbnails/blockout2-thumb.jpg \
+	en_US/apps/resources/thumbnails/chromium-bsu-thumb.jpg \
+	en_US/apps/resources/thumbnails/english-thumb.jpg \
+	en_US/apps/resources/thumbnails/evolution-thumb.jpg \
+	en_US/apps/resources/thumbnails/frostwire-thumb.jpg \
+	en_US/apps/resources/thumbnails/gcalctool-thumb.jpg \
+	en_US/apps/resources/thumbnails/gcompris-thumb.jpg \
+	en_US/apps/resources/thumbnails/gimp-thumb.jpg \
+	en_US/apps/resources/thumbnails/gnome-genius-thumb.jpg \
+	en_US/apps/resources/thumbnails/gnome-sudoku-thumb.jpg \
+	en_US/apps/resources/thumbnails/goldendict-thumb.jpg \
+	en_US/apps/resources/thumbnails/khanacademy-thumb.jpg \
+	en_US/apps/resources/thumbnails/kobodeluxe-thumb.jpg \
+	en_US/apps/resources/thumbnails/lbreakout2-thumb.jpg \
+	en_US/apps/resources/thumbnails/libreoffice-calc-thumb.jpg \
+	en_US/apps/resources/thumbnails/libreoffice-impress-thumb.jpg \
+	en_US/apps/resources/thumbnails/libreoffice-writer-thumb.jpg \
+	en_US/apps/resources/thumbnails/numptyphysics-thumb.jpg \
+	en_US/apps/resources/thumbnails/openarena-thumb.jpg \
+	en_US/apps/resources/thumbnails/photos-thumb.jpg \
+	en_US/apps/resources/thumbnails/pingus-thumb.jpg \
+	en_US/apps/resources/thumbnails/rhythmbox-thumb.jpg \
+	en_US/apps/resources/thumbnails/shotwell-thumb.jpg \
+	en_US/apps/resources/thumbnails/skype-thumb.jpg \
+	en_US/apps/resources/thumbnails/solitaire-thumb.jpg \
+	en_US/apps/resources/thumbnails/sol-thumb.jpg \
+	en_US/apps/resources/thumbnails/stellarium-thumb.jpg \
+	en_US/apps/resources/thumbnails/supertux2-thumb.jpg \
+	en_US/apps/resources/thumbnails/supertuxkart-thumb.jpg \
+	en_US/apps/resources/thumbnails/teeworlds-thumb.jpg \
 	en_US/apps/resources/thumbnails/_thumb.jpg \
-	en_US/apps/resources/thumbnails/totem_thumb.jpg \
-	en_US/apps/resources/thumbnails/translate_thumb.jpg \
-	en_US/apps/resources/thumbnails/tuxmath_thumb.jpg \
-	en_US/apps/resources/thumbnails/tuxtype_thumb.jpg \
-	en_US/apps/resources/thumbnails/weather_thumb.jpg \
-	en_US/apps/resources/thumbnails/wikipedia_thumb.jpg \
-	en_US/apps/resources/thumbnails/youtube_thumb.jpg \
+	en_US/apps/resources/thumbnails/totem-thumb.jpg \
+	en_US/apps/resources/thumbnails/translate-thumb.jpg \
+	en_US/apps/resources/thumbnails/tuxmath-thumb.jpg \
+	en_US/apps/resources/thumbnails/tuxtype-thumb.jpg \
+	en_US/apps/resources/thumbnails/weather-thumb.jpg \
+	en_US/apps/resources/thumbnails/wikipedia-thumb.jpg \
+	en_US/apps/resources/thumbnails/youtube-thumb.jpg \
 	$(NULL)
 
 contentdir = $(datadir)/application-store
