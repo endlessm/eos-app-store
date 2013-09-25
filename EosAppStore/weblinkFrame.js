@@ -221,6 +221,7 @@ const WeblinkListBoxRow = new Lang.Class({
         '_nameLabel',
         '_descriptionLabel',
         '_urlLabel',
+        '_urlIndicator',
         '_stateButton'
     ],
 
@@ -274,35 +275,42 @@ const WeblinkListBoxRow = new Lang.Class({
     },
 
     set weblinkState(state) {
-        this._weblinkState = state;
-        this._stateButton.hide();
+        switch (state) {
+        case EosAppStorePrivate.AppState.INSTALLED:
+            this._stateButton.sensitive = false;
+            this._descriptionLabel.set_text(_("has been added successfully!"));
+            this._nameLabel.vexpand = true;
+            this._urlLabel.visible = false;
+            break;
 
-        switch (this._weblinkState) {
-            case EosAppStorePrivate.AppState.INSTALLED:
-                this._stateButton.set_label(_("UNINSTALL"));
-                this._stateButton.show();
-                break;
+        case EosAppStorePrivate.AppState.UNINSTALLED:
+            this._stateButton.sensitive = true;
+            this._nameLabel.vexpand = false;
+            this._urlLabel.visible = true;
+            break;
 
-            case EosAppStorePrivate.AppState.UNINSTALLED:
-                this._stateButton.set_label(_("INSTALL"));
-                this._stateButton.show();
-                break;
-
-            default:
-                break;
+        default:
+            break;
         }
+        this._stateButton.show();
     },
 
     _onStateButtonClicked: function() {
-        switch (this._weblinkState) {
-            case EosAppStorePrivate.AppState.INSTALLED:
-                this._model.uninstall(this._weblinkId);
-                break;
+        this._model.install(this._weblinkId);
+    },
 
-            case EosAppStorePrivate.AppState.UNINSTALLED:
-                this._model.install(this._weblinkId);
-                break;
-        }
+    _onUrlClicked: function(widget, event) {
+        Gtk.show_uri(null, this._urlLabel.get_text(), event.time, null);
+        // hide the appstore to see the browser
+        this.get_toplevel().emit('delete-event', null);
+    },
+
+    _onStartHoveringLabel: function() {
+        this._urlIndicator.visible = true;
+    },
+
+    _onStopHoveringLabel: function() {
+        this._urlIndicator.visible = false;
     }
 });
 Builder.bindTemplateChildren(WeblinkListBoxRow.prototype);
@@ -313,7 +321,7 @@ const WeblinkListBox = new Lang.Class({
 
     _init: function(model) {
         this.parent({ selection_mode: Gtk.SelectionMode.NONE });
-        
+        this.get_style_context().add_class("weblink-listbox");
         this._model = model;
     }
 });
