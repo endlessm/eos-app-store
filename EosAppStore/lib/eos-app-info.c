@@ -567,13 +567,15 @@ eos_app_info_create_from_json (JsonNode *node)
     info->featured_img = NULL;
 
   /* FIXME: needs to be a boolean */
-  if (json_object_has_member (obj, "is_featured"))
+  if (json_object_has_member (obj, "is_featured") &&
+      json_object_get_boolean_member (obj, "is_featured"))
     info->is_featured = TRUE;
   else
     info->is_featured = FALSE;
 
   /* FIXME: needs to be a boolean */
-  if (json_object_has_member (obj, "is_offline"))
+  if (json_object_has_member (obj, "is_offline") &&
+      json_object_get_boolean_member (obj, "is_offline"))
     info->is_offline = TRUE;
   else
     info->is_offline = FALSE;
