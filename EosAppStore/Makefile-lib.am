@@ -9,13 +9,15 @@ eaprivate_cflags = \
 	$(EOS_APP_STORE_CFLAGS)
 
 eaprivate_source_h = \
-	lib/eos-app-list-model.h \
 	lib/eos-app-enums.h \
+	lib/eos-app-info.h \
+	lib/eos-app-list-model.h \
 	lib/eos-app-utils.h
 
 eaprivate_source_c = \
-	lib/eos-app-list-model.c \
 	lib/eos-app-enums.c \
+	lib/eos-app-info.c \
+	lib/eos-app-list-model.c \
 	lib/eos-app-utils.c
 
 pkglib_LTLIBRARIES += libeaprivate-1.0.la
@@ -23,6 +25,7 @@ pkglib_LTLIBRARIES += libeaprivate-1.0.la
 libeaprivate_1_0_la_LIBADD = $(EOS_APP_STORE_LIBS)
 libeaprivate_1_0_la_LDFLAGS = -avoid-version
 libeaprivate_1_0_la_CPPFLAGS = $(eaprivate_cflags)
+libeaprivate_1_0_la_CFLAGS = $(AM_CFLAGS) $(EOS_APP_STORE_CFLAGS) $(MAINTAINER_CFLAGS)
 libeaprivate_1_0_la_SOURCES = $(eaprivate_source_h) $(eaprivate_source_c) $(eaprivate_built_source)
 
 INTROSPECTION_GIRS += EosAppStorePrivate-1.0.gir
@@ -33,7 +36,7 @@ EosAppStorePrivate_1_0_gir_VERSION = 1.0
 EosAppStorePrivate_1_0_gir_LIBS = libeaprivate-1.0.la
 EosAppStorePrivate_1_0_gir_CFLAGS = $(AM_CPPFLAGS) $(eaprivate_cflags)
 EosAppStorePrivate_1_0_gir_SCANNERFLAGS = --warn-all --symbol-prefix=eos --identifier-prefix=Eos
-EosAppStorePrivate_1_0_gir_INCLUDES = Gtk-3.0 GMenu-3.0 Endless-0
+EosAppStorePrivate_1_0_gir_INCLUDES = Gtk-3.0 GMenu-3.0 Endless-0 Json-1.0
 EosAppStorePrivate_1_0_gir_FILES = \
 	$(addprefix $(srcdir)/,$(eaprivate_source_h)) \
 	$(addprefix $(srcdir)/,$(eaprivate_source_c))

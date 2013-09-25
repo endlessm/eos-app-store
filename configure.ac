@@ -50,6 +50,28 @@ AC_SUBST(GLIB_COMPILE_RESOURCES)
 
 AC_CACHE_SAVE
 
+AC_ARG_ENABLE([maintainer-cflags],
+              [AS_HELP_STRING([--enable-maintainer-cflags],
+                              [Enable more compiler warnings])],
+              [],
+              [enable_maintainer_cflags=yes])
+
+MAINTAINER_CFLAGS="-std=c99"
+AS_IF([test "x$enable_maintainer_cflags" = "xyes"],
+      [
+        MAINTAINER_CFLAGS="$MAINTAINER_CFLAGS -Wall"
+        MAINTAINER_CFLAGS="$MAINTAINER_CFLAGS -Wcast-align"
+        MAINTAINER_CFLAGS="$MAINTAINER_CFLAGS -Wuninitialized"
+        MAINTAINER_CFLAGS="$MAINTAINER_CFLAGS -Wno-strict-aliasing"
+        MAINTAINER_CFLAGS="$MAINTAINER_CFLAGS -Werror=pointer-arith"
+        MAINTAINER_CFLAGS="$MAINTAINER_CFLAGS -Werror=missing-declarations"
+        MAINTAINER_CFLAGS="$MAINTAINER_CFLAGS -Werror=redundant-decls"
+        MAINTAINER_CFLAGS="$MAINTAINER_CFLAGS -Werror=empty-body"
+        MAINTAINER_CFLAGS="$MAINTAINER_CFLAGS -Werror=format -Werror=format-security -Werror=format-nonliteral"
+        MAINTAINER_CFLAGS="$MAINTAINER_CFLAGS -Werror=init-self"
+      ])
+AC_SUBST(MAINTAINER_CFLAGS)
+
 AC_CONFIG_FILES([
         Makefile
         content/Makefile

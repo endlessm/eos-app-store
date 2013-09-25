@@ -9,7 +9,7 @@
 
 G_BEGIN_DECLS
 
-char *  eos_app_get_content_dir (EosAppCategory  category);
+char *  eos_app_get_content_dir (void);
 
 void    eos_app_load_content    (EosFlexyGrid   *grid,
                                  EosAppCategory  category);
