@@ -386,6 +386,18 @@ eos_app_info_get_category (const EosAppInfo *info)
   return EOS_APP_CATEGORY_UTILITIES;
 }
 
+static EosFlexyShape
+eos_app_info_get_shape_for_cell (const EosAppInfo *info)
+{
+  /* Everywhere else it's assumed that only
+   * featured apps get their large image.
+   */
+  if (eos_app_info_is_featured (info))
+    return info->shape;
+  else
+    return EOS_FLEXY_SHAPE_SMALL;
+}
+
 /**
  * eos_app_info_get_square_img:
  * @info: ...
@@ -449,7 +461,7 @@ eos_app_info_create_cell (const EosAppInfo *info)
     return NULL;
 
   GtkWidget *res = g_object_new (eos_app_cell_get_type (),
-                                 "shape", info->shape,
+                                 "shape", eos_app_info_get_shape_for_cell (info),
                                  "title", info->title,
                                  "subtitle", info->subtitle,
                                  "desktop-id", info->desktop_id,
