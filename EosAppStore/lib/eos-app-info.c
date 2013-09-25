@@ -130,8 +130,6 @@ eos_app_cell_draw (GtkWidget *widget,
   GError *error;
   char *path;
 
-  GTK_WIDGET_CLASS (eos_app_cell_parent_class)->draw (widget, cr);
-
   if (self->info == NULL)
     {
       g_critical ("No EosAppInfo found for cell %p", widget);
@@ -139,14 +137,7 @@ eos_app_cell_draw (GtkWidget *widget,
     }
 
   if (self->image != NULL)
-    {
-      cairo_save (cr);
-      cairo_set_operator (cr, CAIRO_OPERATOR_OVER);
-      gdk_cairo_set_source_pixbuf (cr, self->image, 0.0, 0.0);
-      cairo_paint (cr);
-      cairo_restore (cr);
-      return FALSE;
-    }
+    goto out;
 
   gtk_widget_get_allocation (widget, &allocation);
 
@@ -163,11 +154,11 @@ eos_app_cell_draw (GtkWidget *widget,
       return FALSE;
     }
 
+  int width = allocation.width;
+  int height = allocation.height;
+
   error = NULL;
-  self->image = gdk_pixbuf_new_from_file_at_size (path,
-                                                  allocation.width,
-                                                  allocation.height,
-                                                  &error);
+  self->image = gdk_pixbuf_new_from_file_at_size (path, width, height, &error);
   if (error != NULL)
     {
       g_warning ("Unable to load image at path '%s': %s",
@@ -175,16 +166,21 @@ eos_app_cell_draw (GtkWidget *widget,
       g_error_free (error);
     }
 
+  g_free (path);
+
+out:
   if (self->image != NULL)
     {
-      cairo_save (cr);
-      cairo_set_operator (cr, CAIRO_OPERATOR_OVER);
-      gdk_cairo_set_source_pixbuf (cr, self->image, 0.0, 0.0);
-      cairo_paint (cr);
-      cairo_restore (cr);
+      double x = allocation.x;
+      double y = allocation.y;
+
+      gtk_render_icon (gtk_widget_get_style_context (widget),
+                       cr,
+                       self->image,
+                       x, y);
     }
 
-  g_free (path);
+  GTK_WIDGET_CLASS (eos_app_cell_parent_class)->draw (widget, cr);
 
   return FALSE;
 }
