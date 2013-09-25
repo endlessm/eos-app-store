@@ -30,6 +30,15 @@
   color: white;
 }
 
+.app-cell-title {
+  font: bold;
+  color: white;
+}
+
+.app-cell-subtitle {
+  color: white;
+}
+
 .new-site-frame {
   background: rgba(0,0,0,0.25);
   border-radius: 4px;
