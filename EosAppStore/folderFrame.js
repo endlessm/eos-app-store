@@ -14,14 +14,19 @@ const FolderModel = imports.folderModel;
 
 const _FOLDER_BUTTON_SIZE = 96;
 
+const _BUBBLE_GRID_SPACING = 6;
+const _ADD_FOLDER_BUTTON_SIZE = 30;
+
 const FolderNameBubble = new Lang.Class({
     Name: 'FolderNameBubble',
     Extends: PLib.BubbleWindow,
 
     _init : function() {
         this.parent();
+        this.get_style_context().add_class('folder-bubble');
 
-        let grid = new Gtk.Grid();
+        let grid = new Gtk.Grid({
+            'column-spacing': _BUBBLE_GRID_SPACING });
 
         // entry and "add" button...
 
@@ -33,14 +38,17 @@ const FolderNameBubble = new Lang.Class({
             vexpand: true,
             valign: Gtk.Align.FILL,
             'no-show-all': true });
-        this._addButton = new Endless.ActionButton({
-            name: 'add',
-            'icon-id': 'list-add-symbolic',
-            hexpand: true,
-            halign: Gtk.Align.FILL,
+        this._addButton = new Gtk.Button({
+            'width-request': _ADD_FOLDER_BUTTON_SIZE,
+            'height-request': _ADD_FOLDER_BUTTON_SIZE,
+            hexpand: false,
             vexpand: true,
             valign: Gtk.Align.CENTER,
             'no-show-all': true });
+
+        this._entry.connect('changed', Lang.bind(this, function() {
+            this._addButton.set_sensitive(this._entry.get_text_length() != 0);
+        }));
 
         // ... which will be replaced by "done" label and icon
 
@@ -52,10 +60,10 @@ const FolderNameBubble = new Lang.Class({
             valign: Gtk.Align.CENTER,
             'no-show-all': true  });
         this._addedIcon = new Gtk.Image({
-            'icon-name': 'gtk-ok',
-            'icon-size': Gtk.IconSize.BUTTON,
-            hexpand: true,
-            halign: Gtk.Align.CENTER,
+            resource: '/com/endlessm/appstore/icon_installed_24x24.png',
+            'width-request': _ADD_FOLDER_BUTTON_SIZE,
+            'height-request': _ADD_FOLDER_BUTTON_SIZE,
+            hexpand: false,
             vexpand: true,
             valign: Gtk.Align.CENTER,
             'no-show-all': true
@@ -76,15 +84,17 @@ const FolderNameBubble = new Lang.Class({
         if (visible) {
             this._doneLabel.hide();
             this._addedIcon.hide();
-
             this._entry.show();
-            this._addButton.show()
+            this._addButton.show();
+            this.get_style_context().remove_class('done');
+            this.get_style_context().add_class('entering');
         } else {
             this._entry.hide();
             this._addButton.hide()
-
             this._doneLabel.show();
             this._addedIcon.show();
+            this.get_style_context().remove_class('entering');
+            this.get_style_context().add_class('done');
         }
     }
 });
@@ -122,9 +132,10 @@ const FolderIconGrid = new Lang.Class({
             }
 
             // prepare the bubble window for showing...
+            this._bubble._iconName = toggleButton._iconName;
             this._bubble.setEntryVisible(true);
             this._bubble._entry.set_text('');
-            this._bubble._iconName = toggleButton._iconName;
+            this._bubble._addButton.set_sensitive(false);
 
             // ... and now we show the bubble and grab the input
             this._bubble.popup(toggleButton.get_window(),
