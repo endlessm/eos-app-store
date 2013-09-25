@@ -126,7 +126,6 @@ eos_app_cell_draw (GtkWidget *widget,
 {
   EosAppCell *self = (EosAppCell *) widget;
   GtkAllocation allocation;
-  GdkPixbuf *pixbuf;
   GError *error;
   char *path;
 
