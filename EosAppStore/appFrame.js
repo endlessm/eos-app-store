@@ -16,6 +16,9 @@ const Signals = imports.signals;
 const APP_TRANSITION_MS = 500;
 const CATEGORY_TRANSITION_MS = 500;
 
+const CATEGORIES_BOX_SPACING = 32;
+const STACK_TOP_MARGIN = 15;
+
 // If the area available for the grid is less than this minimium size,
 // scroll bars will be added.
 const MIN_GRID_WIDTH = 800;
@@ -125,7 +128,7 @@ Builder.bindTemplateChildren(AppListBoxRow.prototype);
 
 const AppCategoryButton = new Lang.Class({
     Name: 'AppCategoryButton',
-    Extends: Gtk.Button,
+    Extends: Gtk.RadioButton,
     Properties: { 'category': GObject.ParamSpec.string('category',
                                                        'Category',
                                                        'The category name',
@@ -135,7 +138,10 @@ const AppCategoryButton = new Lang.Class({
                                                        '') },
     _init: function(params) {
         this._category = '';
+
         this.parent(params);
+
+        this.get_style_context().add_class('app-category-button');
     },
 
     get category() {
@@ -159,6 +165,8 @@ const AppFrame = new Lang.Class({
 
     _init: function() {
         this.parent();
+
+        this.get_style_context().add_class('app-frame');
 
         this._categories = [
             {
@@ -204,19 +212,26 @@ const AppFrame = new Lang.Class({
         this._mainBox.vexpand = true;
         this._mainBox.show();
 
-        this._categoriesBox = new Gtk.Box({ orientation: Gtk.Orientation.HORIZONTAL, });
+        this._categoriesBox = new Gtk.Box({ orientation: Gtk.Orientation.HORIZONTAL,
+                                            spacing: CATEGORIES_BOX_SPACING });
         this._categoriesBox.hexpand = true;
         this._mainBox.add(this._categoriesBox);
         this._categoriesBox.show();
+
+        let separator = new Gtk.Separator({ orientation: Gtk.Orientation.HORIZONTAL });
+        separator.get_style_context().add_class('frame-separator');
+        this._mainBox.add(separator);
 
         this._stack = new PLib.Stack();
         this._stack.set_transition_duration(CATEGORY_TRANSITION_MS);
         this._stack.set_transition_type(PLib.StackTransitionType.SLIDE_RIGHT);
         this._stack.hexpand = true;
         this._stack.vexpand = true;
+        this._stack.margin_top = STACK_TOP_MARGIN;
         this._mainBox.add(this._stack);
         this._stack.show();
 
+        this._buttonGroup = null;
         this._model.connect('changed', Lang.bind(this, this._populateCategories));
         this._populateCategories();
     },
@@ -227,10 +242,16 @@ const AppFrame = new Lang.Class({
 
             if (!category.button) {
                 category.button = new AppCategoryButton({ label: category.label,
-                                                          category: category.name });
+                                                          category: category.name,
+                                                          draw_indicator: false,
+                                                          group: this._buttonGroup });
                 category.button.connect('clicked', Lang.bind(this, this._onCategoryClicked));
                 category.button.show();
-                this._categoriesBox.add(category.button);
+                this._categoriesBox.pack_start(category.button, false, false, 0);
+
+                if (!this._buttonGroup) {
+                    this._buttonGroup = category.button;
+                }
             }
 
             let scrollWindow;
@@ -271,5 +292,9 @@ const AppFrame = new Lang.Class({
     _onCategoryClicked: function(button) {
         let category = button.category;
         this._stack.set_visible_child_name(category);
+    },
+
+    reset: function() {
+        this._mainStack.set_visible_child_name('main-box');        
     }
 });

@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <gresources>
   <gresource prefix="/com/endlessm/appstore">
+    <file compressed="true">bg_gray_noise.png</file>
     <file compressed="true">btn_add-website_disabled.png</file>
     <file compressed="true">btn_add-website_hover.png</file>
     <file compressed="true">btn_add-website_normal.png</file>
@@ -23,6 +24,7 @@
     <file compressed="true">icon_alert.png</file>
     <file compressed="true">icon_external-link.png</file>
     <file compressed="true">icon_installed_43x43.png</file>
+    <file compressed="true">scrollbar_notch.png</file>
     <file>eos-app-store.css</file>
   </gresource>
 </gresources>

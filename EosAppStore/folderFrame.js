@@ -3,7 +3,6 @@ const GLib = imports.gi.GLib;
 const GObject = imports.gi.GObject;
 const Gdk = imports.gi.Gdk;
 const Gtk = imports.gi.Gtk;
-const Endless = imports.gi.Endless;
 const PLib = imports.gi.PLib;
 const Cairo = imports.cairo;
 
@@ -12,7 +11,9 @@ const Lang = imports.lang;
 
 const FolderModel = imports.folderModel;
 
-const _FOLDER_BUTTON_SIZE = 96;
+const _FOLDER_BUTTON_SIZE = 64;
+const _FOLDER_GRID_SPACING = _FOLDER_BUTTON_SIZE;
+const _FOLDER_GRID_BORDER = _FOLDER_GRID_SPACING / 2;
 
 const _BUBBLE_GRID_SPACING = 6;
 const _ADD_FOLDER_BUTTON_SIZE = 30;
@@ -110,7 +111,9 @@ const FolderIconButton = new Lang.Class({
             'always-show-image': true,
             'width-request': _FOLDER_BUTTON_SIZE,
             'height-request': _FOLDER_BUTTON_SIZE,
-            halign: Gtk.Align.START,
+            relief: Gtk.ReliefStyle.NONE,
+            hexpand: false,
+            vexpand: false,
             image: new Gtk.Image({'icon-name': iconName}) });
 
         this._iconName = iconName;
@@ -153,7 +156,7 @@ const FolderIconGrid = new Lang.Class({
         this._toggleButtons = [];
 
         let base = this._path + '/';
-        let columns = Math.max(1, Math.floor(allocatedWidth / _FOLDER_BUTTON_SIZE));
+        let columns = Math.max(1, Math.floor(allocatedWidth / (_FOLDER_BUTTON_SIZE + _FOLDER_GRID_SPACING)));
 
         for (let i = 0; i < this._iconList.length; i++) {
             let button = new FolderIconButton(this._iconList[i]);
@@ -188,7 +191,10 @@ const FolderIconGrid = new Lang.Class({
     },
 
     _init: function(folderModel) {
-        this.parent();
+        this.parent({
+            'row-spacing': _FOLDER_GRID_SPACING,
+            'column-spacing': _FOLDER_GRID_SPACING,
+            'border-width': _FOLDER_GRID_BORDER });
 
         this._folderModel = folderModel;
         this._get_icons();
@@ -241,6 +247,9 @@ const FolderFrame = new Lang.Class({
         this._viewport.add(this._grid);
 
         this.show_all();
+    },
+
+    reset: function() {
     }
 });
 Builder.bindTemplateChildren(FolderFrame.prototype);

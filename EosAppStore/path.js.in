@@ -1,2 +1,3 @@
 const RESOURCE_DIR = '@pkgdatadir@';
+const ICONS_DIR = '@pkgdatadir@/icons';
 const LOCALE_DIR = "@localedir@";
