@@ -341,6 +341,9 @@ const WeblinkFrame = new Lang.Class({
 
     _init: function(mainWindow) {
         this.parent();
+
+        this.get_style_context().add_class('web-frame');
+
         this.initTemplate({ templateRoot: '_mainBox', bindChildren: true, connectSignals: true, });
         this.add(this._mainBox);
         this._mainBox.show_all();

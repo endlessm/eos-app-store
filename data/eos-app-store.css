@@ -43,6 +43,7 @@
 }
 
 .app-frame,
+.web-frame,
 .folder-frame {
     border: none;
 }
