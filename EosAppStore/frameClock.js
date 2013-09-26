@@ -55,6 +55,8 @@ const FrameClockAnimator = new Lang.Class({
         if (time > 1.0) {
             this._tickId = 0;
 
+            this.setValue(this._endValue);
+
             if (this._endCallback) {
                 this._endCallback();
                 this._endCallback = null;

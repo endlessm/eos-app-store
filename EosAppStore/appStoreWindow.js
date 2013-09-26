@@ -15,6 +15,7 @@ const AppFrame = imports.appFrame;
 const WeblinkFrame = imports.weblinkFrame;
 const FolderFrame = imports.folderFrame;
 const FrameClock = imports.frameClock;
+const Path = imports.path;
 const StoreModel = imports.storeModel;
 const UIBuilder = imports.builder;
 
@@ -173,12 +174,17 @@ const AppStoreWindow = new Lang.Class({
     templateResource: '/com/endlessm/appstore/eos-app-store-main-window.ui',
     templateChildren: [
         'main-box',
-        'side-pane-apps-button',
-        'side-pane-web-button',
-        'side-pane-folder-button',
+        'side-pane-apps-image',
+        'side-pane-web-image',
+        'side-pane-folder-image',
+        'side-pane-apps-label',
+        'side-pane-web-label',
+        'side-pane-folder-label',
+        'side-pane-apps-label-bold',
+        'side-pane-web-label-bold',
+        'side-pane-folder-label-bold',
         'content-box',
         'header-bar-title-label',
-        'header-bar-description-label',
         'close-button',
     ],
 
@@ -199,6 +205,9 @@ const AppStoreWindow = new Lang.Class({
         // bug: https://bugzilla.gnome.org/show_bug.cgi?id=703154
         this.connect('realize', Lang.bind(this, function() { this.opacity = 0.95; }));
         this.add(this.main_box);
+
+        this._loadSideImages();
+        this._setLabelSizeGroup();
 
         // update position when workarea changes
         let screen = Gdk.Screen.get_default();
@@ -240,6 +249,34 @@ const AppStoreWindow = new Lang.Class({
         this._onStorePageChanged(this._storeModel, StoreModel.StorePage.APPS);
     },
 
+    _loadSideImages: function() {
+        let resources = { side_pane_apps_image: 'icon_apps-symbolic.svg',
+                          side_pane_web_image: 'icon_website-symbolic.svg',
+                          side_pane_folder_image: 'icon_folder-symbolic.svg' };
+
+        for (let object in resources) {
+            let iconName = resources[object];
+            let file = Gio.File.new_for_path(Path.ICONS_DIR + '/' + iconName);
+            let icon = new Gio.FileIcon({ file: file });
+            this[object].gicon = icon;
+        }
+    },
+
+    _setLabelSizeGroup: function() {
+        let labels = ['side_pane_apps_label',
+                      'side_pane_web_label',
+                      'side_pane_folder_label',
+                      'side_pane_apps_label_bold',
+                      'side_pane_web_label_bold',
+                      'side_pane_folder_label_bold'];
+
+        let sizeGroup = new Gtk.SizeGroup();
+        for (let idx in labels) {
+            let object = labels[idx];
+            sizeGroup.add_widget(this[object]);
+        }
+    },
+
     _onCloseClicked: function() {
         this.toggle();
     },
@@ -258,7 +295,6 @@ const AppStoreWindow = new Lang.Class({
 
     _onStorePageChanged: function(model, newPage) {
         let title = this.header_bar_title_label;
-        let desc = this.header_bar_description_label;
         let stack = this._stack;
         let page = null;
 
@@ -268,25 +304,23 @@ const AppStoreWindow = new Lang.Class({
 
         switch (newPage) {
             case StoreModel.StorePage.APPS:
-                title.set_text(_("INSTALL APPLICATIONS"));
-                desc.set_text(_("A list of many free applications you can install and update"));
+                title.set_text(_("Install Applications"));
                 page = this._pages.apps;
                 break;
 
             case StoreModel.StorePage.WEB:
-                title.set_text(_("INSTALL SITES"));
-                desc.set_text(_("A list of many sites you can add"));
+                title.set_text(_("Install Websites"));
                 page = this._pages.weblinks;
                 break;
 
             case StoreModel.StorePage.FOLDERS:
-                title.set_text(_("FOLDERS"));
-                desc.set_text(_("A descriptive label for the Folders section"));
+                title.set_text(_("Folders"));
                 page = this._pages.folders;
                 break;
         }
 
         if (page) {
+            page.reset();
             page.show_all();
             stack.set_visible_child(page);
         }
