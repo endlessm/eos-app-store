@@ -256,9 +256,43 @@ const AppStoreWindow = new Lang.Class({
         this._storeModel.changePage(StoreModel.StorePage.FOLDERS);
     },
 
-    _onStorePageChanged: function(model, newPage) {
+    _setDefaultTitle: function() {
         let title = this.header_bar_title_label;
+
+        switch (this._currentPage) {
+            case StoreModel.StorePage.APPS:
+                title.set_text(_("INSTALL APPLICATIONS"));
+                break;
+
+            case StoreModel.StorePage.WEB:
+                title.set_text(_("INSTALL SITES"));
+                break;
+
+            case StoreModel.StorePage.FOLDERS:
+                title.set_text(_("FOLDERS"));
+                break;
+        }
+    },
+
+    _setDefaultSubtitle: function() {
         let desc = this.header_bar_description_label;
+
+        switch (this._currentPage) {
+            case StoreModel.StorePage.APPS:
+                desc.set_text(_("A list of many free applications you can install and update"));
+                break;
+
+            case StoreModel.StorePage.WEB:
+                desc.set_text(_("A list of many sites you can add"));
+                break;
+
+            case StoreModel.StorePage.FOLDERS:
+                desc.set_text(_("A descriptive label for the Folders section"));
+                break;
+        }
+    },
+
+    _onStorePageChanged: function(model, newPage) {
         let stack = this._stack;
         let page = null;
 
@@ -266,22 +300,21 @@ const AppStoreWindow = new Lang.Class({
             this._pages[p].hide();
         }
 
-        switch (newPage) {
+        this._currentPage = newPage;
+
+        this._setDefaultTitle();
+        this._setDefaultSubtitle();
+
+        switch (this._currentPage) {
             case StoreModel.StorePage.APPS:
-                title.set_text(_("INSTALL APPLICATIONS"));
-                desc.set_text(_("A list of many free applications you can install and update"));
                 page = this._pages.apps;
                 break;
 
             case StoreModel.StorePage.WEB:
-                title.set_text(_("INSTALL SITES"));
-                desc.set_text(_("A list of many sites you can add"));
                 page = this._pages.weblinks;
                 break;
 
             case StoreModel.StorePage.FOLDERS:
-                title.set_text(_("FOLDERS"));
-                desc.set_text(_("A descriptive label for the Folders section"));
                 page = this._pages.folders;
                 break;
         }
@@ -319,6 +352,24 @@ const AppStoreWindow = new Lang.Class({
 
     getExpectedWidth: function() {
         return this._animator.expectedWidth;
+    },
+
+    set titleText(str) {
+        if (str) {
+            this.header_bar_title_label.set_text(str);
+        }
+        else {
+            this._setDefaultTitle();
+        }
+    },
+
+    set subtitleText(str) {
+        if (str) {
+            this.header_bar_description_label.set_text(str);
+        }
+        else {
+            this._setDefaultSubtitle();
+        }
     },
 });
 UIBuilder.bindTemplateChildren(AppStoreWindow.prototype);
