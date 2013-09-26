@@ -125,7 +125,7 @@ Builder.bindTemplateChildren(AppListBoxRow.prototype);
 
 const AppCategoryButton = new Lang.Class({
     Name: 'AppCategoryButton',
-    Extends: Gtk.Button,
+    Extends: Gtk.RadioButton,
     Properties: { 'category': GObject.ParamSpec.string('category',
                                                        'Category',
                                                        'The category name',
@@ -135,7 +135,10 @@ const AppCategoryButton = new Lang.Class({
                                                        '') },
     _init: function(params) {
         this._category = '';
+
         this.parent(params);
+
+        this.get_style_context().add_class('app-category-button');
     },
 
     get category() {
@@ -204,7 +207,7 @@ const AppFrame = new Lang.Class({
         this._mainBox.vexpand = true;
         this._mainBox.show();
 
-        this._categoriesBox = new Gtk.Box({ orientation: Gtk.Orientation.HORIZONTAL, });
+        this._categoriesBox = new Gtk.Box({ orientation: Gtk.Orientation.HORIZONTAL });
         this._categoriesBox.hexpand = true;
         this._mainBox.add(this._categoriesBox);
         this._categoriesBox.show();
@@ -217,6 +220,7 @@ const AppFrame = new Lang.Class({
         this._mainBox.add(this._stack);
         this._stack.show();
 
+        this._buttonGroup = null;
         this._model.connect('changed', Lang.bind(this, this._populateCategories));
         this._populateCategories();
     },
@@ -227,10 +231,16 @@ const AppFrame = new Lang.Class({
 
             if (!category.button) {
                 category.button = new AppCategoryButton({ label: category.label,
-                                                          category: category.name });
+                                                          category: category.name,
+                                                          draw_indicator: false,
+                                                          group: this._buttonGroup });
                 category.button.connect('clicked', Lang.bind(this, this._onCategoryClicked));
                 category.button.show();
-                this._categoriesBox.add(category.button);
+                this._categoriesBox.pack_start(category.button, true, false, 0);
+
+                if (!this._buttonGroup) {
+                    this._buttonGroup = category.button;
+                }
             }
 
             let scrollWindow;
