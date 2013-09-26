@@ -33,6 +33,9 @@
                 <property name="label" translatable="yes">NAME</property>
                 <property name="ellipsize">end</property>
                 <property name="width_chars">45</property>
+                <style>
+                  <class name="app-frame-name"/>
+                </style>
               </object>
               <packing>
                 <property name="expand">False</property>
@@ -45,8 +48,13 @@
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
                 <property name="xalign">0</property>
-                <property name="label" translatable="yes">description</property>
-                <property name="width_chars">45</property>
+                <property name="yalign">0</property>
+                <property name="label" translatable="yes">The application's description.</property>
+                <property name="wrap">True</property>
+                <property name="use_markup">True</property>
+                <style>
+                  <class name="app-frame-description"/>
+                </style>
               </object>
               <packing>
                 <property name="expand">True</property>

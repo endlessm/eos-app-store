@@ -34,11 +34,11 @@ const AppListBoxRow = new Lang.Class({
         '_stateButton',
     ],
 
-    _init: function(model, appId) {
+    _init: function(model, appInfo) {
         this.parent();
 
         this._model = model;
-        this._appId = appId;
+        this._appId = appInfo.get_desktop_id();
 
         this.initTemplate({ templateRoot: '_mainBox', bindChildren: true, connectSignals: true, });
         this.add(this._mainBox);
@@ -46,10 +46,11 @@ const AppListBoxRow = new Lang.Class({
 
         this._stateButton.connect('clicked', Lang.bind(this, this._onStateButtonClicked));
 
-        this.appName = this._model.getName(this._appId);
-        this.appDescription = this._model.getDescription(this._appId);
+        this.appInfo = appInfo;
+        this.appName = this.appInfo.get_title();
         this.appIcon = this._model.getIcon(this._appId);
         this.appState = this._model.getState(this._appId);
+        this.appDescription = this.appInfo.get_description();
     },
 
     get appId() {
@@ -261,11 +262,15 @@ const AppFrame = new Lang.Class({
     },
 
     _onCellActivated: function(grid, cell) {
-        let appBox = new AppListBoxRow(this._model, cell.desktop_id);
+        let appBox = new AppListBoxRow(this._model, cell.app_info);
         appBox.show_all();
 
         this._mainStack.add_named(appBox, cell.desktop_id);
         this._mainStack.set_visible_child_name(cell.desktop_id);
+
+        let app = Gio.Application.get_default();
+        app.mainWindowTitle = cell.app_info.get_title();
+        app.mainWindowSubtitle = cell.app_info.get_subtitle();
     },
 
     _onCategoryClicked: function(button) {
