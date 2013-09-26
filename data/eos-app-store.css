@@ -32,11 +32,17 @@
 
 .app-cell-title {
   font: bold;
+  font-size: 1.5em;
   color: white;
 }
 
 .app-cell-subtitle {
   color: white;
+}
+
+.app-cell-frame {
+    border-style: none;
+    padding: 12px;
 }
 
 .new-site-frame {
