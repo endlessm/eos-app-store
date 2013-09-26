@@ -397,6 +397,9 @@ static gboolean
 is_app_installed (EosAppListModel *model,
                   const char      *desktop_app_id)
 {
+  if (model->installed_apps == NULL)
+    return FALSE;
+
   return g_hash_table_contains (model->installed_apps, desktop_app_id);
 }
 
