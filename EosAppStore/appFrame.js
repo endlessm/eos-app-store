@@ -219,7 +219,7 @@ const AppFrame = new Lang.Class({
         this._categoriesBox.show();
 
         let separator = new Gtk.Separator({ orientation: Gtk.Orientation.HORIZONTAL });
-        separator.get_style_context().add_class('app-frame-separator');
+        separator.get_style_context().add_class('frame-separator');
         this._mainBox.add(separator);
 
         this._stack = new PLib.Stack();

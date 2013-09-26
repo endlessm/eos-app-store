@@ -42,11 +42,12 @@
     background-image: linear-gradient(to top, white, white 3px, transparent 3px);
 }
 
-.app-frame {
+.app-frame,
+.folder-frame {
     border: none;
 }
 
-.app-frame-separator {
+.frame-separator {
     color: alpha(white, 0.1);
 }
 
@@ -242,6 +243,12 @@
 .weblink-row .url {
   font: Sans;
   color: orange;
+}
+
+.folder-description {
+    color: white;
+    font-weight: 600; /* semibold */
+    padding: 10px 2px 8px;
 }
 
 .folder-frame GtkToggleButton {
