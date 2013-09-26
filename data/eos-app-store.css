@@ -40,7 +40,11 @@
 }
 
 .app-category-button:active {
-    background-image: linear-gradient(to top, white, white 12%, transparent 12%);
+    background-image: linear-gradient(to top, white, white 3px, transparent 3px);
+}
+
+.app-frame-separator {
+    color: alpha(white, 0.1);
 }
 
 .close-button {

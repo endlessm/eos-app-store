@@ -16,6 +16,9 @@ const Signals = imports.signals;
 const APP_TRANSITION_MS = 500;
 const CATEGORY_TRANSITION_MS = 500;
 
+const CATEGORIES_BOX_SPACING = 32;
+const STACK_TOP_MARGIN = 15;
+
 // If the area available for the grid is less than this minimium size,
 // scroll bars will be added.
 const MIN_GRID_WIDTH = 800;
@@ -158,7 +161,7 @@ const AppCategoryButton = new Lang.Class({
 
 const AppFrame = new Lang.Class({
     Name: 'AppFrame',
-    Extends: Gtk.Frame,
+    Extends: Gtk.Bin,
 
     _init: function() {
         this.parent();
@@ -207,16 +210,22 @@ const AppFrame = new Lang.Class({
         this._mainBox.vexpand = true;
         this._mainBox.show();
 
-        this._categoriesBox = new Gtk.Box({ orientation: Gtk.Orientation.HORIZONTAL });
+        this._categoriesBox = new Gtk.Box({ orientation: Gtk.Orientation.HORIZONTAL,
+                                            spacing: CATEGORIES_BOX_SPACING });
         this._categoriesBox.hexpand = true;
         this._mainBox.add(this._categoriesBox);
         this._categoriesBox.show();
+
+        let separator = new Gtk.Separator({ orientation: Gtk.Orientation.HORIZONTAL });
+        separator.get_style_context().add_class('app-frame-separator');
+        this._mainBox.add(separator);
 
         this._stack = new PLib.Stack();
         this._stack.set_transition_duration(CATEGORY_TRANSITION_MS);
         this._stack.set_transition_type(PLib.StackTransitionType.SLIDE_RIGHT);
         this._stack.hexpand = true;
         this._stack.vexpand = true;
+        this._stack.margin_top = STACK_TOP_MARGIN;
         this._mainBox.add(this._stack);
         this._stack.show();
 
@@ -236,7 +245,7 @@ const AppFrame = new Lang.Class({
                                                           group: this._buttonGroup });
                 category.button.connect('clicked', Lang.bind(this, this._onCategoryClicked));
                 category.button.show();
-                this._categoriesBox.pack_start(category.button, true, false, 0);
+                this._categoriesBox.pack_start(category.button, false, false, 0);
 
                 if (!this._buttonGroup) {
                     this._buttonGroup = category.button;
