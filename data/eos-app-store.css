@@ -8,11 +8,25 @@
 }
 
 .sidebar-button {
-  color: white;
+  background: none;
+  border: none;
+  padding: 0;
+
+  color: #8c8c8c;
+  text-shadow: 0 1px alpha(black, 0.5);
 }
 
-.sidebar-button:hover {
-  color: black;
+.sidebar-button:active {
+    font-weight: bold;
+}
+
+.sidebar-button *:hover {
+  color: #e8e8e8;
+}
+
+.sidebar-button *:active,
+.sidebar-button *:hover:active {
+  color: white;
 }
 
 .close-button {

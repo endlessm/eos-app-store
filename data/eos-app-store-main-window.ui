@@ -27,12 +27,14 @@
                     <property name="can_focus">False</property>
                     <property name="valign">center</property>
                     <property name="orientation">vertical</property>
+                    <property name="spacing">12</property>
                     <child>
-                      <object class="GtkButton" id="side-pane-apps-button">
+                      <object class="GtkRadioButton" id="side-pane-apps-button">
                         <property name="visible">True</property>
                         <property name="can_focus">True</property>
                         <property name="receives_default">True</property>
                         <property name="relief">none</property>
+                        <property name="draw_indicator">False</property>
                         <property name="xalign">0</property>
                         <style>
                           <class name="sidebar-button"/>
@@ -77,12 +79,14 @@
                       </packing>
                     </child>
                     <child>
-                      <object class="GtkButton" id="side-pane-web-button">
+                      <object class="GtkRadioButton" id="side-pane-web-button">
                         <property name="visible">True</property>
                         <property name="can_focus">True</property>
                         <property name="receives_default">True</property>
                         <property name="relief">none</property>
                         <property name="xalign">0</property>
+                        <property name="draw_indicator">False</property>
+                        <property name="group">side-pane-apps-button</property>
                         <style>
                           <class name="sidebar-button"/>
                         </style>
@@ -126,12 +130,14 @@
                       </packing>
                     </child>
                     <child>
-                      <object class="GtkButton" id="side-pane-folder-button">
+                      <object class="GtkRadioButton" id="side-pane-folder-button">
                         <property name="visible">True</property>
                         <property name="can_focus">True</property>
                         <property name="receives_default">True</property>
                         <property name="relief">none</property>
                         <property name="xalign">0</property>
+                        <property name="draw_indicator">False</property>
+                        <property name="group">side-pane-apps-button</property>
                         <style>
                           <class name="sidebar-button"/>
                         </style>
