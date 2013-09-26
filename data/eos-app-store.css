@@ -1,5 +1,6 @@
 .background {
-  background-color: rgb(22, 22, 22);
+  background-color: #333232;
+  background-image: url("bg_gray_noise.png");
 }
 
 .sidebar-frame {
@@ -209,7 +210,6 @@
   background-size: 49px;
   border: 1px;
 }
-
 
 .weblink-row .state-button:hover {
   background-image: url("btn_add-website_hover.png");
