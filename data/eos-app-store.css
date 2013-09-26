@@ -3,8 +3,7 @@
 }
 
 .sidebar-frame {
-  padding-right: 64px;
-  margin-left: 6px;
+    padding: 0 15px;
 }
 
 .app-category-button,
@@ -36,7 +35,7 @@
 }
 
 .app-category-button {
-    padding: 4px 0;
+    padding: 6px 0;
 }
 
 .app-category-button:active {
@@ -54,7 +53,7 @@
 .close-button {
     background: none;
     border: none;
-    padding: 0;
+    padding: 15px 15px 0;
 
     color: #8a8a8a;
     icon-shadow: inset 0 1px black;
@@ -75,14 +74,9 @@
 }
 
 .header-title {
-    font-size: 2.0em;
+    font-size: 1.9em;
     font-weight: bold;
     color: white;
-}
-
-.header-description {
-  font: regular;
-  color: white;
 }
 
 .app-category-button {
