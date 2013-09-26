@@ -213,10 +213,6 @@
   box-shadow: 0px 2px 2px 0px rgba(0,0,0,0.3);
 }
 
-.weblink-listbox {
-  padding: 15px;
-}
-
 .weblink-listbox:hover {
   background: rgba(249,248,248,0.95);
   box-shadow: 0px 0px 12px 0px rgba(0,255,255,0.6);
