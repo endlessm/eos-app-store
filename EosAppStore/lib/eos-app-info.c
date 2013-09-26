@@ -554,6 +554,11 @@ eos_app_info_create_from_json (JsonNode *node)
   else
     info->subtitle = g_strdup ("");
 
+  if (json_object_has_member (obj, "description"))
+    info->description = json_node_dup_string (json_object_get_member (obj, "description"));
+  else
+    info->description = g_strdup ("");
+
   if (json_object_has_member (obj, "displayShape"))
     {
       const char *shape = json_object_get_string_member (obj, "displayShape");
