@@ -20,6 +20,7 @@
               <object class="GtkAlignment" id="alignment1">
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
+                <property name="left_padding">12</property>
                 <child>
                   <object class="GtkBox" id="side-pane-box">
                     <property name="visible">True</property>
@@ -191,6 +192,7 @@
           <object class="GtkFrame" id="content-frame">
             <property name="visible">True</property>
             <property name="can_focus">False</property>
+            <property name="hexpand">True</property>
             <property name="label_xalign">0</property>
             <property name="shadow_type">none</property>
             <style>
@@ -207,16 +209,19 @@
                     <property name="can_focus">True</property>
                     <property name="receives_default">True</property>
                     <property name="halign">end</property>
-                    <property name="margin">12</property>
-                    <signal name="clicked" handler="_onCloseClicked" swapped="no"/>
+                    <property name="margin_left">12</property>
+                    <property name="margin_right">12</property>
+                    <property name="margin_top">12</property>
+                    <property name="margin_bottom">12</property>
                     <style>
                       <class name="close-button"/>
                     </style>
+                    <signal name="clicked" handler="_onCloseClicked" swapped="no"/>
                     <child>
                       <object class="GtkImage" id="close-button-icon">
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
-                        <property name="icon-name">window-close-symbolic</property>
+                        <property name="icon_name">window-close-symbolic</property>
                         <property name="icon-size">1</property>
                       </object>
                     </child>
