@@ -177,6 +177,12 @@ const AppStoreWindow = new Lang.Class({
         'side-pane-apps-image',
         'side-pane-web-image',
         'side-pane-folder-image',
+        'side-pane-apps-label',
+        'side-pane-web-label',
+        'side-pane-folder-label',
+        'side-pane-apps-label-bold',
+        'side-pane-web-label-bold',
+        'side-pane-folder-label-bold',
         'content-box',
         'header-bar-title-label',
         'close-button',
@@ -201,6 +207,7 @@ const AppStoreWindow = new Lang.Class({
         this.add(this.main_box);
 
         this._loadSideImages();
+        this._setLabelSizeGroup();
 
         // update position when workarea changes
         let screen = Gdk.Screen.get_default();
@@ -252,6 +259,21 @@ const AppStoreWindow = new Lang.Class({
             let file = Gio.File.new_for_path(Path.ICONS_DIR + '/' + iconName);
             let icon = new Gio.FileIcon({ file: file });
             this[object].gicon = icon;
+        }
+    },
+
+    _setLabelSizeGroup: function() {
+        let labels = ['side_pane_apps_label',
+                      'side_pane_web_label',
+                      'side_pane_folder_label',
+                      'side_pane_apps_label_bold',
+                      'side_pane_web_label_bold',
+                      'side_pane_folder_label_bold'];
+
+        let sizeGroup = new Gtk.SizeGroup();
+        for (let idx in labels) {
+            let object = labels[idx];
+            sizeGroup.add_widget(this[object]);
         }
     },
 
