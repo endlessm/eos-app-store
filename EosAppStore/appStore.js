@@ -149,6 +149,18 @@ const AppStore = new Lang.Class({
         return AppStoreWindow.AppStoreSizes.SVGA.windowWidth;
     },
 
+    set mainWindowTitle(str) {
+        if (this._mainWindow != null) {
+            this._mainWindow.titleText = str;
+        }
+    },
+
+    set mainWindowSubtitle(str) {
+        if (this._mainWindow != null) {
+            this._mainWindow.subtitleText = str;
+        }
+    },
+
     Toggle: function(timestamp) {
         this._mainWindow.toggle(timestamp);
     },
