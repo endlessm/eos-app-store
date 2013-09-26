@@ -207,13 +207,16 @@
                     <property name="can_focus">True</property>
                     <property name="receives_default">True</property>
                     <property name="halign">end</property>
-                    <property name="always_show_image">True</property>
+                    <property name="margin">12</property>
                     <signal name="clicked" handler="_onCloseClicked" swapped="no"/>
+                    <style>
+                      <class name="close-button"/>
+                    </style>
                     <child>
                       <object class="GtkImage" id="close-button-icon">
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
-                        <property name="stock">gtk-delete</property>
+                        <property name="icon-name">window-close-symbolic</property>
                         <property name="icon-size">1</property>
                       </object>
                     </child>
