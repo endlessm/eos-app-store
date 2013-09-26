@@ -15,6 +15,7 @@ const AppFrame = imports.appFrame;
 const WeblinkFrame = imports.weblinkFrame;
 const FolderFrame = imports.folderFrame;
 const FrameClock = imports.frameClock;
+const Path = imports.path;
 const StoreModel = imports.storeModel;
 const UIBuilder = imports.builder;
 
@@ -173,9 +174,9 @@ const AppStoreWindow = new Lang.Class({
     templateResource: '/com/endlessm/appstore/eos-app-store-main-window.ui',
     templateChildren: [
         'main-box',
-        'side-pane-apps-button',
-        'side-pane-web-button',
-        'side-pane-folder-button',
+        'side-pane-apps-image',
+        'side-pane-web-image',
+        'side-pane-folder-image',
         'content-box',
         'header-bar-title-label',
         'header-bar-description-label',
@@ -199,6 +200,8 @@ const AppStoreWindow = new Lang.Class({
         // bug: https://bugzilla.gnome.org/show_bug.cgi?id=703154
         this.connect('realize', Lang.bind(this, function() { this.opacity = 0.95; }));
         this.add(this.main_box);
+
+        this._loadSideImages();
 
         // update position when workarea changes
         let screen = Gdk.Screen.get_default();
@@ -238,6 +241,19 @@ const AppStoreWindow = new Lang.Class({
 
         // switch to the 'Applications' page
         this._onStorePageChanged(this._storeModel, StoreModel.StorePage.APPS);
+    },
+
+    _loadSideImages: function() {
+        let resources = { side_pane_apps_image: 'icon_apps-symbolic.svg',
+                          side_pane_web_image: 'icon_website-symbolic.svg',
+                          side_pane_folder_image: 'icon_folder-symbolic.svg' };
+
+        for (let object in resources) {
+            let iconName = resources[object];
+            let file = Gio.File.new_for_path(Path.ICONS_DIR + '/' + iconName);
+            let icon = new Gio.FileIcon({ file: file });
+            this[object].gicon = icon;
+        }
     },
 
     _onCloseClicked: function() {
