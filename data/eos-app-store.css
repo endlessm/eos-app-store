@@ -53,8 +53,9 @@
 }
 
 .header-title {
-  font: Sans 24px;
-  color: white;
+    font-size: 2.0em;
+    font-weight: bold;
+    color: white;
 }
 
 .header-description {
