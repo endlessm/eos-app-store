@@ -83,6 +83,11 @@ const FolderNameBubble = new Lang.Class({
 
     setEntryVisible : function(visible) {
         if (visible) {
+            // Temporarily hide the entry, then show the bubble window,
+            // so that the placeholder text is displayed
+            this._entry.hide();
+            this.show();
+
             this._doneLabel.hide();
             this._addedIcon.hide();
             this._entry.show();
