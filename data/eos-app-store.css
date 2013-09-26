@@ -43,6 +43,10 @@
     background-image: linear-gradient(to top, white, white 3px, transparent 3px);
 }
 
+.app-frame {
+    border: none;
+}
+
 .app-frame-separator {
     color: alpha(white, 0.1);
 }

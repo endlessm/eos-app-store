@@ -161,10 +161,12 @@ const AppCategoryButton = new Lang.Class({
 
 const AppFrame = new Lang.Class({
     Name: 'AppFrame',
-    Extends: Gtk.Bin,
+    Extends: Gtk.Frame,
 
     _init: function() {
         this.parent();
+
+        this.get_style_context().add_class('app-frame');
 
         this._categories = [
             {
