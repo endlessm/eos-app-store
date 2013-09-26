@@ -24,6 +24,7 @@
     <file compressed="true">icon_alert.png</file>
     <file compressed="true">icon_external-link.png</file>
     <file compressed="true">icon_installed_43x43.png</file>
+    <file compressed="true">scrollbar_notch.png</file>
     <file>eos-app-store.css</file>
   </gresource>
 </gresources>
