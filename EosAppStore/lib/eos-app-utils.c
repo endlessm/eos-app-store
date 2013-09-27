@@ -4,22 +4,18 @@
 
 #include "eos-app-utils.h"
 #include "eos-app-info.h"
+#include "eos-link-info.h"
 
 #include <locale.h>
 #include <glib/gi18n.h>
 #include <json-glib/json-glib.h>
 
 #define APP_STORE_CONTENT_DIR   "application-store"
+#define APP_STORE_CONTENT_APPS  "apps"
+#define APP_STORE_CONTENT_LINKS "links"
 
-/**
- * eos_app_get_content_dir:
- *
- * ...
- *
- * Returns: (transfer full): ...
- */
-char *
-eos_app_get_content_dir (void)
+static char *
+eos_app_get_content_dir (const gchar *content_type)
 {
   char *locale = g_strdup (setlocale (LC_MESSAGES, NULL));
 
@@ -30,7 +26,7 @@ eos_app_get_content_dir (void)
   char *res = g_build_filename (DATADIR,
                                 APP_STORE_CONTENT_DIR,
                                 locale,
-                                "apps",
+                                content_type,
                                 NULL);
   g_free (locale);
 
@@ -48,35 +44,111 @@ eos_app_get_content_dir (void)
   return res;
 }
 
+static const char *
+eos_app_get_link_category_name (EosLinkCategory category) {
+  switch (category)
+    {
+    case EOS_LINK_CATEGORY_NEWS:
+      return "News";
+
+    case EOS_LINK_CATEGORY_SPORTS:
+      return "Sports";
+
+    case EOS_LINK_CATEGORY_EDUCATION:
+      return "Education and Health";
+
+    case EOS_LINK_CATEGORY_ENTERTAINMENT:
+      return "Entertainment";
+
+    case EOS_LINK_CATEGORY_LOCAL:
+      return "Local";
+
+    case EOS_LINK_CATEGORY_OPPORTUNITIES:
+      return "Opportunities";
+
+    default:
+      return "";
+    }
+}
+
+static JsonArray *
+eos_app_parse_content (JsonParser *parser,
+                       const char *content_type)
+{
+  JsonArray *content_array = NULL;
+  GError *error = NULL;
+
+  char *content_path = eos_app_get_content_dir (content_type);
+  char *content_file = g_build_filename (content_path, "content.json", NULL);
+
+  json_parser_load_from_file (parser, content_file, &error);
+
+  if (error != NULL)
+    {
+      g_critical ("Unable to load content from '%s': %s", content_file, error->message);
+      g_error_free (error);
+      goto out_error;
+      return NULL;
+    }
+
+  JsonNode *node = json_parser_get_root (parser);
+  if (!JSON_NODE_HOLDS_ARRAY (node))
+    {
+      g_critical ("Expected array content");
+      goto out_error;
+    }
+
+  content_array = json_node_get_array (node);
+
+ out_error:
+  g_free (content_path);
+  g_free (content_file);
+
+  return content_array;
+}
+
+/**
+ * eos_app_get_app_content_dir:
+ *
+ * ...
+ *
+ * Returns: (transfer full): ...
+ */
+char *
+eos_app_get_app_content_dir (void)
+{
+  return eos_app_get_content_dir (APP_STORE_CONTENT_APPS);
+}
+
+/**
+ * eos_app_get_link_content_dir:
+ *
+ * ...
+ *
+ * Returns: (transfer full): ...
+ */
+char *
+eos_app_get_link_content_dir (void)
+{
+  return eos_app_get_content_dir (APP_STORE_CONTENT_LINKS);
+}
+
 void
-eos_app_load_content (EosFlexyGrid *grid,
-                      EosAppCategory category)
+eos_app_load_app_content (EosFlexyGrid *grid,
+                          EosAppCategory category)
 {
   g_return_if_fail (EOS_IS_FLEXY_GRID (grid));
   g_return_if_fail (category >= EOS_APP_CATEGORY_FEATURED &&
                     category <= EOS_APP_CATEGORY_UTILITIES);
 
-  char *content_path = eos_app_get_content_dir ();
-  g_assert (content_path != NULL);
-
-  char *content_file = g_build_filename (content_path, "content.json", NULL);
-
   JsonParser *parser = json_parser_new ();
 
-  GError *error = NULL;
-  json_parser_load_from_file (parser, content_file, &error);
-  if (error != NULL)
-    {
-      g_critical ("Unable to load content from '%s': %s", content_file, error->message);
-      g_error_free (error);
-      goto out;
-    }
+  JsonArray *array = eos_app_parse_content (parser,
+                                            APP_STORE_CONTENT_APPS);
 
-  JsonNode *node = json_parser_get_root (parser);
-  if (!JSON_NODE_HOLDS_ARRAY (node))
+  if (array == NULL)
     goto out;
 
-  JsonArray *array = json_node_get_array (node);
   guint i, n_elements = json_array_get_length (array);
   for (i = 0; i < n_elements; i++)
     {
@@ -120,6 +192,71 @@ eos_app_load_content (EosFlexyGrid *grid,
 
 out:
   g_object_unref (parser);
-  g_free (content_file);
-  g_free (content_path);
+}
+
+/**
+ * eos_app_load_link_content:
+ *
+ * ...
+ *
+ * Returns: (element-type EosLinkInfo) (transfer full): ...
+ */
+GList *
+eos_app_load_link_content (EosLinkCategory category)
+{
+  GList *links = NULL;
+  JsonNode *element;
+  JsonObject *obj;
+  JsonParser *parser = json_parser_new ();
+  const gchar *category_name;
+
+  JsonArray *array = eos_app_parse_content (parser,
+                                            APP_STORE_CONTENT_LINKS);
+
+  if (array == NULL)
+    goto out;
+
+  guint i, n_elements = json_array_get_length (array);
+
+  /* First contents are the categories; search for the interested one */
+  category_name = eos_app_get_link_category_name (category);
+  for (i = 0; i < n_elements; i++)
+    {
+      element = json_array_get_element (array, i);
+      if (!JSON_NODE_HOLDS_OBJECT (element))
+        continue;
+
+      obj = json_node_get_object (element);
+
+      if (strcmp (json_node_get_string (json_object_get_member (obj, "category")), category_name) == 0)
+        break;
+    }
+
+  if (i >= n_elements) {
+    g_critical ("Unable to find category '%s'", category_name);
+    goto out;
+  }
+
+  element = json_object_get_member (obj, "links");
+
+  if (!JSON_NODE_HOLDS_ARRAY (element)) {
+    g_critical ("Category '%s' does not contain an array", category_name);
+    goto out;
+  }
+
+  array = json_node_get_array (element);
+  n_elements = json_array_get_length (array);
+
+  for (i = 0; i < n_elements; i++)
+    {
+      element = json_array_get_element (array, i);
+      EosLinkInfo *info = eos_link_info_create_from_json (element);
+      if (info != NULL)
+        links = g_list_prepend (links, info);
+    }
+
+out:
+  g_object_unref (parser);
+
+  return g_list_reverse (links);
 }

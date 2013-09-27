@@ -487,7 +487,7 @@ eos_app_info_get_square_img (const EosAppInfo *info)
   if (info == NULL || info->square_img == NULL || info->square_img[0] == '\0')
     return NULL;
 
-  path = eos_app_get_content_dir ();
+  path = eos_app_get_app_content_dir ();
   res = g_build_filename (path, "resources", "thumbnails", info->square_img, NULL);
 
   g_free (path);
@@ -511,7 +511,7 @@ eos_app_info_get_featured_img (const EosAppInfo *info)
   if (info == NULL || info->featured_img == NULL || info->featured_img[0] == '\0')
     return NULL;
 
-  path = eos_app_get_content_dir ();
+  path = eos_app_get_app_content_dir ();
   res = g_build_filename (path, "resources", "images", info->featured_img, NULL);
 
   g_free (path);

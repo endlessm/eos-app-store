@@ -20,6 +20,8 @@ const Signals = imports.signals;
 const NEW_SITE_TITLE_LIMIT = 20;
 const NEW_SITE_SUCCESS_TIMEOUT = 3;
 
+const CATEGORY_TRANSITION_MS = 500;
+
 const AlertIcon = {
     SPINNER: 0,
     CANCEL: 1,
@@ -92,7 +94,7 @@ const NewSiteBox = new Lang.Class({
     _reset: function() {
         this._siteAddButton.visible = false;
         this._switchAlertIcon(AlertIcon.NOTHING);
-        this._siteAlertLabel.set_text(_("e.g.: http://www.globoesporte.com"));
+        this._siteAlertLabel.set_text(_("e.g.: http://wwww.globoesporte.com"));
         this._urlEntry.set_text("");
         this._urlEntry.max_length = 0;
         this._urlEntry.halign = Gtk.Align.FILL;
@@ -227,53 +229,29 @@ const WeblinkListBoxRow = new Lang.Class({
         '_stateButton'
     ],
 
-    _init: function(model, weblinkId) {
+    _init: function(model, info) {
         this.parent();
 
         this._model = model;
-        this._weblinkId = weblinkId;
+        this._info = info;
 
         this.initTemplate({ templateRoot: '_mainBox', bindChildren: true, connectSignals: true, });
         this.add(this._mainBox);
+
+        this._nameLabel.set_text(info.get_title());
+        this._descriptionLabel.set_text(info.get_description());
+        this._urlLabel.set_text(info.get_url());
+
+        let thumbnail = info.get_thumbnail();
+        if (!thumbnail) {
+            thumbnail = 'gtk-missing-image';
+        }
+
+        this._icon.set_from_icon_name(thumbnail, Gtk.IconSize.DIALOG);
+
         this._mainBox.show();
 
         this._stateButton.connect('clicked', Lang.bind(this, this._onStateButtonClicked));
-    },
-
-    get weblinkId() {
-        return this._weblinkId;
-    },
-
-    set weblinkName(name) {
-        if (!name) {
-            name = _("Unknown weblink");
-        }
-
-        this._nameLabel.set_text(name);
-    },
-
-    set weblinkDescription(description) {
-        if (!description) {
-            description = '';
-        }
-
-        this._descriptionLabel.set_text(description);
-    },
-
-    set weblinkUrl(url) {
-        if (!url) {
-            url = '';
-        }
-
-        this._urlLabel.set_text(url);
-    },
-
-    set weblinkIcon(name) {
-        if (!name) {
-            name = 'gtk-missing-image';
-        }
-
-        this._icon.set_from_icon_name(name, Gtk.IconSize.DIALOG);
     },
 
     set weblinkState(state) {
@@ -302,7 +280,7 @@ const WeblinkListBoxRow = new Lang.Class({
     },
 
     _onUrlClicked: function(widget, event) {
-        Gtk.show_uri(null, this._urlLabel.get_text(), event.time, null);
+        Gtk.show_uri(null, this._info.get_url(), event.time, null);
         // hide the appstore to see the browser
         this.get_toplevel().emit('delete-event', null);
     },
@@ -337,9 +315,7 @@ const WeblinkFrame = new Lang.Class({
         '_mainBox',
         '_newSiteFrame',
         '_categoriesBox',
-        '_scrolledWindow',
-        '_viewport',
-        '_columnsBox',
+        '_listFrame',
     ],
 
     _init: function(mainWindow) {
@@ -406,17 +382,17 @@ const WeblinkFrame = new Lang.Class({
         this._newSiteBox = new NewSiteBox(this._weblinkListModel);
         this._newSiteFrame.add(this._newSiteBox);
 
-        this._listBoxes = [];
-        for (let i = 0; i < this._columns; i++) {
-            this._listBoxes[i] = new WeblinkListBox(this._weblinkListModel);
-            this._columnsBox.add(this._listBoxes[i]);
-        }
+        this._stack = new PLib.Stack();
+        this._stack.set_transition_duration(CATEGORY_TRANSITION_MS);
+        this._stack.set_transition_type (PLib.StackTransitionType.SLIDE_RIGHT);
+        this._stack.hexpand = true;
+        this._stack.vexpand = true;
+        this._listFrame.add (this._stack);
 
-        this._viewport.show_all();
+        this._mainBox.show_all();
 
         this._buttonGroup = null;
-        this._weblinkListModel.connect('changed', Lang.bind(this, this._onListModelChange));
-        this._onListModelChange();
+        this._weblinkListModel.connect('changed', Lang.bind(this, this._populateCategories));
         this._populateCategories();
     },
 
@@ -437,32 +413,43 @@ const WeblinkFrame = new Lang.Class({
                     this._buttonGroup = category.button;
                 }
             }
+
+            let scrollWindow;
+
+            if (!category.widget) {
+                scrollWindow = new Gtk.ScrolledWindow({ hscrollbar_policy: Gtk.PolicyType.NEVER,
+                                                        vscrollbar_policy: Gtk.PolicyType.AUTOMATIC });
+                this._stack.add_named(scrollWindow, category.name);
+                category.widget = scrollWindow;
+            } else {
+                scrollWindow = category.widget;
+                let child = scrollWindow.get_child();
+                child.destroy();
+            }
+
+            let weblinksBox = new Gtk.Box({ orientation: Gtk.Orientation.HORIZONTAL,
+                                            homogeneous: true });
+            scrollWindow.add_with_viewport(weblinksBox);
+
+            let weblinksColumnBoxes = [];
+            for (let i = 0; i < this._columns; i++) {
+                weblinksColumnBoxes[i] = new WeblinkListBox(this._weblinkListModel);
+                weblinksBox.add(weblinksColumnBoxes[i]);
+            }
+
+            let cells = EosAppStorePrivate.app_load_link_content(category.id);
+            let index = 0;
+            for (let i in cells) {
+                let row = new WeblinkListBoxRow(this._model, cells[i]);
+                weblinksColumnBoxes[(index++)%this._columns].add(row);
+            }
+
+            scrollWindow.show_all();
         }
     },
 
-    _onCategoryClicked: function() {
+    _onCategoryClicked: function(button) {
+        this._stack.set_visible_child_name(button.category);
     },
-
-    _onListModelChange: function() {
-        for (let i = 0; i < this._columns; i++) {
-            this._listBoxes[i].foreach(function(child) { child.destroy(); });
-        }
-
-        let model = this._weblinkListModel;
-        let weblinks = model.getWeblinks();
-        let index = 0;
-
-        weblinks.forEach(Lang.bind(this, function(item) {
-            let row = new WeblinkListBoxRow(model, item);
-            row.weblinkName = model.getName(item);
-            row.weblinkDescription = model.getComment(item);
-            row.weblinkUrl = model.getWeblinkUrl(item);
-            row.weblinkIcon = model.getIcon(item);
-            row.weblinkState = model.getState(item);
-
-            this._listBoxes[(index++)%this._columns].add(row);
-            row.show();
-        }));
-    }
 });
 Builder.bindTemplateChildren(WeblinkFrame.prototype);
