@@ -250,8 +250,8 @@ const AppFrame = new Lang.Class({
             scrollWindow.show_all();
         }
 
-        this._currentCategory = this._categories[0];
-        this._stack.set_visible_child_name(this._currentCategory.button.category);
+        this._currentCategory = this._categories[0].button.category;
+        this._stack.set_visible_child_name(this._currentCategory);
     },
 
     _onCellActivated: function(grid, cell) {
@@ -264,10 +264,25 @@ const AppFrame = new Lang.Class({
         let app = Gio.Application.get_default();
         app.mainWindowTitle = cell.app_info.get_title();
         app.mainWindowSubtitle = cell.app_info.get_subtitle();
+        app.mainWindow.backButtonVisible = true;
+        this._backClickedId =
+            app.mainWindow.connect('back-clicked', Lang.bind(this, this._onBackClicked));
+    },
+
+    _onBackClicked: function() {
+        let app = Gio.Application.get_default();
+        app.mainWindow.backButtonVisible = false;
+        app.mainWindow.disconnect(this._backClickedId);
+        this._backClickedId = 0;
+
+        let page = this._mainStack.get_visible_child();
+        this._mainStack.set_visible_child_name('main-box');
+        page.destroy();
     },
 
     _onCategoryClicked: function(button) {
         let category = button.category;
         this._stack.set_visible_child_name(category);
+        this._currentCategory = category;
     }
 });
