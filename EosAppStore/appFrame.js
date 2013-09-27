@@ -283,8 +283,9 @@ const AppFrame = new Lang.Class({
         this._mainStack.set_visible_child_name(cell.desktop_id);
 
         let app = Gio.Application.get_default();
-        app.mainWindowTitle = cell.app_info.get_title();
-        app.mainWindowSubtitle = cell.app_info.get_subtitle();
+        app.mainWindow.titleText = cell.app_info.get_title();
+        app.mainWindow.subtitleText = cell.app_info.get_subtitle();
+        app.mainWindow.headerIcon = this._model.getIcon(cell.desktop_id);
         app.mainWindow.backButtonVisible = true;
         this._backClickedId =
             app.mainWindow.connect('back-clicked', Lang.bind(this, this._onBackClicked));
@@ -292,8 +293,9 @@ const AppFrame = new Lang.Class({
 
     _onBackClicked: function() {
         let app = Gio.Application.get_default();
-        app.mainWindowTitle = null;
-        app.mainWindowSubtitle = null;
+        app.mainWindow.titleText = null;
+        app.mainWindow.subtitleText = null;
+        app.mainWindow.headerIcon = null;
         app.mainWindow.backButtonVisible = false;
         app.mainWindow.disconnect(this._backClickedId);
         this._backClickedId = 0;
@@ -306,5 +308,9 @@ const AppFrame = new Lang.Class({
     _onCategoryClicked: function(button) {
         let category = button.category;
         this._stack.set_visible_child_name(category);
+    },
+
+    reset: function() {
+        this._mainStack.set_visible_child_name('main-box');
     },
 });

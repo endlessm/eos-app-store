@@ -186,6 +186,8 @@ const AppStoreWindow = new Lang.Class({
         'side-pane-folder-label-bold',
         'content-box',
         'header-bar-title-label',
+        'header-bar-subtitle-label',
+        'header-icon',
         'close-button',
         'back-button',
     ],
@@ -317,24 +319,6 @@ const AppStoreWindow = new Lang.Class({
         }
     },
 
-    _setDefaultSubtitle: function() {
-        let desc = this.header_bar_description_label;
-
-        switch (this._currentPage) {
-            case StoreModel.StorePage.APPS:
-                desc.set_text(_("A list of many free applications you can install and update"));
-                break;
-
-            case StoreModel.StorePage.WEB:
-                desc.set_text(_("A list of many sites you can add"));
-                break;
-
-            case StoreModel.StorePage.FOLDERS:
-                desc.set_text(_("A descriptive label for the Folders section"));
-                break;
-        }
-    },
-
     _onStorePageChanged: function(model, newPage) {
         let stack = this._stack;
         let page = null;
@@ -346,7 +330,8 @@ const AppStoreWindow = new Lang.Class({
         this._currentPage = newPage;
 
         this._setDefaultTitle();
-        this._setDefaultSubtitle();
+        this.header_bar_subtitle_label.hide();
+        this.header_icon.hide();
 
         switch (this._currentPage) {
             case StoreModel.StorePage.APPS:
@@ -409,10 +394,21 @@ const AppStoreWindow = new Lang.Class({
 
     set subtitleText(str) {
         if (str) {
-            this.header_bar_description_label.set_text(str);
+            this.header_bar_subtitle_label.set_text(str);
+            this.header_bar_subtitle_label.show();
         }
         else {
-            this._setDefaultSubtitle();
+            this.header_bar_subtitle_label.hide();
+        }
+    },
+
+    set headerIcon(str) {
+        if (str) {
+            this.header_icon.set_from_icon_name(str, Gtk.IconSize.DIALOG);
+            this.header_icon.show();
+        }
+        else {
+            this.header_icon.hide();
         }
     },
 

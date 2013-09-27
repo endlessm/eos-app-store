@@ -103,6 +103,10 @@
     color: white;
 }
 
+.header-subtitle {
+    color: white;
+}
+
 .app-cell-title {
   font: bold;
   font-size: 1.5em;
