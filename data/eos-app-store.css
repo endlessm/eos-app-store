@@ -118,6 +118,15 @@
     padding: 12px;
 }
 
+.app-frame-name {
+  font: bold;
+  color: white;
+}
+
+.app-frame-description {
+  color: white;
+}
+
 .new-site-frame {
   background: rgba(0,0,0,0.25);
   border-radius: 4px;

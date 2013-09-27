@@ -169,6 +169,7 @@ const AppStoreWindow = new Lang.Class({
     Extends: Gtk.ApplicationWindow,
     Signals: {
         'visibility-changed': { param_types: [GObject.TYPE_BOOLEAN] },
+        'back-clicked': { },
     },
 
     templateResource: '/com/endlessm/appstore/eos-app-store-main-window.ui',
@@ -186,6 +187,7 @@ const AppStoreWindow = new Lang.Class({
         'content-box',
         'header-bar-title-label',
         'close-button',
+        'back-button',
     ],
 
     _init: function(app, storeModel, initialPage) {
@@ -281,6 +283,10 @@ const AppStoreWindow = new Lang.Class({
         this.toggle();
     },
 
+    _onBackClicked: function() {
+        this.emit('back-clicked');
+    },
+
     _onAppsClicked: function() {
         this._storeModel.changePage(StoreModel.StorePage.APPS);
     },
@@ -293,8 +299,43 @@ const AppStoreWindow = new Lang.Class({
         this._storeModel.changePage(StoreModel.StorePage.FOLDERS);
     },
 
-    _onStorePageChanged: function(model, newPage) {
+    _setDefaultTitle: function() {
         let title = this.header_bar_title_label;
+
+        switch (this._currentPage) {
+            case StoreModel.StorePage.APPS:
+                title.set_text(_("Install applications"));
+                break;
+
+            case StoreModel.StorePage.WEB:
+                title.set_text(_("Install websites"));
+                break;
+
+            case StoreModel.StorePage.FOLDERS:
+                title.set_text(_("Folders"));
+                break;
+        }
+    },
+
+    _setDefaultSubtitle: function() {
+        let desc = this.header_bar_description_label;
+
+        switch (this._currentPage) {
+            case StoreModel.StorePage.APPS:
+                desc.set_text(_("A list of many free applications you can install and update"));
+                break;
+
+            case StoreModel.StorePage.WEB:
+                desc.set_text(_("A list of many sites you can add"));
+                break;
+
+            case StoreModel.StorePage.FOLDERS:
+                desc.set_text(_("A descriptive label for the Folders section"));
+                break;
+        }
+    },
+
+    _onStorePageChanged: function(model, newPage) {
         let stack = this._stack;
         let page = null;
 
@@ -302,19 +343,21 @@ const AppStoreWindow = new Lang.Class({
             this._pages[p].hide();
         }
 
-        switch (newPage) {
+        this._currentPage = newPage;
+
+        this._setDefaultTitle();
+        this._setDefaultSubtitle();
+
+        switch (this._currentPage) {
             case StoreModel.StorePage.APPS:
-                title.set_text(_("Install Applications"));
                 page = this._pages.apps;
                 break;
 
             case StoreModel.StorePage.WEB:
-                title.set_text(_("Install Websites"));
                 page = this._pages.weblinks;
                 break;
 
             case StoreModel.StorePage.FOLDERS:
-                title.set_text(_("Folders"));
                 page = this._pages.folders;
                 break;
         }
@@ -353,6 +396,33 @@ const AppStoreWindow = new Lang.Class({
 
     getExpectedWidth: function() {
         return this._animator.expectedWidth;
+    },
+
+    set titleText(str) {
+        if (str) {
+            this.header_bar_title_label.set_text(str);
+        }
+        else {
+            this._setDefaultTitle();
+        }
+    },
+
+    set subtitleText(str) {
+        if (str) {
+            this.header_bar_description_label.set_text(str);
+        }
+        else {
+            this._setDefaultSubtitle();
+        }
+    },
+
+    set backButtonVisible(isVisible) {
+        if (isVisible) {
+            this.back_button.show();
+        }
+        else {
+            this.back_button.hide();
+        }
     },
 });
 UIBuilder.bindTemplateChildren(AppStoreWindow.prototype);
