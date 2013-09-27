@@ -271,6 +271,8 @@ const AppFrame = new Lang.Class({
 
     _onBackClicked: function() {
         let app = Gio.Application.get_default();
+        app.mainWindowTitle = null;
+        app.mainWindowSubtitle = null;
         app.mainWindow.backButtonVisible = false;
         app.mainWindow.disconnect(this._backClickedId);
         this._backClickedId = 0;
