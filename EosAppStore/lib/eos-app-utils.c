@@ -24,7 +24,6 @@ eos_app_get_content_dir (void)
   char *locale = g_strdup (setlocale (LC_MESSAGES, NULL));
 
   char *p;
-
   if ((p = strrchr (locale, '.')) != NULL)
     *p = '\0';
 
@@ -34,6 +33,17 @@ eos_app_get_content_dir (void)
                                 "apps",
                                 NULL);
   g_free (locale);
+
+  if (!g_file_test (res, G_FILE_TEST_EXISTS | G_FILE_TEST_IS_DIR))
+    {
+      g_free (res);
+
+      res = g_build_filename (DATADIR,
+                              APP_STORE_CONTENT_DIR,
+                              "C",
+                              "apps",
+                              NULL);
+    }
 
   return res;
 }
