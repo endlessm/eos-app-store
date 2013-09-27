@@ -247,9 +247,6 @@ const FolderFrame = new Lang.Class({
         this._viewport.add(this._grid);
 
         this.show_all();
-    },
-
-    reset: function() {
     }
 });
 Builder.bindTemplateChildren(FolderFrame.prototype);

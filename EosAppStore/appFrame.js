@@ -31,17 +31,15 @@ const AppListBoxRow = new Lang.Class({
     templateResource: '/com/endlessm/appstore/eos-app-store-list-row.ui',
     templateChildren: [
         '_mainBox',
-        '_icon',
-        '_nameLabel',
         '_descriptionLabel',
         '_stateButton',
     ],
 
-    _init: function(model, appId) {
+    _init: function(model, appInfo) {
         this.parent();
 
         this._model = model;
-        this._appId = appId;
+        this._appId = appInfo.get_desktop_id();
 
         this.initTemplate({ templateRoot: '_mainBox', bindChildren: true, connectSignals: true, });
         this.add(this._mainBox);
@@ -49,22 +47,13 @@ const AppListBoxRow = new Lang.Class({
 
         this._stateButton.connect('clicked', Lang.bind(this, this._onStateButtonClicked));
 
-        this.appName = this._model.getName(this._appId);
-        this.appDescription = this._model.getDescription(this._appId);
-        this.appIcon = this._model.getIcon(this._appId);
+        this.appInfo = appInfo;
         this.appState = this._model.getState(this._appId);
+        this.appDescription = this.appInfo.get_description();
     },
 
     get appId() {
         return this._appId;
-    },
-
-    set appName(name) {
-        if (!name) {
-            name = _("Unknown application");
-        }
-
-        this._nameLabel.set_text(name);
     },
 
     set appDescription(description) {
@@ -73,14 +62,6 @@ const AppListBoxRow = new Lang.Class({
         }
 
         this._descriptionLabel.set_text(description);
-    },
-
-    set appIcon(name) {
-        if (!name) {
-            name = "gtk-missing-image";
-        }
-
-        this._icon.set_from_icon_name(name, Gtk.IconSize.DIALOG);
     },
 
     set appState(state) {
@@ -279,22 +260,43 @@ const AppFrame = new Lang.Class({
 
             scrollWindow.show_all();
         }
+
+        this._currentCategory = this._categories[0].button.category;
+        this._stack.set_visible_child_name(this._currentCategory);
     },
 
     _onCellActivated: function(grid, cell) {
-        let appBox = new AppListBoxRow(this._model, cell.desktop_id);
+        let appBox = new AppListBoxRow(this._model, cell.app_info);
         appBox.show_all();
 
         this._mainStack.add_named(appBox, cell.desktop_id);
         this._mainStack.set_visible_child_name(cell.desktop_id);
+
+        let app = Gio.Application.get_default();
+        app.mainWindow.titleText = cell.app_info.get_title();
+        app.mainWindow.subtitleText = cell.app_info.get_subtitle();
+        app.mainWindow.headerIcon = this._model.getIcon(cell.desktop_id);
+        app.mainWindow.backButtonVisible = true;
+        this._backClickedId =
+            app.mainWindow.connect('back-clicked', Lang.bind(this, this._onBackClicked));
+    },
+
+    _onBackClicked: function() {
+        let app = Gio.Application.get_default();
+        app.mainWindow.titleText = null;
+        app.mainWindow.subtitleText = null;
+        app.mainWindow.headerIcon = null;
+        app.mainWindow.backButtonVisible = false;
+        app.mainWindow.disconnect(this._backClickedId);
+        this._backClickedId = 0;
+
+        let page = this._mainStack.get_visible_child();
+        this._mainStack.set_visible_child_name('main-box');
+        page.destroy();
     },
 
     _onCategoryClicked: function(button) {
         let category = button.category;
         this._stack.set_visible_child_name(category);
-    },
-
-    reset: function() {
-        this._mainStack.set_visible_child_name('main-box');        
     }
 });

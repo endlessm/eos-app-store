@@ -103,6 +103,10 @@
     color: white;
 }
 
+.header-subtitle {
+    color: white;
+}
+
 .app-cell-title {
   font: bold;
   font-size: 1.5em;
@@ -116,6 +120,10 @@
 .app-cell-frame {
     border-style: none;
     padding: 12px;
+}
+
+.app-frame-description {
+  color: white;
 }
 
 .new-site-frame {
