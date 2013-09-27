@@ -270,6 +270,9 @@ const AppFrame = new Lang.Class({
 
             scrollWindow.show_all();
         }
+
+        this._currentCategory = this._categories[0];
+        this._stack.set_visible_child_name(this._currentCategory.button.category);
     },
 
     _onCellActivated: function(grid, cell) {
