@@ -169,6 +169,7 @@ const AppStoreWindow = new Lang.Class({
     Extends: Gtk.ApplicationWindow,
     Signals: {
         'visibility-changed': { param_types: [GObject.TYPE_BOOLEAN] },
+        'back-clicked': { },
     },
 
     templateResource: '/com/endlessm/appstore/eos-app-store-main-window.ui',
@@ -186,6 +187,7 @@ const AppStoreWindow = new Lang.Class({
         'content-box',
         'header-bar-title-label',
         'close-button',
+        'back-button',
     ],
 
     _init: function(app, storeModel, initialPage) {
@@ -279,6 +281,10 @@ const AppStoreWindow = new Lang.Class({
 
     _onCloseClicked: function() {
         this.toggle();
+    },
+
+    _onBackClicked: function() {
+        this.emit('back-clicked');
     },
 
     _onAppsClicked: function() {
@@ -407,6 +413,15 @@ const AppStoreWindow = new Lang.Class({
         }
         else {
             this._setDefaultSubtitle();
+        }
+    },
+
+    set backButtonVisible(isVisible) {
+        if (isVisible) {
+            this.back_button.show();
+        }
+        else {
+            this.back_button.hide();
         }
     },
 });
