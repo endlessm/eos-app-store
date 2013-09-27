@@ -78,7 +78,6 @@ const FolderNameBubble = new Lang.Class({
 
         grid.show();
         this.add(grid);
-        this.setEntryVisible(true);
     },
 
     setEntryVisible : function(visible) {
