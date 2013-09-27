@@ -298,9 +298,5 @@ const AppFrame = new Lang.Class({
     _onCategoryClicked: function(button) {
         let category = button.category;
         this._stack.set_visible_child_name(category);
-    },
-
-    reset: function() {
-        this._mainStack.set_visible_child_name('main-box');
-    },
+    }
 });

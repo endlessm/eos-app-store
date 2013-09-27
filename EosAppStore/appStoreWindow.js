@@ -348,7 +348,6 @@ const AppStoreWindow = new Lang.Class({
         }
 
         if (page) {
-            page.reset();
             page.show_all();
             stack.set_visible_child(page);
         }
