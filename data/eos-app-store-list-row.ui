@@ -15,8 +15,8 @@
             <property name="icon-size">6</property>
           </object>
           <packing>
-            <property name="expand">False</property>
-            <property name="fill">False</property>
+            <property name="expand">True</property>
+            <property name="fill">True</property>
             <property name="position">0</property>
           </packing>
         </child>
@@ -26,20 +26,16 @@
             <property name="can_focus">False</property>
             <property name="orientation">vertical</property>
             <child>
-              <object class="GtkLabel" id="_nameLabel">
+              <object class="GtkButton" id="_stateButton">
+                <property name="label" translatable="yes">INSTALL</property>
                 <property name="visible">True</property>
-                <property name="can_focus">False</property>
-                <property name="xalign">0</property>
-                <property name="label" translatable="yes">NAME</property>
-                <property name="ellipsize">end</property>
-                <property name="width_chars">45</property>
-                <style>
-                  <class name="app-frame-name"/>
-                </style>
+                <property name="can_focus">True</property>
+                <property name="receives_default">True</property>
+                <property name="relief">none</property>
               </object>
               <packing>
                 <property name="expand">False</property>
-                <property name="fill">True</property>
+                <property name="fill">False</property>
                 <property name="position">0</property>
               </packing>
             </child>
@@ -50,8 +46,8 @@
                 <property name="xalign">0</property>
                 <property name="yalign">0</property>
                 <property name="label" translatable="yes">The application's description.</property>
-                <property name="wrap">True</property>
                 <property name="use_markup">True</property>
+                <property name="wrap">True</property>
                 <style>
                   <class name="app-frame-description"/>
                 </style>
@@ -64,23 +60,9 @@
             </child>
           </object>
           <packing>
-            <property name="expand">True</property>
+            <property name="expand">False</property>
             <property name="fill">True</property>
             <property name="position">1</property>
-          </packing>
-        </child>
-        <child>
-          <object class="GtkButton" id="_stateButton">
-            <property name="label" translatable="yes">INSTALL</property>
-            <property name="visible">True</property>
-            <property name="can_focus">True</property>
-            <property name="receives_default">True</property>
-            <property name="relief">none</property>
-          </object>
-          <packing>
-            <property name="expand">False</property>
-            <property name="fill">False</property>
-            <property name="position">2</property>
           </packing>
         </child>
       </object>
