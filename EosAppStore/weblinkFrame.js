@@ -391,9 +391,6 @@ const WeblinkFrame = new Lang.Class({
             this._listBoxes[(index++)%this._columns].add(row);
             row.show();
         }));
-    },
-
-    reset: function() {
     }
 });
 Builder.bindTemplateChildren(WeblinkFrame.prototype);

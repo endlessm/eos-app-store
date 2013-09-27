@@ -37,7 +37,7 @@ PKG_CHECK_MODULES(EOS_APP_STORE,
                   gtk+-3.0
                   json-glib-1.0
                   libgnome-menu-3.0
-                  pstack
+                  pstack >= 3
                   endless-0)
 AC_SUBST(EOS_APP_STORE_CFLAGS)
 AC_SUBST(EOS_APP_STORE_LIBS)
