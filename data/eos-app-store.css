@@ -68,7 +68,7 @@
 .web-frame,
 .folder-frame {
     border: none;
-    padding-right: 7px;
+    padding-right: 5px;
 }
 
 .frame-separator {
@@ -78,7 +78,7 @@
 .close-button {
     background: none;
     border: none;
-    padding: 15px 0 0;
+    padding: 12px 0 0;
 
     color: #8a8a8a;
     icon-shadow: inset 0 1px black;
@@ -94,7 +94,7 @@
 }
 
 .content-frame {
-  padding: 0 15px;
+  padding: 0 13px;
 }
 
 .header-title {
