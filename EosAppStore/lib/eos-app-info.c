@@ -274,6 +274,9 @@ struct _EosAppInfo
   char *square_img;
   char *featured_img;
 
+  char **screenshots;
+  guint n_screenshots;
+
   EosFlexyShape shape;
 
   EosAppCategory category;
@@ -320,6 +323,7 @@ eos_app_info_unref (EosAppInfo *info)
       g_free (info->description);
       g_free (info->square_img);
       g_free (info->featured_img);
+      g_strfreev (info->screenshots);
 
       g_slice_free (EosAppInfo, info);
     }
@@ -448,6 +452,32 @@ eos_app_info_get_featured_img (const EosAppInfo *info)
   return res;
 }
 
+guint
+eos_app_info_get_n_screenshots (const EosAppInfo *info)
+{
+  if (info == NULL)
+    return 0;
+
+  return info->n_screenshots;
+}
+
+/**
+ * eos_app_info_get_screenshots:
+ * @info: ...
+ *
+ * ...
+ *
+ * Returns: (transfer full) (array zero-terminated=1): ...
+ */
+char **
+eos_app_info_get_screenshots (const EosAppInfo *info)
+{
+  if (info == NULL)
+    return NULL;
+
+  return g_strdupv (info->screenshots);
+}
+
 /**
  * eos_app_info_create_cell:
  * @info:
@@ -530,6 +560,25 @@ get_shape_from_id (const char *p)
   return EOS_FLEXY_SHAPE_SMALL;
 }
 
+static void
+get_screenshots (JsonArray *array,
+                 EosAppInfo *info)
+{
+  info->n_screenshots = json_array_get_length (array);
+  info->screenshots = g_new0 (char *, info->n_screenshots + 1);
+
+  char *path = eos_app_get_content_dir ();
+
+  for (guint i = 0; i < info->n_screenshots; i++)
+    info->screenshots[i] = g_build_filename (path,
+                                             "resources",
+                                             "screenshots",
+                                             json_array_get_string_element (array, i),
+                                             NULL);
+
+  g_free (path);
+}
+
 /*< private >*/
 EosAppInfo *
 eos_app_info_create_from_json (JsonNode *node)
@@ -602,6 +651,16 @@ eos_app_info_create_from_json (JsonNode *node)
     }
   else
     info->category = EOS_APP_CATEGORY_UTILITIES;
+
+  if (json_object_has_member (obj, "screenshots"))
+    {
+      JsonNode *node = json_object_get_member (obj, "screenshots");
+
+      if (JSON_NODE_HOLDS_ARRAY (node))
+        get_screenshots (json_node_get_array (node), info);
+    }
+  else
+    info->n_screenshots = 0;
 
   return info;
 }
