@@ -31,7 +31,6 @@ const AppListBoxRow = new Lang.Class({
     templateResource: '/com/endlessm/appstore/eos-app-store-list-row.ui',
     templateChildren: [
         '_mainBox',
-        '_icon',
         '_descriptionLabel',
         '_stateButton',
     ],
@@ -49,7 +48,6 @@ const AppListBoxRow = new Lang.Class({
         this._stateButton.connect('clicked', Lang.bind(this, this._onStateButtonClicked));
 
         this.appInfo = appInfo;
-        this.appIcon = this._model.getIcon(this._appId);
         this.appState = this._model.getState(this._appId);
         this.appDescription = this.appInfo.get_description();
     },
@@ -64,14 +62,6 @@ const AppListBoxRow = new Lang.Class({
         }
 
         this._descriptionLabel.set_text(description);
-    },
-
-    set appIcon(name) {
-        if (!name) {
-            name = "gtk-missing-image";
-        }
-
-        this._icon.set_from_icon_name(name, Gtk.IconSize.DIALOG);
     },
 
     set appState(state) {
