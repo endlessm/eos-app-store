@@ -78,6 +78,18 @@ const FolderNameBubble = new Lang.Class({
 
         grid.show();
         this.add(grid);
+
+        this.connect('key-press-event', Lang.bind(this, this._onKeyPress));
+    },
+
+    _onKeyPress : function(window, event) {
+        if (!this._entry.has_focus) {
+            this._entry.grab_focus();
+            // Append rather than overwrite
+            this._entry.set_position(this._entry.get_text_length());
+        }
+
+        return false;
     },
 
     setEntryVisible : function(visible) {
