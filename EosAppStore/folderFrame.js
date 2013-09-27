@@ -8,8 +8,8 @@ const Cairo = imports.cairo;
 
 const Builder = imports.builder;
 const Lang = imports.lang;
-
 const FolderModel = imports.folderModel;
+const Separator = imports.separator;
 
 const _FOLDER_BUTTON_SIZE = 64;
 const _FOLDER_GRID_SPACING = _FOLDER_BUTTON_SIZE;
@@ -250,6 +250,7 @@ const FolderFrame = new Lang.Class({
     templateResource: '/com/endlessm/appstore/eos-app-store-folder-frame.ui',
     templateChildren: [
         '_mainBox',
+        '_folderBoxContent',
         '_scrolledWindow',
         '_viewport',
     ],
@@ -266,6 +267,10 @@ const FolderFrame = new Lang.Class({
         this._mainBox.vexpand = true;
 
         this.add(this._mainBox);
+
+        let separator = new Separator.FrameSeparator();
+        this._folderBoxContent.add(separator);
+        this._folderBoxContent.reorder_child(separator, 1);
 
         this._grid = new FolderIconGrid(this._folderModel);
         this._viewport.add(this._grid);

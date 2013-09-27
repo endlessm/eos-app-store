@@ -13,6 +13,7 @@ const AppListModel = imports.appListModel;
 const AppStoreWindow = imports.appStoreWindow;
 const Builder = imports.builder;
 const Lang = imports.lang;
+const Separator = imports.separator;
 const Signals = imports.signals;
 
 const NEW_SITE_TITLE_LIMIT = 20;
@@ -346,6 +347,11 @@ const WeblinkFrame = new Lang.Class({
 
         this.initTemplate({ templateRoot: '_mainBox', bindChildren: true, connectSignals: true, });
         this.add(this._mainBox);
+
+        let separator = new Separator.FrameSeparator();
+        this._mainBox.add(separator);
+        this._mainBox.reorder_child(separator, 1);
+
         this._mainBox.show_all();
 
         if (mainWindow.getExpectedWidth() <= AppStoreWindow.AppStoreSizes.XGA.windowWidth) {

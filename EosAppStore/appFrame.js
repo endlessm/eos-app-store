@@ -11,13 +11,14 @@ const Endless = imports.gi.Endless;
 const AppListModel = imports.appListModel;
 const Builder = imports.builder;
 const Lang = imports.lang;
+const Separator = imports.separator;
 const Signals = imports.signals;
 
 const APP_TRANSITION_MS = 500;
 const CATEGORY_TRANSITION_MS = 500;
 
 const CATEGORIES_BOX_SPACING = 32;
-const STACK_TOP_MARGIN = 15;
+const STACK_TOP_MARGIN = 4;
 
 // If the area available for the grid is less than this minimium size,
 // scroll bars will be added.
@@ -201,8 +202,7 @@ const AppFrame = new Lang.Class({
         this._mainBox.add(this._categoriesBox);
         this._categoriesBox.show();
 
-        let separator = new Gtk.Separator({ orientation: Gtk.Orientation.HORIZONTAL });
-        separator.get_style_context().add_class('frame-separator');
+        let separator = new Separator.FrameSeparator();
         this._mainBox.add(separator);
 
         this._stack = new PLib.Stack();

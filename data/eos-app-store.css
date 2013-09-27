@@ -75,6 +75,22 @@
     color: alpha(white, 0.1);
 }
 
+.frame-separator-shadows .frame {
+    border: none;
+}
+
+.frame-separator-shadows .left-edge {
+    background-image: url('separator_shadow_left-edge.png');
+}
+
+.frame-separator-shadows .center-line {
+    background-image: url('separator_shadow_body.png');
+}
+
+.frame-separator-shadows .right-edge {
+    background-image: url('separator_shadow_right-edge.png');
+}
+
 .close-button {
     background: none;
     border: none;
