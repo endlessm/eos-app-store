@@ -29,7 +29,6 @@ const AppListBoxRow = new Lang.Class({
     templateChildren: [
         '_mainBox',
         '_icon',
-        '_nameLabel',
         '_descriptionLabel',
         '_stateButton',
     ],
@@ -47,7 +46,6 @@ const AppListBoxRow = new Lang.Class({
         this._stateButton.connect('clicked', Lang.bind(this, this._onStateButtonClicked));
 
         this.appInfo = appInfo;
-        this.appName = this.appInfo.get_title();
         this.appIcon = this._model.getIcon(this._appId);
         this.appState = this._model.getState(this._appId);
         this.appDescription = this.appInfo.get_description();
@@ -55,14 +53,6 @@ const AppListBoxRow = new Lang.Class({
 
     get appId() {
         return this._appId;
-    },
-
-    set appName(name) {
-        if (!name) {
-            name = _("Unknown application");
-        }
-
-        this._nameLabel.set_text(name);
     },
 
     set appDescription(description) {
