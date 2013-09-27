@@ -176,6 +176,8 @@ const AppFrame = new Lang.Class({
             },
         ];
 
+        this._currentCategory = this._categories[0].name;
+
         // initialize the applications model
         this._model = new AppListModel.AppList();
 
@@ -215,6 +217,19 @@ const AppFrame = new Lang.Class({
         this._buttonGroup = null;
         this._model.connect('changed', Lang.bind(this, this._populateCategories));
         this._populateCategories();
+
+        let content_dir = EosAppStorePrivate.app_get_content_dir();
+        let content_path = GLib.build_filenamev([content_dir, 'content.json']);
+        let content_file = Gio.File.new_for_path(content_path);
+        this._contentMonitor = content_file.monitor_file(Gio.FileMonitorFlags.NONE, null);
+        this._contentMonitor.connect('changed', Lang.bind(this, this._onContentChanged));
+
+        this._stack.set_visible_child_name(this._currentCategory);
+    },
+
+    _onContentChanged: function(monitor, file, other_file, event_type) {
+        this._populateCategories();
+        this._stack.set_visible_child_name(this._currentCategory);
     },
 
     _populateCategories: function() {
@@ -260,9 +275,6 @@ const AppFrame = new Lang.Class({
 
             scrollWindow.show_all();
         }
-
-        this._currentCategory = this._categories[0].button.category;
-        this._stack.set_visible_child_name(this._currentCategory);
     },
 
     _onCellActivated: function(grid, cell) {
@@ -297,6 +309,8 @@ const AppFrame = new Lang.Class({
 
     _onCategoryClicked: function(button) {
         let category = button.category;
+
+        this._currentCategory = category;
         this._stack.set_visible_child_name(category);
     }
 });
