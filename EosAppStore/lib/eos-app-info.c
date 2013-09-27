@@ -33,6 +33,7 @@ typedef struct {
   EosAppInfo *info;
 
   GdkPixbuf *image;
+  GtkStyleContext *image_context;
 } EosAppCell;
 
 typedef EosFlexyGridCellClass EosAppCellClass;
@@ -42,6 +43,58 @@ static GParamSpec *eos_app_cell_props[NUM_PROPS] = { NULL, };
 static GType eos_app_cell_get_type (void) G_GNUC_CONST;
 
 G_DEFINE_TYPE (EosAppCell, eos_app_cell, EOS_TYPE_FLEXY_GRID_CELL)
+
+#define PROVIDER_DATA_FORMAT ".app-cell-image { " \
+  "background-image: url(\"%s\"); "               \
+  "background-size: 100%% 100%%; }"
+
+static GdkPixbuf *
+prepare_pixbuf_from_file (EosAppCell *self,
+                          const gchar *path,
+                          gint image_width,
+                          gint image_height,
+                          GError **error)
+{
+  GdkPixbuf *retval;
+  cairo_surface_t *surface;
+  cairo_t *cr;
+  GtkCssProvider *provider;
+  gchar *provider_data;
+
+  provider_data = g_strdup_printf (PROVIDER_DATA_FORMAT, path);
+  provider = gtk_css_provider_new ();
+
+  if (!gtk_css_provider_load_from_data (provider, provider_data, -1, error))
+    {
+      g_free (provider_data);
+      g_object_unref (provider);
+
+      return NULL;
+    }
+
+  gtk_style_context_add_provider (self->image_context,
+                                  GTK_STYLE_PROVIDER (provider),
+                                  GTK_STYLE_PROVIDER_PRIORITY_APPLICATION);
+
+  surface = cairo_image_surface_create (CAIRO_FORMAT_ARGB32,
+                                        image_width, image_height);
+  cr = cairo_create (surface);
+  gtk_render_background (self->image_context, cr,
+                         0, 0, image_width, image_height);
+
+  retval = gdk_pixbuf_get_from_surface (surface, 0, 0,
+                                        image_width, image_height);
+
+  cairo_destroy (cr);
+  cairo_surface_destroy (surface);
+  gtk_style_context_remove_provider (self->image_context,
+                                     GTK_STYLE_PROVIDER (provider));
+
+  g_free (provider_data);
+  g_object_unref (provider);
+
+  return retval;
+}
 
 static void
 eos_app_cell_get_property (GObject    *gobject,
@@ -113,6 +166,7 @@ eos_app_cell_finalize (GObject *gobject)
 {
   EosAppCell *self = (EosAppCell *) gobject;
 
+  g_clear_object (&self->image_context);
   g_clear_object (&self->image);
   g_free (self->desktop_id);
   eos_app_info_unref (self->info);
@@ -128,6 +182,9 @@ eos_app_cell_draw (GtkWidget *widget,
   GtkAllocation allocation;
   GError *error;
   char *path;
+  int width, height;
+  int image_width, image_height;
+  GtkBorder image_margin;
 
   if (self->info == NULL)
     {
@@ -135,10 +192,19 @@ eos_app_cell_draw (GtkWidget *widget,
       return FALSE;
     }
 
+  gtk_widget_get_allocation (widget, &allocation);
+  width = allocation.width;
+  height = allocation.height;
+
+  gtk_style_context_get_margin (self->image_context,
+                                GTK_STATE_FLAG_NORMAL,
+                                &image_margin);
+
+  image_width = width - image_margin.left - image_margin.right;
+  image_height = height - image_margin.top - image_margin.bottom;
+
   if (self->image != NULL)
     goto out;
-
-  gtk_widget_get_allocation (widget, &allocation);
 
   if (eos_app_info_is_featured (self->info))
     path = eos_app_info_get_featured_img (self->info);
@@ -153,11 +219,10 @@ eos_app_cell_draw (GtkWidget *widget,
       goto out;
     }
 
-  int width = allocation.width;
-  int height = allocation.height;
-
   error = NULL;
-  self->image = gdk_pixbuf_new_from_file_at_size (path, width, height, &error);
+  self->image = prepare_pixbuf_from_file
+    (self, path, image_width, image_height, &error);
+
   if (error != NULL)
     {
       g_warning ("Unable to load image at path '%s': %s",
@@ -169,10 +234,10 @@ eos_app_cell_draw (GtkWidget *widget,
 
 out:
   if (self->image != NULL)
-    gtk_render_icon (gtk_widget_get_style_context (widget),
+    gtk_render_icon (self->image_context,
                      cr,
                      self->image,
-                     0.0, 0.0);
+                     image_margin.top, image_margin.left);
 
   GTK_WIDGET_CLASS (eos_app_cell_parent_class)->draw (widget, cr);
 
@@ -256,6 +321,8 @@ eos_app_cell_init (EosAppCell *self)
   gtk_label_set_max_width_chars (GTK_LABEL (self->subtitle_label), 50);
   gtk_container_add (GTK_CONTAINER (box), self->subtitle_label);
   gtk_widget_show (self->subtitle_label);
+
+  self->image_context = eos_app_info_get_cell_style_context ();
 }
 
 /*
@@ -501,6 +568,28 @@ eos_app_info_create_cell (const EosAppInfo *info)
                                  NULL);
 
   return res;
+}
+
+/**
+ * eos_app_info_get_cell_style_context:
+ *
+ * Returns: (transfer full):
+ */
+GtkStyleContext *
+eos_app_info_get_cell_style_context (void)
+{
+  GtkStyleContext *style_context;
+  GtkWidgetPath *widget_path;
+
+  widget_path = gtk_widget_path_new ();
+  gtk_widget_path_append_type (widget_path, eos_app_cell_get_type ());
+
+  style_context = gtk_style_context_new ();
+  gtk_style_context_set_path (style_context, widget_path);
+  gtk_style_context_add_class (style_context, "app-cell-image");
+  gtk_widget_path_free (widget_path);
+
+  return style_context;
 }
 
 /* Keep in the same order as the EosAppCategory enumeration */
