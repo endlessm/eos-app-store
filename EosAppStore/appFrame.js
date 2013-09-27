@@ -9,6 +9,7 @@ const PLib = imports.gi.PLib;
 const Endless = imports.gi.Endless;
 
 const AppListModel = imports.appListModel;
+const CategoryButton = imports.categoryButton;
 const Builder = imports.builder;
 const Lang = imports.lang;
 const Separator = imports.separator;
@@ -108,39 +109,6 @@ const AppListBoxRow = new Lang.Class({
     },
 });
 Builder.bindTemplateChildren(AppListBoxRow.prototype);
-
-const AppCategoryButton = new Lang.Class({
-    Name: 'AppCategoryButton',
-    Extends: Gtk.RadioButton,
-    Properties: { 'category': GObject.ParamSpec.string('category',
-                                                       'Category',
-                                                       'The category name',
-                                                       GObject.ParamFlags.READABLE |
-                                                       GObject.ParamFlags.WRITABLE |
-                                                       GObject.ParamFlags.CONSTRUCT,
-                                                       '') },
-    _init: function(params) {
-        this._category = '';
-
-        this.parent(params);
-
-        this.get_style_context().add_class('app-category-button');
-    },
-
-    get category() {
-        return this._category;
-    },
-
-    set category(c) {
-        if (this._category == c) {
-            return;
-        }
-
-        this._category = c;
-        this.notify('category');
-    }
-});
-
 
 const AppFrame = new Lang.Class({
     Name: 'AppFrame',
@@ -242,10 +210,10 @@ const AppFrame = new Lang.Class({
             let category = this._categories[c];
 
             if (!category.button) {
-                category.button = new AppCategoryButton({ label: category.label,
-                                                          category: category.name,
-                                                          draw_indicator: false,
-                                                          group: this._buttonGroup });
+                category.button = new CategoryButton.CategoryButton({ label: category.label,
+                                                                      category: category.name,
+                                                                      draw_indicator: false,
+                                                                      group: this._buttonGroup });
                 category.button.connect('clicked', Lang.bind(this, this._onCategoryClicked));
                 category.button.show();
                 this._categoriesBox.pack_start(category.button, false, false, 0);

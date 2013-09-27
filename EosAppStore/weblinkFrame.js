@@ -11,6 +11,7 @@ const WebKit = imports.gi.WebKit2;
 
 const AppListModel = imports.appListModel;
 const AppStoreWindow = imports.appStoreWindow;
+const CategoryButton = imports.categoryButton;
 const Builder = imports.builder;
 const Lang = imports.lang;
 const Separator = imports.separator;
@@ -335,6 +336,7 @@ const WeblinkFrame = new Lang.Class({
     templateChildren: [
         '_mainBox',
         '_newSiteFrame',
+        '_categoriesBox',
         '_scrolledWindow',
         '_viewport',
         '_columnsBox',
@@ -344,6 +346,45 @@ const WeblinkFrame = new Lang.Class({
         this.parent();
 
         this.get_style_context().add_class('web-frame');
+
+        this._categories = [
+            {
+                name: 'news',
+                widget: null,
+                label: _("News"),
+                id: EosAppStorePrivate.LinkCategory.NEWS,
+            },
+            {
+                name: 'sports',
+                widget: null,
+                label: _("Sports"),
+                id: EosAppStorePrivate.LinkCategory.SPORTS,
+            },
+            {
+                name: 'education',
+                widget: null,
+                label: _("Education and Health"),
+                id: EosAppStorePrivate.LinkCategory.EDUCATION,
+            },
+            {
+                name: 'entertainment',
+                widget: null,
+                label: _("Entertainment"),
+                id: EosAppStorePrivate.LinkCategory.ENTERTAINMENT,
+            },
+            {
+                name: 'local',
+                widget: null,
+                label: _("Local"),
+                id: EosAppStorePrivate.LinkCategory.LOCAL,
+            },
+            {
+                name: 'opportunities',
+                widget: null,
+                label: _("Opportunities"),
+                id: EosAppStorePrivate.LinkCategory.OPPORTUNITIES,
+            },
+        ];
 
         this.initTemplate({ templateRoot: '_mainBox', bindChildren: true, connectSignals: true, });
         this.add(this._mainBox);
@@ -373,8 +414,33 @@ const WeblinkFrame = new Lang.Class({
 
         this._viewport.show_all();
 
+        this._buttonGroup = null;
         this._weblinkListModel.connect('changed', Lang.bind(this, this._onListModelChange));
         this._onListModelChange();
+        this._populateCategories();
+    },
+
+    _populateCategories: function() {
+        for (let c in this._categories) {
+            let category = this._categories[c];
+
+            if (!category.button) {
+                category.button = new CategoryButton.CategoryButton({ label: category.label,
+                                                                      category: category.name,
+                                                                      draw_indicator: false,
+                                                                      group: this._buttonGroup });
+                category.button.connect('clicked', Lang.bind(this, this._onCategoryClicked));
+                category.button.show();
+                this._categoriesBox.pack_start(category.button, false, false, 0);
+
+                if (!this._buttonGroup) {
+                    this._buttonGroup = category.button;
+                }
+            }
+        }
+    },
+
+    _onCategoryClicked: function() {
     },
 
     _onListModelChange: function() {
