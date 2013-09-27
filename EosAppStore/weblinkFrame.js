@@ -22,6 +22,8 @@ const NEW_SITE_SUCCESS_TIMEOUT = 3;
 
 const CATEGORY_TRANSITION_MS = 500;
 
+const THUMBNAIL_SIZE = 90;
+
 const AlertIcon = {
     SPINNER: 0,
     CANCEL: 1,
@@ -244,10 +246,20 @@ const WeblinkListBoxRow = new Lang.Class({
 
         let thumbnail = info.get_thumbnail();
         if (!thumbnail) {
-            thumbnail = 'gtk-missing-image';
+            this._icon.set_from_icon_name('gtk-missing-image', Gtk.IconSize.DIALOG);
+        } else {
+            // Scale and crop
+            if (thumbnail.height > thumbnail.width) {
+                thumbnail = thumbnail.scale_simple(THUMBNAIL_SIZE,
+                                                   Math.floor(thumbnail.height*THUMBNAIL_SIZE/thumbnail.width),
+                                                   GdkPixbuf.InterpType.BILINEAR);
+            } else {
+                thumbnail = thumbnail.scale_simple(Math.floor(thumbnail.width*THUMBNAIL_SIZE/thumbnail.height),
+                                                   THUMBNAIL_SIZE,
+                                                   GdkPixbuf.InterpType.BILINEAR);
+            }
+            this._icon.set_from_pixbuf(thumbnail.new_subpixbuf(0, 0, THUMBNAIL_SIZE, THUMBNAIL_SIZE));
         }
-
-        this._icon.set_from_icon_name(thumbnail, Gtk.IconSize.DIALOG);
 
         this._mainBox.show();
 
@@ -276,7 +288,11 @@ const WeblinkListBoxRow = new Lang.Class({
     },
 
     _onStateButtonClicked: function() {
-        this._model.install(this._weblinkId);
+        let id = this._info.get_id();
+
+        if (id) {
+            this._model.install(id + ".desktop");
+        }
     },
 
     _onUrlClicked: function(widget, event) {
