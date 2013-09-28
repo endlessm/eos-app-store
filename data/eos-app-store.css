@@ -91,6 +91,21 @@
     background-image: url('separator_shadow_right-edge.png');
 }
 
+.back-button {
+    border: none;
+    background-color: transparent;
+    background-image: url('btn_back_normal.png');
+}
+
+.back-button:hover {
+    background-image: url('btn_back_hover.png');
+}
+
+.back-button:active,
+.back-button:hover:active {
+    background-image: url('btn_back_pressed.png');
+}
+
 .close-button {
     background: none;
     border: none;
