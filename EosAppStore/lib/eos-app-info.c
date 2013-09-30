@@ -656,7 +656,7 @@ get_screenshots (JsonArray *array,
   info->n_screenshots = json_array_get_length (array);
   info->screenshots = g_new0 (char *, info->n_screenshots + 1);
 
-  char *path = eos_app_get_content_dir ();
+  char *path = eos_app_get_app_content_dir ();
 
   for (guint i = 0; i < info->n_screenshots; i++)
     info->screenshots[i] = g_build_filename (path,

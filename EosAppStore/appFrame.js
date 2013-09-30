@@ -187,7 +187,7 @@ const AppFrame = new Lang.Class({
         this._model.connect('changed', Lang.bind(this, this._populateCategories));
         this._populateCategories();
 
-        let content_dir = EosAppStorePrivate.app_get_content_dir();
+        let content_dir = EosAppStorePrivate.app_get_app_content_dir();
         let content_path = GLib.build_filenamev([content_dir, 'content.json']);
         let content_file = Gio.File.new_for_path(content_path);
         this._contentMonitor = content_file.monitor_file(Gio.FileMonitorFlags.NONE, null);

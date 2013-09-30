@@ -466,6 +466,6 @@ const WeblinkFrame = new Lang.Class({
 
     _onCategoryClicked: function(button) {
         this._stack.set_visible_child_name(button.category);
-    },
+    }
 });
 Builder.bindTemplateChildren(WeblinkFrame.prototype);
