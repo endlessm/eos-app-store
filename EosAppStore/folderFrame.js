@@ -38,7 +38,7 @@ const FolderNameBubble = new Lang.Class({
 
         this._entry = new Gtk.Entry({
             'placeholder-text': _("Name of folder"),
-            'width-chars': 30,
+            'width-chars': 20,
             hexpand: true,
             halign: Gtk.Align.FILL,
             vexpand: true,
