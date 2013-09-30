@@ -53,6 +53,9 @@ const FolderNameBubble = new Lang.Class({
             this._addButton.set_sensitive(this._entry.get_text_length() != 0);
         }));
 
+        this._entry.connect('activate',
+                            Lang.bind(this, this._createFolderFromEntry));
+
         this._addButton.connect('clicked',
                                 Lang.bind(this, this._createFolderFromEntry));
 
