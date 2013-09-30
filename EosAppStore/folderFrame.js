@@ -28,6 +28,9 @@ const FolderNameBubble = new Lang.Class({
 
         this._folderModel = folderModel;
 
+        let border = new Gtk.Frame();
+        border.get_style_context().add_class('bubble-border');
+
         let grid = new Gtk.Grid({
             'column-spacing': _BUBBLE_GRID_SPACING });
 
@@ -84,8 +87,9 @@ const FolderNameBubble = new Lang.Class({
         grid.attach(this._doneLabel, 0, 1, 1, 1);
         grid.attach(this._addedIcon, 1, 1, 1, 1);
 
-        grid.show();
-        this.add(grid);
+        border.add(grid);
+        this.add(border);
+        border.show_all();
 
         this.connect('key-press-event', Lang.bind(this, this._onKeyPress));
     },

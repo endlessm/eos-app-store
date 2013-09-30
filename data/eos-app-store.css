@@ -328,19 +328,25 @@
   background: alpha(#ffffff, 0.9);
 }
 
-PBubbleWindow {
-  padding: 12px;
-  border: 2px alpha(#000000, 0.35);
+.folder-bubble {
+  padding: 6px;
+  background: alpha(#000000, 0.35);
   border-radius: 40px;
+}
+
+.folder-bubble .bubble-border {
+  border: none;
+  border-radius: 40px;
+  padding: 2px 6px;
+}
+
+.folder-bubble.entering .bubble-border {
+  background: #ffffff;
   box-shadow: inset 0px 2px 3px 0px rgba(0, 0, 0, 0.25);
 }
 
-PBubbleWindow.entering {
-  background: #ffffff;
-}
-
-PBubbleWindow.done {
-  background: alpha(#000000, 0.35);
+.folder-bubble.done .bubble-border {
+  background: transparent;
 }
 
 .folder-bubble GtkEntry {
