@@ -22,9 +22,11 @@ const FolderNameBubble = new Lang.Class({
     Name: 'FolderNameBubble',
     Extends: PLib.BubbleWindow,
 
-    _init : function() {
+    _init : function(folderModel) {
         this.parent();
         this.get_style_context().add_class('folder-bubble');
+
+        this._folderModel = folderModel;
 
         let grid = new Gtk.Grid({
             'column-spacing': _BUBBLE_GRID_SPACING });
@@ -50,6 +52,9 @@ const FolderNameBubble = new Lang.Class({
         this._entry.connect('changed', Lang.bind(this, function() {
             this._addButton.set_sensitive(this._entry.get_text_length() != 0);
         }));
+
+        this._addButton.connect('clicked',
+                                Lang.bind(this, this._createFolderFromEntry));
 
         // ... which will be replaced by "done" label and icon
 
@@ -90,6 +95,12 @@ const FolderNameBubble = new Lang.Class({
         }
 
         return false;
+    },
+
+    _createFolderFromEntry : function() {
+        this._folderModel.createFolder(this._entry.get_text(),
+                                       this._iconName);
+        this.setEntryVisible(false);
     },
 
     setEntryVisible : function(visible) {
@@ -218,15 +229,7 @@ const FolderIconGrid = new Lang.Class({
 
         // bubble window
 
-        this._bubble = new FolderNameBubble();
-
-        this._bubble._addButton.connect('clicked',
-                                        Lang.bind(this, function(button) {
-            this._folderModel.createFolder(this._bubble._entry.get_text(),
-                                           this._bubble._iconName);
-
-            this._bubble.setEntryVisible(false);
-        }));
+        this._bubble = new FolderNameBubble(folderModel);
 
         this._bubble.connect('hide', Lang.bind(this, function() {
             this._activeToggle.set_active(false);
