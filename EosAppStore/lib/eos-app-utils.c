@@ -15,7 +15,7 @@
 #define APP_STORE_CONTENT_LINKS "links"
 
 static char *
-eos_app_get_content_dir (const gchar *content_type)
+eos_get_content_dir (const gchar *content_type)
 {
   char *locale = g_strdup (setlocale (LC_MESSAGES, NULL));
 
@@ -45,7 +45,7 @@ eos_app_get_content_dir (const gchar *content_type)
 }
 
 static const char *
-eos_app_get_link_category_name (EosLinkCategory category) {
+eos_link_get_category_name (EosLinkCategory category) {
   switch (category)
     {
     case EOS_LINK_CATEGORY_NEWS:
@@ -78,7 +78,7 @@ eos_app_parse_content (JsonParser *parser,
   JsonArray *content_array = NULL;
   GError *error = NULL;
 
-  char *content_path = eos_app_get_content_dir (content_type);
+  char *content_path = eos_get_content_dir (content_type);
   char *content_file = g_build_filename (content_path, "content.json", NULL);
 
   json_parser_load_from_file (parser, content_file, &error);
@@ -108,33 +108,33 @@ eos_app_parse_content (JsonParser *parser,
 }
 
 /**
- * eos_app_get_app_content_dir:
+ * eos_app_get_content_dir:
  *
  * ...
  *
  * Returns: (transfer full): ...
  */
 char *
-eos_app_get_app_content_dir (void)
+eos_app_get_content_dir (void)
 {
-  return eos_app_get_content_dir (APP_STORE_CONTENT_APPS);
+  return eos_get_content_dir (APP_STORE_CONTENT_APPS);
 }
 
 /**
- * eos_app_get_link_content_dir:
+ * eos_link_get_content_dir:
  *
  * ...
  *
  * Returns: (transfer full): ...
  */
 char *
-eos_app_get_link_content_dir (void)
+eos_link_get_content_dir (void)
 {
-  return eos_app_get_content_dir (APP_STORE_CONTENT_LINKS);
+  return eos_get_content_dir (APP_STORE_CONTENT_LINKS);
 }
 
 void
-eos_app_load_app_content (EosFlexyGrid *grid,
+eos_app_load_content (EosFlexyGrid *grid,
                           EosAppCategory category)
 {
   g_return_if_fail (EOS_IS_FLEXY_GRID (grid));
@@ -195,14 +195,14 @@ out:
 }
 
 /**
- * eos_app_load_link_content:
+ * eos_link_load_content:
  *
  * ...
  *
  * Returns: (element-type EosLinkInfo) (transfer full): ...
  */
 GList *
-eos_app_load_link_content (EosLinkCategory category)
+eos_link_load_content (EosLinkCategory category)
 {
   GList *links = NULL;
   JsonNode *element;
@@ -219,7 +219,7 @@ eos_app_load_link_content (EosLinkCategory category)
   guint i, n_elements = json_array_get_length (array);
 
   /* First contents are the categories; search for the interested one */
-  category_name = eos_app_get_link_category_name (category);
+  category_name = eos_link_get_category_name (category);
   for (i = 0; i < n_elements; i++)
     {
       element = json_array_get_element (array, i);

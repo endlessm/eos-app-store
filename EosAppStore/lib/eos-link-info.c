@@ -134,7 +134,7 @@ eos_link_info_create_from_json (JsonNode *node)
   }
 
   if (json_object_has_member (obj, "linkSmall")) {
-    path = eos_app_get_link_content_dir();
+    path = eos_link_get_content_dir();
     thumbnail = g_build_filename (path,
 				  json_node_dup_string (json_object_get_member (obj, "linkSmall")),
 				  NULL);

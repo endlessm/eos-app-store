@@ -453,7 +453,7 @@ const WeblinkFrame = new Lang.Class({
                 weblinksBox.add(weblinksColumnBoxes[i]);
             }
 
-            let cells = EosAppStorePrivate.app_load_link_content(category.id);
+            let cells = EosAppStorePrivate.link_load_content(category.id);
             let index = 0;
             for (let i in cells) {
                 let row = new WeblinkListBoxRow(this._model, cells[i]);
