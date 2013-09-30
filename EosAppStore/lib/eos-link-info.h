@@ -16,11 +16,14 @@ EosLinkInfo *   eos_link_info_new                 (void);
 EosLinkInfo *   eos_link_info_ref                 (EosLinkInfo *info);
 void            eos_link_info_unref               (EosLinkInfo *info);
 
-const gchar *    eos_link_info_get_id             (EosLinkInfo *info);
-const gchar *    eos_link_info_get_title          (EosLinkInfo *info);
-const gchar *    eos_link_info_get_description    (EosLinkInfo *info);
-GdkPixbuf   *    eos_link_info_get_thumbnail      (EosLinkInfo *info);
-const gchar *    eos_link_info_get_url            (EosLinkInfo *info);
+const gchar *   eos_link_info_get_id                 (EosLinkInfo *info);
+const gchar *   eos_link_info_get_title              (EosLinkInfo *info);
+const gchar *   eos_link_info_get_description        (EosLinkInfo *info);
+const gchar *   eos_link_info_get_icon_filename      (EosLinkInfo *info);
+GdkPixbuf   *   eos_link_info_get_icon               (EosLinkInfo *info);
+const gchar *   eos_link_info_get_thumbnail_filename (EosLinkInfo *info);
+GdkPixbuf   *   eos_link_info_get_thumbnail          (EosLinkInfo *info);
+const gchar *   eos_link_info_get_url                (EosLinkInfo *info);
 
 #ifndef __GI_SCANNER__
 

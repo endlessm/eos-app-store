@@ -231,9 +231,10 @@ const WeblinkListBoxRow = new Lang.Class({
         '_stateButton'
     ],
 
-    _init: function(model, info) {
+    _init: function(parentFrame, model, info) {
         this.parent();
 
+        this._parentFrame = parentFrame;
         this._model = model;
         this._info = info;
 
@@ -262,37 +263,36 @@ const WeblinkListBoxRow = new Lang.Class({
         }
 
         this._mainBox.show();
-
-        this._stateButton.connect('clicked', Lang.bind(this, this._onStateButtonClicked));
-    },
-
-    set weblinkState(state) {
-        switch (state) {
-        case EosAppStorePrivate.AppState.INSTALLED:
-            this._stateButton.sensitive = false;
-            this._descriptionLabel.set_text(_("has been added successfully!"));
-            this._nameLabel.vexpand = true;
-            this._urlLabel.visible = false;
-            break;
-
-        case EosAppStorePrivate.AppState.UNINSTALLED:
-            this._stateButton.sensitive = true;
-            this._nameLabel.vexpand = false;
-            this._urlLabel.visible = true;
-            break;
-
-        default:
-            break;
-        }
-        this._stateButton.show();
     },
 
     _onStateButtonClicked: function() {
-        let id = this._info.get_id();
+        this._parentFrame.notifyChanges(false);
 
-        if (id) {
-            this._model.install(id + ".desktop");
+        let url = this._info.get_url();
+        let title = this._info.get_title();
+        let icon = this._info.get_icon_filename();
+        if (!icon) {
+            icon = 'browser';
         }
+
+        let site = this._model.createWeblink(url, title, icon);
+        this._model.install(site);
+
+        this._stateButton.sensitive = false;
+        this._descriptionLabel.set_text(_("has been added successfully!"));
+        this._nameLabel.vexpand = true;
+        this._urlLabel.visible = false;
+
+        GLib.timeout_add_seconds(GLib.PRIORITY_DEFAULT,
+                                 NEW_SITE_SUCCESS_TIMEOUT,
+                                 Lang.bind(this, function() {
+                                     this._stateButton.sensitive = true;
+                                     this._nameLabel.vexpand = false;
+                                     this._urlLabel.visible = true;
+                                     this._descriptionLabel.set_text(this._info.get_description());
+                                     this._parentFrame.notifyChanges(true);
+                                     return false;
+                                 }));
     },
 
     _onUrlClicked: function(widget, event) {
@@ -408,8 +408,19 @@ const WeblinkFrame = new Lang.Class({
         this._mainBox.show_all();
 
         this._buttonGroup = null;
-        this._weblinkListModel.connect('changed', Lang.bind(this, this._populateCategories));
-        this._populateCategories();
+        this._notifyChangesId = null;
+
+        this.notifyChanges(true);
+    },
+
+    notifyChanges: function(notify) {
+        if (notify) {
+            this._notifyChangesId = this._weblinkListModel.connect('changed', Lang.bind(this, this._populateCategories));
+            this._populateCategories();
+        } else if (this._notifyChangesId) {
+            this._weblinkListModel.disconnect(this._notifyChangesId);
+            this._notifyChangesId = null;
+        }
     },
 
     _populateCategories: function() {
@@ -456,7 +467,7 @@ const WeblinkFrame = new Lang.Class({
             let cells = EosAppStorePrivate.link_load_content(category.id);
             let index = 0;
             for (let i in cells) {
-                let row = new WeblinkListBoxRow(this._model, cells[i]);
+                let row = new WeblinkListBoxRow(this, this._weblinkListModel, cells[i]);
                 weblinksColumnBoxes[(index++)%this._columns].add(row);
             }
 

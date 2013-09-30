@@ -10,6 +10,9 @@ struct _EosLinkInfo
   gchar *id;
   gchar *title;
   gchar *description;
+  gchar *icon_filename;
+  gchar *thumbnail_filename;
+  GdkPixbuf *icon;
   GdkPixbuf *thumbnail;
   gchar *url;
 };
@@ -46,6 +49,9 @@ eos_link_info_unref (EosLinkInfo *info)
       g_free (info->id);
       g_free (info->title);
       g_free (info->description);
+      g_free (info->icon_filename);
+      g_free (info->thumbnail_filename);
+      g_clear_object (&(info->icon));
       g_clear_object (&(info->thumbnail));
       g_free (info->url);
 
@@ -75,6 +81,38 @@ eos_link_info_get_description (EosLinkInfo *info)
   g_return_val_if_fail (info != NULL, "");
 
   return info->description;
+}
+
+const gchar *
+eos_link_info_get_icon_filename (EosLinkInfo *info)
+{
+  g_return_val_if_fail (info != NULL, NULL);
+
+  return info->icon_filename;
+}
+
+const gchar *
+eos_link_info_get_thumbnail_filename (EosLinkInfo *info)
+{
+  g_return_val_if_fail (info != NULL, NULL);
+
+  return info->thumbnail_filename;
+}
+
+/**
+ * eos_link_info_get_icon:
+ * @info: ...
+ *
+ * ...
+ *
+ * Returns: (transfer none): ...
+ */
+GdkPixbuf *
+eos_link_info_get_icon (EosLinkInfo *info)
+{
+  g_return_val_if_fail (info != NULL, NULL);
+
+  return info->icon;
 }
 
 /**
@@ -108,7 +146,8 @@ eos_link_info_create_from_json (JsonNode *node)
   EosLinkInfo *info;
   JsonObject *obj;
   const gchar *path;
-  gchar *thumbnail;
+  gchar *thumbnail_filename;
+  gchar *icon_filename;
 
   g_return_val_if_fail (JSON_NODE_HOLDS_OBJECT (node), NULL);
 
@@ -133,15 +172,38 @@ eos_link_info_create_from_json (JsonNode *node)
     info->description = g_strdup ("");
   }
 
+  if (json_object_has_member (obj, "linkIcon")) {
+    path = eos_link_get_content_dir();
+    icon_filename = g_build_filename (path,
+				      json_node_dup_string (json_object_get_member (obj, "linkIcon")),
+				      NULL);
+    info->icon = gdk_pixbuf_new_from_file (icon_filename, NULL);
+    if (info->icon) {
+      info->icon_filename = icon_filename;
+    } else {
+      info->icon_filename = NULL;
+      g_free (icon_filename);
+    }
+  } else {
+    info->icon = NULL;
+    info->icon_filename = NULL;
+  }
+
   if (json_object_has_member (obj, "linkSmall")) {
     path = eos_link_get_content_dir();
-    thumbnail = g_build_filename (path,
-				  json_node_dup_string (json_object_get_member (obj, "linkSmall")),
-				  NULL);
-    info->thumbnail = gdk_pixbuf_new_from_file (thumbnail, NULL);
-    g_free (thumbnail);
+    thumbnail_filename = g_build_filename (path,
+					   json_node_dup_string (json_object_get_member (obj, "linkSmall")),
+					   NULL);
+    info->thumbnail = gdk_pixbuf_new_from_file (thumbnail_filename, NULL);
+    if (info->thumbnail) {
+      info->thumbnail_filename = thumbnail_filename;
+    } else {
+      info->thumbnail_filename = NULL;
+      g_free (thumbnail_filename);
+    }
   } else {
     info->thumbnail = NULL;
+    info->thumbnail_filename = NULL;
   }
 
   if (json_object_has_member (obj, "linkUrl")) {
