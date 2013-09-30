@@ -1,6 +1,7 @@
 @define-color app_store_bg #333232;
 @define-color app_store_button_fg #8c8c8c;
 @define-color app_store_button_hover_fg #e8e8e8;
+@define-color app_store_selected_bg alpha(@app_store_bg, 0.80);
 
 .background {
     background-color: @app_store_bg;
@@ -143,7 +144,7 @@
 }
 
 .app-cell-title {
-    font: bold;
+    font-weight: bold;
     font-size: 1.5em;
     color: white;
 }
@@ -183,9 +184,12 @@
 }
 
 .new-site-frame .url-entry {
-    font: Sans 15px;
-    color: @app_store_bg;
+    font-size: 15px;
+    font-weight: 600; /* semibold */
+
+    color: #333333;
     text-shadow: white 0px 1px 0px;
+
     background: alpha(white, 0.15);
     box-shadow: 0px 2px 0px alpha(black, 0.25) inset;
     padding-left: 20px;
@@ -203,14 +207,19 @@
     background: white;
 }
 
+.new-site-frame .url-entry:selected {
+    background-color: @app_store_selected_bg;
+    color: white;
+}
+
 .new-site-frame .url-label {
-    font: Sans 20px;
+    font-size: 20px;
     font-weight: bold;
     color: white;
 }
    
 .new-site-frame .alert-label {
-    font: regular 14px;
+    font-size: 14px;
     color: #999999;
 }
 
@@ -293,18 +302,15 @@
 }
 
 .weblink-row .title {
-    font: Sans;
     font-weight: bold;
     color: white;
 }
 
 .weblink-row .description {
-    font: regular;
     color: lightgray;
 }
 
 .weblink-row .url {
-    font: Sans;
     color: orange;
 }
 
@@ -357,11 +363,13 @@
     border: none;
     box-shadow: none;
     background: none;
+
+    font-size: 15px;
     font-weight: 600; /* semibold */
 }
 
 .folder-bubble .entry:selected {
-    background-color: alpha(@app_store_bg, 0.80);
+    background-color: @app_store_selected_bg;
 }
 
 .folder-bubble .button {
