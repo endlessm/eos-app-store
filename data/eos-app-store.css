@@ -346,11 +346,18 @@
 }
 
 .folder-bubble.done .bubble-border {
-  background: transparent;
+    background: transparent;
 }
 
-.folder-bubble GtkEntry {
-	border: none;
+.folder-bubble .entry {
+    border: none;
+    box-shadow: none;
+    background: none;
+    font-weight: 600; /* semibold */
+}
+
+.folder-bubble .entry:selected {
+    background-color: alpha(@app_store_bg, 0.80);
 }
 
 .folder-bubble GtkButton {
