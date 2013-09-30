@@ -22,9 +22,11 @@ const FolderNameBubble = new Lang.Class({
     Name: 'FolderNameBubble',
     Extends: PLib.BubbleWindow,
 
-    _init : function() {
+    _init : function(folderModel) {
         this.parent();
         this.get_style_context().add_class('folder-bubble');
+
+        this._folderModel = folderModel;
 
         let grid = new Gtk.Grid({
             'column-spacing': _BUBBLE_GRID_SPACING });
@@ -50,6 +52,12 @@ const FolderNameBubble = new Lang.Class({
         this._entry.connect('changed', Lang.bind(this, function() {
             this._addButton.set_sensitive(this._entry.get_text_length() != 0);
         }));
+
+        this._entry.connect('activate',
+                            Lang.bind(this, this._createFolderFromEntry));
+
+        this._addButton.connect('clicked',
+                                Lang.bind(this, this._createFolderFromEntry));
 
         // ... which will be replaced by "done" label and icon
 
@@ -78,11 +86,35 @@ const FolderNameBubble = new Lang.Class({
 
         grid.show();
         this.add(grid);
-        this.setEntryVisible(true);
+
+        this.connect('key-press-event', Lang.bind(this, this._onKeyPress));
+    },
+
+    _onKeyPress : function(window, event) {
+        if (!this._entry.has_focus) {
+            this._entry.grab_focus();
+            // Append rather than overwrite
+            this._entry.set_position(this._entry.get_text_length());
+        }
+
+        return false;
+    },
+
+    _createFolderFromEntry : function() {
+        if (this._entry.get_text_length() != 0) {
+            this._folderModel.createFolder(this._entry.get_text(),
+                                           this._iconName);
+            this.setEntryVisible(false);
+        }
     },
 
     setEntryVisible : function(visible) {
         if (visible) {
+            // Temporarily hide the entry, then show the bubble window,
+            // so that the placeholder text is displayed
+            this._entry.hide();
+            this.show();
+
             this._doneLabel.hide();
             this._addedIcon.hide();
             this._entry.show();
@@ -202,15 +234,7 @@ const FolderIconGrid = new Lang.Class({
 
         // bubble window
 
-        this._bubble = new FolderNameBubble();
-
-        this._bubble._addButton.connect('clicked',
-                                        Lang.bind(this, function(button) {
-            this._folderModel.createFolder(this._bubble._entry.get_text(),
-                                           this._bubble._iconName);
-
-            this._bubble.setEntryVisible(false);
-        }));
+        this._bubble = new FolderNameBubble(folderModel);
 
         this._bubble.connect('hide', Lang.bind(this, function() {
             this._activeToggle.set_active(false);
