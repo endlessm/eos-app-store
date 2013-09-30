@@ -32,25 +32,25 @@ const FolderNameBubble = new Lang.Class({
         border.get_style_context().add_class('bubble-border');
 
         let grid = new Gtk.Grid({
-            'column-spacing': _BUBBLE_GRID_SPACING });
+            column_spacing: _BUBBLE_GRID_SPACING });
 
         // entry and "add" button...
 
         this._entry = new Gtk.Entry({
-            'placeholder-text': _("Name of folder"),
-            'width-chars': 20,
+            placeholder_text: _("Name of folder"),
+            width_chars: 20,
             hexpand: true,
             halign: Gtk.Align.FILL,
             vexpand: true,
             valign: Gtk.Align.FILL,
-            'no-show-all': true });
+            no_show_all: true });
         this._addButton = new Gtk.Button({
-            'width-request': _ADD_FOLDER_BUTTON_SIZE,
-            'height-request': _ADD_FOLDER_BUTTON_SIZE,
+            width_request: _ADD_FOLDER_BUTTON_SIZE,
+            height_request: _ADD_FOLDER_BUTTON_SIZE,
             hexpand: false,
             vexpand: true,
             valign: Gtk.Align.CENTER,
-            'no-show-all': true });
+            no_show_all: true });
 
         this._entry.connect('changed', Lang.bind(this, function() {
             this._addButton.set_sensitive(this._entry.get_text_length() != 0);
@@ -71,15 +71,15 @@ const FolderNameBubble = new Lang.Class({
             vexpand: true,
             valign: Gtk.Align.CENTER,
             name: 'doneLabel',
-            'no-show-all': true  });
+            no_show_all: true  });
         this._addedIcon = new Gtk.Image({
             resource: '/com/endlessm/appstore/icon_installed_24x24.png',
-            'width-request': _ADD_FOLDER_BUTTON_SIZE,
-            'height-request': _ADD_FOLDER_BUTTON_SIZE,
+            width_request: _ADD_FOLDER_BUTTON_SIZE,
+            height_request: _ADD_FOLDER_BUTTON_SIZE,
             hexpand: false,
             vexpand: true,
             valign: Gtk.Align.CENTER,
-            'no-show-all': true
+            no_show_all: true
         });
 
         grid.attach(this._entry, 0, 0, 1, 1);
@@ -144,14 +144,14 @@ const FolderIconButton = new Lang.Class({
     _init : function(iconName) {
         this.parent({
             active: false,
-            'draw-indicator': false,
-            'always-show-image': true,
-            'width-request': _FOLDER_BUTTON_SIZE,
-            'height-request': _FOLDER_BUTTON_SIZE,
+            draw_indicator: false,
+            always_show_image: true,
+            width_request: _FOLDER_BUTTON_SIZE,
+            height_request: _FOLDER_BUTTON_SIZE,
             relief: Gtk.ReliefStyle.NONE,
             hexpand: false,
             vexpand: false,
-            image: new Gtk.Image({'icon-name': iconName}) });
+            image: new Gtk.Image({ icon_name: iconName }) });
 
         this._iconName = iconName;
         this.get_style_context().add_class('folder-icon-button');
@@ -230,9 +230,9 @@ const FolderIconGrid = new Lang.Class({
 
     _init: function(folderModel) {
         this.parent({
-            'row-spacing': _FOLDER_GRID_SPACING,
-            'column-spacing': _FOLDER_GRID_SPACING,
-            'border-width': _FOLDER_GRID_BORDER });
+            row_spacing: _FOLDER_GRID_SPACING,
+            column_spacing: _FOLDER_GRID_SPACING,
+            border_width: _FOLDER_GRID_BORDER });
 
         this._folderModel = folderModel;
         this._get_icons();
