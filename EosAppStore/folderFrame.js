@@ -70,6 +70,7 @@ const FolderNameBubble = new Lang.Class({
             halign: Gtk.Align.CENTER,
             vexpand: true,
             valign: Gtk.Align.CENTER,
+            name: 'doneLabel',
             'no-show-all': true  });
         this._addedIcon = new Gtk.Image({
             resource: '/com/endlessm/appstore/icon_installed_24x24.png',
@@ -153,6 +154,7 @@ const FolderIconButton = new Lang.Class({
             image: new Gtk.Image({'icon-name': iconName}) });
 
         this._iconName = iconName;
+        this.get_style_context().add_class('folder-icon-button');
     }
 });
 
