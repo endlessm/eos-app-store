@@ -101,9 +101,11 @@ const FolderNameBubble = new Lang.Class({
     },
 
     _createFolderFromEntry : function() {
-        this._folderModel.createFolder(this._entry.get_text(),
-                                       this._iconName);
-        this.setEntryVisible(false);
+        if (this._entry.get_text_length() != 0) {
+            this._folderModel.createFolder(this._entry.get_text(),
+                                           this._iconName);
+            this.setEntryVisible(false);
+        }
     },
 
     setEntryVisible : function(visible) {
