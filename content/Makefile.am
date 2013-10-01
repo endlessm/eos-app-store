@@ -1,7 +1,5 @@
 NULL =
 
-en_us_app_json = \
-	en_US/apps/content.json \
 C_app_json = \
 	C/apps/content.json \
 	$(NULL)

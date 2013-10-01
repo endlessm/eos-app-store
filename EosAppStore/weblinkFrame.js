@@ -252,10 +252,10 @@ const WeblinkListBoxRow = new Lang.Class({
             // Scale and crop
             if (thumbnail.height > thumbnail.width) {
                 thumbnail = thumbnail.scale_simple(THUMBNAIL_SIZE,
-                                                   Math.floor(thumbnail.height*THUMBNAIL_SIZE/thumbnail.width),
+                                                   Math.floor(thumbnail.height * THUMBNAIL_SIZE / thumbnail.width),
                                                    GdkPixbuf.InterpType.BILINEAR);
             } else {
-                thumbnail = thumbnail.scale_simple(Math.floor(thumbnail.width*THUMBNAIL_SIZE/thumbnail.height),
+                thumbnail = thumbnail.scale_simple(Math.floor(thumbnail.width * THUMBNAIL_SIZE / thumbnail.height),
                                                    THUMBNAIL_SIZE,
                                                    GdkPixbuf.InterpType.BILINEAR);
             }
@@ -398,12 +398,11 @@ const WeblinkFrame = new Lang.Class({
         this._newSiteBox = new NewSiteBox(this._weblinkListModel);
         this._newSiteFrame.add(this._newSiteBox);
 
-        this._stack = new PLib.Stack();
-        this._stack.set_transition_duration(CATEGORY_TRANSITION_MS);
-        this._stack.set_transition_type (PLib.StackTransitionType.SLIDE_RIGHT);
-        this._stack.hexpand = true;
-        this._stack.vexpand = true;
-        this._listFrame.add (this._stack);
+        this._stack = new PLib.Stack({ transition_duration: CATEGORY_TRANSITION_MS,
+                                       transition_type: PLib.StackTransitionType.SLIDE_RIGHT,
+                                       hexpand: true,
+                                       vexpand: true });
+        this._listFrame.add(this._stack);
 
         this._mainBox.show_all();
 

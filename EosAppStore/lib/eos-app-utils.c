@@ -225,17 +225,19 @@ eos_link_load_content (EosLinkCategory category)
         break;
     }
 
-  if (i >= n_elements) {
-    g_critical ("Unable to find category '%s'", category_name);
-    goto out;
-  }
+  if (i >= n_elements)
+    {
+      g_critical ("Unable to find category '%s'", category_name);
+      goto out;
+    }
 
   element = json_object_get_member (obj, "links");
 
-  if (!JSON_NODE_HOLDS_ARRAY (element)) {
-    g_critical ("Category '%s' does not contain an array", category_name);
-    goto out;
-  }
+  if (!JSON_NODE_HOLDS_ARRAY (element))
+    {
+      g_critical ("Category '%s' does not contain an array", category_name);
+      goto out;
+    }
 
   JsonArray *links_array = json_node_get_array (element);
   n_elements = json_array_get_length (links_array);
