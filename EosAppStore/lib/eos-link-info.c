@@ -145,7 +145,7 @@ eos_link_info_create_from_json (JsonNode *node)
 {
   EosLinkInfo *info;
   JsonObject *obj;
-  const gchar *path;
+  gchar *path;
   gchar *thumbnail_filename;
   gchar *icon_filename;
 
@@ -172,9 +172,10 @@ eos_link_info_create_from_json (JsonNode *node)
   if (json_object_has_member (obj, "linkIcon")) {
     path = eos_link_get_content_dir();
     icon_filename = g_build_filename (path,
-				      json_node_dup_string (json_object_get_member (obj, "linkIcon")),
+				      json_node_get_string (json_object_get_member (obj, "linkIcon")),
 				      NULL);
     info->icon = gdk_pixbuf_new_from_file (icon_filename, NULL);
+    g_free (path);
     if (info->icon)
       info->icon_filename = icon_filename;
     else {
@@ -189,9 +190,10 @@ eos_link_info_create_from_json (JsonNode *node)
   if (json_object_has_member (obj, "linkSmall")) {
     path = eos_link_get_content_dir();
     thumbnail_filename = g_build_filename (path,
-					   json_node_dup_string (json_object_get_member (obj, "linkSmall")),
+					   json_node_get_string (json_object_get_member (obj, "linkSmall")),
 					   NULL);
     info->thumbnail = gdk_pixbuf_new_from_file (thumbnail_filename, NULL);
+    g_free (path);
     if (info->thumbnail)
       info->thumbnail_filename = thumbnail_filename;
     else {
