@@ -190,7 +190,7 @@
 }
 
 .new-site-frame .url-entry {
-    font-size: 15px;
+    font-size: 1.12em;
     font-weight: 600; /* semibold */
 
     color: #333333;
@@ -369,7 +369,7 @@
     box-shadow: none;
     background: none;
 
-    font-size: 15px;
+    font-size: 1.12em;
     font-weight: 600; /* semibold */
 }
 
