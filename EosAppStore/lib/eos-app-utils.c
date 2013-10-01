@@ -72,11 +72,11 @@ eos_link_get_category_name (EosLinkCategory category) {
 }
 
 static JsonArray *
-eos_app_parse_content (JsonParser *parser,
-                       const char *content_type)
+eos_app_parse_content (const char *content_type)
 {
   JsonArray *content_array = NULL;
   GError *error = NULL;
+  JsonParser *parser = json_parser_new ();
 
   char *content_path = eos_get_content_dir (content_type);
   char *content_file = g_build_filename (content_path, "content.json", NULL);
@@ -88,7 +88,6 @@ eos_app_parse_content (JsonParser *parser,
       g_critical ("Unable to load content from '%s': %s", content_file, error->message);
       g_error_free (error);
       goto out_error;
-      return NULL;
     }
 
   JsonNode *node = json_parser_get_root (parser);
@@ -98,9 +97,10 @@ eos_app_parse_content (JsonParser *parser,
       goto out_error;
     }
 
-  content_array = json_node_get_array (node);
+  content_array = json_node_dup_array (node);
 
  out_error:
+  g_object_unref (parser);
   g_free (content_path);
   g_free (content_file);
 
@@ -141,13 +141,10 @@ eos_app_load_content (EosFlexyGrid *grid,
   g_return_if_fail (category >= EOS_APP_CATEGORY_FEATURED &&
                     category <= EOS_APP_CATEGORY_UTILITIES);
 
-  JsonParser *parser = json_parser_new ();
-
-  JsonArray *array = eos_app_parse_content (parser,
-                                            APP_STORE_CONTENT_APPS);
+  JsonArray *array = eos_app_parse_content (APP_STORE_CONTENT_APPS);
 
   if (array == NULL)
-    goto out;
+    return;
 
   guint i, n_elements = json_array_get_length (array);
   for (i = 0; i < n_elements; i++)
@@ -189,9 +186,7 @@ eos_app_load_content (EosFlexyGrid *grid,
 
       eos_app_info_unref (info);
     }
-
-out:
-  g_object_unref (parser);
+  json_array_unref (array);
 }
 
 /**
@@ -207,22 +202,20 @@ eos_link_load_content (EosLinkCategory category)
   GList *links = NULL;
   JsonNode *element;
   JsonObject *obj;
-  JsonParser *parser = json_parser_new ();
   const gchar *category_name;
 
-  JsonArray *array = eos_app_parse_content (parser,
-                                            APP_STORE_CONTENT_LINKS);
+  JsonArray *categories_array = eos_app_parse_content (APP_STORE_CONTENT_LINKS);
 
-  if (array == NULL)
-    goto out;
+  if (categories_array == NULL)
+    return NULL;
 
-  guint i, n_elements = json_array_get_length (array);
+  guint i, n_elements = json_array_get_length (categories_array);
 
   /* First contents are the categories; search for the interested one */
   category_name = eos_link_get_category_name (category);
   for (i = 0; i < n_elements; i++)
     {
-      element = json_array_get_element (array, i);
+      element = json_array_get_element (categories_array, i);
       if (!JSON_NODE_HOLDS_OBJECT (element))
         continue;
 
@@ -244,19 +237,19 @@ eos_link_load_content (EosLinkCategory category)
     goto out;
   }
 
-  array = json_node_get_array (element);
-  n_elements = json_array_get_length (array);
+  JsonArray *links_array = json_node_get_array (element);
+  n_elements = json_array_get_length (links_array);
 
   for (i = 0; i < n_elements; i++)
     {
-      element = json_array_get_element (array, i);
+      element = json_array_get_element (links_array, i);
       EosLinkInfo *info = eos_link_info_create_from_json (element);
       if (info != NULL)
         links = g_list_prepend (links, info);
     }
 
 out:
-  g_object_unref (parser);
+  json_array_unref (categories_array);
 
   return g_list_reverse (links);
 }
