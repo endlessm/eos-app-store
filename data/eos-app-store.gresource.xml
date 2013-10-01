@@ -6,6 +6,9 @@
     <file compressed="true">btn_add-website_hover.png</file>
     <file compressed="true">btn_add-website_normal.png</file>
     <file compressed="true">btn_add-website_pressed.png</file>
+    <file compressed="true">btn_back_hover.png</file>
+    <file compressed="true">btn_back_normal.png</file>
+    <file compressed="true">btn_back_pressed.png</file>
     <file compressed="true">btn_edit_hover.png</file>
     <file compressed="true">btn_edit_normal.png</file>
     <file compressed="true">btn_edit_pressed.png</file>
@@ -25,6 +28,9 @@
     <file compressed="true">icon_external-link.png</file>
     <file compressed="true">icon_installed_43x43.png</file>
     <file compressed="true">scrollbar_notch.png</file>
+    <file compressed="true">separator_shadow_body.png</file>
+    <file compressed="true">separator_shadow_left-edge.png</file>
+    <file compressed="true">separator_shadow_right-edge.png</file>
     <file>eos-app-store.css</file>
   </gresource>
 </gresources>

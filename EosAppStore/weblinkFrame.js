@@ -13,6 +13,7 @@ const AppListModel = imports.appListModel;
 const AppStoreWindow = imports.appStoreWindow;
 const Builder = imports.builder;
 const Lang = imports.lang;
+const Separator = imports.separator;
 const Signals = imports.signals;
 
 const NEW_SITE_TITLE_LIMIT = 20;
@@ -90,7 +91,7 @@ const NewSiteBox = new Lang.Class({
     _reset: function() {
         this._siteAddButton.visible = false;
         this._switchAlertIcon(AlertIcon.NOTHING);
-        this._siteAlertLabel.set_text(_("e.g.: http://wwww.globoesporte.com"));
+        this._siteAlertLabel.set_text(_("e.g.: http://www.globoesporte.com"));
         this._urlEntry.set_text("");
         this._urlEntry.max_length = 0;
         this._urlEntry.halign = Gtk.Align.FILL;
@@ -346,6 +347,11 @@ const WeblinkFrame = new Lang.Class({
 
         this.initTemplate({ templateRoot: '_mainBox', bindChildren: true, connectSignals: true, });
         this.add(this._mainBox);
+
+        let separator = new Separator.FrameSeparator();
+        this._mainBox.add(separator);
+        this._mainBox.reorder_child(separator, 1);
+
         this._mainBox.show_all();
 
         if (mainWindow.getExpectedWidth() <= AppStoreWindow.AppStoreSizes.XGA.windowWidth) {
