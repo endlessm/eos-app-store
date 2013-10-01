@@ -15,6 +15,7 @@ const _FOLDER_BUTTON_SIZE = 64;
 const _FOLDER_GRID_SPACING = _FOLDER_BUTTON_SIZE;
 const _FOLDER_GRID_BORDER = _FOLDER_GRID_SPACING / 2;
 
+const _BUBBLE_ENTRY_WIDTH_CHARS = 15;
 const _BUBBLE_GRID_SPACING = 6;
 const _ADD_FOLDER_BUTTON_SIZE = 30;
 
@@ -38,7 +39,7 @@ const FolderNameBubble = new Lang.Class({
 
         this._entry = new Gtk.Entry({
             placeholder_text: _("Name of folder"),
-            width_chars: 20,
+            width_chars: _BUBBLE_ENTRY_WIDTH_CHARS,
             hexpand: true,
             halign: Gtk.Align.FILL,
             vexpand: true,

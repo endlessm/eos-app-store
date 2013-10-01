@@ -352,7 +352,7 @@
 .folder-bubble .bubble-border {
     border: none;
     border-radius: 40px;
-    padding: 2px 12px;
+    padding: 2px;
 }
 
 .folder-bubble.entering .bubble-border {
@@ -371,6 +371,8 @@
 
     font-size: 1.12em;
     font-weight: 600; /* semibold */
+
+    padding-left: 10px;
 }
 
 .folder-bubble .entry:selected {
@@ -381,6 +383,7 @@
     border: none;
     background-repeat: no-repeat;
     background-image: url("btn_add-folder_normal.png");
+    background-color: transparent;
 }
 
 .folder-bubble .button:hover {
