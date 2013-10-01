@@ -35,6 +35,8 @@ char **         eos_app_info_get_screenshots    (const EosAppInfo *info);
 
 GtkWidget *     eos_app_info_create_cell        (const EosAppInfo *info);
 
+GtkStyleContext * eos_app_info_get_cell_style_context (void);
+
 #ifndef __GI_SCANNER__
 
 /* private */

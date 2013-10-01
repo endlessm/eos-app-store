@@ -8,13 +8,14 @@ const Cairo = imports.cairo;
 
 const Builder = imports.builder;
 const Lang = imports.lang;
-
 const FolderModel = imports.folderModel;
+const Separator = imports.separator;
 
 const _FOLDER_BUTTON_SIZE = 64;
 const _FOLDER_GRID_SPACING = _FOLDER_BUTTON_SIZE;
 const _FOLDER_GRID_BORDER = _FOLDER_GRID_SPACING / 2;
 
+const _BUBBLE_ENTRY_WIDTH_CHARS = 15;
 const _BUBBLE_GRID_SPACING = 6;
 const _ADD_FOLDER_BUTTON_SIZE = 30;
 
@@ -28,26 +29,29 @@ const FolderNameBubble = new Lang.Class({
 
         this._folderModel = folderModel;
 
+        let border = new Gtk.Frame();
+        border.get_style_context().add_class('bubble-border');
+
         let grid = new Gtk.Grid({
-            'column-spacing': _BUBBLE_GRID_SPACING });
+            column_spacing: _BUBBLE_GRID_SPACING });
 
         // entry and "add" button...
 
         this._entry = new Gtk.Entry({
-            'placeholder-text': _("Name of folder"),
-            'width-chars': 30,
+            placeholder_text: _("Name of folder"),
+            width_chars: _BUBBLE_ENTRY_WIDTH_CHARS,
             hexpand: true,
             halign: Gtk.Align.FILL,
             vexpand: true,
             valign: Gtk.Align.FILL,
-            'no-show-all': true });
+            no_show_all: true });
         this._addButton = new Gtk.Button({
-            'width-request': _ADD_FOLDER_BUTTON_SIZE,
-            'height-request': _ADD_FOLDER_BUTTON_SIZE,
+            width_request: _ADD_FOLDER_BUTTON_SIZE,
+            height_request: _ADD_FOLDER_BUTTON_SIZE,
             hexpand: false,
             vexpand: true,
             valign: Gtk.Align.CENTER,
-            'no-show-all': true });
+            no_show_all: true });
 
         this._entry.connect('changed', Lang.bind(this, function() {
             this._addButton.set_sensitive(this._entry.get_text_length() != 0);
@@ -67,15 +71,16 @@ const FolderNameBubble = new Lang.Class({
             halign: Gtk.Align.CENTER,
             vexpand: true,
             valign: Gtk.Align.CENTER,
-            'no-show-all': true  });
+            name: 'doneLabel',
+            no_show_all: true  });
         this._addedIcon = new Gtk.Image({
             resource: '/com/endlessm/appstore/icon_installed_24x24.png',
-            'width-request': _ADD_FOLDER_BUTTON_SIZE,
-            'height-request': _ADD_FOLDER_BUTTON_SIZE,
+            width_request: _ADD_FOLDER_BUTTON_SIZE,
+            height_request: _ADD_FOLDER_BUTTON_SIZE,
             hexpand: false,
             vexpand: true,
             valign: Gtk.Align.CENTER,
-            'no-show-all': true
+            no_show_all: true
         });
 
         grid.attach(this._entry, 0, 0, 1, 1);
@@ -84,8 +89,9 @@ const FolderNameBubble = new Lang.Class({
         grid.attach(this._doneLabel, 0, 1, 1, 1);
         grid.attach(this._addedIcon, 1, 1, 1, 1);
 
-        grid.show();
-        this.add(grid);
+        border.add(grid);
+        this.add(border);
+        border.show_all();
 
         this.connect('key-press-event', Lang.bind(this, this._onKeyPress));
     },
@@ -139,16 +145,17 @@ const FolderIconButton = new Lang.Class({
     _init : function(iconName) {
         this.parent({
             active: false,
-            'draw-indicator': false,
-            'always-show-image': true,
-            'width-request': _FOLDER_BUTTON_SIZE,
-            'height-request': _FOLDER_BUTTON_SIZE,
+            draw_indicator: false,
+            always_show_image: true,
+            width_request: _FOLDER_BUTTON_SIZE,
+            height_request: _FOLDER_BUTTON_SIZE,
             relief: Gtk.ReliefStyle.NONE,
             hexpand: false,
             vexpand: false,
-            image: new Gtk.Image({'icon-name': iconName}) });
+            image: new Gtk.Image({ icon_name: iconName }) });
 
         this._iconName = iconName;
+        this.get_style_context().add_class('folder-icon-button');
     }
 });
 
@@ -224,9 +231,9 @@ const FolderIconGrid = new Lang.Class({
 
     _init: function(folderModel) {
         this.parent({
-            'row-spacing': _FOLDER_GRID_SPACING,
-            'column-spacing': _FOLDER_GRID_SPACING,
-            'border-width': _FOLDER_GRID_BORDER });
+            row_spacing: _FOLDER_GRID_SPACING,
+            column_spacing: _FOLDER_GRID_SPACING,
+            border_width: _FOLDER_GRID_BORDER });
 
         this._folderModel = folderModel;
         this._get_icons();
@@ -250,6 +257,7 @@ const FolderFrame = new Lang.Class({
     templateResource: '/com/endlessm/appstore/eos-app-store-folder-frame.ui',
     templateChildren: [
         '_mainBox',
+        '_folderBoxContent',
         '_scrolledWindow',
         '_viewport',
     ],
@@ -266,6 +274,10 @@ const FolderFrame = new Lang.Class({
         this._mainBox.vexpand = true;
 
         this.add(this._mainBox);
+
+        let separator = new Separator.FrameSeparator();
+        this._folderBoxContent.add(separator);
+        this._folderBoxContent.reorder_child(separator, 1);
 
         this._grid = new FolderIconGrid(this._folderModel);
         this._viewport.add(this._grid);
