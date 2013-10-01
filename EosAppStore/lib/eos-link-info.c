@@ -169,41 +169,53 @@ eos_link_info_create_from_json (JsonNode *node)
   else
     info->description = g_strdup ("");
   
-  if (json_object_has_member (obj, "linkIcon")) {
-    path = eos_link_get_content_dir();
-    icon_filename = g_build_filename (path,
-				      json_node_get_string (json_object_get_member (obj, "linkIcon")),
-				      NULL);
-    info->icon = gdk_pixbuf_new_from_file (icon_filename, NULL);
-    g_free (path);
-    if (info->icon)
-      info->icon_filename = icon_filename;
-    else {
+  if (json_object_has_member (obj, "linkIcon"))
+    {
+      path = eos_link_get_content_dir();
+      icon_filename = g_build_filename (path,
+					json_node_get_string (json_object_get_member (obj, "linkIcon")),
+					NULL);
+      info->icon = gdk_pixbuf_new_from_file (icon_filename, NULL);
+      g_free (path);
+      if (info->icon)
+	{
+	  info->icon_filename = icon_filename;
+	}
+      else
+	{
+	  info->icon_filename = NULL;
+	  g_free (icon_filename);
+	}
+    }
+  else
+    {
+      info->icon = NULL;
       info->icon_filename = NULL;
-      g_free (icon_filename);
     }
-  } else {
-    info->icon = NULL;
-    info->icon_filename = NULL;
-  }
 
-  if (json_object_has_member (obj, "linkSmall")) {
-    path = eos_link_get_content_dir();
-    thumbnail_filename = g_build_filename (path,
-					   json_node_get_string (json_object_get_member (obj, "linkSmall")),
-					   NULL);
-    info->thumbnail = gdk_pixbuf_new_from_file (thumbnail_filename, NULL);
-    g_free (path);
-    if (info->thumbnail)
-      info->thumbnail_filename = thumbnail_filename;
-    else {
-      info->thumbnail_filename = NULL;
-      g_free (thumbnail_filename);
+  if (json_object_has_member (obj, "linkSmall"))
+    {
+      path = eos_link_get_content_dir();
+      thumbnail_filename = g_build_filename (path,
+					     json_node_get_string (json_object_get_member (obj, "linkSmall")),
+					     NULL);
+      info->thumbnail = gdk_pixbuf_new_from_file (thumbnail_filename, NULL);
+      g_free (path);
+      if (info->thumbnail)
+	{
+	  info->thumbnail_filename = thumbnail_filename;
+	}
+      else
+	{
+	  info->thumbnail_filename = NULL;
+	  g_free (thumbnail_filename);
+	}
     }
-  } else {
-    info->thumbnail = NULL;
-    info->thumbnail_filename = NULL;
-  }
+  else
+    {
+      info->thumbnail = NULL;
+      info->thumbnail_filename = NULL;
+    }
 
   if (json_object_has_member (obj, "linkUrl"))
     info->url = json_node_dup_string (json_object_get_member (obj, "linkUrl"));
