@@ -17,6 +17,8 @@ const AppStoreIface = <interface name="org.gnome.Shell.AppStore">
 <method name="RemoveFolder">
     <arg type="s" direction="in" name="id" />
 </method>
+<method name="ResetDesktop">
+</method>
 <signal name="ApplicationsChanged">
     <arg type="as" name="applications" />
 </signal>
