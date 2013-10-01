@@ -73,7 +73,7 @@
 .web-frame,
 .folder-frame {
     border: none;
-    padding-right: 5px;
+    padding-right: 15px;
 }
 
 .frame-separator {
@@ -114,7 +114,7 @@
 .close-button {
     background: none;
     border: none;
-    padding: 12px 0 0;
+    padding: 7px 8px 0 0;
 
     color: @app_store_button_fg;
     icon-shadow: inset 0 1px black;
@@ -130,7 +130,7 @@
 }
 
 .content-frame {
-    padding: 0 13px;
+    padding: 0;
 }
 
 .header-title {
