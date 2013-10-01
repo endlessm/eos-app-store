@@ -400,4 +400,7 @@
 
 .folder-bubble #doneLabel {
     color: white;
+
+    font-size: 1.12em;
+    font-weight: 600; /* semibold */
 }
