@@ -142,28 +142,17 @@ const NewSiteBox = new Lang.Class({
         this._urlEntry.halign = Gtk.Align.START;
     },
 
-    _onEditSiteCancel: function() {
-        this._reset();
-    },
-
-    _onSiteAdd: function() {
-        let url = this._siteAlertLabel.get_text();
-        let title = this._urlEntry.get_text();
-
-        let urlLabel = new Gtk.Label({ label: title });
+    _showInstalledMessage: function() {
+        let urlLabel = new Gtk.Label({ label: this._urlEntry.get_text() });
         urlLabel.get_style_context().add_class('url-label');
         urlLabel.set_alignment(0, 0.5);
         this._siteUrlFrame.remove(this._urlEntry);
         this._siteUrlFrame.add(urlLabel);
         this._siteUrlFrame.show_all();
-
+        
         this._siteAlertLabel.set_text(_("was added successfully"));
         this._siteAddButton.sensitive = false;
         this._switchAlertIcon(AlertIcon.HIDDEN);
-
-        let newSite = this._weblinkListModel.createWeblink(url, title, 'browser');
-        this._weblinkListModel.update();
-        this._weblinkListModel.install(newSite);
 
         GLib.timeout_add_seconds(GLib.PRIORITY_DEFAULT,
                                  NEW_SITE_SUCCESS_TIMEOUT,
@@ -175,6 +164,21 @@ const NewSiteBox = new Lang.Class({
                                      this._reset();
                                      return false;
                                  }));
+    },
+
+    _onEditSiteCancel: function() {
+        this._reset();
+    },
+
+    _onSiteAdd: function() {
+        let url = this._siteAlertLabel.get_text();
+        let title = this._urlEntry.get_text();
+
+        let newSite = this._weblinkListModel.createWeblink(url, title, 'browser');
+        this._weblinkListModel.update();
+        this._weblinkListModel.install(newSite);
+
+        this._showInstalledMessage();
     },
 
     _onUrlEntryActivated: function() {
@@ -265,19 +269,7 @@ const WeblinkListBoxRow = new Lang.Class({
         this._mainBox.show();
     },
 
-    _onStateButtonClicked: function() {
-        this._parentFrame.notifyChanges(false);
-
-        let url = this._info.get_url();
-        let title = this._info.get_title();
-        let icon = this._info.get_icon_filename();
-        if (!icon) {
-            icon = 'browser';
-        }
-
-        let site = this._model.createWeblink(url, title, icon);
-        this._model.install(site);
-
+    _showInstalledMessage: function () {
         this._stateButton.sensitive = false;
         this._descriptionLabel.set_text(_("has been added successfully!"));
         this._nameLabel.vexpand = true;
@@ -293,6 +285,22 @@ const WeblinkListBoxRow = new Lang.Class({
                                      this._parentFrame.notifyChanges(true);
                                      return false;
                                  }));
+    },
+
+    _onStateButtonClicked: function() {
+        this._parentFrame.notifyChanges(false);
+
+        let url = this._info.get_url();
+        let title = this._info.get_title();
+        let icon = this._info.get_icon_filename();
+        if (!icon) {
+            icon = 'browser';
+        }
+
+        let site = this._model.createWeblink(url, title, icon);
+        this._model.install(site);
+
+        this._showInstalledMessage();
     },
 
     _onUrlClicked: function(widget, event) {
