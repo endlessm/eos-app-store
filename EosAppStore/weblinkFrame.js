@@ -282,13 +282,13 @@ const WeblinkListBoxRow = new Lang.Class({
                                      this._nameLabel.vexpand = false;
                                      this._urlLabel.visible = true;
                                      this._descriptionLabel.set_text(this._info.get_description());
-                                     this._parentFrame.notifyChanges(true);
+                                     this._parentFrame.setModelConnected(true);
                                      return false;
                                  }));
     },
 
     _onStateButtonClicked: function() {
-        this._parentFrame.notifyChanges(false);
+        this._parentFrame.setModelConnected(false);
 
         let url = this._info.get_url();
         let title = this._info.get_title();
@@ -415,18 +415,18 @@ const WeblinkFrame = new Lang.Class({
         this._mainBox.show_all();
 
         this._buttonGroup = null;
-        this._notifyChangesId = null;
+        this._modelConnectionId = null;
 
-        this.notifyChanges(true);
+        this.setModelConnected(true);
     },
 
-    notifyChanges: function(notify) {
-        if (notify) {
-            this._notifyChangesId = this._weblinkListModel.connect('changed', Lang.bind(this, this._populateCategories));
+    setModelConnected: function(connect) {
+        if (connect) {
+            this._modelConnectionId = this._weblinkListModel.connect('changed', Lang.bind(this, this._populateCategories));
             this._populateCategories();
-        } else if (this._notifyChangesId) {
-            this._weblinkListModel.disconnect(this._notifyChangesId);
-            this._notifyChangesId = null;
+        } else if (this._modelConnectionId) {
+            this._weblinkListModel.disconnect(this._modelConnectionId);
+            this._modelConnectionId = null;
         }
     },
 
