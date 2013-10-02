@@ -96,7 +96,7 @@ const NewSiteBox = new Lang.Class({
     _reset: function() {
         this._siteAddButton.visible = false;
         this._switchAlertIcon(AlertIcon.NOTHING);
-        this._siteAlertLabel.set_text(_("e.g.: http://wwww.globoesporte.com"));
+        this._siteAlertLabel.set_text(_("e.g.: http://www.globoesporte.com"));
         this._urlEntry.set_text("");
         this._urlEntry.max_length = 0;
         this._urlEntry.halign = Gtk.Align.FILL;
