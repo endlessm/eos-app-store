@@ -111,7 +111,7 @@ const AppStoreSlider = new Lang.Class({
                          height: height };
 
         this._widget.move(geometry.x, geometry.y);
-        this._widget.set_size_request(geometry.width, geometry.height);
+        this._widget.resize(geometry.width, geometry.height);
     },
 
     setInitialValue: function() {
@@ -234,6 +234,19 @@ const AppStoreWindow = new Lang.Class({
         this._storeModel.connect('page-changed', Lang.bind(this, this._onStorePageChanged));
 
         // the stack that holds the pages
+        this._stack = null;
+        this._createStackPages();
+
+        // switch to the 'Applications' page
+        this._onStorePageChanged(this._storeModel, StoreModel.StorePage.APPS);
+    },
+
+    _createStackPages: function() {
+        if (this._stack) {
+            this.content_box.remove(this._stack);
+        }
+
+        // the stack that holds the pages
         this._stack = new PLib.Stack();
         this._stack.set_transition_duration(PAGE_TRANSITION_MS);
         this._stack.set_transition_type(PLib.StackTransitionType.SLIDE_RIGHT);
@@ -248,9 +261,6 @@ const AppStoreWindow = new Lang.Class({
         this._stack.add_named(this._pages.weblinks, 'weblinks');
         this._pages.folders = new FolderFrame.FolderFrame();
         this._stack.add_named(this._pages.folders, 'folders');
-
-        // switch to the 'Applications' page
-        this._onStorePageChanged(this._storeModel, StoreModel.StorePage.APPS);
     },
 
     _loadSideImages: function() {
@@ -355,6 +365,8 @@ const AppStoreWindow = new Lang.Class({
 
     _onMonitorsChanged: function() {
         this._animator.setInitialValue();
+        this._createStackPages();
+        this._onStorePageChanged(this._storeModel, this._currentPage);
     },
 
     _onVisibilityChanged: function() {
