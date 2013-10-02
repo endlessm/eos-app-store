@@ -269,20 +269,21 @@ const WeblinkListBoxRow = new Lang.Class({
         this._mainBox.show();
     },
 
+    _setInstalledState: function(installed, message) {
+        this._stateButton.sensitive = !installed;
+        this._nameLabel.vexpand = installed;
+        this._urlLabel.visible = !installed;
+        this._descriptionLabel.set_text(message);
+        this._parentFrame.setModelConnected(!installed);
+    },
+
     _showInstalledMessage: function () {
-        this._stateButton.sensitive = false;
-        this._descriptionLabel.set_text(_("has been added successfully!"));
-        this._nameLabel.vexpand = true;
-        this._urlLabel.visible = false;
+        this._setInstalledState(true, _("has been added successfully!"));
 
         GLib.timeout_add_seconds(GLib.PRIORITY_DEFAULT,
                                  NEW_SITE_SUCCESS_TIMEOUT,
                                  Lang.bind(this, function() {
-                                     this._stateButton.sensitive = true;
-                                     this._nameLabel.vexpand = false;
-                                     this._urlLabel.visible = true;
-                                     this._descriptionLabel.set_text(this._info.get_description());
-                                     this._parentFrame.setModelConnected(true);
+                                     this._setInstalledState(false, this._info.get_description());
                                      return false;
                                  }));
     },
