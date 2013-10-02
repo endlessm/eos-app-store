@@ -268,24 +268,49 @@ const WeblinkListBoxRow = new Lang.Class({
             this._icon.set_from_pixbuf(thumbnail.new_subpixbuf(0, 0, THUMBNAIL_SIZE, THUMBNAIL_SIZE));
         }
 
+        this._setState(this._getStateFromUrl());
         this._mainBox.show();
     },
 
+    // FIXME: this should be entirely unnecessary, as we could just use
+    // the linkId, and call getState() on WeblinkList with that ID.
+    // Unfortunately, the CMS-provided content is broken for weblinks
+    // right now, and it has a NULL linkId to all values.
+    // See https://github.com/endlessm/eos-shell/issues/1074
+    _getStateFromUrl: function() {
+        let url = this._info.get_url();
+        let id = this._model.getWeblinkForUrl(url);
+
+        if (id) {
+            return EosAppStorePrivate.AppState.INSTALLED;
+        } else {
+            return EosAppStorePrivate.AppState.UNINSTALLED;
+        }
+    },
+
+    _setState: function(state) {
+        if (state == EosAppStorePrivate.AppState.INSTALLED) {
+            this._stateButton.sensitive = false;
+        } else {
+            this._stateButton.sensitive = true;
+        }
+    },
+
     _setInstalledState: function(installed, message) {
-        this._stateButton.sensitive = !installed;
         this._nameLabel.vexpand = installed;
         this._urlLabel.visible = !installed;
         this._descriptionLabel.set_text(message);
-        this._parentFrame.setModelConnected(!installed);
     },
 
     _showInstalledMessage: function () {
+        this._setState(EosAppStorePrivate.AppState.INSTALLED);
         this._setInstalledState(true, _("added successfully!"));
 
         GLib.timeout_add_seconds(GLib.PRIORITY_DEFAULT,
                                  NEW_SITE_SUCCESS_TIMEOUT,
                                  Lang.bind(this, function() {
                                      this._setInstalledState(false, this._info.get_description());
+                                     this._parentFrame.setModelConnected(true);
                                      return false;
                                  }));
     },

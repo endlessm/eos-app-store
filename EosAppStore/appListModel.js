@@ -126,6 +126,8 @@ const WeblinkList = new Lang.Class({
 
     _init: function() {
         this._weblinks = [];
+        this._urlsToId = {};
+
         this.parent();
     },
 
@@ -135,13 +137,32 @@ const WeblinkList = new Lang.Class({
         });
 
         this._weblinks = weblinks;
+        this._cacheUrls();
+
         this.emit('changed', weblinks);
     },
 
+    // FIXME: all this code should be removed when the CMS generates
+    // non-empty linkId for weblinks.
+    // See https://github.com/endlessm/eos-shell/issues/1074
+    _cacheUrls: function() {
+        // destroy cache
+        this._urlsToId = {};
+
+        for (let idx in this._weblinks) {
+            let link = this._weblinks[idx];
+            let url = this.getWeblinkUrl(link);
+
+            this._urlsToId[url] = link;
+        }
+    },
+
+    // FIXME: see above
     _replaceAll: function(find, replace, str) {
         return str.replace(new RegExp(find, 'g'), replace);
     },
 
+    // FIXME: see above
     _getLocalizedExec: function(args) {
         let languages = GLib.get_language_names();
 
@@ -164,10 +185,7 @@ const WeblinkList = new Lang.Class({
         return defaultExec;
     },
 
-    getWeblinks: function() {
-        return this._weblinks;
-    },
-
+    // FIXME: see above
     getWeblinkUrl: function(id) {
         let exec = this._model.get_app_executable(id);
         if (exec.indexOf(EOS_LOCALIZED) == 0) {
@@ -181,6 +199,17 @@ const WeblinkList = new Lang.Class({
         return exec;
     },
 
+    // FIXME: see above
+    getWeblinkForUrl: function(url) {
+        return this._urlsToId[url];
+    },
+
+    getWeblinks: function() {
+        return this._weblinks;
+    },
+
+    // FIXME: this should use the linkId as provided by the CMS. 
+    // See https://github.com/endlessm/eos-shell/issues/1074
     createWeblink: function(url, title, icon) {
         let desktop = new GLib.KeyFile();
 
