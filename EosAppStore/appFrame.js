@@ -147,39 +147,38 @@ const AppFrame = new Lang.Class({
         ];
 
         this._currentCategory = this._categories[0].name;
+        this._currentCategoryIdx = 0;
 
         // initialize the applications model
         this._model = new AppListModel.AppList();
 
-        this._mainStack = new PLib.Stack();
-        this._mainStack.set_transition_duration(APP_TRANSITION_MS);
-        this._mainStack.set_transition_type(PLib.StackTransitionType.SLIDE_RIGHT);
-        this._mainStack.hexpand = true;
-        this._mainStack.vexpand = true;
+        this._mainStack = new PLib.Stack({ transition_duration: APP_TRANSITION_MS,
+                                           transition_type: PLib.StackTransitionType.SLIDE_RIGHT,
+                                           hexpand: true,
+                                           vexpand: true });
         this.add(this._mainStack);
         this._mainStack.show();
 
-        this._mainBox = new Gtk.Box({ orientation: Gtk.Orientation.VERTICAL, });
+        this._mainBox = new Gtk.Box({ orientation: Gtk.Orientation.VERTICAL,
+                                      hexpand: true,
+                                      vexpand: true });
         this._mainStack.add_named(this._mainBox, 'main-box');
-        this._mainBox.hexpand = true;
-        this._mainBox.vexpand = true;
         this._mainBox.show();
 
         this._categoriesBox = new Gtk.Box({ orientation: Gtk.Orientation.HORIZONTAL,
-                                            spacing: CATEGORIES_BOX_SPACING });
-        this._categoriesBox.hexpand = true;
+                                            spacing: CATEGORIES_BOX_SPACING,
+                                            hexpand: true });
         this._mainBox.add(this._categoriesBox);
         this._categoriesBox.show();
 
         let separator = new Separator.FrameSeparator();
         this._mainBox.add(separator);
 
-        this._stack = new PLib.Stack();
-        this._stack.set_transition_duration(CATEGORY_TRANSITION_MS);
-        this._stack.set_transition_type(PLib.StackTransitionType.SLIDE_RIGHT);
-        this._stack.hexpand = true;
-        this._stack.vexpand = true;
-        this._stack.margin_top = STACK_TOP_MARGIN;
+        this._stack = new PLib.Stack({ transition_duration: CATEGORY_TRANSITION_MS,
+                                       transition_type: PLib.StackTransitionType.SLIDE_RIGHT,
+                                       hexpand: true,
+                                       vexpand: true,
+                                       margin_top: STACK_TOP_MARGIN });
         this._mainBox.add(this._stack);
         this._stack.show();
 
@@ -212,6 +211,7 @@ const AppFrame = new Lang.Class({
             if (!category.button) {
                 category.button = new CategoryButton.CategoryButton({ label: category.label,
                                                                       category: category.name,
+                                                                      index: c,
                                                                       draw_indicator: false,
                                                                       group: this._buttonGroup });
                 category.button.connect('clicked', Lang.bind(this, this._onCategoryClicked));
@@ -255,6 +255,7 @@ const AppFrame = new Lang.Class({
         appBox.show_all();
 
         this._mainStack.add_named(appBox, cell.desktop_id);
+        this._mainStack.transition_type = PLib.StackTransitionType.SLIDE_LEFT;
         this._mainStack.set_visible_child_name(cell.desktop_id);
 
         let app = Gio.Application.get_default();
@@ -276,14 +277,24 @@ const AppFrame = new Lang.Class({
         this._backClickedId = 0;
 
         let page = this._mainStack.get_visible_child();
+        this._mainStack.transition_type = PLib.StackTransitionType.SLIDE_RIGHT;
         this._mainStack.set_visible_child_name('main-box');
         page.destroy();
     },
 
     _onCategoryClicked: function(button) {
         let category = button.category;
+        let idx = button.index;
+
+        if (idx > this._currentCategoryIdx) {
+            this._stack.transition_type = PLib.StackTransitionType.SLIDE_LEFT;
+        } else {
+            this._stack.transition_type = PLib.StackTransitionType.SLIDE_RIGHT;
+        }
 
         this._currentCategory = category;
+        this._currentCategoryIdx = idx;
+
         this._stack.set_visible_child_name(category);
     }
 });
