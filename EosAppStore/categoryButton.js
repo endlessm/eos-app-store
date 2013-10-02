@@ -1,4 +1,5 @@
 // -*- mode: js; js-indent-level: 4; indent-tabs-mode: nil -*-
+const GLib = imports.gi.GLib;
 const GObject = imports.gi.GObject;
 const Gtk = imports.gi.Gtk;
 
@@ -13,9 +14,17 @@ const CategoryButton = new Lang.Class({
                                                        GObject.ParamFlags.READABLE |
                                                        GObject.ParamFlags.WRITABLE |
                                                        GObject.ParamFlags.CONSTRUCT,
-                                                       '') },
+                                                       ''),
+                  'index': GObject.ParamSpec.int('index',
+                                                 'Index',
+                                                 'The button index',
+                                                 GObject.ParamFlags.READABLE |
+                                                 GObject.ParamFlags.WRITABLE |
+                                                 GObject.ParamFlags.CONSTRUCT,
+                                                 0, GLib.MAXINT32, 0) },
     _init: function(params) {
         this._category = '';
+        this._index = 0;
 
         this.parent(params);
 
@@ -33,5 +42,18 @@ const CategoryButton = new Lang.Class({
 
         this._category = c;
         this.notify('category');
+    },
+
+    get index() {
+        return this._index;
+    },
+
+    set index(i) {
+        if (this._index == i) {
+            return;
+        }
+
+        this._index = i;
+        this.notify('index');
     }
 });

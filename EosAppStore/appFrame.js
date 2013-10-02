@@ -147,6 +147,7 @@ const AppFrame = new Lang.Class({
         ];
 
         this._currentCategory = this._categories[0].name;
+        this._currentCategoryIdx = 0;
 
         // initialize the applications model
         this._model = new AppListModel.AppList();
@@ -210,6 +211,7 @@ const AppFrame = new Lang.Class({
             if (!category.button) {
                 category.button = new CategoryButton.CategoryButton({ label: category.label,
                                                                       category: category.name,
+                                                                      index: c,
                                                                       draw_indicator: false,
                                                                       group: this._buttonGroup });
                 category.button.connect('clicked', Lang.bind(this, this._onCategoryClicked));
@@ -253,6 +255,7 @@ const AppFrame = new Lang.Class({
         appBox.show_all();
 
         this._mainStack.add_named(appBox, cell.desktop_id);
+        this._mainStack.transition_type = PLib.StackTransitionType.SLIDE_LEFT;
         this._mainStack.set_visible_child_name(cell.desktop_id);
 
         let app = Gio.Application.get_default();
@@ -274,14 +277,24 @@ const AppFrame = new Lang.Class({
         this._backClickedId = 0;
 
         let page = this._mainStack.get_visible_child();
+        this._mainStack.transition_type = PLib.StackTransitionType.SLIDE_RIGHT;
         this._mainStack.set_visible_child_name('main-box');
         page.destroy();
     },
 
     _onCategoryClicked: function(button) {
         let category = button.category;
+        let idx = button.index;
+
+        if (idx > this._currentCategoryIdx) {
+            this._stack.transition_type = PLib.StackTransitionType.SLIDE_LEFT;
+        } else {
+            this._stack.transition_type = PLib.StackTransitionType.SLIDE_RIGHT;
+        }
 
         this._currentCategory = category;
+        this._currentCategoryIdx = idx;
+
         this._stack.set_visible_child_name(category);
     }
 });

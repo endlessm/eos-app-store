@@ -387,6 +387,8 @@ const WeblinkFrame = new Lang.Class({
             },
         ];
 
+        this._currentCategoryIdx = 0;
+
         this.initTemplate({ templateRoot: '_mainBox', bindChildren: true, connectSignals: true, });
         this.add(this._mainBox);
 
@@ -438,6 +440,7 @@ const WeblinkFrame = new Lang.Class({
             if (!category.button) {
                 category.button = new CategoryButton.CategoryButton({ label: category.label,
                                                                       category: category.name,
+                                                                      index: c,
                                                                       draw_indicator: false,
                                                                       group: this._buttonGroup });
                 category.button.connect('clicked', Lang.bind(this, this._onCategoryClicked));
@@ -484,6 +487,15 @@ const WeblinkFrame = new Lang.Class({
     },
 
     _onCategoryClicked: function(button) {
+        let idx = button.index;
+
+        if (idx > this._currentCategoryIdx) {
+            this._stack.transition_type = PLib.StackTransitionType.SLIDE_LEFT;
+        } else {
+            this._stack.transition_type = PLib.StackTransitionType.SLIDE_RIGHT;
+        }
+
+        this._currentCategoryIdx = idx;
         this._stack.set_visible_child_name(button.category);
     }
 });
