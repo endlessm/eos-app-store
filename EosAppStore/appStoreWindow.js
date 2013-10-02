@@ -184,6 +184,9 @@ const AppStoreWindow = new Lang.Class({
         'side-pane-apps-label-bold',
         'side-pane-web-label-bold',
         'side-pane-folder-label-bold',
+        'side-pane-apps-button',
+        'side-pane-web-button',
+        'side-pane-folder-button',
         'content-box',
         'header-bar-title-label',
         'header-bar-subtitle-label',
@@ -290,15 +293,21 @@ const AppStoreWindow = new Lang.Class({
     },
 
     _onAppsClicked: function() {
-        this._storeModel.changePage(StoreModel.StorePage.APPS);
+        if (this.side_pane_apps_button.active) {
+            this._storeModel.changePage(StoreModel.StorePage.APPS);
+        }
     },
 
     _onWebClicked: function() {
-        this._storeModel.changePage(StoreModel.StorePage.WEB);
+        if (this.side_pane_web_button.active) {
+            this._storeModel.changePage(StoreModel.StorePage.WEB);
+        }
     },
 
     _onFolderClicked: function() {
-        this._storeModel.changePage(StoreModel.StorePage.FOLDERS);
+        if (this.side_pane_folder_button.active) {
+            this._storeModel.changePage(StoreModel.StorePage.FOLDERS);
+        }
     },
 
     _setDefaultTitle: function() {
@@ -336,14 +345,17 @@ const AppStoreWindow = new Lang.Class({
         switch (this._currentPage) {
             case StoreModel.StorePage.APPS:
                 page = this._pages.apps;
+                this.side_pane_apps_button.active = true;
                 break;
 
             case StoreModel.StorePage.WEB:
                 page = this._pages.weblinks;
+                this.side_pane_web_button.active = true;
                 break;
 
             case StoreModel.StorePage.FOLDERS:
                 page = this._pages.folders;
+                this.side_pane_folder_button.active = true;
                 break;
         }
 
