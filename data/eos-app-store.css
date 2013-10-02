@@ -33,7 +33,7 @@
     padding: 0 15px;
 }
 
-.app-category-button,
+.category-button,
 .sidebar-button {
     background: none;
     border: none;
@@ -44,28 +44,28 @@
     text-shadow: 0 1px alpha(black, 0.5);
 }
 
-.app-category-button:active,
+.category-button:active,
 .sidebar-button:active {
     font-weight: bold;
 }
 
-.app-category-button *:hover,
+.category-button *:hover,
 .sidebar-button *:hover {
     color: @app_store_button_hover_fg;
 }
 
-.app-category-button *:active,
-.app-category-button *:hover:active,
+.category-button *:active,
+.category-button *:hover:active,
 .sidebar-button *:active,
 .sidebar-button *:hover:active {
     color: white;
 }
 
-.app-category-button {
+.category-button {
     padding: 6px 0;
 }
 
-.app-category-button:active {
+.category-button:active {
     background-image: linear-gradient(to top, white, white 3px, transparent 3px);
 }
 
