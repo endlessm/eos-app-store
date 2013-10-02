@@ -392,7 +392,7 @@ const WeblinkFrame = new Lang.Class({
 
         let separator = new Separator.FrameSeparator();
         this._mainBox.add(separator);
-        this._mainBox.reorder_child(separator, 1);
+        this._mainBox.reorder_child(separator, 2);
 
         this._mainBox.show_all();
 

@@ -37,7 +37,7 @@ eos_get_content_dir (const gchar *content_type)
       res = g_build_filename (DATADIR,
                               APP_STORE_CONTENT_DIR,
                               "C",
-                              "apps",
+                              content_type,
                               NULL);
     }
 
