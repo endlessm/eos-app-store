@@ -399,8 +399,6 @@ const WeblinkFrame = new Lang.Class({
             },
         ];
 
-        this._currentCategoryIdx = 0;
-
         this.initTemplate({ templateRoot: '_mainBox', bindChildren: true, connectSignals: true, });
         this.add(this._mainBox);
 
@@ -429,10 +427,25 @@ const WeblinkFrame = new Lang.Class({
 
         this._mainBox.show_all();
 
+        this._currentCategory = this._categories[0].name;
+        this._currentCategoryIdx = 0;
+
         this._buttonGroup = null;
         this._modelConnectionId = null;
-
         this.setModelConnected(true);
+
+        let content_dir = EosAppStorePrivate.link_get_content_dir();
+        let content_path = GLib.build_filenamev([content_dir, 'content.json']);
+        let content_file = Gio.File.new_for_path(content_path);
+        this._contentMonitor = content_file.monitor_file(Gio.FileMonitorFlags.NONE, null);
+        this._contentMonitor.connect('changed', Lang.bind(this, this._onContentChanged));
+
+        this._stack.set_visible_child_name(this._currentCategory);
+    },
+
+    _onContentChanged: function(monitor, file, other_file, event_type) {
+        this._populateCategories();
+        this._stack.set_visible_child_name(this._currentCategory);
     },
 
     setModelConnected: function(connect) {
@@ -508,6 +521,7 @@ const WeblinkFrame = new Lang.Class({
 
     _onCategoryClicked: function(button) {
         let idx = button.index;
+        let category = button.category;
 
         if (idx > this._currentCategoryIdx) {
             this._stack.transition_type = PLib.StackTransitionType.SLIDE_LEFT;
@@ -516,7 +530,9 @@ const WeblinkFrame = new Lang.Class({
         }
 
         this._currentCategoryIdx = idx;
-        this._stack.set_visible_child_name(button.category);
+        this._currentCategory = category;
+
+        this._stack.set_visible_child_name(category);
     }
 });
 Builder.bindTemplateChildren(WeblinkFrame.prototype);
