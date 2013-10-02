@@ -24,6 +24,8 @@ const CATEGORY_TRANSITION_MS = 500;
 
 const THUMBNAIL_SIZE = 90;
 
+const LIST_COLUMNS_SPACING = 15;
+
 const AlertIcon = {
     SPINNER: 0,
     CANCEL: 1,
@@ -466,7 +468,8 @@ const WeblinkFrame = new Lang.Class({
             }
 
             let weblinksBox = new Gtk.Box({ orientation: Gtk.Orientation.HORIZONTAL,
-                                            homogeneous: true });
+                                            homogeneous: true,
+                                            spacing: LIST_COLUMNS_SPACING });
             scrollWindow.add_with_viewport(weblinksBox);
 
             let weblinksColumnBoxes = [];
