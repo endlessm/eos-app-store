@@ -11,6 +11,7 @@ const WebKit = imports.gi.WebKit2;
 
 const AppListModel = imports.appListModel;
 const AppStoreWindow = imports.appStoreWindow;
+const CategoryButton = imports.categoryButton;
 const Builder = imports.builder;
 const Lang = imports.lang;
 const Separator = imports.separator;
@@ -18,6 +19,10 @@ const Signals = imports.signals;
 
 const NEW_SITE_TITLE_LIMIT = 20;
 const NEW_SITE_SUCCESS_TIMEOUT = 3;
+
+const CATEGORY_TRANSITION_MS = 500;
+
+const THUMBNAIL_SIZE = 90;
 
 const AlertIcon = {
     SPINNER: 0,
@@ -137,28 +142,17 @@ const NewSiteBox = new Lang.Class({
         this._urlEntry.halign = Gtk.Align.START;
     },
 
-    _onEditSiteCancel: function() {
-        this._reset();
-    },
-
-    _onSiteAdd: function() {
-        let url = this._siteAlertLabel.get_text();
-        let title = this._urlEntry.get_text();
-
-        let urlLabel = new Gtk.Label({ label: title });
+    _showInstalledMessage: function() {
+        let urlLabel = new Gtk.Label({ label: this._urlEntry.get_text() });
         urlLabel.get_style_context().add_class('url-label');
         urlLabel.set_alignment(0, 0.5);
         this._siteUrlFrame.remove(this._urlEntry);
         this._siteUrlFrame.add(urlLabel);
         this._siteUrlFrame.show_all();
-
+        
         this._siteAlertLabel.set_text(_("was added successfully"));
         this._siteAddButton.sensitive = false;
         this._switchAlertIcon(AlertIcon.HIDDEN);
-
-        let newSite = this._weblinkListModel.createWeblink(url, title, 'browser');
-        this._weblinkListModel.update();
-        this._weblinkListModel.install(newSite);
 
         GLib.timeout_add_seconds(GLib.PRIORITY_DEFAULT,
                                  NEW_SITE_SUCCESS_TIMEOUT,
@@ -170,6 +164,21 @@ const NewSiteBox = new Lang.Class({
                                      this._reset();
                                      return false;
                                  }));
+    },
+
+    _onEditSiteCancel: function() {
+        this._reset();
+    },
+
+    _onSiteAdd: function() {
+        let url = this._siteAlertLabel.get_text();
+        let title = this._urlEntry.get_text();
+
+        let newSite = this._weblinkListModel.createWeblink(url, title, 'browser');
+        this._weblinkListModel.update();
+        this._weblinkListModel.install(newSite);
+
+        this._showInstalledMessage();
     },
 
     _onUrlEntryActivated: function() {
@@ -226,82 +235,77 @@ const WeblinkListBoxRow = new Lang.Class({
         '_stateButton'
     ],
 
-    _init: function(model, weblinkId) {
+    _init: function(parentFrame, model, info) {
         this.parent();
 
+        this._parentFrame = parentFrame;
         this._model = model;
-        this._weblinkId = weblinkId;
+        this._info = info;
 
         this.initTemplate({ templateRoot: '_mainBox', bindChildren: true, connectSignals: true, });
         this.add(this._mainBox);
+
+        this._nameLabel.set_text(info.get_title());
+        this._descriptionLabel.set_text(info.get_description());
+        this._urlLabel.set_text(info.get_url());
+
+        let thumbnail = info.get_thumbnail();
+        if (!thumbnail) {
+            this._icon.set_from_icon_name('gtk-missing-image', Gtk.IconSize.DIALOG);
+        } else {
+            // Scale and crop
+            if (thumbnail.height > thumbnail.width) {
+                thumbnail = thumbnail.scale_simple(THUMBNAIL_SIZE,
+                                                   Math.floor(thumbnail.height * THUMBNAIL_SIZE / thumbnail.width),
+                                                   GdkPixbuf.InterpType.BILINEAR);
+            } else {
+                thumbnail = thumbnail.scale_simple(Math.floor(thumbnail.width * THUMBNAIL_SIZE / thumbnail.height),
+                                                   THUMBNAIL_SIZE,
+                                                   GdkPixbuf.InterpType.BILINEAR);
+            }
+            this._icon.set_from_pixbuf(thumbnail.new_subpixbuf(0, 0, THUMBNAIL_SIZE, THUMBNAIL_SIZE));
+        }
+
         this._mainBox.show();
-
-        this._stateButton.connect('clicked', Lang.bind(this, this._onStateButtonClicked));
     },
 
-    get weblinkId() {
-        return this._weblinkId;
+    _setInstalledState: function(installed, message) {
+        this._stateButton.sensitive = !installed;
+        this._nameLabel.vexpand = installed;
+        this._urlLabel.visible = !installed;
+        this._descriptionLabel.set_text(message);
+        this._parentFrame.setModelConnected(!installed);
     },
 
-    set weblinkName(name) {
-        if (!name) {
-            name = _("Unknown weblink");
-        }
+    _showInstalledMessage: function () {
+        this._setInstalledState(true, _("has been added successfully!"));
 
-        this._nameLabel.set_text(name);
-    },
-
-    set weblinkDescription(description) {
-        if (!description) {
-            description = '';
-        }
-
-        this._descriptionLabel.set_text(description);
-    },
-
-    set weblinkUrl(url) {
-        if (!url) {
-            url = '';
-        }
-
-        this._urlLabel.set_text(url);
-    },
-
-    set weblinkIcon(name) {
-        if (!name) {
-            name = 'gtk-missing-image';
-        }
-
-        this._icon.set_from_icon_name(name, Gtk.IconSize.DIALOG);
-    },
-
-    set weblinkState(state) {
-        switch (state) {
-        case EosAppStorePrivate.AppState.INSTALLED:
-            this._stateButton.sensitive = false;
-            this._descriptionLabel.set_text(_("has been added successfully!"));
-            this._nameLabel.vexpand = true;
-            this._urlLabel.visible = false;
-            break;
-
-        case EosAppStorePrivate.AppState.UNINSTALLED:
-            this._stateButton.sensitive = true;
-            this._nameLabel.vexpand = false;
-            this._urlLabel.visible = true;
-            break;
-
-        default:
-            break;
-        }
-        this._stateButton.show();
+        GLib.timeout_add_seconds(GLib.PRIORITY_DEFAULT,
+                                 NEW_SITE_SUCCESS_TIMEOUT,
+                                 Lang.bind(this, function() {
+                                     this._setInstalledState(false, this._info.get_description());
+                                     return false;
+                                 }));
     },
 
     _onStateButtonClicked: function() {
-        this._model.install(this._weblinkId);
+        this._parentFrame.setModelConnected(false);
+
+        let url = this._info.get_url();
+        let title = this._info.get_title();
+        let icon = this._info.get_icon_filename();
+        if (!icon) {
+            icon = 'browser';
+        }
+
+        let site = this._model.createWeblink(url, title, icon);
+        this._model.install(site);
+
+        this._showInstalledMessage();
     },
 
     _onUrlClicked: function(widget, event) {
-        Gtk.show_uri(null, this._urlLabel.get_text(), event.time, null);
+        Gtk.show_uri(null, this._info.get_url(), event.time, null);
         // hide the appstore to see the browser
         this.get_toplevel().emit('delete-event', null);
     },
@@ -335,9 +339,8 @@ const WeblinkFrame = new Lang.Class({
     templateChildren: [
         '_mainBox',
         '_newSiteFrame',
-        '_scrolledWindow',
-        '_viewport',
-        '_columnsBox',
+        '_categoriesBox',
+        '_listFrame',
     ],
 
     _init: function(mainWindow) {
@@ -345,12 +348,51 @@ const WeblinkFrame = new Lang.Class({
 
         this.get_style_context().add_class('web-frame');
 
+        this._categories = [
+            {
+                name: 'news',
+                widget: null,
+                label: _("News"),
+                id: EosAppStorePrivate.LinkCategory.NEWS,
+            },
+            {
+                name: 'sports',
+                widget: null,
+                label: _("Sports"),
+                id: EosAppStorePrivate.LinkCategory.SPORTS,
+            },
+            {
+                name: 'education',
+                widget: null,
+                label: _("Education and Health"),
+                id: EosAppStorePrivate.LinkCategory.EDUCATION,
+            },
+            {
+                name: 'entertainment',
+                widget: null,
+                label: _("Entertainment"),
+                id: EosAppStorePrivate.LinkCategory.ENTERTAINMENT,
+            },
+            {
+                name: 'local',
+                widget: null,
+                label: _("Local"),
+                id: EosAppStorePrivate.LinkCategory.LOCAL,
+            },
+            {
+                name: 'opportunities',
+                widget: null,
+                label: _("Opportunities"),
+                id: EosAppStorePrivate.LinkCategory.OPPORTUNITIES,
+            },
+        ];
+
         this.initTemplate({ templateRoot: '_mainBox', bindChildren: true, connectSignals: true, });
         this.add(this._mainBox);
 
         let separator = new Separator.FrameSeparator();
         this._mainBox.add(separator);
-        this._mainBox.reorder_child(separator, 1);
+        this._mainBox.reorder_child(separator, 2);
 
         this._mainBox.show_all();
 
@@ -365,38 +407,84 @@ const WeblinkFrame = new Lang.Class({
         this._newSiteBox = new NewSiteBox(this._weblinkListModel);
         this._newSiteFrame.add(this._newSiteBox);
 
-        this._listBoxes = [];
-        for (let i = 0; i < this._columns; i++) {
-            this._listBoxes[i] = new WeblinkListBox(this._weblinkListModel);
-            this._columnsBox.add(this._listBoxes[i]);
-        }
+        this._stack = new PLib.Stack({ transition_duration: CATEGORY_TRANSITION_MS,
+                                       transition_type: PLib.StackTransitionType.SLIDE_RIGHT,
+                                       hexpand: true,
+                                       vexpand: true });
+        this._listFrame.add(this._stack);
 
-        this._viewport.show_all();
+        this._mainBox.show_all();
 
-        this._weblinkListModel.connect('changed', Lang.bind(this, this._onListModelChange));
-        this._onListModelChange();
+        this._buttonGroup = null;
+        this._modelConnectionId = null;
+
+        this.setModelConnected(true);
     },
 
-    _onListModelChange: function() {
-        for (let i = 0; i < this._columns; i++) {
-            this._listBoxes[i].foreach(function(child) { child.destroy(); });
+    setModelConnected: function(connect) {
+        if (connect) {
+            this._modelConnectionId = this._weblinkListModel.connect('changed', Lang.bind(this, this._populateCategories));
+            this._populateCategories();
+        } else if (this._modelConnectionId) {
+            this._weblinkListModel.disconnect(this._modelConnectionId);
+            this._modelConnectionId = null;
         }
+    },
 
-        let model = this._weblinkListModel;
-        let weblinks = model.getWeblinks();
-        let index = 0;
+    _populateCategories: function() {
+        for (let c in this._categories) {
+            let category = this._categories[c];
 
-        weblinks.forEach(Lang.bind(this, function(item) {
-            let row = new WeblinkListBoxRow(model, item);
-            row.weblinkName = model.getName(item);
-            row.weblinkDescription = model.getComment(item);
-            row.weblinkUrl = model.getWeblinkUrl(item);
-            row.weblinkIcon = model.getIcon(item);
-            row.weblinkState = model.getState(item);
+            if (!category.button) {
+                category.button = new CategoryButton.CategoryButton({ label: category.label,
+                                                                      category: category.name,
+                                                                      draw_indicator: false,
+                                                                      group: this._buttonGroup });
+                category.button.connect('clicked', Lang.bind(this, this._onCategoryClicked));
+                category.button.show();
+                this._categoriesBox.pack_start(category.button, false, false, 0);
 
-            this._listBoxes[(index++)%this._columns].add(row);
-            row.show();
-        }));
+                if (!this._buttonGroup) {
+                    this._buttonGroup = category.button;
+                }
+            }
+
+            let scrollWindow;
+
+            if (!category.widget) {
+                scrollWindow = new Gtk.ScrolledWindow({ hscrollbar_policy: Gtk.PolicyType.NEVER,
+                                                        vscrollbar_policy: Gtk.PolicyType.AUTOMATIC });
+                this._stack.add_named(scrollWindow, category.name);
+                category.widget = scrollWindow;
+            } else {
+                scrollWindow = category.widget;
+                let child = scrollWindow.get_child();
+                child.destroy();
+            }
+
+            let weblinksBox = new Gtk.Box({ orientation: Gtk.Orientation.HORIZONTAL,
+                                            homogeneous: true });
+            scrollWindow.add_with_viewport(weblinksBox);
+
+            let weblinksColumnBoxes = [];
+            for (let i = 0; i < this._columns; i++) {
+                weblinksColumnBoxes[i] = new WeblinkListBox(this._weblinkListModel);
+                weblinksBox.add(weblinksColumnBoxes[i]);
+            }
+
+            let cells = EosAppStorePrivate.link_load_content(category.id);
+            let index = 0;
+            for (let i in cells) {
+                let row = new WeblinkListBoxRow(this, this._weblinkListModel, cells[i]);
+                weblinksColumnBoxes[(index++)%this._columns].add(row);
+            }
+
+            scrollWindow.show_all();
+        }
+    },
+
+    _onCategoryClicked: function(button) {
+        this._stack.set_visible_child_name(button.category);
     }
 });
 Builder.bindTemplateChildren(WeblinkFrame.prototype);
