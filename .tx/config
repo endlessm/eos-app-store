@@ -1,0 +1,8 @@
+[main]
+host = https://www.transifex.com
+
+[eos-app-store.app]
+file_filter = po/<lang>.po
+source_file = po/eos-app-store.pot
+source_lang = en
+type = PO
