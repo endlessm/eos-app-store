@@ -324,7 +324,7 @@ const AppStoreWindow = new Lang.Class({
                 break;
 
             case StoreModel.StorePage.FOLDERS:
-                title.set_text(_("Folders"));
+                title.set_text(_("Install folders"));
                 break;
         }
     },
