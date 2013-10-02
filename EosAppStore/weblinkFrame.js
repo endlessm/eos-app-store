@@ -150,7 +150,7 @@ const NewSiteBox = new Lang.Class({
         this._siteUrlFrame.add(urlLabel);
         this._siteUrlFrame.show_all();
         
-        this._siteAlertLabel.set_text(_("was added successfully"));
+        this._siteAlertLabel.set_text(_("added successfully!"));
         this._siteAddButton.sensitive = false;
         this._switchAlertIcon(AlertIcon.HIDDEN);
 
@@ -212,7 +212,7 @@ const NewSiteBox = new Lang.Class({
 
     _onLoadFailed: function() {
         this._newSiteError = true;
-        this._siteAlertLabel.set_text(_("the address written does not exist or is not available"));
+        this._siteAlertLabel.set_text(_("The address written does not exist or is not available."));
         this._switchAlertIcon(AlertIcon.ERROR);
         this._urlEntry.get_style_context().add_class('url-entry-error');
         return true;
@@ -278,7 +278,7 @@ const WeblinkListBoxRow = new Lang.Class({
     },
 
     _showInstalledMessage: function () {
-        this._setInstalledState(true, _("has been added successfully!"));
+        this._setInstalledState(true, _("added successfully!"));
 
         GLib.timeout_add_seconds(GLib.PRIORITY_DEFAULT,
                                  NEW_SITE_SUCCESS_TIMEOUT,
