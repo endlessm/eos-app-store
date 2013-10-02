@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: dev 1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-09-19 18:50+0200\n"
+"POT-Creation-Date: 2013-10-02 14:22-0700\n"
 "PO-Revision-Date: 2012-05-31 11:54-0500\n"
 "Last-Translator: Automatically generated\n"
 "Language-Team: none\n"
@@ -21,24 +21,11 @@ msgstr ""
 msgid "Add"
 msgstr "Adicionar"
 
-#: ../data/eos-app-store.desktop.in.h:2
-msgid "Add applications to EOS"
+#: ../data/eos-app-store-folder-frame.ui.h:1
+msgid "Select an icon"
 msgstr ""
 
-#: ../data/eos-app-store-weblink-new-site-frame.ui.h:1
-msgid "e.g.: http://www.globoesporte.com"
-msgstr ""
-
-#: ../data/eos-app-store-list-row.ui.h:1
-msgid "NAME"
-msgstr ""
-
-#: ../data/eos-app-store-list-row.ui.h:2
-msgid "description"
-msgstr ""
-
-#: ../data/eos-app-store-list-row.ui.h:3 ../EosAppStore/appFrame.js:94
-#: ../EosAppStore/weblinkFrame.js:282
+#: ../data/eos-app-store-list-row.ui.h:1 ../EosAppStore/appFrame.js:81
 msgid "INSTALL"
 msgstr ""
 
@@ -54,135 +41,96 @@ msgstr ""
 msgid "Folders"
 msgstr ""
 
-#: ../EosAppStore/appFrame.js:61
-msgid "Unknown application"
+#: ../data/eos-app-store-weblink-new-site-frame.ui.h:1
+#: ../EosAppStore/weblinkFrame.js:99
+msgid "e.g.: http://www.globoesporte.com"
 msgstr ""
 
-#: ../EosAppStore/appFrame.js:89 ../EosAppStore/weblinkFrame.js:277
+#: ../EosAppStore/appFrame.js:76
 msgid "UNINSTALL"
 msgstr ""
 
-#: ../EosAppStore/appFrame.js:99
+#: ../EosAppStore/appFrame.js:86
 msgid "UPDATE"
 msgstr ""
 
-#. Translators: use the same string used to install the app store content JSON
-#: ../EosAppStore/appFrame.js:172 ../EosAppStore/lib/eos-app-utils.c:17
+#: ../EosAppStore/appFrame.js:126
 msgid "Featured"
 msgstr ""
 
-#: ../EosAppStore/appFrame.js:179 ../EosAppStore/lib/eos-app-utils.c:18
+#. Translators: use the same string used to install the app store content JSON
+#: ../EosAppStore/appFrame.js:132 ../EosAppStore/lib/eos-app-info.c:601
 msgid "Education"
 msgstr ""
 
-#: ../EosAppStore/appFrame.js:186 ../EosAppStore/lib/eos-app-utils.c:19
+#: ../EosAppStore/appFrame.js:138 ../EosAppStore/lib/eos-app-info.c:602
 msgid "Leisure"
 msgstr ""
 
-#: ../EosAppStore/appFrame.js:193 ../EosAppStore/lib/eos-app-utils.c:20
+#: ../EosAppStore/appFrame.js:144 ../EosAppStore/lib/eos-app-info.c:603
 msgid "Utilities"
 msgstr ""
 
-#: ../EosAppStore/appStore.js:43
+#: ../EosAppStore/appStore.js:45
 msgid "Application Store"
 msgstr ""
 
-#: ../EosAppStore/appStoreWindow.js:247
-msgid "INSTALL APPLICATIONS"
+#: ../EosAppStore/appStoreWindow.js:319
+msgid "Install applications"
 msgstr ""
 
-#: ../EosAppStore/appStoreWindow.js:248
-msgid "A list of many free applications you can install and update"
+#: ../EosAppStore/appStoreWindow.js:323
+msgid "Install websites"
 msgstr ""
 
-#: ../EosAppStore/appStoreWindow.js:254
-msgid "INSTALL SITES"
+#: ../EosAppStore/appStoreWindow.js:327
+msgid "Install folders"
 msgstr ""
 
-#: ../EosAppStore/appStoreWindow.js:255
-msgid "A list of many sites you can add"
+#: ../EosAppStore/folderFrame.js:41
+msgid "Name of folder"
 msgstr ""
 
-#: ../EosAppStore/appStoreWindow.js:261
-#, fuzzy
-msgid "FOLDERS"
-msgstr "PASTA"
-
-#: ../EosAppStore/appStoreWindow.js:262
-msgid "A descriptive label for the Folders section"
+#: ../EosAppStore/folderFrame.js:69
+msgid "Folder added!"
 msgstr ""
 
-#: ../EosAppStore/weblinkFrame.js:61
+#: ../EosAppStore/weblinkFrame.js:68
 msgid "Write the site address you want to add"
 msgstr ""
 
-#: ../EosAppStore/weblinkFrame.js:92
-msgid "e.g.: http://wwww.globoesporte.com"
+#: ../EosAppStore/weblinkFrame.js:153 ../EosAppStore/weblinkFrame.js:281
+msgid "added successfully!"
 msgstr ""
 
-#: ../EosAppStore/weblinkFrame.js:153
-msgid "was added successfully"
-msgstr ""
-
-#: ../EosAppStore/weblinkFrame.js:188
+#: ../EosAppStore/weblinkFrame.js:199
 msgid "searching"
 msgstr ""
 
-#: ../EosAppStore/weblinkFrame.js:204
-msgid "the address written does not exist or is not available"
+#: ../EosAppStore/weblinkFrame.js:215
+msgid "The address written does not exist or is not available."
 msgstr ""
 
-#: ../EosAppStore/weblinkFrame.js:245
-msgid "Unknown weblink"
+#: ../EosAppStore/weblinkFrame.js:355
+msgid "News"
 msgstr ""
 
-#~ msgid "1. NAME YOUR FOLDER"
-#~ msgstr "1. O NOME DO SEU FOLDER"
+#: ../EosAppStore/weblinkFrame.js:361
+msgid "Sports"
+msgstr ""
 
-#~ msgid "2. PICK A SYMBOL"
-#~ msgstr "2. ESCOLHA UM SÍMBOLO"
+#: ../EosAppStore/weblinkFrame.js:367
+msgid "Education and Health"
+msgstr ""
 
-#~ msgid "APP"
-#~ msgstr "APLICATIVO"
+#: ../EosAppStore/weblinkFrame.js:373
+msgid "Entertainment"
+msgstr ""
 
-#~ msgid "WEB"
-#~ msgstr "SITES"
+#: ../EosAppStore/weblinkFrame.js:379
+msgid "Local"
+msgstr ""
 
-#~ msgid "TYPE WEBSITE"
-#~ msgstr "DIGITE SITE"
-
-#~ msgid "Delete"
-#~ msgstr "Excluir"
-
-#~ msgid "Files"
-#~ msgstr "Files"
-
-#~ msgid ""
-#~ "To delete a folder you have to\n"
-#~ "remove all of the items inside\n"
-#~ "of it first.\n"
-#~ "\n"
-#~ "We are just trying to\n"
-#~ "keep you safe."
-#~ msgstr ""
-#~ "Para apagar uma pasta que você\n"
-#~ "tem que remover todos os itens\n"
-#~ "dentro do primeiro.\n"
-#~ "\n"
-#~ "Estamos apenas tentando mantê-lo\n"
-#~ "seguro."
-
-#~ msgid " remaining"
-#~ msgstr " restante"
-
-#~ msgid " until full"
-#~ msgstr " até carga completa"
-
-#~ msgid "Battery Info"
-#~ msgstr "Informações sobre bateria"
-
-#~ msgid "Google or type website"
-#~ msgstr "Busque ou digite o site"
-
-#~ msgid "Power Settings"
-#~ msgstr "Configurações de energia"
+#: ../EosAppStore/weblinkFrame.js:385
+msgid "Opportunities"
+msgstr ""
