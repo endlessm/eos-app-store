@@ -44,7 +44,7 @@
                 <child>
                   <object class="GtkBox" id="_screenshotPreviewBox">
                     <property name="can_focus">False</property>
-                    <property name="halign">start</property>
+                    <property name="halign">center</property>
                     <property name="valign">start</property>
                     <property name="hexpand">True</property>
                     <property name="spacing">6</property>

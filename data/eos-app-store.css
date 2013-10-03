@@ -133,14 +133,20 @@
     padding: 0;
 }
 
+.header-icon {
+    padding-left: 15px;
+    padding-right: 20px;
+}
+
 .header-title {
-    font-size: 1.9em;
+    font-size: 32px;
     font-weight: bold;
     color: white;
 }
 
 .header-subtitle {
-    color: white;
+    font-size: 14px;
+    color: #ccc;
 }
 
 .app-cell-title {
@@ -166,6 +172,8 @@
 
 .app-frame-description {
     color: white;
+    font-size: 13px;
+    margin-top: 20px;
 }
 
 .app-cell-image {
@@ -175,7 +183,7 @@
 }
 
 .screenshot-box {
-    margin: 3px 4px 3px 4px;
+    padding: 15px 15px;
     border-style: none;
     background-color: shade(@app_store_bg, 0.8);
 }
