@@ -14,6 +14,7 @@ const AppStoreWindow = imports.appStoreWindow;
 const CategoryButton = imports.categoryButton;
 const Builder = imports.builder;
 const Lang = imports.lang;
+const Path = imports.path;
 const Separator = imports.separator;
 const Signals = imports.signals;
 
@@ -62,6 +63,11 @@ const NewSiteBox = new Lang.Class({
                             connectSignals: true });
         this.add(this._mainBox);
         this._mainBox.show_all();
+
+        // https://bugzilla.gnome.org/show_bug.cgi?id=709056
+        let file = Gio.File.new_for_path(Path.ICONS_DIR + '/icon_website-symbolic.svg');
+        let gicon = new Gio.FileIcon({ file: file });
+        this._siteIcon.set_from_gicon(gicon, Gtk.IconSize.DND);
 
         this._createAlertIcons();
         this._switchAlertIcon(AlertIcon.NOTHING);

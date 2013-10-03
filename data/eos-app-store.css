@@ -208,6 +208,7 @@
                                   alpha(white, 0.04),
                                   alpha(white, 0.04) 1px,
                                   alpha(black, 0.08) 1px) 0 2 0 0 / 0 2px 0 0;
+    color: #424244;
 }
 
 .new-site-frame .url-frame {
@@ -250,7 +251,7 @@
 }
    
 .new-site-frame .alert-label {
-    font-size: 14px;
+    font-size: 1.06em;
     color: #999999;
 }
 
