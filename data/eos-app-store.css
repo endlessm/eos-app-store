@@ -183,6 +183,7 @@
 }
 
 .screenshot-box {
+    opacity: 1;
     padding: 15px 15px;
     border-style: none;
     background-color: shade(@app_store_bg, 0.8);

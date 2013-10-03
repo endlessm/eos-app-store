@@ -30,6 +30,26 @@ const SCREENSHOT_SMALL = 120;
 const MIN_GRID_WIDTH = 800;
 const MIN_GRID_HEIGHT = 600;
 
+const AppPreview = new Lang.Class({
+    Name: 'AppPreviewImage',
+    Extends: Gtk.EventBox,
+
+    _init: function(path) {
+        this.parent();
+
+        this._path = path;
+
+        this._image = new Gtk.Image();
+        this.add(this._image);
+
+        EosAppStorePrivate.app_load_screenshot(this._image, this._path, SCREENSHOT_SMALL);
+    },
+
+    get path() {
+        return this._path;
+    },
+});
+
 const AppListBoxRow = new Lang.Class({
     Name: 'AppListBoxRow',
     Extends: Gtk.Bin,
@@ -82,19 +102,20 @@ const AppListBoxRow = new Lang.Class({
 
             if (i == 0) {
                 EosAppStorePrivate.app_load_screenshot(this._screenshotImage, path, SCREENSHOT_LARGE);
-                continue;
             }
 
-            let eventBox = new Gtk.EventBox();
-            this._screenshotPreviewBox.add(eventBox);
-            eventBox.show();
-
-            let image = new Gtk.Image();
-            eventBox.add(image);
-            EosAppStorePrivate.app_load_screenshot(image, path, SCREENSHOT_SMALL);
+            let previewBox = new AppPreview(path);
+            this._screenshotPreviewBox.add(previewBox);
+            previewBox.connect('button-press-event', Lang.bind(this, this._onPreviewPress));
+            previewBox.show();
 
             this._screenshotPreviewBox.show();
         }
+    },
+
+    _onPreviewPress: function(widget, event) {
+        EosAppStorePrivate.app_load_screenshot(this._screenshotImage, widget.path, SCREENSHOT_LARGE);
+        return false;
     },
 
     set appState(state) {
