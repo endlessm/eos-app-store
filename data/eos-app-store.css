@@ -302,6 +302,18 @@
     padding-top: 17px;
 }
 
+.weblink-scrolledwindow {
+    border: none;
+    padding-right: 15px;
+
+    -GtkScrolledWindow-scrollbars-within-bevel: false;
+}
+
+.weblink-listbox {
+    -GtkWidget-focus-line-width: 0;
+    -GtkWidget-focus-padding: 0;
+}
+
 .weblink-listbox .list-row {
     background: alpha(black, 0.25);
     border-radius: 3px;

@@ -506,7 +506,9 @@ const WeblinkFrame = new Lang.Class({
 
             if (!category.widget) {
                 scrollWindow = new Gtk.ScrolledWindow({ hscrollbar_policy: Gtk.PolicyType.NEVER,
-                                                        vscrollbar_policy: Gtk.PolicyType.AUTOMATIC });
+                                                        vscrollbar_policy: Gtk.PolicyType.AUTOMATIC,
+                                                        shadow_type: Gtk.ShadowType.IN });
+                scrollWindow.get_style_context().add_class('weblink-scrolledwindow');
                 this._stack.add_named(scrollWindow, category.name);
                 category.widget = scrollWindow;
             } else {
