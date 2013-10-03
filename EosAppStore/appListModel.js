@@ -12,6 +12,8 @@ const EOS_BROWSER = 'chromium-browser ';
 const EOS_LOCALIZED = 'eos-exec-localized ';
 
 const DESKTOP_KEY_SPLASH = 'X-Endless-Splash-Screen';
+const DESKTOP_KEY_SHOW_IN_STORE = 'X-Endless-ShowInAppStore';
+const DESKTOP_KEY_SHOW_IN_PERSONALITIES = 'X-Endless-ShowInPersonalities';
 
 const StoreModel = new Lang.Class({
     Name: 'StoreModel',
@@ -110,7 +112,26 @@ const AppList = new Lang.Class({
 
     _onModelChanged: function(model, items) {
         let apps = items.filter(function(item) {
-            return item.indexOf(EOS_LINK_PREFIX) != 0;
+            // ignore web links
+            if (item.indexOf(EOS_LINK_PREFIX) == 0)
+                return false;
+
+            let info = model.model.get_app_info(item);
+
+            if (info.has_key(DESKTOP_KEY_SHOW_IN_STORE) && info.get_boolean(DESKTOP_KEY_SHOW_IN_STORE)) {
+                if (info.has_key(DESKTOP_KEY_SHOW_IN_PERSONALITIES)) {
+                    let personalities = info.get_string(DESKTOP_KEY_SHOW_IN_PERSONALITIES);
+                    // TODO : check if the current personality is contained there
+                    return true;
+                } else {
+                    // if a set of personalities is not specified, the app is shown for all
+                    return true;
+                }
+            } else {
+                // the application will not be shown in the app store unless
+                // its desktop entry has X-Endless-ShowInAppStore=true
+                return false;
+            }
         });
         this._apps = apps;
         this.emit('changed', this._apps);
