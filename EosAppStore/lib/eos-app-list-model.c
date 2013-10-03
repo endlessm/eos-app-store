@@ -403,7 +403,16 @@ is_app_installed (EosAppListModel *model,
   return g_hash_table_contains (model->installed_apps, desktop_app_id);
 }
 
-static GDesktopAppInfo *
+/**
+ * eos_app_list_model_get_app_info:
+ * @model: the app list model
+ * @app_id : the id of the app
+ *
+ * Returns the #GDesktopAppInfo for the given app.
+ *
+ * Returns: (transfer none): A #GDesktopAppInfo
+ */
+GDesktopAppInfo *
 eos_app_list_model_get_app_info (EosAppListModel *model,
                                  const char *app_id)
 {

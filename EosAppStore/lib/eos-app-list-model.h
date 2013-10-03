@@ -4,6 +4,7 @@
 #define __EOS_APP_LIST_MODEL_H__
 
 #include <gio/gio.h>
+#include <gio/gdesktopappinfo.h>
 #include "eos-app-enums.h"
 
 G_BEGIN_DECLS
@@ -36,6 +37,7 @@ const char *eos_app_list_model_get_app_icon_name (EosAppListModel *model,
                                                   EosAppIconState icon_state);
 gboolean eos_app_list_model_get_app_visible (EosAppListModel *model, const char *app_id);
 EosAppState eos_app_list_model_get_app_state (EosAppListModel *model, const char *app_id);
+GDesktopAppInfo *eos_app_list_model_get_app_info (EosAppListModel *model, const char *app_id);
 
 void eos_app_list_model_install_app (EosAppListModel *model, const char *app_id);
 void eos_app_list_model_uninstall_app (EosAppListModel *model, const char *app_id);
