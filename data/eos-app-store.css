@@ -190,6 +190,12 @@
     background-color: shade(@app_store_bg, 0.8);
 }
 
+.new-site-frame-container {
+    padding-top: 28px;
+    padding-bottom: 24px;
+    padding-right: 23px;
+}
+
 .new-site-frame {
     background: alpha(black, 0.25);
     border-radius: 4px;
