@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<!-- Generated with glade 3.16.0 on Thu Oct  3 17:57:09 2013 -->
 <interface>
   <!-- interface-requires gtk+ 3.6 -->
   <object class="GtkWindow" id="window1">
@@ -7,6 +8,66 @@
       <object class="GtkBox" id="_mainBox">
         <property name="visible">True</property>
         <property name="can_focus">False</property>
+        <property name="spacing">6</property>
+        <child>
+          <object class="GtkFrame" id="_screenshotFrame">
+            <property name="visible">True</property>
+            <property name="can_focus">False</property>
+            <property name="valign">center</property>
+            <property name="hexpand">False</property>
+            <property name="vexpand">False</property>
+            <property name="label_xalign">0</property>
+            <property name="shadow_type">none</property>
+            <style>
+              <class name="screenshot-box"/>
+            </style>
+            <child>
+              <object class="GtkBox" id="_screenshotBox">
+                <property name="visible">True</property>
+                <property name="can_focus">False</property>
+                <property name="valign">center</property>
+                <property name="hexpand">True</property>
+                <property name="vexpand">False</property>
+                <property name="orientation">vertical</property>
+                <property name="spacing">6</property>
+                <child>
+                  <object class="GtkImage" id="_screenshotImage">
+                    <property name="can_focus">False</property>
+                    <property name="stock">gtk-missing-image</property>
+                  </object>
+                  <packing>
+                    <property name="expand">True</property>
+                    <property name="fill">True</property>
+                    <property name="position">0</property>
+                  </packing>
+                </child>
+                <child>
+                  <object class="GtkBox" id="_screenshotPreviewBox">
+                    <property name="can_focus">False</property>
+                    <property name="halign">start</property>
+                    <property name="valign">start</property>
+                    <property name="hexpand">True</property>
+                    <property name="spacing">6</property>
+                    <property name="homogeneous">True</property>
+                    <style>
+                      <class name="screenshot-preview-box"/>
+                    </style>
+                  </object>
+                  <packing>
+                    <property name="expand">False</property>
+                    <property name="fill">True</property>
+                    <property name="position">1</property>
+                  </packing>
+                </child>
+              </object>
+            </child>
+          </object>
+          <packing>
+            <property name="expand">False</property>
+            <property name="fill">False</property>
+            <property name="position">0</property>
+          </packing>
+        </child>
         <child>
           <object class="GtkBox" id="box2">
             <property name="visible">True</property>
@@ -14,7 +75,7 @@
             <property name="orientation">vertical</property>
             <child>
               <object class="GtkButton" id="_stateButton">
-                <property name="label" translatable="yes">INSTALL</property>
+                <property name="label" translatable="yes">Install application</property>
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
                 <property name="receives_default">True</property>

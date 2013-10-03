@@ -18,6 +18,10 @@ void    eos_app_load_content     (EosFlexyGrid   *grid,
 
 GList * eos_link_load_content    (EosLinkCategory category);
 
+void    eos_app_load_screenshot  (GtkWidget       *image,
+                                  const char      *path,
+                                  int              width);
+
 G_END_DECLS
 
 #endif /* EOS_APP_UTILS_H */

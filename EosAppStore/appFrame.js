@@ -22,6 +22,9 @@ const CELL_DEFAULT_SIZE = 180;
 const CATEGORIES_BOX_SPACING = 32;
 const STACK_TOP_MARGIN = 4;
 
+const SCREENSHOT_LARGE = 480;
+const SCREENSHOT_SMALL = 120;
+
 // If the area available for the grid is less than this minimium size,
 // scroll bars will be added.
 const MIN_GRID_WIDTH = 800;
@@ -36,6 +39,8 @@ const AppListBoxRow = new Lang.Class({
         '_mainBox',
         '_descriptionLabel',
         '_stateButton',
+        '_screenshotImage',
+        '_screenshotPreviewBox',
     ],
 
     _init: function(model, appInfo) {
@@ -53,6 +58,7 @@ const AppListBoxRow = new Lang.Class({
         this.appInfo = appInfo;
         this.appState = this._model.getState(this._appId);
         this.appDescription = this.appInfo.get_description();
+        this.appScreenshots = this.appInfo.get_screenshots();
     },
 
     get appId() {
@@ -67,23 +73,50 @@ const AppListBoxRow = new Lang.Class({
         this._descriptionLabel.set_text(description);
     },
 
+    set appScreenshots(screenshots) {
+        this._screenshotPreviewBox.hide();
+        this._screenshotImage.hide();
+
+        for (let i in screenshots) {
+            let path = screenshots[i];
+
+            if (i == 0) {
+                EosAppStorePrivate.app_load_screenshot(this._screenshotImage, path, SCREENSHOT_LARGE);
+                continue;
+            }
+
+            let eventBox = new Gtk.EventBox();
+            this._screenshotPreviewBox.add(eventBox);
+            eventBox.show();
+
+            let image = new Gtk.Image();
+            eventBox.add(image);
+            EosAppStorePrivate.app_load_screenshot(image, path, SCREENSHOT_SMALL);
+
+            this._screenshotPreviewBox.show();
+        }
+    },
+
     set appState(state) {
         this._appState = state;
         this._stateButton.hide();
 
         switch (this._appState) {
             case EosAppStorePrivate.AppState.INSTALLED:
-                this._stateButton.set_label(_("UNINSTALL"));
+                this._stateButton.set_label(_("Remove application"));
+                this._stateButton.get_style_context().add_class('remove-app-button');
                 this._stateButton.show();
                 break;
 
             case EosAppStorePrivate.AppState.UNINSTALLED:
-                this._stateButton.set_label(_("INSTALL"));
+                this._stateButton.set_label(_("Install application"));
+                this._stateButton.get_style_context().add_class('install-app-button');
                 this._stateButton.show();
                 break;
 
             case EosAppStorePrivate.AppState.UPDATABLE:
-                this._stateButton.set_label(_("UPDATE"));
+                this._stateButton.set_label(_("Update application"));
+                this._stateButton.get_style_context().add_class('update-app-button');
                 this._stateButton.show();
                 break;
 
