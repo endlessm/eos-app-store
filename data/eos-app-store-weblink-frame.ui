@@ -13,8 +13,6 @@
             <property name="height_request">90</property>
             <property name="visible">True</property>
             <property name="can_focus">False</property>
-            <property name="margin_left">15</property>
-            <property name="margin_right">32</property>
             <property name="margin_top">28</property>
             <property name="margin_bottom">24</property>
             <property name="label_xalign">0</property>
