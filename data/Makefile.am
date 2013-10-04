@@ -17,6 +17,8 @@ icons_DATA = \
 	icon_website-symbolic.svg \
 	$(NULL)
 
+EXTRA_DIST += $(icons_DATA)
+
 EXTRA_DIST += \
 	eos-app-store.gresource.xml \
 	$(resource_files) \

@@ -1,12 +1,17 @@
 NULL =
+EXTRA_DIST =
 
 C_app_json = \
 	C/apps/content.json \
 	$(NULL)
 
+EXTRA_DIST += $(C_app_json)
+
 C_links_json = \
 	C/links/content.json \
 	$(NULL)
+
+EXTRA_DIST += $(C_links_json)
 
 C_app_images = \
 	C/apps/resources/images/billard-gl-featured.jpg \
@@ -31,6 +36,8 @@ C_app_images = \
 	C/apps/resources/images/wikipedia-featured.jpg \
 	C/apps/resources/images/youtube-featured.jpg \
 	$(NULL)
+
+EXTRA_DIST += $(C_app_images)
 
 C_app_thumbnails = \
 	C/apps/resources/thumbnails/armagetron-thumb.jpg \
@@ -75,6 +82,8 @@ C_app_thumbnails = \
 	C/apps/resources/thumbnails/wikipedia-thumb.jpg \
 	C/apps/resources/thumbnails/youtube-thumb.jpg \
 	$(NULL)
+
+EXTRA_DIST += $(C_app_thumbnails)
 
 C_links_images = \
 	C/links/images/abril.jpg \
@@ -260,6 +269,8 @@ C_links_images = \
 	C/links/images/youtube.jpg \
 	C/links/images/zap_empregos.jpg \
 	$(NULL)
+
+EXTRA_DIST += $(C_links_images)
 
 contentdir = $(datadir)/application-store
 nobase_content_DATA = \
