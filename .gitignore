@@ -16,6 +16,7 @@ stamp-h1
 /config.*
 /configure
 /eos-app-store
+/eos-reset-desktop
 /install-sh
 /missing
 /data/*.gresource
