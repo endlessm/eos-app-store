@@ -12,6 +12,8 @@
     <file compressed="true">btn_edit_hover.png</file>
     <file compressed="true">btn_edit_normal.png</file>
     <file compressed="true">btn_edit_pressed.png</file>
+    <file compressed="true">btn_folder-glow_hover.png</file>
+    <file compressed="true">btn_folder-glow_pressed.png</file>
     <file compressed="true">btn_add-folder_disabled.png</file>
     <file compressed="true">btn_add-folder_normal.png</file>
     <file compressed="true">btn_add-folder_hover.png</file>
