@@ -1,5 +1,7 @@
 NULL =
 EXTRA_DIST =
+CLEANFILES =
+DISTCLEANFILES =
 
 default_app_json = \
 	Default/apps/content.json \
@@ -278,6 +280,25 @@ default_links_images = \
 	$(NULL)
 
 EXTRA_DIST += $(default_links_images)
+
+# extract-content-strings is a small utility that runs on the build system
+extract_content_strings_sources = $(top_srcdir)/tools/extract-content-strings.c
+extract_content_strings_cflags = $(EOS_APP_STORE_CFLAGS) $(MAINTAINER_CFLAGS)
+extract_content_strings_ldadd = $(EOS_APP_STORE_LIBS)
+
+extract-content-strings$(BUILD_EXEEXT): $(extract_content_strings_sources)
+	@rm -f extract-content-strings$(BUILD_EXEEXT)
+	$(AM_V_CCLD)$(CC) $(AM_CFLAGS) $(extract_content_strings_cflags) $^ $(extract_content_strings_ldadd) -o $@
+
+DISTCLEANFILES += extract-content-strings$(BUILD_EXEEXT)
+
+content_files = $(default_app_json) $(default_links_json)
+content_headers = $(content_files:.json=.json.h)
+%.json.h: $(content_files) extract-content-strings$(BUILD_EXEEXT)
+	$(AM_V_GEN) ./extract-content-strings$(BUILD_EXEEXT) $< > $@
+
+noinst_DATA = $(content_headers)
+DISTCLEANFILES += $(content_headers)
 
 contentdir = $(datadir)/application-store
 nobase_content_DATA = \
