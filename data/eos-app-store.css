@@ -182,7 +182,10 @@
 
 .new-site-frame .url-icon {
     background: alpha(black, 0.12);
-    border-right: 1px solid alpha(black, 0.8);
+    border-image: linear-gradient(to left,
+                                  alpha(white, 0.04),
+                                  alpha(white, 0.04) 1px,
+                                  alpha(black, 0.08) 1px) 0 2 0 0 / 0 2px 0 0;
 }
 
 .new-site-frame .url-frame {
