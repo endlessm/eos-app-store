@@ -11,8 +11,9 @@ const Lang = imports.lang;
 const FolderModel = imports.folderModel;
 const Separator = imports.separator;
 
-const _FOLDER_BUTTON_SIZE = 64;
-const _FOLDER_GRID_SPACING = _FOLDER_BUTTON_SIZE;
+const _FOLDER_BUTTON_IMAGE_SIZE = 64;
+const _FOLDER_BUTTON_SIZE = 96;
+const _FOLDER_GRID_SPACING = 32;
 const _FOLDER_GRID_BORDER = _FOLDER_GRID_SPACING / 2;
 
 const _BUBBLE_ENTRY_WIDTH_CHARS = 15;
@@ -152,7 +153,10 @@ const FolderIconButton = new Lang.Class({
             relief: Gtk.ReliefStyle.NONE,
             hexpand: false,
             vexpand: false,
-            image: new Gtk.Image({ icon_name: iconName }) });
+            image: new Gtk.Image({
+                icon_name: iconName,
+                width_request: _FOLDER_BUTTON_IMAGE_SIZE,
+                height_request: _FOLDER_BUTTON_IMAGE_SIZE }) });
 
         this._iconName = iconName;
         this.get_style_context().add_class('folder-icon-button');
