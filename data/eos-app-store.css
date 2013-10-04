@@ -271,52 +271,58 @@
     background-color: transparent;
 }
 
-.weblink-row {
+.weblink-listbox .list-row-separator {
+    background-color: transparent;
+    border: none;
+    padding-top: 17px;
+}
+
+.weblink-listbox .list-row {
     background: alpha(black, 0.25);
     border-radius: 3px;
     box-shadow: 0px 2px 2px 0px alpha(black, 0.3);
 }
 
-.weblink-listbox:hover {
+.weblink-listbox .list-row:hover {
     background: alpha(#f9f8f8, 0.95);
     box-shadow: 0px 0px 12px 0px alpha(#00ffff, 0.6);
 }
 
-.weblink-row .state-button {
+.weblink-listbox .list-row .state-button {
     background-color: transparent;
     background-image: url("btn_add-website_disabled.png");
     background-size: 49px;
     border: 1px;
 }
 
-.weblink-row .state-button:hover {
+.weblink-listbox .list-row .state-button:hover {
     background-image: url("btn_add-website_hover.png");
 }
 
-.weblink-row .state-button:active,
-.weblink-row .state-button:hover:active {
+.weblink-listbox .list-row .state-button:active,
+.weblink-listbox .list-row .state-button:hover:active {
     background-image: url("btn_add-website_pressed.png");
 }
 
-.weblink-row .state-button:insensitive {
+.weblink-listbox .list-row .state-button:insensitive {
     background-image: url("icon_installed_43x43.png");
     background-color: transparent;
 }
 
-.weblink-row .icon {
+.weblink-listbox .list-row .icon {
     background: alpha(black, 0.12);
 }
 
-.weblink-row .title {
+.weblink-listbox .list-row .title {
     font-weight: bold;
     color: white;
 }
 
-.weblink-row .description {
+.weblink-listbox .list-row .description {
     color: lightgray;
 }
 
-.weblink-row .url {
+.weblink-listbox .list-row .url {
     color: orange;
 }
 

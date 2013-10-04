@@ -24,6 +24,8 @@ const CATEGORY_TRANSITION_MS = 500;
 
 const THUMBNAIL_SIZE = 90;
 
+const LIST_COLUMNS_SPACING = 15;
+
 const AlertIcon = {
     SPINNER: 0,
     CANCEL: 1,
@@ -331,6 +333,16 @@ const WeblinkListBox = new Lang.Class({
     }
 });
 
+const WeblinkListBoxRowSeparator = new Lang.Class({
+    Name: 'WeblinkListBoxRowSeparator',
+    Extends: Gtk.Frame,
+
+    _init: function() {
+        this.parent();
+        this.get_style_context().add_class("list-row-separator");
+    }
+});
+
 const WeblinkFrame = new Lang.Class({
     Name: 'WeblinkFrame',
     Extends: Gtk.Frame,
@@ -466,12 +478,14 @@ const WeblinkFrame = new Lang.Class({
             }
 
             let weblinksBox = new Gtk.Box({ orientation: Gtk.Orientation.HORIZONTAL,
-                                            homogeneous: true });
+                                            homogeneous: true,
+                                            spacing: LIST_COLUMNS_SPACING });
             scrollWindow.add_with_viewport(weblinksBox);
 
             let weblinksColumnBoxes = [];
             for (let i = 0; i < this._columns; i++) {
                 weblinksColumnBoxes[i] = new WeblinkListBox(this._weblinkListModel);
+                weblinksColumnBoxes[i].set_header_func(Lang.bind(this, this._updateColumnBoxHeader));
                 weblinksBox.add(weblinksColumnBoxes[i]);
             }
 
@@ -483,6 +497,12 @@ const WeblinkFrame = new Lang.Class({
             }
 
             scrollWindow.show_all();
+        }
+    },
+
+    _updateColumnBoxHeader: function(row, before) {
+        if (before) {
+            row.set_header(new WeblinkListBoxRowSeparator());
         }
     },
 
