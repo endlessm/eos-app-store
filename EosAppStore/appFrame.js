@@ -57,7 +57,7 @@ const AppListBoxRow = new Lang.Class({
     templateResource: '/com/endlessm/appstore/eos-app-store-list-row.ui',
     templateChildren: [
         '_mainBox',
-        '_descriptionLabel',
+        '_descriptionText',
         '_stateButton',
         '_screenshotImage',
         '_screenshotPreviewBox',
@@ -90,7 +90,7 @@ const AppListBoxRow = new Lang.Class({
             description = "";
         }
 
-        this._descriptionLabel.set_text(description);
+        this._descriptionText.buffer.text = description;
     },
 
     set appScreenshots(screenshots) {
