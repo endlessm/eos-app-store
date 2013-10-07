@@ -190,6 +190,12 @@
     background-color: shade(@app_store_bg, 0.8);
 }
 
+.new-site-frame-container {
+    padding-top: 28px;
+    padding-bottom: 24px;
+    padding-right: 23px;
+}
+
 .new-site-frame {
     background: alpha(black, 0.25);
     border-radius: 4px;
@@ -202,6 +208,7 @@
                                   alpha(white, 0.04),
                                   alpha(white, 0.04) 1px,
                                   alpha(black, 0.08) 1px) 0 2 0 0 / 0 2px 0 0;
+    color: #424244;
 }
 
 .new-site-frame .url-frame {
@@ -209,7 +216,7 @@
 }
 
 .new-site-frame .url-entry {
-    font-size: 1.12em;
+    font-size: 1.25em;
     font-weight: 600; /* semibold */
 
     color: #333333;
@@ -244,7 +251,7 @@
 }
    
 .new-site-frame .alert-label {
-    font-size: 14px;
+    font-size: 1.083em;
     color: #999999;
 }
 
@@ -294,6 +301,18 @@
     background-color: transparent;
     border: none;
     padding-top: 17px;
+}
+
+.weblink-scrolledwindow {
+    border: none;
+    padding-right: 15px;
+
+    -GtkScrolledWindow-scrollbars-within-bevel: false;
+}
+
+.weblink-listbox {
+    -GtkWidget-focus-line-width: 0;
+    -GtkWidget-focus-padding: 0;
 }
 
 .weblink-listbox .list-row {
