@@ -400,7 +400,7 @@ const char *
 eos_app_info_get_title (const EosAppInfo *info)
 {
   if (info != NULL)
-    return info->title;
+    return gettext (info->title);
 
   return "";
 }
@@ -409,7 +409,7 @@ const char *
 eos_app_info_get_subtitle (const EosAppInfo *info)
 {
   if (info != NULL)
-    return info->subtitle;
+    return gettext (info->subtitle);
 
   return "";
 }
@@ -427,7 +427,7 @@ const char *
 eos_app_info_get_description (const EosAppInfo *info)
 {
   if (info != NULL)
-    return info->description;
+    return gettext (info->description);
 
   return "";
 }
