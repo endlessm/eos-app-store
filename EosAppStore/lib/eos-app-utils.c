@@ -255,3 +255,26 @@ out:
 
   return g_list_reverse (links);
 }
+
+void
+eos_app_load_screenshot (GtkWidget  *image,
+                         const char *path,
+                         int         width)
+{
+  GError *error = NULL;
+  GdkPixbuf *pixbuf =
+    gdk_pixbuf_new_from_file_at_size (path, width, width, &error);
+
+  if (error != NULL)
+    {
+      g_warning ("Cannot load image at path '%s': %s", path, error->message);
+      g_error_free (error);
+      gtk_widget_hide (image);
+      return;
+    }
+
+  gtk_image_set_from_pixbuf (GTK_IMAGE (image), pixbuf);
+  gtk_widget_show (image);
+
+  g_object_unref (pixbuf);
+}

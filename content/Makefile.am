@@ -85,6 +85,13 @@ C_app_thumbnails = \
 
 EXTRA_DIST += $(C_app_thumbnails)
 
+C_app_screenshots = \
+	C/apps/resources/screenshots/gimp-screenshot-1.png \
+	C/apps/resources/screenshots/gimp-screenshot-2.png \
+	$(NULL)
+
+EXTRA_DIST += $(C_app_screenshots)
+
 C_links_images = \
 	C/links/images/abril.jpg \
 	C/links/images/acciontrabajo.jpg \
@@ -277,6 +284,7 @@ nobase_content_DATA = \
 	$(C_app_json) \
 	$(C_app_images) \
 	$(C_app_thumbnails) \
+	$(C_app_screenshots) \
 	$(C_links_json) \
 	$(C_links_images) \
 	$(NULL)

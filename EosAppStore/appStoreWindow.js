@@ -110,8 +110,9 @@ const AppStoreSlider = new Lang.Class({
                          width: width,
                          height: height };
 
+
         this._widget.move(geometry.x, geometry.y);
-        this._widget.resize(geometry.width, geometry.height);
+        this._widget.set_size_request(geometry.width, geometry.height);
     },
 
     setInitialValue: function() {
@@ -203,6 +204,7 @@ const AppStoreWindow = new Lang.Class({
 
         this.initTemplate({ templateRoot: 'main-box', bindChildren: true, connectSignals: true, });
         this.stick();
+        this.set_resizable(false);
         this.set_decorated(false);
         // do not destroy, just hide
         this.connect('delete-event', Lang.bind(this, function() {
