@@ -13,8 +13,8 @@ Build-Depends: cdbs (>= 0.4.90~),
                libgjs-dev,
                libjson-glib-dev,
                libgnome-menu-3-dev,
-               gir1.2-endless-0,
-               gir1.2-eos-pstack
+               eos-pstack-dev,
+               eos-sdk-dev
 X-Python-Version: >= 2.4
 Standards-Version: 3.9.2
 Homepage: http://www.endlessm.com
