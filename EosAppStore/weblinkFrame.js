@@ -27,6 +27,8 @@ const THUMBNAIL_SIZE = 90;
 
 const LIST_COLUMNS_SPACING = 15;
 
+const DEFAULT_ICON = 'generic-link';
+
 const AlertIcon = {
     SPINNER: 0,
     CANCEL: 1,
@@ -258,9 +260,7 @@ const WeblinkListBoxRow = new Lang.Class({
         this._urlLabel.set_text(info.get_url());
 
         let thumbnail = info.get_thumbnail();
-        if (!thumbnail) {
-            this._icon.set_from_icon_name('gtk-missing-image', Gtk.IconSize.DIALOG);
-        } else {
+        if (thumbnail) {
             // Scale and crop
             if (thumbnail.height > thumbnail.width) {
                 thumbnail = thumbnail.scale_simple(THUMBNAIL_SIZE,
@@ -271,8 +271,12 @@ const WeblinkListBoxRow = new Lang.Class({
                                                    THUMBNAIL_SIZE,
                                                    GdkPixbuf.InterpType.BILINEAR);
             }
-            this._icon.set_from_pixbuf(thumbnail.new_subpixbuf(0, 0, THUMBNAIL_SIZE, THUMBNAIL_SIZE));
+            thumbnail = thumbnail.new_subpixbuf(0, 0, THUMBNAIL_SIZE, THUMBNAIL_SIZE);
         }
+
+        this._thumbnail = thumbnail;
+
+        this.connect('state-flags-changed', Lang.bind(this, this._onRowHover));
 
         this._setState(this._getStateFromUrl());
         this._mainBox.show();
@@ -299,6 +303,24 @@ const WeblinkListBoxRow = new Lang.Class({
             this._stateButton.sensitive = false;
         } else {
             this._stateButton.sensitive = true;
+        }
+    },
+
+    _onRowHover: function() {
+        let flags = this.get_state_flags();
+        if (flags & Gtk.StateFlags.PRELIGHT) {
+            let icon = this._info.get_icon();
+            if (!icon) {
+                this._icon.set_from_icon_name(DEFAULT_ICON, Gtk.IconSize.DIALOG);
+            } else {
+                this._icon.set_from_pixbuf(icon);
+            }
+        } else {
+            if (this._thumbnail) {
+                this._icon.set_from_pixbuf(this._thumbnail);
+            } else {
+                this._icon.clear();
+            }
         }
     },
 
