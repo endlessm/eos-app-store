@@ -268,24 +268,49 @@ const WeblinkListBoxRow = new Lang.Class({
             this._icon.set_from_pixbuf(thumbnail.new_subpixbuf(0, 0, THUMBNAIL_SIZE, THUMBNAIL_SIZE));
         }
 
+        this._setState(this._getStateFromUrl());
         this._mainBox.show();
     },
 
+    // FIXME: this should be entirely unnecessary, as we could just use
+    // the linkId, and call getState() on WeblinkList with that ID.
+    // Unfortunately, the CMS-provided content is broken for weblinks
+    // right now, and it has a NULL linkId to all values.
+    // See https://github.com/endlessm/eos-shell/issues/1074
+    _getStateFromUrl: function() {
+        let url = this._info.get_url();
+        let id = this._model.getWeblinkForUrl(url);
+
+        if (id) {
+            return EosAppStorePrivate.AppState.INSTALLED;
+        } else {
+            return EosAppStorePrivate.AppState.UNINSTALLED;
+        }
+    },
+
+    _setState: function(state) {
+        if (state == EosAppStorePrivate.AppState.INSTALLED) {
+            this._stateButton.sensitive = false;
+        } else {
+            this._stateButton.sensitive = true;
+        }
+    },
+
     _setInstalledState: function(installed, message) {
-        this._stateButton.sensitive = !installed;
         this._nameLabel.vexpand = installed;
         this._urlLabel.visible = !installed;
         this._descriptionLabel.set_text(message);
-        this._parentFrame.setModelConnected(!installed);
     },
 
     _showInstalledMessage: function () {
+        this._setState(EosAppStorePrivate.AppState.INSTALLED);
         this._setInstalledState(true, _("added successfully!"));
 
         GLib.timeout_add_seconds(GLib.PRIORITY_DEFAULT,
                                  NEW_SITE_SUCCESS_TIMEOUT,
                                  Lang.bind(this, function() {
                                      this._setInstalledState(false, this._info.get_description());
+                                     this._parentFrame.setModelConnected(true);
                                      return false;
                                  }));
     },
@@ -399,8 +424,6 @@ const WeblinkFrame = new Lang.Class({
             },
         ];
 
-        this._currentCategoryIdx = 0;
-
         this.initTemplate({ templateRoot: '_mainBox', bindChildren: true, connectSignals: true, });
         this.add(this._mainBox);
 
@@ -429,10 +452,25 @@ const WeblinkFrame = new Lang.Class({
 
         this._mainBox.show_all();
 
+        this._currentCategory = this._categories[0].name;
+        this._currentCategoryIdx = 0;
+
         this._buttonGroup = null;
         this._modelConnectionId = null;
-
         this.setModelConnected(true);
+
+        let content_dir = EosAppStorePrivate.link_get_content_dir();
+        let content_path = GLib.build_filenamev([content_dir, 'content.json']);
+        let content_file = Gio.File.new_for_path(content_path);
+        this._contentMonitor = content_file.monitor_file(Gio.FileMonitorFlags.NONE, null);
+        this._contentMonitor.connect('changed', Lang.bind(this, this._onContentChanged));
+
+        this._stack.set_visible_child_name(this._currentCategory);
+    },
+
+    _onContentChanged: function(monitor, file, other_file, event_type) {
+        this._populateCategories();
+        this._stack.set_visible_child_name(this._currentCategory);
     },
 
     setModelConnected: function(connect) {
@@ -508,6 +546,7 @@ const WeblinkFrame = new Lang.Class({
 
     _onCategoryClicked: function(button) {
         let idx = button.index;
+        let category = button.category;
 
         if (idx > this._currentCategoryIdx) {
             this._stack.transition_type = PLib.StackTransitionType.SLIDE_LEFT;
@@ -516,7 +555,9 @@ const WeblinkFrame = new Lang.Class({
         }
 
         this._currentCategoryIdx = idx;
-        this._stack.set_visible_child_name(button.category);
+        this._currentCategory = category;
+
+        this._stack.set_visible_child_name(category);
     }
 });
 Builder.bindTemplateChildren(WeblinkFrame.prototype);
