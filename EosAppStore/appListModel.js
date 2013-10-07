@@ -120,9 +120,22 @@ const AppList = new Lang.Class({
 
             if (info.has_key(DESKTOP_KEY_SHOW_IN_STORE) && info.get_boolean(DESKTOP_KEY_SHOW_IN_STORE)) {
                 if (info.has_key(DESKTOP_KEY_SHOW_IN_PERSONALITIES)) {
+                    // FIXME : use the right call to get the current personality
+                    let current = 'Brazil';
+
                     let personalities = info.get_string(DESKTOP_KEY_SHOW_IN_PERSONALITIES);
-                    // TODO : check if the current personality is contained there
-                    return true;
+                    if (personalities && personalities.length > 0) {
+                        let split = personalities.split(';');
+                        for (let i = 0; i < split.length; i++) {
+                            if (split[i].toLowerCase() == current.toLowerCase()) {
+                                return true;
+                            }
+                        }
+                        return false;
+                    } else {
+                        // the key is set but empty, so we just ignore it
+                        return true;
+                    }
                 } else {
                     // if a set of personalities is not specified, the app is shown for all
                     return true;
