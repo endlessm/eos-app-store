@@ -22,10 +22,33 @@ const CELL_DEFAULT_SIZE = 180;
 const CATEGORIES_BOX_SPACING = 32;
 const STACK_TOP_MARGIN = 4;
 
+const SCREENSHOT_LARGE = 480;
+const SCREENSHOT_SMALL = 120;
+
 // If the area available for the grid is less than this minimium size,
 // scroll bars will be added.
 const MIN_GRID_WIDTH = 800;
 const MIN_GRID_HEIGHT = 600;
+
+const AppPreview = new Lang.Class({
+    Name: 'AppPreviewImage',
+    Extends: Gtk.EventBox,
+
+    _init: function(path) {
+        this.parent();
+
+        this._path = path;
+
+        this._image = new Gtk.Image();
+        this.add(this._image);
+
+        EosAppStorePrivate.app_load_screenshot(this._image, this._path, SCREENSHOT_SMALL);
+    },
+
+    get path() {
+        return this._path;
+    },
+});
 
 const AppListBoxRow = new Lang.Class({
     Name: 'AppListBoxRow',
@@ -34,8 +57,10 @@ const AppListBoxRow = new Lang.Class({
     templateResource: '/com/endlessm/appstore/eos-app-store-list-row.ui',
     templateChildren: [
         '_mainBox',
-        '_descriptionLabel',
+        '_descriptionText',
         '_stateButton',
+        '_screenshotImage',
+        '_screenshotPreviewBox',
     ],
 
     _init: function(model, appInfo) {
@@ -53,6 +78,7 @@ const AppListBoxRow = new Lang.Class({
         this.appInfo = appInfo;
         this.appState = this._model.getState(this._appId);
         this.appDescription = this.appInfo.get_description();
+        this.appScreenshots = this.appInfo.get_screenshots();
     },
 
     get appId() {
@@ -64,7 +90,32 @@ const AppListBoxRow = new Lang.Class({
             description = "";
         }
 
-        this._descriptionLabel.set_text(description);
+        this._descriptionText.buffer.text = description;
+    },
+
+    set appScreenshots(screenshots) {
+        this._screenshotPreviewBox.hide();
+        this._screenshotImage.hide();
+
+        for (let i in screenshots) {
+            let path = screenshots[i];
+
+            if (i == 0) {
+                EosAppStorePrivate.app_load_screenshot(this._screenshotImage, path, SCREENSHOT_LARGE);
+            }
+
+            let previewBox = new AppPreview(path);
+            this._screenshotPreviewBox.add(previewBox);
+            previewBox.connect('button-press-event', Lang.bind(this, this._onPreviewPress));
+            previewBox.show();
+
+            this._screenshotPreviewBox.show();
+        }
+    },
+
+    _onPreviewPress: function(widget, event) {
+        EosAppStorePrivate.app_load_screenshot(this._screenshotImage, widget.path, SCREENSHOT_LARGE);
+        return false;
     },
 
     set appState(state) {
@@ -73,17 +124,20 @@ const AppListBoxRow = new Lang.Class({
 
         switch (this._appState) {
             case EosAppStorePrivate.AppState.INSTALLED:
-                this._stateButton.set_label(_("UNINSTALL"));
+                this._stateButton.set_label(_("Remove application"));
+                this._stateButton.get_style_context().add_class('remove-app-button');
                 this._stateButton.show();
                 break;
 
             case EosAppStorePrivate.AppState.UNINSTALLED:
-                this._stateButton.set_label(_("INSTALL"));
+                this._stateButton.set_label(_("Install application"));
+                this._stateButton.get_style_context().add_class('install-app-button');
                 this._stateButton.show();
                 break;
 
             case EosAppStorePrivate.AppState.UPDATABLE:
-                this._stateButton.set_label(_("UPDATE"));
+                this._stateButton.set_label(_("Update application"));
+                this._stateButton.get_style_context().add_class('update-app-button');
                 this._stateButton.show();
                 break;
 
