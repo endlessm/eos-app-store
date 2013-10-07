@@ -59,8 +59,6 @@ main (int   argc,
   JsonParser *parser = json_parser_new ();
   const char *path = argv[1];
 
-  GString *buffer = g_string_new ("");
-
   GError *error = NULL;
   json_parser_load_from_file (parser, path, &error);
   if (error != NULL)
@@ -86,11 +84,15 @@ main (int   argc,
       return EXIT_FAILURE;
     }
 
+  GString *buffer = g_string_new ("");
+
   parse_content_array (json_node_get_array (root), path, buffer);
 
   g_object_unref (parser);
 
-  g_print ("%s", g_string_free (buffer, FALSE));
+  g_print ("%s", buffer->str);
+
+  g_string_free (buffer, TRUE);
 
   return EXIT_SUCCESS;
 }
