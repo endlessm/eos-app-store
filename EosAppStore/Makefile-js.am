@@ -11,6 +11,7 @@ dist_js_DATA = \
 	builder.js \
 	frameClock.js \
 	main.js \
+	resetDesktop.js \
 	separator.js \
 	shellAppStore.js \
 	storeModel.js \
