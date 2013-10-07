@@ -17,18 +17,11 @@
 static char *
 eos_get_content_dir (const gchar *content_type)
 {
-  char *locale = g_strdup (setlocale (LC_MESSAGES, NULL));
-
-  char *p;
-  if ((p = strrchr (locale, '.')) != NULL)
-    *p = '\0';
-
   char *res = g_build_filename (DATADIR,
                                 APP_STORE_CONTENT_DIR,
-                                locale,
+                                eos_get_system_personality (),
                                 content_type,
                                 NULL);
-  g_free (locale);
 
   if (!g_file_test (res, G_FILE_TEST_EXISTS | G_FILE_TEST_IS_DIR))
     {
@@ -36,7 +29,7 @@ eos_get_content_dir (const gchar *content_type)
 
       res = g_build_filename (DATADIR,
                               APP_STORE_CONTENT_DIR,
-                              "C",
+                              "Default",
                               content_type,
                               NULL);
     }
@@ -45,7 +38,8 @@ eos_get_content_dir (const gchar *content_type)
 }
 
 static const char *
-eos_link_get_category_name (EosLinkCategory category) {
+eos_link_get_category_name (EosLinkCategory category)
+{
   switch (category)
     {
     case EOS_LINK_CATEGORY_NEWS:

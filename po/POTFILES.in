@@ -1,4 +1,6 @@
 [encoding: UTF-8]
+content/Default/apps/content.json.h
+content/Default/links/content.json.h
 data/eos-app-store.desktop.in
 [type: gettext/glade]data/eos-app-store-folder-frame.ui
 [type: gettext/glade]data/eos-app-store-list-row.ui
