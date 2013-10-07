@@ -234,6 +234,13 @@ const TwoLinesLabel = new Lang.Class({
         layout.set_height(-2);
 
         return this.parent(cr);
+    },
+
+    set_text: function(text) {
+        // since we handle paragraphs internally, we don't want
+        // new lines in the text
+        let strippedText = text.replace('\n', ' ', 'gm');
+        this.parent(strippedText);
     }
 });
 
