@@ -59,6 +59,7 @@ const AppListBoxRow = new Lang.Class({
         '_mainBox',
         '_descriptionText',
         '_stateButton',
+        '_stateButtonLabel',
         '_screenshotImage',
         '_screenshotPreviewBox',
     ],
@@ -146,15 +147,15 @@ const AppListBoxRow = new Lang.Class({
 
         switch (this._appState) {
             case EosAppStorePrivate.AppState.INSTALLED:
-                this._stateButton.set_label(_("Remove application"));
+                this._stateButtonLabel.set_text(_("Remove application"));
                 break;
 
             case EosAppStorePrivate.AppState.UNINSTALLED:
-                this._stateButton.set_label(_("Install application"));
+                this._stateButtonLabel.set_text(_("Install application"));
                 break;
 
             case EosAppStorePrivate.AppState.UPDATABLE:
-                this._stateButton.set_label(_("Update application"));
+                this._stateButtonLabel.set_text(_("Update application"));
                 break;
 
             default:
