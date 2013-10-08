@@ -310,20 +310,18 @@
     -GtkScrolledWindow-scrollbars-within-bevel: false;
 }
 
-.weblink-listbox {
-    -GtkWidget-focus-line-width: 0;
-    -GtkWidget-focus-padding: 0;
-}
-
 .weblink-listbox .list-row {
     background: alpha(black, 0.25);
     border-radius: 3px;
     box-shadow: 0px 2px 2px 0px alpha(black, 0.3);
+
+    -GtkWidget-focus-line-width: 0;
+    -GtkWidget-focus-padding: 0;
 }
 
 .weblink-listbox .list-row:hover {
     background: alpha(#f9f8f8, 0.95);
-    box-shadow: 0px 0px 12px 0px alpha(#00ffff, 0.6);
+    box-shadow: 0px 0px 12px 0px alpha(white, 0.6);
 }
 
 .weblink-listbox .list-row .state-button {
@@ -352,16 +350,29 @@
 }
 
 .weblink-listbox .list-row .title {
+    font-size: 1.33em;
     font-weight: bold;
     color: white;
 }
 
+.weblink-listbox .list-row .title:hover {
+    color: #3c3c3c;
+}
+
 .weblink-listbox .list-row .description {
-    color: lightgray;
+    color: #b4b4b4;
+}
+
+.weblink-listbox .list-row .description:hover {
+    color: #646464;
 }
 
 .weblink-listbox .list-row .url {
-    color: orange;
+    color: #ffa84d;
+}
+
+.weblink-listbox .list-row .url:hover {
+    color: #e87700;
 }
 
 .folder-description {
