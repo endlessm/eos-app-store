@@ -669,6 +669,11 @@ const WeblinkFrame = new Lang.Class({
         this._currentCategory = category;
 
         this._stack.set_visible_child_name(category);
+    },
+
+    reset: function() {
+        // Return to the first category
+        this._buttonGroup.clicked();
     }
 });
 Builder.bindTemplateChildren(WeblinkFrame.prototype);

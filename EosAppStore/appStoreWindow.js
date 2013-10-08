@@ -366,16 +366,19 @@ const AppStoreWindow = new Lang.Class({
         switch (this._currentPage) {
             case StoreModel.StorePage.APPS:
                 page = this._pages.apps;
+                page.reset();
                 this.side_pane_apps_button.active = true;
                 break;
 
             case StoreModel.StorePage.WEB:
                 page = this._pages.weblinks;
+                page.reset();
                 this.side_pane_web_button.active = true;
                 break;
 
             case StoreModel.StorePage.FOLDERS:
                 page = this._pages.folders;
+                page.reset();
                 this.side_pane_folder_button.active = true;
                 break;
         }

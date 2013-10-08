@@ -407,5 +407,10 @@ const AppFrame = new Lang.Class({
         this._currentCategoryIdx = idx;
 
         this._stack.set_visible_child_name(category);
+    },
+
+    reset: function() {
+        // Return to the first category
+        this._buttonGroup.clicked();
     }
 });
