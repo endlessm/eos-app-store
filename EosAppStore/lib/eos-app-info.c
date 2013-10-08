@@ -22,7 +22,7 @@ enum {
   NUM_PROPS
 };
 
-typedef struct {
+struct _EosAppCell {
   EosFlexyGridCell parent;
 
   char *desktop_id;
@@ -34,13 +34,13 @@ typedef struct {
 
   GdkPixbuf *image;
   GtkStyleContext *image_context;
-} EosAppCell;
+};
 
-typedef EosFlexyGridCellClass EosAppCellClass;
+struct _EosAppCellClass {
+  EosFlexyGridCellClass parent_class;
+};
 
 static GParamSpec *eos_app_cell_props[NUM_PROPS] = { NULL, };
-
-static GType eos_app_cell_get_type (void) G_GNUC_CONST;
 
 G_DEFINE_TYPE (EosAppCell, eos_app_cell, EOS_TYPE_FLEXY_GRID_CELL)
 
@@ -551,7 +551,7 @@ eos_app_info_get_screenshots (const EosAppInfo *info)
  *
  * ...
  *
- * Returns: (transfer full): ...
+ * Returns: (transfer full) (type EosAppCell): ...
  */
 GtkWidget *
 eos_app_info_create_cell (const EosAppInfo *info)
@@ -566,6 +566,8 @@ eos_app_info_create_cell (const EosAppInfo *info)
                                  "desktop-id", info->desktop_id,
                                  "app-info", info,
                                  NULL);
+
+  g_object_ref_sink (res);
 
   return res;
 }

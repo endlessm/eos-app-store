@@ -215,6 +215,12 @@ const AppFrame = new Lang.Class({
                 label: _("Utilities"),
                 id: EosAppStorePrivate.AppCategory.UTILITIES,
             },
+            {
+                name: 'my-applications',
+                widget: null,
+                label: _("My applications"),
+                id: EosAppStorePrivate.AppCategory.MY_APPLICATIONS,
+            },
         ];
 
         this._currentCategory = this._categories[0].name;
@@ -310,9 +316,36 @@ const AppFrame = new Lang.Class({
             let grid = new Endless.FlexyGrid({ cell_size: CELL_DEFAULT_SIZE + cellMargin });
             scrollWindow.add_with_viewport(grid);
 
-            let cells = EosAppStorePrivate.app_load_content(grid, category.id);
-            for (let cell in cells) {
-                grid.add(cell);
+            let appInfos = EosAppStorePrivate.app_load_content(category.id);
+            if (category.id == EosAppStorePrivate.AppCategory.MY_APPLICATIONS) {
+                let installedApps = this._model.apps;
+
+                for (let i in appInfos) {
+                    let id = appInfos[i].get_desktop_id() + '.desktop';
+
+                    let isInstalled = false;
+                    for (let j in installedApps) {
+                        if (installedApps[j] == id &&
+                            this._model.getState(id) == EosAppStorePrivate.AppState.INSTALLED) {
+                            isInstalled = true;
+                            break;
+                        }
+                    }
+
+                    if (isInstalled) {
+                        let cell = appInfos[i].create_cell();
+                        cell.shape = Endless.FlexyShape.SMALL;
+                        grid.add(cell);
+                        cell.show_all();
+                    }
+                }
+            }
+            else {
+                for (let i in appInfos) {
+                    let cell = appInfos[i].create_cell();
+                    grid.add(cell);
+                    cell.show_all();
+                }
             }
 
             grid.connect('cell-activated', Lang.bind(this, this._onCellActivated));
