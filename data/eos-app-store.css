@@ -421,12 +421,15 @@
     border: 1px;
 }
 
-.weblink-listbox .list-row .state-button:hover {
+.weblink-listbox .list-row .state-button-active {
+    background-image: url("btn_add-website_normal.png");
+}
+
+.weblink-listbox .list-row .state-button-hover {
     background-image: url("btn_add-website_hover.png");
 }
 
-.weblink-listbox .list-row .state-button:active,
-.weblink-listbox .list-row .state-button:hover:active {
+.weblink-listbox .list-row .state-button-pressed {
     background-image: url("btn_add-website_pressed.png");
 }
 

@@ -277,8 +277,28 @@ const WeblinkListBoxRow = new Lang.Class({
 
         this._thumbnail = thumbnail;
 
-        this._setState(this._getStateFromUrl());
+        this._setButtonStates();
         this._mainBox.show();
+    },
+
+    _setButtonStates: function() {
+        this._stateButton.connect('pressed', Lang.bind(this, function() {
+            this._setPressState(true);
+        }));
+
+        this._stateButton.connect('released', Lang.bind(this, function() {
+            this._setPressState(false);
+        }));
+
+        this._stateButton.connect('enter-notify-event', Lang.bind(this, function() {
+            this._setHoverState(true);
+        }));
+
+        this._stateButton.connect('leave-notify-event', Lang.bind(this, function() {
+            this._setHoverState(false);
+        }));
+
+        this._setSensitiveState(this._getStateFromUrl() != EosAppStorePrivate.AppState.INSTALLED);
     },
 
     vfunc_state_flags_changed: function(previousFlags) {
@@ -289,8 +309,10 @@ const WeblinkListBoxRow = new Lang.Class({
         let icon = null;
 
         if (isHover) {
+            this._setActiveState(true);
             icon = this._info.get_icon();
         } else {
+            this._setActiveState(false);
             icon = this._thumbnail;
         }
 
@@ -317,11 +339,35 @@ const WeblinkListBoxRow = new Lang.Class({
         }
     },
 
-    _setState: function(state) {
-        if (state == EosAppStorePrivate.AppState.INSTALLED) {
-            this._stateButton.sensitive = false;
+    _setActiveState: function(isActive) {
+        if (isActive) {
+            this._stateButton.get_style_context().add_class('state-button-active');
         } else {
+            this._stateButton.get_style_context().remove_class('state-button-active');
+        }
+    },
+
+    _setPressState: function(isPressed) {
+        if (isPressed) {
+            this._stateButton.get_style_context().add_class('state-button-pressed');
+        } else {
+            this._stateButton.get_style_context().remove_class('state-button-pressed');
+        }
+    },
+
+    _setHoverState: function(isHovered) {
+        if (isHovered) {
+            this._stateButton.get_style_context().add_class('state-button-hover');
+        } else {
+            this._stateButton.get_style_context().remove_class('state-button-hover');
+        }
+    },
+
+    _setSensitiveState: function(isSensitive) {
+        if (isSensitive) {
             this._stateButton.sensitive = true;
+        } else {
+            this._stateButton.sensitive = false;
         }
     },
 
@@ -332,7 +378,7 @@ const WeblinkListBoxRow = new Lang.Class({
     },
 
     _showInstalledMessage: function () {
-        this._setState(EosAppStorePrivate.AppState.INSTALLED);
+        this._setSensitiveState(false);
         this._setInstalledState(true, _("added successfully!"));
 
         GLib.timeout_add_seconds(GLib.PRIORITY_DEFAULT,
