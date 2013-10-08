@@ -208,7 +208,7 @@ const AppStoreWindow = new Lang.Class({
         this.set_decorated(false);
         // do not destroy, just hide
         this.connect('delete-event', Lang.bind(this, function() {
-            this.toggle();
+            this.toggle(false);
             return true;
         }));
         // bug: https://bugzilla.gnome.org/show_bug.cgi?id=703154
@@ -306,7 +306,7 @@ const AppStoreWindow = new Lang.Class({
     },
 
     _onCloseClicked: function() {
-        this.toggle();
+        this.toggle(false);
     },
 
     _onBackClicked: function() {
@@ -403,10 +403,29 @@ const AppStoreWindow = new Lang.Class({
         return this._animator.showing;
     },
 
-    toggle: function(timestamp) {
+    toggle: function(reset, timestamp) {
         if (this._animator.showing) {
             this._animator.slideOut();
         } else {
+            if (reset) {
+                switch (this._currentPage) {
+                    case StoreModel.StorePage.APPS:
+                        page = this._pages.apps;
+                        page.reset();
+                        break;
+
+                    case StoreModel.StorePage.WEB:
+                        page = this._pages.weblinks;
+                        page.reset();
+                        break;
+
+                    case StoreModel.StorePage.FOLDERS:
+                        page = this._pages.folders;
+                        page.reset();
+                        break;
+                }
+            }
+
             this.showPage(timestamp);
         }
     },
