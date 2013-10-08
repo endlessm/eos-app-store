@@ -9,9 +9,14 @@
 G_BEGIN_DECLS
 
 #define EOS_TYPE_APP_INFO       (eos_app_info_get_type ())
+#define EOS_TYPE_APP_CELL       (eos_app_cell_get_type ())
 
 typedef struct _EosAppInfo      EosAppInfo;
 
+typedef struct _EosAppCell      EosAppCell;
+typedef struct _EosAppCellClass EosAppCellClass;
+
+GType eos_app_cell_get_type (void);
 GType eos_app_info_get_type (void);
 
 EosAppInfo *    eos_app_info_new                (void);

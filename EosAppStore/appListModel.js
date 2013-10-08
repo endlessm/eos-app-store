@@ -112,12 +112,17 @@ const AppList = new Lang.Class({
         let apps = items.filter(function(item) {
             return item.indexOf(EOS_LINK_PREFIX) != 0;
         });
-        this.emit('changed', apps);
+        this._apps = apps;
+        this.emit('changed', this._apps);
     },
 
     updateApp: function(id) {
         this._model.update_app(id);
-    }
+    },
+
+    get apps() {
+        return this._apps;
+    },
 });
 
 const WeblinkList = new Lang.Class({

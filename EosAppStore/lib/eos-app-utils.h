@@ -13,10 +13,9 @@ char *  eos_app_get_content_dir  (void);
 
 char *  eos_link_get_content_dir (void);
 
-void    eos_app_load_content     (EosFlexyGrid   *grid,
-                                 EosAppCategory  category);
+GList * eos_app_load_content     (EosAppCategory   category);
 
-GList * eos_link_load_content    (EosLinkCategory category);
+GList * eos_link_load_content    (EosLinkCategory  category);
 
 void    eos_app_load_screenshot  (GtkWidget       *image,
                                   const char      *path,
