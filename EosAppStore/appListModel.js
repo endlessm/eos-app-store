@@ -69,6 +69,39 @@ const BaseList = new Lang.Class({
         // do nothing here
     },
 
+    _isAppVisible: function(info, personality) {
+        if (info.has_key(DESKTOP_KEY_SHOW_IN_STORE) && info.get_boolean(DESKTOP_KEY_SHOW_IN_STORE)) {
+            if (info.has_key(DESKTOP_KEY_SHOW_IN_PERSONALITIES)) {
+                let personalities = info.get_string(DESKTOP_KEY_SHOW_IN_PERSONALITIES);
+
+                if (personalities && personalities.length > 0) {
+                    if (!personality) {
+                        // the application requires specific personalities but this system doesn't have one
+                        return false;
+                    }
+                    let split = personalities.split(';');
+                    for (let i = 0; i < split.length; i++) {
+                        if (split[i].toLowerCase() == personality.toLowerCase()) {
+                            // the system's personality matches one of the app's
+                            return true;
+                        }
+                    }
+                    return false;
+                } else {
+                    // the personalities key is set but empty, so we just ignore it
+                    return true;
+                }
+            } else {
+                // if a set of personalities is not specified, the app is shown for all
+                return true;
+            }
+        } else {
+            // the application will not be shown in the app store unless
+            // its desktop entry has X-Endless-ShowInAppStore=true
+            return false;
+        }
+    },
+
     update: function() {
         this._storeModel.update();
     },
@@ -114,42 +147,13 @@ const AppList = new Lang.Class({
     _onModelChanged: function(model, items) {
         let my_personality = Endless.get_system_personality();
 
-        let apps = items.filter(function(item) {
-            if (item.indexOf(EOS_LINK_PREFIX) == 0)
+        let apps = items.filter(Lang.bind(this, function(item) {
+            if (item.indexOf(EOS_LINK_PREFIX) == 0) {
                 // web links are ignored
                 return false;
-
-            let info = model.model.get_app_info(item);
-
-            if (info.has_key(DESKTOP_KEY_SHOW_IN_STORE) && info.get_boolean(DESKTOP_KEY_SHOW_IN_STORE)) {
-                if (info.has_key(DESKTOP_KEY_SHOW_IN_PERSONALITIES)) {
-                    let personalities = info.get_string(DESKTOP_KEY_SHOW_IN_PERSONALITIES);
-
-                    if (personalities && personalities.length > 0) {
-                        if (!my_personality) {
-                            // the application requires specific personalities but this system doesn't have one
-                            return false;
-                        }
-                        let split = personalities.split(';');
-                        for (let i = 0; i < split.length; i++) {
-                            if (split[i].toLowerCase() == my_personality.toLowerCase()) {
-                                // the system's personality matches one of the app's
-                                return true;
-                            }
-                        }
-                        return false;
-                    } else {
-                        // the personalities key is set but empty, so we just ignore it
-                        return true;
-                    }
-                } else {
-                    // if a set of personalities is not specified, the app is shown for all
-                    return true;
-                }
             } else {
-                // the application will not be shown in the app store unless
-                // its desktop entry has X-Endless-ShowInAppStore=true
-                return false;
+                let info = model.model.get_app_info(item);
+                return this._isAppVisible(info, my_personality);
             }
         });
         this._apps = apps;
@@ -177,9 +181,17 @@ const WeblinkList = new Lang.Class({
     },
 
     _onModelChanged: function(model, items) {
-        let weblinks = items.filter(function(item) {
-            return item.indexOf(EOS_LINK_PREFIX) == 0;
-        });
+        let my_personality = Endless.get_system_personality();
+
+        let weblinks = items.filter(Lang.bind(this, function(item) {
+            if (item.indexOf(EOS_LINK_PREFIX) == 0) {
+                // only take web links into account
+                let info = model.model.get_app_info(item);
+                return this._isAppVisible(info, my_personality);
+            } else {
+                return false;
+            }
+        }));
 
         this._weblinks = weblinks;
         this._cacheUrls();
@@ -253,7 +265,7 @@ const WeblinkList = new Lang.Class({
         return this._weblinks;
     },
 
-    // FIXME: this should use the linkId as provided by the CMS. 
+    // FIXME: this should use the linkId as provided by the CMS.
     // See https://github.com/endlessm/eos-shell/issues/1074
     createWeblink: function(url, title, icon) {
         let desktop = new GLib.KeyFile();
