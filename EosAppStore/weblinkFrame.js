@@ -6,6 +6,7 @@ const GLib = imports.gi.GLib;
 const GObject = imports.gi.GObject;
 const Gtk = imports.gi.Gtk;
 const EosAppStorePrivate = imports.gi.EosAppStorePrivate;
+const Pango = imports.gi.Pango;
 const PLib = imports.gi.PLib;
 const WebKit = imports.gi.WebKit2;
 
@@ -230,6 +231,27 @@ const NewSiteBox = new Lang.Class({
 });
 Builder.bindTemplateChildren(NewSiteBox.prototype);
 
+const TwoLinesLabel = new Lang.Class({
+    Name: 'TwoLinesLabel',
+    Extends: Gtk.Label,
+
+    vfunc_draw: function(cr) {
+        // override this here, as GtkLabel can invalidate and
+        // recreate the PangoLayout at any time
+        let layout = this.get_layout();
+        layout.set_height(-2);
+
+        return this.parent(cr);
+    },
+
+    set_text: function(text) {
+        // since we handle paragraphs internally, we don't want
+        // new lines in the text
+        let strippedText = text.replace('\n', ' ', 'gm');
+        this.parent(strippedText);
+    }
+});
+
 const WeblinkListBoxRow = new Lang.Class({
     Name: 'WeblinkListBoxRow',
     Extends: Gtk.Bin,
@@ -239,7 +261,7 @@ const WeblinkListBoxRow = new Lang.Class({
         '_mainBox',
         '_icon',
         '_nameLabel',
-        '_descriptionLabel',
+        '_labelsBox',
         '_urlLabel',
         '_urlIndicator',
         '_stateButton'
@@ -254,6 +276,17 @@ const WeblinkListBoxRow = new Lang.Class({
 
         this.initTemplate({ templateRoot: '_mainBox', bindChildren: true, connectSignals: true, });
         this.add(this._mainBox);
+
+        this._descriptionLabel = new TwoLinesLabel({ visible: true,
+                                                     vexpand: true,
+                                                     xalign: 0,
+                                                     yalign: 0,
+                                                     ellipsize: Pango.EllipsizeMode.END,
+                                                     wrap: true,
+                                                     wrap_mode: Pango.WrapMode.WORD_CHAR });
+        this._descriptionLabel.get_style_context().add_class('description');
+        this._labelsBox.pack_start(this._descriptionLabel, true, true, 0);
+        this._labelsBox.reorder_child(this._descriptionLabel, 1);
 
         this._nameLabel.set_text(info.get_title());
         this._descriptionLabel.set_text(info.get_description());
