@@ -59,6 +59,7 @@ const AppListBoxRow = new Lang.Class({
         '_mainBox',
         '_descriptionText',
         '_stateButton',
+        '_stateButtonLabel',
         '_screenshotImage',
         '_screenshotPreviewBox',
     ],
@@ -118,27 +119,43 @@ const AppListBoxRow = new Lang.Class({
         return false;
     },
 
+    _setStyleClassFromState: function() {
+        let classes = [ { state: EosAppStorePrivate.AppState.INSTALLED,
+                          style: 'remove' },
+                        { state: EosAppStorePrivate.AppState.UNINSTALLED,
+                          style: 'install' },
+                        { state: EosAppStorePrivate.AppState.UPDATABLE,
+                          style: 'update' } ];
+        let context = this._stateButton.get_style_context();
+
+        for (let idx in classes) {
+            let obj = classes[idx];
+            let state = obj.state;
+            let styleClass = obj.style;
+
+            if (state == this._appState) {
+                context.add_class(styleClass);
+            } else {
+                context.remove_class(styleClass);
+            }                
+        }
+    },
+
     set appState(state) {
         this._appState = state;
-        this._stateButton.hide();
+        this._setStyleClassFromState();
 
         switch (this._appState) {
             case EosAppStorePrivate.AppState.INSTALLED:
-                this._stateButton.set_label(_("Remove application"));
-                this._stateButton.get_style_context().add_class('remove-app-button');
-                this._stateButton.show();
+                this._stateButtonLabel.set_text(_("Remove application"));
                 break;
 
             case EosAppStorePrivate.AppState.UNINSTALLED:
-                this._stateButton.set_label(_("Install application"));
-                this._stateButton.get_style_context().add_class('install-app-button');
-                this._stateButton.show();
+                this._stateButtonLabel.set_text(_("Install application"));
                 break;
 
             case EosAppStorePrivate.AppState.UPDATABLE:
-                this._stateButton.set_label(_("Update application"));
-                this._stateButton.get_style_context().add_class('update-app-button');
-                this._stateButton.show();
+                this._stateButtonLabel.set_text(_("Update application"));
                 break;
 
             default:
