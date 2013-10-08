@@ -27,6 +27,8 @@ const THUMBNAIL_SIZE = 90;
 
 const LIST_COLUMNS_SPACING = 15;
 
+const DEFAULT_ICON = 'generic-link';
+
 const AlertIcon = {
     SPINNER: 0,
     CANCEL: 1,
@@ -258,9 +260,7 @@ const WeblinkListBoxRow = new Lang.Class({
         this._urlLabel.set_text(info.get_url());
 
         let thumbnail = info.get_thumbnail();
-        if (!thumbnail) {
-            this._icon.set_from_icon_name('gtk-missing-image', Gtk.IconSize.DIALOG);
-        } else {
+        if (thumbnail) {
             // Scale and crop
             if (thumbnail.height > thumbnail.width) {
                 thumbnail = thumbnail.scale_simple(THUMBNAIL_SIZE,
@@ -271,11 +271,34 @@ const WeblinkListBoxRow = new Lang.Class({
                                                    THUMBNAIL_SIZE,
                                                    GdkPixbuf.InterpType.BILINEAR);
             }
-            this._icon.set_from_pixbuf(thumbnail.new_subpixbuf(0, 0, THUMBNAIL_SIZE, THUMBNAIL_SIZE));
+            thumbnail = thumbnail.new_subpixbuf(0, 0, THUMBNAIL_SIZE, THUMBNAIL_SIZE);
+            this._icon.set_from_pixbuf(thumbnail);
         }
+
+        this._thumbnail = thumbnail;
 
         this._setState(this._getStateFromUrl());
         this._mainBox.show();
+    },
+
+    vfunc_state_flags_changed: function(previousFlags) {
+        this.parent(previousFlags);
+
+        let flags = this.get_state_flags();
+        let isHover = ((flags & Gtk.StateFlags.PRELIGHT) != 0);
+        let icon = null;
+
+        if (isHover) {
+            icon = this._info.get_icon();
+        } else {
+            icon = this._thumbnail;
+        }
+
+        if (icon) {
+            this._icon.set_from_pixbuf(icon);
+        } else {
+            this._icon.set_from_icon_name(DEFAULT_ICON, Gtk.IconSize.DIALOG);
+        }
     },
 
     // FIXME: this should be entirely unnecessary, as we could just use
@@ -328,7 +351,7 @@ const WeblinkListBoxRow = new Lang.Class({
         let title = this._info.get_title();
         let icon = this._info.get_icon_filename();
         if (!icon) {
-            icon = 'browser';
+            icon = DEFAULT_ICON;
         }
 
         let site = this._model.createWeblink(url, title, icon);
