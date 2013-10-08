@@ -1,5 +1,6 @@
 // -*- mode: js; js-indent-level: 4; indent-tabs-mode: nil -*-
 const EosAppStorePrivate = imports.gi.EosAppStorePrivate;
+const Endless = imports.gi.Endless;
 const Gio = imports.gi.Gio;
 const GLib = imports.gi.GLib;
 
@@ -111,29 +112,34 @@ const AppList = new Lang.Class({
     Extends: BaseList,
 
     _onModelChanged: function(model, items) {
+        let my_personality = Endless.get_system_personality();
+
         let apps = items.filter(function(item) {
-            // ignore web links
             if (item.indexOf(EOS_LINK_PREFIX) == 0)
+                // web links are ignored
                 return false;
 
             let info = model.model.get_app_info(item);
 
             if (info.has_key(DESKTOP_KEY_SHOW_IN_STORE) && info.get_boolean(DESKTOP_KEY_SHOW_IN_STORE)) {
                 if (info.has_key(DESKTOP_KEY_SHOW_IN_PERSONALITIES)) {
-                    // FIXME : use the right call to get the current personality
-                    let current = 'Brazil';
-
                     let personalities = info.get_string(DESKTOP_KEY_SHOW_IN_PERSONALITIES);
+
                     if (personalities && personalities.length > 0) {
+                        if (!my_personality) {
+                            // the application requires specific personalities but this system doesn't have one
+                            return false;
+                        }
                         let split = personalities.split(';');
                         for (let i = 0; i < split.length; i++) {
-                            if (split[i].toLowerCase() == current.toLowerCase()) {
+                            if (split[i].toLowerCase() == my_personality.toLowerCase()) {
+                                // the system's personality matches one of the app's
                                 return true;
                             }
                         }
                         return false;
                     } else {
-                        // the key is set but empty, so we just ignore it
+                        // the personalities key is set but empty, so we just ignore it
                         return true;
                     }
                 } else {
