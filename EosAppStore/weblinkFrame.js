@@ -350,7 +350,7 @@ const WeblinkListBoxRow = new Lang.Class({
         let title = this._info.get_title();
         let icon = this._info.get_icon_filename();
         if (!icon) {
-            icon = 'browser';
+            icon = DEFAULT_ICON;
         }
 
         let site = this._model.createWeblink(url, title, icon);
