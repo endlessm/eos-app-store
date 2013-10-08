@@ -277,10 +277,28 @@ const WeblinkListBoxRow = new Lang.Class({
 
         this._thumbnail = thumbnail;
 
-        this.connect('state-flags-changed', Lang.bind(this, this._onRowHover));
-
         this._setState(this._getStateFromUrl());
         this._mainBox.show();
+    },
+
+    vfunc_state_flags_changed: function(previousFlags) {
+        this.parent(previousFlags);
+
+        let flags = this.get_state_flags();
+        let isHover = ((flags & Gtk.StateFlags.PRELIGHT) != 0);
+        let icon = null;
+
+        if (isHover) {
+            icon = this._info.get_icon();
+        } else {
+            icon = this._thumbnail;
+        }
+
+        if (icon) {
+            this._icon.set_from_pixbuf(icon);
+        } else {
+            this._icon.set_from_icon_name(DEFAULT_ICON, Gtk.IconSize.DIALOG);
+        }
     },
 
     // FIXME: this should be entirely unnecessary, as we could just use
@@ -304,24 +322,6 @@ const WeblinkListBoxRow = new Lang.Class({
             this._stateButton.sensitive = false;
         } else {
             this._stateButton.sensitive = true;
-        }
-    },
-
-    _onRowHover: function() {
-        let flags = this.get_state_flags();
-        if (flags & Gtk.StateFlags.PRELIGHT) {
-            let icon = this._info.get_icon();
-            if (!icon) {
-                this._icon.set_from_icon_name(DEFAULT_ICON, Gtk.IconSize.DIALOG);
-            } else {
-                this._icon.set_from_pixbuf(icon);
-            }
-        } else {
-            if (this._thumbnail) {
-                this._icon.set_from_pixbuf(this._thumbnail);
-            } else {
-                this._icon.clear();
-            }
         }
     },
 
