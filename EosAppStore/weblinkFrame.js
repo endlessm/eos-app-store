@@ -272,6 +272,7 @@ const WeblinkListBoxRow = new Lang.Class({
                                                    GdkPixbuf.InterpType.BILINEAR);
             }
             thumbnail = thumbnail.new_subpixbuf(0, 0, THUMBNAIL_SIZE, THUMBNAIL_SIZE);
+            this._icon.set_from_pixbuf(thumbnail);
         }
 
         this._thumbnail = thumbnail;
