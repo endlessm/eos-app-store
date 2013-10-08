@@ -310,9 +310,11 @@ const AppFrame = new Lang.Class({
             let grid = new Endless.FlexyGrid({ cell_size: CELL_DEFAULT_SIZE + cellMargin });
             scrollWindow.add_with_viewport(grid);
 
-            let cells = EosAppStorePrivate.app_load_content(grid, category.id);
-            for (let cell in cells) {
+            let apps = EosAppStorePrivate.app_load_content(category.id);
+            for (let i in apps) {
+                let cell = apps[i].create_cell();
                 grid.add(cell);
+                cell.show_all();
             }
 
             grid.connect('cell-activated', Lang.bind(this, this._onCellActivated));

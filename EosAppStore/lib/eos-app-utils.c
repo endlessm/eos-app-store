@@ -127,18 +127,23 @@ eos_link_get_content_dir (void)
   return eos_get_content_dir (APP_STORE_CONTENT_LINKS);
 }
 
-void
-eos_app_load_content (EosFlexyGrid *grid,
-                          EosAppCategory category)
+/**
+ * eos_app_load_content:
+ * @category: ...
+ *
+ * ...
+ *
+ * Return value: (transfer full) (element-type EosAppInfo): ...
+ */
+GList *
+eos_app_load_content (EosAppCategory category)
 {
-  g_return_if_fail (EOS_IS_FLEXY_GRID (grid));
-  g_return_if_fail (category >= EOS_APP_CATEGORY_FEATURED &&
-                    category <= EOS_APP_CATEGORY_UTILITIES);
-
   JsonArray *array = eos_app_parse_content (APP_STORE_CONTENT_APPS);
 
   if (array == NULL)
-    return;
+    return NULL;
+
+  GList *infos = NULL;
 
   guint i, n_elements = json_array_get_length (array);
   for (i = 0; i < n_elements; i++)
@@ -149,15 +154,11 @@ eos_app_load_content (EosFlexyGrid *grid,
       if (info == NULL)
         continue;
 
-      if (category != EOS_APP_CATEGORY_FEATURED)
+      if (category == EOS_APP_CATEGORY_MY_APPLICATIONS)
         {
-          if (category != eos_app_info_get_category (info))
-            {
-              eos_app_info_unref (info);
-              continue;
-            }
+          /* do nothing */
         }
-      else
+      else if (category == EOS_APP_CATEGORY_FEATURED)
         {
           if (!eos_app_info_is_featured (info))
             {
@@ -165,22 +166,22 @@ eos_app_load_content (EosFlexyGrid *grid,
               continue;
             }
         }
-
-      GtkWidget *cell = eos_app_info_create_cell (info);
-      if (cell == NULL)
+      else
         {
-          eos_app_info_unref (info);
-          continue;
+          if (category != eos_app_info_get_category (info))
+            {
+              eos_app_info_unref (info);
+              continue;
+            }
+
         }
 
-      gtk_container_add (GTK_CONTAINER (grid), cell);
-      gtk_widget_set_hexpand (cell, TRUE);
-      gtk_widget_set_vexpand (cell, TRUE);
-      gtk_widget_show_all (cell);
-
-      eos_app_info_unref (info);
+      infos = g_list_prepend (infos, info);
     }
+
   json_array_unref (array);
+
+  return g_list_reverse (infos);
 }
 
 /**
