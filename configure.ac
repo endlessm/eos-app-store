@@ -6,7 +6,7 @@ m4_ifdef([AM_SILENT_RULES],[AM_SILENT_RULES([yes])])
 AC_CONFIG_SRCDIR([EosAppStore/main.js])
 AC_CONFIG_HEADERS([EosAppStore/config.h])
 AC_CONFIG_MACRO_DIR([m4])
-AM_INIT_AUTOMAKE([1.9 no-dist-gzip dist-xz foreign])
+AM_INIT_AUTOMAKE([1.9 no-dist-gzip dist-xz tar-ustar foreign])
 
 AC_PROG_SED
 
