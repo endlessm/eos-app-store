@@ -25,10 +25,9 @@ const StoreModel = new Lang.Class({
     },
 
     changePage: function(newPage) {
-        if (this._curPage == newPage) {
-            return;
-        }
-
+        // Emit the page-changed signal,
+        // even if re-select the current page,
+        // in order to reset the category and scrollbar
         this._curPage = newPage;
         this.emit('page-changed', this._curPage);
     },
