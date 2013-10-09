@@ -83,7 +83,7 @@ const AppStore = new Lang.Class({
     },
 
     vfunc_activate: function() {
-        this._mainWindow.showPage(0);
+        this._mainWindow.showPage(Gdk.CURRENT_TIME);
     },
 
     vfunc_command_line: function(cmdline) {
