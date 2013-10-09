@@ -366,24 +366,22 @@ const AppStoreWindow = new Lang.Class({
         switch (this._currentPage) {
             case StoreModel.StorePage.APPS:
                 page = this._pages.apps;
-                page.reset();
                 this.side_pane_apps_button.active = true;
                 break;
 
             case StoreModel.StorePage.WEB:
                 page = this._pages.weblinks;
-                page.reset();
                 this.side_pane_web_button.active = true;
                 break;
 
             case StoreModel.StorePage.FOLDERS:
                 page = this._pages.folders;
-                page.reset();
                 this.side_pane_folder_button.active = true;
                 break;
         }
 
         if (page) {
+            page.reset();
             page.show_all();
             stack.set_visible_child(page);
         }
@@ -408,21 +406,23 @@ const AppStoreWindow = new Lang.Class({
             this._animator.slideOut();
         } else {
             if (reset) {
+                let page = null;
                 switch (this._currentPage) {
                     case StoreModel.StorePage.APPS:
                         page = this._pages.apps;
-                        page.reset();
                         break;
 
                     case StoreModel.StorePage.WEB:
                         page = this._pages.weblinks;
-                        page.reset();
                         break;
 
                     case StoreModel.StorePage.FOLDERS:
                         page = this._pages.folders;
-                        page.reset();
                         break;
+                }
+
+                if (page) {
+                    page.reset();
                 }
             }
 
