@@ -298,6 +298,7 @@ extract-content-strings$(BUILD_EXEEXT): $(extract_content_strings_sources)
 	@rm -f extract-content-strings$(BUILD_EXEEXT)
 	$(AM_V_CCLD)$(CC) $(AM_CFLAGS) $(extract_content_strings_cflags) $^ $(extract_content_strings_ldadd) -o $@
 
+EXTRA_DIST += $(extract_content_strings_sources)
 DISTCLEANFILES += extract-content-strings$(BUILD_EXEEXT)
 
 # this is a weird rule, but it's needed to deal with both autotools and
