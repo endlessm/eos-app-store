@@ -78,6 +78,8 @@ const AppStore = new Lang.Class({
                                                              this._storeModel);
         this._mainWindow.connect('visibility-changed',
                                  Lang.bind(this, this._onVisibilityChanged));
+
+        this._storeModel.changePage(StoreModel.StorePage.APPS);
     },
 
     vfunc_activate: function() {

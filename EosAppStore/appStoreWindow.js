@@ -242,9 +242,6 @@ const AppStoreWindow = new Lang.Class({
         this._stack = null;
         this._createStackPages();
 
-        // switch to the 'Applications' page
-        this._onStorePageChanged(this._storeModel, StoreModel.StorePage.APPS);
-
         // hide main window when clicking outside the store
         this.connect('focus-out-event', Lang.bind(this, this._onLostFocus));
     },
