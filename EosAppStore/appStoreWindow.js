@@ -244,6 +244,9 @@ const AppStoreWindow = new Lang.Class({
 
         // switch to the 'Applications' page
         this._onStorePageChanged(this._storeModel, StoreModel.StorePage.APPS);
+
+        // hide main window when clicking outside the store
+        this.connect('focus-out-event', Lang.bind(this, this._onLostFocus));
     },
 
     _createStackPages: function() {
@@ -293,6 +296,12 @@ const AppStoreWindow = new Lang.Class({
         for (let idx in labels) {
             let object = labels[idx];
             sizeGroup.add_widget(this[object]);
+        }
+    },
+
+    _onLostFocus: function() {
+        if (this.getVisible()) {
+            this.toggle();
         }
     },
 
