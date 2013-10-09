@@ -1,9 +1,6 @@
 [encoding: UTF-8]
-# Need to fix make distcheck
-# For now, just comment out the content.json.h files,
-# since we don't have translated content yet anyhow
-#content/Default/apps/content.json.h
-#content/Default/links/content.json.h
+content/Default/apps/content.json.h
+content/Default/links/content.json.h
 data/eos-app-store.desktop.in
 [type: gettext/glade]data/eos-app-store-folder-frame.ui
 [type: gettext/glade]data/eos-app-store-list-row.ui
