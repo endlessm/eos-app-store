@@ -652,6 +652,13 @@ const WeblinkFrame = new Lang.Class({
         let idx = button.index;
         let category = button.category;
 
+        // Scroll to the top of the selected category
+        let widget = this._categories[idx].widget;
+        if (widget) {
+            let vscrollbar = widget.get_vscrollbar();
+            vscrollbar.set_value(0);
+        }
+
         if (idx > this._currentCategoryIdx) {
             this._stack.transition_type = PLib.StackTransitionType.SLIDE_LEFT;
         } else {
@@ -662,6 +669,11 @@ const WeblinkFrame = new Lang.Class({
         this._currentCategory = category;
 
         this._stack.set_visible_child_name(category);
+    },
+
+    reset: function() {
+        // Return to the first category
+        this._buttonGroup.clicked();
     }
 });
 Builder.bindTemplateChildren(WeblinkFrame.prototype);
