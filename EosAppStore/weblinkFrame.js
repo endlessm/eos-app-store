@@ -523,13 +523,7 @@ const WeblinkFrame = new Lang.Class({
                 widget: null,
                 label: _("Local"),
                 id: EosAppStorePrivate.LinkCategory.LOCAL,
-            },
-            {
-                name: 'opportunities',
-                widget: null,
-                label: _("Opportunities"),
-                id: EosAppStorePrivate.LinkCategory.OPPORTUNITIES,
-            },
+            }
         ];
 
         this.initTemplate({ templateRoot: '_mainBox', bindChildren: true, connectSignals: true, });

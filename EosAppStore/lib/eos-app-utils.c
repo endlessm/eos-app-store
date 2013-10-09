@@ -57,9 +57,6 @@ eos_link_get_category_name (EosLinkCategory category)
     case EOS_LINK_CATEGORY_LOCAL:
       return "Local";
 
-    case EOS_LINK_CATEGORY_OPPORTUNITIES:
-      return "Opportunities";
-
     default:
       return "";
     }

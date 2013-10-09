@@ -18,22 +18,27 @@ EXTRA_DIST += $(default_links_json)
 default_app_images = \
 	Default/apps/resources/images/billard-gl-featured.jpg \
 	Default/apps/resources/images/blockout2-featured.jpg \
+	Default/apps/resources/images/brazil-featured.jpg \
 	Default/apps/resources/images/chromium-bsu-featured.jpg \
 	Default/apps/resources/images/english-featured.jpg \
 	Default/apps/resources/images/gimp-featured.jpg \
+	Default/apps/resources/images/health-featured.jpg \
 	Default/apps/resources/images/khanacademy-featured.jpg \
 	Default/apps/resources/images/libreoffice-calc-featured.jpg \
 	Default/apps/resources/images/libreoffice-impress-featured.jpg \
 	Default/apps/resources/images/libreoffice-writer-featured.jpg \
 	Default/apps/resources/images/numptyphysics-featured.jpg \
 	Default/apps/resources/images/photos-featured.jpg \
+	Default/apps/resources/images/programming-featured.jpg \
 	Default/apps/resources/images/rhythmbox-featured.jpg \
+	Default/apps/resources/images/resume-featured.jpg \
 	Default/apps/resources/images/shotwell-featured.jpg \
 	Default/apps/resources/images/skype-featured.jpg \
 	Default/apps/resources/images/supertux2-featured.jpg \
 	Default/apps/resources/images/supertuxkart-featured.jpg \
 	Default/apps/resources/images/teeworlds-featured.jpg \
 	Default/apps/resources/images/translate-featured.jpg \
+	Default/apps/resources/images/typing-featured.jpg \
 	Default/apps/resources/images/weather-featured.jpg \
 	Default/apps/resources/images/wikipedia-featured.jpg \
 	Default/apps/resources/images/youtube-featured.jpg \
@@ -46,6 +51,7 @@ default_app_thumbnails = \
 	Default/apps/resources/thumbnails/audacity-thumb.jpg \
 	Default/apps/resources/thumbnails/billard-gl-thumb.jpg \
 	Default/apps/resources/thumbnails/blockout2-thumb.jpg \
+	Default/apps/resources/thumbnails/brazil-thumb.jpg \
 	Default/apps/resources/thumbnails/chromium-bsu-thumb.jpg \
 	Default/apps/resources/thumbnails/english-thumb.jpg \
 	Default/apps/resources/thumbnails/evolution-thumb.jpg \
@@ -56,6 +62,7 @@ default_app_thumbnails = \
 	Default/apps/resources/thumbnails/gnome-genius-thumb.jpg \
 	Default/apps/resources/thumbnails/gnome-sudoku-thumb.jpg \
 	Default/apps/resources/thumbnails/goldendict-thumb.jpg \
+	Default/apps/resources/thumbnails/health-thumb.jpg \
 	Default/apps/resources/thumbnails/khanacademy-thumb.jpg \
 	Default/apps/resources/thumbnails/kobodeluxe-thumb.jpg \
 	Default/apps/resources/thumbnails/lbreakout2-thumb.jpg \
@@ -66,6 +73,8 @@ default_app_thumbnails = \
 	Default/apps/resources/thumbnails/openarena-thumb.jpg \
 	Default/apps/resources/thumbnails/photos-thumb.jpg \
 	Default/apps/resources/thumbnails/pingus-thumb.jpg \
+	Default/apps/resources/thumbnails/programming-thumb.jpg \
+	Default/apps/resources/thumbnails/resume-thumb.jpg \
 	Default/apps/resources/thumbnails/rhythmbox-thumb.jpg \
 	Default/apps/resources/thumbnails/shotwell-thumb.jpg \
 	Default/apps/resources/thumbnails/skype-thumb.jpg \
@@ -75,7 +84,6 @@ default_app_thumbnails = \
 	Default/apps/resources/thumbnails/supertux2-thumb.jpg \
 	Default/apps/resources/thumbnails/supertuxkart-thumb.jpg \
 	Default/apps/resources/thumbnails/teeworlds-thumb.jpg \
-	Default/apps/resources/thumbnails/_thumb.jpg \
 	Default/apps/resources/thumbnails/totem-thumb.jpg \
 	Default/apps/resources/thumbnails/translate-thumb.jpg \
 	Default/apps/resources/thumbnails/tuxmath-thumb.jpg \
