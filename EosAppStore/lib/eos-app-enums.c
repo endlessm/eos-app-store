@@ -53,5 +53,4 @@ EOS_DEFINE_ENUM_TYPE (EosLinkCategory, eos_link_category,
                       EOS_ENUM_VALUE (EOS_LINK_CATEGORY_SPORTS, sports)
                       EOS_ENUM_VALUE (EOS_LINK_CATEGORY_EDUCATION, education)
                       EOS_ENUM_VALUE (EOS_LINK_CATEGORY_ENTERTAINMENT, entertainment)
-                      EOS_ENUM_VALUE (EOS_LINK_CATEGORY_LOCAL, local)
-                      EOS_ENUM_VALUE (EOS_LINK_CATEGORY_OPPORTUNITIES, opportunities))
+                      EOS_ENUM_VALUE (EOS_LINK_CATEGORY_LOCAL, local))
