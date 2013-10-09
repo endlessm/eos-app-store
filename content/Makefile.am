@@ -300,13 +300,16 @@ extract-content-strings$(BUILD_EXEEXT): $(extract_content_strings_sources)
 
 DISTCLEANFILES += extract-content-strings$(BUILD_EXEEXT)
 
-content_files = $(default_app_json) $(default_links_json)
-content_headers = $(content_files:.json=.json.h)
-%.json.h: $(content_files) extract-content-strings$(BUILD_EXEEXT)
-	$(AM_V_GEN) ./extract-content-strings$(BUILD_EXEEXT) $< > $@
-
-noinst_DATA = $(content_headers)
-DISTCLEANFILES += $(content_headers)
+# Need to fix make distcheck
+# For now, just comment out the content header files,
+# since we don't have translated content yet anyhow
+#content_files = $(default_app_json) $(default_links_json)
+#content_headers = $(content_files:.json=.json.h)
+#%.json.h: $(content_files) extract-content-strings$(BUILD_EXEEXT)
+#	$(AM_V_GEN) ./extract-content-strings$(BUILD_EXEEXT) $< > $@
+#
+#noinst_DATA = $(content_headers)
+#DISTCLEANFILES += $(content_headers)
 
 contentdir = $(datadir)/application-store
 nobase_content_DATA = \
