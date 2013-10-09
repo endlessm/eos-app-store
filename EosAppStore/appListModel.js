@@ -87,19 +87,16 @@ const BaseList = new Lang.Class({
                         }
                     }
                     return false;
-                } else {
-                    // the personalities key is set but empty, so we just ignore it
-                    return true;
                 }
-            } else {
-                // if a set of personalities is not specified, the app is shown for all
-                return true;
             }
-        } else {
-            // the application will not be shown in the app store unless
-            // its desktop entry has X-Endless-ShowInAppStore=true
-            return false;
+
+            // if the key is not set, or is set but empty, the app will be shown
+            return true;
         }
+
+        // the application will not be shown in the app store unless
+        // its desktop entry has X-Endless-ShowInAppStore=true
+        return false;
     },
 
     update: function() {
@@ -155,7 +152,7 @@ const AppList = new Lang.Class({
                 let info = model.model.get_app_info(item);
                 return this._isAppVisible(info, my_personality);
             }
-        });
+        }));
         this._apps = apps;
         this.emit('changed', this._apps);
     },
