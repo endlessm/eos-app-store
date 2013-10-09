@@ -223,6 +223,8 @@ const AppFrame = new Lang.Class({
             },
         ];
 
+        this._backClickedId = 0;
+
         this._currentCategory = this._categories[0].name;
         this._currentCategoryIdx = 0;
 
@@ -368,22 +370,29 @@ const AppFrame = new Lang.Class({
         app.mainWindow.headerIcon = this._model.getIcon(cell.desktop_id);
         app.mainWindow.backButtonVisible = true;
         this._backClickedId =
-            app.mainWindow.connect('back-clicked', Lang.bind(this, this._onBackClicked));
+            app.mainWindow.connect('back-clicked', Lang.bind(this, this._showGrid));
     },
 
-    _onBackClicked: function() {
+    _showGrid: function() {
         let app = Gio.Application.get_default();
         app.mainWindow.titleText = null;
         app.mainWindow.subtitleText = null;
         app.mainWindow.headerIcon = null;
         app.mainWindow.backButtonVisible = false;
-        app.mainWindow.disconnect(this._backClickedId);
-        this._backClickedId = 0;
 
-        let page = this._mainStack.get_visible_child();
+        if (this._backClickedId > 0) {
+            app.mainWindow.disconnect(this._backClickedId);
+            this._backClickedId = 0;
+        }
+
+        let curPage = this._mainStack.get_visible_child();
         this._mainStack.transition_type = PLib.StackTransitionType.SLIDE_RIGHT;
         this._mainStack.set_visible_child_name('main-box');
-        page.destroy();
+
+        if (curPage != this._mainBox) {
+            // application pages are recreated each time
+            curPage.destroy();
+        }
     },
 
     _onCategoryClicked: function(button) {
@@ -411,6 +420,7 @@ const AppFrame = new Lang.Class({
 
     reset: function() {
         // Return to the first category
+        this._showGrid();
         this._buttonGroup.clicked();
     }
 });
