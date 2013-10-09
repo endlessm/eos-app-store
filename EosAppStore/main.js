@@ -9,6 +9,6 @@ function start() {
     window.C_ = Gettext.pgettext;
     window.ngettext = Gettext.ngettext;
 
-    let app = new AppStore.AppStore(StoreModel.StorePage.APPS);
+    let app = new AppStore.AppStore();
     return app.run(ARGV);
 }

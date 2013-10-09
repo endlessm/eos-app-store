@@ -196,7 +196,7 @@ const AppStoreWindow = new Lang.Class({
         'back-button',
     ],
 
-    _init: function(app, storeModel, initialPage) {
+    _init: function(app, storeModel) {
         this.parent({ application: app,
                         type_hint: Gdk.WindowTypeHint.DOCK,
                              type: Gtk.WindowType.TOPLEVEL,

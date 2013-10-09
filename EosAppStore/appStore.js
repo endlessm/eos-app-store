@@ -38,7 +38,7 @@ const AppStore = new Lang.Class({
     Name: 'AppStore',
     Extends: Gtk.Application,
 
-    _init: function(initialPage) {
+    _init: function() {
         Gettext.bindtextdomain(Config.GETTEXT_PACKAGE, Path.LOCALE_DIR);
         Gettext.textdomain(Config.GETTEXT_PACKAGE);
 
@@ -48,7 +48,6 @@ const AppStore = new Lang.Class({
         this.parent({ application_id: APP_STORE_NAME, 
                       flags: Gio.ApplicationFlags.HANDLES_COMMAND_LINE });
 
-        this._initialPage = initialPage;
         this._storeModel = new StoreModel.StoreModel();
         this.Visible = false;
 
@@ -76,8 +75,7 @@ const AppStore = new Lang.Class({
 
         // the main window
         this._mainWindow = new AppStoreWindow.AppStoreWindow(this,
-                                                             this._storeModel,
-                                                             this._initialPage);
+                                                             this._storeModel);
         this._mainWindow.connect('visibility-changed',
                                  Lang.bind(this, this._onVisibilityChanged));
     },
