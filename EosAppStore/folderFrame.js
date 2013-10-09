@@ -287,6 +287,14 @@ const FolderFrame = new Lang.Class({
         this._viewport.add(this._grid);
 
         this.show_all();
+    },
+
+    reset: function() {
+        // Scroll to the top of the grid
+        if (this._scrolledWindow) {
+            let vscrollbar = this._scrolledWindow.get_vscrollbar();
+            vscrollbar.set_value(0);
+        }
     }
 });
 Builder.bindTemplateChildren(FolderFrame.prototype);

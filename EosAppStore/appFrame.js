@@ -390,6 +390,13 @@ const AppFrame = new Lang.Class({
         let category = button.category;
         let idx = button.index;
 
+        // Scroll to the top of the selected category
+        let widget = this._categories[idx].widget;
+        if (widget) {
+            let vscrollbar = widget.get_vscrollbar();
+            vscrollbar.set_value(0);
+        }
+
         if (idx > this._currentCategoryIdx) {
             this._stack.transition_type = PLib.StackTransitionType.SLIDE_LEFT;
         } else {
@@ -400,5 +407,10 @@ const AppFrame = new Lang.Class({
         this._currentCategoryIdx = idx;
 
         this._stack.set_visible_child_name(category);
+    },
+
+    reset: function() {
+        // Return to the first category
+        this._buttonGroup.clicked();
     }
 });

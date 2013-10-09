@@ -24,6 +24,7 @@ const APP_STORE_IFACE = 'com.endlessm.AppStore';
 
 const AppStoreIface = <interface name={APP_STORE_NAME}>
   <method name="Toggle">
+    <arg type="b" direction="in" name="reset"/>
     <arg type="u" direction="in" name="timestamp"/>
   </method>
   <method name="ShowPage">
@@ -149,8 +150,8 @@ const AppStore = new Lang.Class({
         return AppStoreWindow.AppStoreSizes.SVGA.windowWidth;
     },
 
-    Toggle: function(timestamp) {
-        this._mainWindow.toggle(timestamp);
+    Toggle: function(reset, timestamp) {
+        this._mainWindow.toggle(reset, timestamp);
     },
 
     ShowPage: function(page, timestamp) {
