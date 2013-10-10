@@ -1,5 +1,6 @@
 // -*- mode: js; js-indent-level: 4; indent-tabs-mode: nil -*-
 const EosAppStorePrivate = imports.gi.EosAppStorePrivate;
+const Endless = imports.gi.Endless;
 const Gio = imports.gi.Gio;
 const GLib = imports.gi.GLib;
 
@@ -12,6 +13,8 @@ const EOS_BROWSER = 'chromium-browser ';
 const EOS_LOCALIZED = 'eos-exec-localized ';
 
 const DESKTOP_KEY_SPLASH = 'X-Endless-Splash-Screen';
+const DESKTOP_KEY_SHOW_IN_STORE = 'X-Endless-ShowInAppStore';
+const DESKTOP_KEY_SHOW_IN_PERSONALITIES = 'X-Endless-ShowInPersonalities';
 
 const StoreModel = new Lang.Class({
     Name: 'StoreModel',
@@ -66,6 +69,36 @@ const BaseList = new Lang.Class({
         // do nothing here
     },
 
+    _isAppVisible: function(info, personality) {
+        if (info.has_key(DESKTOP_KEY_SHOW_IN_STORE) && info.get_boolean(DESKTOP_KEY_SHOW_IN_STORE)) {
+            if (info.has_key(DESKTOP_KEY_SHOW_IN_PERSONALITIES)) {
+                let personalities = info.get_string(DESKTOP_KEY_SHOW_IN_PERSONALITIES);
+
+                if (personalities && personalities.length > 0) {
+                    if (!personality) {
+                        // the application requires specific personalities but this system doesn't have one
+                        return false;
+                    }
+                    let split = personalities.split(';');
+                    for (let i = 0; i < split.length; i++) {
+                        if (split[i].toLowerCase() == personality.toLowerCase()) {
+                            // the system's personality matches one of the app's
+                            return true;
+                        }
+                    }
+                    return false;
+                }
+            }
+
+            // if the key is not set, or is set but empty, the app will be shown
+            return true;
+        }
+
+        // the application will not be shown in the app store unless
+        // its desktop entry has X-Endless-ShowInAppStore=true
+        return false;
+    },
+
     update: function() {
         this._storeModel.update();
     },
@@ -109,9 +142,17 @@ const AppList = new Lang.Class({
     Extends: BaseList,
 
     _onModelChanged: function(model, items) {
-        let apps = items.filter(function(item) {
-            return item.indexOf(EOS_LINK_PREFIX) != 0;
-        });
+        let my_personality = Endless.get_system_personality();
+
+        let apps = items.filter(Lang.bind(this, function(item) {
+            if (item.indexOf(EOS_LINK_PREFIX) == 0) {
+                // web links are ignored
+                return false;
+            } else {
+                let info = model.model.get_app_info(item);
+                return this._isAppVisible(info, my_personality);
+            }
+        }));
         this._apps = apps;
         this.emit('changed', this._apps);
     },
@@ -137,9 +178,17 @@ const WeblinkList = new Lang.Class({
     },
 
     _onModelChanged: function(model, items) {
-        let weblinks = items.filter(function(item) {
-            return item.indexOf(EOS_LINK_PREFIX) == 0;
-        });
+        let my_personality = Endless.get_system_personality();
+
+        let weblinks = items.filter(Lang.bind(this, function(item) {
+            if (item.indexOf(EOS_LINK_PREFIX) == 0) {
+                // only take web links into account
+                let info = model.model.get_app_info(item);
+                return this._isAppVisible(info, my_personality);
+            } else {
+                return false;
+            }
+        }));
 
         this._weblinks = weblinks;
         this._cacheUrls();
@@ -213,7 +262,7 @@ const WeblinkList = new Lang.Class({
         return this._weblinks;
     },
 
-    // FIXME: this should use the linkId as provided by the CMS. 
+    // FIXME: this should use the linkId as provided by the CMS.
     // See https://github.com/endlessm/eos-shell/issues/1074
     createWeblink: function(url, title, icon) {
         let desktop = new GLib.KeyFile();
