@@ -57,6 +57,7 @@ const AppListBoxRow = new Lang.Class({
     templateResource: '/com/endlessm/appstore/eos-app-store-list-row.ui',
     templateChildren: [
         '_mainBox',
+        '_contentBox',
         '_descriptionText',
         '_stateButton',
         '_stateButtonLabel',
@@ -72,6 +73,11 @@ const AppListBoxRow = new Lang.Class({
 
         this.initTemplate({ templateRoot: '_mainBox', bindChildren: true, connectSignals: true, });
         this.add(this._mainBox);
+
+        let separator = new Separator.FrameSeparator();
+        this._mainBox.add(separator);
+        this._mainBox.reorder_child(separator, 0);
+
         this._mainBox.show();
 
         this._stateButton.connect('clicked', Lang.bind(this, this._onStateButtonClicked));
@@ -368,6 +374,9 @@ const AppFrame = new Lang.Class({
         app.mainWindow.titleText = cell.app_info.get_title();
         app.mainWindow.subtitleText = cell.app_info.get_subtitle();
         app.mainWindow.headerIcon = this._model.getIcon(cell.desktop_id);
+
+        let appState = this._model.getState(cell.desktop_id);
+        app.mainWindow.headerInstalledVisible = (appState == EosAppStorePrivate.AppState.INSTALLED);
         app.mainWindow.backButtonVisible = true;
         this._backClickedId =
             app.mainWindow.connect('back-clicked', Lang.bind(this, this._showGrid));
@@ -378,6 +387,7 @@ const AppFrame = new Lang.Class({
         app.mainWindow.titleText = null;
         app.mainWindow.subtitleText = null;
         app.mainWindow.headerIcon = null;
+        app.mainWindow.headerInstalledVisible = false;
         app.mainWindow.backButtonVisible = false;
 
         if (this._backClickedId > 0) {
