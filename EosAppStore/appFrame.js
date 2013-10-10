@@ -374,6 +374,9 @@ const AppFrame = new Lang.Class({
         app.mainWindow.titleText = cell.app_info.get_title();
         app.mainWindow.subtitleText = cell.app_info.get_subtitle();
         app.mainWindow.headerIcon = this._model.getIcon(cell.desktop_id);
+
+        let appState = this._model.getState(cell.desktop_id);
+        app.mainWindow.headerInstalledVisible = (appState == EosAppStorePrivate.AppState.INSTALLED);
         app.mainWindow.backButtonVisible = true;
         this._backClickedId =
             app.mainWindow.connect('back-clicked', Lang.bind(this, this._showGrid));
@@ -384,6 +387,7 @@ const AppFrame = new Lang.Class({
         app.mainWindow.titleText = null;
         app.mainWindow.subtitleText = null;
         app.mainWindow.headerIcon = null;
+        app.mainWindow.headerInstalledVisible = false;
         app.mainWindow.backButtonVisible = false;
 
         if (this._backClickedId > 0) {

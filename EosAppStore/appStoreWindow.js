@@ -191,6 +191,7 @@ const AppStoreWindow = new Lang.Class({
         'content-box',
         'header-bar-title-label',
         'header-bar-subtitle-label',
+        'header-bar-installed-image',
         'header-icon',
         'close-button',
         'back-button',
@@ -462,6 +463,14 @@ const AppStoreWindow = new Lang.Class({
         }
         else {
             this.header_icon.hide();
+        }
+    },
+
+    set headerInstalledVisible(isVisible) {
+        if (isVisible) {
+            this.header_bar_installed_image.show();
+        } else {
+            this.header_bar_installed_image.hide();
         }
     },
 
