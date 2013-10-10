@@ -59,8 +59,10 @@ const AppListBoxRow = new Lang.Class({
         '_mainBox',
         '_contentBox',
         '_descriptionText',
-        '_stateButton',
-        '_stateButtonLabel',
+        '_installButton',
+        '_installButtonLabel',
+        '_removeButton',
+        '_removeButtonLabel',
         '_screenshotImage',
         '_screenshotPreviewBox',
     ],
@@ -79,8 +81,6 @@ const AppListBoxRow = new Lang.Class({
         this._mainBox.reorder_child(separator, 0);
 
         this._mainBox.show();
-
-        this._stateButton.connect('clicked', Lang.bind(this, this._onStateButtonClicked));
 
         this.appInfo = appInfo;
         this.appState = this._model.getState(this._appId);
@@ -126,13 +126,12 @@ const AppListBoxRow = new Lang.Class({
     },
 
     _setStyleClassFromState: function() {
-        let classes = [ { state: EosAppStorePrivate.AppState.INSTALLED,
-                          style: 'remove' },
-                        { state: EosAppStorePrivate.AppState.UNINSTALLED,
+        let classes = [ { state: EosAppStorePrivate.AppState.UNINSTALLED,
                           style: 'install' },
                         { state: EosAppStorePrivate.AppState.UPDATABLE,
                           style: 'update' } ];
-        let context = this._stateButton.get_style_context();
+
+        let context = this._installButton.get_style_context();
 
         for (let idx in classes) {
             let obj = classes[idx];
@@ -143,38 +142,44 @@ const AppListBoxRow = new Lang.Class({
                 context.add_class(styleClass);
             } else {
                 context.remove_class(styleClass);
-            }                
+            }
         }
     },
 
     set appState(state) {
         this._appState = state;
+
         this._setStyleClassFromState();
+
+        this._installButton.hide();
+        this._removeButton.hide();
 
         switch (this._appState) {
             case EosAppStorePrivate.AppState.INSTALLED:
-                this._stateButtonLabel.set_text(_("Remove application"));
+                this._removeButton.show();
+                log('app "' + this._appId + '" is installed');
                 break;
 
             case EosAppStorePrivate.AppState.UNINSTALLED:
-                this._stateButtonLabel.set_text(_("Install application"));
+                this._installButtonLabel.set_text(_("Install application"));
+                this._installButton.show();
+                log('app "' + this._appId + '" is not installed');
                 break;
 
             case EosAppStorePrivate.AppState.UPDATABLE:
-                this._stateButtonLabel.set_text(_("Update application"));
+                this._installButtonLabel.set_text(_("Update application"));
+                this._installButton.show();
+                log('app "' + this._appId + '" can be upgraded');
                 break;
 
-            default:
+            case EosAppStorePrivate.AppState.UNKNOWN:
+                log('app "' + this._appId + '" is not known');
                 break;
         }
     },
 
-    _onStateButtonClicked: function() {
+    _onInstallButtonClicked: function() {
         switch (this._appState) {
-            case EosAppStorePrivate.AppState.INSTALLED:
-                this._model.uninstall(this._appId);
-                break;
-
             case EosAppStorePrivate.AppState.UNINSTALLED:
                 this._model.install(this._appId);
                 break;
@@ -183,6 +188,10 @@ const AppListBoxRow = new Lang.Class({
                 this._model.updateApp(this._appId);
                 break;
         }
+    },
+
+    _onRemoveButtonClicked: function() {
+        this._model.uninstall(this._appId);
     },
 });
 Builder.bindTemplateChildren(AppListBoxRow.prototype);
@@ -364,7 +373,7 @@ const AppFrame = new Lang.Class({
 
     _onCellActivated: function(grid, cell) {
         let appBox = new AppListBoxRow(this._model, cell.app_info);
-        appBox.show_all();
+        appBox.show();
 
         this._mainStack.add_named(appBox, cell.desktop_id);
         this._mainStack.transition_type = PLib.StackTransitionType.SLIDE_LEFT;
