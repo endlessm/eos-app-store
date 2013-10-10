@@ -57,6 +57,7 @@ const AppListBoxRow = new Lang.Class({
     templateResource: '/com/endlessm/appstore/eos-app-store-list-row.ui',
     templateChildren: [
         '_mainBox',
+        '_contentBox',
         '_descriptionText',
         '_stateButton',
         '_stateButtonLabel',
@@ -72,6 +73,11 @@ const AppListBoxRow = new Lang.Class({
 
         this.initTemplate({ templateRoot: '_mainBox', bindChildren: true, connectSignals: true, });
         this.add(this._mainBox);
+
+        let separator = new Separator.FrameSeparator();
+        this._mainBox.add(separator);
+        this._mainBox.reorder_child(separator, 0);
+
         this._mainBox.show();
 
         this._stateButton.connect('clicked', Lang.bind(this, this._onStateButtonClicked));
