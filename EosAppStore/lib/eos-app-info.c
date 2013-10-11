@@ -19,6 +19,7 @@ enum {
   PROP_TITLE,
   PROP_SUBTITLE,
   PROP_APP_INFO,
+  PROP_SELECTED,
   NUM_PROPS
 };
 
@@ -34,6 +35,8 @@ struct _EosAppCell {
 
   GdkPixbuf *image;
   GtkStyleContext *image_context;
+
+  guint is_selected : 1;
 };
 
 struct _EosAppCellClass {
@@ -122,6 +125,10 @@ eos_app_cell_get_property (GObject    *gobject,
       g_value_set_boxed (value, self->info);
       break;
 
+    case PROP_SELECTED:
+      g_value_set_boolean (value, self->is_selected);
+      break;
+
     default:
       G_OBJECT_WARN_INVALID_PROPERTY_ID (gobject, prop_id, pspec);
     }
@@ -154,6 +161,18 @@ eos_app_cell_set_property (GObject      *gobject,
       g_assert (self->info == NULL);
       self->info = eos_app_info_ref (g_value_get_boxed (value));
       g_assert (self->info != NULL);
+      break;
+
+    case PROP_SELECTED:
+      {
+        GtkStyleContext *context = gtk_widget_get_style_context (GTK_WIDGET (self));
+
+        self->is_selected = g_value_get_boolean (value);
+        if (self->is_selected)
+          gtk_style_context_add_class (context, "select");
+        else
+          gtk_style_context_remove_class (context, "select");
+      }
       break;
 
     default:
@@ -220,8 +239,7 @@ eos_app_cell_draw (GtkWidget *widget,
     }
 
   error = NULL;
-  self->image = prepare_pixbuf_from_file
-    (self, path, image_width, image_height, &error);
+  self->image = prepare_pixbuf_from_file (self, path, image_width, image_height, &error);
 
   if (error != NULL)
     {
@@ -233,11 +251,22 @@ eos_app_cell_draw (GtkWidget *widget,
   g_free (path);
 
 out:
-  if (self->image != NULL)
-    gtk_render_icon (self->image_context,
-                     cr,
-                     self->image,
-                     image_margin.top, image_margin.left);
+
+  if (self->is_selected)
+    {
+      GtkStyleContext *context = gtk_widget_get_style_context (widget);
+
+      gtk_render_background (context, cr, 0, 0, image_width, image_height);
+      gtk_render_frame (context, cr, 0, 0, image_width, image_height);
+    }
+  else
+    {
+      if (self->image != NULL)
+        gtk_render_icon (self->image_context,
+                         cr,
+                         self->image,
+                         image_margin.top, image_margin.left);
+    }
 
   GTK_WIDGET_CLASS (eos_app_cell_parent_class)->draw (widget, cr);
 
@@ -283,6 +312,13 @@ eos_app_cell_class_init (EosAppCellClass *klass)
                         "Application Info",
                         EOS_TYPE_APP_INFO,
                         G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS | G_PARAM_CONSTRUCT_ONLY);
+
+  eos_app_cell_props[PROP_SELECTED] =
+    g_param_spec_boolean ("selected",
+                          "Selected",
+                          "Whether the cell is selected",
+                          FALSE,
+                          G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS);
 
   g_object_class_install_properties (oclass, NUM_PROPS, eos_app_cell_props);
 }
