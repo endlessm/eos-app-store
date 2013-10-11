@@ -5,6 +5,7 @@ const GLib = imports.gi.GLib;
 const GObject = imports.gi.GObject;
 const Gtk = imports.gi.Gtk;
 const EosAppStorePrivate = imports.gi.EosAppStorePrivate;
+const Mainloop = imports.mainloop;
 const PLib = imports.gi.PLib;
 const Endless = imports.gi.Endless;
 
@@ -61,6 +62,10 @@ const AppListBoxRow = new Lang.Class({
         '_descriptionText',
         '_installButton',
         '_installButtonLabel',
+        '_installProgress',
+        '_installProgressLabel',
+        '_installSpinner',
+        '_installedMessage',
         '_removeButton',
         '_removeButtonLabel',
         '_screenshotImage',
@@ -161,7 +166,10 @@ const AppListBoxRow = new Lang.Class({
 
         switch (this._appState) {
             case EosAppStorePrivate.AppState.INSTALLED:
-                this._removeButton.show();
+                if (!this._installedMessage.visible) {
+                    // wait for the message to hide
+                    this._removeButton.show();
+                }
                 break;
 
             case EosAppStorePrivate.AppState.UNINSTALLED:
@@ -184,11 +192,26 @@ const AppListBoxRow = new Lang.Class({
     _onInstallButtonClicked: function() {
         switch (this._appState) {
             case EosAppStorePrivate.AppState.UNINSTALLED:
+
+                this._installButton.hide();
+                this._installProgress.show();
+                this._installSpinner.start();
+
                 this._model.install(this._appId, Lang.bind(this, function(model, res) {
+                    this._installProgress.hide();
+
                     try {
                         model.install_app_finish(res);
+                        this._installedMessage.show();
+
+                        Mainloop.timeout_add_seconds(3, Lang.bind(this, function() {
+                            this._installedMessage.hide();
+                            this._updateState();
+                            return false;
+                        }));
                     } catch (e) {
                         log('Failed to install app ' + e.message);
+                        this._updateState();
                     }
                 }));
                 break;

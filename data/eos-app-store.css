@@ -281,6 +281,12 @@
     background-color: shade(@app_store_bg, 0.8);
 }
 
+.install-progress,
+.installed-message {
+    color: alpha(white, 0.9);
+    border: none;
+}
+
 .new-site-frame-container {
     padding-top: 28px;
     padding-bottom: 24px;
