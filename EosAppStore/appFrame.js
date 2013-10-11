@@ -71,6 +71,7 @@ const AppListBoxRow = new Lang.Class({
         this.parent();
 
         this._model = model;
+        this._model.connect('changed', Lang.bind(this, this._updateState));
         this._appId = appInfo.get_desktop_id();
 
         this.initTemplate({ templateRoot: '_mainBox', bindChildren: true, connectSignals: true, });
@@ -83,9 +84,13 @@ const AppListBoxRow = new Lang.Class({
         this._mainBox.show();
 
         this.appInfo = appInfo;
-        this.appState = this._model.getState(this._appId);
         this.appDescription = this.appInfo.get_description();
         this.appScreenshots = this.appInfo.get_screenshots();
+        this._updateState();
+    },
+
+    _updateState: function() {
+        this.appState = this._model.getState(this._appId);
     },
 
     get appId() {
