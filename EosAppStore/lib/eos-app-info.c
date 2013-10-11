@@ -19,6 +19,8 @@ enum {
   PROP_TITLE,
   PROP_SUBTITLE,
   PROP_APP_INFO,
+  PROP_SELECTED,
+  PROP_ICON,
   NUM_PROPS
 };
 
@@ -26,14 +28,18 @@ struct _EosAppCell {
   EosFlexyGridCell parent;
 
   char *desktop_id;
+  char *icon_name;
 
   GtkWidget *title_label;
   GtkWidget *subtitle_label;
+  GtkWidget *icon;
 
   EosAppInfo *info;
 
   GdkPixbuf *image;
   GtkStyleContext *image_context;
+
+  guint is_selected : 1;
 };
 
 struct _EosAppCellClass {
@@ -122,6 +128,14 @@ eos_app_cell_get_property (GObject    *gobject,
       g_value_set_boxed (value, self->info);
       break;
 
+    case PROP_SELECTED:
+      g_value_set_boolean (value, self->is_selected);
+      break;
+
+    case PROP_ICON:
+      g_value_set_string (value, self->icon_name);
+      break;
+
     default:
       G_OBJECT_WARN_INVALID_PROPERTY_ID (gobject, prop_id, pspec);
     }
@@ -156,6 +170,37 @@ eos_app_cell_set_property (GObject      *gobject,
       g_assert (self->info != NULL);
       break;
 
+    case PROP_SELECTED:
+      {
+        GtkStyleContext *context = gtk_widget_get_style_context (GTK_WIDGET (self));
+
+        self->is_selected = g_value_get_boolean (value);
+        if (self->is_selected)
+          gtk_style_context_add_class (context, "select");
+        else
+          gtk_style_context_remove_class (context, "select");
+      }
+      break;
+
+    case PROP_ICON:
+      {
+        const char *icon_name = g_value_get_string (value);
+
+        g_free (self->icon_name);
+        self->icon_name = g_strdup (icon_name);
+
+        if (icon_name == NULL)
+          gtk_widget_hide (self->icon);
+        else
+          {
+            gtk_image_set_from_icon_name (GTK_IMAGE (self->icon),
+                                          icon_name,
+                                          GTK_ICON_SIZE_DIALOG);
+            gtk_widget_show (self->icon);
+          }
+      }
+      break;
+
     default:
       G_OBJECT_WARN_INVALID_PROPERTY_ID (gobject, prop_id, pspec);
     }
@@ -169,6 +214,7 @@ eos_app_cell_finalize (GObject *gobject)
   g_clear_object (&self->image_context);
   g_clear_object (&self->image);
   g_free (self->desktop_id);
+  g_free (self->icon_name);
   eos_app_info_unref (self->info);
 
   G_OBJECT_CLASS (eos_app_cell_parent_class)->finalize (gobject);
@@ -220,8 +266,7 @@ eos_app_cell_draw (GtkWidget *widget,
     }
 
   error = NULL;
-  self->image = prepare_pixbuf_from_file
-    (self, path, image_width, image_height, &error);
+  self->image = prepare_pixbuf_from_file (self, path, image_width, image_height, &error);
 
   if (error != NULL)
     {
@@ -233,11 +278,22 @@ eos_app_cell_draw (GtkWidget *widget,
   g_free (path);
 
 out:
-  if (self->image != NULL)
-    gtk_render_icon (self->image_context,
-                     cr,
-                     self->image,
-                     image_margin.top, image_margin.left);
+
+  if (self->is_selected)
+    {
+      GtkStyleContext *context = gtk_widget_get_style_context (widget);
+
+      gtk_render_background (context, cr, 0, 0, image_width, image_height);
+      gtk_render_frame (context, cr, 0, 0, image_width, image_height);
+    }
+  else
+    {
+      if (self->image != NULL)
+        gtk_render_icon (self->image_context,
+                         cr,
+                         self->image,
+                         image_margin.top, image_margin.left);
+    }
 
   GTK_WIDGET_CLASS (eos_app_cell_parent_class)->draw (widget, cr);
 
@@ -284,6 +340,20 @@ eos_app_cell_class_init (EosAppCellClass *klass)
                         EOS_TYPE_APP_INFO,
                         G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS | G_PARAM_CONSTRUCT_ONLY);
 
+  eos_app_cell_props[PROP_SELECTED] =
+    g_param_spec_boolean ("selected",
+                          "Selected",
+                          "Whether the cell is selected",
+                          FALSE,
+                          G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS);
+
+  eos_app_cell_props[PROP_ICON] =
+    g_param_spec_string ("icon",
+                         "Icon",
+                         "Icon name of the app",
+                         NULL,
+                         G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS);
+
   g_object_class_install_properties (oclass, NUM_PROPS, eos_app_cell_props);
 }
 
@@ -304,6 +374,12 @@ eos_app_cell_init (EosAppCell *self)
   gtk_widget_set_halign (box, GTK_ALIGN_START);
   gtk_container_add (GTK_CONTAINER (frame), box);
   gtk_widget_show (box);
+
+  self->icon = gtk_image_new ();
+  gtk_widget_set_hexpand (self->icon, TRUE);
+  gtk_widget_set_halign (self->icon, GTK_ALIGN_CENTER);
+  gtk_container_add (GTK_CONTAINER (box), self->icon);
+  gtk_widget_set_no_show_all (self->icon, TRUE);
 
   self->title_label = gtk_label_new ("");
   gtk_style_context_add_class (gtk_widget_get_style_context (self->title_label),
