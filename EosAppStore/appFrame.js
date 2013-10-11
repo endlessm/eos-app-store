@@ -184,7 +184,13 @@ const AppListBoxRow = new Lang.Class({
     _onInstallButtonClicked: function() {
         switch (this._appState) {
             case EosAppStorePrivate.AppState.UNINSTALLED:
-                this._model.install(this._appId);
+                this._model.install(this._appId, Lang.bind(this, function(model, res) {
+                    try {
+                        model.install_app_finish(res);
+                    } catch (e) {
+                        log('Failed to install app ' + e.message);
+                    }
+                }));
                 break;
 
             case EosAppStorePrivate.AppState.UPDATABLE:
@@ -194,7 +200,13 @@ const AppListBoxRow = new Lang.Class({
     },
 
     _onRemoveButtonClicked: function() {
-        this._model.uninstall(this._appId);
+        this._model.uninstall(this._appId, Lang.bind(this, function(model, res) {
+            try {
+                model.uninstall_app_finish(res);
+            } catch (e) {
+                log('Failed to uninstall app ' + e.message);
+            }
+        }));
     },
 });
 Builder.bindTemplateChildren(AppListBoxRow.prototype);
