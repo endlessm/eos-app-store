@@ -162,23 +162,20 @@ const AppListBoxRow = new Lang.Class({
         switch (this._appState) {
             case EosAppStorePrivate.AppState.INSTALLED:
                 this._removeButton.show();
-                log('app "' + this._appId + '" is installed');
                 break;
 
             case EosAppStorePrivate.AppState.UNINSTALLED:
                 this._installButtonLabel.set_text(_("Install application"));
                 this._installButton.show();
-                log('app "' + this._appId + '" is not installed');
                 break;
 
             case EosAppStorePrivate.AppState.UPDATABLE:
                 this._installButtonLabel.set_text(_("Update application"));
                 this._installButton.show();
-                log('app "' + this._appId + '" can be upgraded');
                 break;
 
             case EosAppStorePrivate.AppState.UNKNOWN:
-                log('app "' + this._appId + '" is not known');
+                log('The state of app "' + this._appId + '" is not known to the app store');
                 break;
         }
     },
