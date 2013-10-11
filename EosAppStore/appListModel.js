@@ -127,12 +127,12 @@ const BaseList = new Lang.Class({
         return this._model.get_app_visible(id);
     },
 
-    install: function(id) {
-        this._model.install_app(id);
+    install: function(id, callback) {
+        this._model.install_app_async(id, null, callback);
     },
 
-    uninstall: function(id) {
-        this._model.uninstall_app(id);
+    uninstall: function(id, callback) {
+        this._model.uninstall_app_async(id, null, callback);
     }
 });
 Signals.addSignalMethods(BaseList.prototype);
