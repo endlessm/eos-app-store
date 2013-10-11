@@ -221,7 +221,9 @@ const AppStoreWindow = new Lang.Class({
         // update position when workarea changes
         let screen = Gdk.Screen.get_default();
         screen.connect('monitors-changed',
-                       Lang.bind(this, this._onMonitorsChanged));
+                       Lang.bind(this, this._onAvailableAreaChanged));
+        screen.connect('size-changed',
+                       Lang.bind(this, this._onAvailableAreaChanged));
 
         let visual = screen.get_rgba_visual();
         if (visual) {
@@ -384,7 +386,7 @@ const AppStoreWindow = new Lang.Class({
         }
     },
 
-    _onMonitorsChanged: function() {
+    _onAvailableAreaChanged: function() {
         this._animator.setInitialValue();
         this._createStackPages();
         this._onStorePageChanged(this._storeModel, this._currentPage);
