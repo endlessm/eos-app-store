@@ -272,6 +272,8 @@ const AppFrame = new Lang.Class({
         this._contentMonitor.connect('changed', Lang.bind(this, this._onContentChanged));
 
         this._stack.set_visible_child_name(this._currentCategory);
+
+        this._lastCellSelected = null;
     },
 
     _onContentChanged: function(monitor, file, other_file, event_type) {
@@ -350,6 +352,7 @@ const AppFrame = new Lang.Class({
                 }
             }
 
+            grid.connect('cell-selected', Lang.bind(this, this._onCellSelected));
             grid.connect('cell-activated', Lang.bind(this, this._onCellActivated));
 
             scrollWindow.show_all();
@@ -371,6 +374,20 @@ const AppFrame = new Lang.Class({
         app.mainWindow.backButtonVisible = true;
         this._backClickedId =
             app.mainWindow.connect('back-clicked', Lang.bind(this, this._showGrid));
+    },
+
+    _onCellSelected: function(grid, cell) {
+        if (this._lastCellSelected != cell) {
+            if (this._lastCellSelected) {
+                this._lastCellSelected.selected = false;
+            }
+
+            this._lastCellSelected = cell;
+
+            if (this._lastCellSelected) {
+                this._lastCellSelected.selected = true;
+            }
+        }
     },
 
     _showGrid: function() {
