@@ -33,6 +33,7 @@ struct _EosAppCell {
   GtkWidget *title_label;
   GtkWidget *subtitle_label;
   GtkWidget *icon;
+  GtkWidget *icon_hbox;
 
   EosAppInfo *info;
 
@@ -264,13 +265,16 @@ eos_app_cell_set_property (GObject      *gobject,
         self->icon_name = g_strdup (icon_name);
 
         if (icon_name == NULL)
-          gtk_widget_hide (self->icon);
+          {
+            gtk_image_clear (GTK_IMAGE (self->icon));
+            gtk_widget_hide (self->icon_hbox);
+          }
         else
           {
             gtk_image_set_from_icon_name (GTK_IMAGE (self->icon),
                                           icon_name,
                                           GTK_ICON_SIZE_DIALOG);
-            gtk_widget_show (self->icon);
+            gtk_widget_show (self->icon_hbox);
           }
       }
       break;
@@ -489,13 +493,23 @@ eos_app_cell_init (EosAppCell *self)
   gtk_container_add (GTK_CONTAINER (frame), box);
   gtk_widget_show (box);
 
+  GtkWidget *hbox = gtk_box_new (GTK_ORIENTATION_HORIZONTAL, 13);
+  self->icon_hbox = hbox;
+  gtk_widget_set_hexpand (hbox, TRUE);
+  gtk_container_add (GTK_CONTAINER (box), hbox);
+  gtk_widget_set_no_show_all (hbox, TRUE);
+
   self->icon = gtk_image_new ();
+  gtk_widget_show (self->icon);
   gtk_style_context_add_class (gtk_widget_get_style_context (self->icon),
                                "app-cell-icon");
-  gtk_widget_set_hexpand (self->icon, TRUE);
   gtk_widget_set_halign (self->icon, GTK_ALIGN_START);
-  gtk_container_add (GTK_CONTAINER (box), self->icon);
-  gtk_widget_set_no_show_all (self->icon, TRUE);
+  gtk_container_add (GTK_CONTAINER (hbox), self->icon);
+
+  GtkWidget *arrow = gtk_image_new_from_resource ("/com/endlessm/appstore/icon_arrow_thumb.png");
+  gtk_widget_show (arrow);
+  gtk_widget_set_valign (arrow, GTK_ALIGN_CENTER);
+  gtk_container_add (GTK_CONTAINER (hbox), arrow);
 
   self->title_label = gtk_label_new ("");
   gtk_style_context_add_class (gtk_widget_get_style_context (self->title_label),
