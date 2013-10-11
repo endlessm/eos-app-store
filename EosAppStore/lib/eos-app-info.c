@@ -164,7 +164,15 @@ eos_app_cell_set_property (GObject      *gobject,
       break;
 
     case PROP_SELECTED:
-      self->is_selected = g_value_get_boolean (value);
+      {
+        GtkStyleContext *context = gtk_widget_get_style_context (GTK_WIDGET (self));
+
+        self->is_selected = g_value_get_boolean (value);
+        if (self->is_selected)
+          gtk_style_context_add_class (context, "select");
+        else
+          gtk_style_context_remove_class (context, "select");
+      }
       break;
 
     default:
@@ -244,11 +252,21 @@ eos_app_cell_draw (GtkWidget *widget,
 
 out:
 
-  if (self->image != NULL)
-    gtk_render_icon (self->image_context,
-                     cr,
-                     self->image,
-                     image_margin.top, image_margin.left);
+  if (self->is_selected)
+    {
+      GtkStyleContext *context = gtk_widget_get_style_context (widget);
+
+      gtk_render_background (context, cr, 0, 0, image_width, image_height);
+      gtk_render_frame (context, cr, 0, 0, image_width, image_height);
+    }
+  else
+    {
+      if (self->image != NULL)
+        gtk_render_icon (self->image_context,
+                         cr,
+                         self->image,
+                         image_margin.top, image_margin.left);
+    }
 
   GTK_WIDGET_CLASS (eos_app_cell_parent_class)->draw (widget, cr);
 

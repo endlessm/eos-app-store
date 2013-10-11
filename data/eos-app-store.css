@@ -183,8 +183,15 @@
     margin-bottom: 3px;
 }
 
-.flexy-grid-cell:hover .app-cell-image {
+.flexy-grid-cell.select {
     background-color: white;
+    border-radius: 3px;
+    icon-shadow: 0 2px 2px alpha(black, 0.3);
+}
+
+.flexy-grid-cell.select .app-cell-title,
+.flexy-grid-cell.select .app-cell-subtitle {
+    color: black;
 }
 
 .app-frame .state-button {
