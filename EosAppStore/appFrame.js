@@ -379,12 +379,14 @@ const AppFrame = new Lang.Class({
     _onCellSelected: function(grid, cell) {
         if (this._lastCellSelected != cell) {
             if (this._lastCellSelected) {
+                this._lastCellSelected.icon = null;
                 this._lastCellSelected.selected = false;
             }
 
             this._lastCellSelected = cell;
 
             if (this._lastCellSelected) {
+                this._lastCellSelected.icon = this._model.getIcon(cell.desktop_id);
                 this._lastCellSelected.selected = true;
             }
         }
