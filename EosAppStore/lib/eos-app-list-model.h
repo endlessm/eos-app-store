@@ -43,6 +43,32 @@ void eos_app_list_model_install_app (EosAppListModel *model, const char *app_id)
 void eos_app_list_model_uninstall_app (EosAppListModel *model, const char *app_id);
 void eos_app_list_model_update_app (EosAppListModel *mode, const char *app_id);
 
+void eos_app_list_model_install_app_async (EosAppListModel *model,
+                                           const gchar *app_id,
+                                           GCancellable *cancellable,
+                                           GAsyncReadyCallback callback,
+                                           gpointer user_data);
+gboolean eos_app_list_model_install_app_finish (EosAppListModel *model,
+                                                GAsyncResult *result,
+                                                GError **error);
+
+void eos_app_list_model_uninstall_app_async (EosAppListModel *model,
+                                             const gchar *app_id,
+                                             GCancellable *cancellable,
+                                             GAsyncReadyCallback callback,
+                                             gpointer user_data);
+gboolean eos_app_list_model_uninstall_app_finish (EosAppListModel *model,
+                                                  GAsyncResult *result,
+                                                  GError **error);
+
+GQuark eos_app_list_model_error_quark (void);
+
+typedef enum {
+  EOS_APP_LIST_MODEL_FAILED,
+  EOS_APP_LIST_MODEL_ERROR_INSTALLED,
+  EOS_APP_LIST_MODEL_ERROR_NOT_INSTALLED
+} EosAppListModelError;
+
 G_END_DECLS
 
 #endif /* __EOS_APP_LIST_MODEL_H__ */
