@@ -172,6 +172,7 @@ const AppListBoxRow = new Lang.Class({
             case EosAppStorePrivate.AppState.UPDATABLE:
                 this._installButtonLabel.set_text(_("Update application"));
                 this._installButton.show();
+                this._removeButton.show();
                 break;
 
             case EosAppStorePrivate.AppState.UNKNOWN:
