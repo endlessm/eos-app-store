@@ -19,6 +19,7 @@ const APP_TRANSITION_MS = 500;
 const CATEGORY_TRANSITION_MS = 500;
 
 const CELL_DEFAULT_SIZE = 180;
+const CELL_DEFAULT_SPACING = 15;
 const CATEGORIES_BOX_SPACING = 32;
 const STACK_TOP_MARGIN = 4;
 
@@ -282,9 +283,7 @@ const AppFrame = new Lang.Class({
     },
 
     _populateCategories: function() {
-        let cellStyle = EosAppStorePrivate.AppInfo.get_cell_style_context();
-        let margin = cellStyle.get_margin(Gtk.StateFlags.NORMAL);
-        let cellMargin = Math.max(margin.top, margin.right, margin.bottom, margin.left);
+        let cellMargin = EosAppStorePrivate.AppInfo.get_cell_margin();
 
         for (let c in this._categories) {
             let category = this._categories[c];
@@ -317,7 +316,8 @@ const AppFrame = new Lang.Class({
                 child.destroy();
             }
 
-            let grid = new Endless.FlexyGrid({ cell_size: CELL_DEFAULT_SIZE + cellMargin });
+            let grid = new Endless.FlexyGrid({ cell_size: CELL_DEFAULT_SIZE + cellMargin,
+                                               cell_spacing: CELL_DEFAULT_SPACING - cellMargin });
             scrollWindow.add_with_viewport(grid);
 
             let appInfos = EosAppStorePrivate.app_load_content(category.id);
