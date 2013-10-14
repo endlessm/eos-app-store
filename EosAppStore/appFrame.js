@@ -20,6 +20,7 @@ const APP_TRANSITION_MS = 500;
 const CATEGORY_TRANSITION_MS = 500;
 
 const CELL_DEFAULT_SIZE = 180;
+const CELL_DEFAULT_SPACING = 15;
 const CATEGORIES_BOX_SPACING = 32;
 const STACK_TOP_MARGIN = 4;
 
@@ -325,6 +326,8 @@ const AppFrame = new Lang.Class({
         this._contentMonitor.connect('changed', Lang.bind(this, this._onContentChanged));
 
         this._stack.set_visible_child_name(this._currentCategory);
+
+        this._lastCellSelected = null;
     },
 
     _onContentChanged: function(monitor, file, other_file, event_type) {
@@ -333,9 +336,7 @@ const AppFrame = new Lang.Class({
     },
 
     _populateCategories: function() {
-        let cellStyle = EosAppStorePrivate.AppInfo.get_cell_style_context();
-        let margin = cellStyle.get_margin(Gtk.StateFlags.NORMAL);
-        let cellMargin = Math.max(margin.top, margin.right, margin.bottom, margin.left);
+        let cellMargin = EosAppStorePrivate.AppInfo.get_cell_margin();
 
         for (let c in this._categories) {
             let category = this._categories[c];
@@ -368,7 +369,8 @@ const AppFrame = new Lang.Class({
                 child.destroy();
             }
 
-            let grid = new Endless.FlexyGrid({ cell_size: CELL_DEFAULT_SIZE + cellMargin });
+            let grid = new Endless.FlexyGrid({ cell_size: CELL_DEFAULT_SIZE + cellMargin,
+                                               cell_spacing: CELL_DEFAULT_SPACING - cellMargin });
             scrollWindow.add_with_viewport(grid);
 
             let appInfos = EosAppStorePrivate.app_load_content(category.id);
@@ -403,6 +405,7 @@ const AppFrame = new Lang.Class({
                 }
             }
 
+            grid.connect('cell-selected', Lang.bind(this, this._onCellSelected));
             grid.connect('cell-activated', Lang.bind(this, this._onCellActivated));
 
             scrollWindow.show_all();
@@ -427,6 +430,22 @@ const AppFrame = new Lang.Class({
         app.mainWindow.backButtonVisible = true;
         this._backClickedId =
             app.mainWindow.connect('back-clicked', Lang.bind(this, this._showGrid));
+    },
+
+    _onCellSelected: function(grid, cell) {
+        if (this._lastCellSelected != cell) {
+            if (this._lastCellSelected) {
+                this._lastCellSelected.icon = null;
+                this._lastCellSelected.selected = false;
+            }
+
+            this._lastCellSelected = cell;
+
+            if (this._lastCellSelected) {
+                this._lastCellSelected.icon = this._model.getIcon(cell.desktop_id);
+                this._lastCellSelected.selected = true;
+            }
+        }
     },
 
     _showGrid: function() {
