@@ -5,6 +5,7 @@
 
 #include <gio/gio.h>
 #include <gio/gdesktopappinfo.h>
+#include <gdk-pixbuf/gdk-pixbuf.h>
 #include "eos-app-enums.h"
 
 G_BEGIN_DECLS
@@ -60,6 +61,10 @@ void eos_app_list_model_uninstall_app_async (EosAppListModel *model,
 gboolean eos_app_list_model_uninstall_app_finish (EosAppListModel *model,
                                                   GAsyncResult *result,
                                                   GError **error);
+
+void eos_app_list_model_save_icon (EosAppListModel *model,
+                                   GdkPixbuf *pixbuf,
+                                   const gchar *filename);
 
 GQuark eos_app_list_model_error_quark (void);
 

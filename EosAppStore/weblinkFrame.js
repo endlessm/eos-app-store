@@ -86,6 +86,7 @@ const NewSiteBox = new Lang.Class({
                                }));
 
         this._siteUrlFrame.add(this._urlEntry);
+        this._sitePixbuf = null;
 
         this._reset();
     },
@@ -109,6 +110,7 @@ const NewSiteBox = new Lang.Class({
         this._urlEntry.max_length = 0;
         this._urlEntry.halign = Gtk.Align.FILL;
         this._urlEntry.grab_focus();
+        this._sitePixbuf = null;
 
         // https://bugzilla.gnome.org/show_bug.cgi?id=709056
         let file = Gio.File.new_for_path(Path.ICONS_DIR + '/icon_website-symbolic.svg');
@@ -187,7 +189,12 @@ const NewSiteBox = new Lang.Class({
         let url = this._siteAlertLabel.get_text();
         let title = this._urlEntry.get_text();
 
-        let newSite = this._weblinkListModel.createWeblink(url, title, 'browser');
+        let weblinkIcon = DEFAULT_ICON;
+        if (this._sitePixbuf) {
+            weblinkIcon = this._weblinkListModel.saveIcon(this._sitePixbuf);
+        }
+
+        let newSite = this._weblinkListModel.createWeblink(url, title, weblinkIcon);
         this._weblinkListModel.update();
         this._weblinkListModel.install(newSite, function() {});
 
@@ -218,24 +225,25 @@ const NewSiteBox = new Lang.Class({
 
             // If size is >66px, resize to 66px
             if (faviconWidth > 66 || faviconHeight > 66) {
-                favicon = favicon.scale_simple(faviconWidth * 66 / biggest,
-                                               faviconHeight * 66 / biggest,
-                                               GdkPixbuf.InterpType.BILINEAR);
-                this._siteIcon.set_from_pixbuf(favicon);
+                this._sitePixbuf = favicon.scale_simple(faviconWidth * 66 / biggest,
+                                                        faviconHeight * 66 / biggest,
+                                                        GdkPixbuf.InterpType.BILINEAR);
+                this._siteIcon.set_from_pixbuf(this._sitePixbuf);
                 return;
             }
 
             // If size is between [48px, 66px], resize to 48px
             if (faviconWidth > 48 || faviconHeight > 48) {
-                favicon = favicon.scale_simple(faviconWidth * 48 / biggest,
-                                               faviconHeight * 48 / biggest,
-                                               GdkPixbuf.InterpType.BILINEAR);
-                this._siteIcon.set_from_pixbuf(favicon);
+                this._sitePixbuf = favicon = favicon.scale_simple(faviconWidth * 48 / biggest,
+                                                                  faviconHeight * 48 / biggest,
+                                                                  GdkPixbuf.InterpType.BILINEAR);
+                this._siteIcon.set_from_pixbuf(this._sitePixbuf);
                 return;
             }
 
             // If size is <48px, keep as it is
-            this._siteIcon.set_from_pixbuf(favicon);
+            this._sitePixbuf = favicon;
+            this._siteIcon.set_from_pixbuf(this._sitePixbuf);
         }
     },
 

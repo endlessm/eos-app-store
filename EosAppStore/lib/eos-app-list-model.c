@@ -730,3 +730,11 @@ eos_app_list_model_uninstall_app_finish (EosAppListModel *model,
   g_hash_table_remove (model->installed_apps, desktop_app_id);
   return TRUE;
 }
+
+void
+eos_app_list_model_save_icon (EosAppListModel *mode,
+                              GdkPixbuf *pixbuf,
+                              const gchar *filename)
+{
+  gdk_pixbuf_save (pixbuf, filename, "png", NULL, NULL);
+}
