@@ -18,6 +18,7 @@ const FrameClock = imports.frameClock;
 const Path = imports.path;
 const StoreModel = imports.storeModel;
 const UIBuilder = imports.builder;
+const WMInspect = imports.wmInspect;
 
 const ANIMATION_TIME = (500 * 1000); // half a second
 
@@ -246,7 +247,8 @@ const AppStoreWindow = new Lang.Class({
         this._createStackPages();
 
         // hide main window when clicking outside the store
-        this.connect('focus-out-event', Lang.bind(this, this._onLostFocus));
+        this._wmInspect = new WMInspect.WMInspect();
+        this._wmInspect.connect('active-window-changed', Lang.bind(this, this._onActiveWindowChanged));
     },
 
     _createStackPages: function() {
@@ -299,9 +301,10 @@ const AppStoreWindow = new Lang.Class({
         }
     },
 
-    _onLostFocus: function() {
-        if (this.getVisible()) {
-            this.toggle();
+    _onActiveWindowChanged: function(wmInspect, activeXid) {
+        let xid = this.get_window().get_xid();
+        if (xid != activeXid) {
+            this._animator.slideOut();
         }
     },
 

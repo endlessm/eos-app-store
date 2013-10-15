@@ -16,6 +16,7 @@ dist_js_DATA = \
 	shellAppStore.js \
 	storeModel.js \
 	weblinkFrame.js \
+	wmInspect.js \
 	$(NULL)
 
 BUILT_SOURCES += $(js_built_sources)
