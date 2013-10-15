@@ -10,7 +10,12 @@
 
 .scrollbar {
     -GtkRange-slider-width: 8;
+    -GtkRange-stepper-spacing: 15;
+    -GtkRange-stepper-size: 0;
+    -GtkRange-trough-under-steppers: false;
+
     -GtkScrollbar-min-slider-length: 115;
+    -GtkScrollbar-has-forward-stepper: true;
 }
 
 .scrollbar.slider {
