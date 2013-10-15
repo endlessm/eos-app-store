@@ -5,6 +5,7 @@
 
 #include <glib.h>
 #include <endless/endless.h>
+#include <webkit2.h>
 #include "eos-app-enums.h"
 
 G_BEGIN_DECLS
@@ -20,6 +21,8 @@ GList * eos_link_load_content    (EosLinkCategory  category);
 void    eos_app_load_screenshot  (GtkWidget       *image,
                                   const char      *path,
                                   int              width);
+
+GdkPixbuf *eos_link_get_favicon  (WebKitWebView *webview);
 
 G_END_DECLS
 

@@ -38,7 +38,7 @@ EosAppStorePrivate_1_0_gir_VERSION = 1.0
 EosAppStorePrivate_1_0_gir_LIBS = libeaprivate-1.0.la
 EosAppStorePrivate_1_0_gir_CFLAGS = $(AM_CPPFLAGS) $(eaprivate_cflags)
 EosAppStorePrivate_1_0_gir_SCANNERFLAGS = --warn-all --symbol-prefix=eos --identifier-prefix=Eos
-EosAppStorePrivate_1_0_gir_INCLUDES = Gtk-3.0 GMenu-3.0 Endless-0 Json-1.0
+EosAppStorePrivate_1_0_gir_INCLUDES = Gtk-3.0 GMenu-3.0 Endless-0 Json-1.0 WebKit2-3.0
 EosAppStorePrivate_1_0_gir_FILES = \
 	$(addprefix $(srcdir)/,$(eaprivate_source_h)) \
 	$(addprefix $(srcdir)/,$(eaprivate_source_c))

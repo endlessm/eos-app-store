@@ -270,3 +270,24 @@ eos_app_load_screenshot (GtkWidget  *image,
 
   g_object_unref (pixbuf);
 }
+
+/**
+ * eos_link_get_favicon:
+ *
+ * ...
+ *
+ * Returns: (transfer full): ...
+ */
+GdkPixbuf *
+eos_link_get_favicon (WebKitWebView *webview)
+{
+  cairo_surface_t *icon_surface = webkit_web_view_get_favicon (webview);
+  if (icon_surface == NULL)
+    return NULL;
+
+  gint favicon_width = cairo_image_surface_get_width (icon_surface);
+  gint favicon_height = cairo_image_surface_get_height (icon_surface);
+  GdkPixbuf *pixbuf = gdk_pixbuf_get_from_surface (icon_surface, 0, 0, favicon_width, favicon_height);
+
+  return pixbuf;
+}

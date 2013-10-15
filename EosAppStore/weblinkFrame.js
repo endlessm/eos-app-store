@@ -67,11 +67,6 @@ const NewSiteBox = new Lang.Class({
         this.add(this._mainBox);
         this._mainBox.show_all();
 
-        // https://bugzilla.gnome.org/show_bug.cgi?id=709056
-        let file = Gio.File.new_for_path(Path.ICONS_DIR + '/icon_website-symbolic.svg');
-        let gicon = new Gio.FileIcon({ file: file });
-        this._siteIcon.set_from_gicon(gicon, Gtk.IconSize.DND);
-
         this._createAlertIcons();
         this._switchAlertIcon(AlertIcon.NOTHING);
 
@@ -91,6 +86,8 @@ const NewSiteBox = new Lang.Class({
                                }));
 
         this._siteUrlFrame.add(this._urlEntry);
+
+        this._reset();
     },
 
     _createAlertIcons: function() {
@@ -112,6 +109,11 @@ const NewSiteBox = new Lang.Class({
         this._urlEntry.max_length = 0;
         this._urlEntry.halign = Gtk.Align.FILL;
         this._urlEntry.grab_focus();
+
+        // https://bugzilla.gnome.org/show_bug.cgi?id=709056
+        let file = Gio.File.new_for_path(Path.ICONS_DIR + '/icon_website-symbolic.svg');
+        let gicon = new Gio.FileIcon({ file: file });
+        this._siteIcon.set_from_gicon(gicon, Gtk.IconSize.DND);
     },
 
     _switchAlertIcon: function(newItem) {
@@ -195,12 +197,46 @@ const NewSiteBox = new Lang.Class({
     _onUrlEntryActivated: function() {
         if (!this._webView) {
             this._webView = new WebKit.WebView();
+            let context = this._webView.get_context();
+            let cachePath = GLib.build_filenamev([GLib.get_user_cache_dir(), 'eos-app-store']);
+            context.set_favicon_database_directory(cachePath);
             this._webView.connect('load-changed', Lang.bind(this, this._onLoadChanged));
             this._webView.connect('load-failed', Lang.bind(this, this._onLoadFailed));
+            this._webView.connect('notify::favicon', Lang.bind(this, this._onFaviconLoaded));
         }
         this._urlEntry.get_style_context().remove_class('url-entry-error');
         let url = this._urlEntry.get_text();
         this._webView.load_uri(url);
+    },
+
+    _onFaviconLoaded: function() {
+        let favicon = EosAppStorePrivate.link_get_favicon(this._webView);
+        if (favicon) {
+            let faviconWidth = favicon.width;
+            let faviconHeight = favicon.height;
+            let biggest = Math.max(faviconWidth, faviconHeight);
+
+            // If size is >66px, resize to 66px
+            if (faviconWidth > 66 || faviconHeight > 66) {
+                favicon = favicon.scale_simple(faviconWidth * 66 / biggest,
+                                               faviconHeight * 66 / biggest,
+                                               GdkPixbuf.InterpType.BILINEAR);
+                this._siteIcon.set_from_pixbuf(favicon);
+                return;
+            }
+
+            // If size is between [48px, 66px], resize to 48px
+            if (faviconWidth > 48 || faviconHeight > 48) {
+                favicon = favicon.scale_simple(faviconWidth * 48 / biggest,
+                                               faviconHeight * 48 / biggest,
+                                               GdkPixbuf.InterpType.BILINEAR);
+                this._siteIcon.set_from_pixbuf(favicon);
+                return;
+            }
+
+            // If size is <48px, keep as it is
+            this._siteIcon.set_from_pixbuf(favicon);
+        }
     },
 
     _onLoadChanged: function(webview, loadEvent) {
