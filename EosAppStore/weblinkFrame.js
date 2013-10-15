@@ -189,7 +189,7 @@ const NewSiteBox = new Lang.Class({
 
         let newSite = this._weblinkListModel.createWeblink(url, title, 'browser');
         this._weblinkListModel.update();
-        this._weblinkListModel.install(newSite);
+        this._weblinkListModel.install(newSite, function() {});
 
         this._showInstalledMessage();
     },
@@ -470,7 +470,7 @@ const WeblinkListBoxRow = new Lang.Class({
         }
 
         let site = this._model.createWeblink(url, title, icon);
-        this._model.install(site);
+        this._model.install(site, function() {});
 
         this._showInstalledMessage();
     },
