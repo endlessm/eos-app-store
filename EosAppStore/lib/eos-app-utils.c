@@ -281,6 +281,8 @@ eos_app_load_screenshot (GtkWidget  *image,
 GdkPixbuf *
 eos_link_get_favicon (WebKitWebView *webview)
 {
+  GdkPixbuf *dest;
+
   cairo_surface_t *icon_surface = webkit_web_view_get_favicon (webview);
   if (icon_surface == NULL)
     return NULL;
@@ -289,5 +291,37 @@ eos_link_get_favicon (WebKitWebView *webview)
   gint favicon_height = cairo_image_surface_get_height (icon_surface);
   GdkPixbuf *pixbuf = gdk_pixbuf_get_from_surface (icon_surface, 0, 0, favicon_width, favicon_height);
 
-  return pixbuf;
+  gint biggest =  MAX (favicon_width, favicon_height);
+
+  /* If size is > 64px, resize it to 64px */
+  if (favicon_width > 64 || favicon_height > 64) {
+    dest = gdk_pixbuf_scale_simple (pixbuf,
+                                    favicon_width * 64 / biggest,
+                                    favicon_height * 64 / biggest,
+                                    GDK_INTERP_BILINEAR);
+    g_object_unref (pixbuf);
+    return dest;
+  }
+
+  /* If size is between [48px, 64px], resize it to 48px, otherwise
+     keep the same size. But as the holder for the icon in the shell
+     is 64x64, and shell scales the desktop icons, let's put the icon
+     inside a canvas of 64x64, so the shell does not scale it */
+  dest = gdk_pixbuf_new (GDK_COLORSPACE_RGB,
+                         gdk_pixbuf_get_has_alpha (pixbuf),
+                         gdk_pixbuf_get_bits_per_sample (pixbuf),
+                         64, 64);
+  gdk_pixbuf_fill (dest, 0);
+
+  if (favicon_width > 48 || favicon_height > 48) {
+    gdouble offset = (double) 48 / biggest;
+    gdk_pixbuf_scale (pixbuf, dest, 8, 8, 48, 48, 8, 8, offset, offset, GDK_INTERP_BILINEAR);
+  } else {
+    gint offset_x = (64 - favicon_width) / 2;
+    gint offset_y = (64 - favicon_height) / 2;
+    gdk_pixbuf_scale (pixbuf, dest, offset_x, offset_y, favicon_width, favicon_height, offset_x, offset_y, 1, 1, GDK_INTERP_BILINEAR);
+  }
+
+  g_object_unref (pixbuf);
+  return dest;
 }

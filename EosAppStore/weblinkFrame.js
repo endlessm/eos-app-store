@@ -219,31 +219,8 @@ const NewSiteBox = new Lang.Class({
     _onFaviconLoaded: function() {
         let favicon = EosAppStorePrivate.link_get_favicon(this._webView);
         if (favicon) {
-            let faviconWidth = favicon.width;
-            let faviconHeight = favicon.height;
-            let biggest = Math.max(faviconWidth, faviconHeight);
-
-            // If size is >66px, resize to 66px
-            if (faviconWidth > 66 || faviconHeight > 66) {
-                this._sitePixbuf = favicon.scale_simple(faviconWidth * 66 / biggest,
-                                                        faviconHeight * 66 / biggest,
-                                                        GdkPixbuf.InterpType.BILINEAR);
-                this._siteIcon.set_from_pixbuf(this._sitePixbuf);
-                return;
-            }
-
-            // If size is between [48px, 66px], resize to 48px
-            if (faviconWidth > 48 || faviconHeight > 48) {
-                this._sitePixbuf = favicon = favicon.scale_simple(faviconWidth * 48 / biggest,
-                                                                  faviconHeight * 48 / biggest,
-                                                                  GdkPixbuf.InterpType.BILINEAR);
-                this._siteIcon.set_from_pixbuf(this._sitePixbuf);
-                return;
-            }
-
-            // If size is <48px, keep as it is
             this._sitePixbuf = favicon;
-            this._siteIcon.set_from_pixbuf(this._sitePixbuf);
+            this._siteIcon.set_from_pixbuf(favicon);
         }
     },
 
