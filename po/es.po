@@ -1,21 +1,698 @@
-# Spanish translations for the Endless OS App Store
-# Copyright (C) 2012 Endless Mobile
-# This file is distributed under the same license as the Endless OS Desktop package.
-# Automatically generated, 2012
-#
+# Translations for the Endless OS App Store
+# Copyright (C) 2013 Endless Mobile
+# This file is distributed under the same license as the Endless OS App Store package.
+# 
+# Translators:
+# Automatically generated, 2012-2013
+# endlessmobile <n@endlessm.com>, 2013
+# endlessmobile <n@endlessm.com>, 2013
+# joelmx <joel@endlessm.com>, 2013
+# joelmx <joel@endlessm.com>, 2013
+# rshuler <roddy@endlessm.com>, 2013
 msgid ""
 msgstr ""
-"Project-Id-Version: dev 1\n"
+"Project-Id-Version: eos-app-store\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-10-02 14:22-0700\n"
-"PO-Revision-Date: 2012-05-31 11:54-0500\n"
-"Last-Translator: Automatically generated\n"
-"Language-Team: none\n"
-"Language: es\n"
+"POT-Creation-Date: 2013-10-16 22:45-0700\n"
+"PO-Revision-Date: 2013-10-17 14:08+0000\n"
+"Last-Translator: joelmx <joel@endlessm.com>\n"
+"Language-Team: Spanish (http://www.transifex.com/projects/p/teams/language/es/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=2; plural=(n > 1);\n"
+"Language: es\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#. Extracted from Default/apps/content.json
+#: ../content/Default/apps/content.json.h:4
+#: ../content/Default/links/content.json.h:4
+msgctxt "title"
+msgid "Freecell"
+msgstr ""
+
+#: ../content/Default/apps/content.json.h:5
+#: ../content/Default/links/content.json.h:5
+msgctxt "subtitle"
+msgid "Freecell"
+msgstr ""
+
+#: ../content/Default/apps/content.json.h:9
+#: ../content/Default/links/content.json.h:9
+msgctxt "title"
+msgid "Sudoku"
+msgstr ""
+
+#: ../content/Default/apps/content.json.h:10
+#: ../content/Default/links/content.json.h:10
+msgctxt "subtitle"
+msgid "Puzzle game"
+msgstr ""
+
+#: ../content/Default/apps/content.json.h:14
+#: ../content/Default/links/content.json.h:14
+msgctxt "title"
+msgid "Khan Academy"
+msgstr ""
+
+#: ../content/Default/apps/content.json.h:15
+#: ../content/Default/links/content.json.h:15
+msgctxt "subtitle"
+msgid "Learn almost anything for free"
+msgstr ""
+
+#: ../content/Default/apps/content.json.h:19
+#: ../content/Default/links/content.json.h:19
+msgctxt "title"
+msgid "Dictionary"
+msgstr ""
+
+#: ../content/Default/apps/content.json.h:20
+#: ../content/Default/links/content.json.h:20
+msgctxt "subtitle"
+msgid "GoldenDict"
+msgstr ""
+
+#: ../content/Default/apps/content.json.h:26
+#: ../content/Default/links/content.json.h:26
+msgctxt "title"
+msgid "Wikipedia"
+msgstr ""
+
+#: ../content/Default/apps/content.json.h:27
+#: ../content/Default/links/content.json.h:27
+msgctxt "subtitle"
+msgid "The free encyclopedia"
+msgstr ""
+
+#: ../content/Default/apps/content.json.h:31
+#: ../content/Default/links/content.json.h:31
+msgctxt "title"
+msgid "Skype"
+msgstr ""
+
+#: ../content/Default/apps/content.json.h:32
+#: ../content/Default/links/content.json.h:32
+msgctxt "subtitle"
+msgid "Internet calls and chat"
+msgstr ""
+
+#: ../content/Default/apps/content.json.h:36
+#: ../content/Default/links/content.json.h:36
+msgctxt "title"
+msgid "Armagetron"
+msgstr ""
+
+#: ../content/Default/apps/content.json.h:37
+#: ../content/Default/links/content.json.h:37
+msgctxt "subtitle"
+msgid "Multiplayer game"
+msgstr ""
+
+#: ../content/Default/apps/content.json.h:41
+#: ../content/Default/links/content.json.h:41
+msgctxt "title"
+msgid "Audio Editor"
+msgstr ""
+
+#: ../content/Default/apps/content.json.h:42
+#: ../content/Default/links/content.json.h:42
+msgctxt "subtitle"
+msgid "Record and edit sounds"
+msgstr ""
+
+#: ../content/Default/apps/content.json.h:43
+#: ../content/Default/apps/content.json.h:234
+#: ../content/Default/apps/content.json.h:237
+#: ../content/Default/apps/content.json.h:240
+#: ../content/Default/links/content.json.h:43
+#: ../content/Default/links/content.json.h:234
+#: ../content/Default/links/content.json.h:237
+#: ../content/Default/links/content.json.h:240
+msgctxt "description"
+msgid ""
+"Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod "
+"tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam,"
+" quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo "
+"consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse "
+"cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat "
+"non proident, sunt in culpa qui officia deserunt mollit anim id est laborum."
+msgstr ""
+
+#: ../content/Default/apps/content.json.h:44
+#: ../content/Default/links/content.json.h:44
+msgctxt "title"
+msgid "Billiards"
+msgstr "Billar"
+
+#: ../content/Default/apps/content.json.h:45
+#: ../content/Default/links/content.json.h:45
+msgctxt "subtitle"
+msgid "Billiard game"
+msgstr ""
+
+#: ../content/Default/apps/content.json.h:49
+#: ../content/Default/links/content.json.h:49
+msgctxt "title"
+msgid "BlockOut 2"
+msgstr ""
+
+#: ../content/Default/apps/content.json.h:50
+#: ../content/Default/links/content.json.h:50
+msgctxt "subtitle"
+msgid "3D Tetris-style game"
+msgstr ""
+
+#: ../content/Default/apps/content.json.h:56
+#: ../content/Default/links/content.json.h:56
+msgctxt "title"
+msgid "Chromium BSU"
+msgstr ""
+
+#: ../content/Default/apps/content.json.h:57
+#: ../content/Default/links/content.json.h:57
+msgctxt "subtitle"
+msgid "Space shooting game"
+msgstr ""
+
+#: ../content/Default/apps/content.json.h:61
+#: ../content/Default/links/content.json.h:61
+msgctxt "title"
+msgid "Learn English"
+msgstr ""
+
+#: ../content/Default/apps/content.json.h:62
+#: ../content/Default/links/content.json.h:62
+msgctxt "subtitle"
+msgid "Have fun learning English!"
+msgstr ""
+
+#: ../content/Default/apps/content.json.h:68
+#: ../content/Default/links/content.json.h:68
+msgctxt "title"
+msgid "E-mail"
+msgstr ""
+
+#: ../content/Default/apps/content.json.h:69
+#: ../content/Default/links/content.json.h:69
+msgctxt "subtitle"
+msgid "E-mail"
+msgstr ""
+
+#: ../content/Default/apps/content.json.h:75
+#: ../content/Default/links/content.json.h:75
+msgctxt "title"
+msgid "Media Download"
+msgstr ""
+
+#: ../content/Default/apps/content.json.h:76
+#: ../content/Default/links/content.json.h:76
+msgctxt "subtitle"
+msgid "File sharing"
+msgstr ""
+
+#: ../content/Default/apps/content.json.h:82
+#: ../content/Default/links/content.json.h:82
+msgctxt "title"
+msgid "Calculator"
+msgstr ""
+
+#: ../content/Default/apps/content.json.h:83
+#: ../content/Default/links/content.json.h:83
+msgctxt "subtitle"
+msgid "Calculator"
+msgstr ""
+
+#: ../content/Default/apps/content.json.h:89
+#: ../content/Default/links/content.json.h:89
+msgctxt "title"
+msgid "EduGames"
+msgstr ""
+
+#: ../content/Default/apps/content.json.h:90
+#: ../content/Default/links/content.json.h:90
+msgctxt "subtitle"
+msgid "Childrens games"
+msgstr ""
+
+#: ../content/Default/apps/content.json.h:96
+#: ../content/Default/links/content.json.h:96
+msgctxt "title"
+msgid "GIMP"
+msgstr ""
+
+#: ../content/Default/apps/content.json.h:97
+#: ../content/Default/links/content.json.h:97
+msgctxt "subtitle"
+msgid "Photo Editor"
+msgstr ""
+
+#: ../content/Default/apps/content.json.h:103
+#: ../content/Default/links/content.json.h:103
+msgctxt "title"
+msgid "Math"
+msgstr ""
+
+#: ../content/Default/apps/content.json.h:104
+#: ../content/Default/links/content.json.h:104
+msgctxt "subtitle"
+msgid "Mathematics Tool"
+msgstr ""
+
+#: ../content/Default/apps/content.json.h:110
+#: ../content/Default/links/content.json.h:110
+msgctxt "title"
+msgid "Kobo Deluxe"
+msgstr ""
+
+#: ../content/Default/apps/content.json.h:111
+#: ../content/Default/links/content.json.h:111
+msgctxt "subtitle"
+msgid "Destroy enemy bases in space"
+msgstr ""
+
+#: ../content/Default/apps/content.json.h:117
+#: ../content/Default/links/content.json.h:117
+msgctxt "title"
+msgid "Breakout"
+msgstr ""
+
+#: ../content/Default/apps/content.json.h:118
+#: ../content/Default/links/content.json.h:118
+msgctxt "subtitle"
+msgid "LBreakout2 game"
+msgstr ""
+
+#: ../content/Default/apps/content.json.h:124
+#: ../content/Default/links/content.json.h:124
+msgctxt "title"
+msgid "Spreadsheet"
+msgstr ""
+
+#: ../content/Default/apps/content.json.h:125
+#: ../content/Default/links/content.json.h:125
+msgctxt "subtitle"
+msgid "Spreadsheet"
+msgstr ""
+
+#: ../content/Default/apps/content.json.h:131
+#: ../content/Default/links/content.json.h:131
+msgctxt "title"
+msgid "Presentation"
+msgstr ""
+
+#: ../content/Default/apps/content.json.h:132
+#: ../content/Default/links/content.json.h:132
+msgctxt "subtitle"
+msgid "Presentation"
+msgstr ""
+
+#: ../content/Default/apps/content.json.h:138
+#: ../content/Default/links/content.json.h:138
+msgctxt "title"
+msgid "Writer"
+msgstr ""
+
+#: ../content/Default/apps/content.json.h:139
+#: ../content/Default/links/content.json.h:139
+msgctxt "subtitle"
+msgid "Writer"
+msgstr ""
+
+#: ../content/Default/apps/content.json.h:145
+#: ../content/Default/links/content.json.h:145
+msgctxt "title"
+msgid "Physics"
+msgstr ""
+
+#: ../content/Default/apps/content.json.h:146
+#: ../content/Default/links/content.json.h:146
+msgctxt "subtitle"
+msgid "Harness gravity with your crayon"
+msgstr ""
+
+#: ../content/Default/apps/content.json.h:152
+#: ../content/Default/links/content.json.h:152
+msgctxt "title"
+msgid "Open Arena"
+msgstr ""
+
+#: ../content/Default/apps/content.json.h:153
+#: ../content/Default/links/content.json.h:153
+msgctxt "subtitle"
+msgid "First person shooter"
+msgstr ""
+
+#: ../content/Default/apps/content.json.h:157
+#: ../content/Default/links/content.json.h:157
+msgctxt "title"
+msgid "Photo Editor"
+msgstr ""
+
+#: ../content/Default/apps/content.json.h:158
+#: ../content/Default/links/content.json.h:158
+msgctxt "subtitle"
+msgid "Edit, filter and share your images"
+msgstr ""
+
+#: ../content/Default/apps/content.json.h:162
+#: ../content/Default/links/content.json.h:162
+msgctxt "title"
+msgid "Pingus"
+msgstr ""
+
+#: ../content/Default/apps/content.json.h:163
+#: ../content/Default/links/content.json.h:163
+msgctxt "subtitle"
+msgid "A journey into the unknown"
+msgstr ""
+
+#: ../content/Default/apps/content.json.h:167
+#: ../content/Default/links/content.json.h:167
+msgctxt "title"
+msgid "Music"
+msgstr ""
+
+#: ../content/Default/apps/content.json.h:168
+#: ../content/Default/links/content.json.h:168
+msgctxt "subtitle"
+msgid "Music player and radio"
+msgstr ""
+
+#: ../content/Default/apps/content.json.h:172
+#: ../content/Default/links/content.json.h:172
+msgctxt "title"
+msgid "Photos"
+msgstr ""
+
+#: ../content/Default/apps/content.json.h:173
+#: ../content/Default/links/content.json.h:173
+msgctxt "subtitle"
+msgid "Photo viewer and organizer"
+msgstr ""
+
+#: ../content/Default/apps/content.json.h:177
+#: ../content/Default/links/content.json.h:177
+msgctxt "title"
+msgid "Solitaire"
+msgstr ""
+
+#: ../content/Default/apps/content.json.h:178
+#: ../content/Default/links/content.json.h:178
+msgctxt "subtitle"
+msgid "Card game"
+msgstr ""
+
+#: ../content/Default/apps/content.json.h:182
+#: ../content/Default/links/content.json.h:182
+msgctxt "title"
+msgid "Stellarium"
+msgstr ""
+
+#: ../content/Default/apps/content.json.h:183
+#: ../content/Default/links/content.json.h:183
+msgctxt "subtitle"
+msgid "Look up at the stars!"
+msgstr ""
+
+#: ../content/Default/apps/content.json.h:187
+#: ../content/Default/links/content.json.h:187
+msgctxt "title"
+msgid "Super Tux"
+msgstr ""
+
+#: ../content/Default/apps/content.json.h:188
+#: ../content/Default/links/content.json.h:188
+msgctxt "subtitle"
+msgid "Super Tux"
+msgstr ""
+
+#: ../content/Default/apps/content.json.h:192
+#: ../content/Default/links/content.json.h:192
+msgctxt "title"
+msgid "Tux Kart"
+msgstr ""
+
+#: ../content/Default/apps/content.json.h:193
+#: ../content/Default/links/content.json.h:193
+msgctxt "subtitle"
+msgid "Racing game"
+msgstr ""
+
+#: ../content/Default/apps/content.json.h:197
+#: ../content/Default/links/content.json.h:197
+msgctxt "title"
+msgid "Teeworlds"
+msgstr ""
+
+#: ../content/Default/apps/content.json.h:198
+#: ../content/Default/links/content.json.h:198
+msgctxt "subtitle"
+msgid "Multiplayer shooting game"
+msgstr ""
+
+#: ../content/Default/apps/content.json.h:202
+#: ../content/Default/links/content.json.h:202
+msgctxt "title"
+msgid "Videos"
+msgstr ""
+
+#: ../content/Default/apps/content.json.h:203
+#: ../content/Default/links/content.json.h:203
+msgctxt "subtitle"
+msgid "Video player"
+msgstr ""
+
+#: ../content/Default/apps/content.json.h:207
+#: ../content/Default/links/content.json.h:207
+msgctxt "title"
+msgid "Translate"
+msgstr ""
+
+#: ../content/Default/apps/content.json.h:208
+#: ../content/Default/links/content.json.h:208
+msgctxt "subtitle"
+msgid "Translate"
+msgstr ""
+
+#: ../content/Default/apps/content.json.h:212
+#: ../content/Default/links/content.json.h:212
+msgctxt "title"
+msgid "123 Tux"
+msgstr ""
+
+#: ../content/Default/apps/content.json.h:213
+#: ../content/Default/links/content.json.h:213
+msgctxt "subtitle"
+msgid "Math games"
+msgstr ""
+
+#: ../content/Default/apps/content.json.h:217
+#: ../content/Default/links/content.json.h:217
+msgctxt "title"
+msgid "Tux Typing"
+msgstr ""
+
+#: ../content/Default/apps/content.json.h:218
+#: ../content/Default/apps/content.json.h:242
+#: ../content/Default/links/content.json.h:218
+#: ../content/Default/links/content.json.h:242
+msgctxt "subtitle"
+msgid "Learn to type"
+msgstr ""
+
+#: ../content/Default/apps/content.json.h:222
+#: ../content/Default/links/content.json.h:222
+msgctxt "title"
+msgid "Weather"
+msgstr ""
+
+#: ../content/Default/apps/content.json.h:223
+#: ../content/Default/links/content.json.h:223
+msgctxt "subtitle"
+msgid "See the weather forecast"
+msgstr ""
+
+#: ../content/Default/apps/content.json.h:227
+#: ../content/Default/links/content.json.h:227
+msgctxt "title"
+msgid "YouTube"
+msgstr ""
+
+#: ../content/Default/apps/content.json.h:228
+#: ../content/Default/links/content.json.h:228
+msgctxt "subtitle"
+msgid "Watch videos and series"
+msgstr ""
+
+#: ../content/Default/apps/content.json.h:232
+#: ../content/Default/links/content.json.h:232
+msgctxt "title"
+msgid "Brazil"
+msgstr ""
+
+#: ../content/Default/apps/content.json.h:233
+#: ../content/Default/links/content.json.h:233
+msgctxt "subtitle"
+msgid "Learn more about brazilian culture"
+msgstr ""
+
+#: ../content/Default/apps/content.json.h:235
+#: ../content/Default/links/content.json.h:235
+msgctxt "title"
+msgid "Health"
+msgstr ""
+
+#: ../content/Default/apps/content.json.h:236
+#: ../content/Default/links/content.json.h:236
+msgctxt "subtitle"
+msgid "Information about health"
+msgstr ""
+
+#: ../content/Default/apps/content.json.h:238
+#: ../content/Default/links/content.json.h:238
+msgctxt "title"
+msgid "Coding Fun"
+msgstr ""
+
+#: ../content/Default/apps/content.json.h:239
+#: ../content/Default/links/content.json.h:239
+msgctxt "subtitle"
+msgid "Learn to code"
+msgstr ""
+
+#: ../content/Default/apps/content.json.h:241
+#: ../content/Default/links/content.json.h:241
+msgctxt "title"
+msgid "Typing"
+msgstr ""
+
+#: ../content/Default/apps/content.json.h:246
+#: ../content/Default/links/content.json.h:246
+msgctxt "title"
+msgid "R?sum?"
+msgstr ""
+
+#: ../content/Default/apps/content.json.h:247
+#: ../content/Default/links/content.json.h:247
+msgctxt "subtitle"
+msgid "Write a r?sum?"
+msgstr ""
+
+#: ../content/Default/apps/content.json.h:248
+#: ../content/Default/apps/content.json.h:147
+#: ../content/Default/apps/content.json.h:140
+#: ../content/Default/apps/content.json.h:133
+#: ../content/Default/apps/content.json.h:126
+#: ../content/Default/apps/content.json.h:119
+#: ../content/Default/apps/content.json.h:112
+#: ../content/Default/apps/content.json.h:105
+#: ../content/Default/apps/content.json.h:98
+#: ../content/Default/apps/content.json.h:91
+#: ../content/Default/apps/content.json.h:84
+#: ../content/Default/apps/content.json.h:77
+#: ../content/Default/apps/content.json.h:70
+#: ../content/Default/apps/content.json.h:63
+#: ../content/Default/apps/content.json.h:58
+#: ../content/Default/apps/content.json.h:51
+#: ../content/Default/apps/content.json.h:46
+#: ../content/Default/apps/content.json.h:38
+#: ../content/Default/apps/content.json.h:33
+#: ../content/Default/apps/content.json.h:28
+#: ../content/Default/apps/content.json.h:21
+#: ../content/Default/apps/content.json.h:16
+#: ../content/Default/links/content.json.h:248
+#: ../content/Default/links/content.json.h:147
+#: ../content/Default/links/content.json.h:140
+#: ../content/Default/links/content.json.h:133
+#: ../content/Default/links/content.json.h:126
+#: ../content/Default/links/content.json.h:119
+#: ../content/Default/links/content.json.h:112
+#: ../content/Default/links/content.json.h:105
+#: ../content/Default/links/content.json.h:98
+#: ../content/Default/links/content.json.h:91
+#: ../content/Default/links/content.json.h:84
+#: ../content/Default/links/content.json.h:77
+#: ../content/Default/links/content.json.h:70
+#: ../content/Default/links/content.json.h:63
+#: ../content/Default/links/content.json.h:58
+#: ../content/Default/links/content.json.h:51
+#: ../content/Default/links/content.json.h:46
+#: ../content/Default/links/content.json.h:38
+#: ../content/Default/links/content.json.h:33
+#: ../content/Default/links/content.json.h:28
+#: ../content/Default/links/content.json.h:21
+#: ../content/Default/links/content.json.h:16
+msgctxt "description"
+msgid ""
+"Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nam egestas, justo "
+"vel aliquam commodo, sapien orci dictum turpis, nec venenatis ligula orci ut"
+" tellus. Suspendisse potenti. Nam tincidunt varius eros id adipiscing. Nunc "
+"venenatis luctus mollis. Maecenas ornare arcu ut quam mattis laoreet. Nulla "
+"et eleifend velit. Mauris quis mi consequat, elementum felis et, commodo "
+"lacus. Sed vitae porta mi. Duis euismod rhoncus quam, sed pharetra risus "
+"placerat sit amet."
+msgstr ""
+
+#: ../content/Default/apps/content.json.h:243
+#: ../content/Default/apps/content.json.h:229
+#: ../content/Default/apps/content.json.h:224
+#: ../content/Default/apps/content.json.h:219
+#: ../content/Default/apps/content.json.h:214
+#: ../content/Default/apps/content.json.h:209
+#: ../content/Default/apps/content.json.h:204
+#: ../content/Default/apps/content.json.h:199
+#: ../content/Default/apps/content.json.h:194
+#: ../content/Default/apps/content.json.h:189
+#: ../content/Default/apps/content.json.h:184
+#: ../content/Default/apps/content.json.h:179
+#: ../content/Default/apps/content.json.h:174
+#: ../content/Default/apps/content.json.h:169
+#: ../content/Default/apps/content.json.h:164
+#: ../content/Default/apps/content.json.h:159
+#: ../content/Default/apps/content.json.h:154
+#: ../content/Default/links/content.json.h:243
+#: ../content/Default/links/content.json.h:229
+#: ../content/Default/links/content.json.h:224
+#: ../content/Default/links/content.json.h:219
+#: ../content/Default/links/content.json.h:214
+#: ../content/Default/links/content.json.h:209
+#: ../content/Default/links/content.json.h:204
+#: ../content/Default/links/content.json.h:199
+#: ../content/Default/links/content.json.h:194
+#: ../content/Default/links/content.json.h:189
+#: ../content/Default/links/content.json.h:184
+#: ../content/Default/links/content.json.h:179
+#: ../content/Default/links/content.json.h:174
+#: ../content/Default/links/content.json.h:169
+#: ../content/Default/links/content.json.h:164
+#: ../content/Default/links/content.json.h:159
+#: ../content/Default/links/content.json.h:154
+msgctxt "description"
+msgid ""
+"Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut dapibus porta "
+"ipsum, ac semper ligula malesuada vitae. Nulla sit amet rutrum eros. Aenean "
+"eu congue arcu. In ullamcorper vitae felis non vehicula. Class aptent taciti"
+" sociosqu ad litora torquent per conubia nostra, per inceptos himenaeos. "
+"Mauris rutrum rhoncus lacus, vitae facilisis purus fermentum ut. In "
+"consectetur convallis dictum."
+msgstr ""
+
+#: ../content/Default/apps/content.json.h:11
+#: ../content/Default/apps/content.json.h:6
+#: ../content/Default/links/content.json.h:11
+#: ../content/Default/links/content.json.h:6
+msgctxt "description"
+msgid ""
+"Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed tincidunt "
+"ornare enim, sit amet hendrerit felis dictum vel. Nam lorem purus, placerat "
+"sed turpis eget, sollicitudin tincidunt quam. Vestibulum venenatis eu neque "
+"at imperdiet. Sed imperdiet tincidunt nibh, a varius massa commodo vitae. "
+"Aenean adipiscing tellus vel metus scelerisque, nec facilisis urna "
+"facilisis. Quisque vestibulum convallis fringilla. Aliquam velit ipsum, "
+"rutrum ornare nisl sit amet, fringilla vulputate nulla. Donec sed dignissim "
+"felis. Aliquam erat volutpat. Vestibulum sed mauris id ante interdum ornare "
+"sit amet sed mauris. Duis rhoncus neque a iaculis consectetur."
+msgstr ""
 
 #: ../data/eos-app-store.desktop.in.h:1
 msgid "Add"
@@ -23,114 +700,132 @@ msgstr "Agregar"
 
 #: ../data/eos-app-store-folder-frame.ui.h:1
 msgid "Select an icon"
-msgstr ""
+msgstr "Selecciona un ícono"
 
-#: ../data/eos-app-store-list-row.ui.h:1 ../EosAppStore/appFrame.js:81
-msgid "INSTALL"
-msgstr ""
+#: ../data/eos-app-store-list-row.ui.h:1 ../EosAppStore/appFrame.js:177
+msgid "Install application"
+msgstr "Instalar aplicación"
+
+#: ../data/eos-app-store-list-row.ui.h:2
+msgid "Installing"
+msgstr "Instalando"
+
+#: ../data/eos-app-store-list-row.ui.h:3
+msgid "Installed successfully"
+msgstr "Instalada exitosamnte"
+
+#: ../data/eos-app-store-list-row.ui.h:4
+msgid "Remove application"
+msgstr "Eliminar aplicación"
 
 #: ../data/eos-app-store-main-window.ui.h:1
 msgid "Applications"
-msgstr ""
+msgstr "Aplicaciones"
 
 #: ../data/eos-app-store-main-window.ui.h:2
 msgid "Websites"
-msgstr ""
+msgstr "Sitios Web"
 
 #: ../data/eos-app-store-main-window.ui.h:3
 msgid "Folders"
-msgstr ""
+msgstr "Carpetas"
 
 #: ../data/eos-app-store-weblink-new-site-frame.ui.h:1
-#: ../EosAppStore/weblinkFrame.js:99
+#: ../EosAppStore/weblinkFrame.js:110
 msgid "e.g.: http://www.globoesporte.com"
-msgstr ""
+msgstr "ej.: http://www.globoesporte.com"
 
-#: ../EosAppStore/appFrame.js:76
-msgid "UNINSTALL"
-msgstr ""
+#: ../EosAppStore/appFrame.js:182
+msgid "Update application"
+msgstr "Actualizar aplicación"
 
-#: ../EosAppStore/appFrame.js:86
-msgid "UPDATE"
-msgstr ""
-
-#: ../EosAppStore/appFrame.js:126
+#: ../EosAppStore/appFrame.js:251
 msgid "Featured"
-msgstr ""
+msgstr "Destacados"
 
 #. Translators: use the same string used to install the app store content JSON
-#: ../EosAppStore/appFrame.js:132 ../EosAppStore/lib/eos-app-info.c:601
+#: ../EosAppStore/appFrame.js:257 ../EosAppStore/lib/eos-app-info.c:801
 msgid "Education"
-msgstr ""
+msgstr "Educación"
 
-#: ../EosAppStore/appFrame.js:138 ../EosAppStore/lib/eos-app-info.c:602
+#: ../EosAppStore/appFrame.js:263 ../EosAppStore/lib/eos-app-info.c:802
 msgid "Leisure"
-msgstr ""
+msgstr "Ocio"
 
-#: ../EosAppStore/appFrame.js:144 ../EosAppStore/lib/eos-app-info.c:603
+#: ../EosAppStore/appFrame.js:269 ../EosAppStore/lib/eos-app-info.c:803
 msgid "Utilities"
-msgstr ""
+msgstr "Utilidades"
 
-#: ../EosAppStore/appStore.js:45
+#: ../EosAppStore/appFrame.js:275
+msgid "My applications"
+msgstr "Mis aplicaciones"
+
+#: ../EosAppStore/appStore.js:46
 msgid "Application Store"
-msgstr ""
+msgstr "Tienda de Aplicaciones"
 
-#: ../EosAppStore/appStoreWindow.js:319
+#: ../EosAppStore/appStoreWindow.js:342
 msgid "Install applications"
-msgstr ""
+msgstr "Instalar aplicaciones"
 
-#: ../EosAppStore/appStoreWindow.js:323
+#: ../EosAppStore/appStoreWindow.js:346
 msgid "Install websites"
-msgstr ""
+msgstr "Instalar sitios web"
 
-#: ../EosAppStore/appStoreWindow.js:327
+#: ../EosAppStore/appStoreWindow.js:350
 msgid "Install folders"
-msgstr ""
+msgstr "Instalar carpetas."
 
-#: ../EosAppStore/folderFrame.js:41
+#: ../EosAppStore/folderFrame.js:42
 msgid "Name of folder"
-msgstr ""
+msgstr "Nombre de carpeta"
 
-#: ../EosAppStore/folderFrame.js:69
+#: ../EosAppStore/folderFrame.js:70
 msgid "Folder added!"
-msgstr ""
+msgstr "Carpeta agregada!"
 
-#: ../EosAppStore/weblinkFrame.js:68
+#: ../EosAppStore/weblinkFrame.js:79
 msgid "Write the site address you want to add"
-msgstr ""
+msgstr "Escribe el sitio web que deseas agregar"
 
-#: ../EosAppStore/weblinkFrame.js:153 ../EosAppStore/weblinkFrame.js:281
+#: ../EosAppStore/weblinkFrame.js:164 ../EosAppStore/weblinkFrame.js:415
 msgid "added successfully!"
-msgstr ""
+msgstr "agregado exitosamente!"
 
-#: ../EosAppStore/weblinkFrame.js:199
+#: ../EosAppStore/weblinkFrame.js:210
 msgid "searching"
-msgstr ""
+msgstr "buscando"
 
-#: ../EosAppStore/weblinkFrame.js:215
+#: ../EosAppStore/weblinkFrame.js:226
 msgid "The address written does not exist or is not available."
-msgstr ""
+msgstr "El sitio web no existe, está incorrecto o no está disponible."
 
-#: ../EosAppStore/weblinkFrame.js:355
+#: ../EosAppStore/weblinkFrame.js:500
 msgid "News"
-msgstr ""
+msgstr "Noticias"
 
-#: ../EosAppStore/weblinkFrame.js:361
+#: ../EosAppStore/weblinkFrame.js:506
 msgid "Sports"
-msgstr ""
+msgstr "Deportes"
 
-#: ../EosAppStore/weblinkFrame.js:367
+#: ../EosAppStore/weblinkFrame.js:512
 msgid "Education and Health"
-msgstr ""
+msgstr "Educación y Salud"
 
-#: ../EosAppStore/weblinkFrame.js:373
+#: ../EosAppStore/weblinkFrame.js:518
 msgid "Entertainment"
-msgstr ""
+msgstr "Entretenimiento"
 
-#: ../EosAppStore/weblinkFrame.js:379
+#: ../EosAppStore/weblinkFrame.js:524
 msgid "Local"
-msgstr ""
+msgstr "Local"
 
-#: ../EosAppStore/weblinkFrame.js:385
-msgid "Opportunities"
-msgstr ""
+#: ../EosAppStore/lib/eos-app-list-model.c:621
+#, c-format
+msgid "Application %s already installed"
+msgstr "La aplicación %s ya está instalada"
+
+#: ../EosAppStore/lib/eos-app-list-model.c:708
+#, c-format
+msgid "Application %s is not installed"
+msgstr "La aplicación %s no está instalada"
