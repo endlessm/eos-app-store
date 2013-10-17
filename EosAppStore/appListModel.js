@@ -263,21 +263,21 @@ const WeblinkList = new Lang.Class({
         return this._weblinks;
     },
 
-    _getAvailableFreeName: function(path, prefix, name, suffix) {
+    _getAvailableFilename: function(path, prefix, name, suffix) {
         let filename = prefix + name;
 
         // Append a number until we find a free slot
         let availableFilename = filename + suffix;
-        let availableFullFilename = GLib.build_filenamev([path, availableFilename]);
+        let availablePath = GLib.build_filenamev([path, availableFilename]);
         let i = 0;
 
-        while (GLib.file_test(availableFullFilename, GLib.FileTest.EXISTS)) {
+        while (GLib.file_test(availablePath, GLib.FileTest.EXISTS)) {
             i++;
             availableFilename = filename + '-' + i + suffix;
-            availableFullFilename = GLib.build_filenamev([path, availableFilename]);
+            availablePath = GLib.build_filenamev([path, availableFilename]);
         }
 
-        return availableFullFilename;
+        return availablePath;
     },
 
     // FIXME: this should use the linkId as provided by the CMS.
@@ -305,7 +305,7 @@ const WeblinkList = new Lang.Class({
         }
 
         let path = GLib.build_filenamev([GLib.get_user_data_dir(), 'applications']);
-        let availableFullFilename = this._getAvailableFreeName(path, 'eos-link-', filename, '.desktop');
+        let availableFullFilename = this._getAvailableFilename(path, 'eos-link-', filename, '.desktop');
 
         desktop.set_string(GLib.KEY_FILE_DESKTOP_GROUP, GLib.KEY_FILE_DESKTOP_KEY_VERSION, '1.0');
         desktop.set_string(GLib.KEY_FILE_DESKTOP_GROUP, GLib.KEY_FILE_DESKTOP_KEY_TYPE, 'Application');
@@ -322,7 +322,7 @@ const WeblinkList = new Lang.Class({
 
     saveIcon: function(pixbuf) {
         let path = GLib.build_filenamev([GLib.get_user_data_dir(), 'applications']);
-        let iconFilename = this._getAvailableFreeName(path, 'eos-link-', 'icon', '.png');
+        let iconFilename = this._getAvailableFilename(path, 'eos-link-', 'icon', '.png');
         this._model.save_icon(pixbuf, iconFilename, 'png');
         return iconFilename;
     },

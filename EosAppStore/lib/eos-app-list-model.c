@@ -732,7 +732,7 @@ eos_app_list_model_uninstall_app_finish (EosAppListModel *model,
 }
 
 void
-eos_app_list_model_save_icon (EosAppListModel *mode,
+eos_app_list_model_save_icon (EosAppListModel *model,
                               GdkPixbuf *pixbuf,
                               const gchar *filename)
 {
