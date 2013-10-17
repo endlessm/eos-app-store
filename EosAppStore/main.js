@@ -1,14 +1,8 @@
-const Gettext = imports.gettext;
-
 const AppStore = imports.appStore;
-const StoreModel = imports.storeModel;
+const Environment = imports.environment;
 
 function start() {
-    // initialize the global shortcuts for localization
-    window._ = Gettext.gettext;
-    window.C_ = Gettext.pgettext;
-    window.ngettext = Gettext.ngettext;
+    Environment.init();
 
-    let app = new AppStore.AppStore();
-    return app.run(ARGV);
+    return new AppStore.AppStore().run(ARGV);
 }

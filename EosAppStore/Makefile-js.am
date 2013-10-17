@@ -5,6 +5,7 @@ dist_js_DATA = \
 	appListModel.js \
 	categories.js \
 	categoryButton.js \
+	environment.js \
 	fillDesktop.js \
 	folderFrame.js \
 	folderModel.js \

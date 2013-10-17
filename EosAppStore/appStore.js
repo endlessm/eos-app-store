@@ -39,12 +39,6 @@ const AppStore = new Lang.Class({
     Extends: Gtk.Application,
 
     _init: function() {
-        Gettext.bindtextdomain(Config.GETTEXT_PACKAGE, Path.LOCALE_DIR);
-        Gettext.textdomain(Config.GETTEXT_PACKAGE);
-
-        GLib.set_prgname('eos-app-store');
-        GLib.set_application_name(_("Application Store"));
-
         this.parent({ application_id: APP_STORE_NAME, 
                       flags: Gio.ApplicationFlags.HANDLES_COMMAND_LINE });
 
