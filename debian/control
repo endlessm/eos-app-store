@@ -13,6 +13,7 @@ Build-Depends: cdbs (>= 0.4.90~),
                libgjs-dev,
                libjson-glib-dev,
                libgnome-menu-3-dev,
+               libwebkit2gtk-3.0-dev,
                eos-pstack-dev,
                eos-sdk-dev
 X-Python-Version: >= 2.4
@@ -27,6 +28,7 @@ Depends: ${gir:Depends},
 	 gir1.2-glib-2.0,
 	 gir1.2-gtk-3.0,
 	 gir1.2-eos-pstack,
+	 gir1.2-webkit2-3.0,
 	 gjs,
 	 xdg-utils
 Description: Endless OS App Store installation package
