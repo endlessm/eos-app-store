@@ -1,3 +1,0 @@
-[D-BUS Service]
-Name=com.endlessm.AppStore
-Exec=@bindir@/eos-app-store --no-default-window

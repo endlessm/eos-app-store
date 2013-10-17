@@ -4,6 +4,7 @@ SUBDIRS = EosAppStore data content po
 
 # Preamble
 bin_SCRIPTS =
+libexec_SCRIPTS =
 EXTRA_DIST =
 CLEANFILES =
 DISTCLEANFILES =
@@ -13,8 +14,8 @@ EXTRA_DIST += \
 	COPYING \
 	NEWS
 
-# launcher
-bin_SCRIPTS += eos-app-store eos-fill-desktop eos-reset-desktop
+bin_SCRIPTS += eos-app-store-launcher eos-fill-desktop eos-reset-desktop
+libexec_SCRIPTS += eos-app-store
 
 do_subst = $(SED) \
 	-e 's|@pkglibdir[@]|$(pkglibdir)|g' \

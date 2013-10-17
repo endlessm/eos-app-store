@@ -39,8 +39,9 @@ const AppStore = new Lang.Class({
     Extends: Gtk.Application,
 
     _init: function() {
-        this.parent({ application_id: APP_STORE_NAME, 
-                      flags: Gio.ApplicationFlags.HANDLES_COMMAND_LINE });
+        this.parent({     application_id: APP_STORE_NAME,
+                                   flags: Gio.ApplicationFlags.IS_SERVICE,
+                      inactivity_timeout: 30000, });
 
         this._storeModel = new StoreModel.StoreModel();
         this.Visible = false;
@@ -74,54 +75,6 @@ const AppStore = new Lang.Class({
                                  Lang.bind(this, this._onVisibilityChanged));
 
         this._storeModel.changePage(StoreModel.StorePage.APPS);
-    },
-
-    vfunc_activate: function() {
-        this._mainWindow.showPage(Gdk.CURRENT_TIME);
-    },
-
-    vfunc_command_line: function(cmdline) {
-        let noDefaultWindow = false;
-        let initialPage = StoreModel.StorePage.APPS;
-        let args = cmdline.get_arguments();
-        for (let i = 0; i < args.length; i++) {
-            let arg = args[i];
-
-            if (arg == '--apps' || arg == '-a') {
-                initialPage = StoreModel.StorePage.APPS;
-                args.splice(i, 1);
-                break;
-            }
-
-            if (arg == '--web-links' || arg == '-w') {
-                initialPage = StoreModel.StorePage.WEB;
-                args.splice(i, 1);
-                break;
-            }
-
-            if (arg == '--folders' || arg == '-f') {
-                initialPage = StoreModel.StorePage.FOLDERS;
-                args.splice(i, 1);
-                break;
-            }
-
-            if (arg == '--no-default-window' || arg == '-n') {
-                noDefaultWindow = true;
-                args.splice(i, 1);
-            }
-
-            log("Unrecognized argument '" + arg + "'\n" +
-                "Usage: eos-app-store [--apps|--folders|--web-links]");
-            return -1;
-        }
-
-        this._storeModel.changePage(initialPage);
-
-        if (!noDefaultWindow) {
-            this.activate();
-        }
-
-        return 0;
     },
 
     get appModel() {
