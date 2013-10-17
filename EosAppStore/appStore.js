@@ -6,6 +6,7 @@ const Gtk = imports.gi.Gtk;
 
 const Gettext = imports.gettext;
 const Lang = imports.lang;
+const Mainloop = imports.mainloop;
 const Signals = imports.signals;
 const _ = imports.gettext.gettext;
 
@@ -34,6 +35,8 @@ const AppStoreIface = <interface name={APP_STORE_NAME}>
   <property name="Visible" type="b" access="read"/>
 </interface>;
 
+const CLEAR_TIMEOUT = 15000;
+
 const AppStore = new Lang.Class({
     Name: 'AppStore',
     Extends: Gtk.Application,
@@ -41,7 +44,7 @@ const AppStore = new Lang.Class({
     _init: function() {
         this.parent({     application_id: APP_STORE_NAME,
                                    flags: Gio.ApplicationFlags.IS_SERVICE,
-                      inactivity_timeout: 30000, });
+                      inactivity_timeout: CLEAR_TIMEOUT, });
 
         this._storeModel = new StoreModel.StoreModel();
         this.Visible = false;
@@ -67,15 +70,20 @@ const AppStore = new Lang.Class({
 
         // the backing app list model
         this._appModel = new AppListModel.StoreModel();
-
-        // the main window
-        this._mainWindow = new AppStoreWindow.AppStoreWindow(this,
-                                                             this._storeModel);
-        this._mainWindow.connect('visibility-changed',
-                                 Lang.bind(this, this._onVisibilityChanged));
-
-        this._storeModel.changePage(StoreModel.StorePage.APPS);
     },
+
+    vfunc_activate: function() {
+        this._createMainWindow();
+    },
+
+    _createMainWindow: function() {
+        if (this._mainWindow == null) {
+            this._mainWindow = new AppStoreWindow.AppStoreWindow(this,
+                                                                 this._storeModel);
+            this._mainWindow.connect('visibility-changed',
+                                     Lang.bind(this, this._onVisibilityChanged));
+        }
+    }
 
     get appModel() {
         return this._appModel;
@@ -86,6 +94,7 @@ const AppStore = new Lang.Class({
     },
 
     get mainWindow() {
+        this._createMainWindow();
         return this._mainWindow;
     },
 
@@ -116,6 +125,15 @@ const AppStore = new Lang.Class({
         this._mainWindow.showPage(timestamp);
     },
 
+    _clearMainWindow: function() {
+        this._clearId = 0;
+
+        this._mainWindow.destroy();
+        this._mainWindow = null;
+
+        return false;
+    },
+
     _onVisibilityChanged: function(proxy, visible) {
         this.Visible = visible;
 
@@ -126,5 +144,20 @@ const AppStore = new Lang.Class({
                                      'org.freedesktop.DBus.Properties',
                                      'PropertiesChanged',
                                      propChangedVariant);
+
+        // if the window stays hidden for a while, we should destroy it to
+        // free up resources. once the window is gone, the inactivity timeout
+        // of Gio.Application will ensure that the app store service goes away
+        // after a while.
+        if (!this.Visible) {
+            this._clearId =
+                Mainloop.timeout_add(CLEAR_TIMEOUT, Lang.bind(this, this._clearMainWindow));
+        }
+        else {
+            if (this._clearId != 0) {
+                Mainloop.source_remove(this._clearId);
+                this._clearId = 0;
+            }
+        }
     }
 });
