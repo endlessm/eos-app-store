@@ -64,6 +64,7 @@ gboolean eos_app_list_model_uninstall_app_finish (EosAppListModel *model,
 
 void eos_app_list_model_save_icon (EosAppListModel *model,
                                    GdkPixbuf *pixbuf,
+                                   const gchar *format,
                                    const gchar *filename);
 
 GQuark eos_app_list_model_error_quark (void);

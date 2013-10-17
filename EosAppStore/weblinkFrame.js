@@ -191,7 +191,7 @@ const NewSiteBox = new Lang.Class({
 
         let weblinkIcon = DEFAULT_ICON;
         if (this._sitePixbuf) {
-            weblinkIcon = this._weblinkListModel.saveIcon(this._sitePixbuf);
+            weblinkIcon = this._weblinkListModel.saveIcon(this._sitePixbuf, "png");
         }
 
         let newSite = this._weblinkListModel.createWeblink(url, title, weblinkIcon);
