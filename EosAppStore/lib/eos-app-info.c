@@ -620,7 +620,7 @@ const char *
 eos_app_info_get_title (const EosAppInfo *info)
 {
   if (info != NULL)
-    return gettext (info->title);
+    return g_dpgettext2 (GETTEXT_PACKAGE, "title", info->title);
 
   return "";
 }
@@ -629,7 +629,7 @@ const char *
 eos_app_info_get_subtitle (const EosAppInfo *info)
 {
   if (info != NULL)
-    return gettext (info->subtitle);
+    return g_dpgettext2 (GETTEXT_PACKAGE, "subtitle", info->subtitle);
 
   return "";
 }
@@ -647,7 +647,7 @@ const char *
 eos_app_info_get_description (const EosAppInfo *info)
 {
   if (info != NULL)
-    return gettext (info->description);
+    return g_dpgettext2 (GETTEXT_PACKAGE, "description", info->description);
 
   return "";
 }
@@ -781,8 +781,8 @@ eos_app_info_create_cell (const EosAppInfo *info)
 
   GtkWidget *res = g_object_new (eos_app_cell_get_type (),
                                  "shape", eos_app_info_get_shape_for_cell (info),
-                                 "title", info->title,
-                                 "subtitle", info->subtitle,
+                                 "title", eos_app_info_get_title (info),
+                                 "subtitle", eos_app_info_get_subtitle (info),
                                  "desktop-id", info->desktop_id,
                                  "app-info", info,
                                  NULL);
