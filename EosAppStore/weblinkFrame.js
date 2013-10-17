@@ -67,11 +67,6 @@ const NewSiteBox = new Lang.Class({
         this.add(this._mainBox);
         this._mainBox.show_all();
 
-        // https://bugzilla.gnome.org/show_bug.cgi?id=709056
-        let file = Gio.File.new_for_path(Path.ICONS_DIR + '/icon_website-symbolic.svg');
-        let gicon = new Gio.FileIcon({ file: file });
-        this._siteIcon.set_from_gicon(gicon, Gtk.IconSize.DND);
-
         this._createAlertIcons();
         this._switchAlertIcon(AlertIcon.NOTHING);
 
@@ -91,6 +86,9 @@ const NewSiteBox = new Lang.Class({
                                }));
 
         this._siteUrlFrame.add(this._urlEntry);
+        this._sitePixbuf = null;
+
+        this._reset();
     },
 
     _createAlertIcons: function() {
@@ -112,6 +110,12 @@ const NewSiteBox = new Lang.Class({
         this._urlEntry.max_length = 0;
         this._urlEntry.halign = Gtk.Align.FILL;
         this._urlEntry.grab_focus();
+        this._sitePixbuf = null;
+
+        // https://bugzilla.gnome.org/show_bug.cgi?id=709056
+        let file = Gio.File.new_for_path(Path.ICONS_DIR + '/icon_website-symbolic.svg');
+        let gicon = new Gio.FileIcon({ file: file });
+        this._siteIcon.set_from_gicon(gicon, Gtk.IconSize.DND);
     },
 
     _switchAlertIcon: function(newItem) {
@@ -185,9 +189,14 @@ const NewSiteBox = new Lang.Class({
         let url = this._siteAlertLabel.get_text();
         let title = this._urlEntry.get_text();
 
-        let newSite = this._weblinkListModel.createWeblink(url, title, 'browser');
+        let weblinkIcon = DEFAULT_ICON;
+        if (this._sitePixbuf) {
+            weblinkIcon = this._weblinkListModel.saveIcon(this._sitePixbuf, "png");
+        }
+
+        let newSite = this._weblinkListModel.createWeblink(url, title, weblinkIcon);
         this._weblinkListModel.update();
-        this._weblinkListModel.install(newSite);
+        this._weblinkListModel.install(newSite, function() {});
 
         this._showInstalledMessage();
     },
@@ -195,12 +204,24 @@ const NewSiteBox = new Lang.Class({
     _onUrlEntryActivated: function() {
         if (!this._webView) {
             this._webView = new WebKit.WebView();
+            let context = this._webView.get_context();
+            let cachePath = GLib.build_filenamev([GLib.get_user_cache_dir(), 'eos-app-store']);
+            context.set_favicon_database_directory(cachePath);
             this._webView.connect('load-changed', Lang.bind(this, this._onLoadChanged));
             this._webView.connect('load-failed', Lang.bind(this, this._onLoadFailed));
+            this._webView.connect('notify::favicon', Lang.bind(this, this._onFaviconLoaded));
         }
         this._urlEntry.get_style_context().remove_class('url-entry-error');
         let url = this._urlEntry.get_text();
         this._webView.load_uri(url);
+    },
+
+    _onFaviconLoaded: function() {
+        let favicon = EosAppStorePrivate.link_get_favicon(this._webView);
+        if (favicon) {
+            this._sitePixbuf = favicon;
+            this._siteIcon.set_from_pixbuf(favicon);
+        }
     },
 
     _onLoadChanged: function(webview, loadEvent) {
@@ -434,7 +455,7 @@ const WeblinkListBoxRow = new Lang.Class({
         }
 
         let site = this._model.createWeblink(url, title, icon);
-        this._model.install(site);
+        this._model.install(site, function() {});
 
         this._showInstalledMessage();
     },

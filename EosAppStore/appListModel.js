@@ -1,6 +1,7 @@
 // -*- mode: js; js-indent-level: 4; indent-tabs-mode: nil -*-
 const EosAppStorePrivate = imports.gi.EosAppStorePrivate;
 const Endless = imports.gi.Endless;
+const GdkPixbuf = imports.gi.GdkPixbuf;
 const Gio = imports.gi.Gio;
 const GLib = imports.gi.GLib;
 
@@ -262,6 +263,23 @@ const WeblinkList = new Lang.Class({
         return this._weblinks;
     },
 
+    _getAvailableFilename: function(path, prefix, name, suffix) {
+        let filename = prefix + name;
+
+        // Append a number until we find a free slot
+        let availableFilename = filename + suffix;
+        let availablePath = GLib.build_filenamev([path, availableFilename]);
+        let i = 0;
+
+        while (GLib.file_test(availablePath, GLib.FileTest.EXISTS)) {
+            i++;
+            availableFilename = filename + '-' + i + suffix;
+            availablePath = GLib.build_filenamev([path, availableFilename]);
+        }
+
+        return [availablePath, availableFilename];
+    },
+
     // FIXME: this should use the linkId as provided by the CMS.
     // See https://github.com/endlessm/eos-shell/issues/1074
     createWeblink: function(url, title, icon) {
@@ -286,20 +304,8 @@ const WeblinkList = new Lang.Class({
             filename = tokens[tokens.length-2];
         }
 
-        // Prefix
-        filename = 'eos-link-' + filename;
-
-        // Append a number until we find a free slot
-        let availableFilename = filename + '.desktop';
         let path = GLib.build_filenamev([GLib.get_user_data_dir(), 'applications']);
-        let availableFullFilename = GLib.build_filenamev([path, availableFilename]);
-        let i = 0;
-
-        while (GLib.file_test(availableFullFilename, GLib.FileTest.EXISTS)) {
-            i++;
-            availableFilename = filename + '-' + i + '.desktop';
-            availableFullFilename = GLib.build_filenamev([path, availableFilename]);
-        }
+        let [availablePath, availableFilename] = this._getAvailableFilename(path, 'eos-link-', filename, '.desktop');
 
         desktop.set_string(GLib.KEY_FILE_DESKTOP_GROUP, GLib.KEY_FILE_DESKTOP_KEY_VERSION, '1.0');
         desktop.set_string(GLib.KEY_FILE_DESKTOP_GROUP, GLib.KEY_FILE_DESKTOP_KEY_TYPE, 'Application');
@@ -309,8 +315,15 @@ const WeblinkList = new Lang.Class({
         desktop.set_string(GLib.KEY_FILE_DESKTOP_GROUP, GLib.KEY_FILE_DESKTOP_KEY_NAME, title);
 
         let [data, length] = desktop.to_data();
-        GLib.file_set_contents(availableFullFilename, data, length);
+        GLib.file_set_contents(availablePath, data, length);
 
         return availableFilename;
-    }
+    },
+
+    saveIcon: function(pixbuf, format) {
+        let path = GLib.build_filenamev([GLib.get_user_data_dir(), 'applications']);
+        let [iconFilename, _] = this._getAvailableFilename(path, 'eos-link-', 'icon', '.'+ format);
+        this._model.save_icon(pixbuf, format, iconFilename);
+        return iconFilename;
+    },
 });
