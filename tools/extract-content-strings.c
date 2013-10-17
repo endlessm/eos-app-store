@@ -2,6 +2,8 @@
 #include <stdio.h>
 #include <string.h>
 
+#include <locale.h>
+
 #include <glib-object.h>
 #include <json-glib/json-glib.h>
 
@@ -50,6 +52,8 @@ int
 main (int   argc,
       char *argv[])
 {
+  setlocale (LC_ALL, "C");
+
   if (argc < 2)
     {
       fprintf (stderr, "Usage: extract-content-strings <content file>\n");
