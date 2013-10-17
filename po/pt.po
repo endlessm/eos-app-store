@@ -1,21 +1,25 @@
-# Portuguese translations for the Endless OS App Store
-# Copyright (C) 2012 Endless Mobile
-# This file is distributed under the same license as the Endless OS Desktop package.
-# Automatically generated, 2012
-#
+# Translations for the Endless OS App Store
+# Copyright (C) 2013 Endless Mobile
+# This file is distributed under the same license as the Endless OS App Store package.
+# 
+# Translators:
+# Automatically generated, 2012-2013
+# joelmx <joel@endlessm.com>, 2013
+# joelmx <joel@endlessm.com>, 2013
+# rshuler <roddy@endlessm.com>, 2013
 msgid ""
 msgstr ""
-"Project-Id-Version: dev 1\n"
+"Project-Id-Version: eos-app-store\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-10-07 19:30+0100\n"
-"PO-Revision-Date: 2012-05-31 11:54-0500\n"
-"Last-Translator: Automatically generated\n"
-"Language-Team: none\n"
-"Language: pt\n"
+"POT-Creation-Date: 2013-10-16 22:45-0700\n"
+"PO-Revision-Date: 2013-10-17 14:15+0000\n"
+"Last-Translator: joelmx <joel@endlessm.com>\n"
+"Language-Team: Portuguese (http://www.transifex.com/projects/p/teams/language/pt/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=2; plural=(n > 1);\n"
+"Language: pt\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
 #. Extracted from Default/apps/content.json
 #: ../content/Default/apps/content.json.h:4
@@ -46,13 +50,13 @@ msgstr ""
 #: ../content/Default/links/content.json.h:14
 msgctxt "title"
 msgid "Khan Academy"
-msgstr "Khan Academy"
+msgstr ""
 
 #: ../content/Default/apps/content.json.h:15
 #: ../content/Default/links/content.json.h:15
 msgctxt "subtitle"
 msgid "Learn almost anything for free"
-msgstr "Reforço escolar sem sair de casa"
+msgstr ""
 
 #: ../content/Default/apps/content.json.h:19
 #: ../content/Default/links/content.json.h:19
@@ -125,8 +129,8 @@ msgstr ""
 msgctxt "description"
 msgid ""
 "Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod "
-"tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, "
-"quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo "
+"tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam,"
+" quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo "
 "consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse "
 "cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat "
 "non proident, sunt in culpa qui officia deserunt mollit anim id est laborum."
@@ -136,7 +140,7 @@ msgstr ""
 #: ../content/Default/links/content.json.h:44
 msgctxt "title"
 msgid "Billiards"
-msgstr ""
+msgstr "Sinuca"
 
 #: ../content/Default/apps/content.json.h:45
 #: ../content/Default/links/content.json.h:45
@@ -153,9 +157,7 @@ msgstr ""
 #: ../content/Default/apps/content.json.h:50
 #: ../content/Default/links/content.json.h:50
 msgctxt "subtitle"
-msgid ""
-"Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nam egestas, justo "
-"vel aliquam commodo, sap"
+msgid "3D Tetris-style game"
 msgstr ""
 
 #: ../content/Default/apps/content.json.h:56
@@ -489,7 +491,9 @@ msgid "Tux Typing"
 msgstr ""
 
 #: ../content/Default/apps/content.json.h:218
+#: ../content/Default/apps/content.json.h:242
 #: ../content/Default/links/content.json.h:218
+#: ../content/Default/links/content.json.h:242
 msgctxt "subtitle"
 msgid "Learn to type"
 msgstr ""
@@ -498,13 +502,13 @@ msgstr ""
 #: ../content/Default/links/content.json.h:222
 msgctxt "title"
 msgid "Weather"
-msgstr "Previsao do Tempo"
+msgstr ""
 
 #: ../content/Default/apps/content.json.h:223
 #: ../content/Default/links/content.json.h:223
 msgctxt "subtitle"
 msgid "See the weather forecast"
-msgstr "Saiba se vai chover ou fazer sol"
+msgstr ""
 
 #: ../content/Default/apps/content.json.h:227
 #: ../content/Default/links/content.json.h:227
@@ -545,7 +549,7 @@ msgstr ""
 #: ../content/Default/apps/content.json.h:238
 #: ../content/Default/links/content.json.h:238
 msgctxt "title"
-msgid "Programming"
+msgid "Coding Fun"
 msgstr ""
 
 #: ../content/Default/apps/content.json.h:239
@@ -554,48 +558,25 @@ msgctxt "subtitle"
 msgid "Learn to code"
 msgstr ""
 
-#: ../content/Default/apps/content.json.h:229
-#: ../content/Default/apps/content.json.h:224
-#: ../content/Default/apps/content.json.h:219
-#: ../content/Default/apps/content.json.h:214
-#: ../content/Default/apps/content.json.h:209
-#: ../content/Default/apps/content.json.h:204
-#: ../content/Default/apps/content.json.h:199
-#: ../content/Default/apps/content.json.h:194
-#: ../content/Default/apps/content.json.h:189
-#: ../content/Default/apps/content.json.h:184
-#: ../content/Default/apps/content.json.h:179
-#: ../content/Default/apps/content.json.h:174
-#: ../content/Default/apps/content.json.h:169
-#: ../content/Default/apps/content.json.h:164
-#: ../content/Default/apps/content.json.h:159
-#: ../content/Default/apps/content.json.h:154
-#: ../content/Default/links/content.json.h:229
-#: ../content/Default/links/content.json.h:224
-#: ../content/Default/links/content.json.h:219
-#: ../content/Default/links/content.json.h:214
-#: ../content/Default/links/content.json.h:209
-#: ../content/Default/links/content.json.h:204
-#: ../content/Default/links/content.json.h:199
-#: ../content/Default/links/content.json.h:194
-#: ../content/Default/links/content.json.h:189
-#: ../content/Default/links/content.json.h:184
-#: ../content/Default/links/content.json.h:179
-#: ../content/Default/links/content.json.h:174
-#: ../content/Default/links/content.json.h:169
-#: ../content/Default/links/content.json.h:164
-#: ../content/Default/links/content.json.h:159
-#: ../content/Default/links/content.json.h:154
-msgctxt "description"
-msgid ""
-"Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut dapibus porta "
-"ipsum, ac semper ligula malesuada vitae. Nulla sit amet rutrum eros. Aenean "
-"eu congue arcu. In ullamcorper vitae felis non vehicula. Class aptent taciti "
-"sociosqu ad litora torquent per conubia nostra, per inceptos himenaeos. "
-"Mauris rutrum rhoncus lacus, vitae facilisis purus fermentum ut. In "
-"consectetur convallis dictum."
+#: ../content/Default/apps/content.json.h:241
+#: ../content/Default/links/content.json.h:241
+msgctxt "title"
+msgid "Typing"
 msgstr ""
 
+#: ../content/Default/apps/content.json.h:246
+#: ../content/Default/links/content.json.h:246
+msgctxt "title"
+msgid "R?sum?"
+msgstr ""
+
+#: ../content/Default/apps/content.json.h:247
+#: ../content/Default/links/content.json.h:247
+msgctxt "subtitle"
+msgid "Write a r?sum?"
+msgstr ""
+
+#: ../content/Default/apps/content.json.h:248
 #: ../content/Default/apps/content.json.h:147
 #: ../content/Default/apps/content.json.h:140
 #: ../content/Default/apps/content.json.h:133
@@ -617,6 +598,7 @@ msgstr ""
 #: ../content/Default/apps/content.json.h:28
 #: ../content/Default/apps/content.json.h:21
 #: ../content/Default/apps/content.json.h:16
+#: ../content/Default/links/content.json.h:248
 #: ../content/Default/links/content.json.h:147
 #: ../content/Default/links/content.json.h:140
 #: ../content/Default/links/content.json.h:133
@@ -641,12 +623,56 @@ msgstr ""
 msgctxt "description"
 msgid ""
 "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nam egestas, justo "
-"vel aliquam commodo, sapien orci dictum turpis, nec venenatis ligula orci ut "
-"tellus. Suspendisse potenti. Nam tincidunt varius eros id adipiscing. Nunc "
+"vel aliquam commodo, sapien orci dictum turpis, nec venenatis ligula orci ut"
+" tellus. Suspendisse potenti. Nam tincidunt varius eros id adipiscing. Nunc "
 "venenatis luctus mollis. Maecenas ornare arcu ut quam mattis laoreet. Nulla "
 "et eleifend velit. Mauris quis mi consequat, elementum felis et, commodo "
 "lacus. Sed vitae porta mi. Duis euismod rhoncus quam, sed pharetra risus "
 "placerat sit amet."
+msgstr ""
+
+#: ../content/Default/apps/content.json.h:243
+#: ../content/Default/apps/content.json.h:229
+#: ../content/Default/apps/content.json.h:224
+#: ../content/Default/apps/content.json.h:219
+#: ../content/Default/apps/content.json.h:214
+#: ../content/Default/apps/content.json.h:209
+#: ../content/Default/apps/content.json.h:204
+#: ../content/Default/apps/content.json.h:199
+#: ../content/Default/apps/content.json.h:194
+#: ../content/Default/apps/content.json.h:189
+#: ../content/Default/apps/content.json.h:184
+#: ../content/Default/apps/content.json.h:179
+#: ../content/Default/apps/content.json.h:174
+#: ../content/Default/apps/content.json.h:169
+#: ../content/Default/apps/content.json.h:164
+#: ../content/Default/apps/content.json.h:159
+#: ../content/Default/apps/content.json.h:154
+#: ../content/Default/links/content.json.h:243
+#: ../content/Default/links/content.json.h:229
+#: ../content/Default/links/content.json.h:224
+#: ../content/Default/links/content.json.h:219
+#: ../content/Default/links/content.json.h:214
+#: ../content/Default/links/content.json.h:209
+#: ../content/Default/links/content.json.h:204
+#: ../content/Default/links/content.json.h:199
+#: ../content/Default/links/content.json.h:194
+#: ../content/Default/links/content.json.h:189
+#: ../content/Default/links/content.json.h:184
+#: ../content/Default/links/content.json.h:179
+#: ../content/Default/links/content.json.h:174
+#: ../content/Default/links/content.json.h:169
+#: ../content/Default/links/content.json.h:164
+#: ../content/Default/links/content.json.h:159
+#: ../content/Default/links/content.json.h:154
+msgctxt "description"
+msgid ""
+"Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut dapibus porta "
+"ipsum, ac semper ligula malesuada vitae. Nulla sit amet rutrum eros. Aenean "
+"eu congue arcu. In ullamcorper vitae felis non vehicula. Class aptent taciti"
+" sociosqu ad litora torquent per conubia nostra, per inceptos himenaeos. "
+"Mauris rutrum rhoncus lacus, vitae facilisis purus fermentum ut. In "
+"consectetur convallis dictum."
 msgstr ""
 
 #: ../content/Default/apps/content.json.h:11
@@ -672,110 +698,132 @@ msgstr "Adicionar"
 
 #: ../data/eos-app-store-folder-frame.ui.h:1
 msgid "Select an icon"
-msgstr ""
+msgstr "Seleccione seu ícone"
 
-#: ../data/eos-app-store-list-row.ui.h:1 ../EosAppStore/appFrame.js:133
+#: ../data/eos-app-store-list-row.ui.h:1 ../EosAppStore/appFrame.js:177
 msgid "Install application"
-msgstr ""
+msgstr "Instalar aplicativo"
+
+#: ../data/eos-app-store-list-row.ui.h:2
+msgid "Installing"
+msgstr "Instalando"
+
+#: ../data/eos-app-store-list-row.ui.h:3
+msgid "Installed successfully"
+msgstr "Instalado com sucesso"
+
+#: ../data/eos-app-store-list-row.ui.h:4
+msgid "Remove application"
+msgstr "Eliminar aplicativo"
 
 #: ../data/eos-app-store-main-window.ui.h:1
 msgid "Applications"
-msgstr ""
+msgstr "Aplicativos"
 
 #: ../data/eos-app-store-main-window.ui.h:2
 msgid "Websites"
-msgstr ""
+msgstr "Atalhos pra sites"
 
 #: ../data/eos-app-store-main-window.ui.h:3
 msgid "Folders"
-msgstr ""
+msgstr "Pastas"
 
 #: ../data/eos-app-store-weblink-new-site-frame.ui.h:1
-#: ../EosAppStore/weblinkFrame.js:101
+#: ../EosAppStore/weblinkFrame.js:110
 msgid "e.g.: http://www.globoesporte.com"
-msgstr ""
+msgstr "ex.: http://www.globoesporte.com"
 
-#: ../EosAppStore/appFrame.js:127
-msgid "Remove application"
-msgstr ""
-
-#: ../EosAppStore/appFrame.js:139
+#: ../EosAppStore/appFrame.js:182
 msgid "Update application"
-msgstr ""
+msgstr "Atualizar aplicativo"
 
-#: ../EosAppStore/appFrame.js:180
+#: ../EosAppStore/appFrame.js:251
 msgid "Featured"
-msgstr ""
+msgstr "Destacado"
 
 #. Translators: use the same string used to install the app store content JSON
-#: ../EosAppStore/appFrame.js:186 ../EosAppStore/lib/eos-app-info.c:601
+#: ../EosAppStore/appFrame.js:257 ../EosAppStore/lib/eos-app-info.c:801
 msgid "Education"
-msgstr ""
+msgstr "Educação"
 
-#: ../EosAppStore/appFrame.js:192 ../EosAppStore/lib/eos-app-info.c:602
+#: ../EosAppStore/appFrame.js:263 ../EosAppStore/lib/eos-app-info.c:802
 msgid "Leisure"
-msgstr ""
+msgstr "Lazer"
 
-#: ../EosAppStore/appFrame.js:198 ../EosAppStore/lib/eos-app-info.c:603
+#: ../EosAppStore/appFrame.js:269 ../EosAppStore/lib/eos-app-info.c:803
 msgid "Utilities"
-msgstr ""
+msgstr "Utilidades"
 
-#: ../EosAppStore/appStoreWindow.js:330
+#: ../EosAppStore/appFrame.js:275
+msgid "My applications"
+msgstr "Meus aplicativos"
+
+#: ../EosAppStore/appStore.js:46
+msgid "Application Store"
+msgstr "Loja de Aplicativos"
+
+#: ../EosAppStore/appStoreWindow.js:342
 msgid "Install applications"
-msgstr ""
+msgstr "Instalar aplicativos"
 
-#: ../EosAppStore/appStoreWindow.js:334
+#: ../EosAppStore/appStoreWindow.js:346
 msgid "Install websites"
-msgstr ""
+msgstr "Adicionar atalhos para sites"
 
-#: ../EosAppStore/appStoreWindow.js:338
+#: ../EosAppStore/appStoreWindow.js:350
 msgid "Install folders"
-msgstr ""
+msgstr "Adicionar pastas"
 
 #: ../EosAppStore/folderFrame.js:42
 msgid "Name of folder"
-msgstr ""
+msgstr "Nome da pasta"
 
 #: ../EosAppStore/folderFrame.js:70
 msgid "Folder added!"
-msgstr ""
+msgstr "Pasta adicionada!"
 
-#: ../EosAppStore/weblinkFrame.js:70
+#: ../EosAppStore/weblinkFrame.js:79
 msgid "Write the site address you want to add"
-msgstr ""
+msgstr "Escreva o endereço do site que deseje adicionar"
 
-#: ../EosAppStore/weblinkFrame.js:155 ../EosAppStore/weblinkFrame.js:307
+#: ../EosAppStore/weblinkFrame.js:164 ../EosAppStore/weblinkFrame.js:415
 msgid "added successfully!"
-msgstr ""
+msgstr "adicionada com sucesso!"
 
-#: ../EosAppStore/weblinkFrame.js:201
+#: ../EosAppStore/weblinkFrame.js:210
 msgid "searching"
-msgstr ""
+msgstr "procurando"
 
-#: ../EosAppStore/weblinkFrame.js:217
+#: ../EosAppStore/weblinkFrame.js:226
 msgid "The address written does not exist or is not available."
-msgstr ""
+msgstr "O endereço escrito não existe ou não está disponível"
 
-#: ../EosAppStore/weblinkFrame.js:392
+#: ../EosAppStore/weblinkFrame.js:500
 msgid "News"
-msgstr ""
+msgstr "Notícias"
 
-#: ../EosAppStore/weblinkFrame.js:398
+#: ../EosAppStore/weblinkFrame.js:506
 msgid "Sports"
-msgstr ""
+msgstr "Esportes"
 
-#: ../EosAppStore/weblinkFrame.js:404
+#: ../EosAppStore/weblinkFrame.js:512
 msgid "Education and Health"
-msgstr ""
+msgstr "Educação e Saúde"
 
-#: ../EosAppStore/weblinkFrame.js:410
+#: ../EosAppStore/weblinkFrame.js:518
 msgid "Entertainment"
-msgstr ""
+msgstr "Divertimento"
 
-#: ../EosAppStore/weblinkFrame.js:416
+#: ../EosAppStore/weblinkFrame.js:524
 msgid "Local"
-msgstr ""
+msgstr "Local"
 
-#: ../EosAppStore/weblinkFrame.js:422
-msgid "Opportunities"
-msgstr ""
+#: ../EosAppStore/lib/eos-app-list-model.c:621
+#, c-format
+msgid "Application %s already installed"
+msgstr "O aplicativo %s já está instalado"
+
+#: ../EosAppStore/lib/eos-app-list-model.c:708
+#, c-format
+msgid "Application %s is not installed"
+msgstr "O aplicativo %s não está instalado"
