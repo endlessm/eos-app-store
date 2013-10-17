@@ -277,7 +277,7 @@ const WeblinkList = new Lang.Class({
             availablePath = GLib.build_filenamev([path, availableFilename]);
         }
 
-        return availablePath;
+        return [availablePath, availableFilename];
     },
 
     // FIXME: this should use the linkId as provided by the CMS.
@@ -305,7 +305,7 @@ const WeblinkList = new Lang.Class({
         }
 
         let path = GLib.build_filenamev([GLib.get_user_data_dir(), 'applications']);
-        let availableFullFilename = this._getAvailableFilename(path, 'eos-link-', filename, '.desktop');
+        let [availablePath, availableFilename] = this._getAvailableFilename(path, 'eos-link-', filename, '.desktop');
 
         desktop.set_string(GLib.KEY_FILE_DESKTOP_GROUP, GLib.KEY_FILE_DESKTOP_KEY_VERSION, '1.0');
         desktop.set_string(GLib.KEY_FILE_DESKTOP_GROUP, GLib.KEY_FILE_DESKTOP_KEY_TYPE, 'Application');
@@ -315,14 +315,14 @@ const WeblinkList = new Lang.Class({
         desktop.set_string(GLib.KEY_FILE_DESKTOP_GROUP, GLib.KEY_FILE_DESKTOP_KEY_NAME, title);
 
         let [data, length] = desktop.to_data();
-        GLib.file_set_contents(availableFullFilename, data, length);
+        GLib.file_set_contents(availablePath, data, length);
 
-        return availableFullFilename.substring(path.length + 1);
+        return availableFilename;
     },
 
     saveIcon: function(pixbuf) {
         let path = GLib.build_filenamev([GLib.get_user_data_dir(), 'applications']);
-        let iconFilename = this._getAvailableFilename(path, 'eos-link-', 'icon', '.png');
+        let [iconFilename, _] = this._getAvailableFilename(path, 'eos-link-', 'icon', '.png');
         this._model.save_icon(pixbuf, iconFilename, 'png');
         return iconFilename;
     },
