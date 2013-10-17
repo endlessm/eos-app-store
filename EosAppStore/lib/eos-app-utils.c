@@ -294,7 +294,7 @@ eos_link_get_favicon (WebKitWebView *webview)
   gint biggest =  MAX (favicon_width, favicon_height);
 
   /* If size is > 64px, resize it to 64px */
-  if (favicon_width > 64 || favicon_height > 64)
+  if (biggest > 64)
     {
       dest = gdk_pixbuf_scale_simple (pixbuf,
                                       favicon_width * 64 / biggest,
@@ -314,7 +314,7 @@ eos_link_get_favicon (WebKitWebView *webview)
                          64, 64);
   gdk_pixbuf_fill (dest, 0);
 
-  if (favicon_width > 48 || favicon_height > 48)
+  if (biggest > 48)
     {
       gdouble offset = (double) 48 / biggest;
       gdk_pixbuf_scale (pixbuf, dest, 8, 8, 48, 48, 8, 8, offset, offset, GDK_INTERP_BILINEAR);
