@@ -50,13 +50,13 @@ msgstr ""
 #: ../content/Default/links/content.json.h:14
 msgctxt "title"
 msgid "Khan Academy"
-msgstr ""
+msgstr "Khan Academy"
 
 #: ../content/Default/apps/content.json.h:15
 #: ../content/Default/links/content.json.h:15
 msgctxt "subtitle"
 msgid "Learn almost anything for free"
-msgstr ""
+msgstr "Reforço escolar sem sair de casa"
 
 #: ../content/Default/apps/content.json.h:19
 #: ../content/Default/links/content.json.h:19
@@ -502,13 +502,13 @@ msgstr ""
 #: ../content/Default/links/content.json.h:222
 msgctxt "title"
 msgid "Weather"
-msgstr ""
+msgstr "Previsão do Tempo"
 
 #: ../content/Default/apps/content.json.h:223
 #: ../content/Default/links/content.json.h:223
 msgctxt "subtitle"
 msgid "See the weather forecast"
-msgstr ""
+msgstr "Saiba se vai chover ou fazer sol"
 
 #: ../content/Default/apps/content.json.h:227
 #: ../content/Default/links/content.json.h:227
@@ -567,13 +567,13 @@ msgstr ""
 #: ../content/Default/apps/content.json.h:246
 #: ../content/Default/links/content.json.h:246
 msgctxt "title"
-msgid "R?sum?"
+msgid "Résumé"
 msgstr ""
 
 #: ../content/Default/apps/content.json.h:247
 #: ../content/Default/links/content.json.h:247
 msgctxt "subtitle"
-msgid "Write a r?sum?"
+msgid "Write a résumé"
 msgstr ""
 
 #: ../content/Default/apps/content.json.h:248
