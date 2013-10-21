@@ -155,8 +155,7 @@ const FolderIconButton = new Lang.Class({
             vexpand: false,
             image: new Gtk.Image({
                 icon_name: iconName,
-                width_request: _FOLDER_BUTTON_IMAGE_SIZE,
-                height_request: _FOLDER_BUTTON_IMAGE_SIZE }) });
+                pixel_size: _FOLDER_BUTTON_IMAGE_SIZE }) });
 
         this._iconName = iconName;
         this.get_style_context().add_class('folder-icon-button');
@@ -176,6 +175,8 @@ const FolderIconGrid = new Lang.Class({
             if (oldToggle && oldToggle != toggleButton && oldToggle.get_active()) {
                 oldToggle.set_active(false);
             }
+
+            this.get_style_context().add_class('grabbed');
 
             // prepare the bubble window for showing...
             this._bubble._iconName = toggleButton._iconName;
@@ -243,6 +244,8 @@ const FolderIconGrid = new Lang.Class({
         this._get_icons();
         this._activeToggle = null;
 
+        this.get_style_context().add_class('folder-icon-grid');
+
         // bubble window
 
         this._bubble = new FolderNameBubble(folderModel);
@@ -250,6 +253,7 @@ const FolderIconGrid = new Lang.Class({
         this._bubble.connect('hide', Lang.bind(this, function() {
             this._activeToggle.set_active(false);
             this._activeToggle = null;
+            this.get_style_context().remove_class('grabbed');
         }));
     }
 });
