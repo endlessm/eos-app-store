@@ -13,14 +13,16 @@ eaprivate_source_h = \
 	lib/eos-app-info.h \
 	lib/eos-app-list-model.h \
 	lib/eos-app-utils.h \
-	lib/eos-link-info.h
+	lib/eos-link-info.h \
+	lib/eos-shadow-frame.h
 
 eaprivate_source_c = \
 	lib/eos-app-enums.c \
 	lib/eos-app-info.c \
 	lib/eos-app-list-model.c \
 	lib/eos-app-utils.c \
-	lib/eos-link-info.c
+	lib/eos-link-info.c \
+	lib/eos-shadow-frame.c
 
 pkglib_LTLIBRARIES += libeaprivate-1.0.la
 
