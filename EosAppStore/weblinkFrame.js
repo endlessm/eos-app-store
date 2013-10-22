@@ -283,7 +283,7 @@ const TwoLinesLabel = new Lang.Class({
 
 const WeblinkListBoxRow = new Lang.Class({
     Name: 'WeblinkListBoxRow',
-    Extends: Gtk.Bin,
+    Extends: EosAppStorePrivate.ShadowFrame,
 
     templateResource: '/com/endlessm/appstore/eos-app-store-weblink-list-row.ui',
     templateChildren: [
