@@ -213,6 +213,14 @@ const NewSiteBox = new Lang.Class({
         }
         this._urlEntry.get_style_context().remove_class('url-entry-error');
         let url = this._urlEntry.get_text();
+
+        // check if the URL that the user entered already has a valid prefix
+        if (url.indexOf('http://') != 0 && url.indexOf('https://') != 0 &&
+            url.indexOf('ftp://')  != 0 && url.indexOf('file://')  != 0) {
+            //if it does not start with a valid prefix, prepend http://
+            url = 'http://' + url;
+        }
+
         this._webView.load_uri(url);
     },
 
