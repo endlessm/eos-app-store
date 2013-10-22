@@ -434,18 +434,21 @@
     -GtkScrolledWindow-scrollbars-within-bevel: false;
 }
 
-.weblink-listbox .list-row {
+.weblink-listbox .shadow-frame {
     background: alpha(black, 0.25);
     border-radius: 3px;
-    box-shadow: 0px 2px 2px 0px alpha(black, 0.3);
-
+    icon-shadow: 0 2px 2px alpha(black, 0.3);
+    
     -GtkWidget-focus-line-width: 0;
     -GtkWidget-focus-padding: 0;
 }
 
-.weblink-listbox .list-row:hover {
+.weblink-listbox .shadow-frame:hover {
     background: alpha(#f9f8f8, 0.95);
-    box-shadow: 0px 0px 12px 0px alpha(white, 0.6);
+    icon-shadow: -2px 0  3px alpha(#f9f8f8, 0.3),
+                  2px 0  3px alpha(#f9f8f8, 0.3),
+                  0 2px  3px alpha(#f9f8f8, 0.3),
+                  0 -2px 3px alpha(#f9f8f8, 0.3);
 }
 
 .weblink-listbox .list-row .state-button {
