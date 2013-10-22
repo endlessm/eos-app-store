@@ -20,7 +20,7 @@ Standards-Version: 3.9.2
 Homepage: http://www.endlessm.com
 
 Package: eos-app-store
-Architecture: all
+Architecture: any
 Depends: ${gir:Depends},
 	 ${misc:Depends},
          ${shlibs:Depends},
