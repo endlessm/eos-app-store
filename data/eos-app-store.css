@@ -512,21 +512,26 @@
     border-radius: 3px;
     border: none;
     background: none;
+    color: #e8e8e8;
 
     -GtkWidget-focus-line-width: 0;
     -GtkWidget-focus-line-padding: 0;
+}
+
+.folder-icon-grid.grabbed .folder-icon-button {
+    color: @app_store_button_fg;
 }
 
 .folder-icon-button:hover {
     background: url("btn_folder-glow_hover.png");
 }
 
-.folder-icon-button GtkImage:hover {
-  box-shadow: inset 0px 0px 6px 0px rgba(0, 0, 0, 0.3);
-}
-
 .folder-icon-button:active {
     background: url("btn_folder-glow_pressed.png");
+}
+
+.folder-icon-button *:active {
+    color: #646464;
 }
 
 .folder-bubble {
