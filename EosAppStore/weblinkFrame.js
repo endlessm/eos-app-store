@@ -26,7 +26,7 @@ const CATEGORY_TRANSITION_MS = 500;
 
 const THUMBNAIL_SIZE = 90;
 
-const LIST_COLUMNS_SPACING = 15;
+const LIST_COLUMNS_SPACING = 1;
 
 const DEFAULT_ICON = 'generic-link';
 
@@ -164,7 +164,7 @@ const NewSiteBox = new Lang.Class({
         this._siteUrlFrame.remove(this._urlEntry);
         this._siteUrlFrame.add(urlLabel);
         this._siteUrlFrame.show_all();
-        
+
         this._siteAlertLabel.set_text(_("added successfully!"));
         this._siteAddButton.sensitive = false;
         this._switchAlertIcon(AlertIcon.HIDDEN);

@@ -8,13 +8,14 @@
 
 #define _EOS_STYLE_CLASS_SHADOW_FRAME "shadow-frame"
 
+#define SELECTED  (GTK_STATE_FLAG_ACTIVE | GTK_STATE_FLAG_PRELIGHT | GTK_STATE_FLAG_SELECTED)
+
 #define EOS_SHADOW_FRAME_PRIVATE(o) \
   (G_TYPE_INSTANCE_GET_PRIVATE ((o), EOS_TYPE_SHADOW_FRAME, EosShadowFramePrivate))
 
 struct _EosShadowFramePrivate {
   GdkPixbuf *bg_image_normal;
   GdkPixbuf *bg_image_selected;
-  guint is_selected : 1;
 };
 
 G_DEFINE_TYPE (EosShadowFrame, eos_shadow_frame, GTK_TYPE_BIN)
@@ -59,7 +60,7 @@ eos_shadow_frame_draw (GtkWidget *widget,
   int image_width, image_height;
 
   GtkStyleContext *context = gtk_widget_get_style_context (widget);
-  gtk_style_context_get_margin(context,
+  gtk_style_context_get_padding(context,
                                gtk_style_context_get_state (context),
                                &margin);
 
@@ -68,7 +69,7 @@ eos_shadow_frame_draw (GtkWidget *widget,
   image_width = allocation.width - margin.left - margin.right;
   image_height = allocation.height - margin.top - margin.bottom;
 
-  if (priv->is_selected) {
+  if (gtk_widget_get_state_flags(widget) & SELECTED) {
       if (!priv->bg_image_selected) {
           priv->bg_image_selected = get_pixbuf_background(self, image_width, image_height);
       }
@@ -90,6 +91,40 @@ eos_shadow_frame_draw (GtkWidget *widget,
   GTK_WIDGET_CLASS (eos_shadow_frame_parent_class)->draw (widget, cr);
 
   return FALSE;
+}
+
+static void
+eos_shadow_frame_get_preferred_width (GtkWidget *widget,
+                                  gint      *minimum_width,
+                                  gint      *natural_width)
+{
+  GtkBorder margin;
+  GtkStyleContext *context = gtk_widget_get_style_context (widget);
+
+  GTK_WIDGET_CLASS (eos_shadow_frame_parent_class)->get_preferred_width (widget, minimum_width, natural_width);
+
+  gtk_style_context_get_padding(context,
+                               gtk_style_context_get_state (context),
+                               &margin);
+  *minimum_width += margin.left + margin.right;
+  *natural_width += margin.left + margin.right;
+}
+
+static void
+eos_shadow_frame_get_preferred_height (GtkWidget *widget,
+                                       gint      *minimum_height,
+                                       gint      *natural_height)
+{
+  GtkBorder margin;
+  GtkStyleContext *context = gtk_widget_get_style_context (widget);
+
+  GTK_WIDGET_CLASS (eos_shadow_frame_parent_class)->get_preferred_height (widget, minimum_height, natural_height);
+
+  gtk_style_context_get_padding(context,
+                               gtk_style_context_get_state (context),
+                               &margin);
+  *minimum_height += margin.top + margin.bottom;
+  *natural_height += margin.top + margin.bottom;
 }
 
 static void
@@ -115,6 +150,8 @@ eos_shadow_frame_class_init (EosShadowFrameClass *klass)
   oclass->finalize = eos_shadow_frame_finalize;
 
   widget_class->draw = eos_shadow_frame_draw;
+  widget_class->get_preferred_width = eos_shadow_frame_get_preferred_width;
+  widget_class->get_preferred_height = eos_shadow_frame_get_preferred_height;
 }
 
 static void
