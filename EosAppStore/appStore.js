@@ -42,8 +42,8 @@ const AppStore = new Lang.Class({
     Extends: Gtk.Application,
 
     _init: function() {
-        this.parent({     application_id: APP_STORE_NAME,
-                                   flags: Gio.ApplicationFlags.IS_SERVICE,
+        this.parent({ application_id: APP_STORE_NAME,
+                      flags: Gio.ApplicationFlags.IS_SERVICE,
                       inactivity_timeout: CLEAR_TIMEOUT, });
 
         this._storeModel = new StoreModel.StoreModel();
@@ -70,6 +70,9 @@ const AppStore = new Lang.Class({
 
         // the backing app list model
         this._appModel = new AppListModel.StoreModel();
+
+        // no window by default
+        this._mainWindow = null;
     },
 
     vfunc_activate: function() {
@@ -83,7 +86,7 @@ const AppStore = new Lang.Class({
             this._mainWindow.connect('visibility-changed',
                                      Lang.bind(this, this._onVisibilityChanged));
         }
-    }
+    },
 
     get appModel() {
         return this._appModel;
@@ -94,7 +97,6 @@ const AppStore = new Lang.Class({
     },
 
     get mainWindow() {
-        this._createMainWindow();
         return this._mainWindow;
     },
 
@@ -107,11 +109,11 @@ const AppStore = new Lang.Class({
     },
 
     Toggle: function(reset, timestamp) {
+        this._createMainWindow();
         this._mainWindow.toggle(reset, timestamp);
     },
 
     ShowPage: function(page, timestamp) {
-        let valid = true;
         if (page == 'apps') {
             this._storeModel.changePage(StoreModel.StorePage.APPS);
         } else if (page == 'folders') {
@@ -122,6 +124,7 @@ const AppStore = new Lang.Class({
             log("Unrecognized page '" + page + "'");
         }
 
+        this._createMainWindow();
         this._mainWindow.showPage(timestamp);
     },
 
