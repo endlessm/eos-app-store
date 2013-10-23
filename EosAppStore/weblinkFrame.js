@@ -283,7 +283,7 @@ const TwoLinesLabel = new Lang.Class({
 
 const WeblinkListBoxRow = new Lang.Class({
     Name: 'WeblinkListBoxRow',
-    Extends: EosAppStorePrivate.ShadowFrame,
+    Extends: Gtk.Bin,
 
     templateResource: '/com/endlessm/appstore/eos-app-store-weblink-list-row.ui',
     templateChildren: [
@@ -663,7 +663,10 @@ const WeblinkFrame = new Lang.Class({
             let cells = EosAppStorePrivate.link_load_content(category.id);
             let index = 0;
             for (let i in cells) {
-                let row = new WeblinkListBoxRow(this, this._weblinkListModel, cells[i]);
+                let info = cells[i];
+                let row = info.create_row();
+                let rowContent = new WeblinkListBoxRow(this, this._weblinkListModel, info);
+                row.add(rowContent);
                 weblinksColumnBoxes[(index++)%this._columns].add(row);
             }
 
