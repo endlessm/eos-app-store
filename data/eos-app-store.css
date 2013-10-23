@@ -421,10 +421,15 @@
     background-color: transparent;
 }
 
+.weblink-listbox .list-row {
+    -GtkWidget-focus-padding: 0;
+    -GtkWidget-focus-line-width: 0;
+}
+
 .weblink-listbox .list-row-separator {
     background-color: transparent;
     border: none;
-    padding-top: 3px;
+    padding-top: 11px;
 }
 
 .weblink-scrolledwindow {
@@ -448,15 +453,6 @@
                   0 2px  3px alpha(#f9f8f8, 0.3),
                   0 -2px 3px alpha(#f9f8f8, 0.3);
     margin: 4px;
-}
-
-.weblink-listbox .weblink-row {
-    padding-left: 4px;
-    padding-right: 4px;
-}
-
-.weblink-listbox .weblink-row .url {
-    padding-bottom: 8px;
 }
 
 .weblink-listbox .list-row .state-button {

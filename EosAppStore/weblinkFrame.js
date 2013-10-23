@@ -24,7 +24,7 @@ const NEW_SITE_SUCCESS_TIMEOUT = 3;
 
 const CATEGORY_TRANSITION_MS = 500;
 
-const LIST_COLUMNS_SPACING = 1;
+const LIST_COLUMNS_SPACING = 10;
 
 const DEFAULT_ICON = 'generic-link';
 
@@ -305,14 +305,13 @@ const WeblinkListBoxRow = new Lang.Class({
         this.add(this._mainBox);
 
         this._descriptionLabel = new TwoLinesLabel({ visible: true,
-                                                     vexpand: true,
                                                      xalign: 0,
                                                      yalign: 0,
                                                      ellipsize: Pango.EllipsizeMode.END,
                                                      wrap: true,
                                                      wrap_mode: Pango.WrapMode.WORD_CHAR });
         this._descriptionLabel.get_style_context().add_class('description');
-        this._labelsBox.pack_start(this._descriptionLabel, true, true, 0);
+        this._labelsBox.pack_start(this._descriptionLabel, false, true, 0);
         this._labelsBox.reorder_child(this._descriptionLabel, 1);
 
         this._nameLabel.set_text(info.get_title());
