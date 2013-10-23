@@ -409,7 +409,7 @@ eos_link_info_unref (EosLinkInfo *info)
 }
 
 const gchar *
-eos_link_info_get_id (EosLinkInfo *info)
+eos_link_info_get_desktop_id (EosLinkInfo *info)
 {
   g_return_val_if_fail (info != NULL, NULL);
 
