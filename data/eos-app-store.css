@@ -434,27 +434,28 @@
     -GtkScrolledWindow-scrollbars-within-bevel: false;
 }
 
-.weblink-listbox .weblink-row {
-    background: alpha(black, 0.25);
+.weblink-row-image {
+    background-color: #2a2a2a;
     border-radius: 4px;
-    icon-shadow: 0 2px 2px 0px rgba(0, 0, 0, 1);
-    margin: 4px;
+    icon-shadow: 0 2px 2px black;
+    margin-bottom: 4px;
 }
 
-.weblink-listbox .weblink-row:hover {
-    background: alpha(#f9f8f8, 0.95);
+.weblink-row-image.select {
+    background-color: alpha(#f9f8f8, 0.95);
     icon-shadow: -2px 0  3px alpha(#f9f8f8, 0.3),
                   2px 0  3px alpha(#f9f8f8, 0.3),
                   0 2px  3px alpha(#f9f8f8, 0.3),
                   0 -2px 3px alpha(#f9f8f8, 0.3);
+    margin: 4px;
 }
 
-.weblink-listbox .weblink-row .weblink-row-content {
+.weblink-listbox .weblink-row {
     padding-left: 4px;
     padding-right: 4px;
 }
 
-.weblink-listbox .weblink-row .weblink-row-content .url {
+.weblink-listbox .weblink-row .url {
     padding-bottom: 8px;
 }
 

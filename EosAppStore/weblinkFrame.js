@@ -24,8 +24,6 @@ const NEW_SITE_SUCCESS_TIMEOUT = 3;
 
 const CATEGORY_TRANSITION_MS = 500;
 
-const THUMBNAIL_SIZE = 90;
-
 const LIST_COLUMNS_SPACING = 1;
 
 const DEFAULT_ICON = 'generic-link';
@@ -321,24 +319,6 @@ const WeblinkListBoxRow = new Lang.Class({
         this._descriptionLabel.set_text(info.get_description());
         this._urlLabel.set_text(info.get_url());
 
-        let thumbnail = info.get_thumbnail();
-        if (thumbnail) {
-            // Scale and crop
-            if (thumbnail.height > thumbnail.width) {
-                thumbnail = thumbnail.scale_simple(THUMBNAIL_SIZE,
-                                                   Math.floor(thumbnail.height * THUMBNAIL_SIZE / thumbnail.width),
-                                                   GdkPixbuf.InterpType.BILINEAR);
-            } else {
-                thumbnail = thumbnail.scale_simple(Math.floor(thumbnail.width * THUMBNAIL_SIZE / thumbnail.height),
-                                                   THUMBNAIL_SIZE,
-                                                   GdkPixbuf.InterpType.BILINEAR);
-            }
-            thumbnail = thumbnail.new_subpixbuf(0, 0, THUMBNAIL_SIZE, THUMBNAIL_SIZE);
-            this._icon.set_from_pixbuf(thumbnail);
-        }
-
-        this._thumbnail = thumbnail;
-
         this._setButtonStates();
         this._mainBox.show();
     },
@@ -373,15 +353,14 @@ const WeblinkListBoxRow = new Lang.Class({
         if (isHover) {
             this._setActiveState(true);
             icon = this._info.get_icon();
+            if (icon) {
+                this._icon.set_from_pixbuf(icon);
+            } else {
+                this._icon.set_from_icon_name(DEFAULT_ICON, Gtk.IconSize.DIALOG);
+            }
         } else {
             this._setActiveState(false);
-            icon = this._thumbnail;
-        }
-
-        if (icon) {
-            this._icon.set_from_pixbuf(icon);
-        } else {
-            this._icon.set_from_icon_name(DEFAULT_ICON, Gtk.IconSize.DIALOG);
+            this._icon.clear();
         }
     },
 

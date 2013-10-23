@@ -12,8 +12,12 @@ struct _EosLinkRow {
 
   EosLinkInfo *link_info;
 
-  GdkPixbuf *bg_image_normal;
-  GdkPixbuf *bg_image_selected;
+  GdkPixbuf *image;
+  GdkPixbuf *selected_image;
+
+  GtkStyleContext *image_context;
+
+  gint cell_margin;
 };
 
 struct _EosLinkRowClass {
@@ -30,22 +34,71 @@ static GParamSpec * eos_link_row_props[NUM_PROPS] = { NULL, };
 
 G_DEFINE_TYPE (EosLinkRow, eos_link_row, GTK_TYPE_BIN)
 
+#define PROVIDER_DATA_FORMAT ".weblink-row-image { " \
+  "background-image: url(\"%s\"); "                  \
+  "background-repeat: no-repeat; "                   \
+  "background-size: 90px 90px; }"
+
+static GtkStyleContext *
+eos_link_row_get_cell_style_context (void)
+{
+  GtkStyleContext *style_context;
+  GtkWidgetPath *widget_path;
+
+  widget_path = gtk_widget_path_new ();
+  gtk_widget_path_append_type (widget_path, eos_link_row_get_type ());
+
+  style_context = gtk_style_context_new ();
+  gtk_style_context_set_path (style_context, widget_path);
+  gtk_style_context_add_class (style_context, "weblink-row-image");
+  gtk_widget_path_free (widget_path);
+
+  return style_context;
+}
+
+static gint
+eos_link_row_get_cell_margin_for_context (GtkStyleContext *context)
+{
+  GtkBorder margin, select_margin;
+  gint retval;
+
+  gtk_style_context_get_margin (context,
+                                GTK_STATE_FLAG_NORMAL,
+                                &margin);
+
+  gtk_style_context_save (context);
+  gtk_style_context_add_class (context, "select");
+  gtk_style_context_get_margin (context,
+                                GTK_STATE_FLAG_NORMAL,
+                                &select_margin);
+  gtk_style_context_restore (context);
+
+  margin.top = MAX (margin.top, select_margin.top);
+  margin.right = MAX (margin.right, select_margin.right);
+  margin.bottom = MAX (margin.bottom, select_margin.bottom);
+  margin.left = MAX (margin.left, select_margin.left);
+
+  retval = margin.top + margin.bottom;
+  retval = MAX (retval, margin.left + margin.right);
+
+  return retval;
+}
+
 static GdkPixbuf *
-get_pixbuf_background (EosLinkRow *self,
-                       gint image_width,
-                       gint image_height)
+get_selected_pixbuf_background (EosLinkRow *self,
+                                gint image_width,
+                                gint image_height)
 {
   GdkPixbuf *retval;
   cairo_surface_t *surface;
   cairo_t *cr;
-  GtkStyleContext *context = gtk_widget_get_style_context (GTK_WIDGET(self));
 
   surface = cairo_image_surface_create (CAIRO_FORMAT_ARGB32,
                                         image_width, image_height);
   cr = cairo_create (surface);
-  gtk_render_background (context, cr,
+  gtk_render_background (self->image_context, cr,
                          0, 0, image_width, image_height);
-  gtk_render_frame (context, cr,
+  gtk_render_frame (self->image_context, cr,
                     0, 0, image_width, image_height);
 
   retval = gdk_pixbuf_get_from_surface (surface, 0, 0,
@@ -57,45 +110,128 @@ get_pixbuf_background (EosLinkRow *self,
   return retval;
 }
 
+static GdkPixbuf *
+get_pixbuf_background (EosLinkRow *self,
+                       const gchar *path,
+                       gint image_width,
+                       gint image_height,
+                       GError **error)
+{
+  GdkPixbuf *retval;
+  cairo_surface_t *surface;
+  cairo_t *cr;
+  GtkCssProvider *provider;
+  gchar *provider_data;
+
+  provider_data = g_strdup_printf (PROVIDER_DATA_FORMAT, path);
+  provider = gtk_css_provider_new ();
+
+  if (!gtk_css_provider_load_from_data (provider, provider_data, -1, error))
+    {
+      g_free (provider_data);
+      g_object_unref (provider);
+
+      return NULL;
+    }
+
+  gtk_style_context_add_provider (self->image_context,
+                                  GTK_STYLE_PROVIDER (provider),
+                                  GTK_STYLE_PROVIDER_PRIORITY_APPLICATION);
+
+  surface = cairo_image_surface_create (CAIRO_FORMAT_ARGB32,
+                                        image_width, image_height);
+  cr = cairo_create (surface);
+  gtk_render_background (self->image_context, cr,
+                         0, 0, image_width, image_height);
+
+  retval = gdk_pixbuf_get_from_surface (surface, 0, 0,
+                                        image_width, image_height);
+
+  cairo_destroy (cr);
+  cairo_surface_destroy (surface);
+
+  gtk_style_context_remove_provider (self->image_context,
+                                     GTK_STYLE_PROVIDER (provider));
+
+  g_free (provider_data);
+  g_object_unref (provider);
+
+  return retval;
+}
+
+static void
+eos_link_row_draw_selected (EosLinkRow *self,
+                            cairo_t *cr,
+                            gint width,
+                            gint height)
+{
+  gint image_width, image_height;
+  GtkBorder image_margin;
+
+  image_width = width - self->cell_margin;
+  image_height = height - self->cell_margin;
+
+  gtk_style_context_save (self->image_context);
+  gtk_style_context_add_class (self->image_context, "select");
+
+  if (self->selected_image == NULL)
+    self->selected_image = get_selected_pixbuf_background (self, image_width, image_height);
+
+  gtk_style_context_get_margin (self->image_context,
+                                GTK_STATE_FLAG_NORMAL,
+                                &image_margin);
+
+  gtk_render_icon (self->image_context,
+                   cr,
+                   self->selected_image,
+                   MAX (image_margin.top, (gint) self->cell_margin / 2),
+                   MAX (image_margin.left, (gint) self->cell_margin / 2));
+
+  gtk_style_context_restore (self->image_context);
+}
+
+static void
+eos_link_row_draw_normal (EosLinkRow *self,
+                          cairo_t *cr,
+                          gint width,
+                          gint height)
+{
+  gint image_width, image_height;
+  GtkBorder image_margin;
+
+  image_width = width - self->cell_margin;
+  image_height = height - self->cell_margin;
+
+  if (self->image == NULL)
+    self->image = get_pixbuf_background (self,
+                                         eos_link_info_get_thumbnail_filename (self->link_info),
+                                         image_width, image_height, NULL);
+
+  gtk_style_context_get_margin (self->image_context,
+                                GTK_STATE_FLAG_NORMAL,
+                                &image_margin);
+
+  gtk_render_icon (self->image_context,
+                   cr,
+                   self->image,
+                   MAX (image_margin.top, (gint) self->cell_margin / 2),
+                   MAX (image_margin.left, (gint) self->cell_margin / 2));
+}
+
 static gboolean
 eos_link_row_draw (GtkWidget *widget,
                    cairo_t   *cr)
 {
   EosLinkRow *self = (EosLinkRow *) widget;
+  gint width, height;
 
-  GtkAllocation allocation;
-  GdkPixbuf *background;
-  GtkBorder margin;
-  int image_width, image_height;
-
-  GtkStyleContext *context = gtk_widget_get_style_context (widget);
-  gtk_style_context_get_margin (context,
-                                gtk_style_context_get_state (context),
-                                &margin);
-
-  gtk_widget_get_allocation (widget, &allocation);
-
-  image_width = allocation.width - margin.left - margin.right;
-  image_height = allocation.height - margin.top - margin.bottom;
+  width = gtk_widget_get_allocated_width (widget);
+  height = gtk_widget_get_allocated_height (widget);
 
   if (gtk_widget_get_state_flags (widget) & SELECTED)
-    {
-      if (!self->bg_image_selected)
-        self->bg_image_selected = get_pixbuf_background (self, image_width, image_height);
-      background = self->bg_image_selected;
-    }
+    eos_link_row_draw_selected (self, cr, width, height);
   else
-    {
-      if (!self->bg_image_normal)
-        self->bg_image_normal = get_pixbuf_background (self, image_width, image_height);
-      background = self->bg_image_normal;
-  }
-
-  gtk_render_icon (context,
-                   cr,
-                   background,
-                   margin.top,
-                   margin.left);
+    eos_link_row_draw_normal (self, cr, width, height);
 
   GTK_WIDGET_CLASS (eos_link_row_parent_class)->draw (widget, cr);
 
@@ -104,42 +240,32 @@ eos_link_row_draw (GtkWidget *widget,
 
 static void
 eos_link_row_get_preferred_width (GtkWidget *widget,
-                                      gint      *minimum_width,
-                                      gint      *natural_width)
+                                  gint      *minimum_width,
+                                  gint      *natural_width)
 {
-  GtkBorder margin;
-  GtkStyleContext *context = gtk_widget_get_style_context (widget);
+  EosLinkRow *self = (EosLinkRow *) widget;
 
   GTK_WIDGET_CLASS (eos_link_row_parent_class)->get_preferred_width (widget, minimum_width, natural_width);
 
-  gtk_style_context_get_margin (context,
-                                gtk_style_context_get_state (context),
-                                &margin);
-
   if (minimum_width)
-    *minimum_width += margin.left + margin.right;
+    *minimum_width += self->cell_margin;
   if (natural_width)
-    *natural_width += margin.left + margin.right;
+    *natural_width += self->cell_margin;
 }
 
 static void
 eos_link_row_get_preferred_height (GtkWidget *widget,
-                                       gint      *minimum_height,
-                                       gint      *natural_height)
+                                   gint      *minimum_height,
+                                   gint      *natural_height)
 {
-  GtkBorder margin;
-  GtkStyleContext *context = gtk_widget_get_style_context (widget);
+  EosLinkRow *self = (EosLinkRow *) widget;
 
   GTK_WIDGET_CLASS (eos_link_row_parent_class)->get_preferred_height (widget, minimum_height, natural_height);
 
-  gtk_style_context_get_margin (context,
-                                gtk_style_context_get_state (context),
-                                &margin);
-
   if (minimum_height)
-    *minimum_height += margin.top + margin.bottom;
+    *minimum_height += self->cell_margin;
   if (natural_height)
-    *natural_height += margin.top + margin.bottom;
+    *natural_height += self->cell_margin;
 }
 
 static void
@@ -173,7 +299,7 @@ eos_link_row_set_property (GObject      *gobject,
     {
     case PROP_LINK_INFO:
       g_assert (self->link_info == NULL);
-      self->link_info = eos_link_info_ref (g_value_get_boxed (value));
+      self->link_info = g_value_dup_boxed (value);
       g_assert (self->link_info != NULL);
       break;
 
@@ -187,8 +313,9 @@ eos_link_row_finalize (GObject *gobject)
 {
   EosLinkRow *self = (EosLinkRow *) gobject;
 
-  g_clear_object (&self->bg_image_normal);
-  g_clear_object (&self->bg_image_selected);
+  g_clear_object (&self->image);
+  g_clear_object (&self->selected_image);
+  g_clear_object (&self->image_context);
 
   g_clear_pointer (&self->link_info, eos_link_info_unref);
 
@@ -222,10 +349,8 @@ eos_link_row_class_init (EosLinkRowClass *klass)
 static void
 eos_link_row_init (EosLinkRow *self)
 {
-  GtkStyleContext *context;
-
-  context = gtk_widget_get_style_context (GTK_WIDGET (self));
-  gtk_style_context_add_class (context, "weblink-row");
+  self->image_context = eos_link_row_get_cell_style_context ();
+  self->cell_margin = eos_link_row_get_cell_margin_for_context (self->image_context);
 }
 
 struct _EosLinkInfo
@@ -277,7 +402,6 @@ eos_link_info_unref (EosLinkInfo *info)
       g_free (info->icon_filename);
       g_free (info->thumbnail_filename);
       g_clear_object (&(info->icon));
-      g_clear_object (&(info->thumbnail));
       g_free (info->url);
 
       g_slice_free (EosLinkInfo, info);
@@ -340,22 +464,6 @@ eos_link_info_get_icon (EosLinkInfo *info)
   return info->icon;
 }
 
-/**
- * eos_link_info_get_thumbnail:
- * @info: ...
- *
- * ...
- *
- * Returns: (transfer none): ...
- */
-GdkPixbuf *
-eos_link_info_get_thumbnail (EosLinkInfo *info)
-{
-  g_return_val_if_fail (info != NULL, NULL);
-
-  return info->thumbnail;
-}
-
 const gchar *
 eos_link_info_get_url (EosLinkInfo *info)
 {
@@ -384,7 +492,6 @@ eos_link_info_create_from_json (JsonNode *node)
   EosLinkInfo *info;
   JsonObject *obj;
   gchar *path;
-  gchar *thumbnail_filename;
   gchar *icon_filename;
 
   g_return_val_if_fail (JSON_NODE_HOLDS_OBJECT (node), NULL);
@@ -434,24 +541,12 @@ eos_link_info_create_from_json (JsonNode *node)
   if (json_object_has_member (obj, "linkSmall"))
     {
       path = eos_link_get_content_dir();
-      thumbnail_filename = g_build_filename (path,
+      info->thumbnail_filename = g_build_filename (path,
                                              json_node_get_string (json_object_get_member (obj, "linkSmall")),
                                              NULL);
-      info->thumbnail = gdk_pixbuf_new_from_file (thumbnail_filename, NULL);
-      g_free (path);
-      if (info->thumbnail)
-        {
-          info->thumbnail_filename = thumbnail_filename;
-        }
-      else
-        {
-          info->thumbnail_filename = NULL;
-          g_free (thumbnail_filename);
-        }
     }
   else
     {
-      info->thumbnail = NULL;
       info->thumbnail_filename = NULL;
     }
 
