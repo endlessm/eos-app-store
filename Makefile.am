@@ -34,4 +34,4 @@ eos-reset-desktop: eos-reset-desktop.in Makefile
 	chmod +x $@
 
 CLEANFILES += eos-app-store eos-fill-desktop eos-reset-desktop
-EXTRA_DIST += eos-app-store.in eos-fill-desktop eos-reset-desktop.in
+EXTRA_DIST += eos-app-store.in eos-fill-desktop.in eos-reset-desktop.in

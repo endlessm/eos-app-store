@@ -62,7 +62,7 @@ const FillDesktop = new Lang.Class({
         }
 
         // Check if it is already installed
-        let state =  this._appList.getState(appId);
+        let state = this._appList.getState(appId);
         if (state == EosAppStorePrivate.AppState.INSTALLED) {
             this._install();
             return;
