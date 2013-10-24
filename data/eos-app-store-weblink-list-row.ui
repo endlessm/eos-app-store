@@ -19,7 +19,7 @@
             <property name="can_focus">False</property>
             <child>
               <object class="GtkImage" id="_icon">
-                <property name="width_request">90</property>
+                <property name="width_request">94</property>
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
                 <style>
@@ -37,9 +37,10 @@
               <object class="GtkBox" id="_labelsBox">
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
-                <property name="margin_left">9</property>
-                <property name="margin_top">9</property>
                 <property name="orientation">vertical</property>
+                <property name="margin_left">15</property>
+                <property name="margin_right">15</property>
+                <property name="margin_top">15</property>
                 <child>
                   <object class="GtkLabel" id="_nameLabel">
                     <property name="visible">True</property>
@@ -60,12 +61,10 @@
                   </packing>
                 </child>
                 <child>
-                  <placeholder/>
-                </child>
-                <child>
                   <object class="GtkBox" id="box1">
                     <property name="visible">True</property>
                     <property name="can_focus">False</property>
+                    <property name="vexpand">True</property>
                     <child>
                       <object class="GtkEventBox" id="eventbox1">
                         <property name="visible">True</property>
@@ -79,7 +78,6 @@
                             <property name="visible">True</property>
                             <property name="can_focus">False</property>
                             <property name="no_show_all">True</property>
-                            <property name="valign">end</property>
                             <property name="xalign">0</property>
                             <property name="ellipsize">end</property>
                             <property name="single_line_mode">True</property>
@@ -113,7 +111,7 @@
                   <packing>
                     <property name="expand">False</property>
                     <property name="fill">True</property>
-                    <property name="position">2</property>
+                    <property name="position">1</property>
                   </packing>
                 </child>
               </object>

@@ -24,9 +24,7 @@ const NEW_SITE_SUCCESS_TIMEOUT = 3;
 
 const CATEGORY_TRANSITION_MS = 500;
 
-const THUMBNAIL_SIZE = 90;
-
-const LIST_COLUMNS_SPACING = 15;
+const LIST_COLUMNS_SPACING = 10;
 
 const DEFAULT_ICON = 'generic-link';
 
@@ -164,7 +162,7 @@ const NewSiteBox = new Lang.Class({
         this._siteUrlFrame.remove(this._urlEntry);
         this._siteUrlFrame.add(urlLabel);
         this._siteUrlFrame.show_all();
-        
+
         this._siteAlertLabel.set_text(_("added successfully!"));
         this._siteAddButton.sensitive = false;
         this._switchAlertIcon(AlertIcon.HIDDEN);
@@ -307,37 +305,18 @@ const WeblinkListBoxRow = new Lang.Class({
         this.add(this._mainBox);
 
         this._descriptionLabel = new TwoLinesLabel({ visible: true,
-                                                     vexpand: true,
                                                      xalign: 0,
                                                      yalign: 0,
                                                      ellipsize: Pango.EllipsizeMode.END,
                                                      wrap: true,
                                                      wrap_mode: Pango.WrapMode.WORD_CHAR });
         this._descriptionLabel.get_style_context().add_class('description');
-        this._labelsBox.pack_start(this._descriptionLabel, true, true, 0);
+        this._labelsBox.pack_start(this._descriptionLabel, false, true, 0);
         this._labelsBox.reorder_child(this._descriptionLabel, 1);
 
         this._nameLabel.set_text(info.get_title());
         this._descriptionLabel.set_text(info.get_description());
         this._urlLabel.set_text(info.get_url());
-
-        let thumbnail = info.get_thumbnail();
-        if (thumbnail) {
-            // Scale and crop
-            if (thumbnail.height > thumbnail.width) {
-                thumbnail = thumbnail.scale_simple(THUMBNAIL_SIZE,
-                                                   Math.floor(thumbnail.height * THUMBNAIL_SIZE / thumbnail.width),
-                                                   GdkPixbuf.InterpType.BILINEAR);
-            } else {
-                thumbnail = thumbnail.scale_simple(Math.floor(thumbnail.width * THUMBNAIL_SIZE / thumbnail.height),
-                                                   THUMBNAIL_SIZE,
-                                                   GdkPixbuf.InterpType.BILINEAR);
-            }
-            thumbnail = thumbnail.new_subpixbuf(0, 0, THUMBNAIL_SIZE, THUMBNAIL_SIZE);
-            this._icon.set_from_pixbuf(thumbnail);
-        }
-
-        this._thumbnail = thumbnail;
 
         this._setButtonStates();
         this._mainBox.show();
@@ -373,15 +352,14 @@ const WeblinkListBoxRow = new Lang.Class({
         if (isHover) {
             this._setActiveState(true);
             icon = this._info.get_icon();
+            if (icon) {
+                this._icon.set_from_pixbuf(icon);
+            } else {
+                this._icon.set_from_icon_name(DEFAULT_ICON, Gtk.IconSize.DIALOG);
+            }
         } else {
             this._setActiveState(false);
-            icon = this._thumbnail;
-        }
-
-        if (icon) {
-            this._icon.set_from_pixbuf(icon);
-        } else {
-            this._icon.set_from_icon_name(DEFAULT_ICON, Gtk.IconSize.DIALOG);
+            this._icon.clear();
         }
     },
 
@@ -663,7 +641,10 @@ const WeblinkFrame = new Lang.Class({
             let cells = EosAppStorePrivate.link_load_content(category.id);
             let index = 0;
             for (let i in cells) {
-                let row = new WeblinkListBoxRow(this, this._weblinkListModel, cells[i]);
+                let info = cells[i];
+                let row = info.create_row();
+                let rowContent = new WeblinkListBoxRow(this, this._weblinkListModel, info);
+                row.add(rowContent);
                 weblinksColumnBoxes[(index++)%this._columns].add(row);
             }
 
