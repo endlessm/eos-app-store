@@ -1,6 +1,7 @@
 //-*- mode: js; js-indent-level: 4; indent-tabs-mode: nil -*-
 
 const AppListModel = imports.appListModel;
+const Categories = imports.categories;
 const EosAppStorePrivate = imports.gi.EosAppStorePrivate;
 const Gettext = imports.gettext;
 const Gio = imports.gi.Gio;
@@ -18,22 +19,6 @@ const FillDesktop = new Lang.Class({
         this._appList = null;
         this._appInfos = [];
 
-        this._appCategories = [
-            EosAppStorePrivate.AppCategory.FEATURED,
-            EosAppStorePrivate.AppCategory.EDUCATION,
-            EosAppStorePrivate.AppCategory.LEISURE,
-            EosAppStorePrivate.AppCategory.UTILITIES,
-            EosAppStorePrivate.AppCategory.MY_APPLICATIONS,
-        ];
-
-        this._linkCategories = [
-            EosAppStorePrivate.LinkCategory.NEWS,
-            EosAppStorePrivate.LinkCategory.SPORTS,
-            EosAppStorePrivate.LinkCategory.EDUCATION,
-            EosAppStorePrivate.LinkCategory.ENTERTAINMENT,
-            EosAppStorePrivate.LinkCategory.LOCAL,
-        ];
-
         this.parent({ application_id: FILL_DESKTOP_NAME });
     },
 
@@ -45,14 +30,16 @@ const FillDesktop = new Lang.Class({
     },
 
     vfunc_activate: function() {
-        for (let c in this._appCategories) {
-            let category = this._appCategories[c];
+        let categories = Categories.get_app_categories();
+        for (let c in categories) {
+            let category = categories[c].id;
 
             this._appInfos = this._appInfos.concat(EosAppStorePrivate.app_load_content(category));
         }
 
-        for (let c in this._linkCategories) {
-            let category = this._linkCategories[c];
+        categories = Categories.get_link_categories();
+        for (let c in categories) {
+            let category = categories[c].id;
 
             this._appInfos = this._appInfos.concat(EosAppStorePrivate.link_load_content(category));
         }

@@ -10,6 +10,7 @@ const PLib = imports.gi.PLib;
 const Endless = imports.gi.Endless;
 
 const AppListModel = imports.appListModel;
+const Categories = imports.categories;
 const CategoryButton = imports.categoryButton;
 const Builder = imports.builder;
 const Lang = imports.lang;
@@ -244,38 +245,7 @@ const AppFrame = new Lang.Class({
 
         this.get_style_context().add_class('app-frame');
 
-        this._categories = [
-            {
-                name: 'featured',
-                widget: null,
-                label: _("Featured"),
-                id: EosAppStorePrivate.AppCategory.FEATURED,
-            },
-            {
-                name: 'education',
-                widget: null,
-                label: _("Education"),
-                id: EosAppStorePrivate.AppCategory.EDUCATION,
-            },
-            {
-                name: 'leisure',
-                widget: null,
-                label: _("Leisure"),
-                id: EosAppStorePrivate.AppCategory.LEISURE,
-            },
-            {
-                name: 'utilities',
-                widget: null,
-                label: _("Utilities"),
-                id: EosAppStorePrivate.AppCategory.UTILITIES,
-            },
-            {
-                name: 'my-applications',
-                widget: null,
-                label: _("My applications"),
-                id: EosAppStorePrivate.AppCategory.MY_APPLICATIONS,
-            },
-        ];
+        this._categories = Categories.get_app_categories();
 
         this._backClickedId = 0;
 

@@ -3,6 +3,7 @@ dist_js_DATA = \
 	$(js_built_sources) \
 	appFrame.js \
 	appListModel.js \
+	categories.js \
 	categoryButton.js \
 	fillDesktop.js \
 	folderFrame.js \
