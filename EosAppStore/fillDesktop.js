@@ -44,6 +44,21 @@ const FillDesktop = new Lang.Class({
             this._appInfos = this._appInfos.concat(EosAppStorePrivate.link_load_content(category));
         }
 
+        // Remove elements without ID or already installed
+        this._appInfos = this._appInfos.filter(Lang.bind(this, function(app) {
+            let appId = app.get_desktop_id();
+            if (!appId) {
+                return false;
+            }
+
+            let state = this._appList.getState(appId);
+            if (state == EosAppStorePrivate.AppState.UNINSTALLED) {
+                return true;
+            } else {
+                return false;
+            }
+        }));
+
         this._install();
         this.hold();
     },
@@ -56,26 +71,15 @@ const FillDesktop = new Lang.Class({
         }
 
         let appId = app.get_desktop_id();
-        if (!appId) {
-            this._install();
-            return;
-        }
 
-        // Check if it is already installed
-        let state = this._appList.getState(appId);
-        if (state == EosAppStorePrivate.AppState.INSTALLED) {
-            this._install();
-            return;
-        }
-
-        try {
-            this._appList.install(appId, Lang.bind(this, function(model, res) {
+        this._appList.install(appId, Lang.bind(this, function(model, res) {
+            try {
                 model.install_app_finish(res);
                 this._install();
-            }));
-        } catch (e) {
-            this._install();
-        }
+            } catch (e) {
+                this._install();
+            }
+        }));
     },
 
     get appModel() {
