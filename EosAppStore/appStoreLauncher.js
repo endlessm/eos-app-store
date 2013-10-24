@@ -96,7 +96,6 @@ function main() {
 
     let storeLauncher = new AppStoreLauncher();
     storeLauncher.proxy.ShowPageRemote(initialPage, Gdk.CURRENT_TIME);
-    storeLauncher.proxy.ToggleRemote(true, Gdk.CURRENT_TIME);
 
     return 0;
 }
