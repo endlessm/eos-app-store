@@ -118,6 +118,8 @@ const AppStore = new Lang.Class({
     },
 
     ShowPage: function(page, timestamp) {
+        this._createMainWindow();
+
         if (page == 'apps') {
             this._storeModel.changePage(StoreModel.StorePage.APPS);
         } else if (page == 'folders') {
@@ -128,7 +130,6 @@ const AppStore = new Lang.Class({
             log("Unrecognized page '" + page + "'");
         }
 
-        this._createMainWindow();
         this._mainWindow.showPage(timestamp);
     },
 
