@@ -1,3 +1,4 @@
+appstore.zip
 Makefile
 Makefile.in
 stamp-h1
@@ -47,3 +48,4 @@ stamp-h1
 /po/stamp-it
 /po/.intltool-merge-cache
 /po/*.gmo
+/unzipped
