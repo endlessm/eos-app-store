@@ -142,6 +142,11 @@ const AppList = new Lang.Class({
     Name: 'AppList',
     Extends: BaseList,
 
+    _init: function() {
+        this._apps = [];
+        this.parent();
+    },
+
     _onModelChanged: function(model, items) {
         let myPersonality = Endless.get_system_personality();
 
