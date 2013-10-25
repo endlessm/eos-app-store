@@ -143,7 +143,7 @@ const AppList = new Lang.Class({
     Extends: BaseList,
 
     _onModelChanged: function(model, items) {
-        let my_personality = Endless.get_system_personality();
+        let myPersonality = Endless.get_system_personality();
 
         let apps = items.filter(Lang.bind(this, function(item) {
             if (item.indexOf(EOS_LINK_PREFIX) == 0) {
@@ -151,7 +151,7 @@ const AppList = new Lang.Class({
                 return false;
             } else {
                 let info = model.model.get_app_info(item);
-                return this._isAppVisible(info, my_personality);
+                return this._isAppVisible(info, myPersonality);
             }
         }));
         this._apps = apps;
@@ -179,13 +179,13 @@ const WeblinkList = new Lang.Class({
     },
 
     _onModelChanged: function(model, items) {
-        let my_personality = Endless.get_system_personality();
+        let myPersonality = Endless.get_system_personality();
 
         let weblinks = items.filter(Lang.bind(this, function(item) {
             if (item.indexOf(EOS_LINK_PREFIX) == 0) {
                 // only take web links into account
                 let info = model.model.get_app_info(item);
-                return this._isAppVisible(info, my_personality);
+                return this._isAppVisible(info, myPersonality);
             } else {
                 return false;
             }
