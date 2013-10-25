@@ -12,6 +12,7 @@ const WebKit = imports.gi.WebKit2;
 
 const AppListModel = imports.appListModel;
 const AppStoreWindow = imports.appStoreWindow;
+const Categories = imports.categories;
 const CategoryButton = imports.categoryButton;
 const Builder = imports.builder;
 const Lang = imports.lang;
@@ -500,38 +501,7 @@ const WeblinkFrame = new Lang.Class({
 
         this.get_style_context().add_class('web-frame');
 
-        this._categories = [
-            {
-                name: 'news',
-                widget: null,
-                label: _("News"),
-                id: EosAppStorePrivate.LinkCategory.NEWS,
-            },
-            {
-                name: 'sports',
-                widget: null,
-                label: _("Sports"),
-                id: EosAppStorePrivate.LinkCategory.SPORTS,
-            },
-            {
-                name: 'education',
-                widget: null,
-                label: _("Education and Health"),
-                id: EosAppStorePrivate.LinkCategory.EDUCATION,
-            },
-            {
-                name: 'entertainment',
-                widget: null,
-                label: _("Entertainment"),
-                id: EosAppStorePrivate.LinkCategory.ENTERTAINMENT,
-            },
-            {
-                name: 'local',
-                widget: null,
-                label: _("Local"),
-                id: EosAppStorePrivate.LinkCategory.LOCAL,
-            }
-        ];
+        this._categories = Categories.get_link_categories();
 
         this.initTemplate({ templateRoot: '_mainBox', bindChildren: true, connectSignals: true, });
         this.add(this._mainBox);

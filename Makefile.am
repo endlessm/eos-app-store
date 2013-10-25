@@ -14,7 +14,7 @@ EXTRA_DIST += \
 	NEWS
 
 # launcher
-bin_SCRIPTS += eos-app-store eos-reset-desktop
+bin_SCRIPTS += eos-app-store eos-fill-desktop eos-reset-desktop
 
 do_subst = $(SED) \
 	-e 's|@pkglibdir[@]|$(pkglibdir)|g' \
@@ -25,9 +25,13 @@ eos-app-store: eos-app-store.in Makefile
 	$(AM_V_GEN) $(do_subst) $< > $@
 	chmod +x $@
 
+eos-fill-desktop: eos-fill-desktop.in Makefile
+	$(AM_V_GEN) $(do_subst) $< > $@
+	chmod +x $@
+
 eos-reset-desktop: eos-reset-desktop.in Makefile
 	$(AM_V_GEN) $(do_subst) $< > $@
 	chmod +x $@
 
-CLEANFILES += eos-app-store eos-reset-desktop
-EXTRA_DIST += eos-app-store.in eos-reset-desktop.in
+CLEANFILES += eos-app-store eos-fill-desktop eos-reset-desktop
+EXTRA_DIST += eos-app-store.in eos-fill-desktop.in eos-reset-desktop.in
