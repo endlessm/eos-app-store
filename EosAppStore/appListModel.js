@@ -21,6 +21,8 @@ const StoreModel = new Lang.Class({
     Name: 'StoreModel',
 
     _init: function() {
+        this._items = [];
+
         this.model= new EosAppStorePrivate.AppListModel();
         this.model.connect('changed', Lang.bind(this, this._onModelChanged));
 
@@ -45,11 +47,16 @@ const StoreModel = new Lang.Class({
     _onLoadComplete: function(model, res) {
         this._updating = false;
         try {
-            let items = model.load_finish(res);
-            this.emit('changed', items);
+            this._items = model.load_finish(res);
+            this.emit('changed', this._items);
         } catch (e) {
+            this._items = [];
             logError('Unable to load the backing model storage: ' + e);
         }
+    },
+
+    getItems: function() {
+        return this._items;
     }
 });
 Signals.addSignalMethods(StoreModel.prototype);
@@ -64,6 +71,7 @@ const BaseList = new Lang.Class({
         this._model = this._storeModel.model;
 
         this._storeModel.connect('changed', Lang.bind(this, this._onModelChanged));
+        this._onModelChanged(this._storeModel, this._storeModel.getItems());
     },
 
     _onModelChanged: function(appModel, items) {
@@ -142,8 +150,13 @@ const AppList = new Lang.Class({
     Name: 'AppList',
     Extends: BaseList,
 
+    _init: function() {
+        this._apps = [];
+        this.parent();
+    },
+
     _onModelChanged: function(model, items) {
-        let my_personality = Endless.get_system_personality();
+        let myPersonality = Endless.get_system_personality();
 
         let apps = items.filter(Lang.bind(this, function(item) {
             if (item.indexOf(EOS_LINK_PREFIX) == 0) {
@@ -151,7 +164,7 @@ const AppList = new Lang.Class({
                 return false;
             } else {
                 let info = model.model.get_app_info(item);
-                return this._isAppVisible(info, my_personality);
+                return this._isAppVisible(info, myPersonality);
             }
         }));
         this._apps = apps;
@@ -179,13 +192,13 @@ const WeblinkList = new Lang.Class({
     },
 
     _onModelChanged: function(model, items) {
-        let my_personality = Endless.get_system_personality();
+        let myPersonality = Endless.get_system_personality();
 
         let weblinks = items.filter(Lang.bind(this, function(item) {
             if (item.indexOf(EOS_LINK_PREFIX) == 0) {
                 // only take web links into account
                 let info = model.model.get_app_info(item);
-                return this._isAppVisible(info, my_personality);
+                return this._isAppVisible(info, myPersonality);
             } else {
                 return false;
             }

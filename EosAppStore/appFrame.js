@@ -307,6 +307,7 @@ const AppFrame = new Lang.Class({
 
     _populateCategories: function() {
         let cellMargin = EosAppStorePrivate.AppInfo.get_cell_margin();
+        let availableApps = this._model.apps;
 
         for (let c in this._categories) {
             let category = this._categories[c];
@@ -344,22 +345,16 @@ const AppFrame = new Lang.Class({
             scrollWindow.add_with_viewport(grid);
 
             let appInfos = EosAppStorePrivate.app_load_content(category.id);
-            if (category.id == EosAppStorePrivate.AppCategory.MY_APPLICATIONS) {
-                let installedApps = this._model.apps;
+            appInfos = appInfos.filter(function(appInfo) {
+                let id = appInfo.get_desktop_id() + '.desktop';
+                return (availableApps.indexOf(id) != -1);
+            });
 
+            if (category.id == EosAppStorePrivate.AppCategory.MY_APPLICATIONS) {
                 for (let i in appInfos) {
                     let id = appInfos[i].get_desktop_id() + '.desktop';
 
-                    let isInstalled = false;
-                    for (let j in installedApps) {
-                        if (installedApps[j] == id &&
-                            this._model.getState(id) == EosAppStorePrivate.AppState.INSTALLED) {
-                            isInstalled = true;
-                            break;
-                        }
-                    }
-
-                    if (isInstalled) {
+                    if (this._model.getState(id) == EosAppStorePrivate.AppState.INSTALLED) {
                         let cell = appInfos[i].create_cell();
                         cell.shape = Endless.FlexyShape.SMALL;
                         grid.add(cell);
