@@ -204,7 +204,8 @@ const NewSiteBox = new Lang.Class({
         if (!this._webView) {
             this._webView = new WebKit.WebView();
             let context = this._webView.get_context();
-            let cachePath = GLib.build_filenamev([GLib.get_user_cache_dir(), 'eos-app-store']);
+            let cachePath = GLib.build_filenamev([GLib.get_user_cache_dir(),
+                                                  'eos-app-store', 'icondatabase']);
             context.set_favicon_database_directory(cachePath);
             this._webView.connect('load-changed', Lang.bind(this, this._onLoadChanged));
             this._webView.connect('load-failed', Lang.bind(this, this._onLoadFailed));
