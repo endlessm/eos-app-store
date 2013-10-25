@@ -16,6 +16,7 @@ stamp-h1
 /config.*
 /configure
 /eos-app-store
+/eos-app-store-launcher
 /eos-fill-desktop
 /eos-reset-desktop
 /install-sh

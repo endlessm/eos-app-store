@@ -3,14 +3,16 @@ dist_js_DATA = \
 	$(js_built_sources) \
 	appFrame.js \
 	appListModel.js \
-	categories.js \
-	categoryButton.js \
-	fillDesktop.js \
-	folderFrame.js \
-	folderModel.js \
+	appStoreLauncher.js \
 	appStoreWindow.js \
 	appStore.js \
 	builder.js \
+	categories.js \
+	categoryButton.js \
+	environment.js \
+	fillDesktop.js \
+	folderFrame.js \
+	folderModel.js \
 	frameClock.js \
 	main.js \
 	resetDesktop.js \

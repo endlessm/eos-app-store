@@ -28,21 +28,14 @@ CLEANFILES += \
 	eos-app-store.gresource \
 	$(NULL)
 
-desktopdir = $(datadir)/applications
-desktop_DATA = eos-app-store.desktop
-
-@INTLTOOL_DESKTOP_RULE@
-
-EXTRA_DIST += eos-app-store.desktop.in
-CLEANFILES += $(desktop_DATA)
-
 servicedir = $(datadir)/dbus-1/services
-service_DATA = $(service_in_files:.service.in=.service)
-service_in_files = \
-	com.endlessm.AppStore.service.in
+service_DATA = com.endlessm.AppStore.service
 
-com.endlessm.AppStore.service: com.endlessm.AppStore.service.in Makefile
-	$(AM_V_GEN) sed -e "s|\@bindir\@|$(bindir)|" $< > $@
+com.endlessm.AppStore.service: Makefile
+	$(AM_V_GEN) \
+	( echo "[D-BUS Service]" ; \
+	  echo "Name=com.endlessm.AppStore" ; \
+	  echo "Exec=${libexecdir}/eos-app-store" ) > $@.tmp && \
+	mv $@.tmp $@
 
-EXTRA_DIST += $(service_in_files)
 CLEANFILES += $(service_DATA)
