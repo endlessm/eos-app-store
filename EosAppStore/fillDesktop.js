@@ -17,6 +17,7 @@ const FillDesktop = new Lang.Class({
     _init: function() {
         this._appModel = null;
         this._appList = null;
+        this._signalId = null;
         this._appInfos = [];
 
         this.parent({ application_id: FILL_DESKTOP_NAME });
@@ -26,10 +27,17 @@ const FillDesktop = new Lang.Class({
         this.parent();
 
         this._appModel = new AppListModel.StoreModel();
-        this._appList = new AppListModel.AppList();
     },
 
     vfunc_activate: function() {
+        this.hold();
+        this._appList = new AppListModel.AppList();
+        this._signalId = this._appList.connect('changed', Lang.bind(this, this._onChanged));
+    },
+
+    _onChanged: function() {
+        this._appList.disconnect(this._signalId);
+
         let categories = Categories.get_app_categories();
         for (let c in categories) {
             let category = categories[c].id;
@@ -60,7 +68,6 @@ const FillDesktop = new Lang.Class({
         }));
 
         this._install();
-        this.hold();
     },
 
     _install: function() {
