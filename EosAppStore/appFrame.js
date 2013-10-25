@@ -354,16 +354,7 @@ const AppFrame = new Lang.Class({
                 for (let i in appInfos) {
                     let id = appInfos[i].get_desktop_id() + '.desktop';
 
-                    let isInstalled = false;
-                    for (let j in availableApps) {
-                        if (availableApps[j] == id &&
-                            this._model.getState(id) == EosAppStorePrivate.AppState.INSTALLED) {
-                            isInstalled = true;
-                            break;
-                        }
-                    }
-
-                    if (isInstalled) {
+                    if (this._model.getState(id) == EosAppStorePrivate.AppState.INSTALLED) {
                         let cell = appInfos[i].create_cell();
                         cell.shape = Endless.FlexyShape.SMALL;
                         grid.add(cell);
