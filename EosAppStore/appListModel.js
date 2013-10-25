@@ -21,6 +21,8 @@ const StoreModel = new Lang.Class({
     Name: 'StoreModel',
 
     _init: function() {
+        this._items = [];
+
         this.model= new EosAppStorePrivate.AppListModel();
         this.model.connect('changed', Lang.bind(this, this._onModelChanged));
 
@@ -45,11 +47,16 @@ const StoreModel = new Lang.Class({
     _onLoadComplete: function(model, res) {
         this._updating = false;
         try {
-            let items = model.load_finish(res);
-            this.emit('changed', items);
+            this._items = model.load_finish(res);
+            this.emit('changed', this._items);
         } catch (e) {
+            this._items = [];
             logError('Unable to load the backing model storage: ' + e);
         }
+    },
+
+    getItems: function() {
+        return this._items;
     }
 });
 Signals.addSignalMethods(StoreModel.prototype);
@@ -64,6 +71,7 @@ const BaseList = new Lang.Class({
         this._model = this._storeModel.model;
 
         this._storeModel.connect('changed', Lang.bind(this, this._onModelChanged));
+        this._onModelChanged(this._storeModel, this._storeModel.getItems());
     },
 
     _onModelChanged: function(appModel, items) {
