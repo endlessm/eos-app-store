@@ -345,11 +345,16 @@ eos_app_cell_draw_normal (EosAppCell *self,
   if (self->image != NULL)
     goto out;
 
+  path = NULL;
+
   if (eos_app_info_is_featured (self->info))
     path = eos_app_info_get_featured_img (self->info);
-  else
+
+  /* If not featured, or if featured image not available */
+  if (path == NULL)
     path = eos_app_info_get_square_img (self->info);
 
+  /* If neither featured image nor square image available */
   if (path == NULL)
     {
       g_warning ("No image found for app info '%s'[%p]",
