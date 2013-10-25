@@ -322,6 +322,9 @@ const WeblinkList = new Lang.Class({
 
     saveIcon: function(pixbuf, format) {
         let path = GLib.build_filenamev([GLib.get_user_data_dir(), 'applications']);
+        if (!GLib.file_test(path, GLib.FileTest.EXISTS)) {
+            GLib.mkdir_with_parents(path, parseInt(750, 8));
+        }
         let [iconFilename, _] = this._getAvailableFilename(path, 'eos-link-', 'icon', '.'+ format);
         this._model.save_icon(pixbuf, format, iconFilename);
         return iconFilename;
