@@ -85,6 +85,9 @@ const AppStore = new Lang.Class({
                                                                  this._storeModel);
             this._mainWindow.connect('visibility-changed',
                                      Lang.bind(this, this._onVisibilityChanged));
+
+            // set initial page
+            this._storeModel.changePage(StoreModel.StorePage.APPS);
         }
     },
 
