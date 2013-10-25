@@ -222,9 +222,9 @@ const AppStoreWindow = new Lang.Class({
 
         // update position when workarea changes
         let screen = Gdk.Screen.get_default();
-        screen.connect('monitors-changed',
+        this._monitorsChangedId = screen.connect('monitors-changed',
                        Lang.bind(this, this._onAvailableAreaChanged));
-        screen.connect('size-changed',
+        this._monitorsSizeChangedId = screen.connect('size-changed',
                        Lang.bind(this, this._onAvailableAreaChanged));
 
         let visual = screen.get_rgba_visual();
@@ -248,7 +248,29 @@ const AppStoreWindow = new Lang.Class({
 
         // hide main window when clicking outside the store
         this._wmInspect = new WMInspect.WMInspect();
-        this._wmInspect.connect('active-window-changed', Lang.bind(this, this._onActiveWindowChanged));
+        this._activeWindowId = this._wmInspect.connect('active-window-changed',
+                                                       Lang.bind(this, this._onActiveWindowChanged));
+    },
+
+    vfunc_destroy: function() {
+        this.parent();
+
+        let screen = Gdk.Screen.get_default();
+
+        if (this._monitorsChangedId > 0) {
+            screen.disconnect(this._monitorsChangedId);
+            this._monitorsChangedId = 0;
+        }
+
+        if (this._monitorsSizeChangedId > 0) {
+            screen.disconnect(this._monitorsSizeChangedId);
+            this._monitorsSizeChangedId = 0;
+        }
+
+        if (this._activeWindowId > 0) {
+            this._wmInspect.disconnect(this._activeWindowId);
+            this._activeWindowId = 0;
+        }
     },
 
     _createStackPages: function() {

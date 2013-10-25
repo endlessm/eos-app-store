@@ -48,6 +48,7 @@ const AppStore = new Lang.Class({
 
         this._storeModel = new StoreModel.StoreModel();
         this.Visible = false;
+        this._clearId = 0;
 
         this._dbusImpl = Gio.DBusExportedObject.wrapJSObject(AppStoreIface, this);
         this._dbusImpl.export(Gio.DBus.session, APP_STORE_PATH);
