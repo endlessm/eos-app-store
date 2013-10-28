@@ -213,8 +213,6 @@ const AppStoreWindow = new Lang.Class({
             this.toggle(false);
             return true;
         }));
-        // bug: https://bugzilla.gnome.org/show_bug.cgi?id=703154
-        this.connect('realize', Lang.bind(this, function() { this.opacity = 0.95; }));
         this.add(this.main_box);
 
         this._loadSideImages();
