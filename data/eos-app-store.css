@@ -4,7 +4,7 @@
 @define-color app_store_selected_bg alpha(@app_store_bg, 0.80);
 
 .background {
-    background-color: @app_store_bg;
+    background-color: transparent;
     background-image: url("bg_gray_noise.png");
 }
 
