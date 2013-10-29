@@ -341,16 +341,18 @@ eos_app_cell_draw_normal (EosAppCell *self,
   GError *error;
   gint image_width, image_height;
   GtkBorder image_margin;
+  EosFlexyShape shape;
 
   if (self->image != NULL)
     goto out;
 
   path = NULL;
+  shape = eos_flexy_grid_cell_get_shape (EOS_FLEXY_GRID_CELL (self));
 
-  if (eos_app_info_is_featured (self->info))
+  if (shape != EOS_FLEXY_SHAPE_SMALL)
     path = eos_app_info_get_featured_img (self->info);
 
-  /* If not featured, or if featured image not available */
+  /* If featured image not available, or not featured */
   if (path == NULL)
     path = eos_app_info_get_square_img (self->info);
 
