@@ -1,5 +1,9 @@
 #!/usr/bin/python
 
+# This script requires installing ImageMagick
+# (sudo apt-get install imagemagick)
+# for the 'convert' command
+
 # To use this script, first log into eoscms.parafernalia.net.br
 # Under "App Store", click on "Generate Package"
 # There should be no warnings
@@ -18,6 +22,10 @@ ZIP_FILENAME = 'appstore.zip'
 UNZIP_DIR = 'unzipped'
 CONTENT_DIR = 'content/Default'
 IGNORE_ERRORS = True
+
+# Run the ImageMagick 'convert' application from the command line
+def convert(source, target, command):
+    os.system('convert ' + source + ' ' + command + ' ' + target)
 
 # Remove the existing unzipped and content directories, if they exist
 shutil.rmtree(UNZIP_DIR, IGNORE_ERRORS)
@@ -40,21 +48,41 @@ os.makedirs(target_dir)
 shutil.copy(source, target)
 
 # Copy the thumbnail images to the content folder
+# with tweaked compression
 source_dir = os.path.join(UNZIP_DIR, 'apps', 'thumbs')
 target_dir = os.path.join(CONTENT_DIR, 'apps', 'resources', 'thumbnails')
-shutil.copytree(source_dir, target_dir)
+os.makedirs(target_dir)
+for source in os.listdir(source_dir):
+    target = source
+    source_file = os.path.join(source_dir, source)
+    target_file = os.path.join(target_dir, target)
+    convert(source_file, target_file, '-quality 90')
 
 # Copy the featured images to the content folder
+# with tweaked compression
 # (Note: if the featured image is square, we just use the thumbnail)
 source_dir = os.path.join(UNZIP_DIR, 'apps', 'featured')
 target_dir = os.path.join(CONTENT_DIR, 'apps', 'resources', 'images')
-shutil.copytree(source_dir, target_dir)
+os.makedirs(target_dir)
+for source in os.listdir(source_dir):
+    target = source
+    source_file = os.path.join(source_dir, source)
+    target_file = os.path.join(target_dir, target)
+    convert(source_file, target_file, '-quality 90')
 
 # Copy the screenshot images to the content folder
+# resized to a width of 480 pixels
 # (Note: if the featured image is square, we just use the thumbnail)
 source_dir = os.path.join(UNZIP_DIR, 'apps', 'screenshots')
 target_dir = os.path.join(CONTENT_DIR, 'apps', 'resources', 'screenshots')
-shutil.copytree(source_dir, target_dir)
+os.makedirs(target_dir)
+for source in os.listdir(source_dir):
+    target = source
+    source_file = os.path.join(source_dir, source)
+    target_file = os.path.join(target_dir, target)
+    # Resize to a width of 480, allowing an arbitrary height
+    convert(source_file, target_file,
+            '-resize 480x480 -quality 90')
 
 # Copy and rename the links json to the content folder
 # We currently support only one version of the content,
@@ -66,9 +94,24 @@ os.makedirs(target_dir)
 shutil.copy(source, target)
 
 # Copy the link images to the content folder
+# resized/cropped to 90x90
 source_dir = os.path.join(UNZIP_DIR, 'links', 'images')
 target_dir = os.path.join(CONTENT_DIR, 'links', 'images')
-shutil.copytree(source_dir, target_dir)
+os.makedirs(target_dir)
+for source in os.listdir(source_dir):
+    target = source
+    source_file = os.path.join(source_dir, source)
+    target_file = os.path.join(target_dir, target)
+    # In case the image is rectangular,
+    # first resize so that the smallest dimension is 90 pixels,
+    # then crop from the center to exactly 90x90
+    # Use an uncompressed TIF as the intermediary image,
+    # to avoid image quality loss due to extra compress/decompress
+    temp_file = '/tmp/temp.tif'
+    convert(source_file, temp_file,
+            '-resize 90x90^')
+    convert(temp_file, target_file,
+            '-gravity Center -crop 90x90+0+0 -quality 90')
 
 # Note: we are not yet handling the app and link icons
 
