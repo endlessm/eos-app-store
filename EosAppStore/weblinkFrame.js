@@ -70,6 +70,7 @@ const NewSiteBox = new Lang.Class({
         this._currentAlertIcon = AlertIcon.NOTHING;
 
         this._entryActivatedId = 0;
+        this._entryChangedId = 0;
 
         this.initTemplate({ templateRoot: '_mainBox',
                             bindChildren: true,
@@ -123,6 +124,11 @@ const NewSiteBox = new Lang.Class({
             this._entryActivateId = 0;
         }
 
+        if (this._entryChangedId > 0) {
+            this._urlEntry.disconnect(this._entryChangedId);
+            this._entryChangedId = 0;
+        }
+
         switch (state) {
         case NewSiteBoxState.EMPTY:
             this._urlEntry.set_text('');
@@ -142,6 +148,11 @@ const NewSiteBox = new Lang.Class({
             let gicon = new Gio.FileIcon({ file: file });
             this._siteIcon.set_from_gicon(gicon, Gtk.IconSize.DND);
 
+            if (this._webView) {
+                this._webView.destroy();
+                this._webView = null;
+            }
+
             this._entryActivateId = this._urlEntry.connect('activate',
                                                            Lang.bind(this, this._onUrlEntryActivated));
 
@@ -152,6 +163,9 @@ const NewSiteBox = new Lang.Class({
 
             this._newSiteError = false;
             this._urlEntry.get_style_context().remove_class('url-entry-error');
+
+            this._entryChangedId = this._urlEntry.connect('changed',
+                                                          Lang.bind(this, this._onUrlEntryChanged));
 
             break;
         case NewSiteBoxState.EDITING:
@@ -172,6 +186,9 @@ const NewSiteBox = new Lang.Class({
 
             this._newSiteError = true;
             this._urlEntry.get_style_context().add_class('url-entry-error');
+
+            this._entryChangedId = this._urlEntry.connect('changed',
+                                                          Lang.bind(this, this._onUrlEntryChanged));
 
             break;
         case NewSiteBoxState.INSTALLED:
@@ -247,17 +264,20 @@ const NewSiteBox = new Lang.Class({
         this._setState(NewSiteBoxState.INSTALLED);
     },
 
+    _onUrlEntryChanged: function() {
+        this._setState(NewSiteBoxState.READY);
+    },
+
     _onUrlEntryActivated: function() {
-        if (!this._webView) {
-            this._webView = new WebKit.WebView();
-            let context = this._webView.get_context();
-            let cachePath = GLib.build_filenamev([GLib.get_user_cache_dir(),
-                                                  'eos-app-store', 'icondatabase']);
-            context.set_favicon_database_directory(cachePath);
-            this._webView.connect('load-changed', Lang.bind(this, this._onLoadChanged));
-            this._webView.connect('load-failed', Lang.bind(this, this._onLoadFailed));
-            this._webView.connect('notify::favicon', Lang.bind(this, this._onFaviconLoaded));
-        }
+        this._webView = new WebKit.WebView();
+        let context = this._webView.get_context();
+        let cachePath = GLib.build_filenamev([GLib.get_user_cache_dir(),
+                                              'eos-app-store', 'icondatabase']);
+        context.set_favicon_database_directory(cachePath);
+        this._webView.connect('load-changed', Lang.bind(this, this._onLoadChanged));
+        this._webView.connect('load-failed', Lang.bind(this, this._onLoadFailed));
+        this._webView.connect('notify::favicon', Lang.bind(this, this._onFaviconLoaded));
+
         let url = this._urlEntry.get_text();
 
         // check if the URL that the user entered already has a valid prefix
