@@ -282,50 +282,67 @@ GdkPixbuf *
 eos_link_get_favicon (WebKitWebView *webview)
 {
   GdkPixbuf *dest;
-
   cairo_surface_t *icon_surface = webkit_web_view_get_favicon (webview);
+
   if (icon_surface == NULL)
     return NULL;
 
   gint favicon_width = cairo_image_surface_get_width (icon_surface);
   gint favicon_height = cairo_image_surface_get_height (icon_surface);
-  GdkPixbuf *pixbuf = gdk_pixbuf_get_from_surface (icon_surface, 0, 0, favicon_width, favicon_height);
-
   gint biggest =  MAX (favicon_width, favicon_height);
+  gdouble scale = 1.0;
+  gdouble offset_x = 0.0;
+  gdouble offset_y = 0.0;
+  GdkPixbuf *base = NULL;
 
   /* If size is > 64px, resize it to 64px */
   if (biggest > 64)
     {
-      dest = gdk_pixbuf_scale_simple (pixbuf,
-                                      favicon_width * 64 / biggest,
-                                      favicon_height * 64 / biggest,
-                                      GDK_INTERP_BILINEAR);
-      g_object_unref (pixbuf);
-      return dest;
+      scale = (gdouble) 64 / biggest;
     }
-
-  /* If size is between [48px, 64px], resize it to 48px, otherwise
-     keep the same size. But as the holder for the icon in the shell
-     is 64x64, and shell scales the desktop icons, let's put the icon
-     inside a canvas of 64x64, so the shell does not scale it */
-  dest = gdk_pixbuf_new (GDK_COLORSPACE_RGB,
-                         gdk_pixbuf_get_has_alpha (pixbuf),
-                         gdk_pixbuf_get_bits_per_sample (pixbuf),
-                         64, 64);
-  gdk_pixbuf_fill (dest, 0);
-
-  if (biggest > 48)
+  /* If size is between [16px, 64px], center in the placeholder icon.
+     Additionally, if between [48px, 64px] resize it to 48px. */
+  else if (biggest > 16)
     {
-      gdouble offset = (double) 48 / biggest;
-      gdk_pixbuf_scale (pixbuf, dest, 8, 8, 48, 48, 8, 8, offset, offset, GDK_INTERP_BILINEAR);
+      if (biggest >= 48)
+        {
+          scale = (gdouble) 48 / biggest;
+          favicon_width *= scale;
+          favicon_height *= scale;
+        }
+
+      offset_x = (64 - favicon_width) / 2;
+      offset_y = (64 - favicon_height) / 2;
+      base = gdk_pixbuf_new_from_resource ("/com/endlessm/appstore/generic-link_big-icon.png", NULL);
     }
+  /* Otherwise keep the same size. But as the holder for the icon
+     in the shell is 64x64, and shell scales the desktop icons,
+     let's put the icon inside a canvas of 64x64,
+     so the shell does not scale it */
   else
     {
-      gint offset_x = (64 - favicon_width) / 2;
-      gint offset_y = (64 - favicon_height) / 2;
-      gdk_pixbuf_scale (pixbuf, dest, offset_x, offset_y, favicon_width, favicon_height, offset_x, offset_y, 1, 1, GDK_INTERP_BILINEAR);
+      offset_x = (64 - favicon_width) / 2;
+      offset_y = (64 - favicon_height) / 2;
+      base = gdk_pixbuf_new_from_resource ("/com/endlessm/appstore/generic-link_favicon.png", NULL);
     }
 
-  g_object_unref (pixbuf);
+  cairo_surface_t *dest_surface = cairo_image_surface_create (CAIRO_FORMAT_ARGB32, 64, 64);
+  cairo_t *cr = cairo_create (dest_surface);
+
+  if (base != NULL)
+    {
+      gdk_cairo_set_source_pixbuf (cr, base, 0, 0);
+      cairo_paint (cr);
+      g_object_unref (base);
+    }
+
+  cairo_set_source_surface (cr, icon_surface, offset_x, offset_y);
+  cairo_scale (cr, scale, scale);
+  cairo_paint (cr);
+
+  dest = gdk_pixbuf_get_from_surface (dest_surface, 0, 0, 64, 64);
+  cairo_surface_destroy (dest_surface);
+  cairo_destroy (cr);
+
   return dest;
 }
