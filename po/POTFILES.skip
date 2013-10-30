@@ -1,0 +1,3 @@
+./po/POTFILES.skip:icons/index.theme.in
+./po/POTFILES.skip:icons/index.theme.in.in
+

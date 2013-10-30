@@ -49,6 +49,11 @@ AC_SUBST(GJS_CONSOLE)
 GLIB_COMPILE_RESOURCES=`$PKG_CONFIG --variable glib_compile_resources gio-2.0`
 AC_SUBST(GLIB_COMPILE_RESOURCES)
 
+AC_PATH_PROG(GTK_UPDATE_ICON_CACHE, gtk-update-icon-cache)
+if test -z "$GTK_UPDATE_ICON_CACHE"; then
+    AC_MSG_ERROR([Could not find gtk-update-icon-cache])
+fi
+
 AC_CACHE_SAVE
 
 AC_ARG_ENABLE([maintainer-cflags],
@@ -79,6 +84,7 @@ AC_CONFIG_FILES([
         data/Makefile
         EosAppStore/Makefile
         po/Makefile.in
+        icons/Makefile
         ])
 
 AC_OUTPUT
