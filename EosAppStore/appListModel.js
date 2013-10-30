@@ -318,7 +318,7 @@ const WeblinkList = new Lang.Class({
         }
 
         let path = GLib.build_filenamev([GLib.get_user_data_dir(), 'applications']);
-        let [availablePath, availableFilename] = this._getAvailableFilename(path, 'eos-link-', filename, '.desktop');
+        let [availablePath, availableFilename] = this._getAvailableFilename(path, 'eos-link-user-', filename, '.desktop');
 
         desktop.set_string(GLib.KEY_FILE_DESKTOP_GROUP, GLib.KEY_FILE_DESKTOP_KEY_VERSION, '1.0');
         desktop.set_string(GLib.KEY_FILE_DESKTOP_GROUP, GLib.KEY_FILE_DESKTOP_KEY_TYPE, 'Application');
