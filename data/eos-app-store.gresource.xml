@@ -46,6 +46,8 @@
     <file compressed="true">eos-app-store-weblink-list-row.ui</file>
     <file compressed="true">eos-app-store-weblink-new-site-frame.ui</file>
     <file compressed="true">eos-app-store-folder-frame.ui</file>
+    <file compressed="true">generic-link_big-icon.png</file>
+    <file compressed="true">generic-link_favicon.png</file>
     <file compressed="true">icon_alert.png</file>
     <file compressed="true">icon_arrow_thumb.png</file>
     <file compressed="true">icon_external-link.png</file>
