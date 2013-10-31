@@ -38,14 +38,6 @@ const NewSiteBoxState = {
     INSTALLED: 5
 };
 
-const AlertIcon = {
-    SPINNER: 0,
-    CANCEL: 1,
-    ERROR: 2,
-    NOTHING: 3,
-    HIDDEN: 4
-};
-
 const NewSiteBox = new Lang.Class({
     Name: 'NewSiteBox',
     Extends: Gtk.Bin,
@@ -66,8 +58,6 @@ const NewSiteBox = new Lang.Class({
         this._weblinkListModel = weblinkListModel;
         this._newSiteError = false;
         this._webView = null;
-        this._alertIcon = null;
-        this._currentAlertIcon = AlertIcon.NOTHING;
 
         this._entryActivatedId = 0;
         this._entryChangedId = 0;
@@ -78,7 +68,15 @@ const NewSiteBox = new Lang.Class({
         this.add(this._mainBox);
         this._mainBox.show_all();
 
-        this._createAlertIcons();
+        this._alertIcons = [ null,
+                             null,
+                             new Gtk.Spinner({ name: 'spinner',
+                                               width_request: 16,
+                                               height_request: 16 }),
+                             new Gtk.Button({ name: 'cancel' }),
+                             new Gtk.Image({ name: 'alert' }),
+                             null ];
+        this._alertIcons[NewSiteBoxState.EDITING].connect('clicked', Lang.bind(this, this._onEditSiteCancel));
 
         this._urlEntry = new Gtk.Entry();
         this._urlEntry.set_placeholder_text(_("Write the site address you want to add"));
@@ -100,23 +98,10 @@ const NewSiteBox = new Lang.Class({
         this._setState(NewSiteBoxState.EMPTY);
     },
 
-    _createAlertIcons: function() {
-        this._alertIcon = [ new Gtk.Spinner({ name: 'spinner' }),
-                            new Gtk.Button({ name: 'cancel' }),
-                            new Gtk.Image({ name: 'alert' }),
-                            null ];
-
-        this._alertIcon[AlertIcon.SPINNER].set_size_request(16, 16);
-        this._alertIcon[AlertIcon.CANCEL].show_all();
-        this._alertIcon[AlertIcon.CANCEL].connect('clicked', Lang.bind(this, this._onEditSiteCancel));
-    },
-
     _setState: function(state) {
         if (this._state == state) {
             return;
         }
-
-        this._state = state;
 
         // Clean up common state
         if (this._entryActivateId > 0) {
@@ -129,13 +114,16 @@ const NewSiteBox = new Lang.Class({
             this._entryChangedId = 0;
         }
 
+        let prevState = this._state;
+        this._state = state;
+        this._switchAlertIcon(prevState);
+
         switch (state) {
         case NewSiteBoxState.EMPTY:
             this._urlEntry.set_text('');
             this._urlEntry.grab_focus();
             // fall through
         case NewSiteBoxState.READY:
-            this._switchAlertIcon(AlertIcon.NOTHING);
             this._siteAlertLabel.set_text(_("e.g.: http://www.globoesporte.com"));
 
             this._siteAddButton.visible = false;
@@ -158,7 +146,6 @@ const NewSiteBox = new Lang.Class({
 
             break;
         case NewSiteBoxState.SEARCHING:
-            this._switchAlertIcon(AlertIcon.SPINNER);
             this._siteAlertLabel.set_text(_("searching"));
 
             this._newSiteError = false;
@@ -169,7 +156,6 @@ const NewSiteBox = new Lang.Class({
 
             break;
         case NewSiteBoxState.EDITING:
-            this._switchAlertIcon(AlertIcon.CANCEL);
             this._siteAlertLabel.set_text(this._webView.get_uri());
 
             this._siteAddButton.visible = true;
@@ -181,7 +167,6 @@ const NewSiteBox = new Lang.Class({
 
             break;
         case NewSiteBoxState.ERROR:
-            this._switchAlertIcon(AlertIcon.ERROR);
             this._siteAlertLabel.set_text(_("The address written does not exist or is not available."));
 
             this._newSiteError = true;
@@ -192,7 +177,6 @@ const NewSiteBox = new Lang.Class({
 
             break;
         case NewSiteBoxState.INSTALLED:
-            this._switchAlertIcon(AlertIcon.HIDDEN);
             this._siteAlertLabel.set_text(_("added successfully!"));
 
             let urlLabel = new Gtk.Label({ label: this._urlEntry.get_text() });
@@ -217,30 +201,28 @@ const NewSiteBox = new Lang.Class({
         }
     },
 
-    _switchAlertIcon: function(newItem) {
-        if (this._currentAlertIcon == AlertIcon.SPINNER) {
-            this._alertIcon[AlertIcon.SPINNER].stop();
-        }
+    _switchAlertIcon: function(prevState) {
+        let oldAlertIcon = this._alertIcons[prevState];
+        let alertIcon = this._alertIcons[this._state];
 
-        if (this._currentAlertIcon != AlertIcon.NOTHING &&
-            this._currentAlertIcon != AlertIcon.HIDDEN) {
-            this._siteAlertIconFrame.remove(this._alertIcon[this._currentAlertIcon]);
-        }
+        if (oldAlertIcon) {
+            this._siteAlertIconFrame.remove(oldAlertIcon);
 
-        this._currentAlertIcon = newItem;
-
-        if (this._currentAlertIcon == AlertIcon.HIDDEN) {
-            this._siteAlertIconFrame.visible = false;
-        } else {
-            this._siteAlertIconFrame.visible = true;
-            if (this._currentAlertIcon != AlertIcon.NOTHING) {
-                this._siteAlertIconFrame.add(this._alertIcon[this._currentAlertIcon]);
-                this._alertIcon[this._currentAlertIcon].show();
+            if (prevState == NewSiteBoxState.SEARCHING) {
+                oldAlertIcon.stop();
             }
         }
 
-        if (this._currentAlertIcon == AlertIcon.SPINNER) {
-            this._alertIcon[AlertIcon.SPINNER].start();
+        if (alertIcon) {
+            this._siteAlertIconFrame.visible = true;
+            this._siteAlertIconFrame.add(alertIcon);
+            alertIcon.show();
+
+            if (this._state == NewSiteBoxState.SEARCHING) {
+                alertIcon.start();
+            }
+        } else {
+            this._siteAlertIconFrame.visible = false;
         }
     },
 
