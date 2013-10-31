@@ -71,8 +71,9 @@ const NewSiteBox = new Lang.Class({
         this._alertIcons = [ null,
                              null,
                              new Gtk.Spinner({ name: 'spinner',
-                                               width_request: 16,
-                                               height_request: 16 }),
+                                               width_request: 12,
+                                               height_request: 12,
+                                               margin: 4 }),
                              new Gtk.Button({ name: 'cancel' }),
                              new Gtk.Image({ name: 'alert' }),
                              null ];

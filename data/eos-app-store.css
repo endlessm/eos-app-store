@@ -392,6 +392,10 @@
     border: 1px;
 }
 
+.new-site-frame #spinner {
+    color: #999999;
+}
+
 .new-site-frame #cancel:active,
 .new-site-frame #cancel:hover:active {
     background-image: url("btn_edit_pressed.png");
