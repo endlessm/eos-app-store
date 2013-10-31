@@ -39,8 +39,8 @@ const AppStoreIface = <interface name={APP_STORE_NAME}>
 const CLEAR_TIMEOUT = 300;
 
 // Quit the app store service if no main window is available after these
-// many milliseconds
-const QUIT_TIMEOUT = 15000;
+// many seconds
+const QUIT_TIMEOUT = 15;
 
 const AppStore = new Lang.Class({
     Name: 'AppStore',
@@ -49,7 +49,7 @@ const AppStore = new Lang.Class({
     _init: function() {
         this.parent({ application_id: APP_STORE_NAME,
                       flags: Gio.ApplicationFlags.IS_SERVICE,
-                      inactivity_timeout: QUIT_TIMEOUT, });
+                      inactivity_timeout: QUIT_TIMEOUT * 1000, });
 
         this._storeModel = new StoreModel.StoreModel();
         this.Visible = false;
