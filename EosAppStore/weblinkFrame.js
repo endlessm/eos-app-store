@@ -257,8 +257,8 @@ const NewSiteBox = new Lang.Class({
         let cachePath = GLib.build_filenamev([GLib.get_user_cache_dir(),
                                               'eos-app-store', 'icondatabase']);
         context.set_favicon_database_directory(cachePath);
-        this._webView.connect('load-changed', Lang.bind(this, this._onLoadChanged));
         this._webView.connect('load-failed', Lang.bind(this, this._onLoadFailed));
+        this._webView.connect('notify::title', Lang.bind(this, this._onTitleLoaded));
         this._webView.connect('notify::favicon', Lang.bind(this, this._onFaviconLoaded));
 
         let url = this._urlEntry.get_text();
@@ -282,16 +282,10 @@ const NewSiteBox = new Lang.Class({
         }
     },
 
-    _onLoadChanged: function(webview, loadEvent) {
-        switch (loadEvent) {
-        case WebKit.LoadEvent.FINISHED:
-            // Error this was processed on 'load-failed' handler
-            if (this._newSiteError) {
-                return;
-            }
-
+    _onTitleLoaded: function() {
+        let title = this._webView.title;
+        if (title) {
             this._setState(NewSiteBoxState.EDITING);
-            break;
         }
     },
 
