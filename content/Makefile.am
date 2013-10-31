@@ -76,3 +76,26 @@ nobase_content_DATA = \
 	$(default_links_json) \
 	$(default_links_images) \
 	$(NULL)
+
+eos-app-store-app-content.gresource: eos-app-store-app-content.gresource.xml
+	$(AM_V_GEN) $(GLIB_COMPILE_RESOURCES) \
+		--target=$@ \
+		--sourcedir="$(srcdir)/Default/apps" \
+		--sourcedir="$(srcdir)/Default/apps/resources/images" \
+		$<
+
+eos-app-store-app-content.gresource.xml: Makefile
+	$(AM_V_GEN) ( echo "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" ; \
+		      echo "<gresources>" ; \
+		      echo "  <gresource prefix=\"/com/endlessm/appstore/apps/content\">" ; \
+		      echo "    <file>$(notdir $(default_app_json))</file>" ) > $@ ; \
+		    for file in $(notdir $(default_app_images)); do \
+		      echo "    <file>$$file</file>" >> $@ ; \
+		    done ; \
+		    ( echo "  </gresource>" ; \
+		      echo "</gresources>" ) >> $@
+
+
+resourcedir = $(pkgdatadir)
+resource_DATA = eos-app-store-app-content.gresource
+CLEANFILES += eos-app-store-app-content.gresource eos-app-store-app-content.gresource.xml
