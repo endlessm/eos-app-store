@@ -29,12 +29,13 @@ const LIST_COLUMNS_SPACING = 10;
 
 const DEFAULT_ICON = 'generic-link';
 
-const AlertIcon = {
-    SPINNER: 0,
-    CANCEL: 1,
-    ERROR: 2,
-    NOTHING: 3,
-    HIDDEN: 4
+const NewSiteBoxState = {
+    EMPTY: 0,
+    READY: 1,
+    SEARCHING: 2,
+    EDITING: 3,
+    ERROR: 4,
+    INSTALLED: 5
 };
 
 const NewSiteBox = new Lang.Class({
@@ -57,8 +58,9 @@ const NewSiteBox = new Lang.Class({
         this._weblinkListModel = weblinkListModel;
         this._newSiteError = false;
         this._webView = null;
-        this._alertIcon = null;
-        this._currentAlertIcon = AlertIcon.NOTHING;
+
+        this._entryActivatedId = 0;
+        this._entryChangedId = 0;
 
         this.initTemplate({ templateRoot: '_mainBox',
                             bindChildren: true,
@@ -66,13 +68,20 @@ const NewSiteBox = new Lang.Class({
         this.add(this._mainBox);
         this._mainBox.show_all();
 
-        this._createAlertIcons();
-        this._switchAlertIcon(AlertIcon.NOTHING);
+        this._alertIcons = [ null,
+                             null,
+                             new Gtk.Spinner({ name: 'spinner',
+                                               width_request: 12,
+                                               height_request: 12,
+                                               margin: 4 }),
+                             new Gtk.Button({ name: 'cancel' }),
+                             new Gtk.Image({ name: 'alert' }),
+                             null ];
+        this._alertIcons[NewSiteBoxState.EDITING].connect('clicked', Lang.bind(this, this._onEditSiteCancel));
 
         this._urlEntry = new Gtk.Entry();
         this._urlEntry.set_placeholder_text(_("Write the site address you want to add"));
         this._urlEntry.get_style_context().add_class('url-entry');
-        this._urlEntry.connect('activate', Lang.bind(this, this._onUrlEntryActivated));
 
         this._urlEntry.connect('enter-notify-event',
                                Lang.bind(this, function() {
@@ -87,101 +96,139 @@ const NewSiteBox = new Lang.Class({
         this._siteUrlFrame.add(this._urlEntry);
         this._sitePixbuf = null;
 
-        this._reset();
+        this._setState(NewSiteBoxState.EMPTY);
     },
 
-    _createAlertIcons: function() {
-        this._alertIcon = [ new Gtk.Spinner({ name: 'spinner' }),
-                            new Gtk.Button({ name: 'cancel' }),
-                            new Gtk.Image({ name: 'alert' }),
-                            null ];
-
-        this._alertIcon[AlertIcon.SPINNER].set_size_request(16, 16);
-        this._alertIcon[AlertIcon.CANCEL].show_all();
-        this._alertIcon[AlertIcon.CANCEL].connect('clicked', Lang.bind(this, this._onEditSiteCancel));
-    },
-
-    _reset: function() {
-        this._siteAddButton.visible = false;
-        this._switchAlertIcon(AlertIcon.NOTHING);
-        this._siteAlertLabel.set_text(_("e.g.: http://www.globoesporte.com"));
-        this._urlEntry.set_text("");
-        this._urlEntry.max_length = 0;
-        this._urlEntry.halign = Gtk.Align.FILL;
-        this._urlEntry.grab_focus();
-        this._sitePixbuf = null;
-
-        // https://bugzilla.gnome.org/show_bug.cgi?id=709056
-        let file = Gio.File.new_for_path(Path.ICONS_DIR + '/icon_website-symbolic.svg');
-        let gicon = new Gio.FileIcon({ file: file });
-        this._siteIcon.set_from_gicon(gicon, Gtk.IconSize.DND);
-    },
-
-    _switchAlertIcon: function(newItem) {
-        if (this._currentAlertIcon == AlertIcon.SPINNER) {
-            this._alertIcon[AlertIcon.SPINNER].stop();
+    _setState: function(state) {
+        if (this._state == state) {
+            return;
         }
 
-        if (this._currentAlertIcon != AlertIcon.NOTHING &&
-            this._currentAlertIcon != AlertIcon.HIDDEN) {
-            this._siteAlertIconFrame.remove(this._alertIcon[this._currentAlertIcon]);
+        // Clean up common state
+        if (this._entryActivateId > 0) {
+            this._urlEntry.disconnect(this._entryActivateId);
+            this._entryActivateId = 0;
         }
 
-        this._currentAlertIcon = newItem;
+        if (this._entryChangedId > 0) {
+            this._urlEntry.disconnect(this._entryChangedId);
+            this._entryChangedId = 0;
+        }
 
-        if (this._currentAlertIcon == AlertIcon.HIDDEN) {
-            this._siteAlertIconFrame.visible = false;
-        } else {
-            this._siteAlertIconFrame.visible = true;
-            if (this._currentAlertIcon != AlertIcon.NOTHING) {
-                this._siteAlertIconFrame.add(this._alertIcon[this._currentAlertIcon]);
-                this._alertIcon[this._currentAlertIcon].show();
+        let prevState = this._state;
+        this._state = state;
+        this._switchAlertIcon(prevState);
+
+        switch (state) {
+        case NewSiteBoxState.EMPTY:
+            this._urlEntry.set_text('');
+            this._urlEntry.grab_focus();
+            // fall through
+        case NewSiteBoxState.READY:
+            this._siteAlertLabel.set_text(_("e.g.: http://www.globoesporte.com"));
+
+            this._siteAddButton.visible = false;
+            this._urlEntry.max_length = 0;
+            this._urlEntry.halign = Gtk.Align.FILL;
+            this._sitePixbuf = null;
+
+            // https://bugzilla.gnome.org/show_bug.cgi?id=709056
+            let file = Gio.File.new_for_path(Path.ICONS_DIR + '/icon_website-symbolic.svg');
+            let gicon = new Gio.FileIcon({ file: file });
+            this._siteIcon.set_from_gicon(gicon, Gtk.IconSize.DND);
+
+            if (this._webView) {
+                this._webView.destroy();
+                this._webView = null;
+            }
+
+            this._entryActivateId = this._urlEntry.connect('activate',
+                                                           Lang.bind(this, this._onUrlEntryActivated));
+
+            break;
+        case NewSiteBoxState.SEARCHING:
+            this._siteAlertLabel.set_text(_("searching"));
+
+            this._newSiteError = false;
+            this._urlEntry.get_style_context().remove_class('url-entry-error');
+
+            this._entryChangedId = this._urlEntry.connect('changed',
+                                                          Lang.bind(this, this._onUrlEntryChanged));
+
+            break;
+        case NewSiteBoxState.EDITING:
+            this._siteAlertLabel.set_text(this._webView.get_uri());
+
+            this._siteAddButton.visible = true;
+
+            // Narrow the entry and put the focus so user can change the title
+            this._urlEntry.max_length = NEW_SITE_TITLE_LIMIT;
+            this._urlEntry.halign = Gtk.Align.START;
+            this._urlEntry.set_text(this._webView.get_title());
+
+            break;
+        case NewSiteBoxState.ERROR:
+            this._siteAlertLabel.set_text(_("The address written does not exist or is not available."));
+
+            this._newSiteError = true;
+            this._urlEntry.get_style_context().add_class('url-entry-error');
+
+            this._entryChangedId = this._urlEntry.connect('changed',
+                                                          Lang.bind(this, this._onUrlEntryChanged));
+
+            break;
+        case NewSiteBoxState.INSTALLED:
+            this._siteAlertLabel.set_text(_("added successfully!"));
+
+            let urlLabel = new Gtk.Label({ label: this._urlEntry.get_text() });
+            urlLabel.get_style_context().add_class('url-label');
+            urlLabel.set_alignment(0, 0.5);
+            this._siteUrlFrame.remove(this._urlEntry);
+            this._siteUrlFrame.add(urlLabel);
+            this._siteUrlFrame.show_all();
+
+            this._siteAddButton.sensitive = false;
+
+            GLib.timeout_add_seconds(GLib.PRIORITY_DEFAULT,
+                                     NEW_SITE_SUCCESS_TIMEOUT,
+                                     Lang.bind(this, function() {
+                                         this._siteUrlFrame.remove(urlLabel);
+                                         this._siteUrlFrame.add(this._urlEntry);
+                                         this._siteAddButton.sensitive = true;
+                                         this._setState(NewSiteBoxState.EMPTY);
+                                         return false;
+                                     }));
+            break;
+        }
+    },
+
+    _switchAlertIcon: function(prevState) {
+        let oldAlertIcon = this._alertIcons[prevState];
+        let alertIcon = this._alertIcons[this._state];
+
+        if (oldAlertIcon) {
+            this._siteAlertIconFrame.remove(oldAlertIcon);
+
+            if (prevState == NewSiteBoxState.SEARCHING) {
+                oldAlertIcon.stop();
             }
         }
 
-        if (this._currentAlertIcon == AlertIcon.SPINNER) {
-            this._alertIcon[AlertIcon.SPINNER].start();
+        if (alertIcon) {
+            this._siteAlertIconFrame.visible = true;
+            this._siteAlertIconFrame.add(alertIcon);
+            alertIcon.show();
+
+            if (this._state == NewSiteBoxState.SEARCHING) {
+                alertIcon.start();
+            }
+        } else {
+            this._siteAlertIconFrame.visible = false;
         }
     },
 
-    _editSite: function() {
-        this._switchAlertIcon(AlertIcon.CANCEL);
-        this._siteAddButton.visible = true;
-        this._urlEntry.set_text(this._webView.get_title());
-        this._siteAlertLabel.set_text(this._webView.get_uri());
-
-        // Narrow the entry and put the focus so user can change the title
-        let [entryWidth, entryHeight] = this._urlEntry.get_size_request();
-        this._urlEntry.max_length = NEW_SITE_TITLE_LIMIT;
-        this._urlEntry.halign = Gtk.Align.START;
-    },
-
-    _showInstalledMessage: function() {
-        let urlLabel = new Gtk.Label({ label: this._urlEntry.get_text() });
-        urlLabel.get_style_context().add_class('url-label');
-        urlLabel.set_alignment(0, 0.5);
-        this._siteUrlFrame.remove(this._urlEntry);
-        this._siteUrlFrame.add(urlLabel);
-        this._siteUrlFrame.show_all();
-
-        this._siteAlertLabel.set_text(_("added successfully!"));
-        this._siteAddButton.sensitive = false;
-        this._switchAlertIcon(AlertIcon.HIDDEN);
-
-        GLib.timeout_add_seconds(GLib.PRIORITY_DEFAULT,
-                                 NEW_SITE_SUCCESS_TIMEOUT,
-                                 Lang.bind(this, function() {
-                                     this._siteUrlFrame.remove(urlLabel);
-                                     this._siteUrlFrame.add(this._urlEntry);
-                                     this._urlEntry.sensitive = true;
-                                     this._siteAddButton.sensitive = true;
-                                     this._reset();
-                                     return false;
-                                 }));
-    },
-
     _onEditSiteCancel: function() {
-        this._reset();
+        this._setState(NewSiteBoxState.EMPTY);
     },
 
     _onSiteAdd: function() {
@@ -197,21 +244,23 @@ const NewSiteBox = new Lang.Class({
         this._weblinkListModel.update();
         this._weblinkListModel.install(newSite, function() {});
 
-        this._showInstalledMessage();
+        this._setState(NewSiteBoxState.INSTALLED);
+    },
+
+    _onUrlEntryChanged: function() {
+        this._setState(NewSiteBoxState.READY);
     },
 
     _onUrlEntryActivated: function() {
-        if (!this._webView) {
-            this._webView = new WebKit.WebView();
-            let context = this._webView.get_context();
-            let cachePath = GLib.build_filenamev([GLib.get_user_cache_dir(),
-                                                  'eos-app-store', 'icondatabase']);
-            context.set_favicon_database_directory(cachePath);
-            this._webView.connect('load-changed', Lang.bind(this, this._onLoadChanged));
-            this._webView.connect('load-failed', Lang.bind(this, this._onLoadFailed));
-            this._webView.connect('notify::favicon', Lang.bind(this, this._onFaviconLoaded));
-        }
-        this._urlEntry.get_style_context().remove_class('url-entry-error');
+        this._webView = new WebKit.WebView();
+        let context = this._webView.get_context();
+        let cachePath = GLib.build_filenamev([GLib.get_user_cache_dir(),
+                                              'eos-app-store', 'icondatabase']);
+        context.set_favicon_database_directory(cachePath);
+        this._webView.connect('load-changed', Lang.bind(this, this._onLoadChanged));
+        this._webView.connect('load-failed', Lang.bind(this, this._onLoadFailed));
+        this._webView.connect('notify::favicon', Lang.bind(this, this._onFaviconLoaded));
+
         let url = this._urlEntry.get_text();
 
         // check if the URL that the user entered already has a valid prefix
@@ -222,6 +271,7 @@ const NewSiteBox = new Lang.Class({
         }
 
         this._webView.load_uri(url);
+        this._setState(NewSiteBoxState.SEARCHING);
     },
 
     _onFaviconLoaded: function() {
@@ -234,27 +284,19 @@ const NewSiteBox = new Lang.Class({
 
     _onLoadChanged: function(webview, loadEvent) {
         switch (loadEvent) {
-        case WebKit.LoadEvent.STARTED:
-            this._switchAlertIcon(AlertIcon.SPINNER);
-            this._siteAlertLabel.set_text(_("searching"));
-            this._newSiteError = false;
-            break;
         case WebKit.LoadEvent.FINISHED:
             // Error this was processed on 'load-failed' handler
             if (this._newSiteError) {
                 return;
             }
 
-            this._editSite();
+            this._setState(NewSiteBoxState.EDITING);
             break;
         }
     },
 
     _onLoadFailed: function() {
-        this._newSiteError = true;
-        this._siteAlertLabel.set_text(_("The address written does not exist or is not available."));
-        this._switchAlertIcon(AlertIcon.ERROR);
-        this._urlEntry.get_style_context().add_class('url-entry-error');
+        this._setState(NewSiteBoxState.ERROR);
         return true;
     }
 });
