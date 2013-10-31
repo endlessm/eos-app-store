@@ -35,7 +35,12 @@ const AppStoreIface = <interface name={APP_STORE_NAME}>
   <property name="Visible" type="b" access="read"/>
 </interface>;
 
-const CLEAR_TIMEOUT = 15000;
+// Tear down the main window if it's been hidden for these many seconds
+const CLEAR_TIMEOUT = 300;
+
+// Quit the app store service if no main window is available after these
+// many seconds
+const QUIT_TIMEOUT = 15;
 
 const AppStore = new Lang.Class({
     Name: 'AppStore',
@@ -44,7 +49,7 @@ const AppStore = new Lang.Class({
     _init: function() {
         this.parent({ application_id: APP_STORE_NAME,
                       flags: Gio.ApplicationFlags.IS_SERVICE,
-                      inactivity_timeout: CLEAR_TIMEOUT, });
+                      inactivity_timeout: QUIT_TIMEOUT * 1000, });
 
         this._storeModel = new StoreModel.StoreModel();
         this.Visible = false;
@@ -159,7 +164,7 @@ const AppStore = new Lang.Class({
         // after a while.
         if (!this.Visible) {
             this._clearId =
-                Mainloop.timeout_add(CLEAR_TIMEOUT, Lang.bind(this, this._clearMainWindow));
+                Mainloop.timeout_add_seconds(CLEAR_TIMEOUT, Lang.bind(this, this._clearMainWindow));
         }
         else {
             if (this._clearId != 0) {
