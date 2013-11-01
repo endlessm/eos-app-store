@@ -117,6 +117,7 @@ prepare_pixbuf_from_file (EosAppCell *self,
   gchar *provider_data;
 
   provider_data = g_strdup_printf (PROVIDER_DATA_FORMAT, path);
+  g_printerr ("provider data for path '%s': %s\n", path, provider_data);
   provider = gtk_css_provider_new ();
 
   if (!gtk_css_provider_load_from_data (provider, provider_data, -1, error))
@@ -709,17 +710,12 @@ eos_app_info_get_shape_for_cell (const EosAppInfo *info)
 char *
 eos_app_info_get_square_img (const EosAppInfo *info)
 {
-  char *path, *res;
-
   if (info == NULL || info->square_img == NULL || info->square_img[0] == '\0')
     return NULL;
 
-  path = eos_app_get_content_dir ();
-  res = g_build_filename (path, "resources", "thumbnails", info->square_img, NULL);
-
-  g_free (path);
-
-  return res;
+  return g_strdup_printf ("resource:///com/endlessm/appstore/apps/%s/%s",
+                          eos_get_system_personality (),
+                          info->featured_img);
 }
 
 /**
@@ -733,17 +729,12 @@ eos_app_info_get_square_img (const EosAppInfo *info)
 char *
 eos_app_info_get_featured_img (const EosAppInfo *info)
 {
-  char *path, *res;
-
   if (info == NULL || info->featured_img == NULL || info->featured_img[0] == '\0')
     return NULL;
 
-  path = eos_app_get_content_dir ();
-  res = g_build_filename (path, "resources", "images", info->featured_img, NULL);
-
-  g_free (path);
-
-  return res;
+  return g_strdup_printf ("resource:///com/endlessm/appstore/apps/%s/%s",
+                          eos_get_system_personality (),
+                          info->featured_img);
 }
 
 guint
