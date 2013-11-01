@@ -82,15 +82,19 @@ eos-app-store-app-content.gresource: eos-app-store-app-content.gresource.xml
 		--target=$@ \
 		--sourcedir="$(srcdir)/Default/apps" \
 		--sourcedir="$(srcdir)/Default/apps/resources/images" \
+		--sourcedir="$(srcdir)/Default/apps/resources/thumbnails" \
 		$<
 
 eos-app-store-app-content.gresource.xml: Makefile
 	$(AM_V_GEN) ( echo "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" ; \
 		      echo "<gresources>" ; \
-		      echo "  <gresource prefix=\"/com/endlessm/appstore/apps/content\">" ; \
+		      echo "  <gresource prefix=\"/com/endlessm/appstore/apps/Default\">" ; \
 		      echo "    <file>$(notdir $(default_app_json))</file>" ) > $@ ; \
 		    for file in $(notdir $(default_app_images)); do \
-		      echo "    <file>$$file</file>" >> $@ ; \
+		      echo "    <file compressed=\"true\">$$file</file>" >> $@ ; \
+		    done ; \
+		    for file in $(notdir $(default_app_thumbnails)); do \
+		      echo "    <file compressed=\"true\">$$file</file>" >> $@ ; \
 		    done ; \
 		    ( echo "  </gresource>" ; \
 		      echo "</gresources>" ) >> $@
