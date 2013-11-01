@@ -22,10 +22,13 @@ ZIP_FILENAME = 'appstore.zip'
 UNZIP_DIR = 'unzipped'
 CONTENT_DIR = 'content/Default'
 IGNORE_ERRORS = True
+JPEG_QUALITY = 90
 
-# Run the ImageMagick 'convert' application from the command line
+# Run the ImageMagick 'convert' application from the command line,
+# with specified JPEG quality and all metadata stripped
 def convert(source, target, command):
-    os.system('convert ' + source + ' ' + command + ' ' + target)
+    os.system('convert ' + source + ' ' + command +
+              ' -quality ' + str(JPEG_QUALITY) + ' -strip ' + target)
 
 # Remove the existing unzipped and content directories, if they exist
 shutil.rmtree(UNZIP_DIR, IGNORE_ERRORS)
@@ -56,7 +59,7 @@ for source in os.listdir(source_dir):
     target = source
     source_file = os.path.join(source_dir, source)
     target_file = os.path.join(target_dir, target)
-    convert(source_file, target_file, '-quality 90')
+    convert(source_file, target_file, '')
 
 # Copy the featured images to the content folder
 # with tweaked compression
@@ -68,7 +71,7 @@ for source in os.listdir(source_dir):
     target = source
     source_file = os.path.join(source_dir, source)
     target_file = os.path.join(target_dir, target)
-    convert(source_file, target_file, '-quality 90')
+    convert(source_file, target_file, '')
 
 # Copy the screenshot images to the content folder
 # resized to a width of 480 pixels
@@ -82,7 +85,7 @@ for source in os.listdir(source_dir):
     target_file = os.path.join(target_dir, target)
     # Resize to a width of 480, allowing an arbitrary height
     convert(source_file, target_file,
-            '-resize 480x480 -quality 90')
+            '-resize 480x480')
 
 # Copy and rename the links json to the content folder
 # We currently support only one version of the content,
@@ -105,13 +108,8 @@ for source in os.listdir(source_dir):
     # In case the image is rectangular,
     # first resize so that the smallest dimension is 90 pixels,
     # then crop from the center to exactly 90x90
-    # Use an uncompressed TIF as the intermediary image,
-    # to avoid image quality loss due to extra compress/decompress
-    temp_file = '/tmp/temp.tif'
-    convert(source_file, temp_file,
-            '-resize 90x90^')
-    convert(temp_file, target_file,
-            '-gravity Center -crop 90x90+0+0 -quality 90')
+    convert(source_file, target_file,
+            '-resize 90x90^ -gravity center -crop 90x90+0+0')
 
 # Note: we are not yet handling the app and link icons
 
