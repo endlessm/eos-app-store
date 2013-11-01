@@ -117,7 +117,6 @@ prepare_pixbuf_from_file (EosAppCell *self,
   gchar *provider_data;
 
   provider_data = g_strdup_printf (PROVIDER_DATA_FORMAT, path);
-  g_printerr ("provider data for path '%s': %s\n", path, provider_data);
   provider = gtk_css_provider_new ();
 
   if (!gtk_css_provider_load_from_data (provider, provider_data, -1, error))
