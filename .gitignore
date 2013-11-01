@@ -16,6 +16,8 @@ stamp-h1
 /autom4te.cache
 /config.*
 /configure
+/content/*.gresource
+/content/*.gresource.xml
 /eos-app-store
 /eos-app-store-launcher
 /eos-fill-desktop
