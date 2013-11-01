@@ -714,7 +714,7 @@ eos_app_info_get_square_img (const EosAppInfo *info)
 
   return g_strdup_printf ("resource:///com/endlessm/appstore/apps/%s/%s",
                           eos_get_system_personality (),
-                          info->featured_img);
+                          info->square_img);
 }
 
 /**
