@@ -712,7 +712,7 @@ eos_app_info_get_square_img (const EosAppInfo *info)
   if (info == NULL || info->square_img == NULL || info->square_img[0] == '\0')
     return NULL;
 
-  return g_strdup_printf ("resource:///com/endlessm/appstore/apps/%s/%s",
+  return g_strdup_printf ("resource:///com/endlessm/appstore-content/apps/%s/%s",
                           eos_get_system_personality (),
                           info->square_img);
 }
@@ -731,7 +731,7 @@ eos_app_info_get_featured_img (const EosAppInfo *info)
   if (info == NULL || info->featured_img == NULL || info->featured_img[0] == '\0')
     return NULL;
 
-  return g_strdup_printf ("resource:///com/endlessm/appstore/apps/%s/%s",
+  return g_strdup_printf ("resource:///com/endlessm/appstore-content/apps/%s/%s",
                           eos_get_system_personality (),
                           info->featured_img);
 }

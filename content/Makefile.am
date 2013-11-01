@@ -88,7 +88,7 @@ eos-app-store-app-content.gresource: eos-app-store-app-content.gresource.xml
 eos-app-store-app-content.gresource.xml: Makefile
 	$(AM_V_GEN) ( echo "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" ; \
 		      echo "<gresources>" ; \
-		      echo "  <gresource prefix=\"/com/endlessm/appstore/apps/Default\">" ; \
+		      echo "  <gresource prefix=\"/com/endlessm/appstore-content/apps/default\">" ; \
 		      echo "    <file>$(notdir $(default_app_json))</file>" ) > $@ ; \
 		    for file in $(notdir $(default_app_images)); do \
 		      echo "    <file compressed=\"true\">$$file</file>" >> $@ ; \

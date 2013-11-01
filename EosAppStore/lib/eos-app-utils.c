@@ -105,7 +105,7 @@ eos_app_parse_resource_content (const char *content_type)
   JsonParser *parser = json_parser_new ();
 
   char *content_path = g_build_filename (DATADIR, "eos-app-store", "eos-app-store-app-content.gresource", NULL);
-  char *content_file = g_strdup_printf ("/com/endlessm/appstore/%s/%s/content.json",
+  char *content_file = g_strdup_printf ("/com/endlessm/appstore-content/%s/%s/content.json",
                                         content_type,
                                         eos_get_system_personality ());
 
