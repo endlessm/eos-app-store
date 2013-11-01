@@ -24,6 +24,10 @@ void    eos_app_load_screenshot  (GtkWidget       *image,
 
 GdkPixbuf *eos_link_get_favicon  (WebKitWebView *webview);
 
+void    eos_save_icon            (GdkPixbuf       *pixbuf,
+                                  const gchar     *format,
+                                  const gchar     *filename);
+
 G_END_DECLS
 
 #endif /* EOS_APP_UTILS_H */

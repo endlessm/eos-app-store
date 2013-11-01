@@ -346,3 +346,11 @@ eos_link_get_favicon (WebKitWebView *webview)
 
   return dest;
 }
+
+void
+eos_save_icon (GdkPixbuf *pixbuf,
+               const gchar *format,
+               const gchar *filename)
+{
+  gdk_pixbuf_save (pixbuf, filename, format, NULL, NULL);
+}

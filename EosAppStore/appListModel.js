@@ -13,7 +13,6 @@ const EOS_LINK_PREFIX = 'eos-link-';
 const EOS_BROWSER = 'chromium-browser ';
 const EOS_LOCALIZED = 'eos-exec-localized ';
 
-const DESKTOP_KEY_SPLASH = 'X-Endless-Splash-Screen';
 const DESKTOP_KEY_SHOW_IN_STORE = 'X-Endless-ShowInAppStore';
 const DESKTOP_KEY_SHOW_IN_PERSONALITIES = 'X-Endless-ShowInPersonalities';
 
@@ -274,72 +273,5 @@ const WeblinkList = new Lang.Class({
 
     getWeblinks: function() {
         return this._weblinks;
-    },
-
-    _getAvailableFilename: function(path, prefix, name, suffix) {
-        let filename = prefix + name;
-
-        // Append a number until we find a free slot
-        let availableFilename = filename + suffix;
-        let availablePath = GLib.build_filenamev([path, availableFilename]);
-        let i = 0;
-
-        while (GLib.file_test(availablePath, GLib.FileTest.EXISTS)) {
-            i++;
-            availableFilename = filename + '-' + i + suffix;
-            availablePath = GLib.build_filenamev([path, availableFilename]);
-        }
-
-        return [availablePath, availableFilename];
-    },
-
-    // FIXME: this should use the linkId as provided by the CMS.
-    // See https://github.com/endlessm/eos-shell/issues/1074
-    createWeblink: function(url, title, icon) {
-        let desktop = new GLib.KeyFile();
-
-        // Let's compute a filename
-        let filename = url;
-
-        // Skip scheme
-        let scheme = GLib.uri_parse_scheme(filename);
-        if (scheme) {
-            filename = filename.substr((scheme+'://').length);
-        }
-
-        // Get only the hostname part
-        let tokens = filename.split('/');
-        filename = tokens[0];
-
-        // Get only domain name
-        tokens = filename.split('.');
-        if (tokens.length > 1) {
-            filename = tokens[tokens.length-2];
-        }
-
-        let path = GLib.build_filenamev([GLib.get_user_data_dir(), 'applications']);
-        let [availablePath, availableFilename] = this._getAvailableFilename(path, 'eos-link-user-', filename, '.desktop');
-
-        desktop.set_string(GLib.KEY_FILE_DESKTOP_GROUP, GLib.KEY_FILE_DESKTOP_KEY_VERSION, '1.0');
-        desktop.set_string(GLib.KEY_FILE_DESKTOP_GROUP, GLib.KEY_FILE_DESKTOP_KEY_TYPE, 'Application');
-        desktop.set_string(GLib.KEY_FILE_DESKTOP_GROUP, GLib.KEY_FILE_DESKTOP_KEY_EXEC, EOS_BROWSER + url);
-        desktop.set_string(GLib.KEY_FILE_DESKTOP_GROUP, GLib.KEY_FILE_DESKTOP_KEY_ICON, icon);
-        desktop.set_boolean(GLib.KEY_FILE_DESKTOP_GROUP, DESKTOP_KEY_SPLASH, false);
-        desktop.set_string(GLib.KEY_FILE_DESKTOP_GROUP, GLib.KEY_FILE_DESKTOP_KEY_NAME, title);
-
-        let [data, length] = desktop.to_data();
-        GLib.file_set_contents(availablePath, data, length);
-
-        return availableFilename;
-    },
-
-    saveIcon: function(pixbuf, format) {
-        let path = GLib.build_filenamev([GLib.get_user_data_dir(), 'applications']);
-        if (!GLib.file_test(path, GLib.FileTest.EXISTS)) {
-            GLib.mkdir_with_parents(path, parseInt(750, 8));
-        }
-        let [iconFilename, _] = this._getAvailableFilename(path, 'eos-link-', 'icon', '.'+ format);
-        this._model.save_icon(pixbuf, format, iconFilename);
-        return iconFilename;
-    },
+    }
 });
