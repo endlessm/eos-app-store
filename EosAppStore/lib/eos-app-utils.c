@@ -242,7 +242,7 @@ eos_link_load_content (EosLinkCategory category)
   JsonObject *obj;
   const gchar *category_name;
 
-  JsonArray *categories_array = eos_app_parse_content (APP_STORE_CONTENT_LINKS);
+  JsonArray *categories_array = eos_app_parse_resource_content (APP_STORE_CONTENT_LINKS);
 
   if (categories_array == NULL)
     return NULL;
