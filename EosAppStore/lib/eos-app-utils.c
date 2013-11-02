@@ -296,7 +296,7 @@ eos_link_get_favicon (WebKitWebView *webview)
   GdkPixbuf *base = NULL;
 
   /* If size is > 64px, resize it to 64px */
-  if (biggest > 64)
+  if (biggest >= 64)
     {
       scale = (gdouble) 64 / biggest;
     }
@@ -313,6 +313,7 @@ eos_link_get_favicon (WebKitWebView *webview)
 
       offset_x = (64 - favicon_width) / 2;
       offset_y = (64 - favicon_height) / 2;
+
       base = gdk_pixbuf_new_from_resource ("/com/endlessm/appstore/generic-link_big-icon.png", NULL);
     }
   /* Otherwise keep the same size. But as the holder for the icon
@@ -336,13 +337,28 @@ eos_link_get_favicon (WebKitWebView *webview)
       g_object_unref (base);
     }
 
-  cairo_set_source_surface (cr, icon_surface, offset_x, offset_y);
-  cairo_scale (cr, scale, scale);
+  cairo_pattern_t *icon_pattern = cairo_pattern_create_for_surface (icon_surface);
+  cairo_matrix_t matrix;
+
+  cairo_matrix_init_scale (&matrix, 1.0 / scale, 1.0 / scale);
+  cairo_matrix_translate (&matrix, - offset_x, - offset_y);
+  cairo_pattern_set_matrix (icon_pattern, &matrix);
+
+  cairo_set_source (cr, icon_pattern);
   cairo_paint (cr);
 
   dest = gdk_pixbuf_get_from_surface (dest_surface, 0, 0, 64, 64);
   cairo_surface_destroy (dest_surface);
+  cairo_pattern_destroy (icon_pattern);
   cairo_destroy (cr);
 
   return dest;
+}
+
+void
+eos_save_icon (GdkPixbuf *pixbuf,
+               const gchar *format,
+               const gchar *filename)
+{
+  gdk_pixbuf_save (pixbuf, filename, format, NULL, NULL);
 }
