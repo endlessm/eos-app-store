@@ -51,8 +51,7 @@ const AppStore = new Lang.Class({
                       flags: Gio.ApplicationFlags.IS_SERVICE,
                       inactivity_timeout: QUIT_TIMEOUT * 1000, });
 
-        let resource = Gio.Resource.load(Path.RESOURCE_DIR + '/eos-app-store.gresource');
-        resource._register();
+        this._loadResources();
 
         this._storeModel = new StoreModel.StoreModel();
         this.Visible = false;
@@ -83,6 +82,18 @@ const AppStore = new Lang.Class({
 
     vfunc_activate: function() {
         this._createMainWindow();
+    },
+
+    _loadResources: function() {
+        let resources = ['eos-app-store.gresource',
+                         'eos-app-store-app-content.gresource',
+                         'eos-app-store-link-content.gresource'];
+
+        for (let idx in resources) {
+            let path = GLib.build_filenamev([Path.RESOURCE_DIR, resources[idx]]);
+            let resource = Gio.Resource.load(path);
+            resource._register();
+        }
     },
 
     _createMainWindow: function() {

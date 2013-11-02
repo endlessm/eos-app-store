@@ -104,20 +104,9 @@ eos_app_parse_resource_content (const char *content_type)
   GError *error = NULL;
   JsonParser *parser = json_parser_new ();
 
-  char *content_path = g_build_filename (DATADIR, "eos-app-store", "eos-app-store-app-content.gresource", NULL);
   char *content_file = g_strdup_printf ("/com/endlessm/appstore-content/%s/%s/content.json",
                                         content_type,
                                         eos_get_system_personality ());
-
-  GResource *resource = g_resource_load (content_path, &error);
-  if (error != NULL)
-    {
-      g_critical ("Unable to load resources: %s", error->message);
-      g_error_free (error);
-      goto out_error;
-    }
-
-  g_resources_register (resource);
 
   GBytes *data = g_resources_lookup_data (content_file, 0, &error);
   if (error != NULL)
@@ -150,7 +139,6 @@ eos_app_parse_resource_content (const char *content_type)
 
  out_error:
   g_object_unref (parser);
-  g_free (content_path);
   g_free (content_file);
 
   return content_array;
