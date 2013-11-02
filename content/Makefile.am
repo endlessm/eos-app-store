@@ -88,18 +88,44 @@ eos-app-store-app-content.gresource: eos-app-store-app-content.gresource.xml
 eos-app-store-app-content.gresource.xml: Makefile
 	$(AM_V_GEN) ( echo "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" ; \
 		      echo "<gresources>" ; \
-		      echo "  <gresource prefix=\"/com/endlessm/appstore-content/apps/default\">" ; \
-		      echo "    <file>$(notdir $(default_app_json))</file>" ) > $@ ; \
+		      echo "  <gresource prefix=\"/com/endlessm/appstore-content\">" ; \
+		      echo "    <file alias=\"apps/default/$(notdir $(default_app_json))\">$(notdir $(default_app_json))</file>" ) > $@ ; \
 		    for file in $(notdir $(default_app_images)); do \
-		      echo "    <file compressed=\"true\">$$file</file>" >> $@ ; \
+		      echo "    <file compressed=\"true\" alias=\"apps/default/$$file\">$$file</file>" >> $@ ; \
 		    done ; \
 		    for file in $(notdir $(default_app_thumbnails)); do \
-		      echo "    <file compressed=\"true\">$$file</file>" >> $@ ; \
+		      echo "    <file compressed=\"true\" alias=\"apps/default/$$file\">$$file</file>" >> $@ ; \
 		    done ; \
 		    ( echo "  </gresource>" ; \
 		      echo "</gresources>" ) >> $@
 
+eos-app-store-link-content.gresource: eos-app-store-link-content.gresource.xml
+	$(AM_V_GEN) $(GLIB_COMPILE_RESOURCES) \
+		--target=$@ \
+		--sourcedir="$(srcdir)/Default/links" \
+		--sourcedir="$(srcdir)/Default/links/images" \
+		$<
+
+eos-app-store-link-content.gresource.xml: Makefile
+	$(AM_V_GEN) ( echo "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" ; \
+		      echo "<gresources>" ; \
+		      echo "  <gresource prefix=\"/com/endlessm/appstore-content\">" ; \
+		      echo "    <file alias=\"links/default/$(notdir $(default_links_json))\">$(notdir $(default_links_json))</file>" ) > $@ ; \
+		    for file in $(notdir $(default_links_images)); do \
+		      echo "    <file compressed=\"true\" alias=\"links/default/$$file\">$$file</file>" >> $@ ; \
+		    done ; \
+		    ( echo "  </gresource>" ; \
+		      echo "</gresources>" ) >> $@
 
 resourcedir = $(pkgdatadir)
-resource_DATA = eos-app-store-app-content.gresource
-CLEANFILES += eos-app-store-app-content.gresource eos-app-store-app-content.gresource.xml
+resource_DATA = \
+	eos-app-store-app-content.gresource \
+	eos-app-store-link-content.gresource \
+	$(NULL)
+
+CLEANFILES += \
+	eos-app-store-app-content.gresource \
+	eos-app-store-app-content.gresource.xml \
+	eos-app-store-link-content.gresource \
+	eos-app-store-link-content.gresource.xml \
+	$(NULL)
