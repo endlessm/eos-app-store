@@ -63,41 +63,6 @@ eos_link_get_category_name (EosLinkCategory category)
 }
 
 static JsonArray *
-eos_app_parse_content (const char *content_type)
-{
-  JsonArray *content_array = NULL;
-  GError *error = NULL;
-  JsonParser *parser = json_parser_new ();
-
-  char *content_path = eos_get_content_dir (content_type);
-  char *content_file = g_build_filename (content_path, "content.json", NULL);
-
-  json_parser_load_from_file (parser, content_file, &error);
-  if (error != NULL)
-    {
-      g_critical ("Unable to load content from '%s': %s", content_file, error->message);
-      g_error_free (error);
-      goto out_error;
-    }
-
-  JsonNode *node = json_parser_get_root (parser);
-  if (!JSON_NODE_HOLDS_ARRAY (node))
-    {
-      g_critical ("Expected array content");
-      goto out_error;
-    }
-
-  content_array = json_node_dup_array (node);
-
- out_error:
-  g_object_unref (parser);
-  g_free (content_path);
-  g_free (content_file);
-
-  return content_array;
-}
-
-static JsonArray *
 eos_app_parse_resource_content (const char *content_type)
 {
   JsonArray *content_array = NULL;
