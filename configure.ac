@@ -75,7 +75,6 @@ AC_SUBST(MAINTAINER_CFLAGS)
 
 AC_CONFIG_FILES([
         Makefile
-        content/Makefile
         data/Makefile
         EosAppStore/Makefile
         po/Makefile.in
