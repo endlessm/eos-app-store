@@ -89,12 +89,12 @@ eos-app-store-app-content.gresource.xml: Makefile
 	$(AM_V_GEN) ( echo "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" ; \
 		      echo "<gresources>" ; \
 		      echo "  <gresource prefix=\"/com/endlessm/appstore-content\">" ; \
-		      echo "    <file alias=\"apps/default/$(notdir $(default_app_json))\">$(notdir $(default_app_json))</file>" ) > $@ ; \
+		      echo "    <file alias=\"apps/$(notdir $(default_app_json))\">$(notdir $(default_app_json))</file>" ) > $@ ; \
 		    for file in $(notdir $(default_app_images)); do \
-		      echo "    <file compressed=\"true\" alias=\"apps/default/$$file\">$$file</file>" >> $@ ; \
+		      echo "    <file compressed=\"true\" alias=\"apps/$$file\">$$file</file>" >> $@ ; \
 		    done ; \
 		    for file in $(notdir $(default_app_thumbnails)); do \
-		      echo "    <file compressed=\"true\" alias=\"apps/default/$$file\">$$file</file>" >> $@ ; \
+		      echo "    <file compressed=\"true\" alias=\"apps/$$file\">$$file</file>" >> $@ ; \
 		    done ; \
 		    ( echo "  </gresource>" ; \
 		      echo "</gresources>" ) >> $@
@@ -110,9 +110,9 @@ eos-app-store-link-content.gresource.xml: Makefile
 	$(AM_V_GEN) ( echo "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" ; \
 		      echo "<gresources>" ; \
 		      echo "  <gresource prefix=\"/com/endlessm/appstore-content\">" ; \
-		      echo "    <file alias=\"links/default/$(notdir $(default_links_json))\">$(notdir $(default_links_json))</file>" ) > $@ ; \
+		      echo "    <file alias=\"links/$(notdir $(default_links_json))\">$(notdir $(default_links_json))</file>" ) > $@ ; \
 		    for file in $(notdir $(default_links_images)); do \
-		      echo "    <file compressed=\"true\" alias=\"links/default/$$file\">$$file</file>" >> $@ ; \
+		      echo "    <file compressed=\"true\" alias=\"links/$$file\">$$file</file>" >> $@ ; \
 		    done ; \
 		    ( echo "  </gresource>" ; \
 		      echo "</gresources>" ) >> $@

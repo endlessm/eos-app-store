@@ -69,9 +69,8 @@ eos_app_parse_resource_content (const char *content_type)
   GError *error = NULL;
   JsonParser *parser = json_parser_new ();
 
-  char *content_file = g_strdup_printf ("/com/endlessm/appstore-content/%s/%s/content.json",
-                                        content_type,
-                                        eos_get_system_personality ());
+  char *content_file = g_strdup_printf ("/com/endlessm/appstore-content/%s/content.json",
+                                        content_type);
 
   GBytes *data = g_resources_lookup_data (content_file, 0, &error);
   if (error != NULL)
