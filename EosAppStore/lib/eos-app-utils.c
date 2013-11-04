@@ -63,16 +63,27 @@ eos_link_get_category_name (EosLinkCategory category)
 }
 
 static JsonArray *
-eos_app_parse_content (const char *content_type)
+eos_app_parse_resource_content (const char *content_type)
 {
   JsonArray *content_array = NULL;
   GError *error = NULL;
   JsonParser *parser = json_parser_new ();
 
-  char *content_path = eos_get_content_dir (content_type);
-  char *content_file = g_build_filename (content_path, "content.json", NULL);
+  char *content_file = g_strdup_printf ("/com/endlessm/appstore-content/%s/content.json",
+                                        content_type);
 
-  json_parser_load_from_file (parser, content_file, &error);
+  GBytes *data = g_resources_lookup_data (content_file, 0, &error);
+  if (error != NULL)
+    {
+      g_critical ("Unable to load content from '%s': %s", content_file, error->message);
+      g_error_free (error);
+      goto out_error;
+    }
+
+  json_parser_load_from_data (parser,
+                              g_bytes_get_data (data, NULL),
+                              g_bytes_get_size (data),
+                              &error);
 
   if (error != NULL)
     {
@@ -92,7 +103,6 @@ eos_app_parse_content (const char *content_type)
 
  out_error:
   g_object_unref (parser);
-  g_free (content_path);
   g_free (content_file);
 
   return content_array;
@@ -135,7 +145,7 @@ eos_link_get_content_dir (void)
 GList *
 eos_app_load_content (EosAppCategory category)
 {
-  JsonArray *array = eos_app_parse_content (APP_STORE_CONTENT_APPS);
+  JsonArray *array = eos_app_parse_resource_content (APP_STORE_CONTENT_APPS);
 
   if (array == NULL)
     return NULL;
@@ -196,7 +206,7 @@ eos_link_load_content (EosLinkCategory category)
   JsonObject *obj;
   const gchar *category_name;
 
-  JsonArray *categories_array = eos_app_parse_content (APP_STORE_CONTENT_LINKS);
+  JsonArray *categories_array = eos_app_parse_resource_content (APP_STORE_CONTENT_LINKS);
 
   if (categories_array == NULL)
     return NULL;
