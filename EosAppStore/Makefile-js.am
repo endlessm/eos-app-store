@@ -27,6 +27,7 @@ BUILT_SOURCES += $(js_built_sources)
 
 do_path_subst = $(SED) \
 	-e 's|@pkgdatadir[@]|$(pkgdatadir)|g' \
+	-e 's|@datadir[@]|$(datadir)|g' \
 	-e 's|@localedir[@]|$(localedir)|g'
 path.js: Makefile path.js.in
 	$(AM_V_GEN) $(do_path_subst) $(srcdir)/path.js.in > $@
