@@ -1,3 +1,4 @@
 const RESOURCE_DIR = '@pkgdatadir@';
+const CONTENT_DIR = '@datadir@/eos-shell-content';
 const ICONS_DIR = '@pkgdatadir@/icons';
 const LOCALE_DIR = "@localedir@";
