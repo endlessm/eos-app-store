@@ -33,6 +33,7 @@ Depends: ${gir:Depends},
          gir1.2-json-1.0,
 	 gir1.2-webkit2-3.0,
 	 gjs,
-	 xdg-utils
+	 xdg-utils,
+	 eos-shell-content
 Description: Endless OS App Store installation package
  This package will install the Endless OS App Store
