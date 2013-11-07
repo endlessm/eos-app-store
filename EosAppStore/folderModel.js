@@ -38,7 +38,7 @@ const FolderModel = new Lang.Class({
         keyFile.set_value(GLib.KEY_FILE_DESKTOP_GROUP,
                           GLib.KEY_FILE_DESKTOP_KEY_TYPE, GLib.KEY_FILE_DESKTOP_TYPE_DIRECTORY);
 
-        let dirpath = GLib.get_user_data_dir() + '/desktop-directories';
+        let dirpath = GLib.build_filenamev([GLib.get_user_data_dir(), '/desktop-directories']);
 
         // octal literals are deprecated in JS, so use parseInt
         if (GLib.mkdir_with_parents(dirpath, parseInt('0755', 8), null) < 0) {
