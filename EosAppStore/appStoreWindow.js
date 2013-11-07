@@ -176,6 +176,7 @@ const AppStoreWindow = new Lang.Class({
 
     templateResource: '/com/endlessm/appstore/eos-app-store-main-window.ui',
     templateChildren: [
+        'main-frame',
         'main-box',
         'side-pane-apps-image',
         'side-pane-web-image',
@@ -204,7 +205,7 @@ const AppStoreWindow = new Lang.Class({
                              type: Gtk.WindowType.TOPLEVEL,
                     });
 
-        this.initTemplate({ templateRoot: 'main-box', bindChildren: true, connectSignals: true, });
+        this.initTemplate({ templateRoot: 'main-frame', bindChildren: true, connectSignals: true, });
         this.stick();
         this.set_resizable(false);
         this.set_decorated(false);
@@ -213,7 +214,7 @@ const AppStoreWindow = new Lang.Class({
             this.toggle(false);
             return true;
         }));
-        this.add(this.main_box);
+        this.add(this.main_frame);
 
         this._loadSideImages();
         this._setLabelSizeGroup();
