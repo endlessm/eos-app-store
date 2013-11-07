@@ -125,9 +125,7 @@ const NewSiteHelper = new Lang.Class({
 
     _saveFavicon: function() {
         let path = GLib.build_filenamev([GLib.get_user_data_dir(), 'applications']);
-        if (!GLib.file_test(path, GLib.FileTest.EXISTS)) {
-            GLib.mkdir_with_parents(path, parseInt(750, 8));
-        }
+        GLib.mkdir_with_parents(path, parseInt('0755', 8));
 
         let [iconFilename, iconPath] = getAvailableFilename(path, 'eos-link-', 'icon', '.png');
         EosAppStorePrivate.save_icon(this._favicon, 'png', iconPath);
