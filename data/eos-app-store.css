@@ -5,7 +5,19 @@
 
 .background {
     background-color: transparent;
+}
+
+.window-frame.frame {
     background-image: url("bg_gray_noise.png");
+    border-width: 0 6px 0 0;
+    border-color: transparent;
+    border-radius: 0;
+
+    border-image: linear-gradient(to left,
+                                  transparent,
+                                  alpha(black, 0.1) 2px,
+                                  alpha(black, 0.55) 6px,
+                                  transparent 6px) 6 / 6px stretch;
 }
 
 .scrollbar {
