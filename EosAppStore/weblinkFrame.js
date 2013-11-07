@@ -73,6 +73,8 @@ function createWeblink(url, title, icon) {
     }
 
     let path = GLib.build_filenamev([GLib.get_user_data_dir(), 'applications']);
+    GLib.mkdir_with_parents(path, parseInt('0755', 8));
+    
     let [availableFilename, availablePath] = getAvailableFilename(path, 'eos-link-user-', filename, '.desktop');
 
     desktop.set_string(GLib.KEY_FILE_DESKTOP_GROUP, GLib.KEY_FILE_DESKTOP_KEY_VERSION, '1.0');
