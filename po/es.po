@@ -1,6 +1,6 @@
-# Translations for the Endless OS App Store
-# Copyright (C) 2013 Endless Mobile
-# This file is distributed under the same license as the eos-app-store package.
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
 # 
 # Translators:
 # Automatically generated, 2012-2013
@@ -14,8 +14,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: eos-app-store\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-11-04 15:34-0800\n"
-"PO-Revision-Date: 2013-11-04 23:38+0000\n"
+"POT-Creation-Date: 2013-11-06 20:33-0800\n"
+"PO-Revision-Date: 2013-11-07 04:36+0000\n"
 "Last-Translator: rshuler <roddy@endlessm.com>\n"
 "Language-Team: Spanish (http://www.transifex.com/projects/p/teams/language/es/)\n"
 "MIME-Version: 1.0\n"
@@ -77,6 +77,47 @@ msgstr "Instalar sitios web"
 msgid "Install folders"
 msgstr "Instalar carpetas."
 
+#: ../EosAppStore/categories.js:10
+msgid "Featured"
+msgstr "Destacados"
+
+#. Translators: use the same string used to install the app store content JSON
+#: ../EosAppStore/categories.js:16 ../EosAppStore/lib/eos-app-info.c:796
+msgid "Education"
+msgstr "Educación"
+
+#: ../EosAppStore/categories.js:22 ../EosAppStore/lib/eos-app-info.c:797
+msgid "Leisure"
+msgstr "Ocio"
+
+#: ../EosAppStore/categories.js:28 ../EosAppStore/lib/eos-app-info.c:798
+msgid "Utilities"
+msgstr "Utilidades"
+
+#: ../EosAppStore/categories.js:34
+msgid "My applications"
+msgstr "Mis aplicaciones"
+
+#: ../EosAppStore/categories.js:45
+msgid "News"
+msgstr "Noticias"
+
+#: ../EosAppStore/categories.js:51
+msgid "Sports"
+msgstr "Deportes"
+
+#: ../EosAppStore/categories.js:57
+msgid "Education and Health"
+msgstr "Educación y Salud"
+
+#: ../EosAppStore/categories.js:63
+msgid "Entertainment"
+msgstr "Entretenimiento"
+
+#: ../EosAppStore/categories.js:69
+msgid "Local"
+msgstr "Local"
+
 #: ../EosAppStore/environment.js:18
 msgid "Application Store"
 msgstr "Tienda de Aplicaciones"
@@ -104,19 +145,6 @@ msgstr "El sitio web no existe, está incorrecto o no está disponible."
 #: ../EosAppStore/weblinkFrame.js:347 ../EosAppStore/weblinkFrame.js:599
 msgid "added successfully!"
 msgstr "agregado exitosamente!"
-
-#. Translators: use the same string used to install the app store content JSON
-#: ../EosAppStore/lib/eos-app-info.c:796
-msgid "Education"
-msgstr "Educación"
-
-#: ../EosAppStore/lib/eos-app-info.c:797
-msgid "Leisure"
-msgstr "Ocio"
-
-#: ../EosAppStore/lib/eos-app-info.c:798
-msgid "Utilities"
-msgstr "Utilidades"
 
 #: ../EosAppStore/lib/eos-app-list-model.c:621
 #, c-format
