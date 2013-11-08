@@ -528,13 +528,7 @@ const WeblinkListBoxRow = new Lang.Class({
 
         if (isHover) {
             this._setActiveState(true);
-            let iconName;
-            let linkId = this._info.get_desktop_id();
-            if (linkId) {
-                iconName = 'eos-link-' + linkId;
-            } else {
-                iconName = DEFAULT_ICON;
-            }
+            let iconName = this._info.get_icon_name();
             this._icon.set_from_icon_name(iconName, Gtk.IconSize.DIALOG);
         } else {
             this._setActiveState(false);
@@ -543,8 +537,7 @@ const WeblinkListBoxRow = new Lang.Class({
     },
 
     _getState: function() {
-        let linkId = this._info.get_desktop_id();
-        let desktopId = 'eos-link-' + linkId;
+        let desktopId = this._info.get_desktop_id();
         return this._model.getState(desktopId);
     },
 
@@ -602,7 +595,7 @@ const WeblinkListBoxRow = new Lang.Class({
     _onStateButtonClicked: function() {
         this._parentFrame.setModelConnected(false);
 
-        let desktopId = 'eos-link-' + this._info.get_desktop_id();
+        let desktopId = this._info.get_desktop_id();
         this._model.install(desktopId, function() {});
 
         this._showInstalledMessage();
