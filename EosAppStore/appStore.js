@@ -13,6 +13,7 @@ const _ = imports.gettext.gettext;
 const AppListModel = imports.appListModel;
 const AppStoreWindow = imports.appStoreWindow;
 const Config = imports.config;
+const Environment = imports.environment;
 const Path = imports.path;
 const ShellAppStore = imports.shellAppStore;
 const StoreModel = imports.storeModel;
@@ -51,7 +52,7 @@ const AppStore = new Lang.Class({
                       flags: Gio.ApplicationFlags.IS_SERVICE,
                       inactivity_timeout: QUIT_TIMEOUT * 1000, });
 
-        this._loadResources();
+        Environment.loadResources();
 
         this._storeModel = new StoreModel.StoreModel();
         this.Visible = false;
@@ -82,19 +83,6 @@ const AppStore = new Lang.Class({
 
     vfunc_activate: function() {
         this._createMainWindow();
-    },
-
-    _loadResources: function() {
-        let resources =
-            [[Path.RESOURCE_DIR, 'eos-app-store.gresource'],
-             [Path.CONTENT_DIR, 'eos-app-store-app-content.gresource'],
-             [Path.CONTENT_DIR, 'eos-app-store-link-content.gresource']];
-
-        for (let idx in resources) {
-            let path = GLib.build_filenamev(resources[idx]);
-            let resource = Gio.Resource.load(path);
-            resource._register();
-        }
     },
 
     _createMainWindow: function() {
