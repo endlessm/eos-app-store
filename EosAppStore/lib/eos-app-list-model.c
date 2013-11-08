@@ -42,19 +42,6 @@ static guint eos_app_list_model_signals[LAST_SIGNAL] = { 0, };
 G_DEFINE_TYPE (EosAppListModel, eos_app_list_model, G_TYPE_OBJECT)
 G_DEFINE_QUARK (eos-app-list-model-error-quark, eos_app_list_model_error)
 
-static gchar *
-ensure_desktop_app_id (const gchar *app_id)
-{
-  gchar *desktop_app_id;
-
-  if (!g_str_has_suffix (app_id, ".desktop"))
-    desktop_app_id = g_strconcat (app_id, ".desktop", NULL);
-  else
-    desktop_app_id = g_strdup (app_id);
-
-  return desktop_app_id;
-}
-
 static GHashTable *
 load_installed_apps_from_gvariant (GVariant *apps)
 {
@@ -175,7 +162,7 @@ eos_app_list_model_new (void)
 
 static gboolean
 add_app_to_shell (EosAppListModel *self,
-                  const char *desktop_app_id,
+                  const char *desktop_id,
                   GCancellable *cancellable,
                   GError **error_out)
 {
@@ -185,7 +172,7 @@ add_app_to_shell (EosAppListModel *self,
                                "org.gnome.Shell",
                                "/org/gnome/Shell",
                                "org.gnome.Shell.AppStore", "AddApplication",
-                               g_variant_new ("(s)", desktop_app_id),
+                               g_variant_new ("(s)", desktop_id),
                                NULL,
                                G_DBUS_CALL_FLAGS_NONE,
                                -1,
@@ -195,7 +182,7 @@ add_app_to_shell (EosAppListModel *self,
   if (error != NULL)
     {
       g_critical ("Unable to add application '%s': %s",
-                  desktop_app_id,
+                  desktop_id,
                   error->message);
       g_propagate_error (error_out, error);
 
@@ -207,7 +194,7 @@ add_app_to_shell (EosAppListModel *self,
 
 static gboolean
 remove_app_from_shell (EosAppListModel *self,
-                       const char *desktop_app_id,
+                       const char *desktop_id,
                        GCancellable *cancellable,
                        GError **error_out)
 {
@@ -217,7 +204,7 @@ remove_app_from_shell (EosAppListModel *self,
                                "org.gnome.Shell",
                                "/org/gnome/Shell",
                                "org.gnome.Shell.AppStore", "RemoveApplication",
-                               g_variant_new ("(s)", desktop_app_id),
+                               g_variant_new ("(s)", desktop_id),
                                NULL,
                                G_DBUS_CALL_FLAGS_NONE,
                                -1,
@@ -227,7 +214,7 @@ remove_app_from_shell (EosAppListModel *self,
   if (error != NULL)
     {
       g_critical ("Unable to remove application '%s': %s",
-                  desktop_app_id,
+                  desktop_id,
                   error->message);
       g_propagate_error (error_out, error);
 
@@ -401,18 +388,18 @@ eos_app_list_model_load_finish (EosAppListModel  *model,
 
 static gboolean
 is_app_installed (EosAppListModel *model,
-                  const char      *desktop_app_id)
+                  const char      *desktop_id)
 {
   if (model->installed_apps == NULL)
     return FALSE;
 
-  return g_hash_table_contains (model->installed_apps, desktop_app_id);
+  return g_hash_table_contains (model->installed_apps, desktop_id);
 }
 
 /**
  * eos_app_list_model_get_app_info:
  * @model: the app list model
- * @app_id : the id of the app
+ * @desktop_id : the id of the app
  *
  * Returns the #GDesktopAppInfo for the given app.
  *
@@ -420,11 +407,10 @@ is_app_installed (EosAppListModel *model,
  */
 GDesktopAppInfo *
 eos_app_list_model_get_app_info (EosAppListModel *model,
-                                 const char *app_id)
+                                 const char *desktop_id)
 {
   GMenuTreeEntry *entry;
   GDesktopAppInfo *res;
-  gchar *desktop_app_id;
 
   if (model->apps_by_id == NULL)
     {
@@ -432,13 +418,11 @@ eos_app_list_model_get_app_info (EosAppListModel *model,
       return NULL;
     }
 
-  desktop_app_id = ensure_desktop_app_id (app_id);
-  entry = g_hash_table_lookup (model->apps_by_id, desktop_app_id);
-  g_free (desktop_app_id);
+  entry = g_hash_table_lookup (model->apps_by_id, desktop_id);
 
   if (entry == NULL)
     {
-      g_critical ("No application '%s' was found.", app_id);
+      g_critical ("No application '%s' was found.", desktop_id);
       return NULL;
     }
 
@@ -449,14 +433,14 @@ eos_app_list_model_get_app_info (EosAppListModel *model,
 
 const char *
 eos_app_list_model_get_app_name (EosAppListModel *model,
-                                 const char *app_id)
+                                 const char *desktop_id)
 {
   GDesktopAppInfo *info;
 
   g_return_val_if_fail (EOS_IS_APP_LIST_MODEL (model), NULL);
-  g_return_val_if_fail (app_id != NULL, NULL);
+  g_return_val_if_fail (desktop_id != NULL, NULL);
 
-  info = eos_app_list_model_get_app_info (model, app_id);
+  info = eos_app_list_model_get_app_info (model, desktop_id);
   if (info == NULL)
     return NULL;
 
@@ -465,14 +449,14 @@ eos_app_list_model_get_app_name (EosAppListModel *model,
 
 const char *
 eos_app_list_model_get_app_executable (EosAppListModel *model,
-                                       const char *app_id)
+                                       const char *desktop_id)
 {
   GDesktopAppInfo *info;
 
   g_return_val_if_fail (EOS_IS_APP_LIST_MODEL (model), NULL);
-  g_return_val_if_fail (app_id != NULL, NULL);
+  g_return_val_if_fail (desktop_id != NULL, NULL);
 
-  info = eos_app_list_model_get_app_info (model, app_id);
+  info = eos_app_list_model_get_app_info (model, desktop_id);
   if (info == NULL)
     return NULL;
 
@@ -481,21 +465,21 @@ eos_app_list_model_get_app_executable (EosAppListModel *model,
 
 const char *
 eos_app_list_model_get_app_description (EosAppListModel *model,
-                                        const char *app_id)
+                                        const char *desktop_id)
 {
   return NULL;
 }
 
 const char *
 eos_app_list_model_get_app_comment (EosAppListModel *model,
-                                    const char *app_id)
+                                    const char *desktop_id)
 {
   GDesktopAppInfo *info;
 
   g_return_val_if_fail (EOS_IS_APP_LIST_MODEL (model), NULL);
-  g_return_val_if_fail (app_id != NULL, NULL);
+  g_return_val_if_fail (desktop_id != NULL, NULL);
 
-  info = eos_app_list_model_get_app_info (model, app_id);
+  info = eos_app_list_model_get_app_info (model, desktop_id);
   if (info == NULL)
     return NULL;
 
@@ -504,14 +488,14 @@ eos_app_list_model_get_app_comment (EosAppListModel *model,
 
 const char *
 eos_app_list_model_get_app_icon_name (EosAppListModel *model,
-                                      const char *app_id,
+                                      const char *desktop_id,
                                       EosAppIconState icon_state)
 {
   GDesktopAppInfo *info;
   g_return_val_if_fail (EOS_IS_APP_LIST_MODEL (model), NULL);
-  g_return_val_if_fail (app_id != NULL, NULL);
+  g_return_val_if_fail (desktop_id != NULL, NULL);
 
-  info = eos_app_list_model_get_app_info (model, app_id);
+  info = eos_app_list_model_get_app_info (model, desktop_id);
   if (info == NULL)
     return NULL;
 
@@ -520,42 +504,38 @@ eos_app_list_model_get_app_icon_name (EosAppListModel *model,
 
 EosAppState
 eos_app_list_model_get_app_state (EosAppListModel *model,
-                                  const char *app_id)
+                                  const char *desktop_id)
 {
-  gchar *desktop_app_id;
   EosAppState retval = EOS_APP_STATE_UNKNOWN;
 
   g_return_val_if_fail (EOS_IS_APP_LIST_MODEL (model), EOS_APP_STATE_UNKNOWN);
-  g_return_val_if_fail (app_id != NULL, EOS_APP_STATE_UNKNOWN);
+  g_return_val_if_fail (desktop_id != NULL, EOS_APP_STATE_UNKNOWN);
 
-  desktop_app_id = ensure_desktop_app_id (app_id);
-
-  if (is_app_installed (model, desktop_app_id))
+  if (is_app_installed (model, desktop_id))
     {
       retval = EOS_APP_STATE_INSTALLED;
       goto out;
     }
 
-  if (eos_app_list_model_get_app_info (model, desktop_app_id) != NULL)
+  if (eos_app_list_model_get_app_info (model, desktop_id) != NULL)
     {
       retval = EOS_APP_STATE_UNINSTALLED;
       goto out;
     }
 
  out:
-  g_free (desktop_app_id);
   return retval;
 }
 
 gboolean
 eos_app_list_model_get_app_visible (EosAppListModel *model,
-                                    const char *app_id)
+                                    const char *desktop_id)
 {
   GDesktopAppInfo *info;
   g_return_val_if_fail (EOS_IS_APP_LIST_MODEL (model), FALSE);
-  g_return_val_if_fail (app_id != NULL, FALSE);
+  g_return_val_if_fail (desktop_id != NULL, FALSE);
 
-  info = eos_app_list_model_get_app_info (model, app_id);
+  info = eos_app_list_model_get_app_info (model, desktop_id);
   if (info == NULL)
     return FALSE;
 
@@ -565,22 +545,15 @@ eos_app_list_model_get_app_visible (EosAppListModel *model,
 
 void
 eos_app_list_model_install_app (EosAppListModel *model,
-                                const char *app_id)
+                                const char *desktop_id)
 {
-  gchar *desktop_app_id;
+  if (is_app_installed (model, desktop_id))
+    return;
 
-  desktop_app_id = ensure_desktop_app_id (app_id);
+  if (!add_app_to_shell (model, desktop_id, NULL, NULL))
+    return;
 
-  if (is_app_installed (model, desktop_app_id))
-    goto out;
-
-  if (!add_app_to_shell (model, desktop_app_id, NULL, NULL))
-    goto out;
-
-  g_hash_table_add (model->installed_apps, g_strdup (desktop_app_id));
-
- out:
-  g_free (desktop_app_id);
+  g_hash_table_add (model->installed_apps, g_strdup (desktop_id));
 }
 
 static void
@@ -591,9 +564,9 @@ add_app_thread_func (GTask *task,
 {
   GError *error = NULL;
   EosAppListModel *model = source_object;
-  const gchar *desktop_app_id = task_data;
+  const gchar *desktop_id = task_data;
 
-  if (!add_app_to_shell (model, desktop_app_id, cancellable, &error))
+  if (!add_app_to_shell (model, desktop_id, cancellable, &error))
     g_task_return_error (task, error);
   else
     g_task_return_boolean (task, TRUE);
@@ -601,25 +574,23 @@ add_app_thread_func (GTask *task,
 
 void
 eos_app_list_model_install_app_async (EosAppListModel *model,
-                                      const gchar *app_id,
+                                      const gchar *desktop_id,
                                       GCancellable *cancellable,
                                       GAsyncReadyCallback callback,
                                       gpointer user_data)
 {
   GTask *task;
-  gchar *desktop_app_id;
 
   task = g_task_new (model, cancellable, callback, user_data);
-  desktop_app_id = ensure_desktop_app_id (app_id);
-  g_task_set_task_data (task, desktop_app_id, (GDestroyNotify) g_free);
+  g_task_set_task_data (task, g_strdup (desktop_id), (GDestroyNotify) g_free);
 
-  if (is_app_installed (model, desktop_app_id))
+  if (is_app_installed (model, desktop_id))
     {
       g_task_return_new_error (task,
                                eos_app_list_model_error_quark (),
                                EOS_APP_LIST_MODEL_ERROR_INSTALLED,
                                _("Application %s already installed"),
-                               app_id);
+                               desktop_id);
       g_object_unref (task);
       return;
     }
@@ -634,40 +605,33 @@ eos_app_list_model_install_app_finish (EosAppListModel *model,
                                        GError **error)
 {
   GTask *task = G_TASK (result);
-  const gchar *desktop_app_id;
+  const gchar *desktop_id;
 
   if (!g_task_propagate_boolean (task, error))
     return FALSE;
 
-  desktop_app_id = g_task_get_task_data (task);
-  g_hash_table_add (model->installed_apps, g_strdup (desktop_app_id));
+  desktop_id = g_task_get_task_data (task);
+  g_hash_table_add (model->installed_apps, g_strdup (desktop_id));
   return TRUE;
 }
 
 void
 eos_app_list_model_update_app (EosAppListModel *model,
-                               const char *app_id)
+                               const char *desktop_id)
 {
 }
 
 void
 eos_app_list_model_uninstall_app (EosAppListModel *model,
-                                  const char *app_id)
+                                  const char *desktop_id)
 {
-  gchar *desktop_app_id;
+  if (!is_app_installed (model, desktop_id))
+    return;
 
-  desktop_app_id = ensure_desktop_app_id (app_id);
+  if (!remove_app_from_shell (model, desktop_id, NULL, NULL))
+    return;
 
-  if (!is_app_installed (model, desktop_app_id))
-    goto out;
-
-  if (!remove_app_from_shell (model, desktop_app_id, NULL, NULL))
-    goto out;
-
-  g_hash_table_remove (model->installed_apps, desktop_app_id);
-
- out:
-  g_free (desktop_app_id);
+  g_hash_table_remove (model->installed_apps, desktop_id);
 }
 
 static void
@@ -678,9 +642,9 @@ remove_app_thread_func (GTask *task,
 {
   GError *error = NULL;
   EosAppListModel *model = source_object;
-  const gchar *desktop_app_id = task_data;
+  const gchar *desktop_id = task_data;
 
-  if (!remove_app_from_shell (model, desktop_app_id, cancellable, &error))
+  if (!remove_app_from_shell (model, desktop_id, cancellable, &error))
     g_task_return_error (task, error);
   else
     g_task_return_boolean (task, TRUE);
@@ -688,25 +652,23 @@ remove_app_thread_func (GTask *task,
 
 void
 eos_app_list_model_uninstall_app_async (EosAppListModel *model,
-                                        const gchar *app_id,
+                                        const gchar *desktop_id,
                                         GCancellable *cancellable,
                                         GAsyncReadyCallback callback,
                                         gpointer user_data)
 {
   GTask *task;
-  gchar *desktop_app_id;
 
   task = g_task_new (model, cancellable, callback, user_data);
-  desktop_app_id = ensure_desktop_app_id (app_id);
-  g_task_set_task_data (task, desktop_app_id, (GDestroyNotify) g_free);
+  g_task_set_task_data (task, g_strdup (desktop_id), (GDestroyNotify) g_free);
 
-  if (!is_app_installed (model, desktop_app_id))
+  if (!is_app_installed (model, desktop_id))
     {
       g_task_return_new_error (task,
                                eos_app_list_model_error_quark (),
                                EOS_APP_LIST_MODEL_ERROR_NOT_INSTALLED,
                                _("Application %s is not installed"),
-                               app_id);
+                               desktop_id);
       g_object_unref (task);
       return;
     }
@@ -721,12 +683,12 @@ eos_app_list_model_uninstall_app_finish (EosAppListModel *model,
                                          GError **error)
 {
   GTask *task = G_TASK (result);
-  const gchar *desktop_app_id;
+  const gchar *desktop_id;
 
   if (!g_task_propagate_boolean (task, error))
     return FALSE;
 
-  desktop_app_id = g_task_get_task_data (task);
-  g_hash_table_remove (model->installed_apps, desktop_app_id);
+  desktop_id = g_task_get_task_data (task);
+  g_hash_table_remove (model->installed_apps, desktop_id);
   return TRUE;
 }
