@@ -4,5 +4,5 @@ const ShellAppStore = imports.shellAppStore;
 
 function main() {
     let shellProxy = new ShellAppStore.ShellAppStore();
-    shellProxy.proxy.ResetDesktopRemote();
+    shellProxy.proxy.ResetDesktopSync();
 }
