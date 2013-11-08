@@ -360,10 +360,7 @@ struct _EosLinkInfo
   gchar *id;
   gchar *title;
   gchar *description;
-  gchar *icon_filename;
   gchar *thumbnail_filename;
-  GdkPixbuf *icon;
-  GdkPixbuf *thumbnail;
   gchar *url;
 };
 
@@ -399,9 +396,7 @@ eos_link_info_unref (EosLinkInfo *info)
       g_free (info->id);
       g_free (info->title);
       g_free (info->description);
-      g_free (info->icon_filename);
       g_free (info->thumbnail_filename);
-      g_clear_object (&(info->icon));
       g_free (info->url);
 
       g_slice_free (EosLinkInfo, info);
@@ -432,13 +427,6 @@ eos_link_info_get_description (EosLinkInfo *info)
   return info->description;
 }
 
-const gchar *
-eos_link_info_get_icon_filename (EosLinkInfo *info)
-{
-  g_return_val_if_fail (info != NULL, NULL);
-
-  return info->icon_filename;
-}
 
 const gchar *
 eos_link_info_get_thumbnail_filename (EosLinkInfo *info)
@@ -446,22 +434,6 @@ eos_link_info_get_thumbnail_filename (EosLinkInfo *info)
   g_return_val_if_fail (info != NULL, NULL);
 
   return info->thumbnail_filename;
-}
-
-/**
- * eos_link_info_get_icon:
- * @info: ...
- *
- * ...
- *
- * Returns: (transfer none): ...
- */
-GdkPixbuf *
-eos_link_info_get_icon (EosLinkInfo *info)
-{
-  g_return_val_if_fail (info != NULL, NULL);
-
-  return info->icon;
 }
 
 const gchar *
@@ -492,7 +464,6 @@ eos_link_info_create_from_json (JsonNode *node)
   EosLinkInfo *info;
   JsonObject *obj;
   gchar *path;
-  gchar *icon_filename;
 
   g_return_val_if_fail (JSON_NODE_HOLDS_OBJECT (node), NULL);
 
@@ -512,31 +483,7 @@ eos_link_info_create_from_json (JsonNode *node)
   if (json_object_has_member (obj, "linkSubtitle"))
     info->description = json_node_dup_string (json_object_get_member (obj, "linkSubtitle"));
   else
-    info->description = g_strdup ("");
-  
-  if (json_object_has_member (obj, "linkIcon"))
-    {
-      path = eos_link_get_content_dir();
-      icon_filename = g_build_filename (path,
-                                        json_node_get_string (json_object_get_member (obj, "linkIcon")),
-                                        NULL);
-      info->icon = gdk_pixbuf_new_from_file (icon_filename, NULL);
-      g_free (path);
-      if (info->icon)
-        {
-          info->icon_filename = icon_filename;
-        }
-      else
-        {
-          info->icon_filename = NULL;
-          g_free (icon_filename);
-        }
-    }
-  else
-    {
-      info->icon = NULL;
-      info->icon_filename = NULL;
-    }
+    info->description = g_strdup ("");  
 
   if (json_object_has_member (obj, "linkSmall"))
     {

@@ -24,8 +24,6 @@ void            eos_link_info_unref               (EosLinkInfo *info);
 const gchar *   eos_link_info_get_desktop_id         (EosLinkInfo *info);
 const gchar *   eos_link_info_get_title              (EosLinkInfo *info);
 const gchar *   eos_link_info_get_description        (EosLinkInfo *info);
-const gchar *   eos_link_info_get_icon_filename      (EosLinkInfo *info);
-GdkPixbuf   *   eos_link_info_get_icon               (EosLinkInfo *info);
 const gchar *   eos_link_info_get_thumbnail_filename (EosLinkInfo *info);
 const gchar *   eos_link_info_get_url                (EosLinkInfo *info);
 
