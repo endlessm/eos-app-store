@@ -204,71 +204,8 @@ const WeblinkList = new Lang.Class({
         }));
 
         this._weblinks = weblinks;
-        this._cacheUrls();
 
         this.emit('changed', weblinks);
-    },
-
-    // FIXME: all this code should be removed when the CMS generates
-    // non-empty linkId for weblinks.
-    // See https://github.com/endlessm/eos-shell/issues/1074
-    _cacheUrls: function() {
-        // destroy cache
-        this._urlsToId = {};
-
-        for (let idx in this._weblinks) {
-            let link = this._weblinks[idx];
-            let url = this.getWeblinkUrl(link);
-
-            this._urlsToId[url] = link;
-        }
-    },
-
-    // FIXME: see above
-    _replaceAll: function(find, replace, str) {
-        return str.replace(new RegExp(find, 'g'), replace);
-    },
-
-    // FIXME: see above
-    _getLocalizedExec: function(args) {
-        let languages = GLib.get_language_names();
-
-        // First value is the default one
-        let defaultExec = this._replaceAll('^\'|^\"|\'$|\"$', '', args[0]);
-
-        for (let a in args.slice(1)) {
-            let arg = args[a];
-            let tokens = arg.split(':');
-            let key = tokens.shift();
-            let value = this._replaceAll('^\'|^\"|\'$|\"$', '', tokens.join(':'));
-            for (let l in languages) {
-                let language = languages[l];
-                if (language == key) {
-                    return value;
-                }
-            }
-        }
-
-        return defaultExec;
-    },
-
-    // FIXME: see above
-    getWeblinkUrl: function(id) {
-        let exec = this._model.get_app_executable(id);
-        if (exec.indexOf(EOS_LOCALIZED) == 0) {
-            exec = exec.substr(EOS_LOCALIZED.length);
-            exec = this._getLocalizedExec(exec.match(/([\w-]+|'(\\'|[^'])*')/g));
-        }
-        if (exec.indexOf(EOS_BROWSER) == 0) {
-            return exec.substr(EOS_BROWSER.length);
-        }
-
-        return exec;
-    },
-
-    // FIXME: see above
-    getWeblinkForUrl: function(url) {
-        return this._urlsToId[url];
     },
 
     getWeblinks: function() {

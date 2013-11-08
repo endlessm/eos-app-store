@@ -516,7 +516,7 @@ const WeblinkListBoxRow = new Lang.Class({
             this._setHoverState(false);
         }));
 
-        this._setSensitiveState(this._getStateFromUrl() != EosAppStorePrivate.AppState.INSTALLED);
+        this._setSensitiveState(this._getState() != EosAppStorePrivate.AppState.INSTALLED);
     },
 
     vfunc_state_flags_changed: function(previousFlags) {
@@ -528,32 +528,24 @@ const WeblinkListBoxRow = new Lang.Class({
 
         if (isHover) {
             this._setActiveState(true);
-            icon = this._info.get_icon();
-            if (icon) {
-                this._icon.set_from_pixbuf(icon);
+            let iconName;
+            let linkId = this._info.get_desktop_id();
+            if (linkId) {
+                iconName = 'eos-link-' + linkId;
             } else {
-                this._icon.set_from_icon_name(DEFAULT_ICON, Gtk.IconSize.DIALOG);
+                iconName = DEFAULT_ICON;
             }
+            this._icon.set_from_icon_name(iconName, Gtk.IconSize.DIALOG);
         } else {
             this._setActiveState(false);
             this._icon.clear();
         }
     },
 
-    // FIXME: this should be entirely unnecessary, as we could just use
-    // the linkId, and call getState() on WeblinkList with that ID.
-    // Unfortunately, the CMS-provided content is broken for weblinks
-    // right now, and it has a NULL linkId to all values.
-    // See https://github.com/endlessm/eos-shell/issues/1074
-    _getStateFromUrl: function() {
-        let url = this._info.get_url();
-        let id = this._model.getWeblinkForUrl(url);
-
-        if (id) {
-            return EosAppStorePrivate.AppState.INSTALLED;
-        } else {
-            return EosAppStorePrivate.AppState.UNINSTALLED;
-        }
+    _getState: function() {
+        let linkId = this._info.get_desktop_id();
+        let desktopId = 'eos-link-' + linkId;
+        return this._model.getState(desktopId);
     },
 
     _setActiveState: function(isActive) {
@@ -610,14 +602,7 @@ const WeblinkListBoxRow = new Lang.Class({
     _onStateButtonClicked: function() {
         this._parentFrame.setModelConnected(false);
 
-        let url = this._info.get_url();
-        let title = this._info.get_title();
-        let icon = this._info.get_icon_filename();
-        if (!icon) {
-            icon = DEFAULT_ICON;
-        }
-
-        let [desktopId, ] = createWeblink(url, title, icon);
+        let desktopId = 'eos-link-' + this._info.get_desktop_id();
         this._model.install(desktopId, function() {});
 
         this._showInstalledMessage();
