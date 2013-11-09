@@ -2,6 +2,7 @@
 
 const AppListModel = imports.appListModel;
 const Categories = imports.categories;
+const Environment = imports.environment;
 const EosAppStorePrivate = imports.gi.EosAppStorePrivate;
 const Gettext = imports.gettext;
 const Gio = imports.gi.Gio;
@@ -19,6 +20,8 @@ const FillDesktop = new Lang.Class({
         this._appList = null;
         this._signalId = null;
         this._appInfos = [];
+
+        Environment.loadResources();
 
         this.parent({ application_id: FILL_DESKTOP_NAME });
     },

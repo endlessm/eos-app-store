@@ -346,13 +346,13 @@ const AppFrame = new Lang.Class({
 
             let appInfos = EosAppStorePrivate.app_load_content(category.id);
             appInfos = appInfos.filter(function(appInfo) {
-                let id = appInfo.get_desktop_id() + '.desktop';
+                let id = appInfo.get_desktop_id();
                 return (availableApps.indexOf(id) != -1);
             });
 
             if (category.id == EosAppStorePrivate.AppCategory.MY_APPLICATIONS) {
                 for (let i in appInfos) {
-                    let id = appInfos[i].get_desktop_id() + '.desktop';
+                    let id = appInfos[i].get_desktop_id();
 
                     if (this._model.getState(id) == EosAppStorePrivate.AppState.INSTALLED) {
                         let cell = appInfos[i].create_cell();

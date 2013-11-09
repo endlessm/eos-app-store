@@ -34,6 +34,8 @@ static GParamSpec * eos_link_row_props[NUM_PROPS] = { NULL, };
 
 G_DEFINE_TYPE (EosLinkRow, eos_link_row, GTK_TYPE_BIN)
 
+#define DEFAULT_LINK_ICON_NAME "generic-link"
+
 #define PROVIDER_DATA_FORMAT ".weblink-row-image { " \
   "background-image: url(\"%s\"); "                  \
   "background-repeat: no-repeat; "                   \
@@ -358,12 +360,11 @@ struct _EosLinkInfo
   volatile int ref_count;
 
   gchar *id;
+  gchar *desktop_id;
   gchar *title;
   gchar *description;
-  gchar *icon_filename;
   gchar *thumbnail_filename;
-  GdkPixbuf *icon;
-  GdkPixbuf *thumbnail;
+  gchar *icon_name;
   gchar *url;
 };
 
@@ -397,11 +398,11 @@ eos_link_info_unref (EosLinkInfo *info)
   if (g_atomic_int_dec_and_test (&(info->ref_count)))
     {
       g_free (info->id);
+      g_free (info->desktop_id);
       g_free (info->title);
       g_free (info->description);
-      g_free (info->icon_filename);
+      g_free (info->icon_name);
       g_free (info->thumbnail_filename);
-      g_clear_object (&(info->icon));
       g_free (info->url);
 
       g_slice_free (EosLinkInfo, info);
@@ -409,11 +410,19 @@ eos_link_info_unref (EosLinkInfo *info)
 }
 
 const gchar *
-eos_link_info_get_desktop_id (EosLinkInfo *info)
+eos_link_info_get_id (EosLinkInfo *info)
 {
   g_return_val_if_fail (info != NULL, NULL);
 
   return info->id;
+}
+
+const gchar *
+eos_link_info_get_desktop_id (EosLinkInfo *info)
+{
+  g_return_val_if_fail (info != NULL, NULL);
+
+  return info->desktop_id;
 }
 
 const gchar *
@@ -433,11 +442,11 @@ eos_link_info_get_description (EosLinkInfo *info)
 }
 
 const gchar *
-eos_link_info_get_icon_filename (EosLinkInfo *info)
+eos_link_info_get_icon_name (EosLinkInfo *info)
 {
   g_return_val_if_fail (info != NULL, NULL);
 
-  return info->icon_filename;
+  return info->icon_name;
 }
 
 const gchar *
@@ -446,22 +455,6 @@ eos_link_info_get_thumbnail_filename (EosLinkInfo *info)
   g_return_val_if_fail (info != NULL, NULL);
 
   return info->thumbnail_filename;
-}
-
-/**
- * eos_link_info_get_icon:
- * @info: ...
- *
- * ...
- *
- * Returns: (transfer none): ...
- */
-GdkPixbuf *
-eos_link_info_get_icon (EosLinkInfo *info)
-{
-  g_return_val_if_fail (info != NULL, NULL);
-
-  return info->icon;
 }
 
 const gchar *
@@ -492,7 +485,6 @@ eos_link_info_create_from_json (JsonNode *node)
   EosLinkInfo *info;
   JsonObject *obj;
   gchar *path;
-  gchar *icon_filename;
 
   g_return_val_if_fail (JSON_NODE_HOLDS_OBJECT (node), NULL);
 
@@ -504,6 +496,16 @@ eos_link_info_create_from_json (JsonNode *node)
   else
     info->id = NULL;
 
+  if (info->id != NULL)
+    info->desktop_id = g_strdup_printf ("eos-link-%s.desktop", info->id);
+  else
+    info->desktop_id = NULL;
+
+  if (info->id != NULL)
+    info->icon_name = g_strdup_printf ("eos-link-%s", info->id);
+  else
+    info->icon_name = DEFAULT_LINK_ICON_NAME;
+
   if (json_object_has_member (obj, "linkName"))
     info->title = json_node_dup_string (json_object_get_member (obj, "linkName"));
   else
@@ -512,31 +514,7 @@ eos_link_info_create_from_json (JsonNode *node)
   if (json_object_has_member (obj, "linkSubtitle"))
     info->description = json_node_dup_string (json_object_get_member (obj, "linkSubtitle"));
   else
-    info->description = g_strdup ("");
-  
-  if (json_object_has_member (obj, "linkIcon"))
-    {
-      path = eos_link_get_content_dir();
-      icon_filename = g_build_filename (path,
-                                        json_node_get_string (json_object_get_member (obj, "linkIcon")),
-                                        NULL);
-      info->icon = gdk_pixbuf_new_from_file (icon_filename, NULL);
-      g_free (path);
-      if (info->icon)
-        {
-          info->icon_filename = icon_filename;
-        }
-      else
-        {
-          info->icon_filename = NULL;
-          g_free (icon_filename);
-        }
-    }
-  else
-    {
-      info->icon = NULL;
-      info->icon_filename = NULL;
-    }
+    info->description = g_strdup ("");  
 
   if (json_object_has_member (obj, "linkSmall"))
     {
