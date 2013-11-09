@@ -627,7 +627,7 @@ const char *
 eos_app_info_get_title (const EosAppInfo *info)
 {
   if (info != NULL)
-    return g_dpgettext2 (GETTEXT_PACKAGE, "title", info->title);
+    return g_dpgettext2 (CONTENT_GETTEXT_PACKAGE, "title", info->title);
 
   return "";
 }
@@ -636,7 +636,7 @@ const char *
 eos_app_info_get_subtitle (const EosAppInfo *info)
 {
   if (info != NULL)
-    return g_dpgettext2 (GETTEXT_PACKAGE, "subtitle", info->subtitle);
+    return g_dpgettext2 (CONTENT_GETTEXT_PACKAGE, "subtitle", info->subtitle);
 
   return "";
 }
@@ -654,7 +654,7 @@ const char *
 eos_app_info_get_description (const EosAppInfo *info)
 {
   if (info != NULL)
-    return g_dpgettext2 (GETTEXT_PACKAGE, "description", info->description);
+    return g_dpgettext2 (CONTENT_GETTEXT_PACKAGE, "description", info->description);
 
   return "";
 }
