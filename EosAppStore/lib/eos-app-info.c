@@ -941,8 +941,37 @@ eos_app_info_create_from_json (JsonNode *node)
     {
       JsonNode *node = json_object_get_member (obj, "screenshots");
 
-      if (JSON_NODE_HOLDS_ARRAY (node))
-        get_screenshots (json_node_get_array (node), info);
+      if (JSON_NODE_HOLDS_OBJECT (node))
+        {
+          JsonObject *screenshots = json_node_get_object (node);
+          const gchar * const * my_languages = g_get_language_names ();
+          gchar *language = NULL;
+
+          for (gint i = 0; my_languages[i] != NULL; i++)
+            {
+              /* FIXME: CMS should use same syntax as glibc for languages */
+              gchar *my_language = g_ascii_strdown (my_languages[i], -1);
+              gchar *ptr = strchr (my_language, '_');
+              if (ptr)
+                *ptr = '-';
+
+              if (json_object_has_member (screenshots, my_language))
+                {
+                  language = my_language;
+                  break;
+                }
+              
+              g_free (my_language);
+            }
+
+          /* FIXME: CMS should use "C" as fallback */
+          if (!language)
+            language = g_strdup ("en-us");
+
+          JsonNode *array = json_object_get_member (screenshots, language);
+          get_screenshots (json_node_get_array (array), info);
+          g_free (language);
+        }
     }
   else
     info->n_screenshots = 0;
