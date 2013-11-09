@@ -939,10 +939,18 @@ eos_app_info_create_from_json (JsonNode *node)
 
   if (json_object_has_member (obj, "screenshots"))
     {
-      JsonNode *node = json_object_get_member (obj, "screenshots");
+      JsonNode *screenshots_node = json_object_get_member (obj, "screenshots");
+      JsonObject *screenshots_obj = json_node_get_object (screenshots_node);
 
-      if (JSON_NODE_HOLDS_ARRAY (node))
-        get_screenshots (json_node_get_array (node), info);
+      /* FIXME Screenshots are by language.
+         For now, we just use the Spanish versions. */
+      if (json_object_has_member (screenshots_obj, "es-gt"))
+	{
+	  JsonNode *node = json_object_get_member (screenshots_obj, "es-gt");
+
+	  if (JSON_NODE_HOLDS_ARRAY (node))
+	    get_screenshots (json_node_get_array (node), info);
+	}
     }
   else
     info->n_screenshots = 0;
