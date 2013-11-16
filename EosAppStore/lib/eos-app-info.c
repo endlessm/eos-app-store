@@ -1,3 +1,5 @@
+/* -*- mode: C; c-file-style: "gnu"; indent-tabs-mode: nil; -*- */
+
 #include "config.h"
 
 #include "eos-app-info.h"
@@ -846,6 +848,7 @@ get_shape_from_id (const char *p)
 
 static void
 get_screenshots (JsonArray *array,
+                 const char *language,
                  EosAppInfo *info)
 {
   info->n_screenshots = json_array_get_length (array);
@@ -857,6 +860,7 @@ get_screenshots (JsonArray *array,
     info->screenshots[i] = g_build_filename (path,
                                              "resources",
                                              "screenshots",
+                                             language,
                                              json_array_get_string_element (array, i),
                                              NULL);
 
@@ -949,11 +953,7 @@ eos_app_info_create_from_json (JsonNode *node)
 
           for (gint i = 0; my_languages[i] != NULL; i++)
             {
-              /* FIXME: CMS should use same syntax as glibc for languages */
               gchar *my_language = g_ascii_strdown (my_languages[i], -1);
-              gchar *ptr = strchr (my_language, '_');
-              if (ptr)
-                *ptr = '-';
 
               if (json_object_has_member (screenshots, my_language))
                 {
@@ -964,12 +964,11 @@ eos_app_info_create_from_json (JsonNode *node)
               g_free (my_language);
             }
 
-          /* FIXME: CMS should use "C" as fallback */
           if (!language)
-            language = g_strdup ("en-us");
+            language = g_strdup ("C");
 
           JsonNode *array = json_object_get_member (screenshots, language);
-          get_screenshots (json_node_get_array (array), info);
+          get_screenshots (json_node_get_array (array), language, info);
           g_free (language);
         }
     }
