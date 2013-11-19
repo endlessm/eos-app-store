@@ -63,14 +63,14 @@ eos_link_get_category_name (EosLinkCategory category)
 }
 
 static JsonArray *
-eos_app_parse_resource_content (const char *content_type)
+eos_app_parse_resource_content (const char *content_type, const char *content_name)
 {
   JsonArray *content_array = NULL;
   GError *error = NULL;
   JsonParser *parser = json_parser_new ();
 
-  char *content_file = g_strdup_printf ("/com/endlessm/appstore-content/%s/content.json",
-                                        content_type);
+  char *content_file = g_strdup_printf ("/com/endlessm/appstore-content/%s/%s.json",
+                                        content_type, content_name);
 
   GBytes *data = g_resources_lookup_data (content_file, 0, &error);
   if (error != NULL)
@@ -145,7 +145,8 @@ eos_link_get_content_dir (void)
 GList *
 eos_app_load_content (EosAppCategory category)
 {
-  JsonArray *array = eos_app_parse_resource_content (APP_STORE_CONTENT_APPS);
+  JsonArray *array = eos_app_parse_resource_content (APP_STORE_CONTENT_APPS,
+                                                     "content");
 
   if (array == NULL)
     return NULL;
@@ -206,7 +207,7 @@ eos_link_load_content (EosLinkCategory category)
   JsonObject *obj;
   const gchar *category_name;
 
-  JsonArray *categories_array = eos_app_parse_resource_content (APP_STORE_CONTENT_LINKS);
+  JsonArray *categories_array = eos_app_parse_resource_content (APP_STORE_CONTENT_LINKS, eos_get_system_personality());
 
   if (categories_array == NULL)
     return NULL;
