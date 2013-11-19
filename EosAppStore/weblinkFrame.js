@@ -445,7 +445,9 @@ const TwoLinesLabel = new Lang.Class({
         let layout = this.get_layout();
         layout.set_height(-2);
 
-        return this.parent(cr);
+        let ret = this.parent(cr);
+        cr.$dispose();
+        return ret;
     },
 
     set_text: function(text) {
