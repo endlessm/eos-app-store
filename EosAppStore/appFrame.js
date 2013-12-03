@@ -6,7 +6,6 @@ const GObject = imports.gi.GObject;
 const Gtk = imports.gi.Gtk;
 const EosAppStorePrivate = imports.gi.EosAppStorePrivate;
 const Mainloop = imports.mainloop;
-const PLib = imports.gi.PLib;
 const Endless = imports.gi.Endless;
 
 const AppListModel = imports.appListModel;
@@ -255,10 +254,10 @@ const AppFrame = new Lang.Class({
         // initialize the applications model
         this._model = new AppListModel.AppList();
 
-        this._mainStack = new PLib.Stack({ transition_duration: APP_TRANSITION_MS,
-                                           transition_type: PLib.StackTransitionType.SLIDE_RIGHT,
-                                           hexpand: true,
-                                           vexpand: true });
+        this._mainStack = new Gtk.Stack({ transition_duration: APP_TRANSITION_MS,
+                                          transition_type: Gtk.StackTransitionType.SLIDE_RIGHT,
+                                          hexpand: true,
+                                          vexpand: true });
         this.add(this._mainStack);
         this._mainStack.show();
 
@@ -277,11 +276,11 @@ const AppFrame = new Lang.Class({
         let separator = new Separator.FrameSeparator();
         this._mainBox.add(separator);
 
-        this._stack = new PLib.Stack({ transition_duration: CATEGORY_TRANSITION_MS,
-                                       transition_type: PLib.StackTransitionType.SLIDE_RIGHT,
-                                       hexpand: true,
-                                       vexpand: true,
-                                       margin_top: STACK_TOP_MARGIN });
+        this._stack = new Gtk.Stack({ transition_duration: CATEGORY_TRANSITION_MS,
+                                      transition_type: Gtk.StackTransitionType.SLIDE_RIGHT,
+                                      hexpand: true,
+                                      vexpand: true,
+                                      margin_top: STACK_TOP_MARGIN });
         this._mainBox.add(this._stack);
         this._stack.show();
 
@@ -382,7 +381,7 @@ const AppFrame = new Lang.Class({
         appBox.show();
 
         this._mainStack.add_named(appBox, cell.desktop_id);
-        this._mainStack.transition_type = PLib.StackTransitionType.SLIDE_LEFT;
+        this._mainStack.transition_type = Gtk.StackTransitionType.SLIDE_LEFT;
         this._mainStack.set_visible_child_name(cell.desktop_id);
 
         let app = Gio.Application.get_default();
@@ -427,7 +426,7 @@ const AppFrame = new Lang.Class({
         }
 
         let curPage = this._mainStack.get_visible_child();
-        this._mainStack.transition_type = PLib.StackTransitionType.SLIDE_RIGHT;
+        this._mainStack.transition_type = Gtk.StackTransitionType.SLIDE_RIGHT;
         this._mainStack.set_visible_child_name('main-box');
 
         if (curPage != this._mainBox) {
@@ -448,9 +447,9 @@ const AppFrame = new Lang.Class({
         }
 
         if (idx > this._currentCategoryIdx) {
-            this._stack.transition_type = PLib.StackTransitionType.SLIDE_LEFT;
+            this._stack.transition_type = Gtk.StackTransitionType.SLIDE_LEFT;
         } else {
-            this._stack.transition_type = PLib.StackTransitionType.SLIDE_RIGHT;
+            this._stack.transition_type = Gtk.StackTransitionType.SLIDE_RIGHT;
         }
 
         this._currentCategory = category;
