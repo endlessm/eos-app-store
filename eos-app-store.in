@@ -17,4 +17,10 @@ if [ "$RUN_DEBUG" != "" ]; then
     DEBUG_COMMAND="gdb --args"
 fi
 
+if [ "$RUN_VALGRIND" != "" ]; then
+    export G_SLICE="always-malloc"
+    DEBUG_COMMAND="valgrind --tool=memcheck --leak-check=full --leak-resolution=high --num-callers=20 --log-file=eos-app-store.vgdump"
+fi
+
+echo "Running $DEBUG_COMMAND @GJS_CONSOLE@..."
 exec $DEBUG_COMMAND @GJS_CONSOLE@ -I @pkgdatadir@/js -c "const Main = imports.main; Main.start();" "$@"
