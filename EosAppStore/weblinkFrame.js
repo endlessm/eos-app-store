@@ -466,6 +466,7 @@ const WeblinkListBoxRow = new Lang.Class({
                                                                    ellipsize: Pango.EllipsizeMode.END,
                                                                    wrap: true,
                                                                    wrap_mode: Pango.WrapMode.WORD_CHAR });
+        this._descriptionLabel.keepSize = true;
         this._descriptionLabel.get_style_context().add_class('description');
         this._labelsBox.pack_start(this._descriptionLabel, false, true, 0);
         this._labelsBox.reorder_child(this._descriptionLabel, 1);
