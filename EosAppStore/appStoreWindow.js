@@ -6,7 +6,6 @@ const Gio = imports.gi.Gio;
 const GLib = imports.gi.GLib;
 const GObject = imports.gi.GObject;
 const Gtk = imports.gi.Gtk;
-const PLib = imports.gi.PLib;
 
 const Lang = imports.lang;
 const Signals = imports.signals;
@@ -278,9 +277,9 @@ const AppStoreWindow = new Lang.Class({
         }
 
         // the stack that holds the pages
-        this._stack = new PLib.Stack();
+        this._stack = new Gtk.Stack();
         this._stack.set_transition_duration(PAGE_TRANSITION_MS);
-        this._stack.set_transition_type(PLib.StackTransitionType.SLIDE_RIGHT);
+        this._stack.set_transition_type(Gtk.StackTransitionType.SLIDE_RIGHT);
         this.content_box.add(this._stack);
         this._stack.show();
 

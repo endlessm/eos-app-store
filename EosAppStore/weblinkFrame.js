@@ -7,7 +7,6 @@ const GObject = imports.gi.GObject;
 const Gtk = imports.gi.Gtk;
 const EosAppStorePrivate = imports.gi.EosAppStorePrivate;
 const Pango = imports.gi.Pango;
-const PLib = imports.gi.PLib;
 const WebKit = imports.gi.WebKit2;
 
 const AppListModel = imports.appListModel;
@@ -460,7 +459,7 @@ const TwoLinesLabel = new Lang.Class({
 
 const WeblinkListBoxRow = new Lang.Class({
     Name: 'WeblinkListBoxRow',
-    Extends: Gtk.Bin,
+    Extends: Gtk.ListBoxRow,
 
     templateResource: '/com/endlessm/appstore/eos-app-store-weblink-list-row.ui',
     templateChildren: [
@@ -621,7 +620,7 @@ Builder.bindTemplateChildren(WeblinkListBoxRow.prototype);
 
 const WeblinkListBox = new Lang.Class({
     Name: 'WeblinkListBox',
-    Extends: PLib.ListBox,
+    Extends: Gtk.ListBox,
 
     _init: function(model) {
         this.parent({ selection_mode: Gtk.SelectionMode.NONE });
@@ -679,10 +678,10 @@ const WeblinkFrame = new Lang.Class({
         this._newSiteBox = new NewSiteBox(this._weblinkListModel);
         this._newSiteFrame.add(this._newSiteBox);
 
-        this._stack = new PLib.Stack({ transition_duration: CATEGORY_TRANSITION_MS,
-                                       transition_type: PLib.StackTransitionType.SLIDE_RIGHT,
-                                       hexpand: true,
-                                       vexpand: true });
+        this._stack = new Gtk.Stack({ transition_duration: CATEGORY_TRANSITION_MS,
+                                      transition_type: Gtk.StackTransitionType.SLIDE_RIGHT,
+                                      hexpand: true,
+                                      vexpand: true });
         this._listFrame.add(this._stack);
 
         this._mainBox.show_all();
@@ -796,9 +795,9 @@ const WeblinkFrame = new Lang.Class({
         }
 
         if (idx > this._currentCategoryIdx) {
-            this._stack.transition_type = PLib.StackTransitionType.SLIDE_LEFT;
+            this._stack.transition_type = Gtk.StackTransitionType.SLIDE_LEFT;
         } else {
-            this._stack.transition_type = PLib.StackTransitionType.SLIDE_RIGHT;
+            this._stack.transition_type = Gtk.StackTransitionType.SLIDE_RIGHT;
         }
 
         this._currentCategoryIdx = idx;
