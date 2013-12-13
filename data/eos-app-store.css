@@ -546,6 +546,7 @@
     background: url("btn_folder-glow_hover.png");
 }
 
+.folder-icon-grid.grabbed .folder-icon-button:active,
 .folder-icon-button:active {
     color: #646464;
 
