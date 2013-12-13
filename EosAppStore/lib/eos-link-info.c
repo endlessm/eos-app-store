@@ -8,7 +8,7 @@
 #define SELECTED (GTK_STATE_FLAG_ACTIVE | GTK_STATE_FLAG_PRELIGHT | GTK_STATE_FLAG_SELECTED)
 
 struct _EosLinkRow {
-  GtkBin parent;
+  GtkListBoxRow parent;
 
   EosLinkInfo *link_info;
 
@@ -21,7 +21,7 @@ struct _EosLinkRow {
 };
 
 struct _EosLinkRowClass {
-  GtkBinClass parent_class;
+  GtkListBoxRowClass parent_class;
 };
 
 enum {
@@ -32,7 +32,7 @@ enum {
 
 static GParamSpec * eos_link_row_props[NUM_PROPS] = { NULL, };
 
-G_DEFINE_TYPE (EosLinkRow, eos_link_row, GTK_TYPE_BIN)
+G_DEFINE_TYPE (EosLinkRow, eos_link_row, GTK_TYPE_LIST_BOX_ROW)
 
 #define DEFAULT_LINK_ICON_NAME "generic-link"
 

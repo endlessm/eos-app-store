@@ -435,6 +435,8 @@
 .weblink-listbox .list-row {
     -GtkWidget-focus-padding: 0;
     -GtkWidget-focus-line-width: 0;
+
+    background-color: transparent;
 }
 
 .weblink-listbox .list-row-separator {
