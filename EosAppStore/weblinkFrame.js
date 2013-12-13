@@ -624,7 +624,7 @@ const WeblinkListBox = new Lang.Class({
 
     _init: function(model) {
         this.parent({ selection_mode: Gtk.SelectionMode.NONE });
-        this.get_style_context().add_class("weblink-listbox");
+        this.get_style_context().add_class('weblink-listbox');
         this._model = model;
     }
 });
@@ -635,7 +635,7 @@ const WeblinkListBoxRowSeparator = new Lang.Class({
 
     _init: function() {
         this.parent();
-        this.get_style_context().add_class("list-row-separator");
+        this.get_style_context().add_class('list-row-separator');
     }
 });
 
