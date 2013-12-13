@@ -432,6 +432,10 @@
     background-color: transparent;
 }
 
+.weblink-listbox {
+    background-color: transparent;
+}
+
 .weblink-listbox .list-row {
     -GtkWidget-focus-padding: 0;
     -GtkWidget-focus-line-width: 0;
