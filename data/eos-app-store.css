@@ -330,7 +330,7 @@
 .new-site-frame {
     background: alpha(black, 0.25);
     border-radius: 4px;
-    box-shadow: 0px 2px 2px 0px black;
+    box-shadow: inset 0px 2px 2px 0px black;
 }
 
 .new-site-frame .url-icon {
@@ -362,7 +362,7 @@
 }
 
 .new-site-frame .url-entry-error {
-    box-shadow: 0px 0px 3px 2px #ffc000;
+    box-shadow: inset 0px 0px 3px 2px #ffc000;
 }
 
 .new-site-frame .url-entry:focused,
