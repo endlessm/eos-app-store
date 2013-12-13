@@ -102,30 +102,30 @@
 }
 
 .frame-separator-shadows .left-edge {
-    background-image: url('separator_shadow_left-edge.png');
+    background-image: url("separator_shadow_left-edge.png");
 }
 
 .frame-separator-shadows .center-line {
-    background-image: url('separator_shadow_body.png');
+    background-image: url("separator_shadow_body.png");
 }
 
 .frame-separator-shadows .right-edge {
-    background-image: url('separator_shadow_right-edge.png');
+    background-image: url("separator_shadow_right-edge.png");
 }
 
 .back-button {
     border: none;
     background-color: transparent;
-    background-image: url('btn_back_normal.png');
+    background-image: url("btn_back_normal.png");
 }
 
 .back-button:hover {
-    background-image: url('btn_back_hover.png');
+    background-image: url("btn_back_hover.png");
 }
 
 .back-button:active,
 .back-button:hover:active {
-    background-image: url('btn_back_pressed.png');
+    background-image: url("btn_back_pressed.png");
 }
 
 .close-button {
@@ -228,9 +228,9 @@
 .app-frame .state-button {
     background: none;
 
-    background-image: url('btn_install_normal_middle.png');
+    background-image: url("btn_install_normal_middle.png");
     background-position: -4px;
-    border-image: url('btn_install_normal_border.png') 4 18 4 18 / 4px 18px 4px 18px;
+    border-image: url("btn_install_normal_border.png") 4 18 4 18 / 4px 18px 4px 18px;
     border-width: 4px 18px 4px 18px;
 
     font-size: 1.12em;
@@ -242,8 +242,8 @@
 .app-frame .state-button:hover {
     color: white;
 
-    background-image: url('btn_install_hover_middle.png');
-    border-image-source: url('btn_install_hover_border.png');
+    background-image: url("btn_install_hover_middle.png");
+    border-image-source: url("btn_install_hover_border.png");
 }
 
 .app-frame .state-button:active,
@@ -251,61 +251,61 @@
     color: alpha(white, 0.75);
     text-shadow: 0 -1px alpha(black, 0.5);
 
-    background-image: url('btn_install_pressed_middle.png');
-    border-image-source: url('btn_install_pressed_border.png');
+    background-image: url("btn_install_pressed_middle.png");
+    border-image-source: url("btn_install_pressed_border.png");
 }
 
 .app-frame .state-button.remove {
-    background-image: url('btn_remove_normal_middle.png');
-    border-image-source: url('btn_remove_normal_border.png');
+    background-image: url("btn_remove_normal_middle.png");
+    border-image-source: url("btn_remove_normal_border.png");
 }
 
 .app-frame .state-button.remove:hover {
-    background-image: url('btn_remove_hover_middle.png');
-    border-image-source: url('btn_remove_hover_border.png');
+    background-image: url("btn_remove_hover_middle.png");
+    border-image-source: url("btn_remove_hover_border.png");
 }
 
 .app-frame .state-button.remove:active,
 .app-frame .state-button.remove:hover:active {
-    background-image: url('btn_remove_pressed_middle.png');
-    border-image-source: url('btn_remove_pressed_border.png');
+    background-image: url("btn_remove_pressed_middle.png");
+    border-image-source: url("btn_remove_pressed_border.png");
 }
 
 .app-frame .state-button .state-image {
     border: none;
-    background-image: url('btn_install_normal_icon.png');
+    background-image: url("btn_install_normal_icon.png");
 }
 
 .app-frame .state-button .state-image:hover {
-    background-image: url('btn_install_hover_icon.png');
+    background-image: url("btn_install_hover_icon.png");
 }
 
 .app-frame .state-button .state-image:active {
-    background-image: url('btn_install_pressed_icon.png');
+    background-image: url("btn_install_pressed_icon.png");
 }
 
 .app-frame .state-button.remove .state-image {
-    background-image: url('btn_remove_normal_icon.png');
+    background-image: url("btn_remove_normal_icon.png");
 }
 
 .app-frame .state-button.remove .state-image:hover {
-    background-image: url('btn_remove_hover_icon.png');
+    background-image: url("btn_remove_hover_icon.png");
 }
 
 .app-frame .state-button.remove .state-image:active {
-    background-image: url('btn_remove_pressed_icon.png');
+    background-image: url("btn_remove_pressed_icon.png");
 }
 
 .app-frame .state-button.update .state-image {
-    background-image: url('btn_update_normal_icon.png');
+    background-image: url("btn_update_normal_icon.png");
 }
 
 .app-frame .state-button.update .state-image:hover {
-    background-image: url('btn_update_hover_icon.png');
+    background-image: url("btn_update_hover_icon.png");
 }
 
 .app-frame .state-button.update .state-image:active {
-    background-image: url('btn_update_pressed_icon.png');
+    background-image: url("btn_update_pressed_icon.png");
 }
 
 .screenshot-box {
