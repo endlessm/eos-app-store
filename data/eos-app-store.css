@@ -66,15 +66,15 @@
     font-weight: bold;
 }
 
-.category-button *:hover,
-.sidebar-button *:hover {
+.category-button:hover,
+.sidebar-button:hover {
     color: @app_store_button_hover_fg;
 }
 
-.category-button *:active,
-.category-button *:hover:active,
-.sidebar-button *:active,
-.sidebar-button *:hover:active {
+.category-button:active,
+.category-button:hover:active,
+.sidebar-button:active,
+.sidebar-button:hover:active {
     color: white;
 }
 
@@ -137,12 +137,12 @@
     icon-shadow: inset 0 1px black;
 }
 
-.close-button *:hover {
+.close-button:hover {
     color: @app_store_button_hover_fg;
 }
 
-.close-button *:active,
-.close-button *:hover:active {
+.close-button:active,
+.close-button:hover:active {
     color: #5d5d5d;
 }
 
@@ -240,24 +240,19 @@
 }
 
 .app-frame .state-button:hover {
+    color: white;
+
     background-image: url('btn_install_hover_middle.png');
     border-image-source: url('btn_install_hover_border.png');
 }
 
 .app-frame .state-button:active,
 .app-frame .state-button:hover:active {
-    background-image: url('btn_install_pressed_middle.png');
-    border-image-source: url('btn_install_pressed_border.png');
-}
-
-.app-frame .state-button *:hover {
-    color: white;
-}
-
-.app-frame .state-button *:active,
-.app-frame .state-button *:hover:active {
     color: alpha(white, 0.75);
     text-shadow: 0 -1px alpha(black, 0.5);
+
+    background-image: url('btn_install_pressed_middle.png');
+    border-image-source: url('btn_install_pressed_border.png');
 }
 
 .app-frame .state-button.remove {
@@ -335,7 +330,7 @@
 .new-site-frame {
     background: alpha(black, 0.25);
     border-radius: 4px;
-    box-shadow: 0px 2px 2px 0px black;
+    box-shadow: inset 0px 2px 2px 0px black;
 }
 
 .new-site-frame .url-icon {
@@ -359,7 +354,7 @@
     text-shadow: white 0px 1px 0px;
 
     background: alpha(white, 0.15);
-    box-shadow: 0px 2px 0px alpha(black, 0.25) inset;
+    box-shadow: inset 0px 2px 0px alpha(black, 0.25);
     padding-left: 20px;
     padding-right: 20px;
     border-radius: 26px;
@@ -367,7 +362,7 @@
 }
 
 .new-site-frame .url-entry-error {
-    box-shadow: 0px 0px 3px 2px #ffc000;
+    box-shadow: inset 0px 0px 3px 2px #ffc000;
 }
 
 .new-site-frame .url-entry:focused,
@@ -437,9 +432,15 @@
     background-color: transparent;
 }
 
+.weblink-listbox {
+    background-color: transparent;
+}
+
 .weblink-listbox .list-row {
     -GtkWidget-focus-padding: 0;
     -GtkWidget-focus-line-width: 0;
+
+    background-color: transparent;
 }
 
 .weblink-listbox .list-row-separator {
@@ -478,15 +479,15 @@
     border: 1px;
 }
 
-.weblink-listbox .list-row .state-button-active {
+.weblink-listbox .list-row .row-highlight .state-button {
     background-image: url("btn_add-website_normal.png");
 }
 
-.weblink-listbox .list-row .state-button-hover {
+.weblink-listbox .list-row .state-button:hover {
     background-image: url("btn_add-website_hover.png");
 }
 
-.weblink-listbox .list-row .state-button-pressed {
+.weblink-listbox .list-row .state-button:active {
     background-image: url("btn_add-website_pressed.png");
 }
 
@@ -501,7 +502,7 @@
     color: white;
 }
 
-.weblink-listbox .list-row .title:hover {
+.weblink-listbox .list-row .row-highlight .title {
     color: #3c3c3c;
 }
 
@@ -509,7 +510,7 @@
     color: #b4b4b4;
 }
 
-.weblink-listbox .list-row .description:hover {
+.weblink-listbox .list-row .row-highlight .description {
     color: #646464;
 }
 
@@ -517,7 +518,7 @@
     color: #ffa84d;
 }
 
-.weblink-listbox .list-row .url:hover {
+.weblink-listbox .list-row .row-highlight .url {
     color: #e87700;
 }
 
@@ -545,12 +546,11 @@
     background: url("btn_folder-glow_hover.png");
 }
 
+.folder-icon-grid.grabbed .folder-icon-button:active,
 .folder-icon-button:active {
-    background: url("btn_folder-glow_pressed.png");
-}
-
-.folder-icon-button *:active {
     color: #646464;
+
+    background: url("btn_folder-glow_pressed.png");
 }
 
 .folder-bubble {

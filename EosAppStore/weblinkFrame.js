@@ -459,7 +459,7 @@ const TwoLinesLabel = new Lang.Class({
 
 const WeblinkListBoxRow = new Lang.Class({
     Name: 'WeblinkListBoxRow',
-    Extends: Gtk.ListBoxRow,
+    Extends: Gtk.EventBox,
 
     templateResource: '/com/endlessm/appstore/eos-app-store-weblink-list-row.ui',
     templateChildren: [
@@ -496,45 +496,27 @@ const WeblinkListBoxRow = new Lang.Class({
         this._descriptionLabel.set_text(info.get_description());
         this._urlLabel.set_text(info.get_url());
 
-        this._setButtonStates();
-        this._mainBox.show();
-    },
-
-    _setButtonStates: function() {
-        this._stateButton.connect('pressed', Lang.bind(this, function() {
-            this._setPressState(true);
-        }));
-
-        this._stateButton.connect('released', Lang.bind(this, function() {
-            this._setPressState(false);
-        }));
-
-        this._stateButton.connect('enter-notify-event', Lang.bind(this, function() {
-            this._setHoverState(true);
-        }));
-
-        this._stateButton.connect('leave-notify-event', Lang.bind(this, function() {
-            this._setHoverState(false);
-        }));
-
         this._setSensitiveState(this._getState() != EosAppStorePrivate.AppState.INSTALLED);
+        this._mainBox.show();
+
+        this.connect('enter-notify-event', Lang.bind(this, this._onEnterEvent));
+        this.connect('leave-notify-event', Lang.bind(this, this._onLeaveEvent));
     },
 
-    vfunc_state_flags_changed: function(previousFlags) {
-        this.parent(previousFlags);
-
-        let flags = this.get_state_flags();
-        let isHover = ((flags & Gtk.StateFlags.PRELIGHT) != 0);
-        let icon = null;
-
-        if (isHover) {
+    _onEnterEvent: function(widget, event) {
+        let notifyType = EosAppStorePrivate.get_event_notify_type(event);
+        if (notifyType != Gdk.NotifyType.INFERIOR) {
             this._setActiveState(true);
-            let iconName = this._info.get_icon_name();
-            this._icon.set_from_icon_name(iconName, Gtk.IconSize.DIALOG);
-        } else {
-            this._setActiveState(false);
-            this._icon.clear();
         }
+        return false;
+    },
+
+    _onLeaveEvent: function(widget, event) {
+        let notifyType = EosAppStorePrivate.get_event_notify_type(event);
+        if (notifyType != Gdk.NotifyType.INFERIOR) {
+            this._setActiveState(false);
+        }
+        return false;
     },
 
     _getState: function() {
@@ -544,25 +526,12 @@ const WeblinkListBoxRow = new Lang.Class({
 
     _setActiveState: function(isActive) {
         if (isActive) {
-            this._stateButton.get_style_context().add_class('state-button-active');
+            this.get_style_context().add_class('row-highlight');
+            let iconName = this._info.get_icon_name();
+            this._icon.set_from_icon_name(iconName, Gtk.IconSize.DIALOG);
         } else {
-            this._stateButton.get_style_context().remove_class('state-button-active');
-        }
-    },
-
-    _setPressState: function(isPressed) {
-        if (isPressed) {
-            this._stateButton.get_style_context().add_class('state-button-pressed');
-        } else {
-            this._stateButton.get_style_context().remove_class('state-button-pressed');
-        }
-    },
-
-    _setHoverState: function(isHovered) {
-        if (isHovered) {
-            this._stateButton.get_style_context().add_class('state-button-hover');
-        } else {
-            this._stateButton.get_style_context().remove_class('state-button-hover');
+            this.get_style_context().remove_class('row-highlight');
+            this._icon.clear();
         }
     },
 
@@ -624,7 +593,7 @@ const WeblinkListBox = new Lang.Class({
 
     _init: function(model) {
         this.parent({ selection_mode: Gtk.SelectionMode.NONE });
-        this.get_style_context().add_class("weblink-listbox");
+        this.get_style_context().add_class('weblink-listbox');
         this._model = model;
     }
 });
@@ -635,7 +604,7 @@ const WeblinkListBoxRowSeparator = new Lang.Class({
 
     _init: function() {
         this.parent();
-        this.get_style_context().add_class("list-row-separator");
+        this.get_style_context().add_class('list-row-separator');
     }
 });
 
