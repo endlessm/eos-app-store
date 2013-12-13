@@ -373,3 +373,9 @@ eos_save_icon (GdkPixbuf *pixbuf,
 {
   gdk_pixbuf_save (pixbuf, filename, format, NULL, NULL);
 }
+
+GdkNotifyType
+eos_get_event_notify_type (GdkEvent *event)
+{
+  return ((GdkEventCrossing *) event)->detail;
+}

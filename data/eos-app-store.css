@@ -475,15 +475,15 @@
     border: 1px;
 }
 
-.weblink-listbox .list-row .state-button-active {
+.weblink-listbox .list-row .row-highlight .state-button {
     background-image: url("btn_add-website_normal.png");
 }
 
-.weblink-listbox .list-row .state-button-hover {
+.weblink-listbox .list-row .state-button:hover {
     background-image: url("btn_add-website_hover.png");
 }
 
-.weblink-listbox .list-row .state-button-pressed {
+.weblink-listbox .list-row .state-button:active {
     background-image: url("btn_add-website_pressed.png");
 }
 
@@ -498,7 +498,7 @@
     color: white;
 }
 
-.weblink-listbox .list-row .title:hover {
+.weblink-listbox .list-row .row-highlight .title {
     color: #3c3c3c;
 }
 
@@ -506,7 +506,7 @@
     color: #b4b4b4;
 }
 
-.weblink-listbox .list-row .description:hover {
+.weblink-listbox .list-row .row-highlight .description {
     color: #646464;
 }
 
@@ -514,7 +514,7 @@
     color: #ffa84d;
 }
 
-.weblink-listbox .list-row .url:hover {
+.weblink-listbox .list-row .row-highlight .url {
     color: #e87700;
 }
 
