@@ -6,6 +6,7 @@ const Gio = imports.gi.Gio;
 const GLib = imports.gi.GLib;
 const GObject = imports.gi.GObject;
 const Gtk = imports.gi.Gtk;
+const Pango = imports.gi.Pango;
 
 const Lang = imports.lang;
 const Signals = imports.signals;
@@ -16,6 +17,7 @@ const FolderFrame = imports.folderFrame;
 const FrameClock = imports.frameClock;
 const Path = imports.path;
 const StoreModel = imports.storeModel;
+const TwoLinesLabel = imports.twoLinesLabel;
 const UIBuilder = imports.builder;
 const WMInspect = imports.wmInspect;
 
@@ -190,6 +192,7 @@ const AppStoreWindow = new Lang.Class({
         'side-pane-web-button',
         'side-pane-folder-button',
         'content-box',
+        'header-bar-box',
         'header-bar-title-label',
         'header-bar-subtitle-label',
         'header-bar-installed-image',
@@ -205,6 +208,15 @@ const AppStoreWindow = new Lang.Class({
                     });
 
         this.initTemplate({ templateRoot: 'main-frame', bindChildren: true, connectSignals: true, });
+        this.header_bar_subtitle_label = new TwoLinesLabel.TwoLinesLabel({ visible: true,
+                                                                           xalign: 0,
+                                                                           yalign: 0,
+                                                                           ellipsize: Pango.EllipsizeMode.END,
+                                                                           wrap: true,
+                                                                           wrap_mode: Pango.WrapMode.WORD_CHAR });
+        this.header_bar_subtitle_label.get_style_context().add_class('header-subtitle');
+        this.header_bar_box.pack_start(this.header_bar_subtitle_label, false, true, 0);
+        this.header_bar_box.reorder_child(this.header_bar_subtitle_label, 1);
         this.stick();
         this.set_resizable(false);
         this.set_decorated(false);
