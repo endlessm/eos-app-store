@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-11-06 20:33-0800\n"
+"POT-Creation-Date: 2013-12-20 16:27-0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -21,7 +21,7 @@ msgstr ""
 msgid "Select an icon"
 msgstr ""
 
-#: ../data/eos-app-store-list-row.ui.h:1 ../EosAppStore/appFrame.js:178
+#: ../data/eos-app-store-list-row.ui.h:1 ../EosAppStore/appFrame.js:177
 msgid "Install application"
 msgstr ""
 
@@ -54,19 +54,19 @@ msgstr ""
 msgid "e.g.: http://www.globoesporte.com"
 msgstr ""
 
-#: ../EosAppStore/appFrame.js:183
+#: ../EosAppStore/appFrame.js:182
 msgid "Update application"
 msgstr ""
 
-#: ../EosAppStore/appStoreWindow.js:362
+#: ../EosAppStore/appStoreWindow.js:374
 msgid "Install applications"
 msgstr ""
 
-#: ../EosAppStore/appStoreWindow.js:366
+#: ../EosAppStore/appStoreWindow.js:378
 msgid "Install websites"
 msgstr ""
 
-#: ../EosAppStore/appStoreWindow.js:370
+#: ../EosAppStore/appStoreWindow.js:382
 msgid "Install folders"
 msgstr ""
 
@@ -75,15 +75,15 @@ msgid "Featured"
 msgstr ""
 
 #. Translators: use the same string used to install the app store content JSON
-#: ../EosAppStore/categories.js:16 ../EosAppStore/lib/eos-app-info.c:796
+#: ../EosAppStore/categories.js:16 ../EosAppStore/lib/eos-app-info.c:798
 msgid "Education"
 msgstr ""
 
-#: ../EosAppStore/categories.js:22 ../EosAppStore/lib/eos-app-info.c:797
+#: ../EosAppStore/categories.js:22 ../EosAppStore/lib/eos-app-info.c:799
 msgid "Leisure"
 msgstr ""
 
-#: ../EosAppStore/categories.js:28 ../EosAppStore/lib/eos-app-info.c:798
+#: ../EosAppStore/categories.js:28 ../EosAppStore/lib/eos-app-info.c:800
 msgid "Utilities"
 msgstr ""
 
@@ -111,7 +111,7 @@ msgstr ""
 msgid "Local"
 msgstr ""
 
-#: ../EosAppStore/environment.js:18
+#: ../EosAppStore/environment.js:19
 msgid "Application Store"
 msgstr ""
 
@@ -135,16 +135,16 @@ msgstr ""
 msgid "The address written does not exist or is not available."
 msgstr ""
 
-#: ../EosAppStore/weblinkFrame.js:347 ../EosAppStore/weblinkFrame.js:599
+#: ../EosAppStore/weblinkFrame.js:347 ../EosAppStore/weblinkFrame.js:533
 msgid "added successfully!"
 msgstr ""
 
-#: ../EosAppStore/lib/eos-app-list-model.c:621
+#: ../EosAppStore/lib/eos-app-list-model.c:592
 #, c-format
 msgid "Application %s already installed"
 msgstr ""
 
-#: ../EosAppStore/lib/eos-app-list-model.c:708
+#: ../EosAppStore/lib/eos-app-list-model.c:670
 #, c-format
 msgid "Application %s is not installed"
 msgstr ""
