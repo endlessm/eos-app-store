@@ -54,10 +54,6 @@ const AppStoreSlider = new Lang.Class({
         return x;
     },
 
-    _getInitialValue: function() {
-        return this._getX(!this.showing);
-    },
-
     setValue: function(newX) {
         let [, oldY] = this._widget.get_position();
         this._widget.move(newX, oldY);
@@ -131,7 +127,7 @@ const AppStoreSlider = new Lang.Class({
         this._widget.show();
 
         this.showing = true;
-        this.start(this._getX(true));
+        this.start(this._getX(false), this._getX(true));
     },
 
     slideOut: function() {
@@ -139,11 +135,11 @@ const AppStoreSlider = new Lang.Class({
             return;
         }
 
-        this.showing = false;
-        this.start(this._getX(false), Lang.bind(this,
-            function() {
-                this._widget.hide();
-            }));
+        this.start(this._getX(true), this._getX(false),
+                   Lang.bind(this, function() {
+                                 this.showing = false;
+                                 this._widget.hide();
+                             }));
     },
 
     set showing(value) {
