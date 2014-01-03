@@ -39,6 +39,7 @@ const AppStoreSlider = new Lang.Class({
 
     _init: function(widget) {
         this._showing = false;
+        this._willShow = false;
         this.parent(widget, ANIMATION_TIME);
     },
 
@@ -119,22 +120,24 @@ const AppStoreSlider = new Lang.Class({
     },
 
     slideIn: function() {
-        if (this.showing) {
+        if (this._willShow) {
             return;
         }
 
         this.setInitialValue();
         this._widget.show();
 
+        this._willShow = true;
         this.showing = true;
         this.start(this._getX(false), this._getX(true));
     },
 
     slideOut: function() {
-        if (!this.showing) {
+        if (!this._willShow) {
             return;
         }
 
+        this._willShow = false;
         this.start(this._getX(true), this._getX(false),
                    Lang.bind(this, function() {
                                  this.showing = false;
