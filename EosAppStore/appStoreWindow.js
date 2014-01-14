@@ -14,7 +14,6 @@ const Signals = imports.signals;
 const AppFrame = imports.appFrame;
 const WeblinkFrame = imports.weblinkFrame;
 const FolderFrame = imports.folderFrame;
-const FrameClock = imports.frameClock;
 const Path = imports.path;
 const StoreModel = imports.storeModel;
 const TwoLinesLabel = imports.twoLinesLabel;
@@ -25,6 +24,8 @@ const ANIMATION_TIME = (500 * 1000); // half a second
 
 const PAGE_TRANSITION_MS = 500;
 
+const SIDE_COMPONENT_ROLE = 'eos-side-component';
+
 const AppStoreSizes = {
   // Note: must be listed in order of increasing screenWidth
   SVGA: { screenWidth:  800, windowWidth:  800 },
@@ -33,33 +34,118 @@ const AppStoreSizes = {
     HD: { screenWidth: 1920, windowWidth: 1366 },
 };
 
-const AppStoreSlider = new Lang.Class({
-    Name: 'AppStoreSlider',
-    Extends: FrameClock.FrameClockAnimator,
-
-    _init: function(widget) {
-        this._showing = false;
-        this._willShow = false;
-        this.parent(widget, ANIMATION_TIME);
+const AppStoreWindow = new Lang.Class({
+    Name: 'AppStoreWindow',
+    Extends: Gtk.ApplicationWindow,
+    Signals: {
+        'visibility-changed': { param_types: [GObject.TYPE_BOOLEAN] },
+        'back-clicked': { },
     },
 
-    _getX: function(forVisibility) {
-        let [width, height] = this._getSize();
-        let workarea = this._getWorkarea();
-        let x = workarea.x - width;
+    templateResource: '/com/endlessm/appstore/eos-app-store-main-window.ui',
+    templateChildren: [
+        'main-frame',
+        'main-box',
+        'side-pane-apps-image',
+        'side-pane-web-image',
+        'side-pane-folder-image',
+        'side-pane-apps-label',
+        'side-pane-web-label',
+        'side-pane-folder-label',
+        'side-pane-apps-label-bold',
+        'side-pane-web-label-bold',
+        'side-pane-folder-label-bold',
+        'side-pane-apps-button',
+        'side-pane-web-button',
+        'side-pane-folder-button',
+        'content-box',
+        'header-bar-box',
+        'header-bar-title-label',
+        'header-bar-subtitle-label',
+        'header-bar-installed-image',
+        'header-icon',
+        'close-button',
+        'back-button',
+    ],
 
-        if (forVisibility) {
-            x += width;
+    _init: function(app, storeModel) {
+        this.parent({ application: app,
+                        type_hint: Gdk.WindowTypeHint.DOCK,
+                             type: Gtk.WindowType.TOPLEVEL,
+                             role: SIDE_COMPONENT_ROLE
+                    });
+
+        this.initTemplate({ templateRoot: 'main-frame', bindChildren: true, connectSignals: true, });
+        this.header_bar_subtitle_label = new TwoLinesLabel.TwoLinesLabel({ visible: true,
+                                                                           xalign: 0,
+                                                                           yalign: 0,
+                                                                           ellipsize: Pango.EllipsizeMode.END,
+                                                                           wrap: true,
+                                                                           wrap_mode: Pango.WrapMode.WORD_CHAR });
+        this.header_bar_subtitle_label.get_style_context().add_class('header-subtitle');
+        this.header_bar_box.pack_start(this.header_bar_subtitle_label, false, true, 0);
+        this.header_bar_box.reorder_child(this.header_bar_subtitle_label, 1);
+        this.stick();
+        this.set_resizable(false);
+        this.set_decorated(false);
+        // do not destroy, just hide
+        this.connect('delete-event', Lang.bind(this, function() {
+            this.toggle(false);
+            return true;
+        }));
+        this.add(this.main_frame);
+
+        this._loadSideImages();
+        this._setLabelSizeGroup();
+
+        // update position when workarea changes
+        let screen = Gdk.Screen.get_default();
+        this._monitorsChangedId = screen.connect('monitors-changed',
+                       Lang.bind(this, this._onAvailableAreaChanged));
+        this._monitorsSizeChangedId = screen.connect('size-changed',
+                       Lang.bind(this, this._onAvailableAreaChanged));
+
+        let visual = screen.get_rgba_visual();
+        if (visual) {
+            this.set_visual(visual);
         }
 
-        return x;
+        this._updateGeometry();
+
+        // the model that handles page changes
+        this._storeModel = storeModel;
+        this._storeModel.connect('page-changed', Lang.bind(this, this._onStorePageChanged));
+
+        // the stack that holds the pages
+        this._stack = null;
+        this._createStackPages();
+
+        // hide main window when clicking outside the store
+        this._wmInspect = new WMInspect.WMInspect();
+        this._activeWindowId = this._wmInspect.connect('active-window-changed',
+                                                       Lang.bind(this, this._onActiveWindowChanged));
     },
 
-    setValue: function(newX) {
-        let [, oldY] = this._widget.get_position();
-        this._widget.move(newX, oldY);
-    },
+    vfunc_destroy: function() {
+        this.parent();
 
+        let screen = Gdk.Screen.get_default();
+
+        if (this._monitorsChangedId > 0) {
+            screen.disconnect(this._monitorsChangedId);
+            this._monitorsChangedId = 0;
+        }
+
+        if (this._monitorsSizeChangedId > 0) {
+            screen.disconnect(this._monitorsSizeChangedId);
+            this._monitorsSizeChangedId = 0;
+        }
+
+        if (this._activeWindowId > 0) {
+            this._wmInspect.disconnect(this._activeWindowId);
+            this._activeWindowId = 0;
+        }
+    },
     _getWorkarea: function() {
         let screen = Gdk.Screen.get_default();
         let monitor = screen.get_primary_monitor();
@@ -102,184 +188,15 @@ const AppStoreSlider = new Lang.Class({
     _updateGeometry: function() {
         let workarea = this._getWorkarea();
         let [width, height] = this._getSize();
-        let x = this._getX(this.showing);
 
-        let geometry = { x: x,
+        let geometry = { x: workarea.x,
                          y: workarea.y,
                          width: width,
                          height: height };
 
 
-        this._widget.move(geometry.x, geometry.y);
-        this._widget.set_size_request(geometry.width, geometry.height);
-    },
-
-    setInitialValue: function() {
-        this.stop();
-        this._updateGeometry();
-    },
-
-    slideIn: function() {
-        if (this._willShow) {
-            return;
-        }
-
-        this.setInitialValue();
-        this._widget.show();
-
-        this._willShow = true;
-        this.showing = true;
-        this.start(this._getX(false), this._getX(true));
-    },
-
-    slideOut: function() {
-        if (!this._willShow) {
-            return;
-        }
-
-        this._willShow = false;
-        this.start(this._getX(true), this._getX(false),
-                   Lang.bind(this, function() {
-                                 this.showing = false;
-                                 this._widget.hide();
-                             }));
-    },
-
-    set showing(value) {
-        this._showing = value;
-        this.emit('visibility-changed');
-    },
-
-    get showing() {
-        return this._showing;
-    },
-
-    get resolution() {
-        return this._getResolution();
-    },
-
-    get expectedWidth() {
-        let [width, height] = this._getSize();
-
-        return width;
-    },
-});
-Signals.addSignalMethods(AppStoreSlider.prototype);
-
-const AppStoreWindow = new Lang.Class({
-    Name: 'AppStoreWindow',
-    Extends: Gtk.ApplicationWindow,
-    Signals: {
-        'visibility-changed': { param_types: [GObject.TYPE_BOOLEAN] },
-        'back-clicked': { },
-    },
-
-    templateResource: '/com/endlessm/appstore/eos-app-store-main-window.ui',
-    templateChildren: [
-        'main-frame',
-        'main-box',
-        'side-pane-apps-image',
-        'side-pane-web-image',
-        'side-pane-folder-image',
-        'side-pane-apps-label',
-        'side-pane-web-label',
-        'side-pane-folder-label',
-        'side-pane-apps-label-bold',
-        'side-pane-web-label-bold',
-        'side-pane-folder-label-bold',
-        'side-pane-apps-button',
-        'side-pane-web-button',
-        'side-pane-folder-button',
-        'content-box',
-        'header-bar-box',
-        'header-bar-title-label',
-        'header-bar-subtitle-label',
-        'header-bar-installed-image',
-        'header-icon',
-        'close-button',
-        'back-button',
-    ],
-
-    _init: function(app, storeModel) {
-        this.parent({ application: app,
-                        type_hint: Gdk.WindowTypeHint.DOCK,
-                             type: Gtk.WindowType.TOPLEVEL,
-                    });
-
-        this.initTemplate({ templateRoot: 'main-frame', bindChildren: true, connectSignals: true, });
-        this.header_bar_subtitle_label = new TwoLinesLabel.TwoLinesLabel({ visible: true,
-                                                                           xalign: 0,
-                                                                           yalign: 0,
-                                                                           ellipsize: Pango.EllipsizeMode.END,
-                                                                           wrap: true,
-                                                                           wrap_mode: Pango.WrapMode.WORD_CHAR });
-        this.header_bar_subtitle_label.get_style_context().add_class('header-subtitle');
-        this.header_bar_box.pack_start(this.header_bar_subtitle_label, false, true, 0);
-        this.header_bar_box.reorder_child(this.header_bar_subtitle_label, 1);
-        this.stick();
-        this.set_resizable(false);
-        this.set_decorated(false);
-        // do not destroy, just hide
-        this.connect('delete-event', Lang.bind(this, function() {
-            this.toggle(false);
-            return true;
-        }));
-        this.add(this.main_frame);
-
-        this._loadSideImages();
-        this._setLabelSizeGroup();
-
-        // update position when workarea changes
-        let screen = Gdk.Screen.get_default();
-        this._monitorsChangedId = screen.connect('monitors-changed',
-                       Lang.bind(this, this._onAvailableAreaChanged));
-        this._monitorsSizeChangedId = screen.connect('size-changed',
-                       Lang.bind(this, this._onAvailableAreaChanged));
-
-        let visual = screen.get_rgba_visual();
-        if (visual) {
-            this.set_visual(visual);
-        }
-
-        // initialize animator
-        this._animator = new AppStoreSlider(this);
-        this._animator.connect('visibility-changed', Lang.bind(this, this._onVisibilityChanged));
-        this._animator.setInitialValue();
-        this._animator.showing = false;
-
-        // the model that handles page changes
-        this._storeModel = storeModel;
-        this._storeModel.connect('page-changed', Lang.bind(this, this._onStorePageChanged));
-
-        // the stack that holds the pages
-        this._stack = null;
-        this._createStackPages();
-
-        // hide main window when clicking outside the store
-        this._wmInspect = new WMInspect.WMInspect();
-        this._activeWindowId = this._wmInspect.connect('active-window-changed',
-                                                       Lang.bind(this, this._onActiveWindowChanged));
-    },
-
-    vfunc_destroy: function() {
-        this.parent();
-
-        let screen = Gdk.Screen.get_default();
-
-        if (this._monitorsChangedId > 0) {
-            screen.disconnect(this._monitorsChangedId);
-            this._monitorsChangedId = 0;
-        }
-
-        if (this._monitorsSizeChangedId > 0) {
-            screen.disconnect(this._monitorsSizeChangedId);
-            this._monitorsSizeChangedId = 0;
-        }
-
-        if (this._activeWindowId > 0) {
-            this._wmInspect.disconnect(this._activeWindowId);
-            this._activeWindowId = 0;
-        }
+        this.move(geometry.x, geometry.y);
+        this.set_size_request(geometry.width, geometry.height);
     },
 
     _createStackPages: function() {
@@ -335,7 +252,7 @@ const AppStoreWindow = new Lang.Class({
     _onActiveWindowChanged: function(wmInspect, activeXid) {
         let xid = this.get_window().get_xid();
         if (xid != activeXid) {
-            this._animator.slideOut();
+            this.hide();
         }
     },
 
@@ -416,22 +333,14 @@ const AppStoreWindow = new Lang.Class({
     },
 
     _onAvailableAreaChanged: function() {
-        this._animator.setInitialValue();
+        this._updateGeometry();
         this._createStackPages();
         this._onStorePageChanged(this._storeModel, this._currentPage);
     },
 
-    _onVisibilityChanged: function() {
-        this.emit('visibility-changed', this._animator.showing);
-    },
-
-    getVisible: function() {
-        return this._animator.showing;
-    },
-
     toggle: function(reset, timestamp) {
-        if (this._animator.showing) {
-            this._animator.slideOut();
+        if (this.is_visible()) {
+            this.hide();
         } else {
             let page = this._pages[this._currentPage];
             if (page && reset) {
@@ -443,12 +352,15 @@ const AppStoreWindow = new Lang.Class({
     },
 
     showPage: function(timestamp) {
-        this._animator.slideIn();
+        this._updateGeometry();
+        this.show();
         this.present_with_time(timestamp);
     },
 
     getExpectedWidth: function() {
-        return this._animator.expectedWidth;
+        let [width, height] = this._getSize();
+
+        return width;
     },
 
     clearHeaderState: function() {
