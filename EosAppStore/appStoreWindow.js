@@ -392,12 +392,9 @@ const AppStoreWindow = new Lang.Class({
             page.hide();
         });
 
-        this._setDefaultTitle();
-        this.header_bar_subtitle_label.hide();
-        this.header_icon.hide();
-
         let page = this._pages[newPage];
         this._currentPage = newPage;
+        this.clearHeaderState();
 
         switch (this._currentPage) {
             case StoreModel.StorePage.APPS:
@@ -452,6 +449,14 @@ const AppStoreWindow = new Lang.Class({
 
     getExpectedWidth: function() {
         return this._animator.expectedWidth;
+    },
+
+    clearHeaderState: function() {
+        this.titleText = null;
+        this.subtitleText = null;
+        this.headerIcon = null;
+        this.headerInstalledVisible = false;
+        this.backButtonVisible = false;
     },
 
     set titleText(str) {

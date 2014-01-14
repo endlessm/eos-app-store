@@ -414,11 +414,7 @@ const AppFrame = new Lang.Class({
 
     _showGrid: function() {
         let app = Gio.Application.get_default();
-        app.mainWindow.titleText = null;
-        app.mainWindow.subtitleText = null;
-        app.mainWindow.headerIcon = null;
-        app.mainWindow.headerInstalledVisible = false;
-        app.mainWindow.backButtonVisible = false;
+        app.mainWindow.clearHeaderState();
 
         if (this._backClickedId > 0) {
             app.mainWindow.disconnect(this._backClickedId);
