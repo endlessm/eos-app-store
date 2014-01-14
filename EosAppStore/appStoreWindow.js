@@ -295,13 +295,13 @@ const AppStoreWindow = new Lang.Class({
         this._stack.show();
 
         // add the pages
-        this._pages = {};
-        this._pages.apps = new AppFrame.AppFrame();
-        this._stack.add_named(this._pages.apps, 'apps');
-        this._pages.weblinks = new WeblinkFrame.WeblinkFrame(this);
-        this._stack.add_named(this._pages.weblinks, 'weblinks');
-        this._pages.folders = new FolderFrame.FolderFrame();
-        this._stack.add_named(this._pages.folders, 'folders');
+        this._pages = [];
+        this._pages[StoreModel.StorePage.APPS] = new AppFrame.AppFrame();
+        this._stack.add_named(this._pages[StoreModel.StorePage.APPS], 'apps');
+        this._pages[StoreModel.StorePage.WEB] = new WeblinkFrame.WeblinkFrame(this);
+        this._stack.add_named(this._pages[StoreModel.StorePage.WEB], 'weblinks');
+        this._pages[StoreModel.StorePage.FOLDERS] = new FolderFrame.FolderFrame();
+        this._stack.add_named(this._pages[StoreModel.StorePage.FOLDERS], 'folders');
     },
 
     _loadSideImages: function() {
@@ -384,41 +384,35 @@ const AppStoreWindow = new Lang.Class({
     },
 
     _onStorePageChanged: function(model, newPage) {
-        let stack = this._stack;
-        let page = null;
-
-        for (let p in this._pages) {
-            this._pages[p].hide();
+        if (!this._pages[newPage]) {
+            return;
         }
 
-        this._currentPage = newPage;
+        this._pages.forEach(function(page) {
+            page.hide();
+        });
 
-        this._setDefaultTitle();
-        this.header_bar_subtitle_label.hide();
-        this.header_icon.hide();
+        let page = this._pages[newPage];
+        this._currentPage = newPage;
+        this.clearHeaderState();
 
         switch (this._currentPage) {
             case StoreModel.StorePage.APPS:
-                page = this._pages.apps;
                 this.side_pane_apps_button.active = true;
                 break;
 
             case StoreModel.StorePage.WEB:
-                page = this._pages.weblinks;
                 this.side_pane_web_button.active = true;
                 break;
 
             case StoreModel.StorePage.FOLDERS:
-                page = this._pages.folders;
                 this.side_pane_folder_button.active = true;
                 break;
         }
 
-        if (page) {
-            page.reset();
-            page.show_all();
-            stack.set_visible_child(page);
-        }
+        page.reset();
+        page.show_all();
+        this._stack.set_visible_child(page);
     },
 
     _onAvailableAreaChanged: function() {
@@ -439,25 +433,9 @@ const AppStoreWindow = new Lang.Class({
         if (this._animator.showing) {
             this._animator.slideOut();
         } else {
-            if (reset) {
-                let page = null;
-                switch (this._currentPage) {
-                    case StoreModel.StorePage.APPS:
-                        page = this._pages.apps;
-                        break;
-
-                    case StoreModel.StorePage.WEB:
-                        page = this._pages.weblinks;
-                        break;
-
-                    case StoreModel.StorePage.FOLDERS:
-                        page = this._pages.folders;
-                        break;
-                }
-
-                if (page) {
-                    page.reset();
-                }
+            let page = this._pages[this._currentPage];
+            if (page && reset) {
+                page.reset();
             }
 
             this.showPage(timestamp);
@@ -471,6 +449,14 @@ const AppStoreWindow = new Lang.Class({
 
     getExpectedWidth: function() {
         return this._animator.expectedWidth;
+    },
+
+    clearHeaderState: function() {
+        this.titleText = null;
+        this.subtitleText = null;
+        this.headerIcon = null;
+        this.headerInstalledVisible = false;
+        this.backButtonVisible = false;
     },
 
     set titleText(str) {
