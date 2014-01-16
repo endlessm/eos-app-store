@@ -13,7 +13,6 @@ dist_js_DATA = \
 	fillDesktop.js \
 	folderFrame.js \
 	folderModel.js \
-	frameClock.js \
 	main.js \
 	resetDesktop.js \
 	separator.js \
