@@ -90,7 +90,7 @@ const AppStoreWindow = new Lang.Class({
         this.set_decorated(false);
         // do not destroy, just hide
         this.connect('delete-event', Lang.bind(this, function() {
-            this.toggle(false);
+            this.hide();
             return true;
         }));
         this.add(this.main_frame);
@@ -251,13 +251,14 @@ const AppStoreWindow = new Lang.Class({
 
     _onActiveWindowChanged: function(wmInspect, activeXid) {
         let xid = this.get_window().get_xid();
+        print('_onActiveWindowChanged : mine = '+xid+' , new = '+activeXid+( (xid==activeXid)?'  SAME':''));
         if (xid != activeXid) {
             this.hide();
         }
     },
 
     _onCloseClicked: function() {
-        this.toggle(false);
+        this.hide();
     },
 
     _onBackClicked: function() {
@@ -338,17 +339,13 @@ const AppStoreWindow = new Lang.Class({
         this._onStorePageChanged(this._storeModel, this._currentPage);
     },
 
-    toggle: function(reset, timestamp) {
-        if (this.is_visible()) {
-            this.hide();
-        } else {
-            let page = this._pages[this._currentPage];
-            if (page && reset) {
-                page.reset();
-            }
-
-            this.showPage(timestamp);
+    doShow: function(reset, timestamp) {
+        let page = this._pages[this._currentPage];
+        if (page && reset) {
+            page.reset();
         }
+
+        this.showPage(timestamp);
     },
 
     showPage: function(timestamp) {
