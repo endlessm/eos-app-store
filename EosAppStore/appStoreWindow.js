@@ -146,24 +146,24 @@ const AppStoreWindow = new Lang.Class({
             this._activeWindowId = 0;
         }
     },
-    _getWorkarea: function() {
+    _getWorkArea: function() {
         let screen = Gdk.Screen.get_default();
         let monitor = screen.get_primary_monitor();
-        let workarea = screen.get_monitor_workarea(monitor);
+        let workArea = screen.get_monitor_workarea(monitor);
 
-        return workarea;
+        return workArea;
     },
 
     _getResolution: function() {
-        let workarea = this._getWorkarea();
+        let workArea = this._getWorkArea();
         let resolution = null;
 
         // Find the largest defined resolution that does not exceed
         // the work area width
-        for (let i in AppStoreSizes) {
-            let res = AppStoreSizes[i];
+        for (let resolutionIdx in AppStoreSizes) {
+            let res = AppStoreSizes[resolutionIdx];
 
-            if (workarea.width >= res.screenWidth) {
+            if (workArea.width >= res.screenWidth) {
                 resolution = res;
             }
         }
@@ -172,25 +172,25 @@ const AppStoreWindow = new Lang.Class({
     },
 
     _getSize: function() {
-        let workarea = this._getWorkarea();
+        let workArea = this._getWorkArea();
 
         let resolution = this._getResolution();
 
         // If the work area is smaller than any defined resolution,
         // use the full size of the work area
         if (!resolution) {
-            return [workarea.width, workarea.height];
+            return [workArea.width, workArea.height];
         }
 
-        return [resolution.windowWidth, workarea.height];
+        return [resolution.windowWidth, workArea.height];
     },
 
     _updateGeometry: function() {
-        let workarea = this._getWorkarea();
+        let workArea = this._getWorkArea();
         let [width, height] = this._getSize();
 
-        let geometry = { x: workarea.x,
-                         y: workarea.y,
+        let geometry = { x: workArea.x,
+                         y: workArea.y,
                          width: width,
                          height: height };
 
