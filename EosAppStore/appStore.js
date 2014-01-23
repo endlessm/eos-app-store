@@ -89,7 +89,7 @@ const AppStore = new Lang.Class({
         if (this._mainWindow == null) {
             this._mainWindow = new AppStoreWindow.AppStoreWindow(this,
                                                                  this._storeModel);
-            this._mainWindow.connect('visibility-changed',
+            this._mainWindow.connect('notify::visible',
                                      Lang.bind(this, this._onVisibilityChanged));
 
             // set initial page
@@ -147,8 +147,8 @@ const AppStore = new Lang.Class({
         return false;
     },
 
-    _onVisibilityChanged: function(proxy, visible) {
-        this.Visible = visible;
+    _onVisibilityChanged: function() {
+        this.Visible = this._mainWindow.is_visible();
 
         let propChangedVariant = new GLib.Variant('(sa{sv}as)',
             [APP_STORE_IFACE, { 'Visible': new GLib.Variant('b', this.Visible) }, []]);
