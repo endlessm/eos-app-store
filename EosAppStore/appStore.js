@@ -25,13 +25,16 @@ const APP_STORE_PATH = '/com/endlessm/AppStore';
 const APP_STORE_IFACE = 'com.endlessm.AppStore';
 
 const AppStoreIface = <interface name={APP_STORE_NAME}>
-  <method name="Toggle">
+  <method name="show">
+    <arg type="u" direction="in" name="timestamp"/>
     <arg type="b" direction="in" name="reset"/>
+  </method>
+  <method name="hide">
     <arg type="u" direction="in" name="timestamp"/>
   </method>
-  <method name="ShowPage">
-    <arg type="s" direction="in" name="page"/>
+  <method name="showPage">
     <arg type="u" direction="in" name="timestamp"/>
+    <arg type="s" direction="in" name="page"/>
   </method>
   <property name="Visible" type="b" access="read"/>
 </interface>;
@@ -89,7 +92,7 @@ const AppStore = new Lang.Class({
         if (this._mainWindow == null) {
             this._mainWindow = new AppStoreWindow.AppStoreWindow(this,
                                                                  this._storeModel);
-            this._mainWindow.connect('visibility-changed',
+            this._mainWindow.connect('notify::visible',
                                      Lang.bind(this, this._onVisibilityChanged));
 
             // set initial page
@@ -117,12 +120,17 @@ const AppStore = new Lang.Class({
         return AppStoreWindow.AppStoreSizes.SVGA.windowWidth;
     },
 
-    Toggle: function(reset, timestamp) {
+    show: function(timestamp, reset) {
         this._createMainWindow();
-        this._mainWindow.toggle(reset, timestamp);
+        this._mainWindow.doShow(reset, timestamp);
     },
 
-    ShowPage: function(page, timestamp) {
+    hide: function(timestamp) {
+        if (this._mainWindow)
+            this._mainWindow.hide();
+    },
+
+    showPage: function(timestamp, page) {
         this._createMainWindow();
 
         if (page == 'apps') {
@@ -147,8 +155,8 @@ const AppStore = new Lang.Class({
         return false;
     },
 
-    _onVisibilityChanged: function(proxy, visible) {
-        this.Visible = visible;
+    _onVisibilityChanged: function() {
+        this.Visible = this._mainWindow.is_visible();
 
         let propChangedVariant = new GLib.Variant('(sa{sv}as)',
             [APP_STORE_IFACE, { 'Visible': new GLib.Variant('b', this.Visible) }, []]);

@@ -14,7 +14,6 @@ const Signals = imports.signals;
 const AppFrame = imports.appFrame;
 const WeblinkFrame = imports.weblinkFrame;
 const FolderFrame = imports.folderFrame;
-const FrameClock = imports.frameClock;
 const Path = imports.path;
 const StoreModel = imports.storeModel;
 const TwoLinesLabel = imports.twoLinesLabel;
@@ -25,6 +24,8 @@ const ANIMATION_TIME = (500 * 1000); // half a second
 
 const PAGE_TRANSITION_MS = 500;
 
+const SIDE_COMPONENT_ROLE = 'eos-side-component';
+
 const AppStoreSizes = {
   // Note: must be listed in order of increasing screenWidth
   SVGA: { screenWidth:  800, windowWidth:  800 },
@@ -32,139 +33,6 @@ const AppStoreSizes = {
   WXGA: { screenWidth: 1366, windowWidth: 1024 },
     HD: { screenWidth: 1920, windowWidth: 1366 },
 };
-
-const AppStoreSlider = new Lang.Class({
-    Name: 'AppStoreSlider',
-    Extends: FrameClock.FrameClockAnimator,
-
-    _init: function(widget) {
-        this._showing = false;
-        this._willShow = false;
-        this.parent(widget, ANIMATION_TIME);
-    },
-
-    _getX: function(forVisibility) {
-        let [width, height] = this._getSize();
-        let workarea = this._getWorkarea();
-        let x = workarea.x - width;
-
-        if (forVisibility) {
-            x += width;
-        }
-
-        return x;
-    },
-
-    setValue: function(newX) {
-        let [, oldY] = this._widget.get_position();
-        this._widget.move(newX, oldY);
-    },
-
-    _getWorkarea: function() {
-        let screen = Gdk.Screen.get_default();
-        let monitor = screen.get_primary_monitor();
-        let workarea = screen.get_monitor_workarea(monitor);
-
-        return workarea;
-    },
-
-    _getResolution: function() {
-        let workarea = this._getWorkarea();
-        let resolution = null;
-
-        // Find the largest defined resolution that does not exceed
-        // the work area width
-        for (let i in AppStoreSizes) {
-            let res = AppStoreSizes[i];
-
-            if (workarea.width >= res.screenWidth) {
-                resolution = res;
-            }
-        }
-
-        return resolution;
-    },
-
-    _getSize: function() {
-        let workarea = this._getWorkarea();
-
-        let resolution = this._getResolution();
-
-        // If the work area is smaller than any defined resolution,
-        // use the full size of the work area
-        if (!resolution) {
-            return [workarea.width, workarea.height];
-        }
-
-        return [resolution.windowWidth, workarea.height];
-    },
-
-    _updateGeometry: function() {
-        let workarea = this._getWorkarea();
-        let [width, height] = this._getSize();
-        let x = this._getX(this.showing);
-
-        let geometry = { x: x,
-                         y: workarea.y,
-                         width: width,
-                         height: height };
-
-
-        this._widget.move(geometry.x, geometry.y);
-        this._widget.set_size_request(geometry.width, geometry.height);
-    },
-
-    setInitialValue: function() {
-        this.stop();
-        this._updateGeometry();
-    },
-
-    slideIn: function() {
-        if (this._willShow) {
-            return;
-        }
-
-        this.setInitialValue();
-        this._widget.show();
-
-        this._willShow = true;
-        this.showing = true;
-        this.start(this._getX(false), this._getX(true));
-    },
-
-    slideOut: function() {
-        if (!this._willShow) {
-            return;
-        }
-
-        this._willShow = false;
-        this.start(this._getX(true), this._getX(false),
-                   Lang.bind(this, function() {
-                                 this.showing = false;
-                                 this._widget.hide();
-                             }));
-    },
-
-    set showing(value) {
-        this._showing = value;
-        this.emit('visibility-changed');
-    },
-
-    get showing() {
-        return this._showing;
-    },
-
-    get resolution() {
-        return this._getResolution();
-    },
-
-    get expectedWidth() {
-        let [width, height] = this._getSize();
-
-        return width;
-    },
-});
-Signals.addSignalMethods(AppStoreSlider.prototype);
 
 const AppStoreWindow = new Lang.Class({
     Name: 'AppStoreWindow',
@@ -204,6 +72,7 @@ const AppStoreWindow = new Lang.Class({
         this.parent({ application: app,
                         type_hint: Gdk.WindowTypeHint.DOCK,
                              type: Gtk.WindowType.TOPLEVEL,
+                             role: SIDE_COMPONENT_ROLE
                     });
 
         this.initTemplate({ templateRoot: 'main-frame', bindChildren: true, connectSignals: true, });
@@ -221,7 +90,7 @@ const AppStoreWindow = new Lang.Class({
         this.set_decorated(false);
         // do not destroy, just hide
         this.connect('delete-event', Lang.bind(this, function() {
-            this.toggle(false);
+            this.hide();
             return true;
         }));
         this.add(this.main_frame);
@@ -241,11 +110,7 @@ const AppStoreWindow = new Lang.Class({
             this.set_visual(visual);
         }
 
-        // initialize animator
-        this._animator = new AppStoreSlider(this);
-        this._animator.connect('visibility-changed', Lang.bind(this, this._onVisibilityChanged));
-        this._animator.setInitialValue();
-        this._animator.showing = false;
+        this._updateGeometry();
 
         // the model that handles page changes
         this._storeModel = storeModel;
@@ -280,6 +145,58 @@ const AppStoreWindow = new Lang.Class({
             this._wmInspect.disconnect(this._activeWindowId);
             this._activeWindowId = 0;
         }
+    },
+    _getWorkArea: function() {
+        let screen = Gdk.Screen.get_default();
+        let monitor = screen.get_primary_monitor();
+        let workArea = screen.get_monitor_workarea(monitor);
+
+        return workArea;
+    },
+
+    _getResolution: function() {
+        let workArea = this._getWorkArea();
+        let resolution = null;
+
+        // Find the largest defined resolution that does not exceed
+        // the work area width
+        for (let resolutionIdx in AppStoreSizes) {
+            let res = AppStoreSizes[resolutionIdx];
+
+            if (workArea.width >= res.screenWidth) {
+                resolution = res;
+            }
+        }
+
+        return resolution;
+    },
+
+    _getSize: function() {
+        let workArea = this._getWorkArea();
+
+        let resolution = this._getResolution();
+
+        // If the work area is smaller than any defined resolution,
+        // use the full size of the work area
+        if (!resolution) {
+            return [workArea.width, workArea.height];
+        }
+
+        return [resolution.windowWidth, workArea.height];
+    },
+
+    _updateGeometry: function() {
+        let workArea = this._getWorkArea();
+        let [width, height] = this._getSize();
+
+        let geometry = { x: workArea.x,
+                         y: workArea.y,
+                         width: width,
+                         height: height };
+
+
+        this.move(geometry.x, geometry.y);
+        this.set_size_request(geometry.width, geometry.height);
     },
 
     _createStackPages: function() {
@@ -334,13 +251,14 @@ const AppStoreWindow = new Lang.Class({
 
     _onActiveWindowChanged: function(wmInspect, activeXid) {
         let xid = this.get_window().get_xid();
+        print('_onActiveWindowChanged : mine = '+xid+' , new = '+activeXid+( (xid==activeXid)?'  SAME':''));
         if (xid != activeXid) {
-            this._animator.slideOut();
+            this.hide();
         }
     },
 
     _onCloseClicked: function() {
-        this.toggle(false);
+        this.hide();
     },
 
     _onBackClicked: function() {
@@ -416,39 +334,30 @@ const AppStoreWindow = new Lang.Class({
     },
 
     _onAvailableAreaChanged: function() {
-        this._animator.setInitialValue();
+        this._updateGeometry();
         this._createStackPages();
         this._onStorePageChanged(this._storeModel, this._currentPage);
     },
 
-    _onVisibilityChanged: function() {
-        this.emit('visibility-changed', this._animator.showing);
-    },
-
-    getVisible: function() {
-        return this._animator.showing;
-    },
-
-    toggle: function(reset, timestamp) {
-        if (this._animator.showing) {
-            this._animator.slideOut();
-        } else {
-            let page = this._pages[this._currentPage];
-            if (page && reset) {
-                page.reset();
-            }
-
-            this.showPage(timestamp);
+    doShow: function(reset, timestamp) {
+        let page = this._pages[this._currentPage];
+        if (page && reset) {
+            page.reset();
         }
+
+        this.showPage(timestamp);
     },
 
     showPage: function(timestamp) {
-        this._animator.slideIn();
+        this._updateGeometry();
+        this.show();
         this.present_with_time(timestamp);
     },
 
     getExpectedWidth: function() {
-        return this._animator.expectedWidth;
+        let [width, height] = this._getSize();
+
+        return width;
     },
 
     clearHeaderState: function() {
