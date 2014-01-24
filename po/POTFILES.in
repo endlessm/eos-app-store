@@ -18,7 +18,6 @@ EosAppStore/environment.js
 EosAppStore/fillDesktop.js
 EosAppStore/folderFrame.js
 EosAppStore/folderModel.js
-EosAppStore/frameClock.js
 EosAppStore/main.js
 EosAppStore/path.js
 EosAppStore/resetDesktop.js
