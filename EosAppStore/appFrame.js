@@ -16,8 +16,8 @@ const Lang = imports.lang;
 const Separator = imports.separator;
 const Signals = imports.signals;
 
-const APP_TRANSITION_MS = 500;
-const CATEGORY_TRANSITION_MS = 500;
+const APP_TRANSITION_MS = 250;
+const CATEGORY_TRANSITION_MS = 250;
 
 const CELL_DEFAULT_SIZE = 180;
 const CELL_DEFAULT_SPACING = 15;
