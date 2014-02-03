@@ -309,12 +309,9 @@ const AppFrame = new Lang.Class({
             Mainloop.source_remove(this._loadDataId);
         }
 
-        let startPopulateTime = GLib.get_monotonic_time();
-
         this._loadData = {
             availableApps: this._model.apps,
             currentCategory: -1,
-            startPopulateTime: startPopulateTime,
         };
 
         this._loadDataId = Mainloop.idle_add(Lang.bind(this, this._idlePopulateCategories));
@@ -329,14 +326,10 @@ const AppFrame = new Lang.Class({
         }
 
         if (this._loadData.currentCategory == this._categories.length) {
-            let endPopulateTime = GLib.get_monotonic_time();
-
             this._loadData = null;
             this._loadDataId = 0;
             return false;
         }
-
-        let startCategoryTime = GLib.get_monotonic_time();
 
         let cellMargin = EosAppStorePrivate.AppInfo.get_cell_margin();
 
@@ -407,9 +400,6 @@ const AppFrame = new Lang.Class({
         grid.connect('cell-activated', Lang.bind(this, this._onCellActivated));
 
         scrollWindow.show_all();
-
-        let endCategoryTime = GLib.get_monotonic_time();
-        let categoryTime = (endCategoryTime - startCategoryTime) / 1000
 
         return true;
     },
