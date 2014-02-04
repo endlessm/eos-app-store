@@ -7,14 +7,20 @@
 #include <endless/endless.h>
 #include <webkit2.h>
 #include "eos-app-enums.h"
+#include "eos-app-info.h"
 
 G_BEGIN_DECLS
+
+typedef gboolean (* EosAppFilterCallback) (EosAppInfo *info,
+                                           gpointer data);
 
 char *  eos_app_get_content_dir  (void);
 
 char *  eos_link_get_content_dir (void);
 
-GList * eos_app_load_content     (EosAppCategory   category);
+GList * eos_app_load_content     (EosAppCategory   category,
+                                  EosAppFilterCallback callback,
+                                  gpointer data);
 
 GList * eos_link_load_content    (EosLinkCategory  category);
 

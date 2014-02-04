@@ -3,7 +3,6 @@
 #include "config.h"
 
 #include "eos-app-utils.h"
-#include "eos-app-info.h"
 #include "eos-link-info.h"
 
 #include <locale.h>
@@ -137,13 +136,17 @@ eos_link_get_content_dir (void)
 /**
  * eos_app_load_content:
  * @category: ...
+ * @callback: (allow-none) (scope call) (closure data): ...
+ * @data: (allow-none): ...
  *
  * ...
  *
  * Return value: (transfer full) (element-type EosAppInfo): ...
  */
 GList *
-eos_app_load_content (EosAppCategory category)
+eos_app_load_content (EosAppCategory category,
+                      EosAppFilterCallback callback,
+                      gpointer data)
 {
   JsonArray *array = eos_app_parse_resource_content (APP_STORE_CONTENT_APPS,
                                                      "content");
@@ -182,6 +185,18 @@ eos_app_load_content (EosAppCategory category)
               continue;
             }
 
+        }
+
+      if (callback != NULL)
+        {
+          gboolean res;
+
+          res = callback (info, data);
+          if (!res)
+            {
+              eos_app_info_unref (info);
+              continue;
+            }
         }
 
       infos = g_list_prepend (infos, info);

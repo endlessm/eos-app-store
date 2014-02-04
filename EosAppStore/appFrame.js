@@ -315,6 +315,7 @@ const AppFrame = new Lang.Class({
             currentCategory: 0,
         };
 
+        // This is basically Mainloop.idle_add() but with a different priority
         let s = GLib.idle_source_new()
         s.set_priority(GLib.PRIORITY_DEFAULT_IDLE - 100);
         GObject.source_set_closure(s, Lang.bind(this, this._idlePopulateCategories));
@@ -362,12 +363,15 @@ const AppFrame = new Lang.Class({
                                            cell_spacing: CELL_DEFAULT_SPACING - cellMargin });
         scrollWindow.add_with_viewport(grid);
 
-        let appInfos = EosAppStorePrivate.app_load_content(category.id);
-        let availableApps = this._loadData.availableApps;
-        appInfos = appInfos.filter(function(appInfo) {
+        let appInfos = EosAppStorePrivate.app_load_content(category.id,
+                                                           Lang.bind(this, function(appInfo) {
             let id = appInfo.get_desktop_id();
-            return (availableApps.indexOf(id) != -1);
-        });
+            if (this._loadData.availableApps.indexOf(id) != -1) {
+                return true;
+            }
+
+            return false;
+        }));
 
         if (category.id == EosAppStorePrivate.AppCategory.MY_APPLICATIONS) {
             for (let i in appInfos) {
