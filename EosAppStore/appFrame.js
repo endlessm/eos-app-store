@@ -284,6 +284,7 @@ const AppFrame = new Lang.Class({
         this._mainBox.add(this._stack);
         this._stack.show();
 
+        this._loadDataSource = null;
         this._buttonGroup = null;
         this._model.connect('changed', Lang.bind(this, this._populateCategories));
         this._populateCategories();
@@ -305,8 +306,8 @@ const AppFrame = new Lang.Class({
     },
 
     _populateCategories: function() {
-        if (this._loadDataId != 0) {
-            Mainloop.source_remove(this._loadDataId);
+        if (this._loadDataSource != null) {
+            this._loadDataSource.destroy();
         }
 
         this._loadData = {
@@ -314,7 +315,12 @@ const AppFrame = new Lang.Class({
             currentCategory: 0,
         };
 
-        this._loadDataId = Mainloop.idle_add(Lang.bind(this, this._idlePopulateCategories));
+        let s = GLib.idle_source_new()
+        s.set_priority(GLib.PRIORITY_DEFAULT_IDLE - 100);
+        GObject.source_set_closure(s, Lang.bind(this, this._idlePopulateCategories));
+        s.attach(null);
+
+        this._loadDataSource = s;
     },
 
     _idlePopulateCategories: function() {
@@ -392,7 +398,7 @@ const AppFrame = new Lang.Class({
 
         if (this._loadData.currentCategory == this._categories.length) {
             this._loadData = null;
-            this._loadDataId = 0;
+            this._loadDataSource = null;
             return false;
         }
 
