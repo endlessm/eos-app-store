@@ -311,26 +311,13 @@ const AppFrame = new Lang.Class({
 
         this._loadData = {
             availableApps: this._model.apps,
-            currentCategory: -1,
+            currentCategory: 0,
         };
 
         this._loadDataId = Mainloop.idle_add(Lang.bind(this, this._idlePopulateCategories));
     },
 
     _idlePopulateCategories: function() {
-        if (this._loadData.currentCategory == -1) {
-            this._loadData.currentCategory = 0;
-        }
-        else {
-            this._loadData.currentCategory += 1;
-        }
-
-        if (this._loadData.currentCategory == this._categories.length) {
-            this._loadData = null;
-            this._loadDataId = 0;
-            return false;
-        }
-
         let cellMargin = EosAppStorePrivate.AppInfo.get_cell_margin();
 
         let c = this._loadData.currentCategory;
@@ -400,6 +387,14 @@ const AppFrame = new Lang.Class({
         grid.connect('cell-activated', Lang.bind(this, this._onCellActivated));
 
         scrollWindow.show_all();
+
+        this._loadData.currentCategory += 1;
+
+        if (this._loadData.currentCategory == this._categories.length) {
+            this._loadData = null;
+            this._loadDataId = 0;
+            return false;
+        }
 
         return true;
     },
