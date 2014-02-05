@@ -284,6 +284,7 @@ const AppFrame = new Lang.Class({
         this._mainBox.add(this._stack);
         this._stack.show();
 
+        this._loadDataSource = null;
         this._buttonGroup = null;
         this._model.connect('changed', Lang.bind(this, this._populateCategories));
         this._populateCategories();
@@ -305,75 +306,107 @@ const AppFrame = new Lang.Class({
     },
 
     _populateCategories: function() {
+        if (this._loadDataSource != null) {
+            this._loadDataSource.destroy();
+        }
+
+        this._loadData = {
+            availableApps: this._model.apps,
+            currentCategory: 0,
+        };
+
+        // This is basically Mainloop.idle_add() but with a different priority
+        let s = GLib.idle_source_new()
+        s.set_priority(GLib.PRIORITY_DEFAULT_IDLE - 100);
+        GObject.source_set_closure(s, Lang.bind(this, this._idlePopulateCategories));
+        s.attach(null);
+
+        this._loadDataSource = s;
+    },
+
+    _idlePopulateCategories: function() {
         let cellMargin = EosAppStorePrivate.AppInfo.get_cell_margin();
-        let availableApps = this._model.apps;
 
-        for (let c in this._categories) {
-            let category = this._categories[c];
+        let c = this._loadData.currentCategory;
+        let category = this._categories[c];
 
-            if (!category.button) {
-                category.button = new CategoryButton.CategoryButton({ label: category.label,
-                                                                      category: category.name,
-                                                                      index: c,
-                                                                      draw_indicator: false,
-                                                                      group: this._buttonGroup });
-                category.button.connect('clicked', Lang.bind(this, this._onCategoryClicked));
-                category.button.show();
-                this._categoriesBox.pack_start(category.button, false, false, 0);
+        if (!category.button) {
+            category.button = new CategoryButton.CategoryButton({ label: category.label,
+                                                                  category: category.name,
+                                                                  index: c,
+                                                                  draw_indicator: false,
+                                                                  group: this._buttonGroup });
+            category.button.connect('clicked', Lang.bind(this, this._onCategoryClicked));
+            category.button.show();
 
-                if (!this._buttonGroup) {
-                    this._buttonGroup = category.button;
-                }
+            this._categoriesBox.pack_start(category.button, false, false, 0);
+
+            if (!this._buttonGroup) {
+                this._buttonGroup = category.button;
+            }
+        }
+
+        let scrollWindow;
+
+        if (!category.widget) {
+            scrollWindow = new Gtk.ScrolledWindow({ hscrollbar_policy: Gtk.PolicyType.NEVER,
+                                                    vscrollbar_policy: Gtk.PolicyType.AUTOMATIC });
+            this._stack.add_named(scrollWindow, category.name);
+            category.widget = scrollWindow;
+        } else {
+            scrollWindow = category.widget;
+            let child = scrollWindow.get_child();
+            child.destroy();
+        }
+
+        let grid = new Endless.FlexyGrid({ cell_size: CELL_DEFAULT_SIZE + cellMargin,
+                                           cell_spacing: CELL_DEFAULT_SPACING - cellMargin });
+        scrollWindow.add_with_viewport(grid);
+
+        let appInfos = EosAppStorePrivate.app_load_content(category.id,
+                                                           Lang.bind(this, function(appInfo) {
+            let id = appInfo.get_desktop_id();
+            if (this._loadData.availableApps.indexOf(id) != -1) {
+                return true;
             }
 
-            let scrollWindow;
+            return false;
+        }));
 
-            if (!category.widget) {
-                scrollWindow = new Gtk.ScrolledWindow({ hscrollbar_policy: Gtk.PolicyType.NEVER,
-                                                        vscrollbar_policy: Gtk.PolicyType.AUTOMATIC });
-                this._stack.add_named(scrollWindow, category.name);
-                category.widget = scrollWindow;
-            } else {
-                scrollWindow = category.widget;
-                let child = scrollWindow.get_child();
-                child.destroy();
-            }
+        if (category.id == EosAppStorePrivate.AppCategory.MY_APPLICATIONS) {
+            for (let i in appInfos) {
+                let id = appInfos[i].get_desktop_id();
 
-            let grid = new Endless.FlexyGrid({ cell_size: CELL_DEFAULT_SIZE + cellMargin,
-                                               cell_spacing: CELL_DEFAULT_SPACING - cellMargin });
-            scrollWindow.add_with_viewport(grid);
-
-            let appInfos = EosAppStorePrivate.app_load_content(category.id);
-            appInfos = appInfos.filter(function(appInfo) {
-                let id = appInfo.get_desktop_id();
-                return (availableApps.indexOf(id) != -1);
-            });
-
-            if (category.id == EosAppStorePrivate.AppCategory.MY_APPLICATIONS) {
-                for (let i in appInfos) {
-                    let id = appInfos[i].get_desktop_id();
-
-                    if (this._model.getState(id) == EosAppStorePrivate.AppState.INSTALLED) {
-                        let cell = appInfos[i].create_cell();
-                        cell.shape = Endless.FlexyShape.SMALL;
-                        grid.add(cell);
-                        cell.show_all();
-                    }
-                }
-            }
-            else {
-                for (let i in appInfos) {
+                if (this._model.getState(id) == EosAppStorePrivate.AppState.INSTALLED) {
                     let cell = appInfos[i].create_cell();
+                    cell.shape = Endless.FlexyShape.SMALL;
                     grid.add(cell);
                     cell.show_all();
                 }
             }
-
-            grid.connect('cell-selected', Lang.bind(this, this._onCellSelected));
-            grid.connect('cell-activated', Lang.bind(this, this._onCellActivated));
-
-            scrollWindow.show_all();
         }
+        else {
+            for (let i in appInfos) {
+                let cell = appInfos[i].create_cell();
+                grid.add(cell);
+                cell.show_all();
+            }
+        }
+
+        grid.connect('cell-selected', Lang.bind(this, this._onCellSelected));
+        grid.connect('cell-activated', Lang.bind(this, this._onCellActivated));
+
+        scrollWindow.show_all();
+
+        this._loadData.currentCategory += 1;
+
+        if (this._loadData.currentCategory == this._categories.length) {
+            this._loadData = null;
+            this._loadDataSource = null;
+            return false;
+        }
+
+        return true;
     },
 
     _onCellActivated: function(grid, cell) {
@@ -457,6 +490,9 @@ const AppFrame = new Lang.Class({
     reset: function() {
         // Return to the first category
         this._showGrid();
-        this._buttonGroup.clicked();
+
+        if (this._buttonGroup != null) {
+            this._buttonGroup.clicked();
+        }
     }
 });
