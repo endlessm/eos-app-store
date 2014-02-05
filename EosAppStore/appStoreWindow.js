@@ -251,7 +251,6 @@ const AppStoreWindow = new Lang.Class({
 
     _onActiveWindowChanged: function(wmInspect, activeXid) {
         let xid = this.get_window().get_xid();
-        print('_onActiveWindowChanged : mine = '+xid+' , new = '+activeXid+( (xid==activeXid)?'  SAME':''));
         if (xid != activeXid) {
             this.hide();
         }
