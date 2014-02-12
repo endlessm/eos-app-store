@@ -684,23 +684,29 @@ const WeblinkFrame = new Lang.Class({
        }
     },
 
+    _resetCategory: function(categoryId) {
+        let category = this._categories[categoryId];
+
+        if (category.widget) {
+            category.widget.destroy();
+            category.widget = null;
+        }
+    },
+
     _populateCategory: function(categoryId) {
         let category = this._categories[categoryId];
 
-        let scrollWindow;
-
-        if (!category.widget) {
-            scrollWindow = new Gtk.ScrolledWindow({ hscrollbar_policy: Gtk.PolicyType.NEVER,
-                                                    vscrollbar_policy: Gtk.PolicyType.AUTOMATIC,
-                                                    shadow_type: Gtk.ShadowType.IN });
-            scrollWindow.get_style_context().add_class('weblink-scrolledwindow');
-            this._stack.add_named(scrollWindow, category.name);
-            category.widget = scrollWindow;
-        } else {
-            scrollWindow = category.widget;
-            let child = scrollWindow.get_child();
-            child.destroy();
+        if (category.widget) {
+            return;
         }
+
+        let scrollWindow;
+        scrollWindow = new Gtk.ScrolledWindow({ hscrollbar_policy: Gtk.PolicyType.NEVER,
+                                                vscrollbar_policy: Gtk.PolicyType.AUTOMATIC,
+                                                shadow_type: Gtk.ShadowType.IN });
+        scrollWindow.get_style_context().add_class('weblink-scrolledwindow');
+        this._stack.add_named(scrollWindow, category.name);
+        category.widget = scrollWindow;
 
         let weblinksBox = new Gtk.Box({ orientation: Gtk.Orientation.HORIZONTAL,
                                         homogeneous: true,
@@ -729,6 +735,7 @@ const WeblinkFrame = new Lang.Class({
 
     _populateAllCategories: function() {
         for (let c in this._categories) {
+            this._resetCategory(c);
             this._populateCategory(c);
         }
     },
