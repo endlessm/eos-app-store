@@ -98,7 +98,7 @@ function main() {
     }
 
     let storeLauncher = new AppStoreLauncher();
-    storeLauncher.proxy.showPageRemote(initialPage, Gdk.CURRENT_TIME);
+    storeLauncher.proxy.showPageRemote(Gdk.CURRENT_TIME, initialPage);
 
     return 0;
 }
