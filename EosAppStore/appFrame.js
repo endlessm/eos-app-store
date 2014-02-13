@@ -284,10 +284,9 @@ const AppFrame = new Lang.Class({
         this._mainBox.add(this._stack);
         this._stack.show();
 
-        this._loadDataSource = null;
         this._buttonGroup = null;
-        this._model.connect('changed', Lang.bind(this, this._populateCategories));
-        this._populateCategories();
+        this._model.connect('changed', Lang.bind(this, this._populateAllCategories));
+        this._populateCategoryHeaders();
 
         let content_dir = EosAppStorePrivate.app_get_content_dir();
         let content_path = GLib.build_filenamev([content_dir, 'content.json']);
@@ -295,69 +294,66 @@ const AppFrame = new Lang.Class({
         this._contentMonitor = content_file.monitor_file(Gio.FileMonitorFlags.NONE, null);
         this._contentMonitor.connect('changed', Lang.bind(this, this._onContentChanged));
 
-        this._stack.set_visible_child_name(this._currentCategory);
-
         this._lastCellSelected = null;
     },
 
     _onContentChanged: function(monitor, file, other_file, event_type) {
-        this._populateCategories();
+        this._populateAllCategories();
         this._stack.set_visible_child_name(this._currentCategory);
     },
 
-    _populateCategories: function() {
-        if (this._loadDataSource != null) {
-            this._loadDataSource.destroy();
-        }
+    _populateCategoryHeaders: function() {
+        for (let c in this._categories) {
+            let category = this._categories[c];
 
-        this._loadData = {
-            availableApps: this._model.apps,
-            currentCategory: 0,
-        };
+            if (!category.button) {
+                category.button = new CategoryButton.CategoryButton({ label: category.label,
+                                                                      category: category.name,
+                                                                      index: c,
+                                                                      draw_indicator: false,
+                                                                      group: this._buttonGroup });
+                category.button.connect('clicked', Lang.bind(this, this._onCategoryClicked));
+                category.button.show();
 
-        // This is basically Mainloop.idle_add() but with a different priority
-        let s = GLib.idle_source_new()
-        s.set_priority(GLib.PRIORITY_DEFAULT_IDLE - 100);
-        GObject.source_set_closure(s, Lang.bind(this, this._idlePopulateCategories));
-        s.attach(null);
+                this._categoriesBox.pack_start(category.button, false, false, 0);
 
-        this._loadDataSource = s;
-    },
-
-    _idlePopulateCategories: function() {
-        let cellMargin = EosAppStorePrivate.AppInfo.get_cell_margin();
-
-        let c = this._loadData.currentCategory;
-        let category = this._categories[c];
-
-        if (!category.button) {
-            category.button = new CategoryButton.CategoryButton({ label: category.label,
-                                                                  category: category.name,
-                                                                  index: c,
-                                                                  draw_indicator: false,
-                                                                  group: this._buttonGroup });
-            category.button.connect('clicked', Lang.bind(this, this._onCategoryClicked));
-            category.button.show();
-
-            this._categoriesBox.pack_start(category.button, false, false, 0);
-
-            if (!this._buttonGroup) {
-                this._buttonGroup = category.button;
+                if (!this._buttonGroup) {
+                    this._buttonGroup = category.button;
+                }
             }
         }
+    },
+
+    _populateAllCategories: function() {
+        for (let c in this._categories) {
+            this._resetCategory(c);
+            this._populateCategory(c);
+        }
+    },
+
+    _resetCategory: function(categoryId) {
+        let category = this._categories[categoryId];
+
+        if (category.widget) {
+            category.widget.destroy();
+            category.widget = null;
+        }
+    },
+
+    _populateCategory: function(categoryId) {
+        let category = this._categories[categoryId];
+
+        if (category.widget) {
+            return;
+        }
+
+        let cellMargin = EosAppStorePrivate.AppInfo.get_cell_margin();
 
         let scrollWindow;
-
-        if (!category.widget) {
-            scrollWindow = new Gtk.ScrolledWindow({ hscrollbar_policy: Gtk.PolicyType.NEVER,
-                                                    vscrollbar_policy: Gtk.PolicyType.AUTOMATIC });
-            this._stack.add_named(scrollWindow, category.name);
-            category.widget = scrollWindow;
-        } else {
-            scrollWindow = category.widget;
-            let child = scrollWindow.get_child();
-            child.destroy();
-        }
+        scrollWindow = new Gtk.ScrolledWindow({ hscrollbar_policy: Gtk.PolicyType.NEVER,
+                                                vscrollbar_policy: Gtk.PolicyType.AUTOMATIC });
+        this._stack.add_named(scrollWindow, category.name);
+        category.widget = scrollWindow;
 
         let grid = new Endless.FlexyGrid({ cell_size: CELL_DEFAULT_SIZE + cellMargin,
                                            cell_spacing: CELL_DEFAULT_SPACING - cellMargin });
@@ -366,7 +362,7 @@ const AppFrame = new Lang.Class({
         let appInfos = EosAppStorePrivate.app_load_content(category.id,
                                                            Lang.bind(this, function(appInfo) {
             let id = appInfo.get_desktop_id();
-            if (this._loadData.availableApps.indexOf(id) != -1) {
+            if (this._model.apps.indexOf(id) != -1) {
                 return true;
             }
 
@@ -397,16 +393,6 @@ const AppFrame = new Lang.Class({
         grid.connect('cell-activated', Lang.bind(this, this._onCellActivated));
 
         scrollWindow.show_all();
-
-        this._loadData.currentCategory += 1;
-
-        if (this._loadData.currentCategory == this._categories.length) {
-            this._loadData = null;
-            this._loadDataSource = null;
-            return false;
-        }
-
-        return true;
     },
 
     _onCellActivated: function(grid, cell) {
@@ -484,6 +470,7 @@ const AppFrame = new Lang.Class({
         this._currentCategory = category;
         this._currentCategoryIdx = idx;
 
+        this._populateCategory(idx);
         this._stack.set_visible_child_name(category);
     },
 

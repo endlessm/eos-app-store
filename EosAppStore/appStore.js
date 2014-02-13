@@ -24,20 +24,20 @@ const APP_STORE_NAME = 'com.endlessm.AppStore';
 const APP_STORE_PATH = '/com/endlessm/AppStore';
 const APP_STORE_IFACE = 'com.endlessm.AppStore';
 
-const AppStoreIface = <interface name={APP_STORE_NAME}>
-  <method name="show">
-    <arg type="u" direction="in" name="timestamp"/>
-    <arg type="b" direction="in" name="reset"/>
-  </method>
-  <method name="hide">
-    <arg type="u" direction="in" name="timestamp"/>
-  </method>
-  <method name="showPage">
-    <arg type="u" direction="in" name="timestamp"/>
-    <arg type="s" direction="in" name="page"/>
-  </method>
-  <property name="Visible" type="b" access="read"/>
-</interface>;
+const AppStoreIface = '<node><interface name="com.endless.AppStore">' +
+  '<method name="show">' +
+    '<arg type="u" direction="in" name="timestamp"/>' +
+    '<arg type="b" direction="in" name="reset"/>' +
+  '</method>' +
+  '<method name="hide">' +
+    '<arg type="u" direction="in" name="timestamp"/>' +
+  '</method>' +
+  '<method name="showPage">' +
+    '<arg type="u" direction="in" name="timestamp"/>' +
+    '<arg type="s" direction="in" name="page"/>' +
+  '</method>' +
+  '<property name="Visible" type="b" access="read"/>' +
+'</interface></node>';
 
 // Tear down the main window if it's been hidden for these many seconds
 const CLEAR_TIMEOUT = 300;

@@ -639,6 +639,7 @@ const WeblinkFrame = new Lang.Class({
 
         this._buttonGroup = null;
         this._modelConnectionId = null;
+        this._populateCategoryHeaders();
         this.setModelConnected(true);
 
         let content_dir = EosAppStorePrivate.link_get_content_dir();
@@ -646,26 +647,23 @@ const WeblinkFrame = new Lang.Class({
         let content_file = Gio.File.new_for_path(content_path);
         this._contentMonitor = content_file.monitor_file(Gio.FileMonitorFlags.NONE, null);
         this._contentMonitor.connect('changed', Lang.bind(this, this._onContentChanged));
-
-        this._stack.set_visible_child_name(this._currentCategory);
     },
 
     _onContentChanged: function(monitor, file, other_file, event_type) {
-        this._populateCategories();
+        this._populateAllCategories();
         this._stack.set_visible_child_name(this._currentCategory);
     },
 
     setModelConnected: function(connect) {
         if (connect) {
-            this._modelConnectionId = this._weblinkListModel.connect('changed', Lang.bind(this, this._populateCategories));
-            this._populateCategories();
+            this._modelConnectionId = this._weblinkListModel.connect('changed', Lang.bind(this, this._populateAllCategories));
         } else if (this._modelConnectionId) {
             this._weblinkListModel.disconnect(this._modelConnectionId);
             this._modelConnectionId = null;
         }
     },
 
-    _populateCategories: function() {
+    _populateCategoryHeaders: function() {
         for (let c in this._categories) {
             let category = this._categories[c];
 
@@ -683,45 +681,62 @@ const WeblinkFrame = new Lang.Class({
                     this._buttonGroup = category.button;
                 }
             }
+       }
+    },
 
-            let scrollWindow;
+    _resetCategory: function(categoryId) {
+        let category = this._categories[categoryId];
 
-            if (!category.widget) {
-                scrollWindow = new Gtk.ScrolledWindow({ hscrollbar_policy: Gtk.PolicyType.NEVER,
-                                                        vscrollbar_policy: Gtk.PolicyType.AUTOMATIC,
-                                                        shadow_type: Gtk.ShadowType.IN });
-                scrollWindow.get_style_context().add_class('weblink-scrolledwindow');
-                this._stack.add_named(scrollWindow, category.name);
-                category.widget = scrollWindow;
-            } else {
-                scrollWindow = category.widget;
-                let child = scrollWindow.get_child();
-                child.destroy();
-            }
+        if (category.widget) {
+            category.widget.destroy();
+            category.widget = null;
+        }
+    },
 
-            let weblinksBox = new Gtk.Box({ orientation: Gtk.Orientation.HORIZONTAL,
-                                            homogeneous: true,
-                                            spacing: LIST_COLUMNS_SPACING });
-            scrollWindow.add_with_viewport(weblinksBox);
+    _populateCategory: function(categoryId) {
+        let category = this._categories[categoryId];
 
-            let weblinksColumnBoxes = [];
-            for (let i = 0; i < this._columns; i++) {
-                weblinksColumnBoxes[i] = new WeblinkListBox(this._weblinkListModel);
-                weblinksColumnBoxes[i].set_header_func(Lang.bind(this, this._updateColumnBoxHeader));
-                weblinksBox.add(weblinksColumnBoxes[i]);
-            }
+        if (category.widget) {
+            return;
+        }
 
-            let cells = EosAppStorePrivate.link_load_content(category.id);
-            let index = 0;
-            for (let i in cells) {
-                let info = cells[i];
-                let row = info.create_row();
-                let rowContent = new WeblinkListBoxRow(this, this._weblinkListModel, info);
-                row.add(rowContent);
-                weblinksColumnBoxes[(index++)%this._columns].add(row);
-            }
+        let scrollWindow;
+        scrollWindow = new Gtk.ScrolledWindow({ hscrollbar_policy: Gtk.PolicyType.NEVER,
+                                                vscrollbar_policy: Gtk.PolicyType.AUTOMATIC,
+                                                shadow_type: Gtk.ShadowType.IN });
+        scrollWindow.get_style_context().add_class('weblink-scrolledwindow');
+        this._stack.add_named(scrollWindow, category.name);
+        category.widget = scrollWindow;
 
-            scrollWindow.show_all();
+        let weblinksBox = new Gtk.Box({ orientation: Gtk.Orientation.HORIZONTAL,
+                                        homogeneous: true,
+                                        spacing: LIST_COLUMNS_SPACING });
+        scrollWindow.add_with_viewport(weblinksBox);
+
+        let weblinksColumnBoxes = [];
+        for (let i = 0; i < this._columns; i++) {
+            weblinksColumnBoxes[i] = new WeblinkListBox(this._weblinkListModel);
+            weblinksColumnBoxes[i].set_header_func(Lang.bind(this, this._updateColumnBoxHeader));
+            weblinksBox.add(weblinksColumnBoxes[i]);
+        }
+
+        let cells = EosAppStorePrivate.link_load_content(category.id);
+        let index = 0;
+        for (let i in cells) {
+            let info = cells[i];
+            let row = info.create_row();
+            let rowContent = new WeblinkListBoxRow(this, this._weblinkListModel, info);
+            row.add(rowContent);
+            weblinksColumnBoxes[(index++)%this._columns].add(row);
+        }
+
+        scrollWindow.show_all();
+    },
+
+    _populateAllCategories: function() {
+        for (let c in this._categories) {
+            this._resetCategory(c);
+            this._populateCategory(c);
         }
     },
 
@@ -750,6 +765,8 @@ const WeblinkFrame = new Lang.Class({
 
         this._currentCategoryIdx = idx;
         this._currentCategory = category;
+
+        this._populateCategory(idx);
 
         this._stack.set_visible_child_name(category);
     },
