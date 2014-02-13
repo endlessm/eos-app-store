@@ -24,7 +24,7 @@ const APP_STORE_NAME = 'com.endlessm.AppStore';
 const APP_STORE_PATH = '/com/endlessm/AppStore';
 const APP_STORE_IFACE = 'com.endlessm.AppStore';
 
-const AppStoreIface = '<node><interface name="com.endless.AppStore">' +
+const AppStoreIface = '<node><interface name="com.endlessm.AppStore">' +
   '<method name="show">' +
     '<arg type="u" direction="in" name="timestamp"/>' +
     '<arg type="b" direction="in" name="reset"/>' +
