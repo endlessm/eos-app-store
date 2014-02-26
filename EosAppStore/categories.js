@@ -5,12 +5,6 @@ const Lang = imports.lang;
 function get_app_categories() {
     return [
         {
-            name: 'featured',
-            widget: null,
-            label: _("Featured"),
-            id: EosAppStorePrivate.AppCategory.FEATURED,
-        },
-        {
             name: 'education',
             widget: null,
             label: _("Education"),
