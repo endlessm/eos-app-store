@@ -169,14 +169,6 @@ eos_app_load_content (EosAppCategory category,
         {
           /* do nothing */
         }
-      else if (category == EOS_APP_CATEGORY_FEATURED)
-        {
-          if (!eos_app_info_is_featured (info))
-            {
-              eos_app_info_unref (info);
-              continue;
-            }
-        }
       else
         {
           if (category != eos_app_info_get_category (info))
