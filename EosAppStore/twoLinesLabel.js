@@ -19,15 +19,52 @@ const TwoLinesLabel = new Lang.Class({
 	     this._keepSize = keep;
     },
 
-    vfunc_size_allocate: function(allocation) {
-	     if (!this._keepSize) {
-	         let layout = this.get_layout();
-	         layout.set_height(-2);
-	         let [w, h] = layout.get_pixel_size();
-	         this.set_size_request(w, h);
-        }
+    vfunc_get_preferred_height_for_width: function(forWidth) {
+        if (!this._keepSize) {
+            let layout = this.get_layout();
 
-	     return this.parent(allocation);
+            /* override the layout to force ellipsization */
+            layout.set_ellipsize(Pango.EllipsizeMode.END);
+            layout.set_width(forWidth * Pango.SCALE);
+
+            /* we want two lines at most, and then ellipsize */
+            layout.set_height(-2);
+
+            let [w, h] = layout.get_pixel_size();
+
+            return [w, h];
+        }
+        else {
+            return this.parent(forWidth);
+        }
+    },
+
+    vfunc_size_allocate: function(allocation) {
+        if (!this._keepSize) {
+            let layout = this.get_layout();
+
+            /* same as get_preferred_height_for_width(), we override the
+             * layout settings to force ellipsization after two lines of
+             * text
+             */
+            layout.set_ellipsize(Pango.EllipsizeMode.END);
+            layout.set_width(allocation.width * Pango.SCALE);
+            layout.set_height(-2);
+
+            /* override the passed allocation with the size of the layout,
+             * if it's smaller than the allocated rectangle
+             */
+            let [w, h] = layout.get_pixel_size();
+            let newAllocation = new Gtk.Allocation();
+            newAllocation.x = allocation.x;
+            newAllocation.y = allocation.y;
+            newAllocation.width = w < allocation.width ? w : allocation.width;
+            newAllocation.height = h < allocation.height ? h : allocation.height;
+            this.parent(newAllocation);
+        }
+        else {
+            this.parent(allocation);
+        }
     },
 
     vfunc_draw: function(cr) {
