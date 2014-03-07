@@ -18,7 +18,6 @@ dist_js_DATA = \
 	separator.js \
 	shellAppStore.js \
 	storeModel.js \
-	twoLinesLabel.js \
 	weblinkFrame.js \
 	wmInspect.js \
 	$(NULL)
