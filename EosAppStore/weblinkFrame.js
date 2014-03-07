@@ -18,7 +18,6 @@ const Lang = imports.lang;
 const Path = imports.path;
 const Separator = imports.separator;
 const Signals = imports.signals;
-const TwoLinesLabel = imports.twoLinesLabel;
 
 const NEW_SITE_TITLE_LIMIT = 20;
 const NEW_SITE_SUCCESS_TIMEOUT = 3;
@@ -460,13 +459,13 @@ const WeblinkListBoxRow = new Lang.Class({
         this.initTemplate({ templateRoot: '_mainBox', bindChildren: true, connectSignals: true, });
         this.add(this._mainBox);
 
-        this._descriptionLabel = new TwoLinesLabel.TwoLinesLabel({ visible: true,
-                                                                   xalign: 0,
-                                                                   yalign: 0,
-                                                                   ellipsize: Pango.EllipsizeMode.END,
-                                                                   wrap: true,
-                                                                   wrap_mode: Pango.WrapMode.WORD_CHAR });
-        this._descriptionLabel.keepSize = true;
+        this._descriptionLabel = new Gtk.Label({ visible: true,
+                                                 xalign: 0,
+                                                 yalign: 0,
+                                                 lines: 2,
+                                                 ellipsize: Pango.EllipsizeMode.END,
+                                                 wrap: true,
+                                                 wrap_mode: Pango.WrapMode.WORD_CHAR });
         this._descriptionLabel.get_style_context().add_class('description');
         this._labelsBox.pack_start(this._descriptionLabel, false, true, 0);
         this._labelsBox.reorder_child(this._descriptionLabel, 1);
