@@ -36,7 +36,7 @@ GOBJECT_INTROSPECTION_REQUIRE([0.9.6])
 PKG_CHECK_MODULES(EOS_APP_STORE,
                   gjs-1.0
                   gio-2.0
-                  gtk+-3.0
+                  gtk+-3.0 >= 3.10.0
                   json-glib-1.0
                   libgnome-menu-3.0
                   pstack >= 3
