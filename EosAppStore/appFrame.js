@@ -370,6 +370,7 @@ const AppFrame = new Lang.Class({
         }));
 
         if (category.id == EosAppStorePrivate.AppCategory.MY_APPLICATIONS) {
+            // 'My Applications' only shows installed apps...
             for (let i in appInfos) {
                 let id = appInfos[i].get_desktop_id();
 
@@ -382,10 +383,15 @@ const AppFrame = new Lang.Class({
             }
         }
         else {
+            // ... while every other category only shows uninstalled apps
             for (let i in appInfos) {
-                let cell = appInfos[i].create_cell();
-                grid.add(cell);
-                cell.show_all();
+                let id = appInfos[i].get_desktop_id();
+
+                if (this._model.getState(id) != EosAppStorePrivate.AppState.INSTALLED) {
+                    let cell = appInfos[i].create_cell();
+                    grid.add(cell);
+                    cell.show_all();
+                }
             }
         }
 
