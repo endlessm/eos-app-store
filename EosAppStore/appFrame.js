@@ -169,6 +169,8 @@ const AppListBoxRow = new Lang.Class({
             case EosAppStorePrivate.AppState.INSTALLED:
                 if (!this._installedMessage.visible) {
                     // wait for the message to hide
+                    this._installButtonLabel.set_text(_("Open application"));
+                    this._installButton.show();
                     this._removeButton.show();
                 }
                 break;
