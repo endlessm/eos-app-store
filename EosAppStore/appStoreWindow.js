@@ -203,12 +203,6 @@ const AppStoreWindow = new Lang.Class({
 
         // add the pages
         this._pages = [];
-        this._pages[StoreModel.StorePage.APPS] = new AppFrame.AppFrame();
-        this._stack.add_named(this._pages[StoreModel.StorePage.APPS], 'apps');
-        this._pages[StoreModel.StorePage.WEB] = new WeblinkFrame.WeblinkFrame(this);
-        this._stack.add_named(this._pages[StoreModel.StorePage.WEB], 'weblinks');
-        this._pages[StoreModel.StorePage.FOLDERS] = new FolderFrame.FolderFrame();
-        this._stack.add_named(this._pages[StoreModel.StorePage.FOLDERS], 'folders');
     },
 
     _loadSideImages: function() {
@@ -292,12 +286,31 @@ const AppStoreWindow = new Lang.Class({
 
     _onStorePageChanged: function(model, newPage) {
         if (!this._pages[newPage]) {
-            return;
+            switch (newPage) {
+                case StoreModel.StorePage.APPS:
+                    this._pages[StoreModel.StorePage.APPS] = new AppFrame.AppFrame();
+                    this._stack.add_named(this._pages[StoreModel.StorePage.APPS], 'apps');
+                    break;
+
+                case StoreModel.StorePage.WEB:
+                    this._pages[StoreModel.StorePage.WEB] = new WeblinkFrame.WeblinkFrame(this);
+                    this._stack.add_named(this._pages[StoreModel.StorePage.WEB], 'weblinks');
+                    break;
+
+                case StoreModel.StorePage.FOLDERS:
+                    this._pages[StoreModel.StorePage.FOLDERS] = new FolderFrame.FolderFrame();
+                    this._stack.add_named(this._pages[StoreModel.StorePage.FOLDERS], 'folders');
+                    break;
+            }
         }
 
-        this._pages.forEach(function(page) {
-            page.hide();
-        });
+        // hide the previously visible page, if it is set
+        if (this._currentPage != null) {
+            let previousPage = this._pages[this._currentPage];
+            if (previousPage) {
+                previousPage.hide();
+            }
+        }
 
         let page = this._pages[newPage];
         this._currentPage = newPage;

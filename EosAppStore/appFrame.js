@@ -125,9 +125,10 @@ const AppListBoxRow = new Lang.Class({
             let previewBox = new AppPreview(path);
             this._screenshotPreviewBox.add(previewBox);
             previewBox.connect('button-press-event', Lang.bind(this, this._onPreviewPress));
-            previewBox.show();
+        }
 
-            this._screenshotPreviewBox.show();
+        if (screenshot.length() != 0) {
+            this._screenshotPreviewBox.show_all();
         }
     },
 
@@ -386,7 +387,6 @@ const AppFrame = new Lang.Class({
                     let cell = appInfos[i].create_cell();
                     cell.shape = Endless.FlexyShape.SMALL;
                     grid.add(cell);
-                    cell.show_all();
                 }
             }
         }
@@ -398,7 +398,6 @@ const AppFrame = new Lang.Class({
                 if (this._model.getState(id) != EosAppStorePrivate.AppState.INSTALLED) {
                     let cell = appInfos[i].create_cell();
                     grid.add(cell);
-                    cell.show_all();
                 }
             }
         }
