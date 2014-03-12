@@ -194,6 +194,12 @@ const AppListBoxRow = new Lang.Class({
 
     _onInstallButtonClicked: function() {
         switch (this._appState) {
+            case EosAppStorePrivate.AppState.INSTALLED:
+                if (!this._model.launch(this._appId)) {
+                    log("Failed to launch app '" + this._appId + "'");
+                }
+                break;
+
             case EosAppStorePrivate.AppState.UNINSTALLED:
 
                 this._installButton.hide();
