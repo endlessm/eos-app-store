@@ -183,7 +183,7 @@ launch_app (EosAppListModel *self,
 
   if (error != NULL)
     {
-      g_critical ("Unable to add application '%s': %s",
+      g_critical ("Unable to launch application '%s': %s",
                   desktop_id,
                   error->message);
       g_propagate_error (error_out, error);
