@@ -161,6 +161,46 @@ eos_app_list_model_new (void)
 }
 
 static gboolean
+launch_app (EosAppListModel *self,
+            const char *desktop_id,
+            GCancellable *cancellable,
+            GError **error_out)
+{
+  GError *error = NULL;
+  gboolean retval = FALSE;
+  GVariant *res;
+
+  res = g_dbus_connection_call_sync (self->connection,
+                                     "org.gnome.Shell",
+                                     "/org/gnome/Shell",
+                                     "org.gnome.Shell.AppLauncher", "Launch",
+                                     g_variant_new ("(s)", desktop_id),
+                                     G_VARIANT_TYPE ("(b)"),
+                                     G_DBUS_CALL_FLAGS_NONE,
+                                     -1,
+                                     NULL,
+                                     &error);
+
+  if (error != NULL)
+    {
+      g_critical ("Unable to launch application '%s': %s",
+                  desktop_id,
+                  error->message);
+      g_propagate_error (error_out, error);
+
+      retval = FALSE;
+    }
+
+  if (res != NULL)
+    {
+      g_variant_get (res, "(b)", &retval);
+      g_variant_unref (res);
+    }
+
+  return retval;
+}
+
+static gboolean
 add_app_to_shell (EosAppListModel *self,
                   const char *desktop_id,
                   GCancellable *cancellable,
@@ -691,4 +731,14 @@ eos_app_list_model_uninstall_app_finish (EosAppListModel *model,
   desktop_id = g_task_get_task_data (task);
   g_hash_table_remove (model->installed_apps, desktop_id);
   return TRUE;
+}
+
+gboolean
+eos_app_list_model_launch_app (EosAppListModel *model,
+                               const char *desktop_id)
+{
+  if (!is_app_installed (model, desktop_id))
+    return FALSE;
+
+  return launch_app (model, desktop_id, NULL, NULL);
 }

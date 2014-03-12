@@ -42,7 +42,8 @@ GDesktopAppInfo *eos_app_list_model_get_app_info (EosAppListModel *model, const 
 
 void eos_app_list_model_install_app (EosAppListModel *model, const char *desktop_id);
 void eos_app_list_model_uninstall_app (EosAppListModel *model, const char *desktop_id);
-void eos_app_list_model_update_app (EosAppListModel *mode, const char *desktop_id);
+void eos_app_list_model_update_app (EosAppListModel *model, const char *desktop_id);
+gboolean eos_app_list_model_launch_app (EosAppListModel *model, const char *desktop_id);
 
 void eos_app_list_model_install_app_async (EosAppListModel *model,
                                            const gchar *desktop_id,
