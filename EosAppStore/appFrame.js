@@ -127,7 +127,7 @@ const AppListBoxRow = new Lang.Class({
             previewBox.connect('button-press-event', Lang.bind(this, this._onPreviewPress));
         }
 
-        if (screenshot.length() != 0) {
+        if (screenshots && screenshots.length > 0) {
             this._screenshotPreviewBox.show_all();
         }
     },
