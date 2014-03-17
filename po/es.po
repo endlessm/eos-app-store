@@ -1,7 +1,7 @@
 # SOME DESCRIPTIVE TITLE.
 # Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
 # This file is distributed under the same license as the PACKAGE package.
-# 
+#
 # Translators:
 # Automatically generated, 2012-2013
 # endlessmobile <n@endlessm.com>, 2013
@@ -14,21 +14,22 @@ msgid ""
 msgstr ""
 "Project-Id-Version: eos-app-store\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-12-20 16:27-0800\n"
+"POT-Creation-Date: 2014-03-17 07:45-0700\n"
 "PO-Revision-Date: 2013-11-20 09:19+0000\n"
 "Last-Translator: rshuler <roddy@endlessm.com>\n"
-"Language-Team: Spanish (http://www.transifex.com/projects/p/teams/language/es/)\n"
+"Language-Team: Spanish (http://www.transifex.com/projects/p/teams/language/"
+"es/)\n"
+"Language: es\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Language: es\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
 #: ../data/eos-app-store-folder-frame.ui.h:1
 msgid "Select an icon"
 msgstr "Selecciona un ícono"
 
-#: ../data/eos-app-store-list-row.ui.h:1 ../EosAppStore/appFrame.js:177
+#: ../data/eos-app-store-list-row.ui.h:1 ../EosAppStore/appFrame.js:180
 msgid "Install application"
 msgstr "Instalar aplicación"
 
@@ -57,64 +58,66 @@ msgid "Folders"
 msgstr "Carpetas"
 
 #: ../data/eos-app-store-weblink-new-site-frame.ui.h:1
-#: ../EosAppStore/weblinkFrame.js:296
+#: ../EosAppStore/weblinkFrame.js:295
 msgid "e.g.: http://www.globoesporte.com"
 msgstr "ej.: http://www.globoesporte.com"
 
-#: ../EosAppStore/appFrame.js:182
+#. wait for the message to hide
+#: ../EosAppStore/appFrame.js:173
+#, fuzzy
+msgid "Open application"
+msgstr "Actualizar aplicación"
+
+#: ../EosAppStore/appFrame.js:185
 msgid "Update application"
 msgstr "Actualizar aplicación"
 
-#: ../EosAppStore/appStoreWindow.js:374
+#: ../EosAppStore/appStoreWindow.js:274
 msgid "Install applications"
 msgstr "Instalar aplicaciones"
 
-#: ../EosAppStore/appStoreWindow.js:378
+#: ../EosAppStore/appStoreWindow.js:278
 msgid "Install websites"
 msgstr "Instalar sitios web"
 
-#: ../EosAppStore/appStoreWindow.js:382
+#: ../EosAppStore/appStoreWindow.js:282
 msgid "Install folders"
 msgstr "Instalar carpetas."
 
-#: ../EosAppStore/categories.js:10
-msgid "Featured"
-msgstr "Destacados"
-
 #. Translators: use the same string used to install the app store content JSON
-#: ../EosAppStore/categories.js:16 ../EosAppStore/lib/eos-app-info.c:798
+#: ../EosAppStore/categories.js:10 ../EosAppStore/lib/eos-app-info.c:798
 msgid "Education"
 msgstr "Educación"
 
-#: ../EosAppStore/categories.js:22 ../EosAppStore/lib/eos-app-info.c:799
+#: ../EosAppStore/categories.js:16 ../EosAppStore/lib/eos-app-info.c:799
 msgid "Leisure"
 msgstr "Ocio"
 
-#: ../EosAppStore/categories.js:28 ../EosAppStore/lib/eos-app-info.c:800
+#: ../EosAppStore/categories.js:22 ../EosAppStore/lib/eos-app-info.c:800
 msgid "Utilities"
 msgstr "Utilidades"
 
-#: ../EosAppStore/categories.js:34
+#: ../EosAppStore/categories.js:28
 msgid "My applications"
 msgstr "Mis aplicaciones"
 
-#: ../EosAppStore/categories.js:45
+#: ../EosAppStore/categories.js:39
 msgid "News"
 msgstr "Noticias"
 
-#: ../EosAppStore/categories.js:51
+#: ../EosAppStore/categories.js:45
 msgid "Sports"
 msgstr "Deportes"
 
-#: ../EosAppStore/categories.js:57
+#: ../EosAppStore/categories.js:51
 msgid "Education and Health"
 msgstr "Educación y Salud"
 
-#: ../EosAppStore/categories.js:63
+#: ../EosAppStore/categories.js:57
 msgid "Entertainment"
 msgstr "Entretenimiento"
 
-#: ../EosAppStore/categories.js:69
+#: ../EosAppStore/categories.js:63
 msgid "Local"
 msgstr "Local"
 
@@ -130,28 +133,31 @@ msgstr "Nombre de carpeta"
 msgid "Folder added!"
 msgstr "Carpeta agregada!"
 
-#: ../EosAppStore/weblinkFrame.js:251
+#: ../EosAppStore/weblinkFrame.js:250
 msgid "Write the site address you want to add"
 msgstr "Escribe el sitio web que deseas agregar"
 
-#: ../EosAppStore/weblinkFrame.js:318
+#: ../EosAppStore/weblinkFrame.js:317
 msgid "searching"
 msgstr "buscando"
 
-#: ../EosAppStore/weblinkFrame.js:338
+#: ../EosAppStore/weblinkFrame.js:337
 msgid "The address written does not exist or is not available."
 msgstr "El sitio web no existe, está incorrecto o no está disponible."
 
-#: ../EosAppStore/weblinkFrame.js:347 ../EosAppStore/weblinkFrame.js:533
+#: ../EosAppStore/weblinkFrame.js:346 ../EosAppStore/weblinkFrame.js:532
 msgid "added successfully!"
 msgstr "agregado exitosamente!"
 
-#: ../EosAppStore/lib/eos-app-list-model.c:592
+#: ../EosAppStore/lib/eos-app-list-model.c:632
 #, c-format
 msgid "Application %s already installed"
 msgstr "La aplicación %s ya está instalada"
 
-#: ../EosAppStore/lib/eos-app-list-model.c:670
+#: ../EosAppStore/lib/eos-app-list-model.c:710
 #, c-format
 msgid "Application %s is not installed"
 msgstr "La aplicación %s no está instalada"
+
+#~ msgid "Featured"
+#~ msgstr "Destacados"

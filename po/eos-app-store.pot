@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-12-20 16:27-0800\n"
+"POT-Creation-Date: 2014-03-17 07:45-0700\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -21,7 +21,7 @@ msgstr ""
 msgid "Select an icon"
 msgstr ""
 
-#: ../data/eos-app-store-list-row.ui.h:1 ../EosAppStore/appFrame.js:177
+#: ../data/eos-app-store-list-row.ui.h:1 ../EosAppStore/appFrame.js:180
 msgid "Install application"
 msgstr ""
 
@@ -50,64 +50,65 @@ msgid "Folders"
 msgstr ""
 
 #: ../data/eos-app-store-weblink-new-site-frame.ui.h:1
-#: ../EosAppStore/weblinkFrame.js:296
+#: ../EosAppStore/weblinkFrame.js:295
 msgid "e.g.: http://www.globoesporte.com"
 msgstr ""
 
-#: ../EosAppStore/appFrame.js:182
+#. wait for the message to hide
+#: ../EosAppStore/appFrame.js:173
+msgid "Open application"
+msgstr ""
+
+#: ../EosAppStore/appFrame.js:185
 msgid "Update application"
 msgstr ""
 
-#: ../EosAppStore/appStoreWindow.js:374
+#: ../EosAppStore/appStoreWindow.js:274
 msgid "Install applications"
 msgstr ""
 
-#: ../EosAppStore/appStoreWindow.js:378
+#: ../EosAppStore/appStoreWindow.js:278
 msgid "Install websites"
 msgstr ""
 
-#: ../EosAppStore/appStoreWindow.js:382
+#: ../EosAppStore/appStoreWindow.js:282
 msgid "Install folders"
 msgstr ""
 
-#: ../EosAppStore/categories.js:10
-msgid "Featured"
-msgstr ""
-
 #. Translators: use the same string used to install the app store content JSON
-#: ../EosAppStore/categories.js:16 ../EosAppStore/lib/eos-app-info.c:798
+#: ../EosAppStore/categories.js:10 ../EosAppStore/lib/eos-app-info.c:798
 msgid "Education"
 msgstr ""
 
-#: ../EosAppStore/categories.js:22 ../EosAppStore/lib/eos-app-info.c:799
+#: ../EosAppStore/categories.js:16 ../EosAppStore/lib/eos-app-info.c:799
 msgid "Leisure"
 msgstr ""
 
-#: ../EosAppStore/categories.js:28 ../EosAppStore/lib/eos-app-info.c:800
+#: ../EosAppStore/categories.js:22 ../EosAppStore/lib/eos-app-info.c:800
 msgid "Utilities"
 msgstr ""
 
-#: ../EosAppStore/categories.js:34
+#: ../EosAppStore/categories.js:28
 msgid "My applications"
 msgstr ""
 
-#: ../EosAppStore/categories.js:45
+#: ../EosAppStore/categories.js:39
 msgid "News"
 msgstr ""
 
-#: ../EosAppStore/categories.js:51
+#: ../EosAppStore/categories.js:45
 msgid "Sports"
 msgstr ""
 
-#: ../EosAppStore/categories.js:57
+#: ../EosAppStore/categories.js:51
 msgid "Education and Health"
 msgstr ""
 
-#: ../EosAppStore/categories.js:63
+#: ../EosAppStore/categories.js:57
 msgid "Entertainment"
 msgstr ""
 
-#: ../EosAppStore/categories.js:69
+#: ../EosAppStore/categories.js:63
 msgid "Local"
 msgstr ""
 
@@ -123,28 +124,28 @@ msgstr ""
 msgid "Folder added!"
 msgstr ""
 
-#: ../EosAppStore/weblinkFrame.js:251
+#: ../EosAppStore/weblinkFrame.js:250
 msgid "Write the site address you want to add"
 msgstr ""
 
-#: ../EosAppStore/weblinkFrame.js:318
+#: ../EosAppStore/weblinkFrame.js:317
 msgid "searching"
 msgstr ""
 
-#: ../EosAppStore/weblinkFrame.js:338
+#: ../EosAppStore/weblinkFrame.js:337
 msgid "The address written does not exist or is not available."
 msgstr ""
 
-#: ../EosAppStore/weblinkFrame.js:347 ../EosAppStore/weblinkFrame.js:533
+#: ../EosAppStore/weblinkFrame.js:346 ../EosAppStore/weblinkFrame.js:532
 msgid "added successfully!"
 msgstr ""
 
-#: ../EosAppStore/lib/eos-app-list-model.c:592
+#: ../EosAppStore/lib/eos-app-list-model.c:632
 #, c-format
 msgid "Application %s already installed"
 msgstr ""
 
-#: ../EosAppStore/lib/eos-app-list-model.c:670
+#: ../EosAppStore/lib/eos-app-list-model.c:710
 #, c-format
 msgid "Application %s is not installed"
 msgstr ""
