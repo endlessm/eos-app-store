@@ -735,10 +735,18 @@ eos_app_list_model_uninstall_app_finish (EosAppListModel *model,
 
 gboolean
 eos_app_list_model_launch_app (EosAppListModel *model,
-                               const char *desktop_id)
+                               const char *desktop_id,
+                               GError **error)
 {
   if (!is_app_installed (model, desktop_id))
-    return FALSE;
+    {
+      g_set_error (error,
+                   eos_app_list_model_error_quark (),
+                   EOS_APP_LIST_MODEL_ERROR_NOT_INSTALLED,
+                   _("Application %s is not installed"),
+                   desktop_id);
+      return FALSE;
+    }
 
-  return launch_app (model, desktop_id, NULL, NULL);
+  return launch_app (model, desktop_id, NULL, error);
 }

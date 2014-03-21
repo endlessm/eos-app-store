@@ -174,6 +174,10 @@ const AppList = new Lang.Class({
         this._model.update_app(id);
     },
 
+    launch: function(id) {
+        return this._model.launch_app(id);
+    },
+
     get apps() {
         return this._apps;
     },
