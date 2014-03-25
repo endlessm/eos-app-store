@@ -312,44 +312,66 @@ eos_link_get_favicon (WebKitWebView *webview)
   gdouble offset_x = 0.0;
   gdouble offset_y = 0.0;
   GdkPixbuf *base = NULL;
+  GdkPixbuf *mask = NULL;
 
-  /* If size is > 64px, resize it to 64px */
-  if (biggest >= 64)
+  if (biggest > 64)
     {
+      /* If size is > 64px, resize it to 64px
+         and mask to a 60px square with rounded corners
+         (resize to 64px prior to masking rather
+         than resize directly to 60px, in order to reduce
+         the likelihood of artifacts, for instance if
+         the original is 128px) */
       scale = (gdouble) 64 / biggest;
+      mask = gdk_pixbuf_new_from_resource ("/com/endlessm/appstore/generic-link_big-icon.png", NULL);
     }
-  /* If size is between [16px, 64px], center in the placeholder icon.
-     Additionally, if between [48px, 64px] resize it to 48px. */
-  else if (biggest > 16)
+  else if (biggest >= 60)
     {
-      if (biggest >= 48)
-        {
-          scale = (gdouble) 48 / biggest;
-          favicon_width *= scale;
-          favicon_height *= scale;
-        }
-
-      offset_x = (64 - favicon_width) / 2;
-      offset_y = (64 - favicon_height) / 2;
-
+      /* If size is in range [60px, 64px],
+         use the icon without resizing, but center within the canvas
+         and mask to a 60px square with rounded corners */
+      mask = gdk_pixbuf_new_from_resource ("/com/endlessm/appstore/generic-link_big-icon.png", NULL);
+    }
+  else if (biggest >= 48)
+    {
+      /* If size is in range [48px, 60px),
+         resize to 48px and center within the placeholder icon */
+      scale = (gdouble) 48 / biggest;
       base = gdk_pixbuf_new_from_resource ("/com/endlessm/appstore/generic-link_big-icon.png", NULL);
     }
-  /* Otherwise keep the same size. But as the holder for the icon
-     in the shell is 64x64, and shell scales the desktop icons,
-     let's put the icon inside a canvas of 64x64,
-     so the shell does not scale it */
+  else if (biggest > 16)
+    {
+      /* If size is in range (16px, 48px),
+         use the icon without resizing,
+         but center within the placeholder icon */
+      base = gdk_pixbuf_new_from_resource ("/com/endlessm/appstore/generic-link_big-icon.png", NULL);
+    }
   else
     {
-      offset_x = (64 - favicon_width) / 2;
-      offset_y = (64 - favicon_height) / 2;
+      /* Otherwise, if size is <= 16 px,
+         use the icon without resizing;
+         but, as the holder for the icon
+         in the shell is 64x64,
+         and the shell scales the desktop icons,
+         let's put the icon inside a canvas of 64x64,
+         so the shell does not scale it */
       base = gdk_pixbuf_new_from_resource ("/com/endlessm/appstore/generic-link_favicon.png", NULL);
     }
+
+  /* Scale each dimension to resize */
+  favicon_width *= scale;
+  favicon_height *= scale;
+
+  /* Center the icon within its canvas */
+  offset_x = (64 - favicon_width) / 2;
+  offset_y = (64 - favicon_height) / 2;
 
   cairo_surface_t *dest_surface = cairo_image_surface_create (CAIRO_FORMAT_ARGB32, 64, 64);
   cairo_t *cr = cairo_create (dest_surface);
 
   if (base != NULL)
     {
+      /* Paint the icon on top of a base pixbuf */
       gdk_cairo_set_source_pixbuf (cr, base, 0, 0);
       cairo_paint (cr);
       g_object_unref (base);
@@ -363,7 +385,30 @@ eos_link_get_favicon (WebKitWebView *webview)
   cairo_pattern_set_matrix (icon_pattern, &matrix);
 
   cairo_set_source (cr, icon_pattern);
-  cairo_paint (cr);
+
+  if (mask != NULL)
+    {
+      /* Use the transparency alpha channel of the mask
+         to clip the icon to a square with a 2-pixel border
+         and rounded corners */
+
+      /* Convert the mask pixbuf to a surface */
+      cairo_surface_t *mask_surface = cairo_image_surface_create (CAIRO_FORMAT_ARGB32, 64, 64);
+      cairo_t *mask_cr = cairo_create (mask_surface);
+      gdk_cairo_set_source_pixbuf (mask_cr, mask, 0, 0);
+      cairo_paint (mask_cr);
+      cairo_destroy (mask_cr);
+
+      /* Draw the icon pattern, masked with the surface */
+      cairo_mask_surface (cr, mask_surface, 0.0, 0.0);
+      cairo_surface_destroy (mask_surface);
+      g_object_unref (mask);
+    }
+  else
+    {
+      /* Not using a mask; just paint the icon pattern directly */
+      cairo_paint (cr);
+    }
 
   dest = gdk_pixbuf_get_from_surface (dest_surface, 0, 0, 64, 64);
   cairo_surface_destroy (dest_surface);
