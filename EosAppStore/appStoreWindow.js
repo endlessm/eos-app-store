@@ -104,7 +104,8 @@ const AppStoreWindow = new Lang.Class({
 
         // the model that handles page changes
         this._storeModel = storeModel;
-        this._storeModel.connect('page-changed', Lang.bind(this, this._onStorePageChanged));
+        this._pageChangedId = this._storeModel.connect('page-changed',
+                                                       Lang.bind(this, this._onStorePageChanged));
 
         // the stack that holds the pages
         this._stack = null;
@@ -134,6 +135,11 @@ const AppStoreWindow = new Lang.Class({
         if (this._activeWindowId > 0) {
             this._wmInspect.disconnect(this._activeWindowId);
             this._activeWindowId = 0;
+        }
+
+        if (this._pageChangedId > 0) {
+            this._storeModel.disconnect(this._pageChangedId);
+            this._pageChangedId = 0;
         }
     },
     _getWorkArea: function() {
