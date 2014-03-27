@@ -30,6 +30,9 @@ const DEFAULT_ICON = 'generic-link';
 const EOS_BROWSER = 'chromium-browser ';
 const DESKTOP_KEY_SPLASH = 'X-Endless-Splash-Screen';
 
+const ICON_EXTERNAL_LINK = '/com/endlessm/appstore/icon_external-link.png';
+const ICON_BLANK = '/com/endlessm/appstore/icon_blank.png';
+
 function getAvailableFilename(path, prefix, name, suffix) {
     let filename = prefix + name;
 
@@ -556,11 +559,11 @@ const WeblinkListBoxRow = new Lang.Class({
     },
 
     _onStartHoveringLabel: function() {
-        this._urlIndicator.visible = true;
+        this._urlIndicator.set_from_resource(ICON_EXTERNAL_LINK);
     },
 
     _onStopHoveringLabel: function() {
-        this._urlIndicator.visible = false;
+        this._urlIndicator.set_from_resource(ICON_BLANK);
     }
 });
 Builder.bindTemplateChildren(WeblinkListBoxRow.prototype);
