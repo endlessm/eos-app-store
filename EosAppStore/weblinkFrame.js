@@ -443,6 +443,7 @@ const WeblinkListBoxRow = new Lang.Class({
         '_mainBox',
         '_icon',
         '_nameLabel',
+        '_descriptionLabel',
         '_labelsBox',
         '_urlLabel',
         '_urlIndicator',
@@ -458,17 +459,6 @@ const WeblinkListBoxRow = new Lang.Class({
 
         this.initTemplate({ templateRoot: '_mainBox', bindChildren: true, connectSignals: true, });
         this.add(this._mainBox);
-
-        this._descriptionLabel = new Gtk.Label({ visible: true,
-                                                 xalign: 0,
-                                                 yalign: 0,
-                                                 lines: 2,
-                                                 ellipsize: Pango.EllipsizeMode.END,
-                                                 wrap: true,
-                                                 wrap_mode: Pango.WrapMode.WORD_CHAR });
-        this._descriptionLabel.get_style_context().add_class('description');
-        this._labelsBox.pack_start(this._descriptionLabel, false, true, 0);
-        this._labelsBox.reorder_child(this._descriptionLabel, 1);
 
         this._nameLabel.set_text(info.get_title());
         this._descriptionLabel.set_text(info.get_description());
