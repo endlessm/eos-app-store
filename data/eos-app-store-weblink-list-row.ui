@@ -87,10 +87,10 @@
                 <child>
                   <object class="GtkImage" id="_urlIndicator">
                     <property name="can_focus">False</property>
-                    <property name="no_show_all">True</property>
                     <property name="hexpand">True</property>
                     <property name="xalign">0</property>
-                    <property name="pixbuf">icon_external-link.png</property>
+                    <property name="pixbuf">icon_blank.png</property>
+                    <property name="visible">True</property>
                   </object>
                   <packing>
                     <property name="expand">True</property>
