@@ -341,6 +341,8 @@ const AppFrame = new Lang.Class({
             this._resetCategory(c);
             this._populateCategory(c);
         }
+
+        this._stack.set_visible_child_name(this._currentCategory);
     },
 
     _resetCategory: function(categoryId) {
