@@ -204,27 +204,26 @@ const AppListBoxRow = new Lang.Class({
                 break;
 
             case EosAppStorePrivate.AppState.UNINSTALLED:
-
                 this._installButton.hide();
                 this._installProgress.show();
                 this._installSpinner.start();
 
-                this._model.install(this._appId, Lang.bind(this, function(model, res) {
+                this._model.install(this._appId, Lang.bind(this, function(error) {
+                    this._installSpinner.stop();
                     this._installProgress.hide();
 
-                    try {
-                        model.install_app_finish(res);
-                        this._installedMessage.show();
-
-                        Mainloop.timeout_add_seconds(3, Lang.bind(this, function() {
-                            this._installedMessage.hide();
-                            this._updateState();
-                            return false;
-                        }));
-                    } catch (e) {
-                        log('Failed to install app ' + e.message);
+                    if (error) {
                         this._updateState();
+                        return;
                     }
+
+                    this._installedMessage.show();
+
+                    Mainloop.timeout_add_seconds(3, Lang.bind(this, function() {
+                        this._installedMessage.hide();
+                        this._updateState();
+                        return false;
+                    }));
                 }));
                 break;
 
@@ -235,12 +234,14 @@ const AppListBoxRow = new Lang.Class({
     },
 
     _onRemoveButtonClicked: function() {
-        this._model.uninstall(this._appId, Lang.bind(this, function(model, res) {
-            try {
-                model.uninstall_app_finish(res);
-            } catch (e) {
-                log('Failed to uninstall app ' + e.message);
-            }
+        this._installProgress.show();
+        this._installSpinner.start();
+
+        this._model.uninstall(this._appId, Lang.bind(this, function(error) {
+            this._installSpinner.stop();
+            this._installProgress.hide();
+
+            this._updateState();
         }));
     },
 });
