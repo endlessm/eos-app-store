@@ -143,7 +143,7 @@ const BaseList = new Lang.Class({
             }
             catch (e) {
                 log('Failed to install app ' + e.message);
-                callback(e.message);
+                callback(e);
             }
         }));
     },
