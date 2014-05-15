@@ -156,6 +156,7 @@ const BaseList = new Lang.Class({
             }
             catch (e) {
                 log('Failed to uninstall app ' + e.message);
+                callback(e);
             }
         }));
     }
