@@ -136,11 +136,29 @@ const BaseList = new Lang.Class({
     },
 
     install: function(id, callback) {
-        this._model.install_app_async(id, null, callback);
+        this._model.install_app_async(id, null, Lang.bind(this, function(model, res) {
+            try {
+                this._model.install_app_finish(res);
+                callback();
+            }
+            catch (e) {
+                log('Failed to install app ' + e.message);
+                callback(e);
+            }
+        }));
     },
 
     uninstall: function(id, callback) {
-        this._model.uninstall_app_async(id, null, callback);
+        this._model.uninstall_app_async(id, null, Lang.bind(this, function(model, res) {
+            try {
+                this._model.uninstall_app_finish(res);
+                callback();
+            }
+            catch (e) {
+                log('Failed to uninstall app ' + e.message);
+                callback(e);
+            }
+        }));
     }
 });
 Signals.addSignalMethods(BaseList.prototype);
