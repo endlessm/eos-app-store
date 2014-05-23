@@ -45,7 +45,7 @@ const FillDesktop = new Lang.Class({
         for (let c in categories) {
             let category = categories[c].id;
 
-            this._appInfos = this._appInfos.concat(EosAppStorePrivate.app_load_content(category));
+            this._appInfos = this._appInfos.concat(EosAppStorePrivate.app_load_content(category, null));
         }
 
         categories = Categories.get_link_categories();
