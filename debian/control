@@ -14,7 +14,6 @@ Build-Depends: cdbs (>= 0.4.90~),
                libjson-glib-dev,
                libgnome-menu-3-dev,
                libwebkit2gtk-3.0-dev,
-               eos-pstack-dev,
                eos-sdk-dev
 Standards-Version: 3.9.2
 Homepage: http://www.endlessm.com
@@ -25,7 +24,6 @@ Depends: ${gir:Depends},
 	 ${misc:Depends},
          ${shlibs:Depends},
          gir1.2-endless-0,
-	 gir1.2-eos-pstack,
          gir1.2-gdkpixbuf-2.0,
 	 gir1.2-glib-2.0,
          gir1.2-gmenu-3.0,
