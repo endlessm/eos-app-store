@@ -172,18 +172,19 @@
 
 .app-cell-title {
     font-weight: bold;
-    font-size: 1.5em;
+    font-size: 17px;
     color: white;
 
     padding: 0 12px;
-    text-shadow: 0 1px 8px black;
+    text-shadow: 0 1px 6px alpha(black, 0.5);
 }
 
 .app-cell-subtitle {
+    font-size: 13px;
     color: white;
     padding: 0 12px;
 
-    text-shadow: 0 1px 2px alpha(black, 0.7);
+    text-shadow: 0 1px 6px alpha(black, 0.5);
 }
 
 .app-cell-frame {
