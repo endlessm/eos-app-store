@@ -16,14 +16,18 @@ struct _EosAppListModel
 {
   GObject parent_instance;
 
-  GDBusConnection *connection;
+  GDBusConnection *system_bus;
+  GDBusConnection *session_bus;
 
   GMenuTree *app_tree;
 
   GHashTable *apps_by_id;
   GHashTable *installed_apps;
+  GHashTable *can_install;
+  GHashTable *can_update;
 
   guint applications_changed_id;
+  guint available_apps_changed_id;
 };
 
 struct _EosAppListModelClass
@@ -56,6 +60,25 @@ load_installed_apps_from_gvariant (GVariant *apps)
 
   while (g_variant_iter_loop (iter, "s", &application))
     g_hash_table_add (retval, g_strdup (application));
+
+  g_variant_iter_free (iter);
+
+  return retval;
+}
+
+static GHashTable *
+load_installable_apps_from_gvariant (GVariantIter *apps)
+{
+  GHashTable *retval;
+  GVariantIter *iter;
+  gchar *id, *name, *version;
+
+  retval = g_hash_table_new_full (g_str_hash, g_str_equal, g_free, NULL);
+
+  iter = g_variant_iter_copy (apps);
+
+  while (g_variant_iter_loop (iter, "sss", &id, &name, &version))
+    g_hash_table_add (retval, g_strdup (id));
 
   g_variant_iter_free (iter);
 
@@ -98,21 +121,58 @@ on_shell_applications_changed (GDBusConnection *connection,
 }
 
 static void
+on_app_manager_available_applications_changed (GDBusConnection *connection,
+                                               const gchar     *sender_name,
+                                               const gchar     *object_path,
+                                               const gchar     *interface_name,
+                                               const gchar     *signal_name,
+                                               GVariant        *parameters,
+                                               gpointer         user_data)
+{
+  EosAppListModel *self = user_data;
+
+  g_clear_pointer (&self->can_install, g_hash_table_unref);
+  g_clear_pointer (&self->can_update, g_hash_table_unref);
+
+  GVariantIter *iter1, *iter2;
+
+  g_variant_get (parameters, "(a(sss)a(sss))", &iter1, &iter2);
+
+  self->can_install = load_installable_apps_from_gvariant (iter1);
+  self->can_update = load_installable_apps_from_gvariant (iter2);
+
+  g_variant_iter_free (iter1);
+  g_variant_iter_free (iter2);
+
+  g_signal_emit (self, eos_app_list_model_signals[CHANGED], 0);
+}
+
+static void
 eos_app_list_model_finalize (GObject *gobject)
 {
   EosAppListModel *self = EOS_APP_LIST_MODEL (gobject);
 
   if (self->applications_changed_id != 0)
     {
-      g_dbus_connection_signal_unsubscribe (self->connection,
+      g_dbus_connection_signal_unsubscribe (self->session_bus,
                                             self->applications_changed_id);
       self->applications_changed_id = 0;
     }
 
-  g_clear_object (&self->connection);
+  if (self->available_apps_changed_id != 0)
+    {
+      g_dbus_connection_signal_unsubscribe (self->system_bus,
+                                            self->available_apps_changed_id);
+      self->available_apps_changed_id = 0;
+    }
+
+  g_clear_object (&self->session_bus);
+  g_clear_object (&self->system_bus);
   g_clear_object (&self->app_tree);
   g_hash_table_unref (self->apps_by_id);
   g_hash_table_unref (self->installed_apps);
+  g_hash_table_unref (self->can_update);
+  g_hash_table_unref (self->can_install);
 
   G_OBJECT_CLASS (eos_app_list_model_parent_class)->finalize (gobject);
 }
@@ -135,7 +195,8 @@ eos_app_list_model_class_init (EosAppListModelClass *klass)
 static void
 eos_app_list_model_init (EosAppListModel *self)
 {
-  self->connection = g_bus_get_sync (G_BUS_TYPE_SESSION, NULL, NULL);
+  self->system_bus = g_bus_get_sync (G_BUS_TYPE_SYSTEM, NULL, NULL);
+  self->session_bus = g_bus_get_sync (G_BUS_TYPE_SESSION, NULL, NULL);
 
   self->app_tree =
     gmenu_tree_new ("gnome-applications.menu", GMENU_TREE_FLAGS_INCLUDE_NODISPLAY);
@@ -144,13 +205,23 @@ eos_app_list_model_init (EosAppListModel *self)
                     self);
 
   self->applications_changed_id =
-    g_dbus_connection_signal_subscribe (self->connection,
+    g_dbus_connection_signal_subscribe (self->session_bus,
                                         "org.gnome.Shell",
                                         "org.gnome.Shell.AppStore",
                                         "ApplicationsChanged",
                                         "/org/gnome/Shell",
                                         NULL, G_DBUS_SIGNAL_FLAGS_NONE,
                                         on_shell_applications_changed,
+                                        self, NULL);
+
+  self->available_apps_changed_id =
+    g_dbus_connection_signal_subscribe (self->system_bus,
+                                        "com.endlessm.AppManager",
+                                        "com.endlessm.AppManager",
+                                        "AvailableApplicationsChanged",
+                                        "/com/endlessm/AppManager",
+                                        NULL, G_DBUS_SIGNAL_FLAGS_NONE,
+                                        on_app_manager_available_applications_changed,
                                         self, NULL);
 }
 
@@ -170,7 +241,7 @@ launch_app (EosAppListModel *self,
   gboolean retval = FALSE;
   GVariant *res;
 
-  res = g_dbus_connection_call_sync (self->connection,
+  res = g_dbus_connection_call_sync (self->session_bus,
                                      "org.gnome.Shell",
                                      "/org/gnome/Shell",
                                      "org.gnome.Shell.AppLauncher", "Launch",
@@ -208,7 +279,7 @@ add_app_to_shell (EosAppListModel *self,
 {
   GError *error = NULL;
 
-  g_dbus_connection_call_sync (self->connection,
+  g_dbus_connection_call_sync (self->session_bus,
                                "org.gnome.Shell",
                                "/org/gnome/Shell",
                                "org.gnome.Shell.AppStore", "AddApplication",
@@ -233,6 +304,38 @@ add_app_to_shell (EosAppListModel *self,
 }
 
 static gboolean
+add_app_from_manager (EosAppListModel *self,
+                      const char *desktop_id,
+                      GCancellable *cancellable,
+                      GError **error_out)
+{
+  GError *error = NULL;
+
+  g_dbus_connection_call_sync (self->system_bus,
+                               "com.endlessm.AppManager",
+                               "/com/endlessm/AppManager",
+                               "com.endlessm.AppManager", "Install",
+                               g_variant_new ("(s)", desktop_id),
+                               NULL,
+                               G_DBUS_CALL_FLAGS_NONE,
+                               -1,
+                               NULL,
+                               &error);
+
+  if (error != NULL)
+    {
+      g_critical ("Unable to install application '%s': %s",
+                  desktop_id,
+                  error->message);
+      g_propagate_error (error_out, error);
+
+      return FALSE;
+    }
+
+  return TRUE;
+}
+
+static gboolean
 remove_app_from_shell (EosAppListModel *self,
                        const char *desktop_id,
                        GCancellable *cancellable,
@@ -240,7 +343,7 @@ remove_app_from_shell (EosAppListModel *self,
 {
   GError *error = NULL;
 
-  g_dbus_connection_call_sync (self->connection,
+  g_dbus_connection_call_sync (self->session_bus,
                                "org.gnome.Shell",
                                "/org/gnome/Shell",
                                "org.gnome.Shell.AppStore", "RemoveApplication",
@@ -264,6 +367,69 @@ remove_app_from_shell (EosAppListModel *self,
   return TRUE;
 }
 
+static gboolean
+remove_app_from_manager (EosAppListModel *self,
+                         const char *desktop_id,
+                         GCancellable *cancellable,
+                         GError **error_out)
+{
+  GError *error = NULL;
+
+  g_dbus_connection_call_sync (self->system_bus,
+                               "com.endlessm.AppManager",
+                               "/com/endlessm/AppManager",
+                               "com.endlessm.AppManager", "Uninstall",
+                               g_variant_new ("(s)", desktop_id),
+                               NULL,
+                               G_DBUS_CALL_FLAGS_NONE,
+                               -1,
+                               cancellable,
+                               &error);
+
+  if (error != NULL)
+    {
+      g_critical ("Unable to uninstall application '%s': %s",
+                  desktop_id,
+                  error->message);
+      g_propagate_error (error_out, error);
+      return FALSE;
+    }
+
+  return TRUE;
+}
+
+static gboolean
+update_app_from_manager (EosAppListModel *self,
+                         const char *desktop_id,
+                         GCancellable *cancellable,
+                         GError **error_out)
+{
+  GError *error = NULL;
+
+  g_dbus_connection_call_sync (self->system_bus,
+                               "com.endlessm.AppManager",
+                               "/com/endlessm/AppManager",
+                               "com.endlessm.AppManager", "Install",
+                               g_variant_new ("(s)", desktop_id),
+                               NULL,
+                               G_DBUS_CALL_FLAGS_NONE,
+                               -1,
+                               NULL,
+                               &error);
+
+  if (error != NULL)
+    {
+      g_critical ("Unable to install application '%s': %s",
+                  desktop_id,
+                  error->message);
+      g_propagate_error (error_out, error);
+
+      return FALSE;
+    }
+
+  return TRUE;
+}
+
 static GHashTable *
 load_installed_apps (EosAppListModel *self)
 {
@@ -272,7 +438,7 @@ load_installed_apps (EosAppListModel *self)
   GHashTable *retval;
 
   applications =
-    g_dbus_connection_call_sync (self->connection,
+    g_dbus_connection_call_sync (self->session_bus,
                                  "org.gnome.Shell",
                                  "/org/gnome/Shell",
                                  "org.gnome.Shell.AppStore",
@@ -296,6 +462,44 @@ load_installed_apps (EosAppListModel *self)
   g_variant_unref (applications);
 
   return retval;
+}
+
+static void
+load_available_apps (EosAppListModel *self)
+{
+  GVariant *applications;
+  GError *error = NULL;
+
+  applications =
+    g_dbus_connection_call_sync (self->system_bus,
+                                 "com.endlessm.AppManager",
+                                 "/com/endlessm/AppManager",
+                                 "com.endlessm.AppManager",
+                                 "ListAvailable",
+                                 NULL, NULL,
+                                 G_DBUS_CALL_FLAGS_NONE,
+                                 -1,
+                                 NULL,
+                                 &error);
+
+  if (error != NULL)
+    {
+      g_critical ("Unable to list available applications: %s",
+                  error->message);
+      g_error_free (error);
+      return;
+    }
+
+  GVariantIter *iter1, *iter2;
+
+  g_variant_get (applications, "(a(sss)a(sss))", &iter1, &iter2);
+
+  self->can_install = load_installable_apps_from_gvariant (iter1);
+  self->can_update = load_installable_apps_from_gvariant (iter2);
+
+  g_variant_iter_free (iter1);
+  g_variant_iter_free (iter2);
+  g_variant_unref (applications);
 }
 
 static void
@@ -377,6 +581,7 @@ tree_load_in_thread (GTask        *task,
 
   model->apps_by_id = set;
   model->installed_apps = load_installed_apps (model);
+  load_available_apps (model);
 
   g_task_return_pointer (task, NULL, NULL);
 }
@@ -434,6 +639,16 @@ is_app_installed (EosAppListModel *model,
     return FALSE;
 
   return g_hash_table_contains (model->installed_apps, desktop_id);
+}
+
+static gboolean
+can_app_update (EosAppListModel *model,
+                const char *desktop_id)
+{
+  if (model->can_update == NULL)
+    return FALSE;
+
+  return g_hash_table_lookup (model->can_update, desktop_id) != NULL;
 }
 
 /**
@@ -553,6 +768,12 @@ eos_app_list_model_get_app_state (EosAppListModel *model,
 
   if (is_app_installed (model, desktop_id))
     {
+      if (can_app_update (model, desktop_id))
+        {
+          retval = EOS_APP_STATE_UPDATABLE;
+          goto out;
+        }
+
       retval = EOS_APP_STATE_INSTALLED;
       goto out;
     }
@@ -590,6 +811,9 @@ eos_app_list_model_install_app (EosAppListModel *model,
   if (is_app_installed (model, desktop_id))
     return;
 
+  if (!add_app_from_manager (model, desktop_id, NULL, NULL))
+    return;
+
   if (!add_app_to_shell (model, desktop_id, NULL, NULL))
     return;
 
@@ -606,10 +830,19 @@ add_app_thread_func (GTask *task,
   EosAppListModel *model = source_object;
   const gchar *desktop_id = task_data;
 
+  if (!add_app_from_manager (model, desktop_id, cancellable, &error))
+    {
+      g_task_return_error (task, error);
+      return;
+    }
+
   if (!add_app_to_shell (model, desktop_id, cancellable, &error))
-    g_task_return_error (task, error);
-  else
-    g_task_return_boolean (task, TRUE);
+    {
+      g_task_return_error (task, error);
+      return;
+    }
+
+  g_task_return_boolean (task, TRUE);
 }
 
 void
@@ -659,13 +892,78 @@ void
 eos_app_list_model_update_app (EosAppListModel *model,
                                const char *desktop_id)
 {
+  if (!can_app_update (model, desktop_id))
+    return;
+
+  update_app_from_manager (model, desktop_id, NULL, NULL);
 }
 
+static void
+update_app_thread_func (GTask *task,
+                        gpointer source_object,
+                        gpointer task_data,
+                        GCancellable *cancellable)
+{
+  GError *error = NULL;
+  EosAppListModel *model = source_object;
+  const gchar *desktop_id = task_data;
+
+  if (!update_app_from_manager (model, desktop_id, cancellable, &error))
+    {
+      g_task_return_error (task, error);
+      return;
+    }
+
+  g_task_return_boolean (task, TRUE);
+}
+
+void
+eos_app_list_model_update_app_async (EosAppListModel *model,
+                                     const gchar *desktop_id,
+                                     GCancellable *cancellable,
+                                     GAsyncReadyCallback callback,
+                                     gpointer user_data)
+{
+  GTask *task;
+
+  task = g_task_new (model, cancellable, callback, user_data);
+  g_task_set_task_data (task, g_strdup (desktop_id), (GDestroyNotify) g_free);
+
+  if (!can_app_update (model, desktop_id))
+    {
+      g_task_return_new_error (task,
+                               eos_app_list_model_error_quark (),
+                               EOS_APP_LIST_MODEL_ERROR_NOT_INSTALLED,
+                               _("Application %s is up to date"),
+                               desktop_id);
+      g_object_unref (task);
+      return;
+    }
+
+  g_task_run_in_thread (task, update_app_thread_func);
+  g_object_unref (task);
+}
+
+gboolean
+eos_app_list_model_update_app_finish (EosAppListModel *model,
+                                      GAsyncResult *result,
+                                      GError **error)
+{
+  GTask *task = G_TASK (result);
+
+  if (!g_task_propagate_boolean (task, error))
+    return FALSE;
+
+  return TRUE;
+}
 void
 eos_app_list_model_uninstall_app (EosAppListModel *model,
                                   const char *desktop_id)
 {
   if (!is_app_installed (model, desktop_id))
+    return;
+
+  if (!remove_app_from_manager (model, desktop_id, NULL, NULL))
     return;
 
   if (!remove_app_from_shell (model, desktop_id, NULL, NULL))
@@ -684,10 +982,19 @@ remove_app_thread_func (GTask *task,
   EosAppListModel *model = source_object;
   const gchar *desktop_id = task_data;
 
+  if (!remove_app_from_manager (model, desktop_id, cancellable, &error))
+    {
+      g_task_return_error (task, error);
+      return;
+    }
+
   if (!remove_app_from_shell (model, desktop_id, cancellable, &error))
-    g_task_return_error (task, error);
-  else
-    g_task_return_boolean (task, TRUE);
+    {
+      g_task_return_error (task, error);
+      return;
+    }
+
+  g_task_return_boolean (task, TRUE);
 }
 
 void
