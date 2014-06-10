@@ -497,7 +497,7 @@
 }
 
 .weblink-listbox .list-row .title {
-    font-size: 1.33em;
+    font-size: 15px;
     font-weight: bold;
     color: white;
 }
@@ -508,6 +508,7 @@
 
 .weblink-listbox .list-row .description {
     color: #b4b4b4;
+    font-size: 13px;
 }
 
 .weblink-listbox .list-row .row-highlight .description {
