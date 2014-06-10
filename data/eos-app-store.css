@@ -554,14 +554,14 @@
 }
 
 .folder-bubble {
-    padding: 6px;
-    background: alpha(black, 0.35);
-    border-radius: 40px;
+    background-color: @app_store_bg;
+    border: none;
+    border-radius: 20px;
 }
 
 .folder-bubble .bubble-border {
     border: none;
-    border-radius: 40px;
+    border-radius: 20px;
     padding: 2px;
 }
 

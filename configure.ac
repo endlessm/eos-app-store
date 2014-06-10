@@ -39,7 +39,6 @@ PKG_CHECK_MODULES(EOS_APP_STORE,
                   gtk+-3.0 >= 3.10.0
                   json-glib-1.0
                   libgnome-menu-3.0
-                  pstack >= 3
                   webkit2gtk-3.0
                   endless-0)
 AC_SUBST(EOS_APP_STORE_CFLAGS)

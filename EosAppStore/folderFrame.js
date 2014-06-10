@@ -3,7 +3,6 @@ const GLib = imports.gi.GLib;
 const GObject = imports.gi.GObject;
 const Gdk = imports.gi.Gdk;
 const Gtk = imports.gi.Gtk;
-const PLib = imports.gi.PLib;
 const Cairo = imports.cairo;
 
 const Builder = imports.builder;
@@ -22,10 +21,10 @@ const _ADD_FOLDER_BUTTON_SIZE = 30;
 
 const FolderNameBubble = new Lang.Class({
     Name: 'FolderNameBubble',
-    Extends: PLib.BubbleWindow,
+    Extends: Gtk.Popover,
 
     _init : function(folderModel) {
-        this.parent();
+        this.parent({ position: Gtk.PositionType.BOTTOM });
         this.get_style_context().add_class('folder-bubble');
 
         this._folderModel = folderModel;
@@ -178,21 +177,25 @@ const FolderIconGrid = new Lang.Class({
 
             this.get_style_context().add_class('grabbed');
 
+            // bubble window
+            this._bubble = new FolderNameBubble(this._folderModel);
+            this._bubble.connect('closed', Lang.bind(this, function() {
+                if (this._activeToggle) {
+                    this._activeToggle.set_active(false);
+                    this._activeToggle = null;
+                }
+                this.get_style_context().remove_class('grabbed');
+            }));
+
             // prepare the bubble window for showing...
             this._bubble._iconName = toggleButton._iconName;
             this._bubble.setEntryVisible(true);
             this._bubble._entry.set_text('');
             this._bubble._addButton.set_sensitive(false);
+            this._bubble.relative_to = toggleButton;
 
-            // ... and now we show the bubble and grab the input
-            this._bubble.popup(toggleButton.get_window(),
-                               toggleButton.get_allocation(),
-                               Gtk.PositionType.BOTTOM);
-
-            let display = Gdk.Display.get_default();
-            let devicemgr = display.get_device_manager();
-            let device = devicemgr.get_client_pointer();
-            this._bubble.grab(device, Gdk.CURRENT_TIME);
+            // ... and now we show the bubble, grabbing the input
+            this._bubble.show();
         }
     },
 
@@ -245,16 +248,6 @@ const FolderIconGrid = new Lang.Class({
         this._activeToggle = null;
 
         this.get_style_context().add_class('folder-icon-grid');
-
-        // bubble window
-
-        this._bubble = new FolderNameBubble(folderModel);
-
-        this._bubble.connect('hide', Lang.bind(this, function() {
-            this._activeToggle.set_active(false);
-            this._activeToggle = null;
-            this.get_style_context().remove_class('grabbed');
-        }));
     }
 });
 
