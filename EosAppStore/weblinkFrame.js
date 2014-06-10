@@ -448,8 +448,6 @@ const WeblinkListBoxRow = new Lang.Class({
         '_nameLabel',
         '_descriptionLabel',
         '_labelsBox',
-        '_urlLabel',
-        '_urlIndicator',
         '_stateButton'
     ],
 
@@ -465,7 +463,6 @@ const WeblinkListBoxRow = new Lang.Class({
 
         this._nameLabel.set_text(info.get_title());
         this._descriptionLabel.set_text(info.get_description());
-        this._urlLabel.set_text(info.get_url());
 
         this._setSensitiveState(this._getState() != EosAppStorePrivate.AppState.INSTALLED);
         this._mainBox.show();
@@ -516,7 +513,6 @@ const WeblinkListBoxRow = new Lang.Class({
 
     _setInstalledState: function(installed, message) {
         this._nameLabel.vexpand = installed;
-        this._urlLabel.visible = !installed;
         this._descriptionLabel.set_text(message);
     },
 
@@ -541,20 +537,6 @@ const WeblinkListBoxRow = new Lang.Class({
 
         this._showInstalledMessage();
     },
-
-    _onUrlClicked: function(widget, event) {
-        Gtk.show_uri(null, this._info.get_url(), event.time, null);
-        // hide the appstore to see the browser
-        this.get_toplevel().emit('delete-event', null);
-    },
-
-    _onStartHoveringLabel: function() {
-        this._urlIndicator.set_from_resource(ICON_EXTERNAL_LINK);
-    },
-
-    _onStopHoveringLabel: function() {
-        this._urlIndicator.set_from_resource(ICON_BLANK);
-    }
 });
 Builder.bindTemplateChildren(WeblinkListBoxRow.prototype);
 
