@@ -21,17 +21,17 @@ Homepage: http://www.endlessm.com
 Package: eos-app-store
 Architecture: any
 Depends: ${gir:Depends},
-	 ${misc:Depends},
+         ${misc:Depends},
          ${shlibs:Depends},
          gir1.2-endless-0,
          gir1.2-gdkpixbuf-2.0,
-	 gir1.2-glib-2.0,
+         gir1.2-glib-2.0,
          gir1.2-gmenu-3.0,
-	 gir1.2-gtk-3.0,
+         gir1.2-gtk-3.0,
          gir1.2-json-1.0,
-	 gir1.2-webkit2-3.0,
-	 gjs,
-	 xdg-utils,
-	 eos-shell-content
+         gir1.2-webkit2-3.0,
+         gjs,
+         xdg-utils,
+         eos-shell-content
 Description: Endless OS App Store installation package
  This package will install the Endless OS App Store
