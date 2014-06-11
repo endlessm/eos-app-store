@@ -63,6 +63,15 @@ gboolean eos_app_list_model_uninstall_app_finish (EosAppListModel *model,
                                                   GAsyncResult *result,
                                                   GError **error);
 
+void eos_app_list_model_update_app_async (EosAppListModel *model,
+                                          const gchar *desktop_id,
+                                          GCancellable *cancellable,
+                                          GAsyncReadyCallback callbcak,
+                                          gpointer user_data);
+gboolean eos_app_list_model_update_app_finish (EosAppListModel *model,
+                                               GAsyncResult *result,
+                                               GError **error);
+
 GQuark eos_app_list_model_error_quark (void);
 
 typedef enum {

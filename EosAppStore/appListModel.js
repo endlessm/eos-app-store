@@ -189,7 +189,16 @@ const AppList = new Lang.Class({
     },
 
     updateApp: function(id) {
-        this._model.update_app(id);
+        this._model.update_app_async(id, null, Lang.bind(this, function(model, res) {
+            try {
+                this._model.update_app_finish(res);
+                callback();
+            }
+            catch (e) {
+                log('Failed to update app ' + e.message);
+                callback(e);
+            }
+        }));
     },
 
     launch: function(id) {
