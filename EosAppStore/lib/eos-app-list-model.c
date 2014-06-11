@@ -23,11 +23,15 @@ struct _EosAppListModel
 
   GHashTable *apps_by_id;
   GHashTable *installed_apps;
-  GHashTable *can_install;
-  GHashTable *can_update;
+  GHashTable *installable_apps;
+  GHashTable *updatable_apps;
 
   guint applications_changed_id;
   guint available_apps_changed_id;
+
+  gboolean can_install;
+  gboolean can_update;
+  gboolean can_uninstall;
 };
 
 struct _EosAppListModelClass
@@ -131,15 +135,15 @@ on_app_manager_available_applications_changed (GDBusConnection *connection,
 {
   EosAppListModel *self = user_data;
 
-  g_clear_pointer (&self->can_install, g_hash_table_unref);
-  g_clear_pointer (&self->can_update, g_hash_table_unref);
+  g_clear_pointer (&self->installable_apps, g_hash_table_unref);
+  g_clear_pointer (&self->updatable_apps, g_hash_table_unref);
 
   GVariantIter *iter1, *iter2;
 
   g_variant_get (parameters, "(a(sss)a(sss))", &iter1, &iter2);
 
-  self->can_install = load_installable_apps_from_gvariant (iter1);
-  self->can_update = load_installable_apps_from_gvariant (iter2);
+  self->installable_apps = load_installable_apps_from_gvariant (iter1);
+  self->updatable_apps = load_installable_apps_from_gvariant (iter2);
 
   g_variant_iter_free (iter1);
   g_variant_iter_free (iter2);
@@ -171,8 +175,8 @@ eos_app_list_model_finalize (GObject *gobject)
   g_clear_object (&self->app_tree);
   g_hash_table_unref (self->apps_by_id);
   g_hash_table_unref (self->installed_apps);
-  g_hash_table_unref (self->can_update);
-  g_hash_table_unref (self->can_install);
+  g_hash_table_unref (self->updatable_apps);
+  g_hash_table_unref (self->installable_apps);
 
   G_OBJECT_CLASS (eos_app_list_model_parent_class)->finalize (gobject);
 }
@@ -494,12 +498,52 @@ load_available_apps (EosAppListModel *self)
 
   g_variant_get (applications, "(a(sss)a(sss))", &iter1, &iter2);
 
-  self->can_install = load_installable_apps_from_gvariant (iter1);
-  self->can_update = load_installable_apps_from_gvariant (iter2);
+  self->installable_apps = load_installable_apps_from_gvariant (iter1);
+  self->updatable_apps = load_installable_apps_from_gvariant (iter2);
 
   g_variant_iter_free (iter1);
   g_variant_iter_free (iter2);
   g_variant_unref (applications);
+}
+
+static void
+load_user_capabilities (EosAppListModel *self)
+{
+  GVariant *capabilities;
+  GError *error = NULL;
+
+  capabilities =
+    g_dbus_connection_call_sync (self->system_bus,
+                                 "com.endlessm.AppManager",
+                                 "/com/endlessm/AppManager",
+                                 "com.endlessm.AppManager",
+                                 "GetUserCapabilities",
+                                 NULL, NULL,
+                                 G_DBUS_CALL_FLAGS_NONE,
+                                 -1,
+                                 NULL,
+                                 &error);
+
+  if (error != NULL)
+    {
+      g_critical ("Unable to list retrieve user capabilities: %s",
+                  error->message);
+      g_error_free (error);
+      return;
+    }
+
+  GVariant *caps;
+  g_variant_get_child (capabilities, 0, "a{sv}", &caps);
+
+  GVariantDict dictionary;
+
+  g_variant_dict_init (&dictionary, caps);
+  g_variant_dict_lookup (&dictionary, "CanInstall", "(b)", &self->can_install);
+  g_variant_dict_lookup (&dictionary, "CanUpdate", "(b)", &self->can_update);
+  g_variant_dict_lookup (&dictionary, "CanUninstall", "(b)", &self->can_uninstall);
+
+  g_variant_unref (caps);
+  g_variant_unref (capabilities);
 }
 
 static void
@@ -582,6 +626,7 @@ tree_load_in_thread (GTask        *task,
   model->apps_by_id = set;
   model->installed_apps = load_installed_apps (model);
   load_available_apps (model);
+  load_user_capabilities (model);
 
   g_task_return_pointer (task, NULL, NULL);
 }
@@ -645,10 +690,10 @@ static gboolean
 can_app_update (EosAppListModel *model,
                 const char *desktop_id)
 {
-  if (model->can_update == NULL)
+  if (model->updatable_apps == NULL)
     return FALSE;
 
-  return g_hash_table_lookup (model->can_update, desktop_id) != NULL;
+  return g_hash_table_lookup (model->updatable_apps, desktop_id) != NULL;
 }
 
 /**
@@ -811,7 +856,7 @@ eos_app_list_model_install_app (EosAppListModel *model,
   if (is_app_installed (model, desktop_id))
     return;
 
-  if (!add_app_from_manager (model, desktop_id, NULL, NULL))
+  if (model->can_install && !add_app_from_manager (model, desktop_id, NULL, NULL))
     return;
 
   if (!add_app_to_shell (model, desktop_id, NULL, NULL))
@@ -830,7 +875,7 @@ add_app_thread_func (GTask *task,
   EosAppListModel *model = source_object;
   const gchar *desktop_id = task_data;
 
-  if (!add_app_from_manager (model, desktop_id, cancellable, &error))
+  if (model->can_install && !add_app_from_manager (model, desktop_id, cancellable, &error))
     {
       g_task_return_error (task, error);
       return;
@@ -892,6 +937,9 @@ void
 eos_app_list_model_update_app (EosAppListModel *model,
                                const char *desktop_id)
 {
+  if (!model->can_update)
+    return;
+
   if (!can_app_update (model, desktop_id))
     return;
 
@@ -963,7 +1011,7 @@ eos_app_list_model_uninstall_app (EosAppListModel *model,
   if (!is_app_installed (model, desktop_id))
     return;
 
-  if (!remove_app_from_manager (model, desktop_id, NULL, NULL))
+  if (model->can_uninstall && !remove_app_from_manager (model, desktop_id, NULL, NULL))
     return;
 
   if (!remove_app_from_shell (model, desktop_id, NULL, NULL))
@@ -982,7 +1030,7 @@ remove_app_thread_func (GTask *task,
   EosAppListModel *model = source_object;
   const gchar *desktop_id = task_data;
 
-  if (!remove_app_from_manager (model, desktop_id, cancellable, &error))
+  if (model->can_uninstall && !remove_app_from_manager (model, desktop_id, cancellable, &error))
     {
       g_task_return_error (task, error);
       return;
