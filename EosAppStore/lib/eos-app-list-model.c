@@ -9,16 +9,13 @@
 #include <json-glib/json-glib.h>
 #include <glib/gi18n-lib.h>
 
-#define GMENU_I_KNOW_THIS_IS_UNSTABLE
-#include <gmenu-tree.h>
-
 struct _EosAppListModel
 {
   GObject parent_instance;
 
   GDBusConnection *connection;
 
-  GMenuTree *app_tree;
+  GAppInfoMonitor *app_monitor;
 
   GHashTable *apps_by_id;
   GHashTable *installed_apps;
@@ -63,8 +60,8 @@ load_installed_apps_from_gvariant (GVariant *apps)
 }
 
 static void
-on_app_tree_changed (GMenuTree       *tree,
-                     EosAppListModel *self)
+on_app_monitor_changed (GAppInfoMonitor *monitor,
+                        EosAppListModel *self)
 {
   if (self->apps_by_id != NULL)
     {
@@ -110,7 +107,7 @@ eos_app_list_model_finalize (GObject *gobject)
     }
 
   g_clear_object (&self->connection);
-  g_clear_object (&self->app_tree);
+  g_clear_object (&self->app_monitor);
   g_hash_table_unref (self->apps_by_id);
   g_hash_table_unref (self->installed_apps);
 
@@ -137,10 +134,9 @@ eos_app_list_model_init (EosAppListModel *self)
 {
   self->connection = g_bus_get_sync (G_BUS_TYPE_SESSION, NULL, NULL);
 
-  self->app_tree =
-    gmenu_tree_new ("gnome-applications.menu", GMENU_TREE_FLAGS_INCLUDE_NODISPLAY);
-  g_signal_connect (self->app_tree, "changed",
-                    G_CALLBACK (on_app_tree_changed),
+  self->app_monitor = g_app_info_monitor_get ();
+  g_signal_connect (self->app_monitor, "changed",
+                    G_CALLBACK (on_app_monitor_changed),
                     self);
 
   self->applications_changed_id =
@@ -299,53 +295,14 @@ load_installed_apps (EosAppListModel *self)
 }
 
 static void
-flatten_menu_tree_recursive (gpointer    directory,
-                             GHashTable *set)
-{
-  GMenuTreeIter *iter = gmenu_tree_directory_iter (directory);
-  GMenuTreeItemType item_type;
-  gpointer item;
-
-  item_type = gmenu_tree_iter_next (iter);
-  while (item_type != GMENU_TREE_ITEM_INVALID)
-    {
-      switch (item_type)
-        {
-        case GMENU_TREE_ITEM_ENTRY:
-          {
-            const char *file_id;
-
-            item = gmenu_tree_iter_get_entry (iter);
-            file_id = gmenu_tree_entry_get_desktop_file_id (item);
-            g_hash_table_replace (set, (gpointer) file_id, item);
-          }
-          break;
-
-        case GMENU_TREE_ITEM_DIRECTORY:
-          item = gmenu_tree_iter_get_directory (iter);
-          flatten_menu_tree_recursive (item, set);
-          gmenu_tree_item_unref (item);
-          break;
-
-        default:
-          break;
-        }
-
-      item_type = gmenu_tree_iter_next (iter);
-    }
-
-  gmenu_tree_iter_unref (iter);
-}
-
-static void
-tree_load_in_thread (GTask        *task,
-                     gpointer      object,
-                     gpointer      task_data,
-                     GCancellable *cancellable)
+all_apps_load_in_thread (GTask        *task,
+                         gpointer      object,
+                         gpointer      task_data,
+                         GCancellable *cancellable)
 {
   EosAppListModel *model = object;
-  GMenuTreeDirectory *root;
-  GError *error = NULL;
+  GList *all_infos, *l;
+  GAppInfo *info;
   GHashTable *set;
 
   if (model->apps_by_id != NULL)
@@ -354,26 +311,18 @@ tree_load_in_thread (GTask        *task,
       model->apps_by_id = NULL;
     }
 
-  if (!gmenu_tree_load_sync (model->app_tree, &error))
-    {
-      g_task_return_error (task, error);
-      return;
-    }
-
+  all_infos = g_app_info_get_all ();
   set = g_hash_table_new_full (g_str_hash, g_str_equal,
                                NULL,
-                               gmenu_tree_item_unref);
+                               g_object_unref);
 
-  root = gmenu_tree_get_root_directory (model->app_tree);
-  if (root == NULL)
+  for (l = all_infos; l != NULL; l = l->next)
     {
-      g_task_return_pointer (task, NULL, NULL);
-      return;
+      info = l->data;
+      g_hash_table_insert (set, (gpointer) g_app_info_get_id (info), info);
     }
 
-  flatten_menu_tree_recursive (root, set);
-
-  gmenu_tree_item_unref (root);
+  g_list_free (all_infos);
 
   model->apps_by_id = set;
   model->installed_apps = load_installed_apps (model);
@@ -401,7 +350,7 @@ eos_app_list_model_load (EosAppListModel     *model,
   g_return_if_fail (callback != NULL);
 
   task = g_task_new (model, cancellable, callback, user_data);
-  g_task_run_in_thread (task, tree_load_in_thread);
+  g_task_run_in_thread (task, all_apps_load_in_thread);
   g_object_unref (task);
 }
 
@@ -449,26 +398,13 @@ GDesktopAppInfo *
 eos_app_list_model_get_app_info (EosAppListModel *model,
                                  const char *desktop_id)
 {
-  GMenuTreeEntry *entry;
-  GDesktopAppInfo *res;
-
   if (model->apps_by_id == NULL)
     {
       g_critical ("The application list is not loaded.");
       return NULL;
     }
 
-  entry = g_hash_table_lookup (model->apps_by_id, desktop_id);
-
-  if (entry == NULL)
-    {
-      g_critical ("No application '%s' was found.", desktop_id);
-      return NULL;
-    }
-
-  res = gmenu_tree_entry_get_app_info (entry);
-
-  return res;
+  return g_hash_table_lookup (model->apps_by_id, desktop_id);
 }
 
 const char *
