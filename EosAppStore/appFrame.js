@@ -195,6 +195,7 @@ const AppListBoxRow = new Lang.Class({
 
     _onInstallButtonClicked: function() {
         switch (this._appState) {
+            // if the application is installed, we launch it
             case EosAppStorePrivate.AppState.INSTALLED:
                 try {
                     this._model.launch(this._appId);
@@ -203,6 +204,7 @@ const AppListBoxRow = new Lang.Class({
                 }
                 break;
 
+            // if the application is uninstalled, we install it
             case EosAppStorePrivate.AppState.UNINSTALLED:
                 this._installButton.hide();
                 this._installProgress.show();
@@ -227,6 +229,7 @@ const AppListBoxRow = new Lang.Class({
                 }));
                 break;
 
+            // if the application can be updated, we update it
             case EosAppStorePrivate.AppState.UPDATABLE:
                 this._model.updateApp(this._appId);
                 break;
@@ -234,15 +237,34 @@ const AppListBoxRow = new Lang.Class({
     },
 
     _onRemoveButtonClicked: function() {
-        this._installProgress.show();
-        this._installSpinner.start();
+        let app = Gio.Application.get_default();
 
-        this._model.uninstall(this._appId, Lang.bind(this, function(error) {
-            this._installSpinner.stop();
-            this._installProgress.hide();
+        let dialog = new Gtk.MessageDialog();
+        dialog.set_transient_for(app.mainWindow);
+        dialog.text = _("Deleting application");
+        dialog.secondary_text = _("Deleting this application will removing it from the device " +
+                                  "and for all users. You will need to download it from the " +
+                                  "Internet in order to install it again.");
+        let applyButton = dialog.add_button(_("Delete application"), Gtk.Response.APPLY);
+        applyButton.get_style_context().add_class('destructive-action');
+        dialog.add_button(_("Cancel"), Gtk.Response.CANCEL);
+        dialog.show_all();
 
-            this._updateState();
-        }));
+        let responseId = dialog.run();
+
+        if (responseId == Gtk.Response.APPLY) {
+            this._installProgress.show();
+            this._installSpinner.start();
+
+            this._model.uninstall(this._appId, Lang.bind(this, function(error) {
+                this._installSpinner.stop();
+                this._installProgress.hide();
+
+                this._updateState();
+            }));
+        }
+
+        dialog.destroy();
     },
 });
 Builder.bindTemplateChildren(AppListBoxRow.prototype);
