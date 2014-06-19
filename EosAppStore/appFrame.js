@@ -168,9 +168,15 @@ const AppListBoxRow = new Lang.Class({
 
         switch (this._appState) {
             case EosAppStorePrivate.AppState.INSTALLED:
+                // wait for the message to hide
                 if (!this._installedMessage.visible) {
-                    // wait for the message to hide
-                    this._installButtonLabel.set_text(_("Open application"));
+                    if (!this._model.get_app_has_launcher(this._appId)) {
+                        this._installButtonLabel.set_text(_("Add to the desktop"));
+                    }
+                    else {
+                        this._installButtonLabel.set_text(_("Open application"));
+                    }
+
                     this._installButton.show();
 
                     // we only show the 'delete app' button if the app does
@@ -200,13 +206,27 @@ const AppListBoxRow = new Lang.Class({
 
     _onInstallButtonClicked: function() {
         switch (this._appState) {
-            // if the application is installed, we launch it
+            // if the application is installed, we have two options
             case EosAppStorePrivate.AppState.INSTALLED:
-                try {
-                    this._model.launch(this._appId);
-                } catch (e) {
-                    log("Failed to launch app '" + this._appId + "': " + e.message);
+                // we launch it, if we have a launcher on the desktop
+                if (this._model.get_app_has_launcher(this._appId)) {
+                    try {
+                        this._model.launch(this._appId);
+                    } catch (e) {
+                        log("Failed to launch app '" + this._appId + "': " + e.message);
+                    }
+
+                    return;
                 }
+
+                // or we add a launcher on the desktop
+                this._installSpinner.start();
+                this._installProgress.show();
+                this._model.install(this._appId, Lang.bind(this, function(error) {
+                    this._installSpinner.stop();
+                    this._installProgress.hide();
+                    this._updateState();
+                }));
                 break;
 
             // if the application is uninstalled, we install it

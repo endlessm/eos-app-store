@@ -877,16 +877,22 @@ add_app_thread_func (GTask *task,
   EosAppListModel *model = source_object;
   const gchar *desktop_id = task_data;
 
-  if (model->can_install && !add_app_from_manager (model, desktop_id, cancellable, &error))
+  if (!app_is_installed (model, desktop_id))
     {
-      g_task_return_error (task, error);
-      return;
-    }
+      if (model->can_install && !add_app_from_manager (model, desktop_id, cancellable, &error))
+        {
+          g_task_return_error (task, error);
+          return;
+        }
+     }
 
-  if (!add_app_to_shell (model, desktop_id, cancellable, &error))
+  if (!app_has_launcher (model, desktop_id))
     {
-      g_task_return_error (task, error);
-      return;
+      if (!add_app_to_shell (model, desktop_id, cancellable, &error))
+        {
+          g_task_return_error (task, error);
+         return;
+        }
     }
 
   g_task_return_boolean (task, TRUE);
@@ -904,7 +910,7 @@ eos_app_list_model_install_app_async (EosAppListModel *model,
   task = g_task_new (model, cancellable, callback, user_data);
   g_task_set_task_data (task, g_strdup (desktop_id), (GDestroyNotify) g_free);
 
-  if (app_is_installed (model, desktop_id))
+  if (app_is_installed (model, desktop_id) && app_has_launcher (model, desktop_id))
     {
       g_task_return_new_error (task,
                                eos_app_list_model_error_quark (),
