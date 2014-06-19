@@ -172,7 +172,12 @@ const AppListBoxRow = new Lang.Class({
                     // wait for the message to hide
                     this._installButtonLabel.set_text(_("Open application"));
                     this._installButton.show();
-                    this._removeButton.show();
+
+                    // we only show the 'delete app' button if the app does
+                    // not have a launcher on the desktop
+                    if (!this._model.get_app_has_launcher(this._appId)) {
+                        this._removeButton.show();
+                    }
                 }
                 break;
 
