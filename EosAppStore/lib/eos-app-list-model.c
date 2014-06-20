@@ -870,7 +870,7 @@ add_app_thread_func (GTask *task,
       if (!add_app_to_shell (model, desktop_id, cancellable, &error))
         {
           g_task_return_error (task, error);
-         return;
+          return;
         }
     }
 
