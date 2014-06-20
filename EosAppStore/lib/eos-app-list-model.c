@@ -989,7 +989,7 @@ eos_app_list_model_update_app_async (EosAppListModel *model,
     {
       g_task_return_new_error (task,
                                eos_app_list_model_error_quark (),
-                               EOS_APP_LIST_MODEL_ERROR_NOT_INSTALLED,
+                               EOS_APP_LIST_MODEL_ERROR_NO_UPDATE,
                                _("Application %s is up to date"),
                                desktop_id);
       g_object_unref (task);
