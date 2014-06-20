@@ -846,27 +846,6 @@ eos_app_list_model_get_app_visible (EosAppListModel *model,
            g_desktop_app_info_get_is_hidden (info));
 }
 
-void
-eos_app_list_model_install_app (EosAppListModel *model,
-                                const char *desktop_id)
-{
-  if (!app_is_installed (model, desktop_id))
-    {
-      if (model->can_install && !add_app_from_manager (model, desktop_id, NULL, NULL))
-        return;
-
-      g_hash_table_add (model->installed_apps, g_strdup (desktop_id));
-    }
-
-  if (!app_has_launcher (model, desktop_id))
-    {
-      if (!add_app_to_shell (model, desktop_id, NULL, NULL))
-        return;
-
-      g_hash_table_add (model->shell_apps, g_strdup (desktop_id));
-    }
-}
-
 static void
 add_app_thread_func (GTask *task,
                      gpointer source_object,
@@ -943,19 +922,6 @@ eos_app_list_model_install_app_finish (EosAppListModel *model,
   return TRUE;
 }
 
-void
-eos_app_list_model_update_app (EosAppListModel *model,
-                               const char *desktop_id)
-{
-  if (!model->can_install)
-    return;
-
-  if (!app_can_update (model, desktop_id))
-    return;
-
-  update_app_from_manager (model, desktop_id, NULL, NULL);
-}
-
 static void
 update_app_thread_func (GTask *task,
                         gpointer source_object,
@@ -1014,23 +980,6 @@ eos_app_list_model_update_app_finish (EosAppListModel *model,
 
   return TRUE;
 }
-void
-eos_app_list_model_uninstall_app (EosAppListModel *model,
-                                  const char *desktop_id)
-{
-  if (!app_is_installed (model, desktop_id))
-    return;
-
-  if (model->can_uninstall && !remove_app_from_manager (model, desktop_id, NULL, NULL))
-    return;
-
-  if (!remove_app_from_shell (model, desktop_id, NULL, NULL))
-    return;
-
-  g_hash_table_remove (model->installed_apps, desktop_id);
-  g_hash_table_remove (model->shell_apps, desktop_id);
-}
-
 static void
 remove_app_thread_func (GTask *task,
                         gpointer source_object,

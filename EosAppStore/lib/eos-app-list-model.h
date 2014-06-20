@@ -41,9 +41,6 @@ EosAppState eos_app_list_model_get_app_state (EosAppListModel *model, const char
 GDesktopAppInfo *eos_app_list_model_get_app_info (EosAppListModel *model, const char *desktop_id);
 gboolean eos_app_list_model_get_app_has_launcher (EosAppListModel *model, const char *desktop_id);
 
-void eos_app_list_model_install_app (EosAppListModel *model, const char *desktop_id);
-void eos_app_list_model_uninstall_app (EosAppListModel *model, const char *desktop_id);
-void eos_app_list_model_update_app (EosAppListModel *model, const char *desktop_id);
 gboolean eos_app_list_model_launch_app (EosAppListModel *model, const char *desktop_id, GError **error);
 
 void eos_app_list_model_install_app_async (EosAppListModel *model,
