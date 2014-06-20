@@ -938,6 +938,8 @@ eos_app_list_model_install_app_finish (EosAppListModel *model,
 
   desktop_id = g_task_get_task_data (task);
   g_hash_table_add (model->installed_apps, g_strdup (desktop_id));
+  g_hash_table_add (model->shell_apps, g_strdup (desktop_id));
+
   return TRUE;
 }
 
@@ -1026,6 +1028,7 @@ eos_app_list_model_uninstall_app (EosAppListModel *model,
     return;
 
   g_hash_table_remove (model->installed_apps, desktop_id);
+  g_hash_table_remove (model->shell_apps, desktop_id);
 }
 
 static void
@@ -1093,6 +1096,8 @@ eos_app_list_model_uninstall_app_finish (EosAppListModel *model,
 
   desktop_id = g_task_get_task_data (task);
   g_hash_table_remove (model->installed_apps, desktop_id);
+  g_hash_table_remove (model->shell_apps, desktop_id);
+
   return TRUE;
 }
 
