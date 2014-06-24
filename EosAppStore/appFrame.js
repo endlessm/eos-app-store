@@ -435,7 +435,7 @@ const AppFrame = new Lang.Class({
             for (let i in appInfos) {
                 let id = appInfos[i].get_desktop_id();
 
-                if (this._model.getState(id) == EosAppStorePrivate.AppState.INSTALLED) {
+                if (this._model.isInstalled(id)) {
                     let cell = appInfos[i].create_cell();
                     cell.shape = Endless.FlexyShape.SMALL;
                     grid.add(cell);
@@ -447,7 +447,7 @@ const AppFrame = new Lang.Class({
             for (let i in appInfos) {
                 let id = appInfos[i].get_desktop_id();
 
-                if (this._model.getState(id) != EosAppStorePrivate.AppState.INSTALLED) {
+                if (!this._model.isInstalled(id)) {
                     let cell = appInfos[i].create_cell();
                     grid.add(cell);
                 }
@@ -472,9 +472,7 @@ const AppFrame = new Lang.Class({
         app.mainWindow.titleText = cell.app_info.get_title();
         app.mainWindow.subtitleText = cell.app_info.get_subtitle();
         app.mainWindow.headerIcon = this._model.getIcon(cell.desktop_id);
-
-        let appState = this._model.getState(cell.desktop_id);
-        app.mainWindow.headerInstalledVisible = (appState == EosAppStorePrivate.AppState.INSTALLED);
+        app.mainWindow.headerInstalledVisible = this._model.isInstalled(cell.desktop_id);
         app.mainWindow.backButtonVisible = true;
         this._backClickedId =
             app.mainWindow.connect('back-clicked', Lang.bind(this, this._showGrid));
