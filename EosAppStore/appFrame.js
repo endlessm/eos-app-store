@@ -170,7 +170,7 @@ const AppListBoxRow = new Lang.Class({
             case EosAppStorePrivate.AppState.INSTALLED:
                 // wait for the message to hide
                 if (!this._installedMessage.visible) {
-                    if (!this._model.get_app_has_launcher(this._appId)) {
+                    if (!this._model.hasLauncher(this._appId)) {
                         this._installButtonLabel.set_text(_("Add to the desktop"));
                     }
                     else {
@@ -181,7 +181,7 @@ const AppListBoxRow = new Lang.Class({
 
                     // we only show the 'delete app' button if the app does
                     // not have a launcher on the desktop
-                    if (!this._model.get_app_has_launcher(this._appId)) {
+                    if (!this._model.hasLauncher(this._appId)) {
                         this._removeButton.show();
                     }
                 }
@@ -209,7 +209,7 @@ const AppListBoxRow = new Lang.Class({
             // if the application is installed, we have two options
             case EosAppStorePrivate.AppState.INSTALLED:
                 // we launch it, if we have a launcher on the desktop
-                if (this._model.get_app_has_launcher(this._appId)) {
+                if (this._model.hasLauncher(this._appId)) {
                     try {
                         this._model.launch(this._appId);
                     } catch (e) {
