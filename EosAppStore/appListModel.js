@@ -135,6 +135,25 @@ const BaseList = new Lang.Class({
         return this._model.get_app_visible(id);
     },
 
+    isInstalled: function(id) {
+        let appState = this._model.get_app_state(id);
+
+        if (appState == EosAppStorePrivate.AppState.INSTALLED ||
+            appState == EosAppStorePrivate.AppState.UPDATABLE) {
+            return true;
+        }
+
+        return false;
+    },
+
+    hasLauncher: function(id) {
+        if (!this.isInstalled(id)) {
+            return false;
+        }
+
+        return this._model.get_app_has_launcher(id);
+    },
+
     install: function(id, callback) {
         this._model.install_app_async(id, null, Lang.bind(this, function(model, res) {
             try {

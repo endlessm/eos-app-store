@@ -170,7 +170,7 @@ const AppListBoxRow = new Lang.Class({
             case EosAppStorePrivate.AppState.INSTALLED:
                 // wait for the message to hide
                 if (!this._installedMessage.visible) {
-                    if (!this._model.get_app_has_launcher(this._appId)) {
+                    if (!this._model.hasLauncher(this._appId)) {
                         this._installButtonLabel.set_text(_("Add to the desktop"));
                     }
                     else {
@@ -181,7 +181,7 @@ const AppListBoxRow = new Lang.Class({
 
                     // we only show the 'delete app' button if the app does
                     // not have a launcher on the desktop
-                    if (!this._model.get_app_has_launcher(this._appId)) {
+                    if (!this._model.hasLauncher(this._appId)) {
                         this._removeButton.show();
                     }
                 }
@@ -209,7 +209,7 @@ const AppListBoxRow = new Lang.Class({
             // if the application is installed, we have two options
             case EosAppStorePrivate.AppState.INSTALLED:
                 // we launch it, if we have a launcher on the desktop
-                if (this._model.get_app_has_launcher(this._appId)) {
+                if (this._model.hasLauncher(this._appId)) {
                     try {
                         this._model.launch(this._appId);
                     } catch (e) {
@@ -435,7 +435,7 @@ const AppFrame = new Lang.Class({
             for (let i in appInfos) {
                 let id = appInfos[i].get_desktop_id();
 
-                if (this._model.getState(id) == EosAppStorePrivate.AppState.INSTALLED) {
+                if (this._model.isInstalled(id)) {
                     let cell = appInfos[i].create_cell();
                     cell.shape = Endless.FlexyShape.SMALL;
                     grid.add(cell);
@@ -447,7 +447,7 @@ const AppFrame = new Lang.Class({
             for (let i in appInfos) {
                 let id = appInfos[i].get_desktop_id();
 
-                if (this._model.getState(id) != EosAppStorePrivate.AppState.INSTALLED) {
+                if (!this._model.isInstalled(id)) {
                     let cell = appInfos[i].create_cell();
                     grid.add(cell);
                 }
@@ -472,9 +472,7 @@ const AppFrame = new Lang.Class({
         app.mainWindow.titleText = cell.app_info.get_title();
         app.mainWindow.subtitleText = cell.app_info.get_subtitle();
         app.mainWindow.headerIcon = this._model.getIcon(cell.desktop_id);
-
-        let appState = this._model.getState(cell.desktop_id);
-        app.mainWindow.headerInstalledVisible = (appState == EosAppStorePrivate.AppState.INSTALLED);
+        app.mainWindow.headerInstalledVisible = this._model.isInstalled(cell.desktop_id);
         app.mainWindow.backButtonVisible = true;
         this._backClickedId =
             app.mainWindow.connect('back-clicked', Lang.bind(this, this._showGrid));
