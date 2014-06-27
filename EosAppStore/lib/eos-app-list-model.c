@@ -18,7 +18,7 @@ struct _EosAppListModel
 
   GAppInfoMonitor *app_monitor;
 
-  GHashTable *apps_by_id;
+  GHashTable *gio_apps;
   GHashTable *shell_apps;
   GHashTable *installed_apps;
   GHashTable *installable_apps;
@@ -90,10 +90,10 @@ static void
 on_app_monitor_changed (GAppInfoMonitor *monitor,
                         EosAppListModel *self)
 {
-  if (self->apps_by_id != NULL)
+  if (self->gio_apps != NULL)
     {
-      g_hash_table_unref (self->apps_by_id);
-      self->apps_by_id = NULL;
+      g_hash_table_unref (self->gio_apps);
+      self->gio_apps = NULL;
     }
 
   g_signal_emit (self, eos_app_list_model_signals[CHANGED], 0);
@@ -171,7 +171,7 @@ eos_app_list_model_finalize (GObject *gobject)
   g_clear_object (&self->session_bus);
   g_clear_object (&self->system_bus);
 
-  g_hash_table_unref (self->apps_by_id);
+  g_hash_table_unref (self->gio_apps);
   g_hash_table_unref (self->shell_apps);
   g_hash_table_unref (self->installed_apps);
   g_hash_table_unref (self->updatable_apps);
@@ -592,10 +592,10 @@ all_apps_load_in_thread (GTask        *task,
   GAppInfo *info;
   GHashTable *set;
 
-  if (model->apps_by_id != NULL)
+  if (model->gio_apps != NULL)
     {
-      g_hash_table_unref (model->apps_by_id);
-      model->apps_by_id = NULL;
+      g_hash_table_unref (model->gio_apps);
+      model->gio_apps = NULL;
     }
 
   all_infos = g_app_info_get_all ();
@@ -610,7 +610,7 @@ all_apps_load_in_thread (GTask        *task,
     }
 
   g_list_free (all_infos);
-  model->apps_by_id = set;
+  model->gio_apps = set;
 
   load_apps_from_shell (model);
   load_installed_apps (model);
@@ -659,10 +659,10 @@ eos_app_list_model_load_finish (EosAppListModel  *model,
 {
   g_return_val_if_fail (g_task_is_valid (result, model), NULL);
 
-  if (model->apps_by_id == NULL || g_task_had_error (G_TASK (result)))
+  if (model->gio_apps == NULL || g_task_had_error (G_TASK (result)))
     return g_task_propagate_pointer (G_TASK (result), error);
 
-  return g_hash_table_get_keys (model->apps_by_id);
+  return g_hash_table_get_keys (model->gio_apps);
 }
 
 static gboolean
@@ -717,13 +717,13 @@ GDesktopAppInfo *
 eos_app_list_model_get_app_info (EosAppListModel *model,
                                  const char *desktop_id)
 {
-  if (model->apps_by_id == NULL)
+  if (model->gio_apps == NULL)
     {
       g_critical ("The application list is not loaded.");
       return NULL;
     }
 
-  return g_hash_table_lookup (model->apps_by_id, desktop_id);
+  return g_hash_table_lookup (model->gio_apps, desktop_id);
 }
 
 const char *
