@@ -78,7 +78,7 @@ load_installable_apps_from_gvariant (GVariantIter *apps)
 
   iter = g_variant_iter_copy (apps);
 
-  while (g_variant_iter_loop (iter, "sss", &id, &name, &version))
+  while (g_variant_iter_loop (iter, "(sss)", &id, &name, &version))
     g_hash_table_add (retval, g_strdup (id));
 
   g_variant_iter_free (iter);
