@@ -577,7 +577,6 @@ load_user_capabilities (EosAppListModel *self)
   g_variant_dict_lookup (&dictionary, "CanInstall", "(b)", &self->can_install);
   g_variant_dict_lookup (&dictionary, "CanUninstall", "(b)", &self->can_uninstall);
 
-  g_variant_unref (caps);
   g_variant_unref (capabilities);
 }
 
