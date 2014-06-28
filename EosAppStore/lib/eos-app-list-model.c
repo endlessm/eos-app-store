@@ -568,15 +568,14 @@ load_user_capabilities (EosAppListModel *self)
       return;
     }
 
+
   GVariant *caps;
-  g_variant_get_child (capabilities, 0, "a{sv}", &caps);
+  caps = g_variant_get_child_value (capabilities, 0);
 
-  GVariantDict dictionary;
+  g_variant_lookup (caps, "CanInstall", "b", &self->can_install);
+  g_variant_lookup (caps, "CanUninstall", "b", &self->can_uninstall);
 
-  g_variant_dict_init (&dictionary, caps);
-  g_variant_dict_lookup (&dictionary, "CanInstall", "(b)", &self->can_install);
-  g_variant_dict_lookup (&dictionary, "CanUninstall", "(b)", &self->can_uninstall);
-
+  g_variant_unref (caps);
   g_variant_unref (capabilities);
 }
 
