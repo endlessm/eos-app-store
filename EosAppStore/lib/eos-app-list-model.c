@@ -657,12 +657,18 @@ eos_app_list_model_load_finish (EosAppListModel  *model,
                                 GAsyncResult     *result,
                                 GError          **error)
 {
+  GList *gio_apps, *installable_apps;
+
   g_return_val_if_fail (g_task_is_valid (result, model), NULL);
 
-  if (model->gio_apps == NULL || g_task_had_error (G_TASK (result)))
+  if ((model->gio_apps == NULL && model->installable_apps == NULL) ||
+      g_task_had_error (G_TASK (result)))
     return g_task_propagate_pointer (G_TASK (result), error);
 
-  return g_hash_table_get_keys (model->gio_apps);
+  gio_apps = g_hash_table_get_keys (model->gio_apps);
+  installable_apps = g_hash_table_get_keys (model->installable_apps);
+
+  return g_list_concat (gio_apps, installable_apps);
 }
 
 static gboolean
