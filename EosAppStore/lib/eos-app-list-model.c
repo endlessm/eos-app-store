@@ -669,6 +669,7 @@ static gboolean
 app_has_launcher (EosAppListModel *model,
                   const char      *desktop_id)
 {
+  /* Note that this doesn't mean that the application is installed */
   if (model->shell_apps == NULL)
     return FALSE;
 
@@ -679,10 +680,12 @@ static gboolean
 app_is_installed (EosAppListModel *model,
                   const char      *desktop_id)
 {
-  if (model->shell_apps != NULL &&
-      g_hash_table_contains (model->shell_apps, desktop_id))
+  /* An app is installed if GIO knows about it... */
+  if (model->gio_apps != NULL &&
+      g_hash_table_contains (model->gio_apps, desktop_id))
     return TRUE;
 
+  /* ...or if the app manager reports it as such */
   if (model->installed_apps != NULL &&
       g_hash_table_contains (model->installed_apps, desktop_id))
     return TRUE;
@@ -811,29 +814,20 @@ eos_app_list_model_get_app_state (EosAppListModel *model,
                                   const char *desktop_id)
 {
   EosAppState retval = EOS_APP_STATE_UNKNOWN;
+  gboolean is_installed;
 
   g_return_val_if_fail (EOS_IS_APP_LIST_MODEL (model), EOS_APP_STATE_UNKNOWN);
   g_return_val_if_fail (desktop_id != NULL, EOS_APP_STATE_UNKNOWN);
 
-  if (app_is_installed (model, desktop_id))
-    {
-      if (app_can_update (model, desktop_id))
-        {
-          retval = EOS_APP_STATE_UPDATABLE;
-          goto out;
-        }
+  is_installed = app_is_installed (model, desktop_id);
 
-      retval = EOS_APP_STATE_INSTALLED;
-      goto out;
-    }
+  if (is_installed && app_can_update (model, desktop_id))
+    retval = EOS_APP_STATE_UPDATABLE;
+  else if (is_installed)
+    retval = EOS_APP_STATE_INSTALLED;
+  else
+    retval = EOS_APP_STATE_UNINSTALLED;
 
-  if (eos_app_list_model_get_app_info (model, desktop_id) != NULL)
-    {
-      retval = EOS_APP_STATE_UNINSTALLED;
-      goto out;
-    }
-
- out:
   return retval;
 }
 
