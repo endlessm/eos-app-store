@@ -30,11 +30,6 @@ enum_type##_get_type (void) \
 
 #endif
 
-EOS_DEFINE_ENUM_TYPE (EosAppIconState, eos_app_icon_state,
-                      EOS_ENUM_VALUE (EOS_APP_ICON_STATE_NORMAL, normal)
-                      EOS_ENUM_VALUE (EOS_APP_ICON_STATE_ACTIVE, active)
-                      EOS_ENUM_VALUE (EOS_APP_ICON_STATE_HOVER, hover))
-
 EOS_DEFINE_ENUM_TYPE (EosAppState, eos_app_state,
                       EOS_ENUM_VALUE (EOS_APP_STATE_UNKNOWN, unknown)
                       EOS_ENUM_VALUE (EOS_APP_STATE_INSTALLED, installed)

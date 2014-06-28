@@ -33,9 +33,7 @@ const char *eos_app_list_model_get_app_name (EosAppListModel *model, const char 
 const char *eos_app_list_model_get_app_description (EosAppListModel *model, const char *desktop_id);
 const char *eos_app_list_model_get_app_comment (EosAppListModel *model, const char *desktop_id);
 const char *eos_app_list_model_get_app_executable (EosAppListModel *model, const char *desktop_id);
-const char *eos_app_list_model_get_app_icon_name (EosAppListModel *model,
-                                                  const char *desktop_id,
-                                                  EosAppIconState icon_state);
+const char *eos_app_list_model_get_app_icon_name (EosAppListModel *model, const char *desktop_id);
 gboolean eos_app_list_model_get_app_visible (EosAppListModel *model, const char *desktop_id);
 EosAppState eos_app_list_model_get_app_state (EosAppListModel *model, const char *desktop_id);
 GDesktopAppInfo *eos_app_list_model_get_app_info (EosAppListModel *model, const char *desktop_id);

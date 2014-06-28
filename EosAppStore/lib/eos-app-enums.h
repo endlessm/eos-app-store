@@ -7,16 +7,6 @@
 
 G_BEGIN_DECLS
 
-#define EOS_TYPE_APP_ICON_STATE         (eos_app_icon_state_get_type ())
-
-typedef enum {
-  EOS_APP_ICON_STATE_NORMAL,
-  EOS_APP_ICON_STATE_ACTIVE,
-  EOS_APP_ICON_STATE_HOVER
-} EosAppIconState;
-
-GType eos_app_icon_state_get_type (void);
-
 #define EOS_TYPE_APP_STATE              (eos_app_state_get_type ())
 
 typedef enum {

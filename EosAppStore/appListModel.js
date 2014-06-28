@@ -120,7 +120,7 @@ const BaseList = new Lang.Class({
     },
 
     getIcon: function(id) {
-        return this._model.get_app_icon_name(id, EosAppStorePrivate.AppIconState.NORMAL);
+        return this._model.get_app_icon_name(id);
     },
 
     getComment: function(id) {
