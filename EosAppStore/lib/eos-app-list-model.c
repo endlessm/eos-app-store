@@ -48,7 +48,7 @@ G_DEFINE_TYPE (EosAppListModel, eos_app_list_model, G_TYPE_OBJECT)
 G_DEFINE_QUARK (eos-app-list-model-error-quark, eos_app_list_model_error)
 
 static GHashTable *
-load_installed_apps_from_gvariant (GVariant *apps)
+load_shell_apps_from_gvariant (GVariant *apps)
 {
   GHashTable *retval;
   GVariantIter *iter;
@@ -116,7 +116,7 @@ on_shell_applications_changed (GDBusConnection *connection,
       self->shell_apps = NULL;
     }
 
-  self->shell_apps = load_installed_apps_from_gvariant (parameters);
+  self->shell_apps = load_shell_apps_from_gvariant (parameters);
 
   g_signal_emit (self, eos_app_list_model_signals[CHANGED], 0);
 }
@@ -464,7 +464,7 @@ load_apps_from_shell (EosAppListModel *self)
       return;
     }
 
-  self->shell_apps = load_installed_apps_from_gvariant (applications);
+  self->shell_apps = load_shell_apps_from_gvariant (applications);
   g_variant_unref (applications);
 }
 
