@@ -198,10 +198,15 @@ const AppList = new Lang.Class({
             if (item.indexOf(EOS_LINK_PREFIX) == 0) {
                 // web links are ignored
                 return false;
-            } else {
-                let info = model.model.get_app_info(item);
+            }
+
+            let info = model.model.get_app_info(item);
+            if (info) {
                 return this._isAppVisible(info, myPersonality);
             }
+
+            // TODO: filter purely from ID for apps on the server
+            return true;
         }));
         this._apps = apps;
         this.emit('changed', this._apps);
