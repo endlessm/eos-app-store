@@ -431,11 +431,11 @@ const AppFrame = new Lang.Class({
         }));
 
         if (category.id == EosAppStorePrivate.AppCategory.MY_APPLICATIONS) {
-            // 'My Applications' only shows installed apps...
+            // 'My Applications' only shows apps available on the desktop...
             for (let i in appInfos) {
                 let id = appInfos[i].get_desktop_id();
 
-                if (this._model.isInstalled(id)) {
+                if (this._model.hasLauncher(id)) {
                     let cell = appInfos[i].create_cell();
                     cell.shape = Endless.FlexyShape.SMALL;
                     grid.add(cell);
@@ -443,11 +443,11 @@ const AppFrame = new Lang.Class({
             }
         }
         else {
-            // ... while every other category only shows uninstalled apps
+            // ... while every other category only shows apps that can be added
             for (let i in appInfos) {
                 let id = appInfos[i].get_desktop_id();
 
-                if (!this._model.isInstalled(id)) {
+                if (!this._model.hasLauncher(id)) {
                     let cell = appInfos[i].create_cell();
                     grid.add(cell);
                 }
