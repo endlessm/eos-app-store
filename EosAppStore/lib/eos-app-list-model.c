@@ -47,35 +47,6 @@ static guint eos_app_list_model_signals[LAST_SIGNAL] = { 0, };
 G_DEFINE_TYPE (EosAppListModel, eos_app_list_model, G_TYPE_OBJECT)
 G_DEFINE_QUARK (eos-app-list-model-error-quark, eos_app_list_model_error)
 
-/* FIXME: eos-app should go away from here one day... */
-static gchar *
-desktop_id_from_app_id (const gchar *id)
-{
-  gchar *desktop_id;
-
-  if (g_str_has_prefix (id, "eos-app-"))
-    desktop_id = g_strdup_printf ("%s.desktop", id);
-  else
-    desktop_id = g_strdup_printf ("eos-app-%s.desktop", id);
-
-  return desktop_id;
-}
-
-static gchar *
-app_id_from_desktop_id (const gchar *desktop_id)
-{
-  gint len;
-  gchar *ptr;
-
-  if (g_str_has_prefix (desktop_id, "eos-app-"))
-    ptr = (gchar *) desktop_id + 8; /* the 8 here is the length of "eos-app-" */
-  else
-    ptr = (gchar *) desktop_id;
-
-  len = strlen (ptr);
-  return g_strndup (ptr, len - 8); /* the 8 here is the length of ".desktop" */
-}
-
 static GHashTable *
 load_shell_apps_from_gvariant (GVariant *apps)
 {
@@ -101,17 +72,14 @@ load_installable_apps_from_gvariant (GVariantIter *apps)
 {
   GHashTable *retval;
   GVariantIter *iter;
-  gchar *desktop_id, *id, *name, *version;
+  gchar *id, *name, *version;
 
   retval = g_hash_table_new_full (g_str_hash, g_str_equal, g_free, NULL);
 
   iter = g_variant_iter_copy (apps);
 
   while (g_variant_iter_loop (iter, "(sss)", &id, &name, &version))
-    {
-      desktop_id = desktop_id_from_app_id (id);
-      g_hash_table_add (retval, desktop_id);
-    }
+    g_hash_table_add (retval, g_strdup (id));
 
   g_variant_iter_free (iter);
 
@@ -344,20 +312,17 @@ add_app_from_manager (EosAppListModel *self,
                       GError **error_out)
 {
   GError *error = NULL;
-  gchar *id;
 
-  id = app_id_from_desktop_id (desktop_id);
   g_dbus_connection_call_sync (self->system_bus,
                                "com.endlessm.AppManager",
                                "/com/endlessm/AppManager",
                                "com.endlessm.AppManager", "Install",
-                               g_variant_new ("(s)", id),
+                               g_variant_new ("(s)", desktop_id),
                                NULL,
                                G_DBUS_CALL_FLAGS_NONE,
                                -1,
                                NULL,
                                &error);
-  g_free (id);
 
   if (error != NULL)
     {
@@ -411,20 +376,17 @@ remove_app_from_manager (EosAppListModel *self,
                          GError **error_out)
 {
   GError *error = NULL;
-  gchar *id;
 
-  id = app_id_from_desktop_id (desktop_id);
   g_dbus_connection_call_sync (self->system_bus,
                                "com.endlessm.AppManager",
                                "/com/endlessm/AppManager",
                                "com.endlessm.AppManager", "Uninstall",
-                               g_variant_new ("(s)", id),
+                               g_variant_new ("(s)", desktop_id),
                                NULL,
                                G_DBUS_CALL_FLAGS_NONE,
                                -1,
                                cancellable,
                                &error);
-  g_free (id);
 
   if (error != NULL)
     {
