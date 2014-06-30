@@ -878,9 +878,9 @@ eos_app_info_create_from_json (JsonNode *node)
 
   EosAppInfo *info = eos_app_info_new ();
 
-  if (json_object_has_member (obj, "desktop-id"))
+  if (json_object_has_member (obj, "application-id"))
     info->desktop_id = g_strdup_printf ("%s.desktop",
-                                        json_node_get_string (json_object_get_member (obj, "desktop-id")));
+                                        json_node_get_string (json_object_get_member (obj, "application-id")));
   else
     info->desktop_id = NULL;
 
