@@ -47,6 +47,15 @@ static guint eos_app_list_model_signals[LAST_SIGNAL] = { 0, };
 G_DEFINE_TYPE (EosAppListModel, eos_app_list_model, G_TYPE_OBJECT)
 G_DEFINE_QUARK (eos-app-list-model-error-quark, eos_app_list_model_error)
 
+static gchar *
+app_id_from_desktop_id (const gchar *desktop_id)
+{
+  gint len;
+
+  len = strlen (desktop_id);
+  return g_strndup (desktop_id, len - 8); /* the 8 here is the length of ".desktop" */
+}
+
 static GHashTable *
 load_shell_apps_from_gvariant (GVariant *apps)
 {
@@ -315,17 +324,20 @@ add_app_from_manager (EosAppListModel *self,
                       GError **error_out)
 {
   GError *error = NULL;
+  gchar *app_id;
 
+  app_id = app_id_from_desktop_id (desktop_id);
   g_dbus_connection_call_sync (self->system_bus,
                                "com.endlessm.AppManager",
                                "/com/endlessm/AppManager",
                                "com.endlessm.AppManager", "Install",
-                               g_variant_new ("(s)", desktop_id),
+                               g_variant_new ("(s)", app_id),
                                NULL,
                                G_DBUS_CALL_FLAGS_NONE,
                                G_MAXINT,
                                NULL,
                                &error);
+  g_free (app_id);
 
   if (error != NULL)
     {
@@ -379,17 +391,20 @@ remove_app_from_manager (EosAppListModel *self,
                          GError **error_out)
 {
   GError *error = NULL;
+  gchar *app_id;
 
+  app_id = app_id_from_desktop_id (desktop_id);
   g_dbus_connection_call_sync (self->system_bus,
                                "com.endlessm.AppManager",
                                "/com/endlessm/AppManager",
                                "com.endlessm.AppManager", "Uninstall",
-                               g_variant_new ("(s)", desktop_id),
+                               g_variant_new ("(s)", app_id),
                                NULL,
                                G_DBUS_CALL_FLAGS_NONE,
                                G_MAXINT,
                                cancellable,
                                &error);
+  g_free (app_id);
 
   if (error != NULL)
     {
