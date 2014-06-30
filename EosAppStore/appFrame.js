@@ -270,14 +270,14 @@ const AppListBoxRow = new Lang.Class({
         dialog.secondary_text = _("Deleting this application will removing it from the device " +
                                   "and for all users. You will need to download it from the " +
                                   "Internet in order to install it again.");
-        let applyButton = dialog.add_button(_("Delete application"), Gtk.Response.APPLY);
+        let applyButton = dialog.add_button(_("Delete application"), Gtk.ResponseType.APPLY);
         applyButton.get_style_context().add_class('destructive-action');
-        dialog.add_button(_("Cancel"), Gtk.Response.CANCEL);
+        dialog.add_button(_("Cancel"), Gtk.ResponseType.CANCEL);
         dialog.show_all();
 
         let responseId = dialog.run();
 
-        if (responseId == Gtk.Response.APPLY) {
+        if (responseId == Gtk.ResponseType.APPLY) {
             this._installProgress.show();
             this._installSpinner.start();
 
