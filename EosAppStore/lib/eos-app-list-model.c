@@ -72,14 +72,17 @@ load_installable_apps_from_gvariant (GVariantIter *apps)
 {
   GHashTable *retval;
   GVariantIter *iter;
-  gchar *id, *name, *version;
+  gchar *desktop_id, *id, *name, *version;
 
   retval = g_hash_table_new_full (g_str_hash, g_str_equal, g_free, NULL);
 
   iter = g_variant_iter_copy (apps);
 
   while (g_variant_iter_loop (iter, "(sss)", &id, &name, &version))
-    g_hash_table_add (retval, g_strdup (id));
+    {
+      desktop_id = g_strdup_printf ("%s.desktop", id);
+      g_hash_table_add (retval, desktop_id);
+    }
 
   g_variant_iter_free (iter);
 
