@@ -3,7 +3,7 @@
 @define-color app_store_button_hover_fg #e8e8e8;
 @define-color app_store_selected_bg alpha(@app_store_bg, 0.80);
 
-.background {
+.main-window.background {
     background-color: transparent;
 }
 

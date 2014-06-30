@@ -79,6 +79,8 @@ const AppStoreWindow = new Lang.Class({
         this.initTemplate({ templateRoot: 'main-frame', bindChildren: true, connectSignals: true, });
         this.stick();
         this.set_decorated(false);
+        this.get_style_context().add_class('main-window');
+
         // do not destroy, just hide
         this.connect('delete-event', Lang.bind(this, function() {
             this.hide();
