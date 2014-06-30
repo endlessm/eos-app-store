@@ -423,7 +423,8 @@ const AppFrame = new Lang.Class({
         let appInfos = EosAppStorePrivate.app_load_content(category.id,
                                                            Lang.bind(this, function(appInfo) {
             let id = appInfo.get_desktop_id();
-            if (this._model.apps.indexOf(id) != -1) {
+            if (this._model.apps.indexOf(id) != -1 ||
+                this._model.apps.indexOf('eos-app-' + id) != -1) {
                 return true;
             }
 
