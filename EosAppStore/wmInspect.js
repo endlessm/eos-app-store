@@ -26,7 +26,7 @@ const WMInspect = new Lang.Class({
             return;
         }
 
-        this.emit('active-window-changed', activeWindow.get_xid());
+        this.emit('active-window-changed', activeWindow);
     }
 });
 Signals.addSignalMethods(WMInspect.prototype);

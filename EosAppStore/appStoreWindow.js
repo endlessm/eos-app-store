@@ -242,11 +242,29 @@ const AppStoreWindow = new Lang.Class({
         }
     },
 
-    _onActiveWindowChanged: function(wmInspect, activeXid) {
+    _onActiveWindowChanged: function(wmInspect, activeWindow) {
+        // try to match the own window first
+        let activeXid = activeWindow.get_xid();
         let xid = this.get_window().get_xid();
-        if (xid != activeXid) {
-            this.hide();
+
+        if (xid == activeXid) {
+            return;
         }
+
+        // try to match transient windows
+        let transientWindow = activeWindow.get_transient();
+        let transientXid = 0;
+
+        if (transientWindow != null) {
+            transientXid = transientWindow.get_xid();
+        }
+
+        if (xid == transientXid) {
+            return;
+        }
+
+        // no matches - hide our own window
+        this.hide();
     },
 
     _onCloseClicked: function() {
