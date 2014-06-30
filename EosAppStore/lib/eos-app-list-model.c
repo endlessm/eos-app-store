@@ -320,7 +320,7 @@ add_app_from_manager (EosAppListModel *self,
                                g_variant_new ("(s)", desktop_id),
                                NULL,
                                G_DBUS_CALL_FLAGS_NONE,
-                               -1,
+                               G_MAXINT,
                                NULL,
                                &error);
 
@@ -384,7 +384,7 @@ remove_app_from_manager (EosAppListModel *self,
                                g_variant_new ("(s)", desktop_id),
                                NULL,
                                G_DBUS_CALL_FLAGS_NONE,
-                               -1,
+                               G_MAXINT,
                                cancellable,
                                &error);
 
