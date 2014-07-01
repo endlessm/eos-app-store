@@ -14,7 +14,6 @@ const EOS_BROWSER = 'chromium-browser ';
 const EOS_LOCALIZED = 'eos-exec-localized ';
 
 const DESKTOP_KEY_SHOW_IN_STORE = 'X-Endless-ShowInAppStore';
-const DESKTOP_KEY_SHOW_IN_PERSONALITIES = 'X-Endless-ShowInPersonalities';
 
 const StoreModel = new Lang.Class({
     Name: 'StoreModel',
@@ -77,34 +76,8 @@ const BaseList = new Lang.Class({
         // do nothing here
     },
 
-    _isAppVisible: function(info, personality) {
-        if (info.has_key(DESKTOP_KEY_SHOW_IN_STORE) && info.get_boolean(DESKTOP_KEY_SHOW_IN_STORE)) {
-            if (info.has_key(DESKTOP_KEY_SHOW_IN_PERSONALITIES)) {
-                let personalities = info.get_string(DESKTOP_KEY_SHOW_IN_PERSONALITIES);
-
-                if (personalities && personalities.length > 0) {
-                    if (!personality) {
-                        // the application requires specific personalities but this system doesn't have one
-                        return false;
-                    }
-                    let split = personalities.split(';');
-                    for (let i = 0; i < split.length; i++) {
-                        if (split[i].toLowerCase() == personality.toLowerCase()) {
-                            // the system's personality matches one of the app's
-                            return true;
-                        }
-                    }
-                    return false;
-                }
-            }
-
-            // if the key is not set, or is set but empty, the app will be shown
-            return true;
-        }
-
-        // the application will not be shown in the app store unless
-        // its desktop entry has X-Endless-ShowInAppStore=true
-        return false;
+    _isAppVisible: function(info) {
+        return info.get_boolean(DESKTOP_KEY_SHOW_IN_STORE);
     },
 
     update: function() {
@@ -192,8 +165,6 @@ const AppList = new Lang.Class({
     },
 
     _onModelChanged: function(model, items) {
-        let myPersonality = Endless.get_system_personality();
-
         let apps = items.filter(Lang.bind(this, function(item) {
             if (item.indexOf(EOS_LINK_PREFIX) == 0) {
                 // web links are ignored
@@ -202,10 +173,10 @@ const AppList = new Lang.Class({
 
             let info = model.model.get_app_info(item);
             if (info) {
-                return this._isAppVisible(info, myPersonality);
+                return this._isAppVisible(info);
             }
 
-            // TODO: filter purely from ID for apps on the server
+            // TODO: filter language from ID for Endless apps on the server
             return true;
         }));
         this._apps = apps;
@@ -246,13 +217,11 @@ const WeblinkList = new Lang.Class({
     },
 
     _onModelChanged: function(model, items) {
-        let myPersonality = Endless.get_system_personality();
-
         let weblinks = items.filter(Lang.bind(this, function(item) {
             if (item.indexOf(EOS_LINK_PREFIX) == 0) {
                 // only take web links into account
                 let info = model.model.get_app_info(item);
-                return this._isAppVisible(info, myPersonality);
+                return this._isAppVisible(info);
             } else {
                 return false;
             }
