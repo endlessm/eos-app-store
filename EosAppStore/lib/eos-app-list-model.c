@@ -745,7 +745,7 @@ app_can_update (EosAppListModel *model,
  *
  * Returns: (transfer none): A #GDesktopAppInfo
  */
-GDesktopAppInfo *
+static GDesktopAppInfo *
 eos_app_list_model_get_app_info (EosAppListModel *model,
                                  const char *desktop_id)
 {
