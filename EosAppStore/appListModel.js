@@ -10,8 +10,6 @@ const Path = imports.path;
 const Signals = imports.signals;
 
 const EOS_LINK_PREFIX = 'eos-link-';
-const EOS_BROWSER = 'chromium-browser ';
-const EOS_LOCALIZED = 'eos-exec-localized ';
 
 const DESKTOP_KEY_SHOW_IN_STORE = 'X-Endless-ShowInAppStore';
 
