@@ -488,11 +488,6 @@ const WeblinkListBoxRow = new Lang.Class({
         return false;
     },
 
-    _getState: function() {
-        let desktopId = this._info.get_desktop_id();
-        return this._model.getState(desktopId);
-    },
-
     _setActiveState: function(isActive) {
         if (isActive) {
             this.get_style_context().add_class('row-highlight');
