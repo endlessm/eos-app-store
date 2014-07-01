@@ -111,6 +111,10 @@ const BaseList = new Lang.Class({
         return false;
     },
 
+    hasApp: function(id) {
+        return this._model.has_app(id);
+    },
+
     hasLauncher: function(id) {
         if (!this.isInstalled(id)) {
             return false;

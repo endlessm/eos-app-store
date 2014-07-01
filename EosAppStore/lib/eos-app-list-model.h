@@ -40,6 +40,8 @@ gboolean eos_app_list_model_get_app_has_launcher (EosAppListModel *model, const 
 
 gboolean eos_app_list_model_launch_app (EosAppListModel *model, const char *desktop_id, GError **error);
 
+gboolean eos_app_list_model_has_app (EosAppListModel *model, const char *desktop_id);
+
 void eos_app_list_model_install_app_async (EosAppListModel *model,
                                            const gchar *desktop_id,
                                            GCancellable *cancellable,

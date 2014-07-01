@@ -694,6 +694,38 @@ eos_app_list_model_load_finish (EosAppListModel  *model,
   return g_list_concat (gio_apps, installable_apps);
 }
 
+/**
+ * eos_app_list_model_get_app_info:
+ * @model: the app list model
+ * @desktop_id : the id of the app
+ *
+ * Returns the #GDesktopAppInfo for the given app.
+ *
+ * Returns: (transfer none): A #GDesktopAppInfo
+ */
+static GDesktopAppInfo *
+eos_app_list_model_get_app_info (EosAppListModel *model,
+                                 const char *desktop_id)
+{
+  gchar *override_desktop_id;
+  GDesktopAppInfo *info;
+
+  if (model->gio_apps == NULL)
+    {
+      g_critical ("The application list is not loaded.");
+      return NULL;
+    }
+
+  override_desktop_id = g_strdup_printf ("eos-app-%s", desktop_id);
+  info = g_hash_table_lookup (model->gio_apps, override_desktop_id);
+  g_free (override_desktop_id);
+
+  if (info == NULL)
+    info = g_hash_table_lookup (model->gio_apps, desktop_id);
+
+  return info;
+}
+
 static gboolean
 app_has_launcher (EosAppListModel *model,
                   const char      *desktop_id)
@@ -706,12 +738,21 @@ app_has_launcher (EosAppListModel *model,
 }
 
 static gboolean
+app_is_installable (EosAppListModel *model,
+                    const char *desktop_id)
+{
+  if (model->installable_apps == NULL)
+    return FALSE;
+
+  return g_hash_table_lookup (model->installable_apps, desktop_id) != NULL;
+}
+
+static gboolean
 app_is_installed (EosAppListModel *model,
                   const char      *desktop_id)
 {
   /* An app is installed if GIO knows about it... */
-  if (model->gio_apps != NULL &&
-      g_hash_table_contains (model->gio_apps, desktop_id))
+  if (eos_app_list_model_get_app_info (model, desktop_id) != NULL)
     return TRUE;
 
   /* ...or if the app manager reports it as such */
@@ -734,28 +775,6 @@ app_can_update (EosAppListModel *model,
     return FALSE;
 
   return g_hash_table_lookup (model->updatable_apps, desktop_id) != NULL;
-}
-
-/**
- * eos_app_list_model_get_app_info:
- * @model: the app list model
- * @desktop_id : the id of the app
- *
- * Returns the #GDesktopAppInfo for the given app.
- *
- * Returns: (transfer none): A #GDesktopAppInfo
- */
-static GDesktopAppInfo *
-eos_app_list_model_get_app_info (EosAppListModel *model,
-                                 const char *desktop_id)
-{
-  if (model->gio_apps == NULL)
-    {
-      g_critical ("The application list is not loaded.");
-      return NULL;
-    }
-
-  return g_hash_table_lookup (model->gio_apps, desktop_id);
 }
 
 const char *
@@ -1096,4 +1115,14 @@ eos_app_list_model_launch_app (EosAppListModel *model,
     }
 
   return launch_app (model, desktop_id, NULL, error);
+}
+
+gboolean
+eos_app_list_model_has_app (EosAppListModel *model,
+                            const char *desktop_id)
+{
+  if (eos_app_list_model_get_app_info (model, desktop_id) != NULL)
+    return TRUE;
+
+  return app_is_installable (model, desktop_id);
 }
