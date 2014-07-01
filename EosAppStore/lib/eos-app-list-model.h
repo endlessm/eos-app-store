@@ -29,17 +29,13 @@ GList *eos_app_list_model_load_finish (EosAppListModel  *model,
                                        GAsyncResult     *result,
                                        GError          **error);
 
-const char *eos_app_list_model_get_app_name (EosAppListModel *model, const char *desktop_id);
-const char *eos_app_list_model_get_app_description (EosAppListModel *model, const char *desktop_id);
-const char *eos_app_list_model_get_app_comment (EosAppListModel *model, const char *desktop_id);
-const char *eos_app_list_model_get_app_executable (EosAppListModel *model, const char *desktop_id);
-const char *eos_app_list_model_get_app_icon_name (EosAppListModel *model, const char *desktop_id);
-gboolean eos_app_list_model_get_app_visible (EosAppListModel *model, const char *desktop_id);
+char *eos_app_list_model_get_app_icon_name (EosAppListModel *model, const char *desktop_id);
 EosAppState eos_app_list_model_get_app_state (EosAppListModel *model, const char *desktop_id);
-GDesktopAppInfo *eos_app_list_model_get_app_info (EosAppListModel *model, const char *desktop_id);
 gboolean eos_app_list_model_get_app_has_launcher (EosAppListModel *model, const char *desktop_id);
 
 gboolean eos_app_list_model_launch_app (EosAppListModel *model, const char *desktop_id, GError **error);
+
+gboolean eos_app_list_model_has_app (EosAppListModel *model, const char *desktop_id);
 
 void eos_app_list_model_install_app_async (EosAppListModel *model,
                                            const gchar *desktop_id,

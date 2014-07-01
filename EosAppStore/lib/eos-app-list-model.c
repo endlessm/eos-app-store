@@ -42,6 +42,8 @@ enum {
   LAST_SIGNAL
 };
 
+#define DESKTOP_KEY_SHOW_IN_STORE "X-Endless-ShowInAppStore"
+
 static guint eos_app_list_model_signals[LAST_SIGNAL] = { 0, };
 
 G_DEFINE_TYPE (EosAppListModel, eos_app_list_model, G_TYPE_OBJECT)
@@ -597,6 +599,15 @@ load_user_capabilities (EosAppListModel *self)
   g_variant_unref (capabilities);
 }
 
+static gboolean
+app_is_visible (GAppInfo *info)
+{
+  GDesktopAppInfo *desktop_info = G_DESKTOP_APP_INFO (info);
+
+  return !g_desktop_app_info_get_nodisplay (desktop_info) &&
+    !g_desktop_app_info_get_is_hidden (desktop_info) &&
+    g_desktop_app_info_get_boolean (desktop_info, DESKTOP_KEY_SHOW_IN_STORE);
+}
 
 static void
 all_apps_load_in_thread (GTask        *task,
@@ -623,7 +634,11 @@ all_apps_load_in_thread (GTask        *task,
   for (l = all_infos; l != NULL; l = l->next)
     {
       info = l->data;
-      g_hash_table_insert (set, (gpointer) g_app_info_get_id (info), info);
+
+      if (app_is_visible (info))
+        g_hash_table_insert (set, (gpointer) g_app_info_get_id (info), info);
+      else
+        g_object_unref (info);
     }
 
   g_list_free (all_infos);
@@ -688,6 +703,38 @@ eos_app_list_model_load_finish (EosAppListModel  *model,
   return g_list_concat (gio_apps, installable_apps);
 }
 
+/**
+ * eos_app_list_model_get_app_info:
+ * @model: the app list model
+ * @desktop_id : the id of the app
+ *
+ * Returns the #GDesktopAppInfo for the given app.
+ *
+ * Returns: (transfer none): A #GDesktopAppInfo
+ */
+static GDesktopAppInfo *
+eos_app_list_model_get_app_info (EosAppListModel *model,
+                                 const char *desktop_id)
+{
+  gchar *override_desktop_id;
+  GDesktopAppInfo *info;
+
+  if (model->gio_apps == NULL)
+    {
+      g_critical ("The application list is not loaded.");
+      return NULL;
+    }
+
+  override_desktop_id = g_strdup_printf ("eos-app-%s", desktop_id);
+  info = g_hash_table_lookup (model->gio_apps, override_desktop_id);
+  g_free (override_desktop_id);
+
+  if (info == NULL)
+    info = g_hash_table_lookup (model->gio_apps, desktop_id);
+
+  return info;
+}
+
 static gboolean
 app_has_launcher (EosAppListModel *model,
                   const char      *desktop_id)
@@ -700,29 +747,28 @@ app_has_launcher (EosAppListModel *model,
 }
 
 static gboolean
-app_is_installed (EosAppListModel *model,
-                  const char      *desktop_id)
+app_is_installable (EosAppListModel *model,
+                    const char *desktop_id)
 {
-  /* An app is installed if GIO knows about it... */
-  if (model->gio_apps != NULL &&
-      g_hash_table_contains (model->gio_apps, desktop_id))
-    return TRUE;
+  if (model->installable_apps == NULL)
+    return FALSE;
 
-  /* ...or if the app manager reports it as such */
-  if (model->installed_apps != NULL &&
-      g_hash_table_contains (model->installed_apps, desktop_id))
-    return TRUE;
-
-  if (model->updatable_apps != NULL &&
-      g_hash_table_contains (model->updatable_apps, desktop_id))
-    return TRUE;
-
-  return FALSE;
+  return g_hash_table_lookup (model->installable_apps, desktop_id) != NULL;
 }
 
 static gboolean
-app_can_update (EosAppListModel *model,
-                const char *desktop_id)
+app_is_manager_installed (EosAppListModel *model,
+                          const char *desktop_id)
+{
+  if (model->installed_apps == NULL)
+    return FALSE;
+
+  return g_hash_table_lookup (model->installed_apps, desktop_id) != NULL;
+}
+
+static gboolean
+app_is_updatable (EosAppListModel *model,
+                  const char *desktop_id)
 {
   if (model->updatable_apps == NULL)
     return FALSE;
@@ -730,58 +776,22 @@ app_can_update (EosAppListModel *model,
   return g_hash_table_lookup (model->updatable_apps, desktop_id) != NULL;
 }
 
-/**
- * eos_app_list_model_get_app_info:
- * @model: the app list model
- * @desktop_id : the id of the app
- *
- * Returns the #GDesktopAppInfo for the given app.
- *
- * Returns: (transfer none): A #GDesktopAppInfo
- */
-GDesktopAppInfo *
-eos_app_list_model_get_app_info (EosAppListModel *model,
-                                 const char *desktop_id)
+static gboolean
+app_is_installed (EosAppListModel *model,
+                  const char      *desktop_id)
 {
-  if (model->gio_apps == NULL)
-    {
-      g_critical ("The application list is not loaded.");
-      return NULL;
-    }
+  /* An app is installed if GIO knows about it... */
+  if (eos_app_list_model_get_app_info (model, desktop_id) != NULL)
+    return TRUE;
 
-  return g_hash_table_lookup (model->gio_apps, desktop_id);
-}
+  /* ...or if the app manager reports it as such */
+  if (app_is_manager_installed (model, desktop_id))
+    return TRUE;
 
-const char *
-eos_app_list_model_get_app_name (EosAppListModel *model,
-                                 const char *desktop_id)
-{
-  GDesktopAppInfo *info;
+  if (app_is_updatable (model, desktop_id))
+    return TRUE;
 
-  g_return_val_if_fail (EOS_IS_APP_LIST_MODEL (model), NULL);
-  g_return_val_if_fail (desktop_id != NULL, NULL);
-
-  info = eos_app_list_model_get_app_info (model, desktop_id);
-  if (info == NULL)
-    return NULL;
-
-  return g_desktop_app_info_get_string (info, G_KEY_FILE_DESKTOP_KEY_NAME);
-}
-
-const char *
-eos_app_list_model_get_app_executable (EosAppListModel *model,
-                                       const char *desktop_id)
-{
-  GDesktopAppInfo *info;
-
-  g_return_val_if_fail (EOS_IS_APP_LIST_MODEL (model), NULL);
-  g_return_val_if_fail (desktop_id != NULL, NULL);
-
-  info = eos_app_list_model_get_app_info (model, desktop_id);
-  if (info == NULL)
-    return NULL;
-
-  return g_desktop_app_info_get_string (info, G_KEY_FILE_DESKTOP_KEY_EXEC);
+  return FALSE;
 }
 
 gboolean
@@ -794,30 +804,7 @@ eos_app_list_model_get_app_has_launcher (EosAppListModel *model,
   return app_has_launcher (model, desktop_id);
 }
 
-const char *
-eos_app_list_model_get_app_description (EosAppListModel *model,
-                                        const char *desktop_id)
-{
-  return NULL;
-}
-
-const char *
-eos_app_list_model_get_app_comment (EosAppListModel *model,
-                                    const char *desktop_id)
-{
-  GDesktopAppInfo *info;
-
-  g_return_val_if_fail (EOS_IS_APP_LIST_MODEL (model), NULL);
-  g_return_val_if_fail (desktop_id != NULL, NULL);
-
-  info = eos_app_list_model_get_app_info (model, desktop_id);
-  if (info == NULL)
-    return NULL;
-
-  return g_desktop_app_info_get_string (info, G_KEY_FILE_DESKTOP_KEY_COMMENT);
-}
-
-const char *
+char *
 eos_app_list_model_get_app_icon_name (EosAppListModel *model,
                                       const char *desktop_id)
 {
@@ -827,7 +814,17 @@ eos_app_list_model_get_app_icon_name (EosAppListModel *model,
 
   info = eos_app_list_model_get_app_info (model, desktop_id);
   if (info == NULL)
-    return NULL;
+    {
+      /* TODO: for applications that are not on the system, just return
+       * a hardcoded default for now. Eventually we want to get this information
+       * from the server, through the app manager.
+       */
+      gchar *app_id = app_id_from_desktop_id (desktop_id);
+      gchar *icon_name = g_strdup_printf ("eos-app-%s", app_id);
+      g_free (app_id);
+
+      return icon_name;
+    }
 
   return g_desktop_app_info_get_string (info, G_KEY_FILE_DESKTOP_KEY_ICON);
 }
@@ -844,7 +841,7 @@ eos_app_list_model_get_app_state (EosAppListModel *model,
 
   is_installed = app_is_installed (model, desktop_id);
 
-  if (is_installed && app_can_update (model, desktop_id))
+  if (is_installed && app_is_updatable (model, desktop_id))
     retval = EOS_APP_STATE_UPDATABLE;
   else if (is_installed)
     retval = EOS_APP_STATE_INSTALLED;
@@ -852,22 +849,6 @@ eos_app_list_model_get_app_state (EosAppListModel *model,
     retval = EOS_APP_STATE_UNINSTALLED;
 
   return retval;
-}
-
-gboolean
-eos_app_list_model_get_app_visible (EosAppListModel *model,
-                                    const char *desktop_id)
-{
-  GDesktopAppInfo *info;
-  g_return_val_if_fail (EOS_IS_APP_LIST_MODEL (model), FALSE);
-  g_return_val_if_fail (desktop_id != NULL, FALSE);
-
-  info = eos_app_list_model_get_app_info (model, desktop_id);
-  if (info == NULL)
-    return FALSE;
-
-  return !(g_desktop_app_info_get_nodisplay (info) ||
-           g_desktop_app_info_get_is_hidden (info));
 }
 
 static void
@@ -977,7 +958,7 @@ eos_app_list_model_update_app_async (EosAppListModel *model,
   task = g_task_new (model, cancellable, callback, user_data);
   g_task_set_task_data (task, g_strdup (desktop_id), (GDestroyNotify) g_free);
 
-  if (!app_can_update (model, desktop_id))
+  if (!app_is_updatable (model, desktop_id))
     {
       g_task_return_new_error (task,
                                eos_app_list_model_error_quark (),
@@ -1090,4 +1071,14 @@ eos_app_list_model_launch_app (EosAppListModel *model,
     }
 
   return launch_app (model, desktop_id, NULL, error);
+}
+
+gboolean
+eos_app_list_model_has_app (EosAppListModel *model,
+                            const char *desktop_id)
+{
+  if (eos_app_list_model_get_app_info (model, desktop_id) != NULL)
+    return TRUE;
+
+  return app_is_installable (model, desktop_id);
 }

@@ -11,8 +11,6 @@ const Signals = imports.signals;
 
 const EOS_LINK_PREFIX = 'eos-link-';
 
-const DESKTOP_KEY_SHOW_IN_STORE = 'X-Endless-ShowInAppStore';
-
 const StoreModel = new Lang.Class({
     Name: 'StoreModel',
 
@@ -74,36 +72,16 @@ const BaseList = new Lang.Class({
         // do nothing here
     },
 
-    _isAppVisible: function(info) {
-        return info.get_boolean(DESKTOP_KEY_SHOW_IN_STORE);
-    },
-
     update: function() {
         this._storeModel.update();
-    },
-
-    getName: function(id) {
-        return this._model.get_app_name(id);
-    },
-
-    getDescription: function(id) {
-        return this._model.get_app_description(id);
     },
 
     getIcon: function(id) {
         return this._model.get_app_icon_name(id);
     },
 
-    getComment: function(id) {
-        return this._model.get_app_comment(id);
-    },
-
     getState: function(id) {
         return this._model.get_app_state(id);
-    },
-
-    getVisible: function(id) {
-        return this._model.get_app_visible(id);
     },
 
     isInstalled: function(id) {
@@ -115,6 +93,10 @@ const BaseList = new Lang.Class({
         }
 
         return false;
+    },
+
+    hasApp: function(id) {
+        return this._model.has_app(id);
     },
 
     hasLauncher: function(id) {
@@ -157,11 +139,6 @@ const AppList = new Lang.Class({
     Name: 'AppList',
     Extends: BaseList,
 
-    _init: function() {
-        this._apps = [];
-        this.parent();
-    },
-
     _onModelChanged: function(model, items) {
         let apps = items.filter(Lang.bind(this, function(item) {
             if (item.indexOf(EOS_LINK_PREFIX) == 0) {
@@ -169,16 +146,10 @@ const AppList = new Lang.Class({
                 return false;
             }
 
-            let info = model.model.get_app_info(item);
-            if (info) {
-                return this._isAppVisible(info);
-            }
-
             // TODO: filter language from ID for Endless apps on the server
             return true;
         }));
-        this._apps = apps;
-        this.emit('changed', this._apps);
+        this.emit('changed', apps);
     },
 
     updateApp: function(id) {
@@ -196,41 +167,22 @@ const AppList = new Lang.Class({
 
     launch: function(id) {
         return this._model.launch_app(id);
-    },
-
-    get apps() {
-        return this._apps;
-    },
+    }
 });
 
 const WeblinkList = new Lang.Class({
     Name: 'WeblinkList',
     Extends: BaseList,
 
-    _init: function() {
-        this._weblinks = [];
-        this._urlsToId = {};
-
-        this.parent();
-    },
-
     _onModelChanged: function(model, items) {
         let weblinks = items.filter(Lang.bind(this, function(item) {
-            if (item.indexOf(EOS_LINK_PREFIX) == 0) {
+            if (item.indexOf(EOS_LINK_PREFIX) == -1) {
                 // only take web links into account
-                let info = model.model.get_app_info(item);
-                return this._isAppVisible(info);
-            } else {
                 return false;
             }
+
+            return true;
         }));
-
-        this._weblinks = weblinks;
-
         this.emit('changed', weblinks);
-    },
-
-    getWeblinks: function() {
-        return this._weblinks;
     }
 });
