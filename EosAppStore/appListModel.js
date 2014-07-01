@@ -155,11 +155,6 @@ const AppList = new Lang.Class({
     Name: 'AppList',
     Extends: BaseList,
 
-    _init: function() {
-        this._apps = [];
-        this.parent();
-    },
-
     _onModelChanged: function(model, items) {
         let apps = items.filter(Lang.bind(this, function(item) {
             if (item.indexOf(EOS_LINK_PREFIX) == 0) {
@@ -170,8 +165,7 @@ const AppList = new Lang.Class({
             // TODO: filter language from ID for Endless apps on the server
             return true;
         }));
-        this._apps = apps;
-        this.emit('changed', this._apps);
+        this.emit('changed', apps);
     },
 
     updateApp: function(id) {
@@ -189,23 +183,12 @@ const AppList = new Lang.Class({
 
     launch: function(id) {
         return this._model.launch_app(id);
-    },
-
-    get apps() {
-        return this._apps;
-    },
+    }
 });
 
 const WeblinkList = new Lang.Class({
     Name: 'WeblinkList',
     Extends: BaseList,
-
-    _init: function() {
-        this._weblinks = [];
-        this._urlsToId = {};
-
-        this.parent();
-    },
 
     _onModelChanged: function(model, items) {
         let weblinks = items.filter(Lang.bind(this, function(item) {
@@ -216,11 +199,6 @@ const WeblinkList = new Lang.Class({
 
             return true;
         }));
-        this._weblinks = weblinks;
         this.emit('changed', weblinks);
-    },
-
-    getWeblinks: function() {
-        return this._weblinks;
     }
 });
