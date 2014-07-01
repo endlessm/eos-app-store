@@ -757,6 +757,26 @@ app_is_installable (EosAppListModel *model,
 }
 
 static gboolean
+app_is_manager_installed (EosAppListModel *model,
+                          const char *desktop_id)
+{
+  if (model->installed_apps == NULL)
+    return FALSE;
+
+  return g_hash_table_lookup (model->installed_apps, desktop_id) != NULL;
+}
+
+static gboolean
+app_is_updatable (EosAppListModel *model,
+                  const char *desktop_id)
+{
+  if (model->updatable_apps == NULL)
+    return FALSE;
+
+  return g_hash_table_lookup (model->updatable_apps, desktop_id) != NULL;
+}
+
+static gboolean
 app_is_installed (EosAppListModel *model,
                   const char      *desktop_id)
 {
@@ -765,25 +785,13 @@ app_is_installed (EosAppListModel *model,
     return TRUE;
 
   /* ...or if the app manager reports it as such */
-  if (model->installed_apps != NULL &&
-      g_hash_table_contains (model->installed_apps, desktop_id))
+  if (app_is_manager_installed (model, desktop_id))
     return TRUE;
 
-  if (model->updatable_apps != NULL &&
-      g_hash_table_contains (model->updatable_apps, desktop_id))
+  if (app_is_updatable (model, desktop_id))
     return TRUE;
 
   return FALSE;
-}
-
-static gboolean
-app_can_update (EosAppListModel *model,
-                const char *desktop_id)
-{
-  if (model->updatable_apps == NULL)
-    return FALSE;
-
-  return g_hash_table_lookup (model->updatable_apps, desktop_id) != NULL;
 }
 
 const char *
@@ -878,7 +886,7 @@ eos_app_list_model_get_app_state (EosAppListModel *model,
 
   is_installed = app_is_installed (model, desktop_id);
 
-  if (is_installed && app_can_update (model, desktop_id))
+  if (is_installed && app_is_updatable (model, desktop_id))
     retval = EOS_APP_STATE_UPDATABLE;
   else if (is_installed)
     retval = EOS_APP_STATE_INSTALLED;
@@ -995,7 +1003,7 @@ eos_app_list_model_update_app_async (EosAppListModel *model,
   task = g_task_new (model, cancellable, callback, user_data);
   g_task_set_task_data (task, g_strdup (desktop_id), (GDestroyNotify) g_free);
 
-  if (!app_can_update (model, desktop_id))
+  if (!app_is_updatable (model, desktop_id))
     {
       g_task_return_new_error (task,
                                eos_app_list_model_error_quark (),
