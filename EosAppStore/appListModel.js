@@ -96,10 +96,6 @@ const BaseList = new Lang.Class({
         return this._model.get_app_state(id);
     },
 
-    getVisible: function(id) {
-        return this._model.get_app_visible(id);
-    },
-
     isInstalled: function(id) {
         let appState = this._model.get_app_state(id);
 

@@ -599,6 +599,15 @@ load_user_capabilities (EosAppListModel *self)
   g_variant_unref (capabilities);
 }
 
+static gboolean
+app_is_visible (GAppInfo *info)
+{
+  GDesktopAppInfo *desktop_info = G_DESKTOP_APP_INFO (info);
+
+  return !g_desktop_app_info_get_nodisplay (desktop_info) &&
+    !g_desktop_app_info_get_is_hidden (desktop_info) &&
+    g_desktop_app_info_get_boolean (desktop_info, DESKTOP_KEY_SHOW_IN_STORE);
+}
 
 static void
 all_apps_load_in_thread (GTask        *task,
@@ -626,7 +635,7 @@ all_apps_load_in_thread (GTask        *task,
     {
       info = l->data;
 
-      if (g_desktop_app_info_get_boolean (G_DESKTOP_APP_INFO (info), DESKTOP_KEY_SHOW_IN_STORE))
+      if (app_is_visible (info))
         g_hash_table_insert (set, (gpointer) g_app_info_get_id (info), info);
       else
         g_object_unref (info);
@@ -877,22 +886,6 @@ eos_app_list_model_get_app_state (EosAppListModel *model,
     retval = EOS_APP_STATE_UNINSTALLED;
 
   return retval;
-}
-
-gboolean
-eos_app_list_model_get_app_visible (EosAppListModel *model,
-                                    const char *desktop_id)
-{
-  GDesktopAppInfo *info;
-  g_return_val_if_fail (EOS_IS_APP_LIST_MODEL (model), FALSE);
-  g_return_val_if_fail (desktop_id != NULL, FALSE);
-
-  info = eos_app_list_model_get_app_info (model, desktop_id);
-  if (info == NULL)
-    return FALSE;
-
-  return !(g_desktop_app_info_get_nodisplay (info) ||
-           g_desktop_app_info_get_is_hidden (info));
 }
 
 static void
