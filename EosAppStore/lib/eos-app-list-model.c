@@ -859,7 +859,7 @@ eos_app_list_model_get_app_comment (EosAppListModel *model,
   return g_desktop_app_info_get_string (info, G_KEY_FILE_DESKTOP_KEY_COMMENT);
 }
 
-const char *
+char *
 eos_app_list_model_get_app_icon_name (EosAppListModel *model,
                                       const char *desktop_id)
 {
@@ -869,7 +869,17 @@ eos_app_list_model_get_app_icon_name (EosAppListModel *model,
 
   info = eos_app_list_model_get_app_info (model, desktop_id);
   if (info == NULL)
-    return NULL;
+    {
+      /* TODO: for applications that are not on the system, just return
+       * a hardcoded default for now. Eventually we want to get this information
+       * from the server, through the app manager.
+       */
+      gchar *app_id = app_id_from_desktop_id (desktop_id);
+      gchar *icon_name = g_strdup_printf ("eos-app-%s", app_id);
+      g_free (app_id);
+
+      return icon_name;
+    }
 
   return g_desktop_app_info_get_string (info, G_KEY_FILE_DESKTOP_KEY_ICON);
 }
