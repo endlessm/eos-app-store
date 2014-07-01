@@ -76,20 +76,8 @@ const BaseList = new Lang.Class({
         this._storeModel.update();
     },
 
-    getName: function(id) {
-        return this._model.get_app_name(id);
-    },
-
-    getDescription: function(id) {
-        return this._model.get_app_description(id);
-    },
-
     getIcon: function(id) {
         return this._model.get_app_icon_name(id);
-    },
-
-    getComment: function(id) {
-        return this._model.get_app_comment(id);
     },
 
     getState: function(id) {

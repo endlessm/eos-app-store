@@ -794,38 +794,6 @@ app_is_installed (EosAppListModel *model,
   return FALSE;
 }
 
-const char *
-eos_app_list_model_get_app_name (EosAppListModel *model,
-                                 const char *desktop_id)
-{
-  GDesktopAppInfo *info;
-
-  g_return_val_if_fail (EOS_IS_APP_LIST_MODEL (model), NULL);
-  g_return_val_if_fail (desktop_id != NULL, NULL);
-
-  info = eos_app_list_model_get_app_info (model, desktop_id);
-  if (info == NULL)
-    return NULL;
-
-  return g_desktop_app_info_get_string (info, G_KEY_FILE_DESKTOP_KEY_NAME);
-}
-
-const char *
-eos_app_list_model_get_app_executable (EosAppListModel *model,
-                                       const char *desktop_id)
-{
-  GDesktopAppInfo *info;
-
-  g_return_val_if_fail (EOS_IS_APP_LIST_MODEL (model), NULL);
-  g_return_val_if_fail (desktop_id != NULL, NULL);
-
-  info = eos_app_list_model_get_app_info (model, desktop_id);
-  if (info == NULL)
-    return NULL;
-
-  return g_desktop_app_info_get_string (info, G_KEY_FILE_DESKTOP_KEY_EXEC);
-}
-
 gboolean
 eos_app_list_model_get_app_has_launcher (EosAppListModel *model,
                                          const char *desktop_id)
@@ -834,29 +802,6 @@ eos_app_list_model_get_app_has_launcher (EosAppListModel *model,
   g_return_val_if_fail (desktop_id != NULL, FALSE);
 
   return app_has_launcher (model, desktop_id);
-}
-
-const char *
-eos_app_list_model_get_app_description (EosAppListModel *model,
-                                        const char *desktop_id)
-{
-  return NULL;
-}
-
-const char *
-eos_app_list_model_get_app_comment (EosAppListModel *model,
-                                    const char *desktop_id)
-{
-  GDesktopAppInfo *info;
-
-  g_return_val_if_fail (EOS_IS_APP_LIST_MODEL (model), NULL);
-  g_return_val_if_fail (desktop_id != NULL, NULL);
-
-  info = eos_app_list_model_get_app_info (model, desktop_id);
-  if (info == NULL)
-    return NULL;
-
-  return g_desktop_app_info_get_string (info, G_KEY_FILE_DESKTOP_KEY_COMMENT);
 }
 
 char *
