@@ -58,6 +58,34 @@ app_id_from_desktop_id (const gchar *desktop_id)
   return g_strndup (desktop_id, len - 8); /* the 8 here is the length of ".desktop" */
 }
 
+static gchar *
+localized_id_from_desktop_id (const gchar *desktop_id)
+{
+  /* HACK: this should really be removed in favor of communicating the
+   * language to the app manager API...
+   */
+  const gchar * const * locales;
+  const gchar *locale_name;
+  const gchar *lang_id;
+  gchar **variants;
+  gchar *localized_id;
+  gchar *app_id;
+
+  locales = g_get_language_names ();
+  locale_name = locales[0];
+
+  variants = g_get_locale_variants (locale_name);
+  lang_id = variants[g_strv_length (variants) - 1];
+
+  app_id = app_id_from_desktop_id (desktop_id);
+  localized_id = g_strdup_printf ("%s-%s.desktop", app_id, lang_id);
+
+  g_free (app_id);
+  g_strfreev (variants);
+
+  return localized_id;
+}
+
 static GHashTable *
 load_shell_apps_from_gvariant (GVariant *apps)
 {
@@ -732,6 +760,13 @@ eos_app_list_model_get_app_info (EosAppListModel *model,
   if (info == NULL)
     info = g_hash_table_lookup (model->gio_apps, desktop_id);
 
+  if (info == NULL)
+    {
+      gchar *localized_id = localized_id_from_desktop_id (desktop_id);
+      info = g_hash_table_lookup (model->gio_apps, localized_id);
+      g_free (localized_id);
+    }
+
   return info;
 }
 
@@ -750,10 +785,20 @@ static gboolean
 app_is_installable (EosAppListModel *model,
                     const char *desktop_id)
 {
+  gchar *localized_id;
+  gboolean res;
+
   if (model->installable_apps == NULL)
     return FALSE;
 
-  return g_hash_table_lookup (model->installable_apps, desktop_id) != NULL;
+  if (g_hash_table_lookup (model->installable_apps, desktop_id) != NULL)
+    return TRUE;
+
+  localized_id = localized_id_from_desktop_id (desktop_id);
+  res = (g_hash_table_lookup (model->installable_apps, localized_id) != NULL);
+  g_free (localized_id);
+
+  return res;
 }
 
 static gboolean
