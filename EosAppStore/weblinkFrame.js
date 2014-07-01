@@ -464,7 +464,8 @@ const WeblinkListBoxRow = new Lang.Class({
         this._nameLabel.set_text(info.get_title());
         this._descriptionLabel.set_text(info.get_description());
 
-        this._setSensitiveState(this._getState() != EosAppStorePrivate.AppState.INSTALLED);
+        let installedSensitive = (!this._model.hasLauncher(this._info.get_desktop_id()));
+        this._setSensitiveState(installedSensitive);
         this._mainBox.show();
 
         this.connect('enter-notify-event', Lang.bind(this, this._onEnterEvent));
