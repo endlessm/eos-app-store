@@ -11,8 +11,6 @@ const Signals = imports.signals;
 
 const EOS_LINK_PREFIX = 'eos-link-';
 
-const DESKTOP_KEY_SHOW_IN_STORE = 'X-Endless-ShowInAppStore';
-
 const StoreModel = new Lang.Class({
     Name: 'StoreModel',
 
@@ -72,10 +70,6 @@ const BaseList = new Lang.Class({
 
     _onModelChanged: function(appModel, items) {
         // do nothing here
-    },
-
-    _isAppVisible: function(info) {
-        return info.get_boolean(DESKTOP_KEY_SHOW_IN_STORE);
     },
 
     update: function() {
@@ -169,11 +163,6 @@ const AppList = new Lang.Class({
                 return false;
             }
 
-            let info = model.model.get_app_info(item);
-            if (info) {
-                return this._isAppVisible(info);
-            }
-
             // TODO: filter language from ID for Endless apps on the server
             return true;
         }));
@@ -216,17 +205,14 @@ const WeblinkList = new Lang.Class({
 
     _onModelChanged: function(model, items) {
         let weblinks = items.filter(Lang.bind(this, function(item) {
-            if (item.indexOf(EOS_LINK_PREFIX) == 0) {
+            if (item.indexOf(EOS_LINK_PREFIX) == -1) {
                 // only take web links into account
-                let info = model.model.get_app_info(item);
-                return this._isAppVisible(info);
-            } else {
                 return false;
             }
+
+            return true;
         }));
-
         this._weblinks = weblinks;
-
         this.emit('changed', weblinks);
     },
 
