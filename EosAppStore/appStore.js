@@ -11,6 +11,7 @@ const Signals = imports.signals;
 const _ = imports.gettext.gettext;
 
 const AppListModel = imports.appListModel;
+const AppManager = imports.appManager;
 const AppStoreWindow = imports.appStoreWindow;
 const Config = imports.config;
 const Environment = imports.environment;
@@ -76,6 +77,10 @@ const AppStore = new Lang.Class({
 
         // the app store shell proxy
         this._shellProxy = new ShellAppStore.ShellAppStore();
+
+        // the app manager proxy
+        this._appManager = new AppManager.AppManager();
+        this._appManager.proxy.RefreshRemote();
 
         // the backing app list model
         this._appModel = new AppListModel.StoreModel();
