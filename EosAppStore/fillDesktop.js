@@ -81,14 +81,8 @@ const FillDesktop = new Lang.Class({
         }
 
         let appId = app.get_desktop_id();
-
-        this._appList.install(appId, Lang.bind(this, function(model, res) {
-            try {
-                model.install_app_finish(res);
-                this._install();
-            } catch (e) {
-                this._install();
-            }
+        this._appList.install(appId, Lang.bind(this, function(error) {
+            this._install();
         }));
     },
 
