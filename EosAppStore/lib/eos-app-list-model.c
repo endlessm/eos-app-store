@@ -766,20 +766,27 @@ static gboolean
 app_is_installable (EosAppListModel *model,
                     const char *desktop_id)
 {
-  gchar *localized_id;
-  gboolean res;
-
   if (model->installable_apps == NULL)
     return FALSE;
 
-  if (g_hash_table_lookup (model->installable_apps, desktop_id) != NULL)
-    return TRUE;
+  return g_hash_table_contains (model->installable_apps, desktop_id);
+}
+
+static gchar *
+app_get_localized_id_for_installable_app (EosAppListModel *model,
+                                          const gchar *desktop_id)
+{
+  gchar *localized_id;
+
+  if (app_is_installable (model, desktop_id))
+    return g_strdup (desktop_id);
 
   localized_id = localized_id_from_desktop_id (desktop_id);
-  res = (g_hash_table_lookup (model->installable_apps, localized_id) != NULL);
-  g_free (localized_id);
+  if (app_is_installable (model, localized_id))
+    return localized_id;
 
-  return res;
+  g_free (localized_id);
+  return NULL;
 }
 
 static gboolean
@@ -820,14 +827,30 @@ app_is_installed (EosAppListModel *model,
   return FALSE;
 }
 
+static const gchar *
+app_get_localized_id_for_installed_app (EosAppListModel *model,
+                                        const gchar *desktop_id)
+{
+  GDesktopAppInfo *info;
+
+  info = eos_app_list_model_get_app_info (model, desktop_id);
+  if (info != NULL)
+    return g_app_info_get_id (G_APP_INFO (info));
+
+  return NULL;
+}
+
 gboolean
 eos_app_list_model_get_app_has_launcher (EosAppListModel *model,
                                          const char *desktop_id)
 {
+  const gchar *localized_id;
+
   g_return_val_if_fail (EOS_IS_APP_LIST_MODEL (model), FALSE);
   g_return_val_if_fail (desktop_id != NULL, FALSE);
 
-  return app_has_launcher (model, desktop_id);
+  localized_id = app_get_localized_id_for_installed_app (model, desktop_id);
+  return app_has_launcher (model, localized_id);
 }
 
 char *
@@ -916,11 +939,27 @@ eos_app_list_model_install_app_async (EosAppListModel *model,
                                       gpointer user_data)
 {
   GTask *task;
+  char *localized_id;
 
   task = g_task_new (model, cancellable, callback, user_data);
-  g_task_set_task_data (task, g_strdup (desktop_id), (GDestroyNotify) g_free);
 
-  if (app_is_installed (model, desktop_id) && app_has_launcher (model, desktop_id))
+  if (app_is_installed (model, desktop_id))
+    localized_id = g_strdup (app_get_localized_id_for_installed_app (model, desktop_id));
+  else
+    localized_id = app_get_localized_id_for_installable_app (model, desktop_id);
+
+  if (localized_id == NULL)
+    {
+      g_task_return_new_error (task,
+                               eos_app_list_model_error_quark (),
+                               EOS_APP_LIST_MODEL_FAILED,
+                               _("Application %s not installable"),
+                               desktop_id);
+      g_object_unref (task);
+      return;
+    }
+
+  if (app_is_installed (model, localized_id) && app_has_launcher (model, localized_id))
     {
       g_task_return_new_error (task,
                                eos_app_list_model_error_quark (),
@@ -928,9 +967,11 @@ eos_app_list_model_install_app_async (EosAppListModel *model,
                                _("Application %s already installed"),
                                desktop_id);
       g_object_unref (task);
+      g_free (localized_id);
       return;
     }
 
+  g_task_set_task_data (task, localized_id, (GDestroyNotify) g_free);
   g_task_run_in_thread (task, add_app_thread_func);
   g_object_unref (task);
 }
@@ -980,11 +1021,24 @@ eos_app_list_model_update_app_async (EosAppListModel *model,
                                      gpointer user_data)
 {
   GTask *task;
+  const char *localized_id;
 
   task = g_task_new (model, cancellable, callback, user_data);
-  g_task_set_task_data (task, g_strdup (desktop_id), (GDestroyNotify) g_free);
 
-  if (!app_is_updatable (model, desktop_id))
+  localized_id = app_get_localized_id_for_installed_app (model, desktop_id);
+
+  if (localized_id == NULL)
+    {
+      g_task_return_new_error (task,
+                               eos_app_list_model_error_quark (),
+                               EOS_APP_LIST_MODEL_FAILED,
+                               _("Application %s not installable"),
+                               desktop_id);
+      g_object_unref (task);
+      return;
+    }
+
+  if (!app_is_updatable (model, localized_id))
     {
       g_task_return_new_error (task,
                                eos_app_list_model_error_quark (),
@@ -995,6 +1049,7 @@ eos_app_list_model_update_app_async (EosAppListModel *model,
       return;
     }
 
+  g_task_set_task_data (task, g_strdup (localized_id), (GDestroyNotify) g_free);
   g_task_run_in_thread (task, update_app_thread_func);
   g_object_unref (task);
 }
@@ -1044,11 +1099,13 @@ eos_app_list_model_uninstall_app_async (EosAppListModel *model,
                                         gpointer user_data)
 {
   GTask *task;
+  const gchar *localized_id;
 
   task = g_task_new (model, cancellable, callback, user_data);
-  g_task_set_task_data (task, g_strdup (desktop_id), (GDestroyNotify) g_free);
 
-  if (!app_is_installed (model, desktop_id))
+  localized_id = app_get_localized_id_for_installed_app (model, desktop_id);
+
+  if ((localized_id == NULL) || !app_is_installed (model, localized_id))
     {
       g_task_return_new_error (task,
                                eos_app_list_model_error_quark (),
@@ -1059,6 +1116,7 @@ eos_app_list_model_uninstall_app_async (EosAppListModel *model,
       return;
     }
 
+  g_task_set_task_data (task, g_strdup (localized_id), (GDestroyNotify) g_free);
   g_task_run_in_thread (task, remove_app_thread_func);
   g_object_unref (task);
 }
@@ -1086,7 +1144,11 @@ eos_app_list_model_launch_app (EosAppListModel *model,
                                const char *desktop_id,
                                GError **error)
 {
-  if (!app_is_installed (model, desktop_id))
+  const gchar *localized_id;
+
+  localized_id = app_get_localized_id_for_installed_app (model, desktop_id);
+
+  if ((localized_id == NULL) || !app_is_installed (model, localized_id))
     {
       g_set_error (error,
                    eos_app_list_model_error_quark (),
@@ -1096,15 +1158,25 @@ eos_app_list_model_launch_app (EosAppListModel *model,
       return FALSE;
     }
 
-  return launch_app (model, desktop_id, NULL, error);
+  return launch_app (model, localized_id, NULL, error);
 }
 
 gboolean
 eos_app_list_model_has_app (EosAppListModel *model,
                             const char *desktop_id)
 {
+  gchar *localized_id;
+  gboolean res;
+
   if (eos_app_list_model_get_app_info (model, desktop_id) != NULL)
     return TRUE;
 
-  return app_is_installable (model, desktop_id);
+  if (app_is_installable (model, desktop_id))
+    return TRUE;
+
+  localized_id = localized_id_from_desktop_id (desktop_id);
+  res = app_is_installable (model, localized_id);
+  g_free (localized_id);
+
+  return res;
 }
