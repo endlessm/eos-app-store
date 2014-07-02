@@ -336,11 +336,7 @@ add_app_to_shell (EosAppListModel *self,
 
   if (error != NULL)
     {
-      g_critical ("Unable to add application '%s': %s",
-                  desktop_id,
-                  error->message);
       g_propagate_error (error_out, error);
-
       return FALSE;
     }
 
@@ -371,11 +367,7 @@ add_app_from_manager (EosAppListModel *self,
 
   if (error != NULL)
     {
-      g_critical ("Unable to install application '%s': %s",
-                  desktop_id,
-                  error->message);
       g_propagate_error (error_out, error);
-
       return FALSE;
     }
 
@@ -403,11 +395,7 @@ remove_app_from_shell (EosAppListModel *self,
 
   if (error != NULL)
     {
-      g_critical ("Unable to remove application '%s': %s",
-                  desktop_id,
-                  error->message);
       g_propagate_error (error_out, error);
-
       return FALSE;
     }
 
@@ -438,9 +426,6 @@ remove_app_from_manager (EosAppListModel *self,
 
   if (error != NULL)
     {
-      g_critical ("Unable to uninstall application '%s': %s",
-                  desktop_id,
-                  error->message);
       g_propagate_error (error_out, error);
       return FALSE;
     }
@@ -469,11 +454,7 @@ update_app_from_manager (EosAppListModel *self,
 
   if (error != NULL)
     {
-      g_critical ("Unable to install application '%s': %s",
-                  desktop_id,
-                  error->message);
       g_propagate_error (error_out, error);
-
       return FALSE;
     }
 

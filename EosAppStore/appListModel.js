@@ -114,7 +114,7 @@ const BaseList = new Lang.Class({
                 callback();
             }
             catch (e) {
-                log('Failed to install app ' + e.message);
+                log('Failed to install app ' + id + ': ' + e.message);
                 callback(e);
             }
         }));
@@ -127,7 +127,7 @@ const BaseList = new Lang.Class({
                 callback();
             }
             catch (e) {
-                log('Failed to uninstall app ' + e.message);
+                log('Failed to uninstall app ' + id + ': ' + e.message);
                 callback(e);
             }
         }));
@@ -159,7 +159,7 @@ const AppList = new Lang.Class({
                 callback();
             }
             catch (e) {
-                log('Failed to update app ' + e.message);
+                log('Failed to update app ' + id + ': ' + e.message);
                 callback(e);
             }
         }));
