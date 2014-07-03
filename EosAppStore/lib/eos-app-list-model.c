@@ -42,8 +42,6 @@ enum {
   LAST_SIGNAL
 };
 
-#define DESKTOP_KEY_SHOW_IN_STORE "X-Endless-ShowInAppStore"
-
 static guint eos_app_list_model_signals[LAST_SIGNAL] = { 0, };
 
 G_DEFINE_TYPE (EosAppListModel, eos_app_list_model, G_TYPE_OBJECT)
@@ -614,8 +612,7 @@ app_is_visible (GAppInfo *info)
   GDesktopAppInfo *desktop_info = G_DESKTOP_APP_INFO (info);
 
   return !g_desktop_app_info_get_nodisplay (desktop_info) &&
-    !g_desktop_app_info_get_is_hidden (desktop_info) &&
-    g_desktop_app_info_get_boolean (desktop_info, DESKTOP_KEY_SHOW_IN_STORE);
+    !g_desktop_app_info_get_is_hidden (desktop_info);
 }
 
 static void
