@@ -80,7 +80,7 @@ const AppStore = new Lang.Class({
 
         // the app manager proxy
         this._appManager = new AppManager.AppManager();
-        this._appManager.proxy.RefreshRemote();
+        this._appManager.proxy.RefreshRemote({});
 
         // the backing app list model
         this._appModel = new AppListModel.StoreModel();

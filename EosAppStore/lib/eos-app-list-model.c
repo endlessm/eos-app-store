@@ -537,13 +537,29 @@ load_available_apps (EosAppListModel *self)
   GVariant *applications;
   GError *error = NULL;
 
+  const char * const *locales = g_get_language_names ();
+  const char *locale_name = locales[0];
+
+  char **variants = g_get_locale_variants (locale_name);
+  const char *lang_id = variants[g_strv_length (variants) - 1];
+
+  GVariantBuilder builder;
+
+  g_variant_builder_init (&builder, G_VARIANT_TYPE ("(a{sv})"));
+  g_variant_builder_open (&builder, G_VARIANT_TYPE ("a{sv}"));
+  g_variant_builder_add (&builder, "{sv}", "EndlessLanguage", g_variant_new_string (lang_id));
+  g_variant_builder_close (&builder);
+
+  g_strfreev (variants);
+
   applications =
     g_dbus_connection_call_sync (self->system_bus,
                                  "com.endlessm.AppManager",
                                  "/com/endlessm/AppManager",
                                  "com.endlessm.AppManager",
                                  "ListAvailable",
-                                 NULL, NULL,
+                                 g_variant_builder_end (&builder),
+                                 NULL,
                                  G_DBUS_CALL_FLAGS_NONE,
                                  -1,
                                  NULL,
