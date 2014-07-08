@@ -11,10 +11,10 @@ function get_app_categories() {
             id: EosAppStorePrivate.AppCategory.EDUCATION,
         },
         {
-            name: 'leisure',
+            name: 'games',
             widget: null,
-            label: _("Leisure"),
-            id: EosAppStorePrivate.AppCategory.LEISURE,
+            label: _("Games"),
+            id: EosAppStorePrivate.AppCategory.GAMES,
         },
         {
             name: 'utilities',

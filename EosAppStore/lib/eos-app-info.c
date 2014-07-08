@@ -796,7 +796,7 @@ static const struct {
 } categories[] = {
   /* Translators: use the same string used to install the app store content JSON */
   { EOS_APP_CATEGORY_EDUCATION, N_("Education") },
-  { EOS_APP_CATEGORY_LEISURE,   N_("Leisure") },
+  { EOS_APP_CATEGORY_GAMES,     N_("Games") },
   { EOS_APP_CATEGORY_UTILITIES, N_("Utilities") },
 };
 
