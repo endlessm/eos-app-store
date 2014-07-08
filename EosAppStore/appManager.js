@@ -5,6 +5,7 @@ const AppManagerIface = '\
 <node> \
   <interface name="com.endlessm.AppManager"> \
     <method name="Refresh"> \
+      <arg type="a{sv}" direction="in" /> \
       <arg type="b" direction="out" /> \
     </method> \
     </interface> \
