@@ -193,9 +193,8 @@ const AppStoreWindow = new Lang.Class({
                          width: width,
                          height: height };
 
-
         this.move(geometry.x, geometry.y);
-        this.set_size_request(geometry.width, geometry.height);
+        this.resize(geometry.width, geometry.height);
     },
 
     _createStackPages: function() {
