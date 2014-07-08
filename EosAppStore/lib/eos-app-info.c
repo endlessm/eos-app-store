@@ -968,7 +968,8 @@ eos_app_info_create_from_json (JsonNode *node)
             language = g_strdup ("C");
 
           JsonNode *array = json_object_get_member (screenshots, language);
-          get_screenshots (json_node_get_array (array), language, info);
+          if (array != NULL)
+            get_screenshots (json_node_get_array (array), language, info);
           g_free (language);
         }
     }
