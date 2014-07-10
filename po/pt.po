@@ -16,8 +16,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: eos-app-store\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-07-09 22:25-0700\n"
-"PO-Revision-Date: 2014-07-10 05:25+0000\n"
+"POT-Creation-Date: 2014-07-10 15:45-0700\n"
+"PO-Revision-Date: 2014-07-10 22:45+0000\n"
 "Last-Translator: Roddy Shuler <roddy@endlessm.com>\n"
 "Language-Team: Portuguese (http://www.transifex.com/projects/p/eos-app-store/language/pt/)\n"
 "MIME-Version: 1.0\n"
@@ -31,8 +31,8 @@ msgid "Create your own folder to organize your apps. First, choose an icon."
 msgstr ""
 
 #: ../data/eos-app-store-list-row.ui.h:1 ../EosAppStore/appFrame.js:191
-msgid "Install application"
-msgstr "Instalar aplicativo"
+msgid "Install app"
+msgstr ""
 
 #: ../data/eos-app-store-list-row.ui.h:2
 msgid "Installing"
@@ -42,8 +42,8 @@ msgstr "Instalando"
 msgid "Installed successfully"
 msgstr "Instalado com sucesso"
 
-#: ../data/eos-app-store-list-row.ui.h:4 ../EosAppStore/appFrame.js:271
-msgid "Delete application"
+#: ../data/eos-app-store-list-row.ui.h:4
+msgid "Delete from device"
 msgstr ""
 
 #: ../data/eos-app-store-main-window.ui.h:1
@@ -68,21 +68,25 @@ msgid "Add to the desktop"
 msgstr ""
 
 #: ../EosAppStore/appFrame.js:177
-msgid "Open application"
-msgstr "Abrir aplicativo"
+msgid "Open app"
+msgstr ""
 
 #: ../EosAppStore/appFrame.js:196
-msgid "Update application"
-msgstr "Atualizar aplicativo"
+msgid "Update app"
+msgstr ""
 
 #: ../EosAppStore/appFrame.js:269
-msgid "Deleting application"
+msgid "Deleting app"
 msgstr ""
 
 #: ../EosAppStore/appFrame.js:270
 msgid ""
-"Deleting this application will remove it from the device for all users. You "
-"will need to download it from the Internet in order to reinstall it."
+"Deleting this app will remove it from the device for all users. You will "
+"need to download it from the Internet in order to reinstall it."
+msgstr ""
+
+#: ../EosAppStore/appFrame.js:271
+msgid "Delete app"
 msgstr ""
 
 #: ../EosAppStore/appFrame.js:273
@@ -144,8 +148,8 @@ msgid "Local"
 msgstr "Localidade"
 
 #: ../EosAppStore/environment.js:19
-msgid "Application Store"
-msgstr "Central de Aplicativos"
+msgid "App Store"
+msgstr ""
 
 #: ../EosAppStore/folderFrame.js:41
 msgid "Name of folder"
@@ -171,24 +175,24 @@ msgstr "O endereço escrito não existe ou não está disponível."
 msgid "added successfully!"
 msgstr "adicionado com sucesso!"
 
-#: ../EosAppStore/lib/eos-app-list-model.c:953
-#: ../EosAppStore/lib/eos-app-list-model.c:1032
+#: ../EosAppStore/lib/eos-app-list-model.c:969
+#: ../EosAppStore/lib/eos-app-list-model.c:1048
 #, c-format
-msgid "Application %s not installable"
+msgid "App %s not installable"
 msgstr ""
 
-#: ../EosAppStore/lib/eos-app-list-model.c:964
+#: ../EosAppStore/lib/eos-app-list-model.c:980
 #, c-format
-msgid "Application %s already installed"
-msgstr "O aplicativo %s já está instalado"
-
-#: ../EosAppStore/lib/eos-app-list-model.c:1043
-#, c-format
-msgid "Application %s is up to date"
+msgid "App %s already installed"
 msgstr ""
 
-#: ../EosAppStore/lib/eos-app-list-model.c:1110
-#: ../EosAppStore/lib/eos-app-list-model.c:1153
+#: ../EosAppStore/lib/eos-app-list-model.c:1059
 #, c-format
-msgid "Application %s is not installed"
-msgstr "O aplicativo %s não está instalado"
+msgid "App %s is up to date"
+msgstr ""
+
+#: ../EosAppStore/lib/eos-app-list-model.c:1126
+#: ../EosAppStore/lib/eos-app-list-model.c:1169
+#, c-format
+msgid "App %s is not installed"
+msgstr ""

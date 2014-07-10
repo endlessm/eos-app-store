@@ -966,7 +966,7 @@ eos_app_list_model_install_app_async (EosAppListModel *model,
       g_task_return_new_error (task,
                                eos_app_list_model_error_quark (),
                                EOS_APP_LIST_MODEL_FAILED,
-                               _("Application %s not installable"),
+                               _("App %s not installable"),
                                desktop_id);
       g_object_unref (task);
       return;
@@ -977,7 +977,7 @@ eos_app_list_model_install_app_async (EosAppListModel *model,
       g_task_return_new_error (task,
                                eos_app_list_model_error_quark (),
                                EOS_APP_LIST_MODEL_ERROR_INSTALLED,
-                               _("Application %s already installed"),
+                               _("App %s already installed"),
                                desktop_id);
       g_object_unref (task);
       g_free (localized_id);
@@ -1045,7 +1045,7 @@ eos_app_list_model_update_app_async (EosAppListModel *model,
       g_task_return_new_error (task,
                                eos_app_list_model_error_quark (),
                                EOS_APP_LIST_MODEL_FAILED,
-                               _("Application %s not installable"),
+                               _("App %s not installable"),
                                desktop_id);
       g_object_unref (task);
       return;
@@ -1056,7 +1056,7 @@ eos_app_list_model_update_app_async (EosAppListModel *model,
       g_task_return_new_error (task,
                                eos_app_list_model_error_quark (),
                                EOS_APP_LIST_MODEL_ERROR_NO_UPDATE,
-                               _("Application %s is up to date"),
+                               _("App %s is up to date"),
                                desktop_id);
       g_object_unref (task);
       return;
@@ -1123,7 +1123,7 @@ eos_app_list_model_uninstall_app_async (EosAppListModel *model,
       g_task_return_new_error (task,
                                eos_app_list_model_error_quark (),
                                EOS_APP_LIST_MODEL_ERROR_NOT_INSTALLED,
-                               _("Application %s is not installed"),
+                               _("App %s is not installed"),
                                desktop_id);
       g_object_unref (task);
       return;
@@ -1166,7 +1166,7 @@ eos_app_list_model_launch_app (EosAppListModel *model,
       g_set_error (error,
                    eos_app_list_model_error_quark (),
                    EOS_APP_LIST_MODEL_ERROR_NOT_INSTALLED,
-                   _("Application %s is not installed"),
+                   _("App %s is not installed"),
                    desktop_id);
       return FALSE;
     }

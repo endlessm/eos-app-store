@@ -174,7 +174,7 @@ const AppListBoxRow = new Lang.Class({
                         this._installButtonLabel.set_text(_("Add to the desktop"));
                     }
                     else {
-                        this._installButtonLabel.set_text(_("Open application"));
+                        this._installButtonLabel.set_text(_("Open app"));
                     }
 
                     this._installButton.show();
@@ -188,12 +188,12 @@ const AppListBoxRow = new Lang.Class({
                 break;
 
             case EosAppStorePrivate.AppState.UNINSTALLED:
-                this._installButtonLabel.set_text(_("Install application"));
+                this._installButtonLabel.set_text(_("Install app"));
                 this._installButton.show();
                 break;
 
             case EosAppStorePrivate.AppState.UPDATABLE:
-                this._installButtonLabel.set_text(_("Update application"));
+                this._installButtonLabel.set_text(_("Update app"));
                 this._installButton.show();
                 this._removeButton.show();
                 break;
@@ -266,9 +266,9 @@ const AppListBoxRow = new Lang.Class({
 
         let dialog = new Gtk.MessageDialog();
         dialog.set_transient_for(app.mainWindow);
-        dialog.text = _("Deleting application");
-        dialog.secondary_text = _("Deleting this application will remove it from the device for all users. You will need to download it from the Internet in order to reinstall it.");
-        let applyButton = dialog.add_button(_("Delete application"), Gtk.ResponseType.APPLY);
+        dialog.text = _("Deleting app");
+        dialog.secondary_text = _("Deleting this app will remove it from the device for all users. You will need to download it from the Internet in order to reinstall it.");
+        let applyButton = dialog.add_button(_("Delete app"), Gtk.ResponseType.APPLY);
         applyButton.get_style_context().add_class('destructive-action');
         dialog.add_button(_("Cancel"), Gtk.ResponseType.CANCEL);
         dialog.show_all();

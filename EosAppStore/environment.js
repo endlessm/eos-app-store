@@ -16,7 +16,7 @@ function init() {
     window.ngettext = Gettext.ngettext;
 
     GLib.set_prgname('eos-app-store');
-    GLib.set_application_name(_("Application Store"));
+    GLib.set_application_name(_("App Store"));
 }
 
 function loadResources() {
