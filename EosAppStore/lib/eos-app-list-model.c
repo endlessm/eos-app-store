@@ -920,7 +920,9 @@ add_app_thread_func (GTask *task,
 
   if (!app_is_installed (model, desktop_id))
     {
-      if (model->can_install && !add_app_from_manager (model, desktop_id, cancellable, &error))
+      if (!desktop_id_is_web_link (desktop_id) &&
+          model->can_install &&
+          !add_app_from_manager (model, desktop_id, cancellable, &error))
         {
           g_task_return_error (task, error);
           return;
