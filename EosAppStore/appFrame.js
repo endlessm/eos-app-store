@@ -267,9 +267,7 @@ const AppListBoxRow = new Lang.Class({
         let dialog = new Gtk.MessageDialog();
         dialog.set_transient_for(app.mainWindow);
         dialog.text = _("Deleting application");
-        dialog.secondary_text = _("Deleting this application will removing it from the device " +
-                                  "and for all users. You will need to download it from the " +
-                                  "Internet in order to install it again.");
+        dialog.secondary_text = _("Deleting this application will remove it from the device for all users. You will need to download it from the Internet in order to reinstall it.");
         let applyButton = dialog.add_button(_("Delete application"), Gtk.ResponseType.APPLY);
         applyButton.get_style_context().add_class('destructive-action');
         dialog.add_button(_("Cancel"), Gtk.ResponseType.CANCEL);
@@ -426,8 +424,8 @@ const AppFrame = new Lang.Class({
             return this._model.hasApp(id);
         }));
 
-        if (category.id == EosAppStorePrivate.AppCategory.MY_APPLICATIONS) {
-            // 'My Applications' only shows apps available on the desktop...
+        if (category.id == EosAppStorePrivate.AppCategory.INSTALLED) {
+            // 'Installed' only shows apps available on the desktop...
             for (let i in appInfos) {
                 let id = appInfos[i].get_desktop_id();
 

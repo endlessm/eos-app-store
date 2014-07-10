@@ -297,7 +297,7 @@ const AppStoreWindow = new Lang.Class({
 
         switch (this._currentPage) {
             case StoreModel.StorePage.APPS:
-                title.set_text(_("Install applications"));
+                title.set_text(_("Install apps"));
                 break;
 
             case StoreModel.StorePage.WEB:

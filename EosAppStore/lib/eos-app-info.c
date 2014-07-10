@@ -795,9 +795,11 @@ static const struct {
   const char *id;
 } categories[] = {
   /* Translators: use the same string used to install the app store content JSON */
-  { EOS_APP_CATEGORY_EDUCATION, N_("Education") },
-  { EOS_APP_CATEGORY_GAMES,     N_("Games") },
-  { EOS_APP_CATEGORY_UTILITIES, N_("Utilities") },
+  { EOS_APP_CATEGORY_RESOURCES,     N_("Resources") },
+  { EOS_APP_CATEGORY_EDUCATION,     N_("Education") },
+  { EOS_APP_CATEGORY_GAMES,         N_("Games") },
+  { EOS_APP_CATEGORY_ENTERTAINMENT, N_("Entertainment") },
+  { EOS_APP_CATEGORY_UTILITIES,     N_("Utilities") },
 };
 
 static const guint n_categories = G_N_ELEMENTS (categories);

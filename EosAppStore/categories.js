@@ -5,6 +5,12 @@ const Lang = imports.lang;
 function get_app_categories() {
     return [
         {
+            name: 'resources',
+            widget: null,
+            label: _("Resources"),
+            id: EosAppStorePrivate.AppCategory.RESOURCES,
+        },
+        {
             name: 'education',
             widget: null,
             label: _("Education"),
@@ -17,16 +23,22 @@ function get_app_categories() {
             id: EosAppStorePrivate.AppCategory.GAMES,
         },
         {
+            name: 'entertainment',
+            widget: null,
+            label: _("Entertainment"),
+            id: EosAppStorePrivate.AppCategory.ENTERTAINMENT,
+        },
+        {
             name: 'utilities',
             widget: null,
             label: _("Utilities"),
             id: EosAppStorePrivate.AppCategory.UTILITIES,
         },
         {
-            name: 'my-applications',
+            name: 'installed',
             widget: null,
-            label: _("My applications"),
-            id: EosAppStorePrivate.AppCategory.MY_APPLICATIONS,
+            label: _("Installed"),
+            id: EosAppStorePrivate.AppCategory.INSTALLED,
         },
     ];
 }

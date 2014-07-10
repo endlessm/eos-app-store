@@ -85,7 +85,7 @@ function main() {
                 "  -h, --help           Show help\n" +
                 "\n" +
                 "Application options:\n" +
-                "  -a, --apps           Show the 'Applications' page\n" +
+                "  -a, --apps           Show the 'Apps' page\n" +
                 "  -f, --folders        Show the 'Folders' page\n" +
                 "  -w, --web-links      Show the 'Web Links' page\n" +
                 "  -v, --version        Print version and exit");

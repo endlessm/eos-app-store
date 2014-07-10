@@ -165,7 +165,7 @@ eos_app_load_content (EosAppCategory category,
       if (info == NULL)
         continue;
 
-      if (category == EOS_APP_CATEGORY_MY_APPLICATIONS)
+      if (category == EOS_APP_CATEGORY_INSTALLED)
         {
           /* do nothing */
         }
