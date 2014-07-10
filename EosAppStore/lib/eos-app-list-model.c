@@ -47,6 +47,14 @@ static guint eos_app_list_model_signals[LAST_SIGNAL] = { 0, };
 G_DEFINE_TYPE (EosAppListModel, eos_app_list_model, G_TYPE_OBJECT)
 G_DEFINE_QUARK (eos-app-list-model-error-quark, eos_app_list_model_error)
 
+#define WEB_LINK_ID_PREFIX "eos-link-"
+
+static gboolean
+desktop_id_is_web_link (const gchar *desktop_id)
+{
+  return g_str_has_prefix (desktop_id, WEB_LINK_ID_PREFIX);
+}
+
 static gchar *
 app_id_from_desktop_id (const gchar *desktop_id)
 {
@@ -775,6 +783,9 @@ app_get_localized_id_for_installable_app (EosAppListModel *model,
 {
   gchar *localized_id;
 
+  if (desktop_id_is_web_link (desktop_id))
+    return g_strdup (desktop_id);
+
   if (app_is_installable (model, desktop_id))
     return g_strdup (desktop_id);
 
@@ -909,7 +920,9 @@ add_app_thread_func (GTask *task,
 
   if (!app_is_installed (model, desktop_id))
     {
-      if (model->can_install && !add_app_from_manager (model, desktop_id, cancellable, &error))
+      if (!desktop_id_is_web_link (desktop_id) &&
+          model->can_install &&
+          !add_app_from_manager (model, desktop_id, cancellable, &error))
         {
           g_task_return_error (task, error);
           return;
