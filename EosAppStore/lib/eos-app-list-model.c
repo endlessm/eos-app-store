@@ -857,6 +857,9 @@ eos_app_list_model_get_app_has_launcher (EosAppListModel *model,
   g_return_val_if_fail (EOS_IS_APP_LIST_MODEL (model), FALSE);
   g_return_val_if_fail (desktop_id != NULL, FALSE);
 
+  if (app_has_launcher (model, desktop_id))
+    return TRUE;
+
   localized_id = app_get_localized_id_for_installed_app (model, desktop_id);
   return app_has_launcher (model, localized_id);
 }
