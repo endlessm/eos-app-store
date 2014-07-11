@@ -616,17 +616,19 @@ const WeblinkFrame = new Lang.Class({
         let content_path = GLib.build_filenamev([content_dir, 'content.json']);
         let content_file = Gio.File.new_for_path(content_path);
         this._contentMonitor = content_file.monitor_file(Gio.FileMonitorFlags.NONE, null);
-        this._contentMonitor.connect('changed', Lang.bind(this, this._onContentChanged));
+        this._contentMonitor.connect('changed', Lang.bind(this, this._repopulate));
     },
 
-    _onContentChanged: function(monitor, file, other_file, event_type) {
+    _repopulate: function(monitor, file, other_file, event_type) {
         this._populateAllCategories();
+
+        this._stack.transition_type = Gtk.StackTransitionType.NONE;
         this._stack.set_visible_child_name(this._currentCategory);
     },
 
     setModelConnected: function(connect) {
         if (connect) {
-            this._modelConnectionId = this._weblinkListModel.connect('changed', Lang.bind(this, this._populateAllCategories));
+            this._modelConnectionId = this._weblinkListModel.connect('changed', Lang.bind(this, this._repopulate));
         } else if (this._modelConnectionId) {
             this._weblinkListModel.disconnect(this._modelConnectionId);
             this._modelConnectionId = null;
