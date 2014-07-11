@@ -9,14 +9,15 @@
 # goizueta <goizueta@endlessm.com>, 2014
 # Joel Gil Leon <joel@endlessm.com>, 2013-2014
 # Joel Gil Leon <joel@endlessm.com>, 2013
+# Nuritzi Sanchez <ns@endlessm.com>, 2014
 # Roddy Shuler <roddy@endlessm.com>, 2013-2014
 # Roddy Shuler <roddy@endlessm.com>, 2013
 msgid ""
 msgstr ""
 "Project-Id-Version: eos-app-store\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-07-10 15:45-0700\n"
-"PO-Revision-Date: 2014-07-10 22:59+0000\n"
+"POT-Creation-Date: 2014-07-10 22:16-0700\n"
+"PO-Revision-Date: 2014-07-11 05:16+0000\n"
 "Last-Translator: Roddy Shuler <roddy@endlessm.com>\n"
 "Language-Team: Spanish (http://www.transifex.com/projects/p/eos-app-store/language/es/)\n"
 "MIME-Version: 1.0\n"
@@ -81,8 +82,8 @@ msgstr "Eliminando la app"
 #: ../EosAppStore/appFrame.js:270
 msgid ""
 "Deleting this app will remove it from the device for all users. You will "
-"need to download it from the Internet in order to reinstall it."
-msgstr "Si borras esta app será eliminada del sistema, y el cambio será actualizado para todos los usuarios de esta computadora. Para reinstalar la app, tendrás que descargarla del Internet e instalarla de nuevo."
+"need to download it from the internet in order to reinstall it."
+msgstr "Si borras esta app será eliminada del sistema, y el cambio será actualizado para todos los usuarios de esta computadora. Para reinstalar la app, tendrás que descargarla del internet e instalarla de nuevo."
 
 #: ../EosAppStore/appFrame.js:271
 msgid "Delete app"

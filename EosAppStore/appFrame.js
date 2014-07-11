@@ -267,7 +267,7 @@ const AppListBoxRow = new Lang.Class({
         let dialog = new Gtk.MessageDialog();
         dialog.set_transient_for(app.mainWindow);
         dialog.text = _("Deleting app");
-        dialog.secondary_text = _("Deleting this app will remove it from the device for all users. You will need to download it from the Internet in order to reinstall it.");
+        dialog.secondary_text = _("Deleting this app will remove it from the device for all users. You will need to download it from the internet in order to reinstall it.");
         let applyButton = dialog.add_button(_("Delete app"), Gtk.ResponseType.APPLY);
         applyButton.get_style_context().add_class('destructive-action');
         dialog.add_button(_("Cancel"), Gtk.ResponseType.CANCEL);
