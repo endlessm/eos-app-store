@@ -5,6 +5,7 @@ const AppManagerIface = '\
 <node> \
   <interface name="com.endlessm.AppManager"> \
     <method name="Refresh"> \
+      <arg type="a{sv}" direction="in" /> \
       <arg type="b" direction="out" /> \
     </method> \
     </interface> \
@@ -20,7 +21,15 @@ const AppManager = new Lang.Class({
     Name: 'AppManager',
 
     _init: function() {
-        this.proxy = new AppManagerProxy(Gio.DBus.system,
-            APP_MANAGER_NAME, APP_MANAGER_PATH);
+        this._proxy = new AppManagerProxy(Gio.DBus.system,
+                                          APP_MANAGER_NAME,
+                                          APP_MANAGER_PATH);
+    },
+
+    refresh: function() {
+        // refresh all applications; ListAvailable() will filter
+        // them later on inside the EosAppListModel
+        let opts = {};
+        this._proxy.RefreshRemote(opts);
     }
 });
