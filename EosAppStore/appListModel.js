@@ -111,11 +111,15 @@ const BaseList = new Lang.Class({
         this._model.install_app_async(id, null, Lang.bind(this, function(model, res) {
             try {
                 this._model.install_app_finish(res);
-                callback();
+                if (callback) {
+                    callback();
+                }
             }
             catch (e) {
                 log('Failed to install app ' + id + ': ' + e.message);
-                callback(e);
+                if (callback) {
+                    callback(e);
+                }
             }
         }));
     },
@@ -124,11 +128,15 @@ const BaseList = new Lang.Class({
         this._model.uninstall_app_async(id, null, Lang.bind(this, function(model, res) {
             try {
                 this._model.uninstall_app_finish(res);
-                callback();
+                if (callback) {
+                    callback();
+                }
             }
             catch (e) {
                 log('Failed to uninstall app ' + id + ': ' + e.message);
-                callback(e);
+                if (callback) {
+                    callback(e);
+                }
             }
         }));
     }
@@ -152,15 +160,19 @@ const AppList = new Lang.Class({
         this.emit('changed', apps);
     },
 
-    updateApp: function(id) {
+    updateApp: function(id, callback) {
         this._model.update_app_async(id, null, Lang.bind(this, function(model, res) {
             try {
                 this._model.update_app_finish(res);
-                callback();
+                if (callback) {
+                    callback();
+                }
             }
             catch (e) {
                 log('Failed to update app ' + id + ': ' + e.message);
-                callback(e);
+                if (callback) {
+                    callback(e);
+                }
             }
         }));
     },

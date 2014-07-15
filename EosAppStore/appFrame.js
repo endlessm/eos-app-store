@@ -256,7 +256,18 @@ const AppListBoxRow = new Lang.Class({
 
             // if the application can be updated, we update it
             case EosAppStorePrivate.AppState.UPDATABLE:
-                this._model.updateApp(this._appId);
+                this._installButton.hide();
+
+                this._installProgressLabel.set_text(_("Updating..."));
+                this._installProgress.show();
+                this._installSpinner.start();
+
+                this._model.updateApp(this._appId, Lang.bind(this, function(error) {
+                    this._installSpinner.stop();
+                    this._installProgress.hide();
+
+                    this._updateState();
+                }));
                 break;
         }
     },
