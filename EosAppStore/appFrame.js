@@ -195,7 +195,12 @@ const AppListBoxRow = new Lang.Class({
             case EosAppStorePrivate.AppState.UPDATABLE:
                 this._installButtonLabel.set_text(_("Update app"));
                 this._installButton.show();
-                this._removeButton.show();
+
+                // like the .INSTALLED case, we only show the 'delete app'
+                // button if the app does not have a launcher on the desktop
+                if (!this._model.hasLauncher(this._appId)) {
+                    this._removeButton.show();
+                }
                 break;
 
             case EosAppStorePrivate.AppState.UNKNOWN:
