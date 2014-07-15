@@ -225,8 +225,9 @@ const AppListBoxRow = new Lang.Class({
                 }
 
                 // or we add a launcher on the desktop
-                this._installSpinner.start();
+                this._installProgressLabel.set_text(_("Installing..."));
                 this._installProgress.show();
+                this._installSpinner.start();
                 this._model.install(this._appId, Lang.bind(this, function(error) {
                     this._installSpinner.stop();
                     this._installProgress.hide();
@@ -281,6 +282,7 @@ const AppListBoxRow = new Lang.Class({
         let responseId = dialog.run();
 
         if (responseId == Gtk.ResponseType.APPLY) {
+            this._installProgressLabel.set_text(_("Removing..."));
             this._installProgress.show();
             this._installSpinner.start();
 
