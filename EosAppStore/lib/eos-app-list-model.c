@@ -18,6 +18,8 @@ struct _EosAppListModel
 
   GAppInfoMonitor *app_monitor;
 
+  GMutex table_lock;
+
   GHashTable *gio_apps;
   GHashTable *shell_apps;
   GHashTable *installed_apps;
@@ -138,11 +140,15 @@ static void
 on_app_monitor_changed (GAppInfoMonitor *monitor,
                         EosAppListModel *self)
 {
+  g_mutex_lock (&self->table_lock);
+
   if (self->gio_apps != NULL)
     {
       g_hash_table_unref (self->gio_apps);
       self->gio_apps = NULL;
     }
+
+  g_mutex_unlock (&self->table_lock);
 
   g_signal_emit (self, eos_app_list_model_signals[CHANGED], 0);
 }
@@ -158,6 +164,8 @@ on_shell_applications_changed (GDBusConnection *connection,
 {
   EosAppListModel *self = user_data;
 
+  g_mutex_lock (&self->table_lock);
+
   if (self->shell_apps != NULL)
     {
       g_hash_table_unref (self->shell_apps);
@@ -165,6 +173,8 @@ on_shell_applications_changed (GDBusConnection *connection,
     }
 
   self->shell_apps = load_shell_apps_from_gvariant (parameters);
+
+  g_mutex_unlock (&self->table_lock);
 
   g_signal_emit (self, eos_app_list_model_signals[CHANGED], 0);
 }
@@ -180,6 +190,8 @@ on_app_manager_available_applications_changed (GDBusConnection *connection,
 {
   EosAppListModel *self = user_data;
 
+  g_mutex_lock (&self->table_lock);
+
   g_clear_pointer (&self->installable_apps, g_hash_table_unref);
   g_clear_pointer (&self->updatable_apps, g_hash_table_unref);
 
@@ -193,6 +205,8 @@ on_app_manager_available_applications_changed (GDBusConnection *connection,
   g_variant_iter_free (iter1);
   g_variant_iter_free (iter2);
 
+  g_mutex_unlock (&self->table_lock);
+
   g_signal_emit (self, eos_app_list_model_signals[CHANGED], 0);
 }
 
@@ -200,6 +214,8 @@ static void
 eos_app_list_model_finalize (GObject *gobject)
 {
   EosAppListModel *self = EOS_APP_LIST_MODEL (gobject);
+
+  g_mutex_clear (&self->table_lock);
 
   if (self->applications_changed_id != 0)
     {
@@ -246,6 +262,8 @@ eos_app_list_model_class_init (EosAppListModelClass *klass)
 static void
 eos_app_list_model_init (EosAppListModel *self)
 {
+  g_mutex_init (&self->table_lock);
+
   self->system_bus = g_bus_get_sync (G_BUS_TYPE_SYSTEM, NULL, NULL);
   self->session_bus = g_bus_get_sync (G_BUS_TYPE_SESSION, NULL, NULL);
 
@@ -473,6 +491,8 @@ load_apps_from_shell (EosAppListModel *self)
   GVariant *applications;
   GError *error = NULL;
 
+  g_mutex_lock (&self->table_lock);
+
   if (self->shell_apps != NULL)
     {
       g_hash_table_unref (self->shell_apps);
@@ -493,6 +513,7 @@ load_apps_from_shell (EosAppListModel *self)
 
   if (error != NULL)
     {
+      g_mutex_unlock (&self->table_lock);
       g_critical ("Unable to list applications: %s",
                   error->message);
       g_error_free (error);
@@ -501,6 +522,8 @@ load_apps_from_shell (EosAppListModel *self)
 
   self->shell_apps = load_shell_apps_from_gvariant (applications);
   g_variant_unref (applications);
+
+  g_mutex_unlock (&self->table_lock);
 }
 
 static void
@@ -508,6 +531,8 @@ load_installed_apps (EosAppListModel *self)
 {
   GVariant *applications;
   GError *error = NULL;
+
+  g_mutex_lock (&self->table_lock);
 
   applications =
     g_dbus_connection_call_sync (self->system_bus,
@@ -523,6 +548,7 @@ load_installed_apps (EosAppListModel *self)
 
   if (error != NULL)
     {
+      g_mutex_unlock (&self->table_lock);
       g_critical ("Unable to list installed applications: %s",
                   error->message);
       g_error_free (error);
@@ -537,6 +563,8 @@ load_installed_apps (EosAppListModel *self)
 
   g_variant_iter_free (iter);
   g_variant_unref (applications);
+
+  g_mutex_unlock (&self->table_lock);
 }
 
 static void
@@ -544,6 +572,8 @@ load_available_apps (EosAppListModel *self)
 {
   GVariant *applications;
   GError *error = NULL;
+
+  g_mutex_lock (&self->table_lock);
 
   applications =
     g_dbus_connection_call_sync (self->system_bus,
@@ -559,6 +589,7 @@ load_available_apps (EosAppListModel *self)
 
   if (error != NULL)
     {
+      g_mutex_unlock (&self->table_lock);
       g_critical ("Unable to list available applications: %s",
                   error->message);
       g_error_free (error);
@@ -575,6 +606,8 @@ load_available_apps (EosAppListModel *self)
   g_variant_iter_free (iter1);
   g_variant_iter_free (iter2);
   g_variant_unref (applications);
+
+  g_mutex_unlock (&self->table_lock);
 }
 
 static void
@@ -634,6 +667,8 @@ all_apps_load_in_thread (GTask        *task,
   GAppInfo *info;
   GHashTable *set;
 
+  g_mutex_lock (&model->table_lock);
+
   if (model->gio_apps != NULL)
     {
       g_hash_table_unref (model->gio_apps);
@@ -657,6 +692,8 @@ all_apps_load_in_thread (GTask        *task,
 
   g_list_free (all_infos);
   model->gio_apps = set;
+
+  g_mutex_unlock (&model->table_lock);
 
   load_apps_from_shell (model);
   load_installed_apps (model);
@@ -703,7 +740,8 @@ eos_app_list_model_load_finish (EosAppListModel  *model,
                                 GAsyncResult     *result,
                                 GError          **error)
 {
-  GList *gio_apps, *installable_apps;
+  GList *gio_apps = NULL;
+  GList *installable_apps = NULL;
 
   g_return_val_if_fail (g_task_is_valid (result, model), NULL);
 
@@ -711,8 +749,10 @@ eos_app_list_model_load_finish (EosAppListModel  *model,
       g_task_had_error (G_TASK (result)))
     return g_task_propagate_pointer (G_TASK (result), error);
 
-  gio_apps = g_hash_table_get_keys (model->gio_apps);
-  installable_apps = g_hash_table_get_keys (model->installable_apps);
+  if (model->gio_apps)
+    gio_apps = g_hash_table_get_keys (model->gio_apps);
+  if (model->installable_apps)
+    installable_apps = g_hash_table_get_keys (model->installable_apps);
 
   return g_list_concat (gio_apps, installable_apps);
 }
@@ -941,6 +981,13 @@ add_app_thread_func (GTask *task,
         }
     }
 
+  g_mutex_lock (&model->table_lock);
+
+  g_hash_table_add (model->installed_apps, g_strdup (desktop_id));
+  g_hash_table_add (model->shell_apps, g_strdup (desktop_id));
+
+  g_mutex_lock (&model->table_lock);
+
   g_task_return_boolean (task, TRUE);
 }
 
@@ -995,14 +1042,9 @@ eos_app_list_model_install_app_finish (EosAppListModel *model,
                                        GError **error)
 {
   GTask *task = G_TASK (result);
-  const gchar *desktop_id;
 
   if (!g_task_propagate_boolean (task, error))
     return FALSE;
-
-  desktop_id = g_task_get_task_data (task);
-  g_hash_table_add (model->installed_apps, g_strdup (desktop_id));
-  g_hash_table_add (model->shell_apps, g_strdup (desktop_id));
 
   return TRUE;
 }
@@ -1101,6 +1143,13 @@ remove_app_thread_func (GTask *task,
       return;
     }
 
+  g_mutex_lock (&model->table_lock);
+
+  g_hash_table_remove (model->installed_apps, desktop_id);
+  g_hash_table_remove (model->shell_apps, desktop_id);
+
+  g_mutex_unlock (&model->table_lock);
+
   g_task_return_boolean (task, TRUE);
 }
 
@@ -1140,14 +1189,9 @@ eos_app_list_model_uninstall_app_finish (EosAppListModel *model,
                                          GError **error)
 {
   GTask *task = G_TASK (result);
-  const gchar *desktop_id;
 
   if (!g_task_propagate_boolean (task, error))
     return FALSE;
-
-  desktop_id = g_task_get_task_data (task);
-  g_hash_table_remove (model->installed_apps, desktop_id);
-  g_hash_table_remove (model->shell_apps, desktop_id);
 
   return TRUE;
 }

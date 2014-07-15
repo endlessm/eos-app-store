@@ -195,7 +195,12 @@ const AppListBoxRow = new Lang.Class({
             case EosAppStorePrivate.AppState.UPDATABLE:
                 this._installButtonLabel.set_text(_("Update app"));
                 this._installButton.show();
-                this._removeButton.show();
+
+                // like the .INSTALLED case, we only show the 'delete app'
+                // button if the app does not have a launcher on the desktop
+                if (!this._model.hasLauncher(this._appId)) {
+                    this._removeButton.show();
+                }
                 break;
 
             case EosAppStorePrivate.AppState.UNKNOWN:
@@ -220,8 +225,9 @@ const AppListBoxRow = new Lang.Class({
                 }
 
                 // or we add a launcher on the desktop
-                this._installSpinner.start();
+                this._installProgressLabel.set_text(_("Installing..."));
                 this._installProgress.show();
+                this._installSpinner.start();
                 this._model.install(this._appId, Lang.bind(this, function(error) {
                     this._installSpinner.stop();
                     this._installProgress.hide();
@@ -287,6 +293,7 @@ const AppListBoxRow = new Lang.Class({
         let responseId = dialog.run();
 
         if (responseId == Gtk.ResponseType.APPLY) {
+            this._installProgressLabel.set_text(_("Removing..."));
             this._installProgress.show();
             this._installSpinner.start();
 
