@@ -22,7 +22,6 @@ struct _EosAppListModel
 
   GHashTable *gio_apps;
   GHashTable *shell_apps;
-  GHashTable *installed_apps;
   GHashTable *installable_apps;
   GHashTable *updatable_apps;
 
@@ -228,7 +227,6 @@ eos_app_list_model_finalize (GObject *gobject)
 
   g_hash_table_unref (self->gio_apps);
   g_hash_table_unref (self->shell_apps);
-  g_hash_table_unref (self->installed_apps);
   g_hash_table_unref (self->updatable_apps);
   g_hash_table_unref (self->installable_apps);
 
@@ -546,44 +544,6 @@ load_apps_from_shell (EosAppListModel *self)
 }
 
 static void
-load_installed_apps (EosAppListModel *self)
-{
-  GVariant *applications;
-  GError *error = NULL;
-
-  g_clear_pointer (&self->installed_apps, g_hash_table_unref);
-
-  applications =
-    g_dbus_connection_call_sync (self->system_bus,
-                                 "com.endlessm.AppManager",
-                                 "/com/endlessm/AppManager",
-                                 "com.endlessm.AppManager",
-                                 "ListInstalled",
-                                 NULL, NULL,
-                                 G_DBUS_CALL_FLAGS_NONE,
-                                 -1,
-                                 NULL,
-                                 &error);
-
-  if (error != NULL)
-    {
-      g_critical ("Unable to list installed applications: %s",
-                  error->message);
-      g_error_free (error);
-      return;
-    }
-
-  GVariantIter *iter;
-
-  g_variant_get (applications, "(a(sss))", &iter);
-
-  self->installed_apps = load_installable_apps_from_gvariant (iter);
-
-  g_variant_iter_free (iter);
-  g_variant_unref (applications);
-}
-
-static void
 load_available_apps (EosAppListModel *self)
 {
   GVariant *applications;
@@ -677,7 +637,6 @@ all_apps_load_in_thread (GTask        *task,
 
   load_apps_from_gio (model);
   load_apps_from_shell (model);
-  load_installed_apps (model);
   load_available_apps (model);
   load_user_capabilities (model);
 
@@ -821,16 +780,6 @@ app_get_localized_id_for_installable_app (EosAppListModel *model,
 }
 
 static gboolean
-app_is_manager_installed (EosAppListModel *model,
-                          const char *desktop_id)
-{
-  if (model->installed_apps == NULL)
-    return FALSE;
-
-  return g_hash_table_lookup (model->installed_apps, desktop_id) != NULL;
-}
-
-static gboolean
 app_is_updatable (EosAppListModel *model,
                   const char *desktop_id)
 {
@@ -844,18 +793,8 @@ static gboolean
 app_is_installed (EosAppListModel *model,
                   const char      *desktop_id)
 {
-  /* An app is installed if GIO knows about it... */
-  if (eos_app_list_model_get_app_info (model, desktop_id) != NULL)
-    return TRUE;
-
-  /* ...or if the app manager reports it as such */
-  if (app_is_manager_installed (model, desktop_id))
-    return TRUE;
-
-  if (app_is_updatable (model, desktop_id))
-    return TRUE;
-
-  return FALSE;
+  /* An app is installed if GIO knows about it */
+  return (eos_app_list_model_get_app_info (model, desktop_id) != NULL);
 }
 
 static const gchar *
@@ -966,7 +905,6 @@ add_app_thread_func (GTask *task,
         }
     }
 
-  g_hash_table_add (model->installed_apps, g_strdup (desktop_id));
   g_hash_table_add (model->shell_apps, g_strdup (desktop_id));
 
   g_task_return_boolean (task, TRUE);
@@ -1129,7 +1067,6 @@ remove_app_thread_func (GTask *task,
       goto out;
     }
 
-  g_hash_table_remove (model->installed_apps, desktop_id);
   g_hash_table_remove (model->shell_apps, desktop_id);
 
   g_task_return_boolean (task, TRUE);
