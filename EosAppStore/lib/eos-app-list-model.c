@@ -986,7 +986,7 @@ add_app_thread_func (GTask *task,
   g_hash_table_add (model->installed_apps, g_strdup (desktop_id));
   g_hash_table_add (model->shell_apps, g_strdup (desktop_id));
 
-  g_mutex_lock (&model->table_lock);
+  g_mutex_unlock (&model->table_lock);
 
   g_task_return_boolean (task, TRUE);
 }
