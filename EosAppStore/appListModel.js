@@ -19,34 +19,11 @@ const StoreModel = new Lang.Class({
 
         this.model= new EosAppStorePrivate.AppListModel();
         this.model.connect('changed', Lang.bind(this, this._onModelChanged));
-
-        // initialize model state
-        this._updating = false;
-        this._update();
-    },
-
-    _update: function() {
-        if (this._updating) {
-            return;
-        }
-
-        this._updating = true;
-        this.model.load(null, Lang.bind(this, this._onLoadComplete));
     },
 
     _onModelChanged: function() {
-        this._update();
-    },
-
-    _onLoadComplete: function(model, res) {
-        this._updating = false;
-        try {
-            this._items = model.load_finish(res);
-            this.emit('changed', this._items);
-        } catch (e) {
-            this._items = [];
-            logError('Unable to load the backing model storage: ' + e);
-        }
+        this._items = this.model.get_all_apps();
+        this.emit('changed', this._items);
     },
 
     getItems: function() {

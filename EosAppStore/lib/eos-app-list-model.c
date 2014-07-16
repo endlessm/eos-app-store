@@ -25,6 +25,8 @@ struct _EosAppListModel
   GHashTable *installable_apps;
   GHashTable *updatable_apps;
 
+  GCancellable *load_cancellable;
+
   guint applications_changed_id;
   guint available_apps_changed_id;
 
@@ -135,13 +137,50 @@ load_installable_apps_from_gvariant (GVariantIter *apps)
   return retval;
 }
 
+static gboolean
+app_is_visible (GAppInfo *info)
+{
+  GDesktopAppInfo *desktop_info = G_DESKTOP_APP_INFO (info);
+
+  return !g_desktop_app_info_get_nodisplay (desktop_info) &&
+    !g_desktop_app_info_get_is_hidden (desktop_info);
+}
+
+static void
+load_apps_from_gio (EosAppListModel *self)
+{
+  GList *all_infos, *l;
+  GAppInfo *info;
+  GHashTable *set;
+
+  g_clear_pointer (&self->gio_apps, g_hash_table_unref);
+
+  all_infos = g_app_info_get_all ();
+  set = g_hash_table_new_full (g_str_hash, g_str_equal,
+                               NULL,
+                               g_object_unref);
+
+  for (l = all_infos; l != NULL; l = l->next)
+    {
+      info = l->data;
+
+      if (app_is_visible (info))
+        g_hash_table_insert (set, (gpointer) g_app_info_get_id (info), info);
+      else
+        g_object_unref (info);
+    }
+
+  g_list_free (all_infos);
+  self->gio_apps = set;
+}
+
 static void
 on_app_monitor_changed (GAppInfoMonitor *monitor,
                         EosAppListModel *self)
 {
   g_mutex_lock (&self->table_lock);
 
-  g_clear_pointer (self->gio_apps, g_hash_table_unref);
+  load_apps_from_gio (self);
 
   g_mutex_unlock (&self->table_lock);
 
@@ -201,9 +240,190 @@ on_app_manager_available_applications_changed (GDBusConnection *connection,
 }
 
 static void
+on_app_list_model_loaded (GObject *source,
+                          GAsyncResult *result,
+                          gpointer user_data)
+{
+  GTask *task = G_TASK (result);
+  EosAppListModel *self = EOS_APP_LIST_MODEL (source);
+
+  g_clear_object (&self->load_cancellable);
+
+  if (g_task_had_error (task))
+    {
+      g_critical ("The application list model could not be loaded because of an error");
+      return;
+    }
+
+  g_signal_emit (self, eos_app_list_model_signals[CHANGED], 0);
+}
+
+static gboolean
+load_apps_from_shell (EosAppListModel *self,
+                      GCancellable *cancellable,
+                      GError **error_out)
+{
+  GVariant *applications;
+  GError *error = NULL;
+
+  g_clear_pointer (&self->shell_apps, g_hash_table_unref);
+
+  applications =
+    g_dbus_connection_call_sync (self->session_bus,
+                                 "org.gnome.Shell",
+                                 "/org/gnome/Shell",
+                                 "org.gnome.Shell.AppStore",
+                                 "ListApplications",
+                                 NULL, NULL,
+                                 G_DBUS_CALL_FLAGS_NONE,
+                                 -1,
+                                 cancellable,
+                                 &error);
+
+  if (error != NULL)
+    {
+      g_critical ("Unable to list applications: %s",
+                  error->message);
+      g_propagate_error (error_out, error);
+      return FALSE;
+    }
+
+  self->shell_apps = load_shell_apps_from_gvariant (applications);
+  g_variant_unref (applications);
+
+  return TRUE;
+}
+
+static gboolean
+load_available_apps (EosAppListModel *self,
+                     GCancellable *cancellable,
+                     GError **error_out)
+{
+  GVariant *applications;
+  GError *error = NULL;
+
+  g_clear_pointer (&self->installable_apps, g_hash_table_unref);
+  g_clear_pointer (&self->updatable_apps, g_hash_table_unref);
+
+  applications =
+    g_dbus_connection_call_sync (self->system_bus,
+                                 "com.endlessm.AppManager",
+                                 "/com/endlessm/AppManager",
+                                 "com.endlessm.AppManager",
+                                 "ListAvailable",
+                                 NULL, NULL,
+                                 G_DBUS_CALL_FLAGS_NONE,
+                                 -1,
+                                 cancellable,
+                                 &error);
+
+  if (error != NULL)
+    {
+      g_critical ("Unable to list available applications: %s",
+                  error->message);
+      g_propagate_error (error_out, error);
+      return FALSE;
+    }
+
+  GVariantIter *iter1, *iter2;
+
+  g_variant_get (applications, "(a(sss)a(sss))", &iter1, &iter2);
+
+  self->installable_apps = load_installable_apps_from_gvariant (iter1);
+  self->updatable_apps = load_installable_apps_from_gvariant (iter2);
+
+  g_variant_iter_free (iter1);
+  g_variant_iter_free (iter2);
+  g_variant_unref (applications);
+
+  return TRUE;
+}
+
+static gboolean
+load_user_capabilities (EosAppListModel *self,
+                        GCancellable *cancellable,
+                        GError **error_out)
+{
+  GVariant *capabilities;
+  GError *error = NULL;
+
+  capabilities =
+    g_dbus_connection_call_sync (self->system_bus,
+                                 "com.endlessm.AppManager",
+                                 "/com/endlessm/AppManager",
+                                 "com.endlessm.AppManager",
+                                 "GetUserCapabilities",
+                                 NULL, NULL,
+                                 G_DBUS_CALL_FLAGS_NONE,
+                                 -1,
+                                 cancellable,
+                                 &error);
+
+  if (error != NULL)
+    {
+      g_critical ("Unable to list retrieve user capabilities: %s",
+                  error->message);
+      g_propagate_error (error_out, error);
+      return FALSE;
+    }
+
+
+  GVariant *caps;
+  caps = g_variant_get_child_value (capabilities, 0);
+
+  g_variant_lookup (caps, "CanInstall", "b", &self->can_install);
+  g_variant_lookup (caps, "CanUninstall", "b", &self->can_uninstall);
+
+  g_variant_unref (caps);
+  g_variant_unref (capabilities);
+
+  return TRUE;
+}
+
+static void
+all_apps_load_in_thread (GTask        *task,
+                         gpointer      object,
+                         gpointer      task_data,
+                         GCancellable *cancellable)
+{
+  EosAppListModel *model = object;
+  GError *error = NULL;
+
+  /* we acquire a lock on the tables here, since all these
+   * functions are synchronous
+   */
+
+  g_mutex_lock (&model->table_lock);
+
+  load_apps_from_gio (model);
+
+  if (!load_apps_from_shell (model, cancellable, &error))
+    goto out;
+
+  if (!load_available_apps (model, cancellable, &error))
+    goto out;
+
+  if (!load_user_capabilities (model, cancellable, &error))
+    goto out;
+
+ out:
+  g_mutex_unlock (&model->table_lock);
+
+  if (error != NULL)
+    g_task_return_error (task, error);
+  else
+    g_task_return_pointer (task, NULL, NULL);
+}
+
+static void
 eos_app_list_model_finalize (GObject *gobject)
 {
   EosAppListModel *self = EOS_APP_LIST_MODEL (gobject);
+
+  if (self->load_cancellable != NULL)
+    g_cancellable_cancel (self->load_cancellable);
+
+  g_clear_object (&self->load_cancellable);
 
   g_mutex_clear (&self->table_lock);
 
@@ -251,6 +471,8 @@ eos_app_list_model_class_init (EosAppListModelClass *klass)
 static void
 eos_app_list_model_init (EosAppListModel *self)
 {
+  GTask *task;
+
   g_mutex_init (&self->table_lock);
 
   self->system_bus = g_bus_get_sync (G_BUS_TYPE_SYSTEM, NULL, NULL);
@@ -280,6 +502,11 @@ eos_app_list_model_init (EosAppListModel *self)
                                         NULL, G_DBUS_SIGNAL_FLAGS_NONE,
                                         on_app_manager_available_applications_changed,
                                         self, NULL);
+
+  self->load_cancellable = g_cancellable_new ();
+  task = g_task_new (self, self->load_cancellable, on_app_list_model_loaded, NULL);
+  g_task_run_in_thread (task, all_apps_load_in_thread);
+  g_object_unref (task);
 }
 
 EosAppListModel *
@@ -474,222 +701,17 @@ update_app_from_manager (EosAppListModel *self,
   return TRUE;
 }
 
-static gboolean
-app_is_visible (GAppInfo *info)
-{
-  GDesktopAppInfo *desktop_info = G_DESKTOP_APP_INFO (info);
-
-  return !g_desktop_app_info_get_nodisplay (desktop_info) &&
-    !g_desktop_app_info_get_is_hidden (desktop_info);
-}
-
-static void
-load_apps_from_gio (EosAppListModel *self)
-{
-  GList *all_infos, *l;
-  GAppInfo *info;
-  GHashTable *set;
-
-  g_clear_pointer (&self->gio_apps, g_hash_table_unref);
-
-  all_infos = g_app_info_get_all ();
-  set = g_hash_table_new_full (g_str_hash, g_str_equal,
-                               NULL,
-                               g_object_unref);
-
-  for (l = all_infos; l != NULL; l = l->next)
-    {
-      info = l->data;
-
-      if (app_is_visible (info))
-        g_hash_table_insert (set, (gpointer) g_app_info_get_id (info), info);
-      else
-        g_object_unref (info);
-    }
-
-  g_list_free (all_infos);
-  self->gio_apps = set;
-}
-
-static void
-load_apps_from_shell (EosAppListModel *self)
-{
-  GVariant *applications;
-  GError *error = NULL;
-
-  g_clear_pointer (&self->shell_apps, g_hash_table_unref);
-
-  applications =
-    g_dbus_connection_call_sync (self->session_bus,
-                                 "org.gnome.Shell",
-                                 "/org/gnome/Shell",
-                                 "org.gnome.Shell.AppStore",
-                                 "ListApplications",
-                                 NULL, NULL,
-                                 G_DBUS_CALL_FLAGS_NONE,
-                                 -1,
-                                 NULL,
-                                 &error);
-
-  if (error != NULL)
-    {
-      g_critical ("Unable to list applications: %s",
-                  error->message);
-      g_error_free (error);
-      return;
-    }
-
-  self->shell_apps = load_shell_apps_from_gvariant (applications);
-  g_variant_unref (applications);
-}
-
-static void
-load_available_apps (EosAppListModel *self)
-{
-  GVariant *applications;
-  GError *error = NULL;
-
-  g_clear_pointer (&self->installable_apps, g_hash_table_unref);
-  g_clear_pointer (&self->updatable_apps, g_hash_table_unref);
-
-  applications =
-    g_dbus_connection_call_sync (self->system_bus,
-                                 "com.endlessm.AppManager",
-                                 "/com/endlessm/AppManager",
-                                 "com.endlessm.AppManager",
-                                 "ListAvailable",
-                                 NULL, NULL,
-                                 G_DBUS_CALL_FLAGS_NONE,
-                                 -1,
-                                 NULL,
-                                 &error);
-
-  if (error != NULL)
-    {
-      g_critical ("Unable to list available applications: %s",
-                  error->message);
-      g_error_free (error);
-      return;
-    }
-
-  GVariantIter *iter1, *iter2;
-
-  g_variant_get (applications, "(a(sss)a(sss))", &iter1, &iter2);
-
-  self->installable_apps = load_installable_apps_from_gvariant (iter1);
-  self->updatable_apps = load_installable_apps_from_gvariant (iter2);
-
-  g_variant_iter_free (iter1);
-  g_variant_iter_free (iter2);
-  g_variant_unref (applications);
-}
-
-static void
-load_user_capabilities (EosAppListModel *self)
-{
-  GVariant *capabilities;
-  GError *error = NULL;
-
-  capabilities =
-    g_dbus_connection_call_sync (self->system_bus,
-                                 "com.endlessm.AppManager",
-                                 "/com/endlessm/AppManager",
-                                 "com.endlessm.AppManager",
-                                 "GetUserCapabilities",
-                                 NULL, NULL,
-                                 G_DBUS_CALL_FLAGS_NONE,
-                                 -1,
-                                 NULL,
-                                 &error);
-
-  if (error != NULL)
-    {
-      g_critical ("Unable to list retrieve user capabilities: %s",
-                  error->message);
-      g_error_free (error);
-      return;
-    }
-
-
-  GVariant *caps;
-  caps = g_variant_get_child_value (capabilities, 0);
-
-  g_variant_lookup (caps, "CanInstall", "b", &self->can_install);
-  g_variant_lookup (caps, "CanUninstall", "b", &self->can_uninstall);
-
-  g_variant_unref (caps);
-  g_variant_unref (capabilities);
-}
-
-static void
-all_apps_load_in_thread (GTask        *task,
-                         gpointer      object,
-                         gpointer      task_data,
-                         GCancellable *cancellable)
-{
-  EosAppListModel *model = object;
-
-  /* we acquire a lock on the tables here, since all these
-   * functions are synchronous
-   */
-
-  g_mutex_lock (&model->table_lock);
-
-  load_apps_from_gio (model);
-  load_apps_from_shell (model);
-  load_available_apps (model);
-  load_user_capabilities (model);
-
-  g_mutex_unlock (&model->table_lock);
-
-  g_task_return_pointer (task, NULL, NULL);
-}
-
 /**
- * eos_app_list_model_load:
+ * eos_app_list_model_get_all_apps:
  * @model:
- * @cancellable: (allow-none):
- * @callback:
- * @user_data:
- *
- */
-void
-eos_app_list_model_load (EosAppListModel     *model,
-                         GCancellable        *cancellable,
-                         GAsyncReadyCallback  callback,
-                         gpointer             user_data)
-{
-  GTask *task;
-
-  g_return_if_fail (EOS_IS_APP_LIST_MODEL (model));
-  g_return_if_fail (callback != NULL);
-
-  task = g_task_new (model, cancellable, callback, user_data);
-  g_task_run_in_thread (task, all_apps_load_in_thread);
-  g_object_unref (task);
-}
-
-/**
- * eos_app_list_model_load_finish:
- * @model:
- * @result:
- * @error:
  *
  * Returns: (transfer container) (element-type utf8):
  */
 GList *
-eos_app_list_model_load_finish (EosAppListModel  *model,
-                                GAsyncResult     *result,
-                                GError          **error)
+eos_app_list_model_get_all_apps (EosAppListModel *model)
 {
   GList *gio_apps = NULL;
   GList *installable_apps = NULL;
-
-  g_return_val_if_fail (g_task_is_valid (result, model), NULL);
-
-  if ((model->gio_apps == NULL && model->installable_apps == NULL) ||
-      g_task_had_error (G_TASK (result)))
-    return g_task_propagate_pointer (G_TASK (result), error);
 
   if (model->gio_apps)
     gio_apps = g_hash_table_get_keys (model->gio_apps);
