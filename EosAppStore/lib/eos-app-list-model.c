@@ -142,11 +142,7 @@ on_app_monitor_changed (GAppInfoMonitor *monitor,
 {
   g_mutex_lock (&self->table_lock);
 
-  if (self->gio_apps != NULL)
-    {
-      g_hash_table_unref (self->gio_apps);
-      self->gio_apps = NULL;
-    }
+  g_clear_pointer (self->gio_apps, g_hash_table_unref);
 
   g_mutex_unlock (&self->table_lock);
 
