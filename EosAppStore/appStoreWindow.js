@@ -29,8 +29,10 @@ const AppStoreSizes = {
   // Note: must be listed in order of increasing screenWidth
   // Include compensation for 5% overscan on either side,
   // plus some additional margin
-  SVGA: { screenWidth:  800, windowWidth:  800 },
-   XGA: { screenWidth:  900, windowWidth:  800 }, // nominally 1024
+  // For now, use a window width of 1024 for any screen width
+  // less than 1700, since we don't handle narrower windows well
+  // SVGA: { screenWidth:  800, windowWidth:  800 },
+  //  XGA: { screenWidth:  900, windowWidth:  800 }, // nominally 1024
   WXGA: { screenWidth: 1200, windowWidth: 1024 }, // nominally 1366
     HD: { screenWidth: 1700, windowWidth: 1366 }, // nominally 1920
 };
