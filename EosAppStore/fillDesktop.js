@@ -1,6 +1,5 @@
 //-*- mode: js; js-indent-level: 4; indent-tabs-mode: nil -*-
 
-const AppListModel = imports.appListModel;
 const Categories = imports.categories;
 const Environment = imports.environment;
 const EosAppStorePrivate = imports.gi.EosAppStorePrivate;
@@ -29,7 +28,7 @@ const FillDesktop = new Lang.Class({
     vfunc_startup: function() {
         this.parent();
 
-        this._appModel = new AppListModel.StoreModel();
+        this._appModel = new EosAppStorePrivate.AppListModel();
     },
 
     vfunc_activate: function() {
