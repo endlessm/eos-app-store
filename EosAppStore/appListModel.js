@@ -22,10 +22,10 @@ const StoreModel = new Lang.Class({
 
         // initialize model state
         this._updating = false;
-        this.update();
+        this._update();
     },
 
-    update: function() {
+    _update: function() {
         if (this._updating) {
             return;
         }
@@ -35,7 +35,7 @@ const StoreModel = new Lang.Class({
     },
 
     _onModelChanged: function() {
-        this.update();
+        this._update();
     },
 
     _onLoadComplete: function(model, res) {
@@ -70,10 +70,6 @@ const BaseList = new Lang.Class({
 
     _onModelChanged: function(appModel, items) {
         // do nothing here
-    },
-
-    update: function() {
-        this._storeModel.update();
     },
 
     getIcon: function(id) {
