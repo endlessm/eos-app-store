@@ -961,6 +961,8 @@ add_app_thread_func (GTask *task,
   EosAppListModel *model = source_object;
   const gchar *desktop_id = task_data;
 
+  g_mutex_lock (&model->table_lock);
+
   if (!app_is_installed (model, desktop_id))
     {
       if (!desktop_id_is_web_link (desktop_id) &&
@@ -968,7 +970,7 @@ add_app_thread_func (GTask *task,
           !add_app_from_manager (model, desktop_id, cancellable, &error))
         {
           g_task_return_error (task, error);
-          return;
+          goto out;
         }
      }
 
@@ -977,18 +979,17 @@ add_app_thread_func (GTask *task,
       if (!add_app_to_shell (model, desktop_id, cancellable, &error))
         {
           g_task_return_error (task, error);
-          return;
+          goto out;
         }
     }
-
-  g_mutex_lock (&model->table_lock);
 
   g_hash_table_add (model->installed_apps, g_strdup (desktop_id));
   g_hash_table_add (model->shell_apps, g_strdup (desktop_id));
 
-  g_mutex_lock (&model->table_lock);
-
   g_task_return_boolean (task, TRUE);
+
+out:
+  g_mutex_unlock (&model->table_lock);
 }
 
 void
