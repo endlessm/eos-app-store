@@ -690,7 +690,7 @@ update_app_from_manager (EosAppListModel *self,
                                g_variant_new ("(s)", app_id),
                                NULL,
                                G_DBUS_CALL_FLAGS_NONE,
-                               -1,
+                               G_MAXINT,
                                NULL,
                                &error);
   g_free (app_id);
