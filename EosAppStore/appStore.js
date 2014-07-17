@@ -1,4 +1,5 @@
 // -*- mode: js; js-indent-level: 4; indent-tabs-mode: nil -*-
+const EosAppStorePrivate = imports.gi.EosAppStorePrivate;
 const Gdk = imports.gi.Gdk;
 const Gio = imports.gi.Gio;
 const GLib = imports.gi.GLib;
@@ -10,7 +11,6 @@ const Mainloop = imports.mainloop;
 const Signals = imports.signals;
 const _ = imports.gettext.gettext;
 
-const AppListModel = imports.appListModel;
 const AppManager = imports.appManager;
 const AppStoreWindow = imports.appStoreWindow;
 const Config = imports.config;
@@ -83,7 +83,7 @@ const AppStore = new Lang.Class({
         this._appManager.proxy.RefreshRemote();
 
         // the backing app list model
-        this._appModel = new AppListModel.StoreModel();
+        this._appModel = new EosAppStorePrivate.AppListModel();
 
         // no window by default
         this._mainWindow = null;

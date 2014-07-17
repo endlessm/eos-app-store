@@ -11,69 +11,20 @@ const Signals = imports.signals;
 
 const EOS_LINK_PREFIX = 'eos-link-';
 
-const StoreModel = new Lang.Class({
-    Name: 'StoreModel',
-
-    _init: function() {
-        this._items = [];
-
-        this.model= new EosAppStorePrivate.AppListModel();
-        this.model.connect('changed', Lang.bind(this, this._onModelChanged));
-
-        // initialize model state
-        this._updating = false;
-        this.update();
-    },
-
-    update: function() {
-        if (this._updating) {
-            return;
-        }
-
-        this._updating = true;
-        this.model.load(null, Lang.bind(this, this._onLoadComplete));
-    },
-
-    _onModelChanged: function() {
-        this.update();
-    },
-
-    _onLoadComplete: function(model, res) {
-        this._updating = false;
-        try {
-            this._items = model.load_finish(res);
-            this.emit('changed', this._items);
-        } catch (e) {
-            this._items = [];
-            logError('Unable to load the backing model storage: ' + e);
-        }
-    },
-
-    getItems: function() {
-        return this._items;
-    }
-});
-Signals.addSignalMethods(StoreModel.prototype);
-
 const BaseList = new Lang.Class({
     Name: 'BaseList',
     Abstract: true,
 
     _init: function() {
         let application = Gio.Application.get_default();
-        this._storeModel = application.appModel;
-        this._model = this._storeModel.model;
+        this._model = application.appModel;
 
-        this._storeModel.connect('changed', Lang.bind(this, this._onModelChanged));
-        this._onModelChanged(this._storeModel, this._storeModel.getItems());
+        this._model.connect('changed', Lang.bind(this, this._onModelChanged));
+        this._onModelChanged(this._model);
     },
 
-    _onModelChanged: function(appModel, items) {
+    _onModelChanged: function(model) {
         // do nothing here
-    },
-
-    update: function() {
-        this._storeModel.update();
     },
 
     getIcon: function(id) {
@@ -147,7 +98,8 @@ const AppList = new Lang.Class({
     Name: 'AppList',
     Extends: BaseList,
 
-    _onModelChanged: function(model, items) {
+    _onModelChanged: function(model) {
+        let items = model.get_all_apps();
         let apps = items.filter(Lang.bind(this, function(item) {
             if (item.indexOf(EOS_LINK_PREFIX) == 0) {
                 // web links are ignored
@@ -186,7 +138,8 @@ const WeblinkList = new Lang.Class({
     Name: 'WeblinkList',
     Extends: BaseList,
 
-    _onModelChanged: function(model, items) {
+    _onModelChanged: function(model) {
+        let items = model.get_all_apps();
         let weblinks = items.filter(Lang.bind(this, function(item) {
             if (item.indexOf(EOS_LINK_PREFIX) == -1) {
                 // only take web links into account
