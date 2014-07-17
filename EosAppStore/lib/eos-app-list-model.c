@@ -878,14 +878,20 @@ eos_app_list_model_get_app_state (EosAppListModel *model,
                                   const char *desktop_id)
 {
   EosAppState retval = EOS_APP_STATE_UNKNOWN;
-  gboolean is_installed;
+  gboolean is_installed, is_updatable = FALSE;
 
   g_return_val_if_fail (EOS_IS_APP_LIST_MODEL (model), EOS_APP_STATE_UNKNOWN);
   g_return_val_if_fail (desktop_id != NULL, EOS_APP_STATE_UNKNOWN);
 
   is_installed = app_is_installed (model, desktop_id);
+  if (is_installed)
+    {
+      const char *localized_id;
+      localized_id = app_get_localized_id_for_installed_app (model, desktop_id);
+      is_updatable = app_is_updatable (model, localized_id);
+    }
 
-  if (is_installed && app_is_updatable (model, desktop_id))
+  if (is_installed && is_updatable)
     retval = EOS_APP_STATE_UPDATABLE;
   else if (is_installed)
     retval = EOS_APP_STATE_INSTALLED;
