@@ -22,6 +22,7 @@ struct _EosAppListModel
   GHashTable *shell_apps;
   GHashTable *installable_apps;
   GHashTable *updatable_apps;
+  GHashTable *manager_installed_apps;
 
   GCancellable *load_cancellable;
 
@@ -49,6 +50,8 @@ G_DEFINE_TYPE (EosAppListModel, eos_app_list_model, G_TYPE_OBJECT)
 G_DEFINE_QUARK (eos-app-list-model-error-quark, eos_app_list_model_error)
 
 #define WEB_LINK_ID_PREFIX "eos-link-"
+
+static void load_manager_installed_apps (EosAppListModel *self);
 
 static gboolean
 desktop_id_is_web_link (const gchar *desktop_id)
@@ -178,6 +181,9 @@ on_app_monitor_changed (GAppInfoMonitor *monitor,
   self->gio_apps = load_apps_from_gio ();
 
   g_signal_emit (self, eos_app_list_model_signals[CHANGED], 0);
+
+  /* queue a reload of the manager-installed apps */
+  load_manager_installed_apps (self);
 }
 
 static void
@@ -386,6 +392,55 @@ app_manager_apps_load_in_thread (GTask        *task,
 }
 
 static void
+on_manager_installed_apps_loaded (GObject *source,
+                                  GAsyncResult *result,
+                                  gpointer user_data)
+{
+  EosAppListModel *self = user_data;
+  GVariant *applications;
+  GError *error = NULL;
+
+  applications = g_dbus_connection_call_finish (G_DBUS_CONNECTION (source),
+                                                result, &error);
+
+  if (error != NULL)
+    {
+      g_critical ("Unable to load manager installed applications: %s",
+                  error->message);
+      g_error_free (error);
+      return;
+    }
+
+  GVariantIter *iter;
+
+  g_variant_get (applications, "(a(sss))", &iter);
+
+  g_clear_pointer (&self->manager_installed_apps, g_hash_table_unref);
+  self->manager_installed_apps = load_installable_apps_from_gvariant (iter);
+
+  g_variant_iter_free (iter);
+  g_variant_unref (applications);
+
+  g_signal_emit (self, eos_app_list_model_signals[CHANGED], 0);
+}
+
+static void
+load_manager_installed_apps (EosAppListModel *self)
+{
+  g_dbus_connection_call (self->system_bus,
+                          "com.endlessm.AppManager",
+                          "/com/endlessm/AppManager",
+                          "com.endlessm.AppManager",
+                          "ListInstalled",
+                          NULL, NULL,
+                          G_DBUS_CALL_FLAGS_NONE,
+                          -1,
+                          self->load_cancellable,
+                          on_manager_installed_apps_loaded,
+                          self);
+}
+
+static void
 on_shell_apps_loaded (GObject *source,
                       GAsyncResult *result,
                       gpointer user_data)
@@ -413,6 +468,22 @@ on_shell_apps_loaded (GObject *source,
 }
 
 static void
+load_shell_apps (EosAppListModel *self)
+{
+  g_dbus_connection_call (self->session_bus,
+                          "org.gnome.Shell",
+                          "/org/gnome/Shell",
+                          "org.gnome.Shell.AppStore",
+                          "ListApplications",
+                          NULL, NULL,
+                          G_DBUS_CALL_FLAGS_NONE,
+                          -1,
+                          self->load_cancellable,
+                          on_shell_apps_loaded,
+                          self);
+}
+
+static void
 load_all_apps (EosAppListModel *self)
 {
   GTask *task;
@@ -427,17 +498,10 @@ load_all_apps (EosAppListModel *self)
   g_object_unref (task);
 
   /* Load shell apps */
-  g_dbus_connection_call (self->session_bus,
-                          "org.gnome.Shell",
-                          "/org/gnome/Shell",
-                          "org.gnome.Shell.AppStore",
-                          "ListApplications",
-                          NULL, NULL,
-                          G_DBUS_CALL_FLAGS_NONE,
-                          -1,
-                          self->load_cancellable,
-                          on_shell_apps_loaded,
-                          self);
+  load_shell_apps (self);
+
+  /* Load manager-installed apps */
+  load_manager_installed_apps (self);
 }
 
 static void
@@ -472,6 +536,7 @@ eos_app_list_model_finalize (GObject *gobject)
   g_hash_table_unref (self->shell_apps);
   g_hash_table_unref (self->updatable_apps);
   g_hash_table_unref (self->installable_apps);
+  g_hash_table_unref (self->manager_installed_apps);
 
   G_OBJECT_CLASS (eos_app_list_model_parent_class)->finalize (gobject);
 }
@@ -1187,4 +1252,16 @@ eos_app_list_model_has_app (EosAppListModel *model,
   g_free (localized_id);
 
   return res;
+}
+
+gboolean
+eos_app_list_model_get_app_can_remove (EosAppListModel *model,
+                                       const char *desktop_id)
+{
+  const gchar *localized_id;
+
+  localized_id = app_get_localized_id_for_installed_app (model, desktop_id);
+
+  /* Can only remove what the manager installed */
+  return g_hash_table_contains (model->manager_installed_apps, localized_id);
 }
