@@ -59,7 +59,12 @@ const BaseList = new Lang.Class({
     },
 
     install: function(id, callback) {
+        let application = Gio.Application.get_default();
+        application.hold();
+
         this._model.install_app_async(id, null, Lang.bind(this, function(model, res) {
+            application.release();
+
             try {
                 this._model.install_app_finish(res);
                 if (callback) {
@@ -76,7 +81,12 @@ const BaseList = new Lang.Class({
     },
 
     uninstall: function(id, callback) {
+        let application = Gio.Application.get_default();
+        application.hold();
+
         this._model.uninstall_app_async(id, null, Lang.bind(this, function(model, res) {
+            application.release();
+
             try {
                 this._model.uninstall_app_finish(res);
                 if (callback) {
@@ -113,7 +123,12 @@ const AppList = new Lang.Class({
     },
 
     updateApp: function(id, callback) {
+        let application = Gio.Application.get_default();
+        application.hold();
+
         this._model.update_app_async(id, null, Lang.bind(this, function(model, res) {
+            application.release();
+
             try {
                 this._model.update_app_finish(res);
                 if (callback) {
