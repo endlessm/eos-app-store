@@ -299,6 +299,7 @@ const AppListBoxRow = new Lang.Class({
 
         if (responseId == Gtk.ResponseType.APPLY) {
             this._removeButton.hide();
+            this._installButton.hide();
 
             this._installProgressLabel.set_text(_("Removing..."));
             this._installProgress.show();
