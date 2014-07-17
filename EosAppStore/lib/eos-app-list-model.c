@@ -680,17 +680,20 @@ update_app_from_manager (EosAppListModel *self,
                          GError **error_out)
 {
   GError *error = NULL;
+  gchar *app_id;
 
+  app_id = app_id_from_desktop_id (desktop_id);
   g_dbus_connection_call_sync (self->system_bus,
                                "com.endlessm.AppManager",
                                "/com/endlessm/AppManager",
                                "com.endlessm.AppManager", "Install",
-                               g_variant_new ("(s)", desktop_id),
+                               g_variant_new ("(s)", app_id),
                                NULL,
                                G_DBUS_CALL_FLAGS_NONE,
                                -1,
                                NULL,
                                &error);
+  g_free (app_id);
 
   if (error != NULL)
     {
