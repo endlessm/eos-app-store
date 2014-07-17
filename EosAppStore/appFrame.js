@@ -179,9 +179,7 @@ const AppListBoxRow = new Lang.Class({
 
                     this._installButton.show();
 
-                    // we only show the 'delete app' button if the app does
-                    // not have a launcher on the desktop
-                    if (!this._model.hasLauncher(this._appId)) {
+                    if (this._model.canRemove(this._appId)) {
                         this._removeButton.show();
                     }
                 }

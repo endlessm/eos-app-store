@@ -58,6 +58,15 @@ const BaseList = new Lang.Class({
         return this._model.get_app_has_launcher(id);
     },
 
+    canRemove: function(id) {
+        // Only apps that don't have a launcher can be
+        // removed from the system
+        if (this.hasLauncher(id))
+            return false;
+
+        return this._model.get_app_can_remove(id);
+    },
+
     install: function(id, callback) {
         let application = Gio.Application.get_default();
         application.hold();
