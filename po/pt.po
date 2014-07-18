@@ -16,8 +16,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: eos-app-store\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-07-10 22:16-0700\n"
-"PO-Revision-Date: 2014-07-11 05:16+0000\n"
+"POT-Creation-Date: 2014-07-16 16:44-0700\n"
+"PO-Revision-Date: 2014-07-16 23:44+0000\n"
 "Last-Translator: Roddy Shuler <roddy@endlessm.com>\n"
 "Language-Team: Portuguese (http://www.transifex.com/projects/p/eos-app-store/language/pt/)\n"
 "MIME-Version: 1.0\n"
@@ -75,33 +75,45 @@ msgstr ""
 msgid "Update app"
 msgstr ""
 
-#: ../EosAppStore/appFrame.js:269
+#: ../EosAppStore/appFrame.js:230 ../EosAppStore/appFrame.js:245
+msgid "Installing..."
+msgstr ""
+
+#: ../EosAppStore/appFrame.js:272
+msgid "Updating..."
+msgstr ""
+
+#: ../EosAppStore/appFrame.js:291
 msgid "Deleting app"
 msgstr ""
 
-#: ../EosAppStore/appFrame.js:270
+#: ../EosAppStore/appFrame.js:292
 msgid ""
 "Deleting this app will remove it from the device for all users. You will "
 "need to download it from the internet in order to reinstall it."
 msgstr ""
 
-#: ../EosAppStore/appFrame.js:271
+#: ../EosAppStore/appFrame.js:293
 msgid "Delete app"
 msgstr ""
 
-#: ../EosAppStore/appFrame.js:273
+#: ../EosAppStore/appFrame.js:295
 msgid "Cancel"
 msgstr ""
 
-#: ../EosAppStore/appStoreWindow.js:300
+#: ../EosAppStore/appFrame.js:303
+msgid "Removing..."
+msgstr ""
+
+#: ../EosAppStore/appStoreWindow.js:302
 msgid "Install apps"
 msgstr ""
 
-#: ../EosAppStore/appStoreWindow.js:304
+#: ../EosAppStore/appStoreWindow.js:306
 msgid "Install websites"
 msgstr "Adicionar atalhos para sites"
 
-#: ../EosAppStore/appStoreWindow.js:308
+#: ../EosAppStore/appStoreWindow.js:310
 msgid "Install folders"
 msgstr "Adicionar pastas"
 
@@ -175,24 +187,24 @@ msgstr "O endereço escrito não existe ou não está disponível."
 msgid "added successfully!"
 msgstr "adicionado com sucesso!"
 
-#: ../EosAppStore/lib/eos-app-list-model.c:969
-#: ../EosAppStore/lib/eos-app-list-model.c:1048
+#: ../EosAppStore/lib/eos-app-list-model.c:1004
+#: ../EosAppStore/lib/eos-app-list-model.c:1078
 #, c-format
 msgid "App %s not installable"
 msgstr ""
 
-#: ../EosAppStore/lib/eos-app-list-model.c:980
+#: ../EosAppStore/lib/eos-app-list-model.c:1015
 #, c-format
 msgid "App %s already installed"
 msgstr ""
 
-#: ../EosAppStore/lib/eos-app-list-model.c:1059
+#: ../EosAppStore/lib/eos-app-list-model.c:1089
 #, c-format
 msgid "App %s is up to date"
 msgstr ""
 
-#: ../EosAppStore/lib/eos-app-list-model.c:1126
-#: ../EosAppStore/lib/eos-app-list-model.c:1169
+#: ../EosAppStore/lib/eos-app-list-model.c:1164
+#: ../EosAppStore/lib/eos-app-list-model.c:1202
 #, c-format
 msgid "App %s is not installed"
 msgstr ""
