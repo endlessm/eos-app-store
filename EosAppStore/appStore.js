@@ -117,14 +117,6 @@ const AppStore = new Lang.Class({
         return this._mainWindow;
     },
 
-    get mainWindowWidth() {
-        if (this._mainWindow != null) {
-            return this._mainWindow.getExpectedWidth();
-        }
-
-        return AppStoreWindow.AppStoreSizes.SVGA.windowWidth;
-    },
-
     show: function(timestamp, reset) {
         this._createMainWindow();
         this._mainWindow.doShow(reset, timestamp);
