@@ -293,7 +293,7 @@ load_available_apps (EosAppListModel *self,
 
   g_variant_builder_init (&builder, G_VARIANT_TYPE ("(a{sv})"));
   g_variant_builder_open (&builder, G_VARIANT_TYPE ("a{sv}"));
-  g_variant_builder_add (&builder, "{sv}", "EndlessLanguage", g_variant_new_string (lang_id));
+  g_variant_builder_add (&builder, "{sv}", "Locale", g_variant_new_string (lang_id));
   g_variant_builder_close (&builder);
 
   g_strfreev (variants);
