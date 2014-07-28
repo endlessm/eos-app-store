@@ -579,9 +579,15 @@ const WeblinkFrame = new Lang.Class({
         this.initTemplate({ templateRoot: '_mainBox', bindChildren: true, connectSignals: true, });
         this.add(this._mainBox);
 
+        let description = new Gtk.Label({ label: _("Add your favorite websites to your desktop or choose suggested ones from our list.") });
+        description.get_style_context().add_class('weblink-description');
+        description.set_alignment(0, 0.5);
+        this._mainBox.add(description);
+        this._mainBox.reorder_child(description, 0);
+
         let separator = new Separator.FrameSeparator();
         this._mainBox.add(separator);
-        this._mainBox.reorder_child(separator, 2);
+        this._mainBox.reorder_child(separator, 3);
 
         this._mainBox.show_all();
 

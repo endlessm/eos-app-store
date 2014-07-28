@@ -433,6 +433,12 @@
     background-color: transparent;
 }
 
+.weblink-description {
+    color: white;
+    font-weight: 600; /* semibold */
+    padding: 10px 2px 8px;
+}
+
 .weblink-listbox {
     background-color: transparent;
 }
