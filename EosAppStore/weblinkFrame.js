@@ -250,7 +250,7 @@ const NewSiteBox = new Lang.Class({
         this._alertIcons[NewSiteBoxState.EDITING].connect('clicked', Lang.bind(this, this._onEditSiteCancel));
 
         this._urlEntry = new Gtk.Entry();
-        this._urlEntry.set_placeholder_text(_("Write the site address you want to add"));
+        this._urlEntry.set_placeholder_text(_("Write the website you'd like to add here and press “Enter”"));
         this._urlEntry.get_style_context().add_class('url-entry');
 
         this._urlEntry.connect('enter-notify-event',
