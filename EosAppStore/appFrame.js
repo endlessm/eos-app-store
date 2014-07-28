@@ -27,11 +27,6 @@ const STACK_TOP_MARGIN = 4;
 const SCREENSHOT_LARGE = 480;
 const SCREENSHOT_SMALL = 120;
 
-// If the area available for the grid is less than this minimium size,
-// scroll bars will be added.
-const MIN_GRID_WIDTH = 800;
-const MIN_GRID_HEIGHT = 600;
-
 const AppPreview = new Lang.Class({
     Name: 'AppPreviewImage',
     Extends: Gtk.EventBox,
