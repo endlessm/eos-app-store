@@ -157,6 +157,7 @@ const AppStoreWindow = new Lang.Class({
             this._pageChangedId = 0;
         }
     },
+
     _getWorkArea: function() {
         let screen = Gdk.Screen.get_default();
         let monitor = screen.get_primary_monitor();

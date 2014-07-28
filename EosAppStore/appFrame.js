@@ -9,6 +9,7 @@ const Mainloop = imports.mainloop;
 const Endless = imports.gi.Endless;
 
 const AppListModel = imports.appListModel;
+const AppStoreWindow = imports.appStoreWindow;
 const Categories = imports.categories;
 const CategoryButton = imports.categoryButton;
 const Builder = imports.builder;
@@ -31,7 +32,7 @@ const AppPreview = new Lang.Class({
     Name: 'AppPreviewImage',
     Extends: Gtk.EventBox,
 
-    _init: function(path) {
+    _init: function(path, width) {
         this.parent();
 
         this._path = path;
@@ -39,7 +40,7 @@ const AppPreview = new Lang.Class({
         this._image = new Gtk.Image();
         this.add(this._image);
 
-        EosAppStorePrivate.app_load_screenshot(this._image, this._path, SCREENSHOT_SMALL);
+        EosAppStorePrivate.app_load_screenshot(this._image, this._path, width);
     },
 
     get path() {
@@ -70,6 +71,19 @@ const AppListBoxRow = new Lang.Class({
 
     _init: function(model, appInfo) {
         this.parent();
+
+        let app = Gio.Application.get_default();
+        let width = app.mainWindow.getExpectedWidth();
+        width = Math.max(width, AppStoreWindow.AppStoreSizes.VGA.screenWidth);
+        let xgaWidth = AppStoreWindow.AppStoreSizes.XGA.screenWidth;
+        if (width < xgaWidth) {
+            let screenshotRatio = SCREENSHOT_SMALL / SCREENSHOT_LARGE;
+            this._screenshotLarge = SCREENSHOT_LARGE + width - xgaWidth;
+            this._screenshotSmall = this._screenshotLarge * screenshotRatio;
+        } else {
+            this._screenshotLarge = SCREENSHOT_LARGE;
+            this._screenshotSmall = SCREENSHOT_SMALL;
+        }
 
         this._model = model;
         this._model.connect('changed', Lang.bind(this, this._updateState));
@@ -114,10 +128,10 @@ const AppListBoxRow = new Lang.Class({
             let path = screenshots[i];
 
             if (i == 0) {
-                EosAppStorePrivate.app_load_screenshot(this._screenshotImage, path, SCREENSHOT_LARGE);
+                EosAppStorePrivate.app_load_screenshot(this._screenshotImage, path, this._screenshotLarge);
             }
 
-            let previewBox = new AppPreview(path);
+            let previewBox = new AppPreview(path, this._screenshotSmall);
             this._screenshotPreviewBox.add(previewBox);
             previewBox.connect('button-press-event', Lang.bind(this, this._onPreviewPress));
         }
@@ -128,7 +142,7 @@ const AppListBoxRow = new Lang.Class({
     },
 
     _onPreviewPress: function(widget, event) {
-        EosAppStorePrivate.app_load_screenshot(this._screenshotImage, widget.path, SCREENSHOT_LARGE);
+        EosAppStorePrivate.app_load_screenshot(this._screenshotImage, widget.path, this._screenshotLarge);
         return false;
     },
 
