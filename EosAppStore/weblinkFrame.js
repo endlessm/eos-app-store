@@ -295,7 +295,7 @@ const NewSiteBox = new Lang.Class({
             this._urlEntry.grab_focus();
             // fall through
         case NewSiteBoxState.READY:
-            this._siteAlertLabel.set_text(_("e.g.: http://www.globoesporte.com"));
+            this._siteAlertLabel.set_text(_("e.g.: http://www.prensalibre.com.gt"));
 
             this._siteAddButton.visible = false;
             this._urlEntry.max_length = 0;
