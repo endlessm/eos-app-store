@@ -357,8 +357,14 @@ const AppFrame = new Lang.Class({
         this._mainStack.add_named(this._mainBox, 'main-box');
         this._mainBox.show();
 
+        let categoriesBoxSpacing = CATEGORIES_BOX_SPACING;
+        let app = Gio.Application.get_default();
+        if (app.mainWindow.getExpectedWidth() <
+            AppStoreWindow.AppStoreSizes.SVGA.screenWidth) {
+            categoriesBoxSpacing /= 2;
+        }
         this._categoriesBox = new Gtk.Box({ orientation: Gtk.Orientation.HORIZONTAL,
-                                            spacing: CATEGORIES_BOX_SPACING,
+                                            spacing: categoriesBoxSpacing,
                                             hexpand: true });
         this._mainBox.add(this._categoriesBox);
         this._categoriesBox.show();
