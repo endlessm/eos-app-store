@@ -27,6 +27,8 @@ const SIDE_COMPONENT_ROLE = 'eos-side-component';
 
 const AppStoreSizes = {
     // Note: must be listed in order of increasing screenWidth.
+    // Window widths are chosen so that the application grid
+    // approximately fills the entire width of the window.
     // Thresholds include compensation for 5% overscan on either side,
     // plus some additional margin.
     // If actual screen width is below the VGA threshold width,
@@ -38,13 +40,13 @@ const AppStoreSizes = {
     // for each resolution, useful as fixed constants
     // (whereas the threshold and window widths may be
     // adjusted as necessary).
-    // For now, use a window width of 800 for any screen width
+    // For now, use a window width of 760 for any screen width
     // less than 900, since we don't handle narrower windows well.
-    VGA:  { screenWidth:  640, thresholdWidth:  550, windowWidth:  800 },
-    SVGA: { screenWidth:  800, thresholdWidth:  700, windowWidth:  800 },
-    XGA:  { screenWidth: 1024, thresholdWidth:  900, windowWidth:  800 },
-    WXGA: { screenWidth: 1366, thresholdWidth: 1200, windowWidth: 1024 },
-    HD:   { screenWidth: 1920, thresholdWidth: 1700, windowWidth: 1366 }
+    VGA:  { screenWidth:  640, thresholdWidth:  550, windowWidth:  760 },
+    SVGA: { screenWidth:  800, thresholdWidth:  700, windowWidth:  760 },
+    XGA:  { screenWidth: 1024, thresholdWidth:  900, windowWidth:  950 },
+    WXGA: { screenWidth: 1366, thresholdWidth: 1200, windowWidth: 1150 },
+    HD:   { screenWidth: 1920, thresholdWidth: 1700, windowWidth: 1340 }
 };
 
 const AppStoreWindow = new Lang.Class({
