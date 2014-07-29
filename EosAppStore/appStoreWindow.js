@@ -38,11 +38,11 @@ const AppStoreSizes = {
     // for each resolution, useful as fixed constants
     // (whereas the threshold and window widths may be
     // adjusted as necessary).
-    // For now, use a window width of 1024 for any screen width
-    // less than 1700, since we don't handle narrower windows well.
-    VGA:  { screenWidth:  640, thresholdWidth:  550, windowWidth: 1024 },
-    SVGA: { screenWidth:  800, thresholdWidth:  700, windowWidth: 1024 },
-    XGA:  { screenWidth: 1024, thresholdWidth:  900, windowWidth: 1024 },
+    // For now, use a window width of 800 for any screen width
+    // less than 900, since we don't handle narrower windows well.
+    VGA:  { screenWidth:  640, thresholdWidth:  550, windowWidth:  800 },
+    SVGA: { screenWidth:  800, thresholdWidth:  700, windowWidth:  800 },
+    XGA:  { screenWidth: 1024, thresholdWidth:  900, windowWidth:  800 },
     WXGA: { screenWidth: 1366, thresholdWidth: 1200, windowWidth: 1024 },
     HD:   { screenWidth: 1920, thresholdWidth: 1700, windowWidth: 1366 }
 };
