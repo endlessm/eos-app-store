@@ -26,13 +26,25 @@ const PAGE_TRANSITION_MS = 500;
 const SIDE_COMPONENT_ROLE = 'eos-side-component';
 
 const AppStoreSizes = {
-  // Note: must be listed in order of increasing screenWidth
-  // Include compensation for 5% overscan on either side,
-  // plus some additional margin
-  SVGA: { screenWidth:  800, windowWidth:  800 },
-   XGA: { screenWidth:  900, windowWidth:  800 }, // nominally 1024
-  WXGA: { screenWidth: 1200, windowWidth: 1024 }, // nominally 1366
-    HD: { screenWidth: 1700, windowWidth: 1366 }, // nominally 1920
+    // Note: must be listed in order of increasing screenWidth.
+    // Thresholds include compensation for 5% overscan on either side,
+    // plus some additional margin.
+    // If actual screen width is below the VGA threshold width,
+    // use the full width.
+    // Otherwise, pick the highest resolution for which the
+    // threshold is met, and use the specified window width,
+    // truncating if necessary to the actual screen width.
+    // Table screen widths are the nominal screen widths
+    // for each resolution, useful as fixed constants
+    // (whereas the threshold and window widths may be
+    // adjusted as necessary).
+    // For now, use a window width of 1024 for any screen width
+    // less than 1700, since we don't handle narrower windows well.
+    VGA:  { screenWidth:  640, thresholdWidth:  550, windowWidth: 1024 },
+    SVGA: { screenWidth:  800, thresholdWidth:  700, windowWidth: 1024 },
+    XGA:  { screenWidth: 1024, thresholdWidth:  900, windowWidth: 1024 },
+    WXGA: { screenWidth: 1366, thresholdWidth: 1200, windowWidth: 1024 },
+    HD:   { screenWidth: 1920, thresholdWidth: 1700, windowWidth: 1366 }
 };
 
 const AppStoreWindow = new Lang.Class({
@@ -159,15 +171,9 @@ const AppStoreWindow = new Lang.Class({
 
         // Find the largest defined resolution that does not exceed
         // the work area width
-        // For now, use a window width of 1024 for any screen width
-        // less than 1700, since we don't handle narrower windows well
         for (let resolutionIdx in AppStoreSizes) {
             let res = AppStoreSizes[resolutionIdx];
-            if (res.windowWidth < AppStoreSizes.WXGA.windowWidth) {
-                continue;
-            }
-
-            if (workArea.width >= res.screenWidth) {
+            if (workArea.width >= res.thresholdWidth) {
                 resolution = res;
             }
         }
@@ -186,7 +192,10 @@ const AppStoreWindow = new Lang.Class({
             return [workArea.width, workArea.height];
         }
 
-        return [resolution.windowWidth, workArea.height];
+        // If the selected resolution specifies a window width
+        // that exceeds the work area, truncate it as necessary
+        return [Math.min(workArea.width, resolution.windowWidth),
+                workArea.height];
     },
 
     _updateGeometry: function() {

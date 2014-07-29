@@ -585,7 +585,7 @@ const WeblinkFrame = new Lang.Class({
 
         this._mainBox.show_all();
 
-        if (mainWindow.getExpectedWidth() <= AppStoreWindow.AppStoreSizes.XGA.windowWidth) {
+        if (mainWindow.getExpectedWidth() <= AppStoreWindow.AppStoreSizes.SVGA.screenWidth) {
             this._columns = 1;
         } else {
             this._columns = 2;
