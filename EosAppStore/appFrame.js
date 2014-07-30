@@ -9,6 +9,7 @@ const Mainloop = imports.mainloop;
 const Endless = imports.gi.Endless;
 
 const AppListModel = imports.appListModel;
+const AppStoreWindow = imports.appStoreWindow;
 const Categories = imports.categories;
 const CategoryButton = imports.categoryButton;
 const Builder = imports.builder;
@@ -27,16 +28,11 @@ const STACK_TOP_MARGIN = 4;
 const SCREENSHOT_LARGE = 480;
 const SCREENSHOT_SMALL = 120;
 
-// If the area available for the grid is less than this minimium size,
-// scroll bars will be added.
-const MIN_GRID_WIDTH = 800;
-const MIN_GRID_HEIGHT = 600;
-
 const AppPreview = new Lang.Class({
     Name: 'AppPreviewImage',
     Extends: Gtk.EventBox,
 
-    _init: function(path) {
+    _init: function(path, width) {
         this.parent();
 
         this._path = path;
@@ -44,7 +40,7 @@ const AppPreview = new Lang.Class({
         this._image = new Gtk.Image();
         this.add(this._image);
 
-        EosAppStorePrivate.app_load_screenshot(this._image, this._path, SCREENSHOT_SMALL);
+        EosAppStorePrivate.app_load_screenshot(this._image, this._path, width);
     },
 
     get path() {
@@ -75,6 +71,19 @@ const AppListBoxRow = new Lang.Class({
 
     _init: function(model, appInfo) {
         this.parent();
+
+        let app = Gio.Application.get_default();
+        let width = app.mainWindow.getExpectedWidth();
+        width = Math.max(width, AppStoreWindow.AppStoreSizes.VGA.screenWidth);
+        let xgaWidth = AppStoreWindow.AppStoreSizes.XGA.screenWidth;
+        if (width < xgaWidth) {
+            let screenshotRatio = SCREENSHOT_SMALL / SCREENSHOT_LARGE;
+            this._screenshotLarge = SCREENSHOT_LARGE + width - xgaWidth;
+            this._screenshotSmall = this._screenshotLarge * screenshotRatio;
+        } else {
+            this._screenshotLarge = SCREENSHOT_LARGE;
+            this._screenshotSmall = SCREENSHOT_SMALL;
+        }
 
         this._model = model;
         this._model.connect('changed', Lang.bind(this, this._updateState));
@@ -119,10 +128,10 @@ const AppListBoxRow = new Lang.Class({
             let path = screenshots[i];
 
             if (i == 0) {
-                EosAppStorePrivate.app_load_screenshot(this._screenshotImage, path, SCREENSHOT_LARGE);
+                EosAppStorePrivate.app_load_screenshot(this._screenshotImage, path, this._screenshotLarge);
             }
 
-            let previewBox = new AppPreview(path);
+            let previewBox = new AppPreview(path, this._screenshotSmall);
             this._screenshotPreviewBox.add(previewBox);
             previewBox.connect('button-press-event', Lang.bind(this, this._onPreviewPress));
         }
@@ -133,7 +142,7 @@ const AppListBoxRow = new Lang.Class({
     },
 
     _onPreviewPress: function(widget, event) {
-        EosAppStorePrivate.app_load_screenshot(this._screenshotImage, widget.path, SCREENSHOT_LARGE);
+        EosAppStorePrivate.app_load_screenshot(this._screenshotImage, widget.path, this._screenshotLarge);
         return false;
     },
 
@@ -348,8 +357,14 @@ const AppFrame = new Lang.Class({
         this._mainStack.add_named(this._mainBox, 'main-box');
         this._mainBox.show();
 
+        let categoriesBoxSpacing = CATEGORIES_BOX_SPACING;
+        let app = Gio.Application.get_default();
+        if (app.mainWindow.getExpectedWidth() <
+            AppStoreWindow.AppStoreSizes.SVGA.screenWidth) {
+            categoriesBoxSpacing /= 2;
+        }
         this._categoriesBox = new Gtk.Box({ orientation: Gtk.Orientation.HORIZONTAL,
-                                            spacing: CATEGORIES_BOX_SPACING,
+                                            spacing: categoriesBoxSpacing,
                                             hexpand: true });
         this._mainBox.add(this._categoriesBox);
         this._categoriesBox.show();
