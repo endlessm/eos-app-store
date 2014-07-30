@@ -250,7 +250,7 @@ const NewSiteBox = new Lang.Class({
         this._alertIcons[NewSiteBoxState.EDITING].connect('clicked', Lang.bind(this, this._onEditSiteCancel));
 
         this._urlEntry = new Gtk.Entry();
-        this._urlEntry.set_placeholder_text(_("Write the site address you want to add"));
+        this._urlEntry.set_placeholder_text(_("Write the website you'd like to add here and press “Enter”"));
         this._urlEntry.get_style_context().add_class('url-entry');
 
         this._urlEntry.connect('enter-notify-event',
@@ -295,7 +295,7 @@ const NewSiteBox = new Lang.Class({
             this._urlEntry.grab_focus();
             // fall through
         case NewSiteBoxState.READY:
-            this._siteAlertLabel.set_text(_("e.g.: http://www.globoesporte.com"));
+            this._siteAlertLabel.set_text(_("e.g.: http://www.prensalibre.com.gt"));
 
             this._siteAddButton.visible = false;
             this._urlEntry.max_length = 0;
@@ -579,9 +579,15 @@ const WeblinkFrame = new Lang.Class({
         this.initTemplate({ templateRoot: '_mainBox', bindChildren: true, connectSignals: true, });
         this.add(this._mainBox);
 
+        let description = new Gtk.Label({ label: _("Add your favorite websites to your desktop or choose suggested ones from our list.") });
+        description.get_style_context().add_class('weblink-description');
+        description.set_alignment(0, 0.5);
+        this._mainBox.add(description);
+        this._mainBox.reorder_child(description, 0);
+
         let separator = new Separator.FrameSeparator();
         this._mainBox.add(separator);
-        this._mainBox.reorder_child(separator, 2);
+        this._mainBox.reorder_child(separator, 3);
 
         this._mainBox.show_all();
 
