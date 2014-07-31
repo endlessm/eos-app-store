@@ -27,26 +27,30 @@ const SIDE_COMPONENT_ROLE = 'eos-side-component';
 
 const AppStoreSizes = {
     // Note: must be listed in order of increasing screenWidth.
-    // Window widths are chosen so that the application grid
-    // approximately fills the entire width of the window.
-    // Thresholds include compensation for 5% overscan on either side,
-    // plus some additional margin.
-    // If actual screen width is below the VGA threshold width,
-    // use the full width.
-    // Otherwise, pick the highest resolution for which the
-    // threshold is met, and use the specified window width,
+    // Window widths are chosen by design to match a specific
+    // number of columns of tiles on the application grid.
+    // Higher resolution thresholds include compensation for 5% overscan
+    // on either side, plus some additional margin.
+    // Pick the highest resolution for which the
+    // threshold is met, and use the specified window and sidebar width,
     // truncating if necessary to the actual screen width.
     // Table screen widths are the nominal screen widths
     // for each resolution, useful as fixed constants
     // (whereas the threshold and window widths may be
     // adjusted as necessary).
-    // For now, use a window width of 760 for any screen width
-    // less than 900, since we don't handle narrower windows well.
-    VGA:  { screenWidth:  640, thresholdWidth:  550, windowWidth:  760 },
-    SVGA: { screenWidth:  800, thresholdWidth:  700, windowWidth:  760 },
-    XGA:  { screenWidth: 1024, thresholdWidth:  900, windowWidth:  950 },
-    WXGA: { screenWidth: 1366, thresholdWidth: 1200, windowWidth: 1150 },
-    HD:   { screenWidth: 1920, thresholdWidth: 1700, windowWidth: 1340 }
+    // For any screen smaller than 1024 wide (even XGA w/ overscan),
+    // use a window width of 800 (or the full screen width if less
+    // than 800), since we don't handle narrower windows well.
+    VGA:  { screenWidth:  640, thresholdWidth:    0, windowWidth:  800,
+            sidebarWidth: 186 },
+    SVGA: { screenWidth:  800, thresholdWidth:  800, windowWidth:  800,
+            sidebarWidth: 186 },
+    XGA:  { screenWidth: 1024, thresholdWidth: 1024, windowWidth: 1024,
+            sidebarWidth: 215 },
+    WXGA: { screenWidth: 1366, thresholdWidth: 1200, windowWidth: 1024,
+            sidebarWidth: 215 },
+    HD:   { screenWidth: 1920, thresholdWidth: 1700, windowWidth: 1414,
+            sidebarWidth: 215 }
 };
 
 const AppStoreWindow = new Lang.Class({
@@ -61,6 +65,7 @@ const AppStoreWindow = new Lang.Class({
     templateChildren: [
         'main-frame',
         'main-box',
+        'sidebar-frame',
         'side-pane-apps-image',
         'side-pane-web-image',
         'side-pane-folder-image',
@@ -198,12 +203,13 @@ const AppStoreWindow = new Lang.Class({
         // If the selected resolution specifies a window width
         // that exceeds the work area, truncate it as necessary
         return [Math.min(workArea.width, resolution.windowWidth),
-                workArea.height];
+                workArea.height,
+                resolution.sidebarWidth];
     },
 
     _updateGeometry: function() {
         let workArea = this._getWorkArea();
-        let [width, height] = this._getSize();
+        let [width, height, sidebarWidth] = this._getSize();
 
         let geometry = { x: workArea.x,
                          y: workArea.y,
@@ -212,6 +218,8 @@ const AppStoreWindow = new Lang.Class({
 
         this.move(geometry.x, geometry.y);
         this.resize(geometry.width, geometry.height);
+
+        this.sidebar_frame.width_request = sidebarWidth;
     },
 
     _createStackPages: function() {
@@ -400,7 +408,7 @@ const AppStoreWindow = new Lang.Class({
     },
 
     getExpectedWidth: function() {
-        let [width, height] = this._getSize();
+        let [width, height, sidebarWidth] = this._getSize();
 
         return width;
     },

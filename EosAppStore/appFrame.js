@@ -359,7 +359,7 @@ const AppFrame = new Lang.Class({
 
         let categoriesBoxSpacing = CATEGORIES_BOX_SPACING;
         let app = Gio.Application.get_default();
-        if (app.mainWindow.getExpectedWidth() <
+        if (app.mainWindow.getExpectedWidth() <=
             AppStoreWindow.AppStoreSizes.SVGA.screenWidth) {
             categoriesBoxSpacing /= 2;
         }
