@@ -27,26 +27,25 @@ const SIDE_COMPONENT_ROLE = 'eos-side-component';
 
 const AppStoreSizes = {
     // Note: must be listed in order of increasing screenWidth.
-    // Window widths are chosen so that the application grid
-    // approximately fills the entire width of the window.
-    // Thresholds include compensation for 5% overscan on either side,
-    // plus some additional margin.
-    // If actual screen width is below the VGA threshold width,
-    // use the full width.
-    // Otherwise, pick the highest resolution for which the
+    // Window widths are chosen by design to match a specific
+    // number of columns of tiles on the application grid.
+    // Higher resolution thresholds include compensation for 5% overscan
+    // on either side, plus some additional margin.
+    // Pick the highest resolution for which the
     // threshold is met, and use the specified window width,
     // truncating if necessary to the actual screen width.
     // Table screen widths are the nominal screen widths
     // for each resolution, useful as fixed constants
     // (whereas the threshold and window widths may be
     // adjusted as necessary).
-    // For now, use a window width of 760 for any screen width
-    // less than 900, since we don't handle narrower windows well.
-    VGA:  { screenWidth:  640, thresholdWidth:  550, windowWidth:  760 },
-    SVGA: { screenWidth:  800, thresholdWidth:  700, windowWidth:  760 },
-    XGA:  { screenWidth: 1024, thresholdWidth:  900, windowWidth:  950 },
-    WXGA: { screenWidth: 1366, thresholdWidth: 1200, windowWidth: 1150 },
-    HD:   { screenWidth: 1920, thresholdWidth: 1700, windowWidth: 1340 }
+    // For any screen smaller than 1024 wide (even XGA w/ overscan),
+    // use a window width of 800 (or the full screen width if less
+    // than 800), since we don't handle narrower windows well.
+    VGA:  { screenWidth:  640, thresholdWidth:    0, windowWidth:  800 },
+    SVGA: { screenWidth:  800, thresholdWidth:  800, windowWidth:  800 },
+    XGA:  { screenWidth: 1024, thresholdWidth: 1024, windowWidth: 1024 },
+    WXGA: { screenWidth: 1366, thresholdWidth: 1200, windowWidth: 1024 },
+    HD:   { screenWidth: 1920, thresholdWidth: 1700, windowWidth: 1414 }
 };
 
 const AppStoreWindow = new Lang.Class({
