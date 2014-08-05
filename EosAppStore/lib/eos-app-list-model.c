@@ -68,34 +68,6 @@ app_id_from_desktop_id (const gchar *desktop_id)
   return g_strndup (desktop_id, len - 8); /* the 8 here is the length of ".desktop" */
 }
 
-static gchar *
-localized_id_from_desktop_id (const gchar *desktop_id)
-{
-  /* HACK: this should really be removed in favor of communicating the
-   * language to the app manager API...
-   */
-  const gchar * const * locales;
-  const gchar *locale_name;
-  const gchar *lang_id;
-  gchar **variants;
-  gchar *localized_id;
-  gchar *app_id;
-
-  locales = g_get_language_names ();
-  locale_name = locales[0];
-
-  variants = g_get_locale_variants (locale_name);
-  lang_id = variants[g_strv_length (variants) - 1];
-
-  app_id = app_id_from_desktop_id (desktop_id);
-  localized_id = g_strdup_printf ("%s-%s.desktop", app_id, lang_id);
-
-  g_free (app_id);
-  g_strfreev (variants);
-
-  return localized_id;
-}
-
 static GHashTable *
 load_shell_apps_from_gvariant (GVariant *apps)
 {
@@ -834,13 +806,6 @@ eos_app_list_model_get_app_info (EosAppListModel *model,
   if (info == NULL)
     info = g_hash_table_lookup (model->gio_apps, desktop_id);
 
-  if (info == NULL)
-    {
-      gchar *localized_id = localized_id_from_desktop_id (desktop_id);
-      info = g_hash_table_lookup (model->gio_apps, localized_id);
-      g_free (localized_id);
-    }
-
   return info;
 }
 
@@ -865,44 +830,6 @@ app_is_installable (EosAppListModel *model,
   return g_hash_table_contains (model->installable_apps, desktop_id);
 }
 
-static gchar *
-app_get_localized_id_for_installable_app (EosAppListModel *model,
-                                          const gchar *desktop_id)
-{
-  gchar *localized_id;
-
-  if (desktop_id_is_web_link (desktop_id))
-    return g_strdup (desktop_id);
-
-  if (app_is_installable (model, desktop_id))
-    return g_strdup (desktop_id);
-
-  localized_id = localized_id_from_desktop_id (desktop_id);
-  if (app_is_installable (model, localized_id))
-    return localized_id;
-
-  g_free (localized_id);
-  return NULL;
-}
-
-static gboolean
-app_is_updatable (EosAppListModel *model,
-                  const char *desktop_id)
-{
-  if (model->updatable_apps == NULL)
-    return FALSE;
-
-  return g_hash_table_lookup (model->updatable_apps, desktop_id) != NULL;
-}
-
-static gboolean
-app_is_installed (EosAppListModel *model,
-                  const char      *desktop_id)
-{
-  /* An app is installed if GIO knows about it */
-  return (eos_app_list_model_get_app_info (model, desktop_id) != NULL);
-}
-
 static const gchar *
 app_get_localized_id_for_installed_app (EosAppListModel *model,
                                         const gchar *desktop_id)
@@ -914,6 +841,37 @@ app_get_localized_id_for_installed_app (EosAppListModel *model,
     return g_app_info_get_id (G_APP_INFO (info));
 
   return NULL;
+}
+
+static const gchar *
+app_get_localized_id_for_installable_app (EosAppListModel *model,
+                                          const gchar *desktop_id)
+{
+  if (desktop_id_is_web_link (desktop_id))
+    return desktop_id;
+
+  if (app_is_installable (model, desktop_id))
+    return desktop_id;
+
+  return NULL;
+}
+
+static gboolean
+app_is_updatable (EosAppListModel *model,
+                  const char *desktop_id)
+{
+  if (model->updatable_apps == NULL)
+    return FALSE;
+
+  return g_hash_table_contains (model->updatable_apps, desktop_id);
+}
+
+static gboolean
+app_is_installed (EosAppListModel *model,
+                  const char      *desktop_id)
+{
+  /* An app is installed if GIO knows about it */
+  return (eos_app_list_model_get_app_info (model, desktop_id) != NULL);
 }
 
 gboolean
@@ -1026,12 +984,12 @@ eos_app_list_model_install_app_async (EosAppListModel *model,
                                       gpointer user_data)
 {
   GTask *task;
-  char *localized_id;
+  const char *localized_id;
 
   task = g_task_new (model, cancellable, callback, user_data);
 
   if (app_is_installed (model, desktop_id))
-    localized_id = g_strdup (app_get_localized_id_for_installed_app (model, desktop_id));
+    localized_id = app_get_localized_id_for_installed_app (model, desktop_id);
   else
     localized_id = app_get_localized_id_for_installable_app (model, desktop_id);
 
@@ -1054,11 +1012,10 @@ eos_app_list_model_install_app_async (EosAppListModel *model,
                                _("App %s already installed"),
                                desktop_id);
       g_object_unref (task);
-      g_free (localized_id);
       return;
     }
 
-  g_task_set_task_data (task, localized_id, (GDestroyNotify) g_free);
+  g_task_set_task_data (task, g_strdup (localized_id), (GDestroyNotify) g_free);
   g_task_run_in_thread (task, add_app_thread_func);
   g_object_unref (task);
 }
@@ -1242,20 +1199,13 @@ gboolean
 eos_app_list_model_has_app (EosAppListModel *model,
                             const char *desktop_id)
 {
-  gchar *localized_id;
-  gboolean res;
-
   if (eos_app_list_model_get_app_info (model, desktop_id) != NULL)
     return TRUE;
 
   if (app_is_installable (model, desktop_id))
     return TRUE;
 
-  localized_id = localized_id_from_desktop_id (desktop_id);
-  res = app_is_installable (model, localized_id);
-  g_free (localized_id);
-
-  return res;
+  return FALSE;
 }
 
 gboolean
