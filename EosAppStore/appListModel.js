@@ -72,8 +72,6 @@ const BaseList = new Lang.Class({
         application.hold();
 
         this._model.install_app_async(id, null, Lang.bind(this, function(model, res) {
-            application.release();
-
             try {
                 this._model.install_app_finish(res);
                 if (callback) {
@@ -86,6 +84,8 @@ const BaseList = new Lang.Class({
                     callback(e);
                 }
             }
+
+            application.release();
         }));
     },
 
@@ -94,8 +94,6 @@ const BaseList = new Lang.Class({
         application.hold();
 
         this._model.uninstall_app_async(id, null, Lang.bind(this, function(model, res) {
-            application.release();
-
             try {
                 this._model.uninstall_app_finish(res);
                 if (callback) {
@@ -108,6 +106,8 @@ const BaseList = new Lang.Class({
                     callback(e);
                 }
             }
+
+            application.release();
         }));
     }
 });
@@ -136,8 +136,6 @@ const AppList = new Lang.Class({
         application.hold();
 
         this._model.update_app_async(id, null, Lang.bind(this, function(model, res) {
-            application.release();
-
             try {
                 this._model.update_app_finish(res);
                 if (callback) {
@@ -150,6 +148,8 @@ const AppList = new Lang.Class({
                     callback(e);
                 }
             }
+
+            application.release();
         }));
     },
 

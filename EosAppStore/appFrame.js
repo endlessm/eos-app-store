@@ -10,10 +10,11 @@ const Endless = imports.gi.Endless;
 
 const AppListModel = imports.appListModel;
 const AppStoreWindow = imports.appStoreWindow;
+const Builder = imports.builder;
 const Categories = imports.categories;
 const CategoryButton = imports.categoryButton;
-const Builder = imports.builder;
 const Lang = imports.lang;
+const Notify = imports.notify;
 const Separator = imports.separator;
 const Signals = imports.signals;
 
@@ -99,6 +100,7 @@ const AppListBoxRow = new Lang.Class({
         this._mainBox.show();
 
         this.appInfo = appInfo;
+        this.appTitle = this.appInfo.get_title();
         this.appDescription = this.appInfo.get_description();
         this.appScreenshots = this.appInfo.get_screenshots();
         this._updateState();
@@ -239,9 +241,17 @@ const AppListBoxRow = new Lang.Class({
                 this._installSpinner.start();
 
                 this._model.install(this._appId, Lang.bind(this, function(error) {
+
                     this._installSpinner.stop();
                     this._installProgress.hide();
                     this._updateState();
+
+                    if (error) {
+                        this._maybeNotify(_("We could not install '" + this.appTitle + "'"));
+                    }
+                    else {
+                        this._maybeNotify(_("'" + this.appTitle + "' was installed successfully"));
+                    }
                 }));
                 break;
 
@@ -256,6 +266,13 @@ const AppListBoxRow = new Lang.Class({
                 this._model.install(this._appId, Lang.bind(this, function(error) {
                     this._installSpinner.stop();
                     this._installProgress.hide();
+
+                    if (error) {
+                        this._maybeNotify(_("We could not install '" + this.appTitle + "'"));
+                    }
+                    else {
+                        this._maybeNotify(_("'" + this.appTitle + "' was installed successfully"));
+                    }
 
                     if (error) {
                         this._updateState();
@@ -285,6 +302,13 @@ const AppListBoxRow = new Lang.Class({
                     this._installProgress.hide();
 
                     this._updateState();
+
+                    if (error) {
+                        this._maybeNotify(_("We could not update '" + this.appTitle + "'"));
+                    }
+                    else {
+                        this._maybeNotify(_('"' + this.appTitle + "' was updated successfully"));
+                    }
                 }));
                 break;
         }
@@ -316,12 +340,28 @@ const AppListBoxRow = new Lang.Class({
                 this._installSpinner.stop();
                 this._installProgress.hide();
 
+                if (error) {
+                    this._maybeNotify(_("We could not remove '" + this.appTitle + "'"));
+                }
+                else {
+                    this._maybeNotify(_('"' + this.appTitle + "' was removed successfully"));
+                }
+
                 this._updateState();
             }));
         }
 
         dialog.destroy();
     },
+
+    _maybeNotify: function(message) {
+        let app = Gio.Application.get_default();
+        let appWindowVisible = app.mainWindow.is_visible();
+        if (!appWindowVisible) {
+            let notification = Notify.Notification(message, '');
+            notification.show();
+        }
+    }
 });
 Builder.bindTemplateChildren(AppListBoxRow.prototype);
 
