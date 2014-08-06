@@ -246,11 +246,20 @@ const AppListBoxRow = new Lang.Class({
                     this._installProgress.hide();
                     this._updateState();
 
-                    if (error) {
-                        this._maybeNotify(_("We could not install '" + this.appTitle + "'"));
-                    }
-                    else {
-                        this._maybeNotify(_("'" + this.appTitle + "' was installed successfully"));
+                    let app = Gio.Application.get_default();
+                    let appWindowVisible = app.mainWindow.is_visible();
+                    if (!appWindowVisible) {
+                        let summary = '';
+
+                        if (error) {
+                            summary = _("We could not install '" + this.appTitle + "'");
+                        }
+                        else {
+                            summary = _("'" + this.appTitle + "' was installed successfully");
+                        }
+
+                        let notification = Notify.Notification(summary, '');
+                        notification.show();
                     }
                 }));
                 break;
@@ -267,11 +276,20 @@ const AppListBoxRow = new Lang.Class({
                     this._installSpinner.stop();
                     this._installProgress.hide();
 
-                    if (error) {
-                        this._maybeNotify(_("We could not install '" + this.appTitle + "'"));
-                    }
-                    else {
-                        this._maybeNotify(_("'" + this.appTitle + "' was installed successfully"));
+                    let app = Gio.Application.get_default();
+                    let appWindowVisible = app.mainWindow.is_visible();
+                    if (!appWindowVisible) {
+                        let summary;
+
+                        if (error) {
+                            summary = _("We could not install '" + this.appTitle + "'");
+                        }
+                        else {
+                            summary = _("'" + this.appTitle + '" was installed successfully");
+                        }
+
+                        let notification = Notify.Notification(summary, '');
+                        notification.show();
                     }
 
                     if (error) {
@@ -303,11 +321,20 @@ const AppListBoxRow = new Lang.Class({
 
                     this._updateState();
 
-                    if (error) {
-                        this._maybeNotify(_("We could not update '" + this.appTitle + "'"));
-                    }
-                    else {
-                        this._maybeNotify(_('"' + this.appTitle + "' was updated successfully"));
+                    let app = Gio.Application.get_default();
+                    let appWindowVisible = app.mainWindow.is_visible();
+                    if (!appWindowVisible) {
+                        let summary;
+
+                        if (error) {
+                            summary = _("We could not update '" + this.appTitle + "'");
+                        }
+                        else {
+                            summary = _('"' + this.appTitle + "' was updated successfully");
+                        }
+
+                        let notification = Notify.Notification(summary, '');
+                        notification.show();
                     }
                 }));
                 break;
@@ -340,11 +367,20 @@ const AppListBoxRow = new Lang.Class({
                 this._installSpinner.stop();
                 this._installProgress.hide();
 
-                if (error) {
-                    this._maybeNotify(_("We could not remove '" + this.appTitle + "'"));
-                }
-                else {
-                    this._maybeNotify(_('"' + this.appTitle + "' was removed successfully"));
+                let app = Gio.Application.get_default();
+                let appWindowVisible = app.mainWindow.is_visible();
+                if (!appWindowVisible) {
+                    let summary;
+
+                    if (error) {
+                        summary = _("We could not remove '" + this.appTitle + "'");
+                    }
+                    else {
+                        summary = _('"' + this.appTitle + "' was removed successfully");
+                    }
+
+                    let notification = Notify.Notification(summary, '');
+                    notification.show();
                 }
 
                 this._updateState();
@@ -353,15 +389,6 @@ const AppListBoxRow = new Lang.Class({
 
         dialog.destroy();
     },
-
-    _maybeNotify: function(message) {
-        let app = Gio.Application.get_default();
-        let appWindowVisible = app.mainWindow.is_visible();
-        if (!appWindowVisible) {
-            let notification = Notify.Notification(message, '');
-            notification.show();
-        }
-    }
 });
 Builder.bindTemplateChildren(AppListBoxRow.prototype);
 
