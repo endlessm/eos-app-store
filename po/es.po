@@ -10,15 +10,16 @@
 # Joel Gil Leon <joel@endlessm.com>, 2013-2014
 # Joel Gil Leon <joel@endlessm.com>, 2013
 # Nuritzi Sanchez <ns@endlessm.com>, 2014
+# Philip Chimento <philip.chimento@gmail.com>, 2014
 # Roddy Shuler <roddy@endlessm.com>, 2013-2014
 # Roddy Shuler <roddy@endlessm.com>, 2013
 msgid ""
 msgstr ""
 "Project-Id-Version: eos-app-store\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-07-28 16:56-0700\n"
-"PO-Revision-Date: 2014-08-01 03:40+0000\n"
-"Last-Translator: endlessmobile_build <philip@endlessm.com>\n"
+"POT-Creation-Date: 2014-08-07 10:07-0700\n"
+"PO-Revision-Date: 2014-08-07 17:11+0000\n"
+"Last-Translator: Philip Chimento <philip.chimento@gmail.com>\n"
 "Language-Team: Spanish (http://www.transifex.com/projects/p/eos-app-store/language/es/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -30,7 +31,7 @@ msgstr ""
 msgid "Create your own folder to organize your apps. First, choose an icon."
 msgstr "Crea tu propia carpeta para organizar tus apps. Primero, escoge un icono."
 
-#: ../data/eos-app-store-list-row.ui.h:1 ../EosAppStore/appFrame.js:189
+#: ../data/eos-app-store-list-row.ui.h:1 ../EosAppStore/appFrame.js:200
 msgid "Install app"
 msgstr "Instalar app"
 
@@ -62,57 +63,87 @@ msgstr "Carpetas"
 msgid "e.g.: http://www.globoesporte.com"
 msgstr "ej.: http://www.globoesporte.com"
 
-#: ../EosAppStore/appFrame.js:174
+#: ../EosAppStore/appFrame.js:185
 msgid "Add to the desktop"
 msgstr "Agregar al escritorio"
 
-#: ../EosAppStore/appFrame.js:177
+#: ../EosAppStore/appFrame.js:188
 msgid "Open app"
 msgstr "Abrir app"
 
-#: ../EosAppStore/appFrame.js:194
+#: ../EosAppStore/appFrame.js:205
 msgid "Update app"
 msgstr "Actualizar app"
 
-#: ../EosAppStore/appFrame.js:228 ../EosAppStore/appFrame.js:243
+#: ../EosAppStore/appFrame.js:239 ../EosAppStore/appFrame.js:262
 msgid "Installing..."
 msgstr "Instalando..."
 
-#: ../EosAppStore/appFrame.js:270
+#: ../EosAppStore/appFrame.js:250 ../EosAppStore/appFrame.js:271
+#, c-format
+msgid "We could not install '%s'"
+msgstr "No pudimos instalar '%s'"
+
+#: ../EosAppStore/appFrame.js:253 ../EosAppStore/appFrame.js:274
+#, c-format
+msgid "'%s' was installed successfully"
+msgstr "'%s' fue instalado con éxito"
+
+#: ../EosAppStore/appFrame.js:296
 msgid "Updating..."
 msgstr "Actualizando..."
 
-#: ../EosAppStore/appFrame.js:289
+#: ../EosAppStore/appFrame.js:307
+#, c-format
+msgid "We could not update '%s'"
+msgstr "No pudimos actualizar '%s'"
+
+#: ../EosAppStore/appFrame.js:310
+#, c-format
+msgid "'%s' was updated successfully"
+msgstr "'%s' fue actualizado con éxito"
+
+#: ../EosAppStore/appFrame.js:322
 msgid "Deleting app"
 msgstr "Eliminando la app"
 
-#: ../EosAppStore/appFrame.js:290
+#: ../EosAppStore/appFrame.js:323
 msgid ""
 "Deleting this app will remove it from the device for all users. You will "
 "need to download it from the internet in order to reinstall it."
 msgstr "Si borras esta app será eliminada del sistema, y el cambio será actualizado para todos los usuarios de esta computadora. Para reinstalar la app, tendrás que descargarla del internet e instalarla de nuevo."
 
-#: ../EosAppStore/appFrame.js:291
+#: ../EosAppStore/appFrame.js:324
 msgid "Delete app"
 msgstr "Eliminar app"
 
-#: ../EosAppStore/appFrame.js:293
+#: ../EosAppStore/appFrame.js:326
 msgid "Cancel"
 msgstr "Cancelar"
 
-#: ../EosAppStore/appFrame.js:302
+#: ../EosAppStore/appFrame.js:335
 msgid "Removing..."
 msgstr "Eliminando...."
 
-#: ../EosAppStore/appStoreWindow.js:305
+#: ../EosAppStore/appFrame.js:344
+#, c-format
+msgid "We could not remove '%s'"
+msgstr "No pudimos remover '%s'"
+
+#: ../EosAppStore/appFrame.js:347
+#, c-format
+msgid "'%s' was removed successfully"
+msgstr "'%s' fue removido con éxito"
+
+#: ../EosAppStore/appStoreWindow.js:325
 msgid "Install apps"
 msgstr "Instalar apps"
 
-#: ../EosAppStore/appStoreWindow.js:309
+#: ../EosAppStore/appStoreWindow.js:329
 msgid "Install websites"
 msgstr "Instalar sitios web"
 
-#: ../EosAppStore/appStoreWindow.js:313
+#: ../EosAppStore/appStoreWindow.js:333
 msgid "Install folders"
 msgstr "Instalar carpetas."
 
@@ -196,24 +227,24 @@ msgid ""
 " list."
 msgstr "Agrega tus sitios favoritos a tu escritorio o escoge uno de nuestra lista."
 
-#: ../EosAppStore/lib/eos-app-list-model.c:1054
-#: ../EosAppStore/lib/eos-app-list-model.c:1128
+#: ../EosAppStore/lib/eos-app-list-model.c:1043
+#: ../EosAppStore/lib/eos-app-list-model.c:1117
 #, c-format
 msgid "App %s not installable"
 msgstr "No es posible instalar la app %s"
 
-#: ../EosAppStore/lib/eos-app-list-model.c:1065
+#: ../EosAppStore/lib/eos-app-list-model.c:1054
 #, c-format
 msgid "App %s already installed"
 msgstr "La app %s ya está instalada"
 
-#: ../EosAppStore/lib/eos-app-list-model.c:1139
+#: ../EosAppStore/lib/eos-app-list-model.c:1128
 #, c-format
 msgid "App %s is up to date"
 msgstr "La app %s ya está actualizada"
 
-#: ../EosAppStore/lib/eos-app-list-model.c:1206
-#: ../EosAppStore/lib/eos-app-list-model.c:1244
+#: ../EosAppStore/lib/eos-app-list-model.c:1195
+#: ../EosAppStore/lib/eos-app-list-model.c:1233
 #, c-format
 msgid "App %s is not installed"
 msgstr "La app %s no está instalada"
