@@ -356,7 +356,17 @@ const AppListBoxRow = new Lang.Class({
 
     _maybeNotify: function(message) {
         let app = Gio.Application.get_default();
-        let appWindowVisible = app.mainWindow.is_visible();
+        let appWindowVisible = false;
+        if (app.mainWindow) {
+            appWindowVisible = app.mainWindow.is_visible();
+        }
+        else {
+            // the app store window timeout triggered, but the
+            // app store process is still running because of the
+            // reference we hold
+            appWindowVisible = false;
+        }
+
         if (!appWindowVisible) {
             let notification = Notify.Notification(message, '');
             notification.show();
