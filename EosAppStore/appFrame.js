@@ -368,7 +368,7 @@ const AppListBoxRow = new Lang.Class({
         }
 
         if (!appWindowVisible) {
-            let notification = Notify.Notification(message, '');
+            let notification = new Notify.Notification(message, '');
             notification.show();
         }
     }
