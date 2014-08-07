@@ -247,10 +247,10 @@ const AppListBoxRow = new Lang.Class({
                     this._updateState();
 
                     if (error) {
-                        this._maybeNotify(_("We could not install '" + this.appTitle + "'"));
+                        this._maybeNotify(_("We could not install '%s'").format(this.appTitle));
                     }
                     else {
-                        this._maybeNotify(_("'" + this.appTitle + "' was installed successfully"));
+                        this._maybeNotify(_("'%s' was installed successfully").format(this.appTitle));
                     }
                 }));
                 break;
@@ -268,10 +268,10 @@ const AppListBoxRow = new Lang.Class({
                     this._installProgress.hide();
 
                     if (error) {
-                        this._maybeNotify(_("We could not install '" + this.appTitle + "'"));
+                        this._maybeNotify(_("We could not install '%s'").format(this.appTitle));
                     }
                     else {
-                        this._maybeNotify(_("'" + this.appTitle + "' was installed successfully"));
+                        this._maybeNotify(_("'%s' was installed successfully").format(this.appTitle));
                     }
 
                     if (error) {
@@ -304,10 +304,10 @@ const AppListBoxRow = new Lang.Class({
                     this._updateState();
 
                     if (error) {
-                        this._maybeNotify(_("We could not update '" + this.appTitle + "'"));
+                        this._maybeNotify(_("We could not update '%s'").format(this.appTitle));
                     }
                     else {
-                        this._maybeNotify(_('"' + this.appTitle + "' was updated successfully"));
+                        this._maybeNotify(_("'%s' was updated successfully").format(this.appTitle));
                     }
                 }));
                 break;
@@ -341,10 +341,10 @@ const AppListBoxRow = new Lang.Class({
                 this._installProgress.hide();
 
                 if (error) {
-                    this._maybeNotify(_("We could not remove '" + this.appTitle + "'"));
+                    this._maybeNotify(_("We could not remove '%s'").format(this.appTitle));
                 }
                 else {
-                    this._maybeNotify(_('"' + this.appTitle + "' was removed successfully"));
+                    this._maybeNotify(_("'%s' was removed successfully").format(this.appTitle));
                 }
 
                 this._updateState();
