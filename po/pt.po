@@ -8,16 +8,18 @@
 # Joel Gil Leon <joel@endlessm.com>, 2013
 # Nuritzi Sanchez <ns@endlessm.com>, 2013
 # Nuritzi Sanchez <ns@endlessm.com>, 2013
+# Philip Chimento <philip.chimento@gmail.com>, 2014
 # Renato Peixoto Pinto <renato@endlessm.com>, 2013
 # Ricardo Pitanga <pitanga@endlessm.com>, 2013
 # Roddy Shuler <roddy@endlessm.com>, 2013-2014
 # Roddy Shuler <roddy@endlessm.com>, 2013
+# Silva <michele@endlessm.com>, 2014
 msgid ""
 msgstr ""
 "Project-Id-Version: eos-app-store\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2014-08-07 10:07-0700\n"
-"PO-Revision-Date: 2014-08-07 17:08+0000\n"
+"PO-Revision-Date: 2014-08-07 20:10+0000\n"
 "Last-Translator: Philip Chimento <philip.chimento@gmail.com>\n"
 "Language-Team: Portuguese (http://www.transifex.com/projects/p/eos-app-store/language/pt/)\n"
 "MIME-Version: 1.0\n"
@@ -28,11 +30,11 @@ msgstr ""
 
 #: ../data/eos-app-store-folder-frame.ui.h:1
 msgid "Create your own folder to organize your apps. First, choose an icon."
-msgstr ""
+msgstr "Crie a sua própria pasta para organizar seus aplicativos. Primeiro, escolha um ícone."
 
 #: ../data/eos-app-store-list-row.ui.h:1 ../EosAppStore/appFrame.js:200
 msgid "Install app"
-msgstr ""
+msgstr "Instalar aplicativo"
 
 #: ../data/eos-app-store-list-row.ui.h:2
 msgid "Installing"
@@ -44,11 +46,11 @@ msgstr "Instalado com sucesso"
 
 #: ../data/eos-app-store-list-row.ui.h:4
 msgid "Delete from device"
-msgstr ""
+msgstr "Apagar do dispositivo"
 
 #: ../data/eos-app-store-main-window.ui.h:1
 msgid "Apps"
-msgstr ""
+msgstr "Aplicativos"
 
 #: ../data/eos-app-store-main-window.ui.h:2
 msgid "Websites"
@@ -64,79 +66,79 @@ msgstr "ex.: http://www.globoesporte.com"
 
 #: ../EosAppStore/appFrame.js:185
 msgid "Add to the desktop"
-msgstr ""
+msgstr "Adicionar à área de trabalho"
 
 #: ../EosAppStore/appFrame.js:188
 msgid "Open app"
-msgstr ""
+msgstr "Abrir aplicativo"
 
 #: ../EosAppStore/appFrame.js:205
 msgid "Update app"
-msgstr ""
+msgstr "Atualizar aplicativo"
 
 #: ../EosAppStore/appFrame.js:239 ../EosAppStore/appFrame.js:262
 msgid "Installing..."
-msgstr ""
+msgstr "Instalando..."
 
 #: ../EosAppStore/appFrame.js:250 ../EosAppStore/appFrame.js:271
 #, c-format
 msgid "We could not install '%s'"
-msgstr ""
+msgstr "Não foi possível instalar  '%s'"
 
 #: ../EosAppStore/appFrame.js:253 ../EosAppStore/appFrame.js:274
 #, c-format
 msgid "'%s' was installed successfully"
-msgstr ""
+msgstr "'%s' instalado com sucesso"
 
 #: ../EosAppStore/appFrame.js:296
 msgid "Updating..."
-msgstr ""
+msgstr "Atualizando..."
 
 #: ../EosAppStore/appFrame.js:307
 #, c-format
 msgid "We could not update '%s'"
-msgstr ""
+msgstr "Não foi possível atualizar '%s'"
 
 #: ../EosAppStore/appFrame.js:310
 #, c-format
 msgid "'%s' was updated successfully"
-msgstr ""
+msgstr "'%s' foi atualizado com sucesso"
 
 #: ../EosAppStore/appFrame.js:322
 msgid "Deleting app"
-msgstr ""
+msgstr "Excluindo aplicativo"
 
 #: ../EosAppStore/appFrame.js:323
 msgid ""
 "Deleting this app will remove it from the device for all users. You will "
 "need to download it from the internet in order to reinstall it."
-msgstr ""
+msgstr "Ao excluir este aplicativo você o removerá de todas as contas de usuário desse computador. Caso queira reinstalar será necessário baixar pela internet."
 
 #: ../EosAppStore/appFrame.js:324
 msgid "Delete app"
-msgstr ""
+msgstr "Excluir aplicativo "
 
 #: ../EosAppStore/appFrame.js:326
 msgid "Cancel"
-msgstr ""
+msgstr "Cancelar"
 
 #: ../EosAppStore/appFrame.js:335
 msgid "Removing..."
-msgstr ""
+msgstr "Removendo..."
 
 #: ../EosAppStore/appFrame.js:344
 #, c-format
 msgid "We could not remove '%s'"
-msgstr ""
+msgstr "Não foi possível excluir '%s'"
 
 #: ../EosAppStore/appFrame.js:347
 #, c-format
 msgid "'%s' was removed successfully"
-msgstr ""
+msgstr " '%s' foi excluído com sucesso"
 
 #: ../EosAppStore/appStoreWindow.js:325
 msgid "Install apps"
-msgstr ""
+msgstr "Instalar aplicativos"
 
 #: ../EosAppStore/appStoreWindow.js:329
 msgid "Install websites"
@@ -149,7 +151,7 @@ msgstr "Adicionar pastas"
 #. Translators: use the same string used to install the app store content JSON
 #: ../EosAppStore/categories.js:10 ../EosAppStore/lib/eos-app-info.c:798
 msgid "Resources"
-msgstr ""
+msgstr "Recursos"
 
 #: ../EosAppStore/categories.js:16 ../EosAppStore/lib/eos-app-info.c:799
 msgid "Education"
@@ -170,7 +172,7 @@ msgstr "Utilidades"
 
 #: ../EosAppStore/categories.js:40
 msgid "Installed"
-msgstr ""
+msgstr "Instalado"
 
 #: ../EosAppStore/categories.js:51
 msgid "News"
@@ -190,7 +192,7 @@ msgstr "Localidade"
 
 #: ../EosAppStore/environment.js:19
 msgid "App Store"
-msgstr ""
+msgstr "Central de Aplicativos"
 
 #: ../EosAppStore/folderFrame.js:41
 msgid "Name of folder"
@@ -202,11 +204,11 @@ msgstr "Pasta adicionada!"
 
 #: ../EosAppStore/weblinkFrame.js:253
 msgid "Write the website you'd like to add here and press “Enter”"
-msgstr ""
+msgstr "Escreva o nome do site que você gostaria de acrescentar aqui e pressione  “Enter”"
 
 #: ../EosAppStore/weblinkFrame.js:298
 msgid "e.g.: http://www.prensalibre.com.gt"
-msgstr ""
+msgstr "ex.: http://www.g1.com.br"
 
 #: ../EosAppStore/weblinkFrame.js:320
 msgid "searching"
@@ -224,26 +226,26 @@ msgstr "adicionado com sucesso!"
 msgid ""
 "Add your favorite websites to your desktop or choose suggested ones from our"
 " list."
-msgstr ""
+msgstr "Adicione seus sites favoritos à sua área de trabalho ou escolha entre as opções que sugerimos. "
 
 #: ../EosAppStore/lib/eos-app-list-model.c:1043
 #: ../EosAppStore/lib/eos-app-list-model.c:1117
 #, c-format
 msgid "App %s not installable"
-msgstr ""
+msgstr "Não é possível instalar o aplicativo %s "
 
 #: ../EosAppStore/lib/eos-app-list-model.c:1054
 #, c-format
 msgid "App %s already installed"
-msgstr ""
+msgstr "O aplicativo %s  já está instalado"
 
 #: ../EosAppStore/lib/eos-app-list-model.c:1128
 #, c-format
 msgid "App %s is up to date"
-msgstr ""
+msgstr "O aplicativo  %s está atualizado"
 
 #: ../EosAppStore/lib/eos-app-list-model.c:1195
 #: ../EosAppStore/lib/eos-app-list-model.c:1233
 #, c-format
 msgid "App %s is not installed"
-msgstr ""
+msgstr " O aplicativo %s não está instalado"
