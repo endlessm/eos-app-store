@@ -33,7 +33,7 @@ struct _EosAppCell {
   char *desktop_id;
   char *icon_name;
 
-  EosStack *stack;
+  GtkWidget *stack;
   GtkWidget *frame, *frame_selected;
 
   GtkWidget *title_label, *title_label_selected;
@@ -226,18 +226,16 @@ eos_app_cell_set_property (GObject      *gobject,
 
     case PROP_SELECTED:
       {
-        GtkStyleContext *context = gtk_widget_get_style_context (GTK_WIDGET (self));
-
         self->is_selected = g_value_get_boolean (value);
         if (self->is_selected)
           {
             gtk_stack_set_transition_type (GTK_STACK (self->stack), GTK_STACK_TRANSITION_TYPE_SLIDE_UP);
-            eos_stack_set_visible_child (GTK_STACK (self->stack), self->frame_selected, TRUE);
+            eos_stack_set_visible_child (EOS_STACK (self->stack), self->frame_selected, TRUE);
           }
         else
           {
             gtk_stack_set_transition_type (GTK_STACK (self->stack), GTK_STACK_TRANSITION_TYPE_SLIDE_DOWN);
-            eos_stack_set_visible_child (GTK_STACK (self->stack), self->frame, FALSE);
+            eos_stack_set_visible_child (EOS_STACK (self->stack), self->frame, FALSE);
           }
       }
       break;
@@ -431,12 +429,12 @@ eos_app_cell_init (EosAppCell *self)
   gtk_widget_set_hexpand (GTK_WIDGET (self), TRUE);
   gtk_widget_set_vexpand (GTK_WIDGET (self), TRUE);
 
-  EosStack *stack = EOS_STACK (eos_stack_new());
+  GtkWidget *stack = eos_stack_new ();
   self->stack = stack;
   eos_stack_set_transition_duration (self->stack, 350);
   gtk_container_add (GTK_CONTAINER (self), GTK_WIDGET (stack));
 
-  // Normal state
+  /* Normal state */
   self->frame = gtk_frame_new (NULL);
   gtk_style_context_add_class (gtk_widget_get_style_context (self->frame),
                                "app-cell-frame");
@@ -466,7 +464,7 @@ eos_app_cell_init (EosAppCell *self)
   gtk_container_add (GTK_CONTAINER (box), self->subtitle_label);
   gtk_widget_show (self->subtitle_label);
 
-  // Selected state
+  /* Selected state */
   self->frame_selected = gtk_frame_new (NULL);
   gtk_style_context_add_class (gtk_widget_get_style_context (self->frame_selected),
                                "app-cell-frame");
@@ -484,7 +482,6 @@ eos_app_cell_init (EosAppCell *self)
   self->icon_hbox = hbox;
   gtk_widget_set_hexpand (hbox, TRUE);
   gtk_container_add (GTK_CONTAINER (box_selected), hbox);
-  //gtk_widget_set_no_show_all (hbox, TRUE);
   gtk_widget_show (hbox);
 
   self->icon = gtk_image_new ();

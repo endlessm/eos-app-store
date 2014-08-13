@@ -37,7 +37,7 @@ G_DEFINE_TYPE_WITH_PRIVATE (EosStack, eos_stack, GTK_TYPE_STACK)
 
 static gboolean
 eos_stack_draw (GtkWidget *widget,
-                                cairo_t   *cr)
+		cairo_t   *cr)
 {
   EosStack *stack = EOS_STACK (widget);
   EosStackPrivate *priv = eos_stack_get_instance_private (stack);
@@ -119,7 +119,7 @@ eos_stack_transition_cb (GtkStack      *stack,
 }
 
 void
-eos_stack_set_visible_child (GtkStack  *stack,
+eos_stack_set_visible_child (EosStack  *stack,
                              GtkWidget *child,
                              gboolean show_overlay)
 {
@@ -134,15 +134,16 @@ eos_stack_set_visible_child (GtkStack  *stack,
       priv->overlay_type = EOS_STACK_OVERLAY_TRANSITION_TYPE_SHOW;
   else
       priv->overlay_type = EOS_STACK_OVERLAY_TRANSITION_TYPE_HIDE;
-  priv->show_overlay = show_overlay;
 
+  priv->show_overlay = show_overlay;
   priv->transition_pos = 0.0;
   priv->start_time = gdk_frame_clock_get_frame_time (gtk_widget_get_frame_clock (widget));
   priv->end_time = priv->start_time + (priv->transition_duration * 1000);
+
   if (priv->tick_id == 0)
-    {
-      priv->tick_id = gtk_widget_add_tick_callback (GTK_WIDGET (stack), (GtkTickCallback)eos_stack_transition_cb, stack, NULL);
-    }
+    priv->tick_id = gtk_widget_add_tick_callback (GTK_WIDGET (stack),
+						  (GtkTickCallback) eos_stack_transition_cb,
+						  stack, NULL);
 
   gtk_stack_set_visible_child (stack, child);
 }

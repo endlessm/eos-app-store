@@ -29,30 +29,15 @@ G_BEGIN_DECLS
   (G_TYPE_INSTANCE_GET_CLASS ((obj), \
   EOS_TYPE_STACK, EosStackClass))
 
-typedef struct _EosStack EosStack;
-typedef struct _EosStackClass EosStackClass;
-
-/**
- * EosStack:
- *
- * This structure contains no public members.
- */
-struct _EosStack
-{
-  GtkStack parent;
-};
-
-struct _EosStackClass
-{
-  GtkStackClass parent_class;
-};
+typedef GtkStack EosStack;
+typedef GtkStackClass EosStackClass;
 
 GType        eos_stack_get_type                            (void) G_GNUC_CONST;
 
 void         eos_stack_set_transition_duration             (EosStack *stack,
                                                             guint duration);
 
-void         eos_stack_set_visible_child                   (GtkStack  *stack,
+void         eos_stack_set_visible_child                   (EosStack  *stack,
                                                             GtkWidget *child,
                                                             gboolean show_overlay);
 
