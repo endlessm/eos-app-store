@@ -317,7 +317,7 @@ const AppListBoxRow = new Lang.Class({
     _onRemoveButtonClicked: function() {
         let app = Gio.Application.get_default();
 
-        let dialog = new Gtk.MessageDialog({ );
+        let dialog = new Gtk.MessageDialog();
         dialog.set_transient_for(app.mainWindow);
         dialog.modal = true;
         dialog.destroy_with_parent = true;
