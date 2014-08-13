@@ -244,7 +244,6 @@ eos_app_cell_set_property (GObject      *gobject,
       {
         const char *icon_name = g_value_get_string (value);
 
-        g_free (self->icon_name);
         self->icon_name = g_strdup (icon_name);
 
         if (icon_name != NULL)
@@ -418,7 +417,7 @@ eos_app_cell_class_init (EosAppCellClass *klass)
                          "Icon",
                          "Icon name of the app",
                          NULL,
-                         G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS);
+                         G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS | G_PARAM_CONSTRUCT_ONLY);
 
   g_object_class_install_properties (oclass, NUM_PROPS, eos_app_cell_props);
 }
@@ -732,13 +731,15 @@ eos_app_info_get_screenshots (const EosAppInfo *info)
 /**
  * eos_app_info_create_cell:
  * @info:
+ * @icon_name: (allow-none):
  *
  * ...
  *
  * Returns: (transfer full) (type EosAppCell): ...
  */
 GtkWidget *
-eos_app_info_create_cell (const EosAppInfo *info)
+eos_app_info_create_cell (const EosAppInfo *info,
+                          const gchar *icon_name)
 {
   if (info == NULL)
     return NULL;
@@ -749,6 +750,7 @@ eos_app_info_create_cell (const EosAppInfo *info)
                                  "subtitle", eos_app_info_get_subtitle (info),
                                  "desktop-id", info->desktop_id,
                                  "app-info", info,
+                                 "icon", icon_name,
                                  NULL);
 
   g_object_ref_sink (res);

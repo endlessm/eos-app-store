@@ -521,7 +521,7 @@ const AppFrame = new Lang.Class({
                 let id = appInfos[i].get_desktop_id();
 
                 if (this._model.hasLauncher(id)) {
-                    let cell = appInfos[i].create_cell();
+                    let cell = appInfos[i].create_cell(this._model.getIcon(id));
                     cell.shape = Endless.FlexyShape.SMALL;
                     grid.add(cell);
                 }
@@ -533,7 +533,7 @@ const AppFrame = new Lang.Class({
                 let id = appInfos[i].get_desktop_id();
 
                 if (!this._model.hasLauncher(id)) {
-                    let cell = appInfos[i].create_cell();
+                    let cell = appInfos[i].create_cell(this._model.getIcon(id));
                     grid.add(cell);
                 }
             }
@@ -566,14 +566,12 @@ const AppFrame = new Lang.Class({
     _onCellSelected: function(grid, cell) {
         if (this._lastCellSelected != cell) {
             if (this._lastCellSelected) {
-                this._lastCellSelected.icon = null;
                 this._lastCellSelected.selected = false;
             }
 
             this._lastCellSelected = cell;
 
             if (this._lastCellSelected) {
-                this._lastCellSelected.icon = this._model.getIcon(cell.desktop_id);
                 this._lastCellSelected.selected = true;
             }
         }
