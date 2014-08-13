@@ -23,7 +23,6 @@ typedef enum {
 } EosStackOverlayTransitionType;
 
 typedef struct {
-  guint transition_duration;
   gdouble transition_pos;
   guint tick_id;
   gint64 start_time;
@@ -85,14 +84,6 @@ eos_stack_draw (GtkWidget *widget,
   return TRUE;
 }
 
-void eos_stack_set_transition_duration (EosStack *stack,
-                                        guint duration)
-{
-  EosStackPrivate *priv = eos_stack_get_instance_private (stack);
-  priv->transition_duration = duration;
-  gtk_stack_set_transition_duration (GTK_STACK (stack), duration);
-}
-
 static gboolean
 eos_stack_transition_cb (GtkStack      *stack,
                          GdkFrameClock *frame_clock,
@@ -125,6 +116,9 @@ eos_stack_set_visible_child (EosStack  *stack,
 {
   EosStackPrivate *priv = eos_stack_get_instance_private (EOS_STACK (stack));
   GtkWidget *widget = GTK_WIDGET (stack);
+  guint transition_duration;
+
+  transition_duration = gtk_stack_get_transition_duration (stack);
 
   if (!priv->show_overlay && !show_overlay)
       priv->overlay_type = EOS_STACK_OVERLAY_TRANSITION_TYPE_NONE;
@@ -138,7 +132,7 @@ eos_stack_set_visible_child (EosStack  *stack,
   priv->show_overlay = show_overlay;
   priv->transition_pos = 0.0;
   priv->start_time = gdk_frame_clock_get_frame_time (gtk_widget_get_frame_clock (widget));
-  priv->end_time = priv->start_time + (priv->transition_duration * 1000);
+  priv->end_time = priv->start_time + (transition_duration * 1000);
 
   if (priv->tick_id == 0)
     priv->tick_id = gtk_widget_add_tick_callback (GTK_WIDGET (stack),

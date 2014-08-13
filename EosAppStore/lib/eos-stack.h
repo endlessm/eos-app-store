@@ -34,9 +34,6 @@ typedef GtkStackClass EosStackClass;
 
 GType        eos_stack_get_type                            (void) G_GNUC_CONST;
 
-void         eos_stack_set_transition_duration             (EosStack *stack,
-                                                            guint duration);
-
 void         eos_stack_set_visible_child                   (EosStack  *stack,
                                                             GtkWidget *child,
                                                             gboolean show_overlay);
