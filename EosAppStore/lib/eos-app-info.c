@@ -10,6 +10,7 @@
 #include <endless/endless.h>
 
 #include "eos-app-utils.h"
+#include "eos-stack.h"
 
 /*
  * EosAppCell
@@ -32,7 +33,10 @@ struct _EosAppCell {
   char *desktop_id;
   char *icon_name;
 
-  GtkWidget *title_label;
+  GtkWidget *stack;
+  GtkWidget *frame, *frame_selected;
+
+  GtkWidget *title_label, *title_label_selected;
   GtkWidget *subtitle_label;
   GtkWidget *icon;
   GtkWidget *icon_hbox;
@@ -40,7 +44,6 @@ struct _EosAppCell {
   EosAppInfo *info;
 
   GdkPixbuf *image;
-  GdkPixbuf *selected_image;
   GtkStyleContext *image_context;
 
   gint cell_margin;
@@ -88,7 +91,6 @@ eos_app_info_get_cell_margin_for_context (GtkStyleContext *context)
                                 &margin);
 
   gtk_style_context_save (context);
-  gtk_style_context_add_class (context, "select");
   gtk_style_context_get_margin (context,
                                 GTK_STATE_FLAG_NORMAL,
                                 &select_margin);
@@ -153,32 +155,6 @@ prepare_pixbuf_from_file (EosAppCell *self,
   return retval;
 }
 
-static GdkPixbuf *
-prepare_selected_pixbuf (EosAppCell *self,
-                         gint image_width,
-                         gint image_height)
-{
-  GdkPixbuf *retval;
-  cairo_surface_t *surface;
-  cairo_t *cr;
-
-  surface = cairo_image_surface_create (CAIRO_FORMAT_ARGB32,
-                                        image_width, image_height);
-  cr = cairo_create (surface);
-  gtk_render_background (self->image_context, cr,
-                         0, 0, image_width, image_height);
-  gtk_render_frame (self->image_context, cr,
-                    0, 0, image_width, image_height);
-
-  retval = gdk_pixbuf_get_from_surface (surface, 0, 0,
-                                        image_width, image_height);
-
-  cairo_destroy (cr);
-  cairo_surface_destroy (surface);
-
-  return retval;
-}
-
 static void
 eos_app_cell_get_property (GObject    *gobject,
                            guint       prop_id,
@@ -235,6 +211,7 @@ eos_app_cell_set_property (GObject      *gobject,
 
     case PROP_TITLE:
       gtk_label_set_text (GTK_LABEL (self->title_label), g_value_get_string (value));
+      gtk_label_set_text (GTK_LABEL (self->title_label_selected), g_value_get_string (value));
       break;
 
     case PROP_SUBTITLE:
@@ -249,13 +226,17 @@ eos_app_cell_set_property (GObject      *gobject,
 
     case PROP_SELECTED:
       {
-        GtkStyleContext *context = gtk_widget_get_style_context (GTK_WIDGET (self));
-
         self->is_selected = g_value_get_boolean (value);
         if (self->is_selected)
-          gtk_style_context_add_class (context, "select");
+          {
+            gtk_stack_set_transition_type (GTK_STACK (self->stack), GTK_STACK_TRANSITION_TYPE_SLIDE_UP);
+            eos_stack_set_visible_child (EOS_STACK (self->stack), self->frame_selected, TRUE);
+          }
         else
-          gtk_style_context_remove_class (context, "select");
+          {
+            gtk_stack_set_transition_type (GTK_STACK (self->stack), GTK_STACK_TRANSITION_TYPE_SLIDE_DOWN);
+            eos_stack_set_visible_child (EOS_STACK (self->stack), self->frame, FALSE);
+          }
       }
       break;
 
@@ -263,15 +244,9 @@ eos_app_cell_set_property (GObject      *gobject,
       {
         const char *icon_name = g_value_get_string (value);
 
-        g_free (self->icon_name);
         self->icon_name = g_strdup (icon_name);
 
-        if (icon_name == NULL)
-          {
-            gtk_image_clear (GTK_IMAGE (self->icon));
-            gtk_widget_hide (self->icon_hbox);
-          }
-        else
+        if (icon_name != NULL)
           {
             gtk_image_set_from_icon_name (GTK_IMAGE (self->icon),
                                           icon_name,
@@ -293,44 +268,11 @@ eos_app_cell_finalize (GObject *gobject)
 
   g_clear_object (&self->image_context);
   g_clear_object (&self->image);
-  g_clear_object (&self->selected_image);
   g_free (self->desktop_id);
   g_free (self->icon_name);
   eos_app_info_unref (self->info);
 
   G_OBJECT_CLASS (eos_app_cell_parent_class)->finalize (gobject);
-}
-
-static void
-eos_app_cell_draw_selected (EosAppCell *self,
-                            cairo_t *cr,
-                            gint width,
-                            gint height)
-{
-  gint image_width, image_height;
-  GtkBorder image_margin;
-
-  gtk_style_context_save (self->image_context);
-  gtk_style_context_add_class (self->image_context, "select");
-
-  if (self->selected_image != NULL)
-    goto out;
-
-  image_width = width - self->cell_margin;
-  image_height = height - self->cell_margin;
-
-  self->selected_image = prepare_selected_pixbuf (self, image_width, image_height);
-
- out:
-  gtk_style_context_get_margin (self->image_context,
-                                GTK_STATE_FLAG_NORMAL,
-                                &image_margin);
-  gtk_render_icon (self->image_context,
-                   cr,
-                   self->selected_image,
-                   MAX (image_margin.top, (gint) self->cell_margin / 2),
-                   MAX (image_margin.left, (gint) self->cell_margin / 2));
-  gtk_style_context_restore (self->image_context);
 }
 
 static void
@@ -415,12 +357,8 @@ eos_app_cell_draw (GtkWidget *widget,
   width = allocation.width;
   height = allocation.height;
 
-  if (self->is_selected)
-    eos_app_cell_draw_selected (self, cr,
-                                width, height);
-  else
-    eos_app_cell_draw_normal (self, cr,
-                              width, height);
+  eos_app_cell_draw_normal (self, cr,
+                            width, height);
 
   GTK_WIDGET_CLASS (eos_app_cell_parent_class)->draw (widget, cr);
 
@@ -479,7 +417,7 @@ eos_app_cell_class_init (EosAppCellClass *klass)
                          "Icon",
                          "Icon name of the app",
                          NULL,
-                         G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS);
+                         G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS | G_PARAM_CONSTRUCT_ONLY);
 
   g_object_class_install_properties (oclass, NUM_PROPS, eos_app_cell_props);
 }
@@ -490,35 +428,25 @@ eos_app_cell_init (EosAppCell *self)
   gtk_widget_set_hexpand (GTK_WIDGET (self), TRUE);
   gtk_widget_set_vexpand (GTK_WIDGET (self), TRUE);
 
-  GtkWidget *frame = gtk_frame_new (NULL);
-  gtk_style_context_add_class (gtk_widget_get_style_context (frame),
+  GtkWidget *stack = eos_stack_new ();
+  self->stack = stack;
+  gtk_style_context_add_class (gtk_widget_get_style_context (self->stack),
+                               "app-cell-stack");
+  gtk_stack_set_transition_duration (GTK_STACK (self->stack), 350);
+  gtk_container_add (GTK_CONTAINER (self), GTK_WIDGET (stack));
+
+  /* Normal state */
+  self->frame = gtk_frame_new (NULL);
+  gtk_style_context_add_class (gtk_widget_get_style_context (self->frame),
                                "app-cell-frame");
-  gtk_container_add (GTK_CONTAINER (self), frame);
-  gtk_widget_show (frame);
+  gtk_container_add (GTK_CONTAINER (stack), self->frame);
+  gtk_widget_show (self->frame);
 
   GtkWidget *box = gtk_box_new (GTK_ORIENTATION_VERTICAL, 2);
   gtk_widget_set_valign (box, GTK_ALIGN_END);
   gtk_widget_set_halign (box, GTK_ALIGN_START);
-  gtk_container_add (GTK_CONTAINER (frame), box);
+  gtk_container_add (GTK_CONTAINER (self->frame), box);
   gtk_widget_show (box);
-
-  GtkWidget *hbox = gtk_box_new (GTK_ORIENTATION_HORIZONTAL, 13);
-  self->icon_hbox = hbox;
-  gtk_widget_set_hexpand (hbox, TRUE);
-  gtk_container_add (GTK_CONTAINER (box), hbox);
-  gtk_widget_set_no_show_all (hbox, TRUE);
-
-  self->icon = gtk_image_new ();
-  gtk_widget_show (self->icon);
-  gtk_style_context_add_class (gtk_widget_get_style_context (self->icon),
-                               "app-cell-icon");
-  gtk_widget_set_halign (self->icon, GTK_ALIGN_START);
-  gtk_container_add (GTK_CONTAINER (hbox), self->icon);
-
-  GtkWidget *arrow = gtk_image_new_from_resource ("/com/endlessm/appstore/icon_arrow_thumb.png");
-  gtk_widget_show (arrow);
-  gtk_widget_set_valign (arrow, GTK_ALIGN_CENTER);
-  gtk_container_add (GTK_CONTAINER (hbox), arrow);
 
   self->title_label = gtk_label_new ("");
   gtk_style_context_add_class (gtk_widget_get_style_context (self->title_label),
@@ -536,6 +464,46 @@ eos_app_cell_init (EosAppCell *self)
   gtk_label_set_max_width_chars (GTK_LABEL (self->subtitle_label), 50);
   gtk_container_add (GTK_CONTAINER (box), self->subtitle_label);
   gtk_widget_show (self->subtitle_label);
+
+  /* Selected state */
+  self->frame_selected = gtk_frame_new (NULL);
+  gtk_style_context_add_class (gtk_widget_get_style_context (self->frame_selected),
+                               "app-cell-frame");
+  gtk_style_context_add_class (gtk_widget_get_style_context (self->frame_selected), "select");
+  gtk_container_add (GTK_CONTAINER (stack), self->frame_selected);
+  gtk_widget_show (self->frame_selected);
+
+  GtkWidget *box_selected = gtk_box_new (GTK_ORIENTATION_VERTICAL, 2);
+  gtk_widget_set_valign (box_selected, GTK_ALIGN_END);
+  gtk_widget_set_halign (box_selected, GTK_ALIGN_START);
+  gtk_container_add (GTK_CONTAINER (self->frame_selected), box_selected);
+  gtk_widget_show (box_selected);
+
+  GtkWidget *hbox = gtk_box_new (GTK_ORIENTATION_HORIZONTAL, 13);
+  self->icon_hbox = hbox;
+  gtk_widget_set_hexpand (hbox, TRUE);
+  gtk_container_add (GTK_CONTAINER (box_selected), hbox);
+  gtk_widget_show (hbox);
+
+  self->icon = gtk_image_new ();
+  gtk_widget_show (self->icon);
+  gtk_style_context_add_class (gtk_widget_get_style_context (self->icon),
+                               "app-cell-icon");
+  gtk_widget_set_halign (self->icon, GTK_ALIGN_START);
+  gtk_container_add (GTK_CONTAINER (hbox), self->icon);
+
+  GtkWidget *arrow_selected = gtk_image_new_from_resource ("/com/endlessm/appstore/icon_arrow_thumb.png");
+  gtk_widget_show (arrow_selected);
+  gtk_widget_set_valign (arrow_selected, GTK_ALIGN_CENTER);
+  gtk_container_add (GTK_CONTAINER (hbox), arrow_selected);
+
+  self->title_label_selected = gtk_label_new ("");
+  gtk_style_context_add_class (gtk_widget_get_style_context (self->title_label_selected),
+                               "app-cell-title");
+  gtk_label_set_line_wrap (GTK_LABEL (self->title_label_selected), TRUE);
+  gtk_misc_set_alignment (GTK_MISC (self->title_label_selected), 0.0, 0.5);
+  gtk_container_add (GTK_CONTAINER (box_selected), self->title_label_selected);
+  gtk_widget_show (self->title_label_selected);
 
   self->image_context = eos_app_info_get_cell_style_context ();
   self->cell_margin = eos_app_info_get_cell_margin_for_context (self->image_context);
@@ -765,13 +733,15 @@ eos_app_info_get_screenshots (const EosAppInfo *info)
 /**
  * eos_app_info_create_cell:
  * @info:
+ * @icon_name: (allow-none):
  *
  * ...
  *
  * Returns: (transfer full) (type EosAppCell): ...
  */
 GtkWidget *
-eos_app_info_create_cell (const EosAppInfo *info)
+eos_app_info_create_cell (const EosAppInfo *info,
+                          const gchar *icon_name)
 {
   if (info == NULL)
     return NULL;
@@ -782,6 +752,7 @@ eos_app_info_create_cell (const EosAppInfo *info)
                                  "subtitle", eos_app_info_get_subtitle (info),
                                  "desktop-id", info->desktop_id,
                                  "app-info", info,
+                                 "icon", icon_name,
                                  NULL);
 
   g_object_ref_sink (res);
