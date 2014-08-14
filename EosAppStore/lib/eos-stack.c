@@ -62,22 +62,38 @@ eos_stack_draw (GtkWidget *widget,
     default:
       overlay_opacity = 0.0;
     }
-  overlay_opacity *= 0.5;
-  cairo_set_source_rgba (cr, 1, 1, 1, overlay_opacity);
 
-  double x = 1.0,
-         y = 1.0,
-         width = allocation.width - 3.0,
-         height = allocation.height - 3.0,
-         radius = 3.0,
-         degrees = 0.01745329251; // PI / 180.0
+  GtkStyleContext *context = gtk_widget_get_style_context (widget);
+  gtk_style_context_save (context);
+  gtk_style_context_add_class (context, "fade-overlay");
+
+  GdkRGBA bg;
+  gtk_style_context_get_background_color (context, GTK_STATE_FLAG_NORMAL, &bg);
+  cairo_set_source_rgba (cr, bg.red, bg.green, bg.blue, overlay_opacity * bg.alpha);
+
+  gint radius;
+  gtk_style_context_get (context, GTK_STATE_FLAG_NORMAL,
+			 GTK_STYLE_PROPERTY_BORDER_RADIUS, &radius,
+			 NULL);
+
+  GtkBorder margin;
+  gtk_style_context_get_margin (context, GTK_STATE_FLAG_NORMAL, &margin);
+
+  double x = margin.left,
+         y = margin.top,
+         width = allocation.width - margin.left - margin.right,
+         height = allocation.height - margin.top - margin.bottom,
+         degrees = G_PI / 180.0;
+
   cairo_new_sub_path (cr);
   cairo_arc (cr, x + width - radius, y + radius, radius, -90 * degrees, 0 * degrees);
   cairo_arc (cr, x + width - radius, y + height - radius, radius, 0 * degrees, 90 * degrees);
   cairo_arc (cr, x + radius, y + height - radius, radius, 90 * degrees, 180 * degrees);
   cairo_arc (cr, x + radius, y + radius, radius, 180 * degrees, 270 * degrees);
   cairo_close_path (cr);
-  cairo_fill_preserve (cr);
+  cairo_fill (cr);
+
+  gtk_style_context_restore (context);
 
   GTK_WIDGET_CLASS (eos_stack_parent_class)->draw (widget, cr);
 

@@ -430,6 +430,8 @@ eos_app_cell_init (EosAppCell *self)
 
   GtkWidget *stack = eos_stack_new ();
   self->stack = stack;
+  gtk_style_context_add_class (gtk_widget_get_style_context (self->stack),
+                               "app-cell-stack");
   gtk_stack_set_transition_duration (GTK_STACK (self->stack), 350);
   gtk_container_add (GTK_CONTAINER (self), GTK_WIDGET (stack));
 
