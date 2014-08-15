@@ -3,6 +3,7 @@ const Gio = imports.gi.Gio;
 const GLib = imports.gi.GLib;
 
 const Config = imports.config;
+const Format = imports.format;
 const Gettext = imports.gettext;
 const Path = imports.path;
 
@@ -17,6 +18,8 @@ function init() {
 
     GLib.set_prgname('eos-app-store');
     GLib.set_application_name(_("App Store"));
+
+    String.prototype.format = Format.format;
 }
 
 function loadResources() {
