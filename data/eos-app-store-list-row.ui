@@ -273,6 +273,8 @@
                     <property name="relief">normal</property>
                     <property name="height_request">38</property>
                     <property name="halign">start</property>
+                    <property name="margin-bottom">40</property>
+                    <property name="margin-end">40</property>
                     <style>
                       <class name="state-button"/>
                       <class name="remove"/>
