@@ -20,6 +20,18 @@
                                   transparent 6px) 6 / 6px stretch;
 }
 
+.window-frame.frame:dir(rtl) {
+    border-width: 0 0 0 6px;
+    border-color: transparent;
+    border-radius: 0;
+
+    border-image: linear-gradient(to right,
+                                  transparent,
+                                  alpha(black, 0.1) 2px,
+                                  alpha(black, 0.55) 6px,
+                                  transparent 6px) 6 / 6px stretch;
+}
+
 .scrollbar {
     -GtkRange-slider-width: 8;
     -GtkRange-stepper-spacing: 15;
