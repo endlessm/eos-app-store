@@ -74,7 +74,9 @@ const AppListBoxRow = new Lang.Class({
         this.parent();
 
         let app = Gio.Application.get_default();
-        let width = app.mainWindow.getExpectedWidth();
+        let mainWindow = app.mainWindow;
+
+        let width = mainWindow.getExpectedWidth();
         width = Math.max(width, AppStoreWindow.AppStoreSizes.VGA.screenWidth);
         let xgaWidth = AppStoreWindow.AppStoreSizes.XGA.screenWidth;
         if (width < xgaWidth) {
@@ -90,6 +92,10 @@ const AppListBoxRow = new Lang.Class({
         this._model.connect('changed', Lang.bind(this, this._updateState));
         this._appId = appInfo.get_desktop_id();
 
+        this._removeDialog = null;
+        this._windowHideId = mainWindow.connect('hide', Lang.bind(this, this._destroyRemoveDialog));
+        this.connect('destroy', Lang.bind(this, this._onDestroy));
+
         this.initTemplate({ templateRoot: '_mainBox', bindChildren: true, connectSignals: true, });
         this.add(this._mainBox);
 
@@ -104,6 +110,27 @@ const AppListBoxRow = new Lang.Class({
         this.appDescription = this.appInfo.get_description();
         this.appScreenshots = this.appInfo.get_screenshots();
         this._updateState();
+    },
+
+    _destroyRemoveDialog: function() {
+        if (this._removeDialog != null) {
+            this._removeDialog.destroy();
+            this._removeDialog = null;
+        }
+    },
+
+    _onDestroy: function() {
+        this._destroyRemoveDialog();
+        if (this._windowHideId != 0) {
+            let app = Gio.Application.get_default();
+            let appWindow = app.mainWindow;
+
+            if (appWindow) {
+                appWindow.disconnect(this._windowHideId);
+            }
+
+            this._windowHideId = 0;
+        }
     },
 
     _updateState: function() {
@@ -337,8 +364,10 @@ const AppListBoxRow = new Lang.Class({
         applyButton.get_style_context().add_class('destructive-action');
         dialog.add_button(_("Cancel"), Gtk.ResponseType.CANCEL);
         dialog.show_all();
+        this._removeDialog = dialog;
 
-        let responseId = dialog.run();
+        let responseId = this._removeDialog.run();
+        this._destroyRemoveDialog();
 
         if (responseId == Gtk.ResponseType.APPLY) {
             this._removeButton.hide();
@@ -362,8 +391,6 @@ const AppListBoxRow = new Lang.Class({
                 this._updateState();
             }));
         }
-
-        dialog.destroy();
     },
 
     _maybeNotify: function(message) {
