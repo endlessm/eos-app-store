@@ -22,12 +22,10 @@ GType eos_app_state_get_type (void);
 #define EOS_TYPE_APP_CATEGORY           (eos_app_category_get_type ())
 
 typedef enum {
-  EOS_APP_CATEGORY_RESOURCES,
   EOS_APP_CATEGORY_EDUCATION,
   EOS_APP_CATEGORY_GAMES,
-  EOS_APP_CATEGORY_ENTERTAINMENT,
+  EOS_APP_CATEGORY_RESOURCES,
   EOS_APP_CATEGORY_UTILITIES,
-
   EOS_APP_CATEGORY_INSTALLED
 } EosAppCategory;
 

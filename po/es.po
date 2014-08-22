@@ -17,7 +17,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: eos-app-store\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-08-07 10:07-0700\n"
+"POT-Creation-Date: 2014-08-22 14:04-0700\n"
 "PO-Revision-Date: 2014-08-13 18:53+0000\n"
 "Last-Translator: Philip Chimento <philip.chimento@gmail.com>\n"
 "Language-Team: Spanish (http://www.transifex.com/projects/p/eos-app-store/language/es/)\n"
@@ -31,7 +31,7 @@ msgstr ""
 msgid "Create your own folder to organize your apps. First, choose an icon."
 msgstr "Crea tu propia carpeta para organizar tus apps. Primero, escoge un icono."
 
-#: ../data/eos-app-store-list-row.ui.h:1 ../EosAppStore/appFrame.js:200
+#: ../data/eos-app-store-list-row.ui.h:1 ../EosAppStore/appFrame.js:227
 msgid "Install app"
 msgstr "Instalar app"
 
@@ -63,133 +63,132 @@ msgstr "Carpetas"
 msgid "e.g.: http://www.globoesporte.com"
 msgstr "ej.: http://www.globoesporte.com"
 
-#: ../EosAppStore/appFrame.js:185
+#: ../EosAppStore/appFrame.js:212
 msgid "Add to the desktop"
 msgstr "Agregar al escritorio"
 
-#: ../EosAppStore/appFrame.js:188
+#: ../EosAppStore/appFrame.js:215
 msgid "Open app"
 msgstr "Abrir app"
 
-#: ../EosAppStore/appFrame.js:205
+#: ../EosAppStore/appFrame.js:232
 msgid "Update app"
 msgstr "Actualizar app"
 
-#: ../EosAppStore/appFrame.js:239 ../EosAppStore/appFrame.js:262
+#: ../EosAppStore/appFrame.js:266 ../EosAppStore/appFrame.js:294
 msgid "Installing..."
 msgstr "Instalando..."
 
-#: ../EosAppStore/appFrame.js:250 ../EosAppStore/appFrame.js:271
+#: ../EosAppStore/appFrame.js:277 ../EosAppStore/appFrame.js:303
 #, c-format
 msgid "We could not install '%s'"
 msgstr "No pudimos instalar '%s'"
 
-#: ../EosAppStore/appFrame.js:253 ../EosAppStore/appFrame.js:274
+#: ../EosAppStore/appFrame.js:280 ../EosAppStore/appFrame.js:306
 #, c-format
 msgid "'%s' was installed successfully"
 msgstr "'%s' fue instalado con éxito"
 
-#: ../EosAppStore/appFrame.js:296
+#: ../EosAppStore/appFrame.js:333
 msgid "Updating..."
 msgstr "Actualizando..."
 
-#: ../EosAppStore/appFrame.js:307
+#: ../EosAppStore/appFrame.js:344
 #, c-format
 msgid "We could not update '%s'"
 msgstr "No pudimos actualizar '%s'"
 
-#: ../EosAppStore/appFrame.js:310
+#: ../EosAppStore/appFrame.js:347
 #, c-format
 msgid "'%s' was updated successfully"
 msgstr "'%s' fue actualizado con éxito"
 
-#: ../EosAppStore/appFrame.js:322
+#: ../EosAppStore/appFrame.js:361
 msgid "Deleting app"
 msgstr "Eliminando la app"
 
-#: ../EosAppStore/appFrame.js:323
+#: ../EosAppStore/appFrame.js:362
 msgid ""
 "Deleting this app will remove it from the device for all users. You will "
 "need to download it from the internet in order to reinstall it."
 msgstr "Si borras esta app será eliminada del sistema, y el cambio será actualizado para todos los usuarios de esta computadora. Para reinstalar la app, tendrás que descargarla del internet e instalarla de nuevo."
 
-#: ../EosAppStore/appFrame.js:324
+#: ../EosAppStore/appFrame.js:363
 msgid "Delete app"
 msgstr "Eliminar app"
 
-#: ../EosAppStore/appFrame.js:326
+#: ../EosAppStore/appFrame.js:365
 msgid "Cancel"
 msgstr "Cancelar"
 
-#: ../EosAppStore/appFrame.js:335
+#: ../EosAppStore/appFrame.js:376
 msgid "Removing..."
 msgstr "Eliminando...."
 
-#: ../EosAppStore/appFrame.js:344
+#: ../EosAppStore/appFrame.js:385
 #, c-format
 msgid "We could not remove '%s'"
 msgstr "No pudimos remover '%s'"
 
-#: ../EosAppStore/appFrame.js:347
+#: ../EosAppStore/appFrame.js:388
 #, c-format
 msgid "'%s' was removed successfully"
 msgstr "'%s' fue removido con éxito"
 
-#: ../EosAppStore/appStoreWindow.js:325
+#: ../EosAppStore/appStoreWindow.js:330
 msgid "Install apps"
 msgstr "Instalar apps"
 
-#: ../EosAppStore/appStoreWindow.js:329
+#: ../EosAppStore/appStoreWindow.js:334
 msgid "Install websites"
 msgstr "Instalar sitios web"
 
-#: ../EosAppStore/appStoreWindow.js:333
+#: ../EosAppStore/appStoreWindow.js:338
 msgid "Install folders"
 msgstr "Instalar carpetas."
 
 #. Translators: use the same string used to install the app store content JSON
-#: ../EosAppStore/categories.js:10 ../EosAppStore/lib/eos-app-info.c:798
-msgid "Resources"
-msgstr "Recursos"
-
-#: ../EosAppStore/categories.js:16 ../EosAppStore/lib/eos-app-info.c:799
+#: ../EosAppStore/categories.js:10 ../EosAppStore/lib/eos-app-info.c:769
 msgid "Education"
 msgstr "Educación"
 
-#: ../EosAppStore/categories.js:22 ../EosAppStore/lib/eos-app-info.c:800
+#: ../EosAppStore/categories.js:16 ../EosAppStore/lib/eos-app-info.c:770
 msgid "Games"
 msgstr "Juegos"
 
-#: ../EosAppStore/categories.js:28 ../EosAppStore/categories.js:69
-#: ../EosAppStore/lib/eos-app-info.c:801
-msgid "Entertainment"
-msgstr "Entretenimiento"
+#: ../EosAppStore/categories.js:22 ../EosAppStore/lib/eos-app-info.c:771
+msgid "Resources"
+msgstr "Recursos"
 
-#: ../EosAppStore/categories.js:34 ../EosAppStore/lib/eos-app-info.c:802
+#: ../EosAppStore/categories.js:28 ../EosAppStore/lib/eos-app-info.c:772
 msgid "Utilities"
 msgstr "Herramientas"
 
-#: ../EosAppStore/categories.js:40
+#: ../EosAppStore/categories.js:34
 msgid "Installed"
 msgstr "Instaladas"
 
-#: ../EosAppStore/categories.js:51
+#: ../EosAppStore/categories.js:45
 msgid "News"
 msgstr "Noticias"
 
-#: ../EosAppStore/categories.js:57
+#: ../EosAppStore/categories.js:51
 msgid "Sports"
 msgstr "Deportes"
 
-#: ../EosAppStore/categories.js:63
+#: ../EosAppStore/categories.js:57
 msgid "Education and Health"
 msgstr "Educación y salud"
 
-#: ../EosAppStore/categories.js:75
+#: ../EosAppStore/categories.js:63
+msgid "Entertainment"
+msgstr "Entretenimiento"
+
+#: ../EosAppStore/categories.js:69
 msgid "Local"
 msgstr "Local"
 
-#: ../EosAppStore/environment.js:19
+#: ../EosAppStore/environment.js:20
 msgid "App Store"
 msgstr "Tienda de apps"
 

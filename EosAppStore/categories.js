@@ -5,12 +5,6 @@ const Lang = imports.lang;
 function get_app_categories() {
     return [
         {
-            name: 'resources',
-            widget: null,
-            label: _("Resources"),
-            id: EosAppStorePrivate.AppCategory.RESOURCES,
-        },
-        {
             name: 'education',
             widget: null,
             label: _("Education"),
@@ -23,10 +17,10 @@ function get_app_categories() {
             id: EosAppStorePrivate.AppCategory.GAMES,
         },
         {
-            name: 'entertainment',
+            name: 'resources',
             widget: null,
-            label: _("Entertainment"),
-            id: EosAppStorePrivate.AppCategory.ENTERTAINMENT,
+            label: _("Resources"),
+            id: EosAppStorePrivate.AppCategory.RESOURCES,
         },
         {
             name: 'utilities',
