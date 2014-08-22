@@ -40,7 +40,6 @@ EOS_DEFINE_ENUM_TYPE (EosAppCategory, eos_app_category,
                       EOS_ENUM_VALUE (EOS_APP_CATEGORY_RESOURCES, resources)
                       EOS_ENUM_VALUE (EOS_APP_CATEGORY_EDUCATION, education)
                       EOS_ENUM_VALUE (EOS_APP_CATEGORY_GAMES, games)
-                      EOS_ENUM_VALUE (EOS_APP_CATEGORY_ENTERTAINMENT, entertainment)
                       EOS_ENUM_VALUE (EOS_APP_CATEGORY_UTILITIES, utilities)
                       EOS_ENUM_VALUE (EOS_APP_CATEGORY_INSTALLED, installed))
 

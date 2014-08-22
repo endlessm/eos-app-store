@@ -23,12 +23,6 @@ function get_app_categories() {
             id: EosAppStorePrivate.AppCategory.GAMES,
         },
         {
-            name: 'entertainment',
-            widget: null,
-            label: _("Entertainment"),
-            id: EosAppStorePrivate.AppCategory.ENTERTAINMENT,
-        },
-        {
             name: 'utilities',
             widget: null,
             label: _("Utilities"),

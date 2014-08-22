@@ -769,7 +769,6 @@ static const struct {
   { EOS_APP_CATEGORY_RESOURCES,     N_("Resources") },
   { EOS_APP_CATEGORY_EDUCATION,     N_("Education") },
   { EOS_APP_CATEGORY_GAMES,         N_("Games") },
-  { EOS_APP_CATEGORY_ENTERTAINMENT, N_("Entertainment") },
   { EOS_APP_CATEGORY_UTILITIES,     N_("Utilities") },
 };
 
