@@ -425,8 +425,8 @@ eos_app_cell_class_init (EosAppCellClass *klass)
 static void
 configure_style_for_subtitle_label (GtkLabel *label)
 {
-  gtk_style_context_add_class (gtk_widget_get_style_context (GTK_WIDGET (label),
-                               "app-cell-subtitle"));
+  gtk_style_context_add_class (gtk_widget_get_style_context (GTK_WIDGET (label)),
+                               "app-cell-subtitle");
   gtk_misc_set_alignment (GTK_MISC (label), 0.0, 0.0);
 
   gtk_label_set_line_wrap (GTK_LABEL (label), TRUE);
