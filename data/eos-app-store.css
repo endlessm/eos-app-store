@@ -184,24 +184,24 @@
 
 .app-cell-title {
     font-weight: bold;
-    font-size: 17px;
+    font-size: 13px;
     color: white;
 
-    padding: 0 12px;
+    padding: 0 14px;
     text-shadow: 0 1px 6px alpha(black, 0.5);
 }
 
 .app-cell-subtitle {
-    font-size: 13px;
+    font-size: 10px;
     color: white;
-    padding: 0 12px;
+    padding: 0 14px;
 
     text-shadow: 0 1px 6px alpha(black, 0.5);
 }
 
 .app-cell-frame {
     border-style: none;
-    padding: 12px 0;
+    padding: 14px 0;
 }
 
 .app-frame-description {

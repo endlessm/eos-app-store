@@ -423,6 +423,19 @@ eos_app_cell_class_init (EosAppCellClass *klass)
 }
 
 static void
+configure_style_for_subtitle_label (GtkLabel *label)
+{
+  gtk_style_context_add_class (gtk_widget_get_style_context (GTK_WIDGET (label),
+                               "app-cell-subtitle"));
+  gtk_misc_set_alignment (GTK_MISC (label), 0.0, 0.0);
+
+  gtk_label_set_line_wrap (GTK_LABEL (label), TRUE);
+  gtk_label_set_max_width_chars (GTK_LABEL (label), 50);
+  gtk_label_set_ellipsize (GTK_LABEL (label), PANGO_ELLIPSIZE_END);
+  gtk_label_set_lines (GTK_LABEL(label), 2);
+}
+
+static void
 eos_app_cell_init (EosAppCell *self)
 {
   gtk_widget_set_hexpand (GTK_WIDGET (self), TRUE);
@@ -456,14 +469,23 @@ eos_app_cell_init (EosAppCell *self)
   gtk_container_add (GTK_CONTAINER (box), self->title_label);
   gtk_widget_show (self->title_label);
 
+  /* We use a stack with a dummy label which will have two lines of
+     text, so we can control the space allocated for the visible
+     subtitle regardless of its text length, to match the UI spec. */
+  GtkWidget *subtitle_stack = gtk_stack_new ();
+  GtkWidget *two_line_label = gtk_label_new ("Lorem ipsum dolor sit amet,"
+                                             "consectetur adipiscing elit");
+  configure_style_for_subtitle_label (GTK_LABEL (two_line_label));
+  gtk_stack_add_named (GTK_STACK (subtitle_stack), two_line_label, "invisible_label");
+
   self->subtitle_label = gtk_label_new ("");
-  gtk_style_context_add_class (gtk_widget_get_style_context (self->subtitle_label),
-                               "app-cell-subtitle");
-  gtk_label_set_line_wrap (GTK_LABEL (self->subtitle_label), TRUE);
-  gtk_misc_set_alignment (GTK_MISC (self->subtitle_label), 0.0, 0.5);
-  gtk_label_set_max_width_chars (GTK_LABEL (self->subtitle_label), 50);
-  gtk_container_add (GTK_CONTAINER (box), self->subtitle_label);
+  configure_style_for_subtitle_label (GTK_LABEL (self->subtitle_label));
   gtk_widget_show (self->subtitle_label);
+
+  gtk_stack_add_named (GTK_STACK (subtitle_stack), self->subtitle_label, "visible_label");
+  gtk_stack_set_visible_child_name (GTK_STACK (subtitle_stack), "visible_label");
+  gtk_container_add (GTK_CONTAINER (box), subtitle_stack);
+  gtk_widget_show (subtitle_stack);
 
   /* Selected state */
   self->frame_selected = gtk_frame_new (NULL);
