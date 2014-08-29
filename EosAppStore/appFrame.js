@@ -279,10 +279,13 @@ const AppListBoxRow = new Lang.Class({
                     else {
                         this._maybeNotify(_("'%s' was installed successfully").format(this.appTitle));
 
-                        let appWindow = Gio.Application.get_default().mainWindow;
-                        if (appWindow && appWindow.is_visible()) {
-                            appWindow.hide();
-                        }
+                        Mainloop.timeout_add_seconds(3, Lang.bind(this, function() {
+                            let appWindow = Gio.Application.get_default().mainWindow;
+                            if (appWindow && appWindow.is_visible()) {
+                                appWindow.hide();
+                            }
+                            return false;
+                        }));
                     }
                 }));
                 break;
@@ -313,14 +316,15 @@ const AppListBoxRow = new Lang.Class({
 
                     this._installedMessage.show();
 
-                    let appWindow = Gio.Application.get_default().mainWindow;
-                    if (appWindow && appWindow.is_visible()) {
-                        appWindow.hide();
-                    }
-
                     Mainloop.timeout_add_seconds(3, Lang.bind(this, function() {
                         this._installedMessage.hide();
                         this._updateState();
+
+                        let appWindow = Gio.Application.get_default().mainWindow;
+                        if (appWindow && appWindow.is_visible()) {
+                            appWindow.hide();
+                        }
+
                         return false;
                     }));
                 }));
