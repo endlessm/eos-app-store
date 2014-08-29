@@ -1116,12 +1116,7 @@ eos_app_list_model_install_app_finish (EosAppListModel *model,
                                        GAsyncResult *result,
                                        GError **error)
 {
-  GTask *task = G_TASK (result);
-
-  if (!g_task_propagate_boolean (task, error))
-    return FALSE;
-
-  return TRUE;
+  return g_task_propagate_boolean (G_TASK (result), error);
 }
 
 static void
@@ -1189,13 +1184,9 @@ eos_app_list_model_update_app_finish (EosAppListModel *model,
                                       GAsyncResult *result,
                                       GError **error)
 {
-  GTask *task = G_TASK (result);
-
-  if (!g_task_propagate_boolean (task, error))
-    return FALSE;
-
-  return TRUE;
+  return g_task_propagate_boolean (G_TASK (result), error);
 }
+
 static void
 remove_app_thread_func (GTask *task,
                         gpointer source_object,
@@ -1256,12 +1247,7 @@ eos_app_list_model_uninstall_app_finish (EosAppListModel *model,
                                          GAsyncResult *result,
                                          GError **error)
 {
-  GTask *task = G_TASK (result);
-
-  if (!g_task_propagate_boolean (task, error))
-    return FALSE;
-
-  return TRUE;
+  return g_task_propagate_boolean (G_TASK (result), error);
 }
 
 gboolean
