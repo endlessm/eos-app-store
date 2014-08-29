@@ -93,7 +93,7 @@ const AppListBoxRow = new Lang.Class({
         this._appId = appInfo.get_desktop_id();
 
         this._removeDialog = null;
-        this._windowHideId = mainWindow.connect('hide', Lang.bind(this, this._destroyRemoveDialog));
+        this._windowHideId = mainWindow.connect('hide', Lang.bind(this, this._destroyPendingDialogs));
         this.connect('destroy', Lang.bind(this, this._onDestroy));
 
         this.initTemplate({ templateRoot: '_mainBox', bindChildren: true, connectSignals: true, });
@@ -119,8 +119,21 @@ const AppListBoxRow = new Lang.Class({
         }
     },
 
-    _onDestroy: function() {
+    _destroyErrorDialog: function() {
+        if (this._errorDialog != null) {
+            this._errorDialog.destroy();
+            this._errorDialog = null;
+        }
+    },
+
+    _destroyPendingDialogs: function() {
         this._destroyRemoveDialog();
+        this._destroyErrorDialog();
+    },
+
+    _onDestroy: function() {
+        this._destroyPendingDialogs();
+
         if (this._windowHideId != 0) {
             let app = Gio.Application.get_default();
             let appWindow = app.mainWindow;
@@ -274,7 +287,7 @@ const AppListBoxRow = new Lang.Class({
                     this._updateState();
 
                     if (error) {
-                        this._maybeNotify(_("We could not install '%s'").format(this.appTitle));
+                        this._maybeNotify(_("We could not install '%s'").format(this.appTitle), error);
                     }
                     else {
                         this._maybeNotify(_("'%s' was installed successfully").format(this.appTitle));
@@ -300,7 +313,7 @@ const AppListBoxRow = new Lang.Class({
                     this._installProgress.hide();
 
                     if (error) {
-                        this._maybeNotify(_("We could not install '%s'").format(this.appTitle));
+                        this._maybeNotify(_("We could not install '%s'").format(this.appTitle), error);
                     }
                     else {
                         this._maybeNotify(_("'%s' was installed successfully").format(this.appTitle));
@@ -341,7 +354,7 @@ const AppListBoxRow = new Lang.Class({
                     this._updateState();
 
                     if (error) {
-                        this._maybeNotify(_("We could not update '%s'").format(this.appTitle));
+                        this._maybeNotify(_("We could not update '%s'").format(this.appTitle), error);
                     }
                     else {
                         this._maybeNotify(_("'%s' was updated successfully").format(this.appTitle));
@@ -382,7 +395,7 @@ const AppListBoxRow = new Lang.Class({
                 this._installProgress.hide();
 
                 if (error) {
-                    this._maybeNotify(_("We could not remove '%s'").format(this.appTitle));
+                    this._maybeNotify(_("We could not remove '%s'").format(this.appTitle), error);
                 }
                 else {
                     this._maybeNotify(_("'%s' was removed successfully").format(this.appTitle));
@@ -393,7 +406,7 @@ const AppListBoxRow = new Lang.Class({
         }
     },
 
-    _maybeNotify: function(message) {
+    _maybeNotify: function(message, error) {
         let app = Gio.Application.get_default();
         let appWindowVisible = false;
         if (app.mainWindow) {
@@ -406,11 +419,28 @@ const AppListBoxRow = new Lang.Class({
             appWindowVisible = false;
         }
 
+        // if the window is not visible, we emit a notification instead
+        // of showing a dialog
         if (!appWindowVisible) {
             let notification = new Notify.Notification(message, '');
             notification.show();
+            return;
         }
-    }
+
+        // we only show the error dialog if the error is set
+        if (error) {
+            let dialog = new Gtk.MessageDialog();
+            dialog.set_transient_for(app.mainWindow);
+            dialog.modal = true;
+            dialog.destroy_with_parent = true;
+            dialog.text = message;
+            dialog.add_button(_("Dismiss"), Gtk.ResponseType.OK);
+            dialog.show_all();
+            this._errorDialog = dialog;
+            this._errorDialog.run();
+            this._destroyErrorDialog();
+        }
+    },
 });
 Builder.bindTemplateChildren(AppListBoxRow.prototype);
 
