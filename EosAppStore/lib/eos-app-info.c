@@ -43,7 +43,7 @@ struct _EosAppCell {
 
   EosAppInfo *info;
 
-  GdkPixbuf *image;
+  cairo_surface_t *image;
   GtkStyleContext *image_context;
 
   gint cell_margin;
@@ -107,14 +107,13 @@ eos_app_info_get_cell_margin_for_context (GtkStyleContext *context)
   return retval;
 }
 
-static GdkPixbuf *
-prepare_pixbuf_from_file (EosAppCell *self,
-                          const gchar *path,
-                          gint image_width,
-                          gint image_height,
-                          GError **error)
+static cairo_surface_t *
+prepare_surface_from_file (EosAppCell *self,
+                           const gchar *path,
+                           gint image_width,
+                           gint image_height,
+                           GError **error)
 {
-  GdkPixbuf *retval;
   cairo_surface_t *surface;
   cairo_t *cr;
   GtkCssProvider *provider;
@@ -141,18 +140,14 @@ prepare_pixbuf_from_file (EosAppCell *self,
   gtk_render_background (self->image_context, cr,
                          0, 0, image_width, image_height);
 
-  retval = gdk_pixbuf_get_from_surface (surface, 0, 0,
-                                        image_width, image_height);
-
   cairo_destroy (cr);
-  cairo_surface_destroy (surface);
   gtk_style_context_remove_provider (self->image_context,
                                      GTK_STYLE_PROVIDER (provider));
 
   g_free (provider_data);
   g_object_unref (provider);
 
-  return retval;
+  return surface;
 }
 
 static void
@@ -267,7 +262,7 @@ eos_app_cell_finalize (GObject *gobject)
   EosAppCell *self = (EosAppCell *) gobject;
 
   g_clear_object (&self->image_context);
-  g_clear_object (&self->image);
+  g_clear_pointer (&self->image, (GDestroyNotify) cairo_surface_destroy);
   g_free (self->desktop_id);
   g_free (self->icon_name);
   eos_app_info_unref (self->info);
@@ -313,7 +308,7 @@ eos_app_cell_draw_normal (EosAppCell *self,
   image_width = width - self->cell_margin;
   image_height = height - self->cell_margin;
 
-  self->image = prepare_pixbuf_from_file (self, path, image_width, image_height, &error);
+  self->image = prepare_surface_from_file (self, path, image_width, image_height, &error);
 
   if (error != NULL)
     {
@@ -331,11 +326,11 @@ out:
                                     GTK_STATE_FLAG_NORMAL,
                                     &image_margin);
 
-      gtk_render_icon (self->image_context,
-                       cr,
-                       self->image,
-                       MAX (image_margin.top, (gint) self->cell_margin / 2),
-                       MAX (image_margin.left, (gint) self->cell_margin / 2));
+      gtk_render_icon_surface (self->image_context,
+                               cr,
+                               self->image,
+                               MAX (image_margin.top, (gint) self->cell_margin / 2),
+                               MAX (image_margin.left, (gint) self->cell_margin / 2));
     }
 }
 
