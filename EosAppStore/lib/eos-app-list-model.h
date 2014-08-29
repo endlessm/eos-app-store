@@ -59,6 +59,8 @@ gboolean eos_app_list_model_update_app_finish (EosAppListModel *model,
                                                GAsyncResult *result,
                                                GError **error);
 
+#define EOS_APP_LIST_MODEL_ERROR        (eos_app_list_model_error_quark ())
+
 GQuark eos_app_list_model_error_quark (void);
 
 typedef enum {
