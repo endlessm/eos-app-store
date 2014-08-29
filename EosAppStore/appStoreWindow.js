@@ -21,7 +21,7 @@ const WMInspect = imports.wmInspect;
 
 const ANIMATION_TIME = (500 * 1000); // half a second
 
-const PAGE_TRANSITION_MS = 500;
+const PAGE_TRANSITION_MS = 250;
 
 const SIDE_COMPONENT_ROLE = 'eos-side-component';
 
