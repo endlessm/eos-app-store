@@ -675,19 +675,19 @@ add_app_from_manager (EosAppListModel *self,
                       GError **error_out)
 {
   GError *error = NULL;
-  gchar *app_id;
-
-  app_id = app_id_from_desktop_id (desktop_id);
-  g_dbus_connection_call_sync (self->system_bus,
-                               "com.endlessm.AppManager",
-                               "/com/endlessm/AppManager",
-                               "com.endlessm.AppManager", "Install",
-                               g_variant_new ("(s)", app_id),
-                               NULL,
-                               G_DBUS_CALL_FLAGS_NONE,
-                               G_MAXINT,
-                               NULL,
-                               &error);
+  gboolean retval = FALSE;
+  char *app_id = app_id_from_desktop_id (desktop_id);
+  GVariant *res =
+    g_dbus_connection_call_sync (self->system_bus,
+                                 "com.endlessm.AppManager",
+                                 "/com/endlessm/AppManager",
+                                 "com.endlessm.AppManager", "Install",
+                                 g_variant_new ("(s)", app_id),
+                                 G_VARIANT_TYPE ("(b)"),
+                                 G_DBUS_CALL_FLAGS_NONE,
+                                 G_MAXINT,
+                                 NULL,
+                                 &error);
   g_free (app_id);
 
   if (error != NULL)
@@ -696,7 +696,23 @@ add_app_from_manager (EosAppListModel *self,
       return FALSE;
     }
 
-  return TRUE;
+  if (res != NULL)
+    {
+      g_variant_get (res, "(b)", &retval);
+      g_variant_unref (res);
+    }
+
+  if (!retval)
+    {
+      g_set_error (error_out, EOS_APP_LIST_MODEL_ERROR,
+                   EOS_APP_LIST_MODEL_ERROR_NO_UPDATE,
+                   _("Application '%s' could not be installed"),
+                   desktop_id);
+
+      return FALSE;
+    }
+
+  return retval;
 }
 
 static gboolean
@@ -734,19 +750,19 @@ remove_app_from_manager (EosAppListModel *self,
                          GError **error_out)
 {
   GError *error = NULL;
-  gchar *app_id;
-
-  app_id = app_id_from_desktop_id (desktop_id);
-  g_dbus_connection_call_sync (self->system_bus,
-                               "com.endlessm.AppManager",
-                               "/com/endlessm/AppManager",
-                               "com.endlessm.AppManager", "Uninstall",
-                               g_variant_new ("(s)", app_id),
-                               NULL,
-                               G_DBUS_CALL_FLAGS_NONE,
-                               G_MAXINT,
-                               cancellable,
-                               &error);
+  gboolean retval = FALSE;
+  char *app_id = app_id_from_desktop_id (desktop_id);
+  GVariant *res =
+    g_dbus_connection_call_sync (self->system_bus,
+                                 "com.endlessm.AppManager",
+                                 "/com/endlessm/AppManager",
+                                 "com.endlessm.AppManager", "Uninstall",
+                                 g_variant_new ("(s)", app_id),
+                                 G_VARIANT_TYPE ("(b)"),
+                                 G_DBUS_CALL_FLAGS_NONE,
+                                 G_MAXINT,
+                                 cancellable,
+                                 &error);
   g_free (app_id);
 
   if (error != NULL)
@@ -755,7 +771,23 @@ remove_app_from_manager (EosAppListModel *self,
       return FALSE;
     }
 
-  return TRUE;
+  if (res != NULL)
+    {
+      g_variant_get (res, "(b)", &retval);
+      g_variant_unref (res);
+    }
+
+  if (!retval)
+    {
+      g_set_error (error_out, EOS_APP_LIST_MODEL_ERROR,
+                   EOS_APP_LIST_MODEL_ERROR_NO_UPDATE,
+                   _("Application '%s' could not be removed"),
+                   desktop_id);
+
+      return FALSE;
+    }
+
+  return retval;
 }
 
 static gboolean
@@ -765,24 +797,40 @@ update_app_from_manager (EosAppListModel *self,
                          GError **error_out)
 {
   GError *error = NULL;
-  gchar *app_id;
-
-  app_id = app_id_from_desktop_id (desktop_id);
-  g_dbus_connection_call_sync (self->system_bus,
-                               "com.endlessm.AppManager",
-                               "/com/endlessm/AppManager",
-                               "com.endlessm.AppManager", "Install",
-                               g_variant_new ("(s)", app_id),
-                               NULL,
-                               G_DBUS_CALL_FLAGS_NONE,
-                               G_MAXINT,
-                               NULL,
-                               &error);
+  gboolean retval = FALSE;
+  char *app_id = app_id_from_desktop_id (desktop_id);
+  GVariant *res =
+    g_dbus_connection_call_sync (self->system_bus,
+                                 "com.endlessm.AppManager",
+                                 "/com/endlessm/AppManager",
+                                 "com.endlessm.AppManager", "Install",
+                                 g_variant_new ("(s)", app_id),
+                                 G_VARIANT_TYPE ("(b)"),
+                                 G_DBUS_CALL_FLAGS_NONE,
+                                 G_MAXINT,
+                                 NULL,
+                                 &error);
   g_free (app_id);
 
   if (error != NULL)
     {
       g_propagate_error (error_out, error);
+      return FALSE;
+    }
+
+  if (res != NULL)
+    {
+      g_variant_get (res, "(b)", &retval);
+      g_variant_unref (res);
+    }
+
+  if (!retval)
+    {
+      g_set_error (error_out, EOS_APP_LIST_MODEL_ERROR,
+                   EOS_APP_LIST_MODEL_ERROR_NO_UPDATE,
+                   _("Application '%s' could not be updated"),
+                   desktop_id);
+
       return FALSE;
     }
 
@@ -1068,12 +1116,7 @@ eos_app_list_model_install_app_finish (EosAppListModel *model,
                                        GAsyncResult *result,
                                        GError **error)
 {
-  GTask *task = G_TASK (result);
-
-  if (!g_task_propagate_boolean (task, error))
-    return FALSE;
-
-  return TRUE;
+  return g_task_propagate_boolean (G_TASK (result), error);
 }
 
 static void
@@ -1141,13 +1184,9 @@ eos_app_list_model_update_app_finish (EosAppListModel *model,
                                       GAsyncResult *result,
                                       GError **error)
 {
-  GTask *task = G_TASK (result);
-
-  if (!g_task_propagate_boolean (task, error))
-    return FALSE;
-
-  return TRUE;
+  return g_task_propagate_boolean (G_TASK (result), error);
 }
+
 static void
 remove_app_thread_func (GTask *task,
                         gpointer source_object,
@@ -1208,12 +1247,7 @@ eos_app_list_model_uninstall_app_finish (EosAppListModel *model,
                                          GAsyncResult *result,
                                          GError **error)
 {
-  GTask *task = G_TASK (result);
-
-  if (!g_task_propagate_boolean (task, error))
-    return FALSE;
-
-  return TRUE;
+  return g_task_propagate_boolean (G_TASK (result), error);
 }
 
 gboolean
