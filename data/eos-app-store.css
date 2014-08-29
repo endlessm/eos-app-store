@@ -7,7 +7,7 @@
     background-color: transparent;
 }
 
-.window-frame.frame {
+.main-frame.frame {
     background-image: url("bg_gray_noise.png");
     border-width: 0 6px 0 0;
     border-color: transparent;
@@ -20,7 +20,7 @@
                                   transparent 6px) 6 / 6px stretch;
 }
 
-.window-frame.frame:dir(rtl) {
+.main-frame.frame:dir(rtl) {
     border-width: 0 0 0 6px;
     border-color: transparent;
     border-radius: 0;
