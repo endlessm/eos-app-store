@@ -451,18 +451,19 @@ const WeblinkListBoxRow = new Lang.Class({
         '_stateButton'
     ],
 
-    _init: function(parentFrame, model, info) {
+    _init: function(parentFrame, model, row) {
         this.parent();
 
         this._parentFrame = parentFrame;
         this._model = model;
-        this._info = info;
+        this._row = row;
+        this._info = row.linkInfo;
 
         this.initTemplate({ templateRoot: '_mainBox', bindChildren: true, connectSignals: true, });
         this.add(this._mainBox);
 
-        this._nameLabel.set_text(info.get_title());
-        this._descriptionLabel.set_text(info.get_description());
+        this._nameLabel.set_text(this._info.get_title());
+        this._descriptionLabel.set_text(this._info.get_description());
 
         let installedSensitive = (!this._model.hasLauncher(this._info.get_desktop_id()));
         this._setSensitiveState(installedSensitive);
@@ -477,22 +478,14 @@ const WeblinkListBoxRow = new Lang.Class({
         }
     },
 
-    _setInstalledState: function(installed, message) {
-        this._nameLabel.vexpand = installed;
-        this._descriptionLabel.set_text(message);
-    },
+    // This 'just installed' state should go away after closing the store and
+    // opening it again, by restoring the original screenshot and description.
+    _setJustInstalledState: function() {
+        this._descriptionLabel.set_text(_("added successfully!"));
 
-    _showInstalledMessage: function () {
-        this._setSensitiveState(false);
-        this._setInstalledState(true, _("added successfully!"));
-
-        GLib.timeout_add_seconds(GLib.PRIORITY_DEFAULT,
-                                 NEW_SITE_SUCCESS_TIMEOUT,
-                                 Lang.bind(this, function() {
-                                     this._setInstalledState(false, this._info.get_description());
-                                     this._parentFrame.setModelConnected(true);
-                                     return false;
-                                 }));
+        let iconName = this._info.get_icon_name();
+        this._icon.set_from_icon_name(iconName, Gtk.IconSize.DIALOG);
+        this._row.show_icon = true;
     },
 
     _onStateButtonClicked: function() {
@@ -501,7 +494,15 @@ const WeblinkListBoxRow = new Lang.Class({
         let desktopId = this._info.get_desktop_id();
         this._model.install(desktopId, function() {});
 
-        this._showInstalledMessage();
+        this._setSensitiveState(false);
+        this._setJustInstalledState();
+
+        GLib.timeout_add_seconds(GLib.PRIORITY_DEFAULT,
+                                 NEW_SITE_SUCCESS_TIMEOUT,
+                                 Lang.bind(this, function() {
+                                     this._parentFrame.setModelConnected(true);
+                                     return false;
+                                 }));
     },
 });
 Builder.bindTemplateChildren(WeblinkListBoxRow.prototype);
@@ -593,6 +594,10 @@ const WeblinkFrame = new Lang.Class({
         let content_file = Gio.File.new_for_path(content_path);
         this._contentMonitor = content_file.monitor_file(Gio.FileMonitorFlags.NONE, null);
         this._contentMonitor.connect('changed', Lang.bind(this, this._repopulate));
+
+        // We want all the links to recover their original state (screenshot and description)
+        // after hiding the store, regardless they have been recently installed or not.
+        mainWindow.connect('hide', Lang.bind(this, this._repopulate));
     },
 
     _repopulate: function(monitor, file, other_file, event_type) {
@@ -603,12 +608,15 @@ const WeblinkFrame = new Lang.Class({
     },
 
     setModelConnected: function(connect) {
-        if (connect) {
-            this._modelConnectionId = this._weblinkListModel.connect('changed', Lang.bind(this, this._repopulate));
-        } else if (this._modelConnectionId) {
+        // Ensure that we don't connect to the 'changed' signal from the model more than
+        // once at the same time by always disconnecting from it first if needed.
+        if (this._modelConnectionId) {
             this._weblinkListModel.disconnect(this._modelConnectionId);
             this._modelConnectionId = null;
         }
+
+        if (connect)
+            this._modelConnectionId = this._weblinkListModel.connect('changed', Lang.bind(this, this._repopulate));
     },
 
     _populateCategoryHeaders: function() {
@@ -673,7 +681,7 @@ const WeblinkFrame = new Lang.Class({
         for (let i in cells) {
             let info = cells[i];
             let row = info.create_row();
-            let rowContent = new WeblinkListBoxRow(this, this._weblinkListModel, info);
+            let rowContent = new WeblinkListBoxRow(this, this._weblinkListModel, row);
             row.add(rowContent);
             weblinksColumnBoxes[(index++)%this._columns].add(row);
         }
