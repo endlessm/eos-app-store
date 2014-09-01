@@ -477,24 +477,11 @@
     margin-bottom: 4px;
 }
 
-.weblink-row-image.select {
-    background-color: alpha(#f9f8f8, 0.95);
-    icon-shadow: -2px 0  3px alpha(#f9f8f8, 0.3),
-                  2px 0  3px alpha(#f9f8f8, 0.3),
-                  0 2px  3px alpha(#f9f8f8, 0.3),
-                  0 -2px 3px alpha(#f9f8f8, 0.3);
-    margin: 4px;
-}
-
 .weblink-listbox .list-row .state-button {
     background-color: transparent;
     background-image: url("btn_add-website_disabled.png");
     background-size: 49px;
     border: 1px;
-}
-
-.weblink-listbox .list-row .row-highlight .state-button {
-    background-image: url("btn_add-website_normal.png");
 }
 
 .weblink-listbox .list-row .state-button:hover {
@@ -516,25 +503,13 @@
     color: white;
 }
 
-.weblink-listbox .list-row .row-highlight .title {
-    color: #3c3c3c;
-}
-
 .weblink-listbox .list-row .description {
     color: #b4b4b4;
     font-size: 10px;
 }
 
-.weblink-listbox .list-row .row-highlight .description {
-    color: #646464;
-}
-
 .weblink-listbox .list-row .url {
     color: #ffa84d;
-}
-
-.weblink-listbox .list-row .row-highlight .url {
-    color: #e87700;
 }
 
 .folder-description {

@@ -5,8 +5,6 @@
 
 #include <gdk-pixbuf/gdk-pixbuf.h>
 
-#define SELECTED (GTK_STATE_FLAG_ACTIVE | GTK_STATE_FLAG_PRELIGHT | GTK_STATE_FLAG_SELECTED)
-
 struct _EosLinkRow {
   GtkListBoxRow parent;
 
@@ -61,24 +59,12 @@ eos_link_row_get_cell_style_context (void)
 static gint
 eos_link_row_get_cell_margin_for_context (GtkStyleContext *context)
 {
-  GtkBorder margin, select_margin;
+  GtkBorder margin;
   gint retval;
 
   gtk_style_context_get_margin (context,
                                 GTK_STATE_FLAG_NORMAL,
                                 &margin);
-
-  gtk_style_context_save (context);
-  gtk_style_context_add_class (context, "select");
-  gtk_style_context_get_margin (context,
-                                GTK_STATE_FLAG_NORMAL,
-                                &select_margin);
-  gtk_style_context_restore (context);
-
-  margin.top = MAX (margin.top, select_margin.top);
-  margin.right = MAX (margin.right, select_margin.right);
-  margin.bottom = MAX (margin.bottom, select_margin.bottom);
-  margin.left = MAX (margin.left, select_margin.left);
 
   retval = margin.top + margin.bottom;
   retval = MAX (retval, margin.left + margin.right);
@@ -174,7 +160,6 @@ eos_link_row_draw_selected (EosLinkRow *self,
   image_height = height - self->cell_margin;
 
   gtk_style_context_save (self->image_context);
-  gtk_style_context_add_class (self->image_context, "select");
 
   if (self->selected_image == NULL)
     self->selected_image = get_selected_pixbuf_background (self, image_width, image_height);
@@ -230,10 +215,12 @@ eos_link_row_draw (GtkWidget *widget,
   width = gtk_widget_get_allocated_width (widget);
   height = gtk_widget_get_allocated_height (widget);
 
-  if (gtk_widget_get_state_flags (widget) & SELECTED)
-    eos_link_row_draw_selected (self, cr, width, height);
-  else
-    eos_link_row_draw_normal (self, cr, width, height);
+  /* FIXME: the following code is temporarily commented to avoid
+     visual effects when moving the mouse over a web link */
+  /* if (gtk_widget_get_state_flags (widget) & SELECTED) */
+  /*   eos_link_row_draw_selected (self, cr, width, height); */
+  /* else */
+  eos_link_row_draw_normal (self, cr, width, height);
 
   GTK_WIDGET_CLASS (eos_link_row_parent_class)->draw (widget, cr);
 

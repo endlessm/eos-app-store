@@ -467,36 +467,6 @@ const WeblinkListBoxRow = new Lang.Class({
         let installedSensitive = (!this._model.hasLauncher(this._info.get_desktop_id()));
         this._setSensitiveState(installedSensitive);
         this._mainBox.show();
-
-        this.connect('enter-notify-event', Lang.bind(this, this._onEnterEvent));
-        this.connect('leave-notify-event', Lang.bind(this, this._onLeaveEvent));
-    },
-
-    _onEnterEvent: function(widget, event) {
-        let notifyType = EosAppStorePrivate.get_event_notify_type(event);
-        if (notifyType != Gdk.NotifyType.INFERIOR) {
-            this._setActiveState(true);
-        }
-        return false;
-    },
-
-    _onLeaveEvent: function(widget, event) {
-        let notifyType = EosAppStorePrivate.get_event_notify_type(event);
-        if (notifyType != Gdk.NotifyType.INFERIOR) {
-            this._setActiveState(false);
-        }
-        return false;
-    },
-
-    _setActiveState: function(isActive) {
-        if (isActive) {
-            this.get_style_context().add_class('row-highlight');
-            let iconName = this._info.get_icon_name();
-            this._icon.set_from_icon_name(iconName, Gtk.IconSize.DIALOG);
-        } else {
-            this.get_style_context().remove_class('row-highlight');
-            this._icon.clear();
-        }
     },
 
     _setSensitiveState: function(isSensitive) {
