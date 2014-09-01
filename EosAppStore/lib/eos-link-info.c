@@ -11,7 +11,9 @@ struct _EosLinkRow {
   EosLinkInfo *link_info;
 
   GdkPixbuf *image;
-  GdkPixbuf *selected_image;
+  GdkPixbuf *icon;
+
+  gboolean show_icon;
 
   GtkStyleContext *image_context;
 
@@ -25,6 +27,7 @@ struct _EosLinkRowClass {
 enum {
   PROP_0,
   PROP_LINK_INFO,
+  PROP_SHOW_ICON,
   NUM_PROPS
 };
 
@@ -73,9 +76,9 @@ eos_link_row_get_cell_margin_for_context (GtkStyleContext *context)
 }
 
 static GdkPixbuf *
-get_selected_pixbuf_background (EosLinkRow *self,
-                                gint image_width,
-                                gint image_height)
+get_icon_pixbuf_background (EosLinkRow *self,
+                            gint image_width,
+                            gint image_height)
 {
   GdkPixbuf *retval;
   cairo_surface_t *surface;
@@ -148,10 +151,10 @@ get_pixbuf_background (EosLinkRow *self,
 }
 
 static void
-eos_link_row_draw_selected (EosLinkRow *self,
-                            cairo_t *cr,
-                            gint width,
-                            gint height)
+eos_link_row_draw_with_icon (EosLinkRow *self,
+                             cairo_t *cr,
+                             gint width,
+                             gint height)
 {
   gint image_width, image_height;
   GtkBorder image_margin;
@@ -161,8 +164,8 @@ eos_link_row_draw_selected (EosLinkRow *self,
 
   gtk_style_context_save (self->image_context);
 
-  if (self->selected_image == NULL)
-    self->selected_image = get_selected_pixbuf_background (self, image_width, image_height);
+  if (self->icon == NULL)
+    self->icon = get_icon_pixbuf_background (self, image_width, image_height);
 
   gtk_style_context_get_margin (self->image_context,
                                 GTK_STATE_FLAG_NORMAL,
@@ -170,7 +173,7 @@ eos_link_row_draw_selected (EosLinkRow *self,
 
   gtk_render_icon (self->image_context,
                    cr,
-                   self->selected_image,
+                   self->icon,
                    MAX (image_margin.top, (gint) self->cell_margin / 2),
                    MAX (image_margin.left, (gint) self->cell_margin / 2));
 
@@ -215,12 +218,10 @@ eos_link_row_draw (GtkWidget *widget,
   width = gtk_widget_get_allocated_width (widget);
   height = gtk_widget_get_allocated_height (widget);
 
-  /* FIXME: the following code is temporarily commented to avoid
-     visual effects when moving the mouse over a web link */
-  /* if (gtk_widget_get_state_flags (widget) & SELECTED) */
-  /*   eos_link_row_draw_selected (self, cr, width, height); */
-  /* else */
-  eos_link_row_draw_normal (self, cr, width, height);
+  if (self->show_icon)
+    eos_link_row_draw_with_icon (self, cr, width, height);
+  else
+    eos_link_row_draw_normal (self, cr, width, height);
 
   GTK_WIDGET_CLASS (eos_link_row_parent_class)->draw (widget, cr);
 
@@ -271,6 +272,10 @@ eos_link_row_get_property (GObject    *gobject,
       g_value_set_boxed (value, self->link_info);
       break;
 
+    case PROP_SHOW_ICON:
+      g_value_set_boolean (value, self->show_icon);
+      break;
+
     default:
       G_OBJECT_WARN_INVALID_PROPERTY_ID (gobject, prop_id, pspec);
     }
@@ -292,6 +297,10 @@ eos_link_row_set_property (GObject      *gobject,
       g_assert (self->link_info != NULL);
       break;
 
+    case PROP_SHOW_ICON:
+      self->show_icon = g_value_get_boolean (value);
+      break;
+
     default:
       G_OBJECT_WARN_INVALID_PROPERTY_ID (gobject, prop_id, pspec);
     }
@@ -303,7 +312,7 @@ eos_link_row_finalize (GObject *gobject)
   EosLinkRow *self = (EosLinkRow *) gobject;
 
   g_clear_object (&self->image);
-  g_clear_object (&self->selected_image);
+  g_clear_object (&self->icon);
   g_clear_object (&self->image_context);
 
   g_clear_pointer (&self->link_info, eos_link_info_unref);
@@ -331,6 +340,13 @@ eos_link_row_class_init (EosLinkRowClass *klass)
                         "Link Info",
                         EOS_TYPE_LINK_INFO,
                         G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS | G_PARAM_CONSTRUCT_ONLY);
+
+  eos_link_row_props[PROP_SHOW_ICON] =
+    g_param_spec_boolean ("show-icon",
+                          "Show Icon",
+                          "Whether to show the icon associated to the link",
+                          FALSE,
+                          G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS);
 
   g_object_class_install_properties (oclass, NUM_PROPS, eos_link_row_props);
 }
