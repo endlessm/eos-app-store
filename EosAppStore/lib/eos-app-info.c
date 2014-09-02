@@ -224,15 +224,11 @@ eos_app_cell_set_property (GObject      *gobject,
         if (self->is_selected)
           {
             gtk_stack_set_visible_child (GTK_STACK (self->stack), self->tile_selected);
-            gtk_revealer_set_transition_type (GTK_REVEALER (self->revealer),
-                                              GTK_REVEALER_TRANSITION_TYPE_SLIDE_UP);
             gtk_revealer_set_reveal_child (GTK_REVEALER (self->revealer), TRUE);
           }
         else
           {
             gtk_stack_set_visible_child (GTK_STACK (self->stack), self->tile);
-            gtk_revealer_set_transition_type (GTK_REVEALER (self->revealer),
-                                              GTK_REVEALER_TRANSITION_TYPE_SLIDE_DOWN);
             gtk_revealer_set_reveal_child (GTK_REVEALER (self->revealer), FALSE);
           }
       }
@@ -501,6 +497,8 @@ eos_app_cell_init (EosAppCell *self)
   self->revealer = revealer;
   gtk_widget_set_valign (self->revealer, GTK_ALIGN_END);
   gtk_revealer_set_transition_duration (GTK_REVEALER (self->revealer), 350);
+  gtk_revealer_set_transition_type (GTK_REVEALER (self->revealer),
+                                    GTK_REVEALER_TRANSITION_TYPE_SLIDE_UP);
   gtk_container_add (GTK_CONTAINER (frame), self->revealer);
   gtk_widget_show (self->revealer);
 
