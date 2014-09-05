@@ -288,6 +288,7 @@ eos_link_row_set_property (GObject      *gobject,
 
     case PROP_SHOW_ICON:
       self->show_icon = g_value_get_boolean (value);
+      gtk_widget_queue_draw (GTK_WIDGET (self));
       break;
 
     default:
