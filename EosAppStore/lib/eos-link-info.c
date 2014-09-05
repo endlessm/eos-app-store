@@ -5,15 +5,15 @@
 
 #include <gdk-pixbuf/gdk-pixbuf.h>
 
-#define SELECTED (GTK_STATE_FLAG_ACTIVE | GTK_STATE_FLAG_PRELIGHT | GTK_STATE_FLAG_SELECTED)
-
 struct _EosLinkRow {
   GtkListBoxRow parent;
 
   EosLinkInfo *link_info;
 
-  GdkPixbuf *image;
-  GdkPixbuf *selected_image;
+  cairo_surface_t *image;
+  cairo_surface_t *icon;
+
+  gboolean show_icon;
 
   GtkStyleContext *image_context;
 
@@ -27,6 +27,7 @@ struct _EosLinkRowClass {
 enum {
   PROP_0,
   PROP_LINK_INFO,
+  PROP_SHOW_ICON,
   NUM_PROPS
 };
 
@@ -61,24 +62,12 @@ eos_link_row_get_cell_style_context (void)
 static gint
 eos_link_row_get_cell_margin_for_context (GtkStyleContext *context)
 {
-  GtkBorder margin, select_margin;
+  GtkBorder margin;
   gint retval;
 
   gtk_style_context_get_margin (context,
                                 GTK_STATE_FLAG_NORMAL,
                                 &margin);
-
-  gtk_style_context_save (context);
-  gtk_style_context_add_class (context, "select");
-  gtk_style_context_get_margin (context,
-                                GTK_STATE_FLAG_NORMAL,
-                                &select_margin);
-  gtk_style_context_restore (context);
-
-  margin.top = MAX (margin.top, select_margin.top);
-  margin.right = MAX (margin.right, select_margin.right);
-  margin.bottom = MAX (margin.bottom, select_margin.bottom);
-  margin.left = MAX (margin.left, select_margin.left);
 
   retval = margin.top + margin.bottom;
   retval = MAX (retval, margin.left + margin.right);
@@ -86,12 +75,11 @@ eos_link_row_get_cell_margin_for_context (GtkStyleContext *context)
   return retval;
 }
 
-static GdkPixbuf *
-get_selected_pixbuf_background (EosLinkRow *self,
-                                gint image_width,
-                                gint image_height)
+static cairo_surface_t *
+get_icon_surface_background (EosLinkRow *self,
+                             gint image_width,
+                             gint image_height)
 {
-  GdkPixbuf *retval;
   cairo_surface_t *surface;
   cairo_t *cr;
 
@@ -103,23 +91,18 @@ get_selected_pixbuf_background (EosLinkRow *self,
   gtk_render_frame (self->image_context, cr,
                     0, 0, image_width, image_height);
 
-  retval = gdk_pixbuf_get_from_surface (surface, 0, 0,
-                                        image_width, image_height);
-
   cairo_destroy (cr);
-  cairo_surface_destroy (surface);
 
-  return retval;
+  return surface;
 }
 
-static GdkPixbuf *
-get_pixbuf_background (EosLinkRow *self,
-                       const gchar *path,
-                       gint image_width,
-                       gint image_height,
-                       GError **error)
+static cairo_surface_t *
+get_thumbnail_surface_background (EosLinkRow *self,
+                                  const gchar *path,
+                                  gint image_width,
+                                  gint image_height,
+                                  GError **error)
 {
-  GdkPixbuf *retval;
   cairo_surface_t *surface;
   cairo_t *cr;
   GtkCssProvider *provider;
@@ -146,26 +129,21 @@ get_pixbuf_background (EosLinkRow *self,
   gtk_render_background (self->image_context, cr,
                          0, 0, image_width, image_height);
 
-  retval = gdk_pixbuf_get_from_surface (surface, 0, 0,
-                                        image_width, image_height);
-
   cairo_destroy (cr);
-  cairo_surface_destroy (surface);
-
   gtk_style_context_remove_provider (self->image_context,
                                      GTK_STYLE_PROVIDER (provider));
 
   g_free (provider_data);
   g_object_unref (provider);
 
-  return retval;
+  return surface;
 }
 
 static void
-eos_link_row_draw_selected (EosLinkRow *self,
-                            cairo_t *cr,
-                            gint width,
-                            gint height)
+eos_link_row_draw_with_icon (EosLinkRow *self,
+                             cairo_t *cr,
+                             gint width,
+                             gint height)
 {
   gint image_width, image_height;
   GtkBorder image_margin;
@@ -174,20 +152,19 @@ eos_link_row_draw_selected (EosLinkRow *self,
   image_height = height - self->cell_margin;
 
   gtk_style_context_save (self->image_context);
-  gtk_style_context_add_class (self->image_context, "select");
 
-  if (self->selected_image == NULL)
-    self->selected_image = get_selected_pixbuf_background (self, image_width, image_height);
+  if (self->icon == NULL)
+    self->icon = get_icon_surface_background (self, image_width, image_height);
 
   gtk_style_context_get_margin (self->image_context,
                                 GTK_STATE_FLAG_NORMAL,
                                 &image_margin);
 
-  gtk_render_icon (self->image_context,
-                   cr,
-                   self->selected_image,
-                   MAX (image_margin.top, (gint) self->cell_margin / 2),
-                   MAX (image_margin.left, (gint) self->cell_margin / 2));
+  gtk_render_icon_surface (self->image_context,
+                           cr,
+                           self->icon,
+                           MAX (image_margin.top, (gint) self->cell_margin / 2),
+                           MAX (image_margin.left, (gint) self->cell_margin / 2));
 
   gtk_style_context_restore (self->image_context);
 }
@@ -205,19 +182,19 @@ eos_link_row_draw_normal (EosLinkRow *self,
   image_height = height - self->cell_margin;
 
   if (self->image == NULL)
-    self->image = get_pixbuf_background (self,
-                                         eos_link_info_get_thumbnail_filename (self->link_info),
-                                         image_width, image_height, NULL);
+    self->image = get_thumbnail_surface_background (self,
+                                                    eos_link_info_get_thumbnail_filename (self->link_info),
+                                                    image_width, image_height, NULL);
 
   gtk_style_context_get_margin (self->image_context,
                                 GTK_STATE_FLAG_NORMAL,
                                 &image_margin);
 
-  gtk_render_icon (self->image_context,
-                   cr,
-                   self->image,
-                   MAX (image_margin.top, (gint) self->cell_margin / 2),
-                   MAX (image_margin.left, (gint) self->cell_margin / 2));
+  gtk_render_icon_surface (self->image_context,
+                           cr,
+                           self->image,
+                           MAX (image_margin.top, (gint) self->cell_margin / 2),
+                           MAX (image_margin.left, (gint) self->cell_margin / 2));
 }
 
 static gboolean
@@ -230,8 +207,8 @@ eos_link_row_draw (GtkWidget *widget,
   width = gtk_widget_get_allocated_width (widget);
   height = gtk_widget_get_allocated_height (widget);
 
-  if (gtk_widget_get_state_flags (widget) & SELECTED)
-    eos_link_row_draw_selected (self, cr, width, height);
+  if (self->show_icon)
+    eos_link_row_draw_with_icon (self, cr, width, height);
   else
     eos_link_row_draw_normal (self, cr, width, height);
 
@@ -284,6 +261,10 @@ eos_link_row_get_property (GObject    *gobject,
       g_value_set_boxed (value, self->link_info);
       break;
 
+    case PROP_SHOW_ICON:
+      g_value_set_boolean (value, self->show_icon);
+      break;
+
     default:
       G_OBJECT_WARN_INVALID_PROPERTY_ID (gobject, prop_id, pspec);
     }
@@ -305,6 +286,11 @@ eos_link_row_set_property (GObject      *gobject,
       g_assert (self->link_info != NULL);
       break;
 
+    case PROP_SHOW_ICON:
+      self->show_icon = g_value_get_boolean (value);
+      gtk_widget_queue_draw (GTK_WIDGET (self));
+      break;
+
     default:
       G_OBJECT_WARN_INVALID_PROPERTY_ID (gobject, prop_id, pspec);
     }
@@ -315,8 +301,8 @@ eos_link_row_finalize (GObject *gobject)
 {
   EosLinkRow *self = (EosLinkRow *) gobject;
 
-  g_clear_object (&self->image);
-  g_clear_object (&self->selected_image);
+  g_clear_pointer (&self->image, (GDestroyNotify) cairo_surface_destroy);
+  g_clear_pointer (&self->icon, (GDestroyNotify) cairo_surface_destroy);
   g_clear_object (&self->image_context);
 
   g_clear_pointer (&self->link_info, eos_link_info_unref);
@@ -344,6 +330,13 @@ eos_link_row_class_init (EosLinkRowClass *klass)
                         "Link Info",
                         EOS_TYPE_LINK_INFO,
                         G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS | G_PARAM_CONSTRUCT_ONLY);
+
+  eos_link_row_props[PROP_SHOW_ICON] =
+    g_param_spec_boolean ("show-icon",
+                          "Show Icon",
+                          "Whether to show the icon associated to the link",
+                          FALSE,
+                          G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS);
 
   g_object_class_install_properties (oclass, NUM_PROPS, eos_link_row_props);
 }
