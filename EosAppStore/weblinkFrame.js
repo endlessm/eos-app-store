@@ -615,8 +615,9 @@ const WeblinkFrame = new Lang.Class({
             this._modelConnectionId = null;
         }
 
-        if (connect)
+        if (connect) {
             this._modelConnectionId = this._weblinkListModel.connect('changed', Lang.bind(this, this._repopulate));
+        }
     },
 
     _populateCategoryHeaders: function() {
