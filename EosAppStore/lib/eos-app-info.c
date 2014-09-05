@@ -10,7 +10,6 @@
 #include <endless/endless.h>
 
 #include "eos-app-utils.h"
-#include "eos-stack.h"
 
 /*
  * EosAppCell
@@ -34,12 +33,12 @@ struct _EosAppCell {
   char *icon_name;
 
   GtkWidget *stack;
-  GtkWidget *frame, *frame_selected;
+  GtkWidget *revealer;
+  GtkWidget *tile, *tile_selected;
 
   GtkWidget *title_label, *title_label_selected;
   GtkWidget *subtitle_label;
   GtkWidget *icon;
-  GtkWidget *icon_hbox;
 
   EosAppInfo *info;
 
@@ -224,13 +223,13 @@ eos_app_cell_set_property (GObject      *gobject,
         self->is_selected = g_value_get_boolean (value);
         if (self->is_selected)
           {
-            gtk_stack_set_transition_type (GTK_STACK (self->stack), GTK_STACK_TRANSITION_TYPE_SLIDE_UP);
-            eos_stack_set_visible_child (EOS_STACK (self->stack), self->frame_selected, TRUE);
+            gtk_stack_set_visible_child (GTK_STACK (self->stack), self->tile_selected);
+            gtk_revealer_set_reveal_child (GTK_REVEALER (self->revealer), TRUE);
           }
         else
           {
-            gtk_stack_set_transition_type (GTK_STACK (self->stack), GTK_STACK_TRANSITION_TYPE_SLIDE_DOWN);
-            eos_stack_set_visible_child (EOS_STACK (self->stack), self->frame, FALSE);
+            gtk_stack_set_visible_child (GTK_STACK (self->stack), self->tile);
+            gtk_revealer_set_reveal_child (GTK_REVEALER (self->revealer), FALSE);
           }
       }
       break;
@@ -242,12 +241,9 @@ eos_app_cell_set_property (GObject      *gobject,
         self->icon_name = g_strdup (icon_name);
 
         if (icon_name != NULL)
-          {
-            gtk_image_set_from_icon_name (GTK_IMAGE (self->icon),
-                                          icon_name,
-                                          GTK_ICON_SIZE_DIALOG);
-            gtk_widget_show (self->icon_hbox);
-          }
+          gtk_image_set_from_icon_name (GTK_IMAGE (self->icon),
+                                        icon_name,
+                                        GTK_ICON_SIZE_DIALOG);
       }
       break;
 
@@ -339,8 +335,6 @@ eos_app_cell_draw (GtkWidget *widget,
                    cairo_t   *cr)
 {
   EosAppCell *self = (EosAppCell *) widget;
-  GtkAllocation allocation;
-  int width, height;
 
   if (self->info == NULL)
     {
@@ -348,12 +342,9 @@ eos_app_cell_draw (GtkWidget *widget,
       return FALSE;
     }
 
-  gtk_widget_get_allocation (widget, &allocation);
-  width = allocation.width;
-  height = allocation.height;
-
   eos_app_cell_draw_normal (self, cr,
-                            width, height);
+                            gtk_widget_get_allocated_width (widget),
+                            gtk_widget_get_allocated_height (widget));
 
   GTK_WIDGET_CLASS (eos_app_cell_parent_class)->draw (widget, cr);
 
@@ -433,27 +424,29 @@ configure_style_for_subtitle_label (GtkLabel *label)
 static void
 eos_app_cell_init (EosAppCell *self)
 {
-  gtk_widget_set_hexpand (GTK_WIDGET (self), TRUE);
-  gtk_widget_set_vexpand (GTK_WIDGET (self), TRUE);
+  GtkWidget *overlay = gtk_overlay_new ();
+  gtk_widget_set_hexpand (GTK_WIDGET (overlay), TRUE);
+  gtk_widget_set_vexpand (GTK_WIDGET (overlay), TRUE);
+  gtk_container_add (GTK_CONTAINER (self), overlay);
+  gtk_widget_show (overlay);
 
-  GtkWidget *stack = eos_stack_new ();
+  GtkWidget *stack = gtk_stack_new ();
   self->stack = stack;
-  gtk_style_context_add_class (gtk_widget_get_style_context (self->stack),
-                               "app-cell-stack");
+  gtk_stack_set_transition_type (GTK_STACK (self->stack), GTK_STACK_TRANSITION_TYPE_CROSSFADE);
   gtk_stack_set_transition_duration (GTK_STACK (self->stack), 350);
-  gtk_container_add (GTK_CONTAINER (self), GTK_WIDGET (stack));
+  gtk_container_add (GTK_CONTAINER (overlay), stack);
 
   /* Normal state */
-  self->frame = gtk_frame_new (NULL);
-  gtk_style_context_add_class (gtk_widget_get_style_context (self->frame),
+  self->tile = gtk_frame_new (NULL);
+  gtk_style_context_add_class (gtk_widget_get_style_context (self->tile),
                                "app-cell-frame");
-  gtk_container_add (GTK_CONTAINER (stack), self->frame);
-  gtk_widget_show (self->frame);
+  gtk_container_add (GTK_CONTAINER (self->stack), self->tile);
+  gtk_widget_show (self->tile);
 
   GtkWidget *box = gtk_box_new (GTK_ORIENTATION_VERTICAL, 2);
   gtk_widget_set_valign (box, GTK_ALIGN_END);
   gtk_widget_set_halign (box, GTK_ALIGN_START);
-  gtk_container_add (GTK_CONTAINER (self->frame), box);
+  gtk_container_add (GTK_CONTAINER (self->tile), box);
   gtk_widget_show (box);
 
   self->title_label = gtk_label_new ("");
@@ -483,21 +476,39 @@ eos_app_cell_init (EosAppCell *self)
   gtk_widget_show (subtitle_stack);
 
   /* Selected state */
-  self->frame_selected = gtk_frame_new (NULL);
-  gtk_style_context_add_class (gtk_widget_get_style_context (self->frame_selected),
+  self->tile_selected = gtk_frame_new (NULL);
+  gtk_style_context_add_class (gtk_widget_get_style_context (self->tile_selected),
                                "app-cell-frame");
-  gtk_style_context_add_class (gtk_widget_get_style_context (self->frame_selected), "select");
-  gtk_container_add (GTK_CONTAINER (stack), self->frame_selected);
-  gtk_widget_show (self->frame_selected);
+  gtk_style_context_add_class (gtk_widget_get_style_context (self->tile_selected),
+                               "select");
+  gtk_container_add (GTK_CONTAINER (stack), self->tile_selected);
+  gtk_widget_show (self->tile_selected);
+
+  GtkWidget *frame = gtk_frame_new (NULL);
+  gtk_style_context_add_class (gtk_widget_get_style_context (frame),
+                               "app-cell-frame");
+  gtk_frame_set_shadow_type (GTK_FRAME (frame), GTK_SHADOW_NONE);
+  gtk_widget_set_hexpand (frame, TRUE);
+  gtk_widget_set_vexpand (frame, TRUE);
+  gtk_overlay_add_overlay (GTK_OVERLAY (overlay), frame);
+  gtk_widget_show (frame);
+
+  GtkWidget *revealer = gtk_revealer_new ();
+  self->revealer = revealer;
+  gtk_widget_set_valign (self->revealer, GTK_ALIGN_END);
+  gtk_revealer_set_transition_duration (GTK_REVEALER (self->revealer), 350);
+  gtk_revealer_set_transition_type (GTK_REVEALER (self->revealer),
+                                    GTK_REVEALER_TRANSITION_TYPE_SLIDE_UP);
+  gtk_container_add (GTK_CONTAINER (frame), self->revealer);
+  gtk_widget_show (self->revealer);
 
   GtkWidget *box_selected = gtk_box_new (GTK_ORIENTATION_VERTICAL, 2);
-  gtk_widget_set_valign (box_selected, GTK_ALIGN_END);
-  gtk_widget_set_halign (box_selected, GTK_ALIGN_START);
-  gtk_container_add (GTK_CONTAINER (self->frame_selected), box_selected);
+  gtk_container_add (GTK_CONTAINER (self->revealer), box_selected);
   gtk_widget_show (box_selected);
+  gtk_style_context_add_class (gtk_widget_get_style_context (box_selected),
+                               "select");
 
   GtkWidget *hbox = gtk_box_new (GTK_ORIENTATION_HORIZONTAL, 13);
-  self->icon_hbox = hbox;
   gtk_widget_set_hexpand (hbox, TRUE);
   gtk_container_add (GTK_CONTAINER (box_selected), hbox);
   gtk_widget_show (hbox);
