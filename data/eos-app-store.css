@@ -340,8 +340,8 @@
 
 .new-site-frame {
     background: alpha(black, 0.25);
-    border-radius: 4px;
-    box-shadow: inset 0px 2px 2px 0px black;
+    border-radius: 3px;
+    box-shadow: inset 0px 2px 2px 0px alpha(black, 0.40);
 }
 
 .new-site-frame .url-icon {
@@ -387,14 +387,19 @@
 }
 
 .new-site-frame .url-label {
-    font-size: 20px;
+    font-size: 12px;
     font-weight: bold;
     color: white;
+    padding: 8px 0px 8px 6px;
 }
-   
+
 .new-site-frame .alert-label {
-    font-size: 1.083em;
+    font-size: 11px;
     color: #999999;
+}
+
+.new-site-frame .alert-highlight .alert-label {
+    color: white;
 }
 
 .new-site-frame #alert {
@@ -407,7 +412,12 @@
     background-image: url("btn_edit_normal.png");
     background-size: 22px;
     background-repeat: no-repeat;
-    border: 1px;
+    background-position: center;
+    border: 0px;
+}
+
+.new-site-frame .alert-highlight #cancel {
+    background-image: url("btn_edit_hover.png");
 }
 
 .new-site-frame #spinner {
