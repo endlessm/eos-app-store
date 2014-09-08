@@ -19,7 +19,6 @@ const Path = imports.path;
 const Separator = imports.separator;
 const Signals = imports.signals;
 
-const NEW_SITE_TITLE_LIMIT = 20;
 const NEW_SITE_SUCCESS_TIMEOUT = 3;
 
 const CATEGORY_TRANSITION_MS = 500;
@@ -229,9 +228,6 @@ const NewSiteBox = new Lang.Class({
         this._webHelper = null;
         this._weblinkListModel = weblinkListModel;
 
-        this._entryActivatedId = 0;
-        this._entryChangedId = 0;
-
         this.initTemplate({ templateRoot: '_mainBox',
                             bindChildren: true,
                             connectSignals: true });
@@ -248,7 +244,14 @@ const NewSiteBox = new Lang.Class({
                              new Gtk.Image({ name: 'alert' }),
                              null ];
         this._alertIcons[NewSiteBoxState.EDITING].connect('clicked', Lang.bind(this, this._onEditSiteCancel));
+        this._sitePixbuf = null;
 
+        this._buildSearchBoxForNewSites();
+
+        this._setState(NewSiteBoxState.EMPTY);
+    },
+
+    _buildSearchBoxForNewSites: function() {
         this._urlEntry = new Gtk.Entry();
         this._urlEntry.set_placeholder_text(_("Write the website you'd like to add here and press “Enter”"));
         this._urlEntry.get_style_context().add_class('url-entry');
@@ -263,26 +266,24 @@ const NewSiteBox = new Lang.Class({
                                    this._urlEntry.unset_state_flags(Gtk.StateFlags.PRELIGHT);
                                }));
 
-        this._siteUrlFrame.add(this._urlEntry);
-        this._sitePixbuf = null;
+        this._urlEntry.connect('activate',
+                               Lang.bind(this, this._onUrlEntryActivated));
 
-        this._setState(NewSiteBoxState.EMPTY);
+        this._urlEntry.connect('changed',
+                               Lang.bind(this, this._onUrlEntryChanged));
+
+        this._urlEntry.connect('icon-press',
+                               Lang.bind(this, function () {
+                                   this._urlEntry.emit('activate');
+                               }));
+
+        this._siteUrlFrame.add(this._urlEntry);
+
     },
 
     _setState: function(state) {
         if (this._state == state) {
             return;
-        }
-
-        // Clean up common state
-        if (this._entryActivateId > 0) {
-            this._urlEntry.disconnect(this._entryActivateId);
-            this._entryActivateId = 0;
-        }
-
-        if (this._entryChangedId > 0) {
-            this._urlEntry.disconnect(this._entryChangedId);
-            this._entryChangedId = 0;
         }
 
         let prevState = this._state;
@@ -312,37 +313,24 @@ const NewSiteBox = new Lang.Class({
                 this._webHelper = null;
             }
 
-            this._entryActivateId = this._urlEntry.connect('activate',
-                                                           Lang.bind(this, this._onUrlEntryActivated));
-
             break;
         case NewSiteBoxState.SEARCHING:
             this._siteAlertLabel.set_text(_("searching"));
-
+            this._urlEntry.secondary_icon_name = null;
             this._urlEntry.get_style_context().remove_class('url-entry-error');
-
-            this._entryChangedId = this._urlEntry.connect('changed',
-                                                          Lang.bind(this, this._onUrlEntryChanged));
 
             break;
         case NewSiteBoxState.EDITING:
             this._siteAlertLabel.set_text(this._webHelper.url);
-
             this._siteAddButton.visible = true;
-
-            // Narrow the entry and put the focus so user can change the title
-            this._urlEntry.max_length = NEW_SITE_TITLE_LIMIT;
-            this._urlEntry.halign = Gtk.Align.START;
             this._urlEntry.set_text(this._webHelper.title);
+            this._urlEntry.secondary_icon_name = null;
 
             break;
         case NewSiteBoxState.ERROR:
             this._siteAlertLabel.set_text(_("The address written does not exist or is not available."));
-
+            this._urlEntry.secondary_icon_name = null;
             this._urlEntry.get_style_context().add_class('url-entry-error');
-
-            this._entryChangedId = this._urlEntry.connect('changed',
-                                                          Lang.bind(this, this._onUrlEntryChanged));
 
             break;
         case NewSiteBoxState.INSTALLED:
@@ -409,7 +397,13 @@ const NewSiteBox = new Lang.Class({
     },
 
     _onUrlEntryChanged: function() {
-        this._setState(NewSiteBoxState.READY);
+        if (this._state == NewSiteBoxState.SEARCHING || this._state == NewSiteBoxState.ERROR) {
+            this._setState(NewSiteBoxState.READY)
+        }
+
+        // Show the '>' secondary icon in the entry when there's some text written.
+        let iconName = (this._urlEntry.get_text().length > 0) ? 'go-next-symbolic' : null;
+        this._urlEntry.secondary_icon_name = iconName;
     },
 
     _onUrlEntryActivated: function() {
