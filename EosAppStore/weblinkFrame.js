@@ -240,7 +240,7 @@ const NewSiteBox = new Lang.Class({
                              new Gtk.Spinner({ name: 'spinner',
                                                width_request: 12,
                                                height_request: 12 }),
-                             new Gtk.Button({ name: 'cancel',
+                             new Gtk.Button({ name: 'back',
                                               width_request: 22,
                                               height_request: 22 }),
                              new Gtk.Image({ name: 'alert',

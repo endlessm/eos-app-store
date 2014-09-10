@@ -408,29 +408,29 @@
     background-repeat: no-repeat;
 }
 
-.new-site-frame #cancel {
-    background-image: url("btn_edit_normal.png");
+.new-site-frame #back {
+    background-image: url("btn_back_22x22_normal.png");
     background-size: 22px;
     background-repeat: no-repeat;
     background-position: center;
     border: 0px;
 }
 
-.new-site-frame .alert-highlight #cancel {
-    background-image: url("btn_edit_hover.png");
+.new-site-frame .alert-highlight #back {
+    background-image: url("btn_back_22x22_hover.png");
 }
 
 .new-site-frame #spinner {
     color: #999999;
 }
 
-.new-site-frame #cancel:active,
-.new-site-frame #cancel:hover:active {
-    background-image: url("btn_edit_pressed.png");
+.new-site-frame #back:active,
+.new-site-frame #back:hover:active {
+    background-image: url("btn_back_22x22_pressed.png");
 }
 
-.new-site-frame #cancel:hover {
-    background-image: url("btn_edit_hover.png");
+.new-site-frame #back:hover {
+    background-image: url("btn_back_22x22_hover.png");
 }
 
 .new-site-frame .add-button {
