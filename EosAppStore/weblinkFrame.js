@@ -317,8 +317,7 @@ const NewSiteBox = new Lang.Class({
 
         // Make sure this style is never applied by default when changing states.
         let eventBoxStyleContext = this._siteAlertLabelEventBox.get_style_context();
-        if (eventBoxStyleContext.has_class('alert-highlight'))
-            this._siteAlertLabelEventBox.get_style_context().remove_class('alert-highlight');
+        this._siteAlertLabelEventBox.get_style_context().remove_class('alert-highlight');
 
         switch (state) {
         case NewSiteBoxState.EMPTY:
