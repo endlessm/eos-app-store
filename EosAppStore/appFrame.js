@@ -267,9 +267,13 @@ const AppListBoxRow = new Lang.Class({
         this._installProgress.show();
         this._installSpinner.start();
 
+        Gio.Application.get_default().pushRunningOperation();
+
         this._model.install(this._appId, Lang.bind(this, function(error) {
             this._installSpinner.stop();
             this._installProgress.hide();
+
+            Gio.Application.get_default().popRunningOperation();
 
             if (error) {
                 this._maybeNotify(_("We could not install '%s'").format(this.appTitle), error);
@@ -321,11 +325,15 @@ const AppListBoxRow = new Lang.Class({
                 this._installProgress.show();
                 this._installSpinner.start();
 
+                Gio.Application.get_default().pushRunningOperation();
+
                 this._model.install(this._appId, Lang.bind(this, function(error) {
 
                     this._installSpinner.stop();
                     this._installProgress.hide();
                     this._updateState();
+
+                    Gio.Application.get_default().popRunningOperation();
 
                     if (error) {
                         this._maybeNotify(_("We could not install '%s'").format(this.appTitle), error);
@@ -357,11 +365,15 @@ const AppListBoxRow = new Lang.Class({
                 this._installProgress.show();
                 this._installSpinner.start();
 
+                Gio.Application.get_default().pushRunningOperation();
+
                 this._model.updateApp(this._appId, Lang.bind(this, function(error) {
                     this._installSpinner.stop();
                     this._installProgress.hide();
 
                     this._updateState();
+
+                    Gio.Application.get_default().popRunningOperation();
 
                     if (error) {
                         this._maybeNotify(_("We could not update '%s'").format(this.appTitle), error);
@@ -406,9 +418,13 @@ const AppListBoxRow = new Lang.Class({
             this._installProgress.show();
             this._installSpinner.start();
 
+            app.pushRunningOperation();
+
             this._model.uninstall(this._appId, Lang.bind(this, function(error) {
                 this._installSpinner.stop();
                 this._installProgress.hide();
+
+                app.popRunningOperation();
 
                 if (error) {
                     this._maybeNotify(_("We could not remove '%s'").format(this.appTitle), error);
