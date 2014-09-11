@@ -279,9 +279,7 @@ const NewSiteBox = new Lang.Class({
                                Lang.bind(this, this._onUrlEntryChanged));
 
         this._urlEntry.connect('icon-press',
-                               Lang.bind(this, function () {
-                                   this._urlEntry.emit('activate');
-                               }));
+                               Lang.bind(this, this._onUrlEntryActivated));
 
         this._urlLabel = new Gtk.Label();
         this._urlLabel.get_style_context().add_class('url-label');
