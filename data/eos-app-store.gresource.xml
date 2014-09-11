@@ -9,9 +9,9 @@
     <file compressed="true">btn_back_hover.png</file>
     <file compressed="true">btn_back_normal.png</file>
     <file compressed="true">btn_back_pressed.png</file>
-    <file compressed="true">btn_edit_hover.png</file>
-    <file compressed="true">btn_edit_normal.png</file>
-    <file compressed="true">btn_edit_pressed.png</file>
+    <file compressed="true">btn_back_22x22_hover.png</file>
+    <file compressed="true">btn_back_22x22_normal.png</file>
+    <file compressed="true">btn_back_22x22_pressed.png</file>
     <file compressed="true">btn_folder-glow_hover.png</file>
     <file compressed="true">btn_folder-glow_pressed.png</file>
     <file compressed="true">btn_add-folder_disabled.png</file>

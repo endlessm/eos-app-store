@@ -19,7 +19,6 @@ const Path = imports.path;
 const Separator = imports.separator;
 const Signals = imports.signals;
 
-const NEW_SITE_TITLE_LIMIT = 20;
 const NEW_SITE_SUCCESS_TIMEOUT = 3;
 
 const CATEGORY_TRANSITION_MS = 500;
@@ -204,7 +203,7 @@ const NewSiteBoxState = {
     EMPTY: 0,
     READY: 1,
     SEARCHING: 2,
-    EDITING: 3,
+    FOUND: 3,
     ERROR: 4,
     INSTALLED: 5
 };
@@ -219,6 +218,7 @@ const NewSiteBox = new Lang.Class({
         '_siteIcon',
         '_siteUrlFrame',
         '_siteAlertIconFrame',
+        '_siteAlertLabelEventBox',
         '_siteAlertLabel',
         '_siteAddButton'
     ],
@@ -228,9 +228,6 @@ const NewSiteBox = new Lang.Class({
 
         this._webHelper = null;
         this._weblinkListModel = weblinkListModel;
-
-        this._entryActivatedId = 0;
-        this._entryChangedId = 0;
 
         this.initTemplate({ templateRoot: '_mainBox',
                             bindChildren: true,
@@ -242,14 +239,26 @@ const NewSiteBox = new Lang.Class({
                              null,
                              new Gtk.Spinner({ name: 'spinner',
                                                width_request: 12,
-                                               height_request: 12,
-                                               margin: 4 }),
-                             new Gtk.Button({ name: 'cancel' }),
-                             new Gtk.Image({ name: 'alert' }),
+                                               height_request: 12 }),
+                             new Gtk.Button({ name: 'back',
+                                              width_request: 22,
+                                              height_request: 22 }),
+                             new Gtk.Image({ name: 'alert',
+                                             halign: Gtk.Align.CENTER,
+                                             valign: Gtk.Align.CENTER }),
                              null ];
-        this._alertIcons[NewSiteBoxState.EDITING].connect('clicked', Lang.bind(this, this._onEditSiteCancel));
 
-        this._urlEntry = new Gtk.Entry();
+        this._alertIcons[NewSiteBoxState.FOUND].connect('clicked', Lang.bind(this, this._onFoundSiteBack));
+        this._sitePixbuf = null;
+
+        this._buildWidgetsForSiteUrlFrame();
+        this._setSiteUrlFrameChild(this._urlEntry);
+
+        this._setState(NewSiteBoxState.EMPTY);
+    },
+
+    _buildWidgetsForSiteUrlFrame: function() {
+        this._urlEntry = new Gtk.Entry({ margin_bottom: 12 });
         this._urlEntry.set_placeholder_text(_("Write the website you'd like to add here and press “Enter”"));
         this._urlEntry.get_style_context().add_class('url-entry');
 
@@ -263,10 +272,38 @@ const NewSiteBox = new Lang.Class({
                                    this._urlEntry.unset_state_flags(Gtk.StateFlags.PRELIGHT);
                                }));
 
-        this._siteUrlFrame.add(this._urlEntry);
-        this._sitePixbuf = null;
+        this._urlEntry.connect('activate',
+                               Lang.bind(this, this._onUrlEntryActivated));
 
-        this._setState(NewSiteBoxState.EMPTY);
+        this._urlEntry.connect('changed',
+                               Lang.bind(this, this._onUrlEntryChanged));
+
+        this._urlEntry.connect('icon-press',
+                               Lang.bind(this, this._onUrlEntryActivated));
+
+        this._urlLabel = new Gtk.Label();
+        this._urlLabel.get_style_context().add_class('url-label');
+        this._urlLabel.set_alignment(0, 0);
+        this._urlLabel.show();
+
+        this._siteAlertLabelEventBox.connect('enter-notify-event',
+                                             Lang.bind(this, this._onSiteAlertEnterEvent));
+        this._siteAlertLabelEventBox.connect('leave-notify-event',
+                                             Lang.bind(this, this._onSiteAlertLeaveEvent));
+        this._siteAlertLabelEventBox.connect('button-press-event',
+                                             Lang.bind(this, this._onSiteAlertLabelClicked));
+    },
+
+    _setSiteUrlFrameChild: function(child) {
+        let curChild = this._siteUrlFrame.get_child();
+        if (child != curChild) {
+            if (curChild) {
+                this._siteUrlFrame.remove(curChild);
+            }
+
+            this._siteUrlFrame.add(child);
+            child.show();
+        }
     },
 
     _setState: function(state) {
@@ -274,20 +311,13 @@ const NewSiteBox = new Lang.Class({
             return;
         }
 
-        // Clean up common state
-        if (this._entryActivateId > 0) {
-            this._urlEntry.disconnect(this._entryActivateId);
-            this._entryActivateId = 0;
-        }
-
-        if (this._entryChangedId > 0) {
-            this._urlEntry.disconnect(this._entryChangedId);
-            this._entryChangedId = 0;
-        }
-
         let prevState = this._state;
         this._state = state;
         this._switchAlertIcon(prevState);
+
+        // Make sure this style is never applied by default when changing states.
+        let eventBoxStyleContext = this._siteAlertLabelEventBox.get_style_context();
+        this._siteAlertLabelEventBox.get_style_context().remove_class('alert-highlight');
 
         switch (state) {
         case NewSiteBoxState.EMPTY:
@@ -300,6 +330,8 @@ const NewSiteBox = new Lang.Class({
             this._siteAddButton.visible = false;
             this._urlEntry.max_length = 0;
             this._urlEntry.halign = Gtk.Align.FILL;
+            this._setSiteUrlFrameChild(this._urlEntry);
+
             this._sitePixbuf = null;
 
             // https://bugzilla.gnome.org/show_bug.cgi?id=709056
@@ -312,56 +344,39 @@ const NewSiteBox = new Lang.Class({
                 this._webHelper = null;
             }
 
-            this._entryActivateId = this._urlEntry.connect('activate',
-                                                           Lang.bind(this, this._onUrlEntryActivated));
-
             break;
         case NewSiteBoxState.SEARCHING:
             this._siteAlertLabel.set_text(_("searching"));
-
+            this._urlEntry.secondary_icon_name = null;
             this._urlEntry.get_style_context().remove_class('url-entry-error');
-
-            this._entryChangedId = this._urlEntry.connect('changed',
-                                                          Lang.bind(this, this._onUrlEntryChanged));
+            this._setSiteUrlFrameChild(this._urlEntry);
 
             break;
-        case NewSiteBoxState.EDITING:
+        case NewSiteBoxState.FOUND:
+            this._urlLabel.set_label(this._webHelper.title);
+            this._setSiteUrlFrameChild(this._urlLabel);
             this._siteAlertLabel.set_text(this._webHelper.url);
-
             this._siteAddButton.visible = true;
-
-            // Narrow the entry and put the focus so user can change the title
-            this._urlEntry.max_length = NEW_SITE_TITLE_LIMIT;
-            this._urlEntry.halign = Gtk.Align.START;
-            this._urlEntry.set_text(this._webHelper.title);
+            this._urlEntry.secondary_icon_name = null;
 
             break;
         case NewSiteBoxState.ERROR:
             this._siteAlertLabel.set_text(_("The address written does not exist or is not available."));
-
+            this._urlEntry.secondary_icon_name = null;
             this._urlEntry.get_style_context().add_class('url-entry-error');
-
-            this._entryChangedId = this._urlEntry.connect('changed',
-                                                          Lang.bind(this, this._onUrlEntryChanged));
+            this._setSiteUrlFrameChild(this._urlEntry);
 
             break;
         case NewSiteBoxState.INSTALLED:
+            this._urlLabel.set_label(this._webHelper.title);
+            this._setSiteUrlFrameChild(this._urlLabel);
             this._siteAlertLabel.set_text(_("added successfully!"));
-
-            let urlLabel = new Gtk.Label({ label: this._urlEntry.get_text() });
-            urlLabel.get_style_context().add_class('url-label');
-            urlLabel.set_alignment(0, 0.5);
-            this._siteUrlFrame.remove(this._urlEntry);
-            this._siteUrlFrame.add(urlLabel);
-            this._siteUrlFrame.show_all();
-
             this._siteAddButton.sensitive = false;
 
             GLib.timeout_add_seconds(GLib.PRIORITY_DEFAULT,
                                      NEW_SITE_SUCCESS_TIMEOUT,
                                      Lang.bind(this, function() {
-                                         this._siteUrlFrame.remove(urlLabel);
-                                         this._siteUrlFrame.add(this._urlEntry);
+                                         this._setSiteUrlFrameChild(this._urlEntry);
                                          this._siteAddButton.sensitive = true;
                                          this._setState(NewSiteBoxState.EMPTY);
                                          return false;
@@ -383,19 +398,20 @@ const NewSiteBox = new Lang.Class({
         }
 
         if (alertIcon) {
-            this._siteAlertIconFrame.visible = true;
             this._siteAlertIconFrame.add(alertIcon);
             alertIcon.show();
 
             if (this._state == NewSiteBoxState.SEARCHING) {
                 alertIcon.start();
             }
-        } else {
-            this._siteAlertIconFrame.visible = false;
         }
+
+        // We hide the icon frame only in the INSTALLED state, so that the
+        // width request does not get the alert label misaligned in this case.
+        this._siteAlertIconFrame.visible = (this._state != NewSiteBoxState.INSTALLED);
     },
 
-    _onEditSiteCancel: function() {
+    _onFoundSiteBack: function() {
         this._setState(NewSiteBoxState.EMPTY);
     },
 
@@ -409,7 +425,13 @@ const NewSiteBox = new Lang.Class({
     },
 
     _onUrlEntryChanged: function() {
-        this._setState(NewSiteBoxState.READY);
+        if (this._state == NewSiteBoxState.SEARCHING || this._state == NewSiteBoxState.ERROR) {
+            this._setState(NewSiteBoxState.READY)
+        }
+
+        // Show the '>' secondary icon in the entry when there's some text written.
+        let iconName = (this._urlEntry.get_text().length > 0) ? 'go-next-symbolic' : null;
+        this._urlEntry.secondary_icon_name = iconName;
     },
 
     _onUrlEntryActivated: function() {
@@ -428,7 +450,21 @@ const NewSiteBox = new Lang.Class({
     },
 
     _onWebsiteLoaded: function() {
-        this._setState(NewSiteBoxState.EDITING);
+        this._setState(NewSiteBoxState.FOUND);
+    },
+
+    _onSiteAlertEnterEvent: function() {
+        if (this._state == NewSiteBoxState.FOUND) {
+            this._siteAlertLabelEventBox.get_style_context().add_class('alert-highlight');
+        }
+    },
+
+    _onSiteAlertLeaveEvent: function() {
+        this._siteAlertLabelEventBox.get_style_context().remove_class('alert-highlight');
+    },
+
+    _onSiteAlertLabelClicked: function() {
+        this._setState(NewSiteBoxState.EMPTY);
     },
 
     _onWebsiteFailed: function() {
