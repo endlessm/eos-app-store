@@ -407,7 +407,7 @@ const NewSiteBox = new Lang.Class({
         }
 
         // We hide the icon frame only in the INSTALLED state, so that the
-        // width request is not get the alert label misaligned in this case.
+        // width request does not get the alert label misaligned in this case.
         this._siteAlertIconFrame.visible = (this._state != NewSiteBoxState.INSTALLED);
     },
 
