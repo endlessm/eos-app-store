@@ -251,12 +251,13 @@ const NewSiteBox = new Lang.Class({
         this._alertIcons[NewSiteBoxState.FOUND].connect('clicked', Lang.bind(this, this._onFoundSiteBack));
         this._sitePixbuf = null;
 
-        this._buildSearchBoxForNewSites();
+        this._buildWidgetsForSiteUrlFrame();
+        this._setSiteUrlFrameChild(this._urlEntry);
 
         this._setState(NewSiteBoxState.EMPTY);
     },
 
-    _buildSearchBoxForNewSites: function() {
+    _buildWidgetsForSiteUrlFrame: function() {
         this._urlEntry = new Gtk.Entry({ margin_bottom: 12 });
         this._urlEntry.set_placeholder_text(_("Write the website you'd like to add here and press “Enter”"));
         this._urlEntry.get_style_context().add_class('url-entry');
@@ -293,32 +294,17 @@ const NewSiteBox = new Lang.Class({
                                              Lang.bind(this, this._onSiteAlertLeaveEvent));
         this._siteAlertLabelEventBox.connect('button-press-event',
                                              Lang.bind(this, this._onSiteAlertLabelClicked));
-
-        this._siteUrlFrame.add(this._urlEntry);
     },
 
-    _updateUrlFrameForState: function() {
-        switch (this._state) {
-        case NewSiteBoxState.EMPTY:
-        case NewSiteBoxState.READY:
-        case NewSiteBoxState.SEARCHING:
-        case NewSiteBoxState.ERROR:
-            if (this._siteUrlFrame.get_child() != this._urlEntry) {
-                this._siteUrlFrame.remove(this._urlLabel);
-                this._siteUrlFrame.add(this._urlEntry);
-                this._urlEntry.show();
+    _setSiteUrlFrameChild: function(child) {
+        let curChild = this._siteUrlFrame.get_child();
+        if (child != curChild) {
+            if (curChild) {
+                this._siteUrlFrame.remove(curChild);
             }
 
-            break;
-        case NewSiteBoxState.FOUND:
-        case NewSiteBoxState.INSTALLED:
-            if (this._siteUrlFrame.get_child() != this._urlLabel) {
-                this._siteUrlFrame.remove(this._urlEntry);
-                this._siteUrlFrame.add(this._urlLabel);
-                this._urlLabel.show();
-            }
-
-            break;
+            this._siteUrlFrame.add(child);
+            child.show();
         }
     },
 
@@ -336,10 +322,6 @@ const NewSiteBox = new Lang.Class({
         if (eventBoxStyleContext.has_class('alert-highlight'))
             this._siteAlertLabelEventBox.get_style_context().remove_class('alert-highlight');
 
-        // Prepare the frame where either the URL or the site title
-        // will be shown, depending on the actual state.
-        this._updateUrlFrameForState();
-
         switch (state) {
         case NewSiteBoxState.EMPTY:
             this._urlEntry.set_text('');
@@ -351,6 +333,8 @@ const NewSiteBox = new Lang.Class({
             this._siteAddButton.visible = false;
             this._urlEntry.max_length = 0;
             this._urlEntry.halign = Gtk.Align.FILL;
+            this._setSiteUrlFrameChild(this._urlEntry);
+
             this._sitePixbuf = null;
 
             // https://bugzilla.gnome.org/show_bug.cgi?id=709056
@@ -368,10 +352,12 @@ const NewSiteBox = new Lang.Class({
             this._siteAlertLabel.set_text(_("searching"));
             this._urlEntry.secondary_icon_name = null;
             this._urlEntry.get_style_context().remove_class('url-entry-error');
+            this._setSiteUrlFrameChild(this._urlEntry);
 
             break;
         case NewSiteBoxState.FOUND:
             this._urlLabel.set_label(this._webHelper.title);
+            this._setSiteUrlFrameChild(this._urlLabel);
             this._siteAlertLabel.set_text(this._webHelper.url);
             this._siteAddButton.visible = true;
             this._urlEntry.secondary_icon_name = null;
@@ -381,17 +367,19 @@ const NewSiteBox = new Lang.Class({
             this._siteAlertLabel.set_text(_("The address written does not exist or is not available."));
             this._urlEntry.secondary_icon_name = null;
             this._urlEntry.get_style_context().add_class('url-entry-error');
+            this._setSiteUrlFrameChild(this._urlEntry);
 
             break;
         case NewSiteBoxState.INSTALLED:
-            this._siteAlertLabel.set_text(_("added successfully!"));
             this._urlLabel.set_label(this._webHelper.title);
+            this._setSiteUrlFrameChild(this._urlLabel);
+            this._siteAlertLabel.set_text(_("added successfully!"));
             this._siteAddButton.sensitive = false;
 
             GLib.timeout_add_seconds(GLib.PRIORITY_DEFAULT,
                                      NEW_SITE_SUCCESS_TIMEOUT,
                                      Lang.bind(this, function() {
-                                         this._updateUrlFrameForState();
+                                         this._setSiteUrlFrameChild(this._urlEntry);
                                          this._siteAddButton.sensitive = true;
                                          this._setState(NewSiteBoxState.EMPTY);
                                          return false;
