@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: eos-app-store\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2014-08-29 10:09-0700\n"
-"PO-Revision-Date: 2014-09-08 22:06+0000\n"
+"PO-Revision-Date: 2014-09-10 23:24+0000\n"
 "Last-Translator: Philip Chimento <philip.chimento@gmail.com>\n"
 "Language-Team: French (http://www.transifex.com/projects/p/eos-app-store/language/fr/)\n"
 "MIME-Version: 1.0\n"
@@ -19,93 +19,93 @@ msgstr ""
 
 #: ../data/eos-app-store-folder-frame.ui.h:1
 msgid "Create your own folder to organize your apps. First, choose an icon."
-msgstr ""
+msgstr "Créez votre propre dossier pour organiser vos applications. D'abord, choisissez une icône."
 
 #: ../data/eos-app-store-list-row.ui.h:1 ../EosAppStore/appFrame.js:240
 msgid "Install app"
-msgstr ""
+msgstr "Installer l'application"
 
 #: ../data/eos-app-store-list-row.ui.h:2
 msgid "Installing"
-msgstr ""
+msgstr "En cours d'installation"
 
 #: ../data/eos-app-store-list-row.ui.h:3
 msgid "Installed successfully"
-msgstr ""
+msgstr "Installé avec succès"
 
 #: ../data/eos-app-store-list-row.ui.h:4
 msgid "Delete from device"
-msgstr ""
+msgstr "Supprimer du système"
 
 #: ../data/eos-app-store-main-window.ui.h:1
 msgid "Apps"
-msgstr ""
+msgstr "Applications"
 
 #: ../data/eos-app-store-main-window.ui.h:2
 msgid "Websites"
-msgstr ""
+msgstr "Sites internet"
 
 #: ../data/eos-app-store-main-window.ui.h:3
 msgid "Folders"
-msgstr ""
+msgstr "Dossiers"
 
 #: ../data/eos-app-store-weblink-new-site-frame.ui.h:1
 msgid "e.g.: http://www.globoesporte.com"
-msgstr ""
+msgstr "ex. : http://www.globoesporte.com"
 
 #: ../EosAppStore/appFrame.js:225
 msgid "Add to the desktop"
-msgstr ""
+msgstr "Ajouter au bureau"
 
 #: ../EosAppStore/appFrame.js:228
 msgid "Open app"
-msgstr ""
+msgstr "Ouvrir l'application"
 
 #: ../EosAppStore/appFrame.js:245
 msgid "Update app"
-msgstr ""
+msgstr "Mettre à jour l'application"
 
 #: ../EosAppStore/appFrame.js:279 ../EosAppStore/appFrame.js:310
 msgid "Installing..."
-msgstr ""
+msgstr "Installation en cours..."
 
 #: ../EosAppStore/appFrame.js:290 ../EosAppStore/appFrame.js:319
 #, c-format
 msgid "We could not install '%s'"
-msgstr ""
+msgstr "Nous n'avons pas pu installer « %s »"
 
 #: ../EosAppStore/appFrame.js:293 ../EosAppStore/appFrame.js:322
 #, c-format
 msgid "'%s' was installed successfully"
-msgstr ""
+msgstr "« %s » a été installé avec succès"
 
 #: ../EosAppStore/appFrame.js:350
 msgid "Updating..."
-msgstr ""
+msgstr "Mise à jour en cours..."
 
 #: ../EosAppStore/appFrame.js:361
 #, c-format
 msgid "We could not update '%s'"
-msgstr ""
+msgstr "Nous n'avons pas pu mettre à jour « %s »"
 
 #: ../EosAppStore/appFrame.js:364
 #, c-format
 msgid "'%s' was updated successfully"
-msgstr ""
+msgstr "« %s » a été mis à jour avec succès"
 
 #: ../EosAppStore/appFrame.js:378
 msgid "Deleting app"
-msgstr ""
+msgstr "Suppression de l'application"
 
 #: ../EosAppStore/appFrame.js:379
 msgid ""
 "Deleting this app will remove it from the device for all users. You will "
 "need to download it from the internet in order to reinstall it."
-msgstr ""
+msgstr "La suppression de cette application l'éliminera du système pour tous les utilisateurs. Vous devrez la télécharger à partir d'internet pour la réinstaller."
 
 #: ../EosAppStore/appFrame.js:380
 msgid "Delete app"
-msgstr ""
+msgstr "Supprimer l'application"
 
 #: ../EosAppStore/appFrame.js:382
 msgid "Cancel"
@@ -113,146 +113,146 @@ msgstr "Annuler"
 
 #: ../EosAppStore/appFrame.js:393
 msgid "Removing..."
-msgstr ""
+msgstr "Élimination en cours..."
 
 #: ../EosAppStore/appFrame.js:402
 #, c-format
 msgid "We could not remove '%s'"
-msgstr ""
+msgstr "Nous n'avons pas pu éliminer « %s »"
 
 #: ../EosAppStore/appFrame.js:405
 #, c-format
 msgid "'%s' was removed successfully"
-msgstr ""
+msgstr "« %s » a été enlevé avec succès"
 
 #: ../EosAppStore/appFrame.js:441
 msgid "Dismiss"
-msgstr ""
+msgstr "Rejeter"
 
 #: ../EosAppStore/appStoreWindow.js:330
 msgid "Install apps"
-msgstr ""
+msgstr "Installer les applications"
 
 #: ../EosAppStore/appStoreWindow.js:334
 msgid "Install websites"
-msgstr ""
+msgstr "Installer les sites internet"
 
 #: ../EosAppStore/appStoreWindow.js:338
 msgid "Install folders"
-msgstr ""
+msgstr "Installer les dossiers"
 
 #. Translators: use the same string used to install the app store content JSON
 #: ../EosAppStore/categories.js:10 ../EosAppStore/lib/eos-app-info.c:791
 msgid "Education"
-msgstr ""
+msgstr "Formation"
 
 #: ../EosAppStore/categories.js:16 ../EosAppStore/lib/eos-app-info.c:792
 msgid "Games"
-msgstr ""
+msgstr "Jeux"
 
 #: ../EosAppStore/categories.js:22 ../EosAppStore/lib/eos-app-info.c:793
 msgid "Resources"
-msgstr ""
+msgstr "Documentations "
 
 #: ../EosAppStore/categories.js:28 ../EosAppStore/lib/eos-app-info.c:794
 msgid "Utilities"
-msgstr ""
+msgstr "Utilitaires"
 
 #: ../EosAppStore/categories.js:34
 msgid "Installed"
-msgstr ""
+msgstr "Installé(e)..."
 
 #: ../EosAppStore/categories.js:45
 msgid "News"
-msgstr ""
+msgstr "Nouveautés"
 
 #: ../EosAppStore/categories.js:51
 msgid "Sports"
-msgstr ""
+msgstr "Sports"
 
 #: ../EosAppStore/categories.js:57
 msgid "Education and Health"
-msgstr ""
+msgstr "Éducation et Santé"
 
 #: ../EosAppStore/categories.js:63
 msgid "Entertainment"
-msgstr ""
+msgstr "Divertissement "
 
 #: ../EosAppStore/categories.js:69
 msgid "Local"
-msgstr ""
+msgstr "Régional"
 
 #: ../EosAppStore/environment.js:20
 msgid "App Store"
-msgstr ""
+msgstr "App Store"
 
 #: ../EosAppStore/folderFrame.js:41
 msgid "Name of folder"
-msgstr ""
+msgstr "Nom du dossier"
 
 #: ../EosAppStore/folderFrame.js:69
 msgid "Folder added!"
-msgstr ""
+msgstr "Dossier ajouté !"
 
 #: ../EosAppStore/weblinkFrame.js:253
 msgid "Write the website you'd like to add here and press “Enter”"
-msgstr ""
+msgstr "Écrivez le site internet que vous aimeriez ajouter ici et appuyer sur «Entrée»"
 
 #: ../EosAppStore/weblinkFrame.js:298
 msgid "e.g.: http://www.prensalibre.com.gt"
-msgstr ""
+msgstr "ex. : http://www.prensalibre.com.gt"
 
 #: ../EosAppStore/weblinkFrame.js:320
 msgid "searching"
-msgstr ""
+msgstr "recherche en cours"
 
 #: ../EosAppStore/weblinkFrame.js:340
 msgid "The address written does not exist or is not available."
-msgstr ""
+msgstr "L'adresse écrite n'existe pas ou n'est pas disponible."
 
 #: ../EosAppStore/weblinkFrame.js:349 ../EosAppStore/weblinkFrame.js:517
 msgid "added successfully!"
-msgstr ""
+msgstr "ajouté avec succès !"
 
 #: ../EosAppStore/weblinkFrame.js:582
 msgid ""
 "Add your favorite websites to your desktop or choose suggested ones from our"
 " list."
-msgstr ""
+msgstr "Ajouter vos sites internet préférés à votre bureau ou choisissez parmi les suggestions de notre liste. "
 
 #: ../EosAppStore/lib/eos-app-list-model.c:709
 #, c-format
 msgid "Application '%s' could not be installed"
-msgstr ""
+msgstr "L'application « %s » n'a pas pu être installée"
 
 #: ../EosAppStore/lib/eos-app-list-model.c:784
 #, c-format
 msgid "Application '%s' could not be removed"
-msgstr ""
+msgstr "L'application « %s » n'a pas pu être éliminée"
 
 #: ../EosAppStore/lib/eos-app-list-model.c:831
 #, c-format
 msgid "Application '%s' could not be updated"
-msgstr ""
+msgstr "L'application « %s » n'a pas pu être mise à jour"
 
 #: ../EosAppStore/lib/eos-app-list-model.c:1091
 #: ../EosAppStore/lib/eos-app-list-model.c:1160
 #, c-format
 msgid "App %s not installable"
-msgstr ""
+msgstr "L'application «%s» ne peut pas être installée"
 
 #: ../EosAppStore/lib/eos-app-list-model.c:1102
 #, c-format
 msgid "App %s already installed"
-msgstr ""
+msgstr "« %s » de l'application est déjà installé"
 
 #: ../EosAppStore/lib/eos-app-list-model.c:1171
 #, c-format
 msgid "App %s is up to date"
-msgstr ""
+msgstr "« %s » de l'application est mis à jour"
 
 #: ../EosAppStore/lib/eos-app-list-model.c:1234
 #: ../EosAppStore/lib/eos-app-list-model.c:1267
 #, c-format
 msgid "App %s is not installed"
-msgstr ""
+msgstr "« %s » de l'application n'est pas installé"
