@@ -260,6 +260,45 @@ const AppListBoxRow = new Lang.Class({
         }
     },
 
+    _installApp: function() {
+        this._installButton.hide();
+
+        this._installProgressLabel.set_text(_("Installing..."));
+        this._installProgress.show();
+        this._installSpinner.start();
+
+        this._model.install(this._appId, Lang.bind(this, function(error) {
+            this._installSpinner.stop();
+            this._installProgress.hide();
+
+            if (error) {
+                this._maybeNotify(_("We could not install '%s'").format(this.appTitle), error);
+            }
+            else {
+                this._maybeNotify(_("'%s' was installed successfully").format(this.appTitle));
+            }
+
+            if (error) {
+                this._updateState();
+                return;
+            }
+
+            this._installedMessage.show();
+
+            Mainloop.timeout_add_seconds(3, Lang.bind(this, function() {
+                this._installedMessage.hide();
+                this._updateState();
+
+                let appWindow = Gio.Application.get_default().mainWindow;
+                if (appWindow && appWindow.is_visible()) {
+                    appWindow.hide();
+                }
+
+                return false;
+            }));
+        }));
+    },
+
     _onInstallButtonClicked: function() {
         switch (this._appState) {
             // if the application is installed, we have two options
@@ -307,42 +346,7 @@ const AppListBoxRow = new Lang.Class({
 
             // if the application is uninstalled, we install it
             case EosAppStorePrivate.AppState.UNINSTALLED:
-                this._installButton.hide();
-
-                this._installProgressLabel.set_text(_("Installing..."));
-                this._installProgress.show();
-                this._installSpinner.start();
-
-                this._model.install(this._appId, Lang.bind(this, function(error) {
-                    this._installSpinner.stop();
-                    this._installProgress.hide();
-
-                    if (error) {
-                        this._maybeNotify(_("We could not install '%s'").format(this.appTitle), error);
-                    }
-                    else {
-                        this._maybeNotify(_("'%s' was installed successfully").format(this.appTitle));
-                    }
-
-                    if (error) {
-                        this._updateState();
-                        return;
-                    }
-
-                    this._installedMessage.show();
-
-                    Mainloop.timeout_add_seconds(3, Lang.bind(this, function() {
-                        this._installedMessage.hide();
-                        this._updateState();
-
-                        let appWindow = Gio.Application.get_default().mainWindow;
-                        if (appWindow && appWindow.is_visible()) {
-                            appWindow.hide();
-                        }
-
-                        return false;
-                    }));
-                }));
+                this._installApp();
                 break;
 
             // if the application can be updated, we update it
@@ -363,7 +367,13 @@ const AppListBoxRow = new Lang.Class({
                         this._maybeNotify(_("We could not update '%s'").format(this.appTitle), error);
                     }
                     else {
-                        this._maybeNotify(_("'%s' was updated successfully").format(this.appTitle));
+                        // if not in the desktop, install it
+                        if (!this._model.hasLauncher(this._appId)) {
+                            this._installApp();
+                        }
+                        else {
+                            this._maybeNotify(_("'%s' was updated successfully").format(this.appTitle));
+                        }
                     }
                 }));
                 break;
