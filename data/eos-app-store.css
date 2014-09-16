@@ -477,6 +477,12 @@
     margin-bottom: 4px;
 }
 
+.weblink-row-image.with-icon {
+    background-image: url("bg_installed-link.png");
+    background-repeat: no-repeat;
+    background-size: 90px 90px;
+}
+
 .weblink-listbox .list-row .state-button {
     background-color: transparent;
     background-image: url("btn_add-website_disabled.png");
@@ -501,10 +507,6 @@
     font-size: 12px;
     font-weight: bold;
     color: white;
-}
-
-.weblink-listbox .list-row .icon {
-    background-color: alpha(black, 0.20);
 }
 
 .weblink-listbox .list-row .description {

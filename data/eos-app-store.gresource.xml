@@ -2,6 +2,7 @@
 <gresources>
   <gresource prefix="/com/endlessm/appstore">
     <file compressed="true">bg_gray_noise.png</file>
+    <file compressed="true">bg_installed-link.png</file>
     <file compressed="true">btn_add-website_disabled.png</file>
     <file compressed="true">btn_add-website_hover.png</file>
     <file compressed="true">btn_add-website_normal.png</file>

@@ -152,6 +152,7 @@ eos_link_row_draw_with_icon (EosLinkRow *self,
   image_height = height - self->cell_margin;
 
   gtk_style_context_save (self->image_context);
+  gtk_style_context_add_class (self->image_context, "with-icon");
 
   if (self->icon == NULL)
     self->icon = get_icon_surface_background (self, image_width, image_height);
