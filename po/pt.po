@@ -19,8 +19,8 @@ msgstr ""
 "Project-Id-Version: eos-app-store\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2014-08-29 10:09-0700\n"
-"PO-Revision-Date: 2014-09-10 17:36+0000\n"
-"Last-Translator: Philip Chimento <philip.chimento@gmail.com>\n"
+"PO-Revision-Date: 2014-09-17 04:30+0000\n"
+"Last-Translator: Roddy Shuler <roddy@endlessm.com>\n"
 "Language-Team: Portuguese (http://www.transifex.com/projects/p/eos-app-store/language/pt/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -30,11 +30,11 @@ msgstr ""
 
 #: ../data/eos-app-store-folder-frame.ui.h:1
 msgid "Create your own folder to organize your apps. First, choose an icon."
-msgstr "Crie a sua própria pasta para organizar seus aplicativos. Primeiro, escolha um ícone."
+msgstr "Crie a sua própria pasta para organizar seus programas. Primeiro, escolha um ícone."
 
 #: ../data/eos-app-store-list-row.ui.h:1 ../EosAppStore/appFrame.js:240
 msgid "Install app"
-msgstr "Instalar aplicativo"
+msgstr "Instalar programa"
 
 #: ../data/eos-app-store-list-row.ui.h:2
 msgid "Installing"
@@ -50,7 +50,7 @@ msgstr "Apagar do dispositivo"
 
 #: ../data/eos-app-store-main-window.ui.h:1
 msgid "Apps"
-msgstr "Aplicativos"
+msgstr "Programas"
 
 #: ../data/eos-app-store-main-window.ui.h:2
 msgid "Websites"
@@ -70,11 +70,11 @@ msgstr "Adicionar à área de trabalho"
 
 #: ../EosAppStore/appFrame.js:228
 msgid "Open app"
-msgstr "Abrir aplicativo"
+msgstr "Abrir programa"
 
 #: ../EosAppStore/appFrame.js:245
 msgid "Update app"
-msgstr "Atualizar aplicativo"
+msgstr "Atualizar programa"
 
 #: ../EosAppStore/appFrame.js:279 ../EosAppStore/appFrame.js:310
 msgid "Installing..."
@@ -83,7 +83,7 @@ msgstr "Instalando..."
 #: ../EosAppStore/appFrame.js:290 ../EosAppStore/appFrame.js:319
 #, c-format
 msgid "We could not install '%s'"
-msgstr "Não foi possível instalar  '%s'"
+msgstr "Não foi possível instalar '%s'"
 
 #: ../EosAppStore/appFrame.js:293 ../EosAppStore/appFrame.js:322
 #, c-format
@@ -106,17 +106,17 @@ msgstr "'%s' foi atualizado com sucesso"
 
 #: ../EosAppStore/appFrame.js:378
 msgid "Deleting app"
-msgstr "Excluindo aplicativo"
+msgstr "Excluindo programa"
 
 #: ../EosAppStore/appFrame.js:379
 msgid ""
 "Deleting this app will remove it from the device for all users. You will "
 "need to download it from the internet in order to reinstall it."
-msgstr "Ao excluir este aplicativo você o removerá de todas as contas de usuário desse computador. Caso queira reinstalar será necessário baixar pela internet."
+msgstr "Ao excluir este programa você o removerá de todas as contas de usuário desse computador. Caso queira reinstalar será necessário baixar pela internet."
 
 #: ../EosAppStore/appFrame.js:380
 msgid "Delete app"
-msgstr "Excluir aplicativo "
+msgstr "Excluir programa "
 
 #: ../EosAppStore/appFrame.js:382
 msgid "Cancel"
@@ -142,7 +142,7 @@ msgstr "Descartar"
 
 #: ../EosAppStore/appStoreWindow.js:330
 msgid "Install apps"
-msgstr "Instalar aplicativos"
+msgstr "Instalar programas"
 
 #: ../EosAppStore/appStoreWindow.js:334
 msgid "Install websites"
@@ -195,7 +195,7 @@ msgstr "Localidade"
 
 #: ../EosAppStore/environment.js:20
 msgid "App Store"
-msgstr "Central de Aplicativos"
+msgstr "Central de Programas"
 
 #: ../EosAppStore/folderFrame.js:41
 msgid "Name of folder"
@@ -234,36 +234,36 @@ msgstr "Adicione seus sites favoritos à sua área de trabalho ou escolha entre 
 #: ../EosAppStore/lib/eos-app-list-model.c:709
 #, c-format
 msgid "Application '%s' could not be installed"
-msgstr "Aplicativo '%s' não pôde ser instalado "
+msgstr "Programa '%s' não pôde ser instalado "
 
 #: ../EosAppStore/lib/eos-app-list-model.c:784
 #, c-format
 msgid "Application '%s' could not be removed"
-msgstr "Aplicativo '%s' não pôde ser removido"
+msgstr "Programa '%s' não pôde ser removido"
 
 #: ../EosAppStore/lib/eos-app-list-model.c:831
 #, c-format
 msgid "Application '%s' could not be updated"
-msgstr "Aplicativo '%s' não pôde ser atualizado"
+msgstr "Programa '%s' não pôde ser atualizado"
 
 #: ../EosAppStore/lib/eos-app-list-model.c:1091
 #: ../EosAppStore/lib/eos-app-list-model.c:1160
 #, c-format
 msgid "App %s not installable"
-msgstr "Não é possível instalar o aplicativo %s "
+msgstr "Não é possível instalar o programa %s "
 
 #: ../EosAppStore/lib/eos-app-list-model.c:1102
 #, c-format
 msgid "App %s already installed"
-msgstr "O aplicativo %s  já está instalado"
+msgstr "O programa %s já está instalado"
 
 #: ../EosAppStore/lib/eos-app-list-model.c:1171
 #, c-format
 msgid "App %s is up to date"
-msgstr "O aplicativo  %s está atualizado"
+msgstr "O programa %s está atualizado"
 
 #: ../EosAppStore/lib/eos-app-list-model.c:1234
 #: ../EosAppStore/lib/eos-app-list-model.c:1267
 #, c-format
 msgid "App %s is not installed"
-msgstr " O aplicativo %s não está instalado"
+msgstr " O programa %s não está instalado"
