@@ -464,10 +464,11 @@ const AppFrame = new Lang.Class({
     Name: 'AppFrame',
     Extends: Gtk.Frame,
 
-    _init: function() {
+    _init: function(mainWindow) {
         this.parent();
 
         this.get_style_context().add_class('app-frame');
+        this._mainWindow = mainWindow;
 
         this._categories = Categories.get_app_categories();
 
@@ -493,8 +494,7 @@ const AppFrame = new Lang.Class({
         this._mainBox.show();
 
         let categoriesBoxSpacing = CATEGORIES_BOX_SPACING;
-        let app = Gio.Application.get_default();
-        if (app.mainWindow.getExpectedWidth() <=
+        if (this._mainWindow.getExpectedWidth() <=
             AppStoreWindow.AppStoreSizes.SVGA.screenWidth) {
             categoriesBoxSpacing /= 2;
         }
@@ -507,13 +507,13 @@ const AppFrame = new Lang.Class({
         let separator = new Separator.FrameSeparator();
         this._mainBox.add(separator);
 
-        this._stack = new Gtk.Stack({ transition_duration: CATEGORY_TRANSITION_MS,
-                                      transition_type: Gtk.StackTransitionType.SLIDE_RIGHT,
-                                      hexpand: true,
-                                      vexpand: true,
-                                      margin_top: STACK_TOP_MARGIN });
-        this._mainBox.add(this._stack);
-        this._stack.show();
+        this._categoriesStack = new Gtk.Stack({ transition_duration: CATEGORY_TRANSITION_MS,
+                                                transition_type: Gtk.StackTransitionType.SLIDE_RIGHT,
+                                                hexpand: true,
+                                                vexpand: true,
+                                                margin_top: STACK_TOP_MARGIN });
+        this._mainBox.add(this._categoriesStack);
+        this._categoriesStack.show();
 
         this._buttonGroup = null;
         this._model.connect('changed', Lang.bind(this, this._populateAllCategories));
@@ -526,11 +526,12 @@ const AppFrame = new Lang.Class({
         this._contentMonitor.connect('changed', Lang.bind(this, this._onContentChanged));
 
         this._lastCellSelected = null;
+        this.show_all();
     },
 
     _onContentChanged: function(monitor, file, other_file, event_type) {
         this._populateAllCategories();
-        this._stack.set_visible_child_name(this._currentCategory);
+        this._categoriesStack.set_visible_child_name(this._currentCategory);
     },
 
     _populateCategoryHeaders: function() {
@@ -561,7 +562,7 @@ const AppFrame = new Lang.Class({
             this._populateCategory(c);
         }
 
-        this._stack.set_visible_child_name(this._currentCategory);
+        this._categoriesStack.set_visible_child_name(this._currentCategory);
     },
 
     _resetCategory: function(categoryId) {
@@ -585,7 +586,7 @@ const AppFrame = new Lang.Class({
         let scrollWindow;
         scrollWindow = new Gtk.ScrolledWindow({ hscrollbar_policy: Gtk.PolicyType.NEVER,
                                                 vscrollbar_policy: Gtk.PolicyType.AUTOMATIC });
-        this._stack.add_named(scrollWindow, category.name);
+        this._categoriesStack.add_named(scrollWindow, category.name);
         category.widget = scrollWindow;
 
         let grid = new Endless.FlexyGrid({ cell_size: CELL_DEFAULT_SIZE + cellMargin,
@@ -636,14 +637,13 @@ const AppFrame = new Lang.Class({
         this._mainStack.transition_type = Gtk.StackTransitionType.SLIDE_LEFT;
         this._mainStack.set_visible_child_name(cell.desktop_id);
 
-        let app = Gio.Application.get_default();
-        app.mainWindow.titleText = cell.app_info.get_title();
-        app.mainWindow.subtitleText = cell.app_info.get_subtitle();
-        app.mainWindow.headerIcon = this._model.getIcon(cell.desktop_id);
-        app.mainWindow.headerInstalledVisible = this._model.isInstalled(cell.desktop_id);
-        app.mainWindow.backButtonVisible = true;
+        this._mainWindow.titleText = cell.app_info.get_title();
+        this._mainWindow.subtitleText = cell.app_info.get_subtitle();
+        this._mainWindow.headerIcon = this._model.getIcon(cell.desktop_id);
+        this._mainWindow.headerInstalledVisible = this._model.isInstalled(cell.desktop_id);
+        this._mainWindow.backButtonVisible = true;
         this._backClickedId =
-            app.mainWindow.connect('back-clicked', Lang.bind(this, this._showGrid));
+            this._mainWindow.connect('back-clicked', Lang.bind(this, this._showGrid));
     },
 
     _onCellSelected: function(grid, cell) {
@@ -661,11 +661,10 @@ const AppFrame = new Lang.Class({
     },
 
     _showGrid: function() {
-        let app = Gio.Application.get_default();
-        app.mainWindow.clearHeaderState();
+        this._mainWindow.clearHeaderState();
 
         if (this._backClickedId > 0) {
-            app.mainWindow.disconnect(this._backClickedId);
+            this._mainWindow.disconnect(this._backClickedId);
             this._backClickedId = 0;
         }
 
@@ -691,16 +690,16 @@ const AppFrame = new Lang.Class({
         }
 
         if (idx > this._currentCategoryIdx) {
-            this._stack.transition_type = Gtk.StackTransitionType.SLIDE_LEFT;
+            this._categoriesStack.transition_type = Gtk.StackTransitionType.SLIDE_LEFT;
         } else {
-            this._stack.transition_type = Gtk.StackTransitionType.SLIDE_RIGHT;
+            this._categoriesStack.transition_type = Gtk.StackTransitionType.SLIDE_RIGHT;
         }
 
         this._currentCategory = category;
         this._currentCategoryIdx = idx;
 
         this._populateCategory(idx);
-        this._stack.set_visible_child_name(category);
+        this._categoriesStack.set_visible_child_name(category);
     },
 
     reset: function() {

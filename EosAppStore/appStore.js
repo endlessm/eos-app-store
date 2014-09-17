@@ -17,7 +17,6 @@ const Config = imports.config;
 const Environment = imports.environment;
 const Path = imports.path;
 const ShellAppStore = imports.shellAppStore;
-const StoreModel = imports.storeModel;
 
 const APP_STORE_CSS = 'resource:///com/endlessm/appstore/eos-app-store.css';
 
@@ -58,7 +57,6 @@ const AppStore = new Lang.Class({
 
         Environment.loadResources();
 
-        this._storeModel = new StoreModel.StoreModel();
         this.Visible = false;
         this._clearId = 0;
 
@@ -95,13 +93,12 @@ const AppStore = new Lang.Class({
 
     _createMainWindow: function() {
         if (this._mainWindow == null) {
-            this._mainWindow = new AppStoreWindow.AppStoreWindow(this,
-                                                                 this._storeModel);
+            this._mainWindow = new AppStoreWindow.AppStoreWindow(this);
             this._mainWindow.connect('notify::visible',
                                      Lang.bind(this, this._onVisibilityChanged));
 
             // set initial page
-            this._storeModel.changePage(StoreModel.StorePage.APPS);
+            this._mainWindow.changePage('apps');
         }
     },
 
@@ -130,16 +127,7 @@ const AppStore = new Lang.Class({
     showPage: function(timestamp, page) {
         this._createMainWindow();
 
-        if (page == 'apps') {
-            this._storeModel.changePage(StoreModel.StorePage.APPS);
-        } else if (page == 'folders') {
-            this._storeModel.changePage(StoreModel.StorePage.FOLDERS);
-        } else if (page == 'web') {
-            this._storeModel.changePage(StoreModel.StorePage.WEB);
-        } else {
-            log("Unrecognized page '" + page + "'");
-        }
-
+        this._mainWindow.changePage(page);
         this._mainWindow.showPage(timestamp);
     },
 

@@ -1,6 +1,8 @@
 // -*- mode: js; js-indent-level: 4; indent-tabs-mode: nil -*-
+const EosAppStorePrivate = imports.gi.EosAppStorePrivate;
 const Gio = imports.gi.Gio;
 const GLib = imports.gi.GLib;
+const GObject = imports.gi.GObject;
 
 const Config = imports.config;
 const Format = imports.format;
@@ -18,6 +20,8 @@ function init() {
 
     GLib.set_prgname('eos-app-store');
     GLib.set_application_name(_("App Store"));
+
+    GObject.type_ensure(EosAppStorePrivate.VerticalStackSwitcher);
 
     String.prototype.format = Format.format;
 }

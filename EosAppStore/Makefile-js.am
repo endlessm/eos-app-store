@@ -19,7 +19,6 @@ dist_js_DATA = \
 	resetDesktop.js \
 	separator.js \
 	shellAppStore.js \
-	storeModel.js \
 	weblinkFrame.js \
 	wmInspect.js \
 	$(NULL)

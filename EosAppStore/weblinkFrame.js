@@ -634,6 +634,8 @@ const WeblinkFrame = new Lang.Class({
         // We want all the links to recover their original state (screenshot and description)
         // after hiding the store, regardless they have been recently installed or not.
         mainWindow.connect('hide', Lang.bind(this, this._repopulate));
+
+        this.show_all();
     },
 
     _repopulate: function(monitor, file, other_file, event_type) {

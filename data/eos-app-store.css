@@ -64,30 +64,32 @@
 }
 
 .category-button,
-.sidebar-button {
+.sidebar-frame .button {
     background: none;
     border: none;
     border-radius: 0;
-    padding: 0;
+    padding: 4px;
+    border-image: none;
+    box-shadow: none;
 
     color: @app_store_button_fg;
     text-shadow: 0 1px alpha(black, 0.5);
 }
 
 .category-button:active,
-.sidebar-button:active {
+.sidebar-frame .button:active {
     font-weight: bold;
 }
 
 .category-button:hover,
-.sidebar-button:hover {
+.sidebar-frame .button:hover {
     color: @app_store_button_hover_fg;
 }
 
 .category-button:active,
 .category-button:hover:active,
-.sidebar-button:active,
-.sidebar-button:hover:active {
+.sidebar-frame .button:active,
+.sidebar-frame .button:hover:active {
     color: white;
 }
 

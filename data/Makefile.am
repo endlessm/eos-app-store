@@ -12,8 +12,6 @@ resource_DATA = eos-app-store.gresource
 # Can't be part of GResource, or symbolic won't work
 iconsdir = $(pkgdatadir)/icons
 icons_DATA = \
-	icon_apps-symbolic.svg \
-	icon_folder-symbolic.svg \
 	icon_website-symbolic.svg \
 	$(NULL)
 
