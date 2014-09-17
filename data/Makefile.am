@@ -9,14 +9,6 @@ eos-app-store.gresource: eos-app-store.gresource.xml $(resource_files)
 resourcedir = $(pkgdatadir)
 resource_DATA = eos-app-store.gresource
 
-# Can't be part of GResource, or symbolic won't work
-iconsdir = $(pkgdatadir)/icons
-icons_DATA = \
-	icon_website-symbolic.svg \
-	$(NULL)
-
-EXTRA_DIST += $(icons_DATA)
-
 EXTRA_DIST += \
 	eos-app-store.gresource.xml \
 	$(resource_files) \

@@ -334,8 +334,7 @@ const NewSiteBox = new Lang.Class({
 
             this._sitePixbuf = null;
 
-            // https://bugzilla.gnome.org/show_bug.cgi?id=709056
-            let file = Gio.File.new_for_path(Path.ICONS_DIR + '/icon_website-symbolic.svg');
+            let file = Gio.File.new_for_uri('resource:///com/endlessm/appstore/icon_website-symbolic.svg');
             let gicon = new Gio.FileIcon({ file: file });
             this._siteIcon.set_from_gicon(gicon, Gtk.IconSize.DND);
 
