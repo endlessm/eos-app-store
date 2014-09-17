@@ -769,6 +769,10 @@ const WeblinkFrame = new Lang.Class({
     reset: function() {
         // Return to the first category
         this._buttonGroup.clicked();
+    },
+
+    get title() {
+        return _("Install websites");
     }
 });
 Builder.bindTemplateChildren(WeblinkFrame.prototype);

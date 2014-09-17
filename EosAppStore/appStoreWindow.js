@@ -214,7 +214,12 @@ const AppStoreWindow = new Lang.Class({
         this.content_box.add(this._stack);
         this._stack.show();
 
-        this._stack.add_titled(new AppFrame.AppFrame(this), 'apps', _("Apps"));
+        let appFrame = new AppFrame.AppBroker(this);
+        let categories = appFrame.categories;
+
+        categories.forEach(Lang.bind(this, function(category) {
+            this._stack.add_titled(category.widget, category.name, category.label);
+        }));
         this._stack.add_titled(new WeblinkFrame.WeblinkFrame(this), 'weblinks', _("Websites"));
         this._stack.add_titled(new FolderFrame.FolderFrame(), 'folders', _("Folders"));
     },
@@ -254,20 +259,7 @@ const AppStoreWindow = new Lang.Class({
 
     _setDefaultTitle: function() {
         let title = this.header_bar_title_label;
-
-        switch (this._stack.visible_child_name) {
-            case 'apps':
-                title.set_text(_("Install apps"));
-                break;
-
-            case 'weblinks':
-                title.set_text(_("Install websites"));
-                break;
-
-            case 'folders':
-                title.set_text(_("Install folders"));
-                break;
-        }
+        title.set_text(this._stack.get_visible_child().title);
     },
 
     _onStorePageChanged: function() {
@@ -275,7 +267,6 @@ const AppStoreWindow = new Lang.Class({
         this.clearHeaderState();
 
         page.reset();
-        page.show_all();
     },
 
     _onAvailableAreaChanged: function() {

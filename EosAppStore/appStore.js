@@ -98,7 +98,7 @@ const AppStore = new Lang.Class({
                                      Lang.bind(this, this._onVisibilityChanged));
 
             // set initial page
-            this._mainWindow.changePage('apps');
+            this._mainWindow.changePage(Categories.DEFAULT_APP_CATEGORY);
         }
     },
 
