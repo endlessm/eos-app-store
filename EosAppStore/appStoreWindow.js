@@ -220,7 +220,7 @@ const AppStoreWindow = new Lang.Class({
         categories.forEach(Lang.bind(this, function(category) {
             this._stack.add_titled(category.widget, category.name, category.label);
         }));
-        this._stack.add_titled(new WeblinkFrame.WeblinkFrame(this), 'weblinks', _("Websites"));
+        this._stack.add_titled(new WeblinkFrame.WeblinkFrame(this), 'web', _("Websites"));
         this._stack.add_titled(new FolderFrame.FolderFrame(), 'folders', _("Folders"));
     },
 

@@ -13,6 +13,7 @@ const _ = imports.gettext.gettext;
 
 const AppManager = imports.appManager;
 const AppStoreWindow = imports.appStoreWindow;
+const Categories = imports.categories;
 const Config = imports.config;
 const Environment = imports.environment;
 const Path = imports.path;
@@ -126,6 +127,9 @@ const AppStore = new Lang.Class({
 
     showPage: function(timestamp, page) {
         this._createMainWindow();
+
+        if (page == 'apps')
+            page = Categories.DEFAULT_APP_CATEGORY;
 
         this._mainWindow.changePage(page);
         this._mainWindow.showPage(timestamp);
