@@ -38,6 +38,7 @@ PKG_CHECK_MODULES(EOS_APP_STORE,
                   gio-2.0
                   gtk+-3.0 >= 3.10.0
                   json-glib-1.0
+                  libsoup-2.4 >= 2.44.0
                   webkit2gtk-3.0
                   endless-0)
 AC_SUBST(EOS_APP_STORE_CFLAGS)
