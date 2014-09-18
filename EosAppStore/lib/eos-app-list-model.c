@@ -847,6 +847,9 @@ download_bundle_from_uri (EosAppListModel *self,
 
 #define GET_DATA_BLOCK_SIZE     64 * 1024
 
+  /* ensure we emit a progress notification at the beginning */
+  queue_download_progress (self, app_id, 0, total);
+
   gssize res = 0;
   gsize pos = 0;
   content = g_byte_array_new ();
