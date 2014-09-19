@@ -15,7 +15,6 @@ const AppFrame = imports.appFrame;
 const WeblinkFrame = imports.weblinkFrame;
 const FolderFrame = imports.folderFrame;
 const Path = imports.path;
-const StoreModel = imports.storeModel;
 const UIBuilder = imports.builder;
 const WMInspect = imports.wmInspect;
 
@@ -66,18 +65,7 @@ const AppStoreWindow = new Lang.Class({
         'main-frame',
         'main-box',
         'sidebar-frame',
-        'side-pane-apps-image',
-        'side-pane-web-image',
-        'side-pane-folder-image',
-        'side-pane-apps-label',
-        'side-pane-web-label',
-        'side-pane-folder-label',
-        'side-pane-apps-label-bold',
-        'side-pane-web-label-bold',
-        'side-pane-folder-label-bold',
-        'side-pane-apps-button',
-        'side-pane-web-button',
-        'side-pane-folder-button',
+        'side-pane-box',
         'content-box',
         'header-bar-box',
         'header-bar-title-label',
@@ -87,7 +75,7 @@ const AppStoreWindow = new Lang.Class({
         'back-button',
     ],
 
-    _init: function(app, storeModel) {
+    _init: function(app) {
         this.parent({ application: app,
                         type_hint: Gdk.WindowTypeHint.DOCK,
                              type: Gtk.WindowType.TOPLEVEL,
@@ -106,9 +94,6 @@ const AppStoreWindow = new Lang.Class({
         }));
         this.add(this.main_frame);
 
-        this._loadSideImages();
-        this._setLabelSizeGroup();
-
         // update position when workarea changes
         let screen = Gdk.Screen.get_default();
         this._monitorsChangedId = screen.connect('monitors-changed',
@@ -122,11 +107,6 @@ const AppStoreWindow = new Lang.Class({
         }
 
         this._updateGeometry();
-
-        // the model that handles page changes
-        this._storeModel = storeModel;
-        this._pageChangedId = this._storeModel.connect('page-changed',
-                                                       Lang.bind(this, this._onStorePageChanged));
 
         // the stack that holds the pages
         this._stack = null;
@@ -156,11 +136,6 @@ const AppStoreWindow = new Lang.Class({
         if (this._activeWindowId > 0) {
             this._wmInspect.disconnect(this._activeWindowId);
             this._activeWindowId = 0;
-        }
-
-        if (this._pageChangedId > 0) {
-            this._storeModel.disconnect(this._pageChangedId);
-            this._pageChangedId = 0;
         }
     },
 
@@ -233,41 +208,20 @@ const AppStoreWindow = new Lang.Class({
 
         // the stack that holds the pages
         this._stack = new Gtk.Stack();
-        this._stack.set_transition_duration(PAGE_TRANSITION_MS);
-        this._stack.set_transition_type(Gtk.StackTransitionType.SLIDE_RIGHT);
+        this._stack.connect('notify::visible-child-name',
+                            Lang.bind(this, this._onStorePageChanged));
+        this.side_pane_box.stack = this._stack;
         this.content_box.add(this._stack);
         this._stack.show();
 
-        // add the pages
-        this._pages = [];
-    },
+        let appFrame = new AppFrame.AppBroker(this);
+        let categories = appFrame.categories;
 
-    _loadSideImages: function() {
-        let resources = { side_pane_apps_image: 'icon_apps-symbolic.svg',
-                          side_pane_web_image: 'icon_website-symbolic.svg',
-                          side_pane_folder_image: 'icon_folder-symbolic.svg' };
-
-        for (let object in resources) {
-            let iconName = resources[object];
-            let file = Gio.File.new_for_path(Path.ICONS_DIR + '/' + iconName);
-            let icon = new Gio.FileIcon({ file: file });
-            this[object].gicon = icon;
-        }
-    },
-
-    _setLabelSizeGroup: function() {
-        let labels = ['side_pane_apps_label',
-                      'side_pane_web_label',
-                      'side_pane_folder_label',
-                      'side_pane_apps_label_bold',
-                      'side_pane_web_label_bold',
-                      'side_pane_folder_label_bold'];
-
-        let sizeGroup = new Gtk.SizeGroup();
-        for (let idx in labels) {
-            let object = labels[idx];
-            sizeGroup.add_widget(this[object]);
-        }
+        categories.forEach(Lang.bind(this, function(category) {
+            this._stack.add_titled(category.widget, category.name, category.label);
+        }));
+        this._stack.add_titled(new WeblinkFrame.WeblinkFrame(this), 'web', _("Websites"));
+        this._stack.add_titled(new FolderFrame.FolderFrame(), 'folders', _("Folders"));
     },
 
     _onActiveWindowChanged: function(wmInspect, activeWindow) {
@@ -303,106 +257,35 @@ const AppStoreWindow = new Lang.Class({
         this.emit('back-clicked');
     },
 
-    _onAppsClicked: function() {
-        if (this.side_pane_apps_button.active) {
-            this._storeModel.changePage(StoreModel.StorePage.APPS);
-        }
-    },
-
-    _onWebClicked: function() {
-        if (this.side_pane_web_button.active) {
-            this._storeModel.changePage(StoreModel.StorePage.WEB);
-        }
-    },
-
-    _onFolderClicked: function() {
-        if (this.side_pane_folder_button.active) {
-            this._storeModel.changePage(StoreModel.StorePage.FOLDERS);
-        }
-    },
-
     _setDefaultTitle: function() {
         let title = this.header_bar_title_label;
-
-        switch (this._currentPage) {
-            case StoreModel.StorePage.APPS:
-                title.set_text(_("Install apps"));
-                break;
-
-            case StoreModel.StorePage.WEB:
-                title.set_text(_("Install websites"));
-                break;
-
-            case StoreModel.StorePage.FOLDERS:
-                title.set_text(_("Install folders"));
-                break;
-        }
+        title.set_text(this._stack.get_visible_child().title);
     },
 
-    _onStorePageChanged: function(model, newPage) {
-        if (!this._pages[newPage]) {
-            switch (newPage) {
-                case StoreModel.StorePage.APPS:
-                    this._pages[StoreModel.StorePage.APPS] = new AppFrame.AppFrame();
-                    this._stack.add_named(this._pages[StoreModel.StorePage.APPS], 'apps');
-                    break;
-
-                case StoreModel.StorePage.WEB:
-                    this._pages[StoreModel.StorePage.WEB] = new WeblinkFrame.WeblinkFrame(this);
-                    this._stack.add_named(this._pages[StoreModel.StorePage.WEB], 'weblinks');
-                    break;
-
-                case StoreModel.StorePage.FOLDERS:
-                    this._pages[StoreModel.StorePage.FOLDERS] = new FolderFrame.FolderFrame();
-                    this._stack.add_named(this._pages[StoreModel.StorePage.FOLDERS], 'folders');
-                    break;
-            }
-        }
-
-        // hide the previously visible page, if it is set
-        if (this._currentPage != null) {
-            let previousPage = this._pages[this._currentPage];
-            if (previousPage) {
-                previousPage.hide();
-            }
-        }
-
-        let page = this._pages[newPage];
-        this._currentPage = newPage;
+    _onStorePageChanged: function() {
+        let page = this._stack.visible_child;
         this.clearHeaderState();
 
-        switch (this._currentPage) {
-            case StoreModel.StorePage.APPS:
-                this.side_pane_apps_button.active = true;
-                break;
-
-            case StoreModel.StorePage.WEB:
-                this.side_pane_web_button.active = true;
-                break;
-
-            case StoreModel.StorePage.FOLDERS:
-                this.side_pane_folder_button.active = true;
-                break;
-        }
-
         page.reset();
-        page.show_all();
-        this._stack.set_visible_child(page);
     },
 
     _onAvailableAreaChanged: function() {
         this._updateGeometry();
         this._createStackPages();
-        this._onStorePageChanged(this._storeModel, this._currentPage);
+        this._onStorePageChanged();
     },
 
     doShow: function(reset, timestamp) {
-        let page = this._pages[this._currentPage];
+        let page = this._stack.get_visible_child();
         if (page && reset) {
             page.reset();
         }
 
         this.showPage(timestamp);
+    },
+
+    changePage: function(page) {
+        this._stack.visible_child_name = page;
     },
 
     showPage: function(timestamp) {

@@ -2,6 +2,8 @@
 const EosAppStorePrivate = imports.gi.EosAppStorePrivate;
 const Lang = imports.lang;
 
+const DEFAULT_APP_CATEGORY = 'education';
+
 function get_app_categories() {
     return [
         {

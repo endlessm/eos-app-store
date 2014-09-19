@@ -292,6 +292,10 @@ const FolderFrame = new Lang.Class({
             let vscrollbar = this._scrolledWindow.get_vscrollbar();
             vscrollbar.set_value(0);
         }
+    },
+
+    get title() {
+        return _("Install folders");
     }
 });
 Builder.bindTemplateChildren(FolderFrame.prototype);
