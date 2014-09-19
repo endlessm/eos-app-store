@@ -35,6 +35,12 @@ set_align_for_child (GtkWidget *widget)
     gtk_widget_set_halign (child, GTK_ALIGN_START);
 }
 
+static GType
+eos_vertical_stack_switcher_child_type (GtkContainer *container)
+{
+  return GTK_TYPE_BUTTON;
+}
+
 static void
 eos_vertical_stack_switcher_remove (GtkContainer *container,
 				    GtkWidget *widget)
@@ -63,8 +69,7 @@ eos_vertical_stack_switcher_add (GtkContainer *container,
 
   GTK_CONTAINER_CLASS (eos_vertical_stack_switcher_parent_class)->add (container, widget);
 
-  if (!GTK_IS_BUTTON (widget))
-    return;
+  g_assert (GTK_IS_BUTTON (widget));
 
   g_signal_connect (widget, "add", G_CALLBACK (set_align_for_child), container);
   g_hash_table_add (priv->buttons, widget);
@@ -91,6 +96,7 @@ eos_vertical_stack_switcher_class_init (EosVerticalStackSwitcherClass *class)
 
   cclass->add = eos_vertical_stack_switcher_add;
   cclass->remove = eos_vertical_stack_switcher_remove;
+  cclass->child_type = eos_vertical_stack_switcher_child_type;
 
   oclass->finalize = eos_vertical_stack_switcher_finalize;
 }
