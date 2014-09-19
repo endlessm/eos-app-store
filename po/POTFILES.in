@@ -23,7 +23,6 @@ EosAppStore/path.js
 EosAppStore/resetDesktop.js
 EosAppStore/separator.js
 EosAppStore/shellAppStore.js
-EosAppStore/storeModel.js
 EosAppStore/weblinkFrame.js
 EosAppStore/wmInspect.js
 EosAppStore/lib/eos-app-enums.c
