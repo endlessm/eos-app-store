@@ -4,6 +4,7 @@
 # 
 # Translators:
 # Automatically generated, 2012-2013
+# c.sanchez <cassandra@endlessm.com>, 2014
 # Endless Mobile <n@endlessm.com>, 2013
 # Endless Mobile <n@endlessm.com>, 2013
 # Endless Mobile <n@endlessm.com>, 2013
@@ -20,8 +21,8 @@ msgstr ""
 "Project-Id-Version: eos-app-store\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2014-09-19 15:56-0700\n"
-"PO-Revision-Date: 2014-09-19 22:57+0000\n"
-"Last-Translator: Roddy Shuler <roddy@endlessm.com>\n"
+"PO-Revision-Date: 2014-09-19 23:46+0000\n"
+"Last-Translator: c.sanchez <cassandra@endlessm.com>\n"
 "Language-Team: Spanish (http://www.transifex.com/projects/p/eos-app-store/language/es/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -102,7 +103,7 @@ msgstr "Eliminando el programa"
 msgid ""
 "Deleting this app will remove it from the device for all users. You will "
 "need to download it from the internet in order to reinstall it."
-msgstr "Si borras este programa será eliminada del sistema, y el cambio será actualizado para todos los usuarios de esta computadora. Para reinstalar el programa, tendrás que descargarla del internet e instalarla de nuevo."
+msgstr "Si borras este programa será eliminado del sistema, y el cambio será actualizado para todos los usuarios de esta computadora. Para reinstalar el programa, tendrás que descargarlo del internet e instalarlo de nuevo."
 
 #: ../EosAppStore/appFrame.js:392
 msgid "Delete app"
@@ -161,7 +162,7 @@ msgstr "Herramientas"
 
 #: ../EosAppStore/categories.js:36
 msgid "Installed"
-msgstr "Instaladas"
+msgstr "Instalados"
 
 #: ../EosAppStore/categories.js:47
 msgid "News"
@@ -193,7 +194,7 @@ msgstr "Nombre de carpeta"
 
 #: ../EosAppStore/folderFrame.js:69
 msgid "Folder added!"
-msgstr "Carpeta agregada!"
+msgstr "¡Carpeta agregada!"
 
 #: ../EosAppStore/folderFrame.js:298
 msgid "Install folders"
@@ -217,7 +218,7 @@ msgstr "El sitio web no existe, está incorrecto o no está disponible."
 
 #: ../EosAppStore/weblinkFrame.js:372 ../EosAppStore/weblinkFrame.js:519
 msgid "added successfully!"
-msgstr "Agregado exitosamente!"
+msgstr "¡Agregado exitosamente!"
 
 #: ../EosAppStore/weblinkFrame.js:588
 msgid ""
