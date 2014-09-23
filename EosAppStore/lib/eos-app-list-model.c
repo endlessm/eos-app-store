@@ -795,14 +795,14 @@ download_bundle_from_uri (EosAppListModel *self,
     self->soup_session = soup_session_async_new ();
 
   SoupRequest *request = soup_session_request_uri (self->soup_session, uri, &internal_error);
+
+  soup_uri_free (uri);
+
   if (internal_error != NULL)
     {
       g_propagate_error (error, internal_error);
-      soup_uri_free (uri);
       return FALSE;
     }
-
-  soup_uri_free (uri);
 
   GByteArray *content = NULL;
   GFileOutputStream *out_stream = NULL;
