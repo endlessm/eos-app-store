@@ -369,7 +369,7 @@ const NewSiteBox = new Lang.Class({
         case NewSiteBoxState.INSTALLED:
             this._urlLabel.set_label(this._webHelper.title);
             this._setSiteUrlFrameChild(this._urlLabel);
-            this._siteAlertLabel.set_text(_("added successfully!"));
+            this._siteAlertLabel.set_text(_("Added successfully!"));
             this._siteAddButton.sensitive = false;
 
             GLib.timeout_add_seconds(GLib.PRIORITY_DEFAULT,
@@ -516,7 +516,7 @@ const WeblinkListBoxRow = new Lang.Class({
     // This 'just installed' state should go away after closing the store and
     // opening it again, by restoring the original screenshot and description.
     _setJustInstalledState: function() {
-        this._descriptionLabel.set_text(_("added successfully!"));
+        this._descriptionLabel.set_text(_("Added successfully!"));
 
         let iconName = this._info.get_icon_name();
         this._icon.set_from_icon_name(iconName, Gtk.IconSize.DIALOG);
