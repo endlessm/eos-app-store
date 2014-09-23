@@ -39,8 +39,8 @@ eos-app-manager-transaction.c: eos-app-manager-transaction.h
 	@: # generated as a side-effect
 
 EXTRA_DIST += $(top_srcdir)/data/eam-transaction-interface.xml
-CLEANFILES += eos-app-manager-transaction.c eos-app-manager-transaction.h
-BUILT_SOURCES += eos-app-manager-transaction.c eos-app-manager-transaction.h
+CLEANFILES += lib/eos-app-manager-transaction.c lib/eos-app-manager-transaction.h
+BUILT_SOURCES += lib/eos-app-manager-transaction.c lib/eos-app-manager-transaction.h
 
 pkglib_LTLIBRARIES += libeaprivate-1.0.la
 
