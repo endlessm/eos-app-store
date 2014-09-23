@@ -758,7 +758,7 @@ check_available_space (GFile         *path,
   if (free_space < req_space)
     {
       g_set_error (error, EOS_APP_LIST_MODEL_ERROR,
-                   EOS_APP_LIST_MODEL_ERROR_NO_UPDATE,
+                   EOS_APP_LIST_MODEL_ERROR_DISK_FULL,
                    _("Not enough space on device for downloading app"));
       retval = FALSE;
     }
