@@ -753,6 +753,10 @@ check_available_space (GFile         *path,
     return FALSE;
 
   guint64 free_space = g_file_info_get_attribute_uint64 (info, G_FILE_ATTRIBUTE_FILESYSTEM_FREE);
+
+  /* we try to be conservative, and reserve twice the requested size, like
+   * eos-app-manager does.
+   */
   guint64 req_space = min_size * 2;
 
   if (free_space < req_space)
