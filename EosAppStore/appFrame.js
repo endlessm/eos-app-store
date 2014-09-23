@@ -62,7 +62,7 @@ const AppListBoxRow = new Lang.Class({
         '_installButtonLabel',
         '_installProgress',
         '_installProgressLabel',
-        '_installSpinner',
+        '_installProgressBar',
         '_installedMessage',
         '_removeButton',
         '_removeButtonLabel',
@@ -88,9 +88,15 @@ const AppListBoxRow = new Lang.Class({
             this._screenshotSmall = SCREENSHOT_SMALL;
         }
 
-        this._model = model;
-        this._model.connect('changed', Lang.bind(this, this._updateState));
+        this.appInfo = appInfo;
+        this.appTitle = this.appInfo.get_title();
+        this.appDescription = this.appInfo.get_description();
+        this.appScreenshots = this.appInfo.get_screenshots();
         this._appId = appInfo.get_desktop_id();
+
+        this._model = model;
+        this._changedId = this._model.connect('changed', Lang.bind(this, this._updateState));
+        this._progressId = this._model.connect('download-progress', Lang.bind(this, this._downloadProgress));
 
         this._removeDialog = null;
         this._windowHideId = mainWindow.connect('hide', Lang.bind(this, this._destroyPendingDialogs));
@@ -102,13 +108,8 @@ const AppListBoxRow = new Lang.Class({
         let separator = new Separator.FrameSeparator();
         this._mainBox.add(separator);
         this._mainBox.reorder_child(separator, 0);
-
         this._mainBox.show();
 
-        this.appInfo = appInfo;
-        this.appTitle = this.appInfo.get_title();
-        this.appDescription = this.appInfo.get_description();
-        this.appScreenshots = this.appInfo.get_screenshots();
         this._updateState();
     },
 
@@ -144,10 +145,28 @@ const AppListBoxRow = new Lang.Class({
 
             this._windowHideId = 0;
         }
+
+        if (this._changedId != 0) {
+            this._model.disconnect(this._changedId);
+            this._changedId = 0;
+        }
+
+        if (this._progressId != 0) {
+            this._model.disconnect(this._progressId);
+            this._progressId = 0;
+        }
     },
 
     _updateState: function() {
         this.appState = this._model.getState(this._appId);
+    },
+
+    _downloadProgress: function(model, appid, progress) {
+        if (this.appId != appid) {
+            return;
+        }
+
+        this._installProgressBar.fraction = progress;
     },
 
     get appId() {
@@ -265,11 +284,13 @@ const AppListBoxRow = new Lang.Class({
 
         this._installProgressLabel.set_text(_("Installing..."));
         this._installProgress.show();
-        this._installSpinner.start();
+
+        Gio.Application.get_default().pushRunningOperation();
 
         this._model.install(this._appId, Lang.bind(this, function(error) {
-            this._installSpinner.stop();
             this._installProgress.hide();
+
+            Gio.Application.get_default().popRunningOperation();
 
             if (error) {
                 this._maybeNotify(_("We could not install '%s'").format(this.appTitle), error);
@@ -319,13 +340,14 @@ const AppListBoxRow = new Lang.Class({
 
                 this._installProgressLabel.set_text(_("Installing..."));
                 this._installProgress.show();
-                this._installSpinner.start();
+
+                Gio.Application.get_default().pushRunningOperation();
 
                 this._model.install(this._appId, Lang.bind(this, function(error) {
-
-                    this._installSpinner.stop();
                     this._installProgress.hide();
                     this._updateState();
+
+                    Gio.Application.get_default().popRunningOperation();
 
                     if (error) {
                         this._maybeNotify(_("We could not install '%s'").format(this.appTitle), error);
@@ -355,13 +377,15 @@ const AppListBoxRow = new Lang.Class({
 
                 this._installProgressLabel.set_text(_("Updating..."));
                 this._installProgress.show();
-                this._installSpinner.start();
+
+                Gio.Application.get_default().pushRunningOperation();
 
                 this._model.updateApp(this._appId, Lang.bind(this, function(error) {
-                    this._installSpinner.stop();
                     this._installProgress.hide();
 
                     this._updateState();
+
+                    Gio.Application.get_default().popRunningOperation();
 
                     if (error) {
                         this._maybeNotify(_("We could not update '%s'").format(this.appTitle), error);
@@ -404,11 +428,13 @@ const AppListBoxRow = new Lang.Class({
 
             this._installProgressLabel.set_text(_("Removing..."));
             this._installProgress.show();
-            this._installSpinner.start();
+
+            app.pushRunningOperation();
 
             this._model.uninstall(this._appId, Lang.bind(this, function(error) {
-                this._installSpinner.stop();
                 this._installProgress.hide();
+
+                app.popRunningOperation();
 
                 if (error) {
                     this._maybeNotify(_("We could not remove '%s'").format(this.appTitle), error);

@@ -29,6 +29,7 @@ stamp-h1
 /data/eos-app-store.desktop
 /EosAppStore/*.la
 /EosAppStore/*.lo
+/EosAppStore/lib/eos-app-manager-transaction.[ch]
 /EosAppStore/config.js
 /EosAppStore/config.h
 /EosAppStore/config.h.in

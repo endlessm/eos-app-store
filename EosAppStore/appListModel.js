@@ -117,6 +117,22 @@ const AppList = new Lang.Class({
     Name: 'AppList',
     Extends: BaseList,
 
+    _onDownloadProgress: function(model, appid, current, total) {
+        let progress;
+
+        if (current == 0) {
+            progress = 0.0;
+        }
+        else if (current == total) {
+            progress = 1.0;
+        }
+        else {
+            progress = current / total;
+        }
+
+        this.emit('download-progress', appid, progress);
+    },
+
     _onModelChanged: function(model) {
         let items = model.get_all_apps();
         let apps = items.filter(Lang.bind(this, function(item) {

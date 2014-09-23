@@ -61,6 +61,8 @@ const AppStore = new Lang.Class({
         this.Visible = false;
         this._clearId = 0;
 
+        this._runningOperations = 0;
+
         this._dbusImpl = Gio.DBusExportedObject.wrapJSObject(AppStoreIface, this);
         this._dbusImpl.export(Gio.DBus.session, APP_STORE_PATH);
     },
@@ -155,11 +157,12 @@ const AppStore = new Lang.Class({
                                      'PropertiesChanged',
                                      propChangedVariant);
 
-        // if the window stays hidden for a while, we should destroy it to
-        // free up resources. once the window is gone, the inactivity timeout
-        // of Gio.Application will ensure that the app store service goes away
-        // after a while.
-        if (!this.Visible) {
+        // if the window stays hidden for a while and there are no running
+        // operations (like an installation, upgrade, or removal) in progress,
+        // we should destroy the window to free up resources. once the window
+        // is gone, the inactivity timeout of Gio.Application will ensure that
+        // the app store service goes away after a while as well.
+        if (!this.Visible && this._runningOperations == 0) {
             this._clearId =
                 Mainloop.timeout_add_seconds(CLEAR_TIMEOUT, Lang.bind(this, this._clearMainWindow));
         }
@@ -169,5 +172,33 @@ const AppStore = new Lang.Class({
                 this._clearId = 0;
             }
         }
-    }
+    },
+
+    pushRunningOperation: function() {
+        this._runningOperations += 1;
+
+        if (this._clearId) {
+            Mainloop.source_remove(this._clearId);
+            this._clearId = 0;
+        }
+    },
+
+    popRunningOperation: function() {
+        this._runningOperations -= 1;
+
+        if (this._runningOperations < 0) {
+            log("appStore.popRunningOperation() called without a previous call to " +
+                "appStore.pushRunningOperation().");
+            this._runningOperations = 0;
+        }
+
+        if (this._runningOperations == 0 && !this.Visible) {
+            if (this._clearId != 0) {
+                Mainloop.source_remove(this._clearId);
+            }
+
+            this._clearId =
+                Mainloop.timeout_add_seconds(CLEAR_TIMEOUT, Lang.bind(this, this._clearMainWindow));
+        }
+    },
 });
