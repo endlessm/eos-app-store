@@ -50,6 +50,9 @@ AC_SUBST(GJS_CONSOLE)
 GLIB_COMPILE_RESOURCES=`$PKG_CONFIG --variable glib_compile_resources gio-2.0`
 AC_SUBST(GLIB_COMPILE_RESOURCES)
 
+GDBUS_CODEGEN=`$PKG_CONFIG --variable gdbus_codegen gio-2.0`
+AC_SUBST(GDBUS_CODEGEN)
+
 AC_CACHE_SAVE
 
 AC_ARG_ENABLE([maintainer-cflags],
