@@ -3,6 +3,7 @@
 #include "config.h"
 
 #include "eos-app-list-model.h"
+#include "eos-app-manager-transaction.h"
 
 #include <glib-object.h>
 #include <gio/gio.h>
@@ -917,8 +918,6 @@ add_app_from_manager (EosAppListModel *self,
   gboolean retval = FALSE;
   char *app_id = app_id_from_desktop_id (desktop_id);
   char *transaction_path = NULL;
-  char *bundle_uri = NULL;
-  char *bundle_path = NULL;
   GVariant *res =
     g_dbus_connection_call_sync (self->system_bus,
                                  "com.endlessm.AppManager",
@@ -954,18 +953,13 @@ add_app_from_manager (EosAppListModel *self,
       return FALSE;
     }
 
-  res =
-    g_dbus_connection_call_sync (self->system_bus,
-                                 "com.endlessm.AppManager",
-                                 transaction_path,
-                                 "com.endlessm.AppManager.Transaction", "GetBundleURI",
-                                 NULL,
-                                 G_VARIANT_TYPE ("(s)"),
-                                 G_DBUS_CALL_FLAGS_NONE,
-                                 G_MAXINT,
-                                 NULL,
-                                 &error);
-
+  EosAppManagerTransaction *transaction =
+    eos_app_manager_transaction_proxy_new_sync (self->system_bus,
+                                                G_DBUS_PROXY_FLAGS_NONE,
+                                                "com.endlessm.AppManager",
+                                                transaction_path,
+                                                cancellable,
+                                                &error);
   if (error != NULL)
     {
       g_free (transaction_path);
@@ -973,15 +967,12 @@ add_app_from_manager (EosAppListModel *self,
       return FALSE;
     }
 
-  if (res != NULL)
-    {
-      g_variant_get (res, "(s)", &bundle_uri);
-      g_variant_unref (res);
-    }
+  const char *bundle_uri = eos_app_manager_transaction_get_bundle_uri (transaction);
 
   if (bundle_uri == NULL || *bundle_uri == '\0')
     {
       g_free (transaction_path);
+      g_object_unref (transaction);
       g_set_error (error_out, EOS_APP_LIST_MODEL_ERROR,
                    EOS_APP_LIST_MODEL_ERROR_NO_UPDATE,
                    _("Application '%s' could not be installed"),
@@ -989,40 +980,29 @@ add_app_from_manager (EosAppListModel *self,
       return FALSE;
     }
 
+  char *bundle_path = NULL;
+
   if (!download_bundle_from_uri (self, desktop_id, bundle_uri, &bundle_path, cancellable, &error))
     {
-      g_free (bundle_uri);
+      g_object_unref (transaction);
       g_free (transaction_path);
       g_propagate_error (error_out, error);
       return FALSE;
     }
 
-  res =
-    g_dbus_connection_call_sync (self->system_bus,
-                                 "com.endlessm.AppManager",
-                                 transaction_path,
-                                 "com.endlessm.AppManager.Transaction", "CompleteTransaction",
-                                 g_variant_new ("(s)", bundle_path),
-                                 G_VARIANT_TYPE ("(b)"),
-                                 G_DBUS_CALL_FLAGS_NONE,
-                                 G_MAXINT,
-                                 NULL,
-                                 &error);
+  eos_app_manager_transaction_call_complete_transaction_sync (transaction, bundle_path,
+                                                              &retval,
+                                                              cancellable,
+                                                              &error);
 
+  g_object_unref (transaction);
+  g_free (transaction_path);
   g_free (bundle_path);
 
   if (error != NULL)
     {
-      g_free (bundle_uri);
-      g_free (transaction_path);
       g_propagate_error (error_out, error);
       return FALSE;
-    }
-
-  if (res != NULL)
-    {
-      g_variant_get (res, "(b)", &retval);
-      g_variant_unref (res);
     }
 
   return retval;
