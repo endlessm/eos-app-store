@@ -29,7 +29,8 @@ eaprivate_built_source = \
 	lib/eos-app-manager-transaction.h
 
 lib/eos-app-manager-transaction.h: Makefile $(top_srcdir)/data/eam-transaction-interface.xml
-	$(AM_V_GEN) $(GDBUS_CODEGEN) \
+	$(AM_V_GEN) $(MKDIR_P) lib && \
+	$(GDBUS_CODEGEN) \
 		--interface-prefix com.endlessm.AppManager. \
 		--generate-c-code lib/eos-app-manager-transaction \
 		--c-generate-object-manager \
