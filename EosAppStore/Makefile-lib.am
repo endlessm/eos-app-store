@@ -28,14 +28,14 @@ eaprivate_built_source = \
 	lib/eos-app-manager-transaction.c \
 	lib/eos-app-manager-transaction.h
 
-eos-app-manager-transaction.h: Makefile $(top_srcdir)/data/eam-transaction-interface.xml
+lib/eos-app-manager-transaction.h: Makefile $(top_srcdir)/data/eam-transaction-interface.xml
 	$(AM_V_GEN) $(GDBUS_CODEGEN) \
 		--interface-prefix com.endlessm.AppManager. \
 		--generate-c-code lib/eos-app-manager-transaction \
 		--c-generate-object-manager \
 		--c-namespace EosAppManager \
 		$(top_srcdir)/data/eam-transaction-interface.xml
-eos-app-manager-transaction.c: eos-app-manager-transaction.h
+lib/eos-app-manager-transaction.c: lib/eos-app-manager-transaction.h
 	@: # generated as a side-effect
 
 EXTRA_DIST += $(top_srcdir)/data/eam-transaction-interface.xml
