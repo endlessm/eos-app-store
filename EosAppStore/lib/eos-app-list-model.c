@@ -831,14 +831,12 @@ download_bundle_from_uri (EosAppListModel *self,
   if (internal_error != NULL)
     {
       g_propagate_error (error, internal_error);
-      retval = FALSE;
       goto out;
     }
 
   if (!check_available_space (parent, total, cancellable, &internal_error))
     {
       g_propagate_error (error, internal_error);
-      retval = FALSE;
       goto out;
     }
 
@@ -846,7 +844,6 @@ download_bundle_from_uri (EosAppListModel *self,
   if (internal_error != NULL)
     {
       g_propagate_error (error, internal_error);
-      retval = FALSE;
       goto out;
     }
 
@@ -874,7 +871,6 @@ download_bundle_from_uri (EosAppListModel *self,
       if (internal_error != NULL)
         {
           g_propagate_error (error, internal_error);
-          retval = FALSE;
           goto out;
         }
 
@@ -886,7 +882,6 @@ download_bundle_from_uri (EosAppListModel *self,
   if (res < 0)
     {
       g_propagate_error (error, internal_error);
-      retval = FALSE;
       goto out;
     }
 
