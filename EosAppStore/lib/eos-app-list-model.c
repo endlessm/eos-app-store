@@ -792,7 +792,7 @@ download_bundle_from_uri (EosAppListModel *self,
     }
 
   if (self->soup_session == NULL)
-    self->soup_session = soup_session_async_new ();
+    self->soup_session = soup_session_new ();
 
   SoupRequest *request = soup_session_request_uri (self->soup_session, uri, &internal_error);
 
