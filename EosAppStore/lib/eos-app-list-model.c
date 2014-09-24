@@ -861,7 +861,8 @@ download_bundle_from_uri (EosAppListModel *self,
    * data is coming from a network request, so it won't have a file
    * descriptor we can use splice() on
    */
-  while ((res = g_input_stream_read (in_stream, content->data,
+  while (!g_cancellable_is_cancelled (cancellable) &&
+         (res = g_input_stream_read (in_stream, content->data,
                                      GET_DATA_BLOCK_SIZE,
                                      cancellable, &internal_error)) > 0)
     {
@@ -877,6 +878,19 @@ download_bundle_from_uri (EosAppListModel *self,
       pos += res;
 
       queue_download_progress (self, app_id, pos, total);
+    }
+
+  if (g_cancellable_is_cancelled (cancellable))
+    {
+      /* emit a progress notification for the whole file */
+      queue_download_progress (self, app_id, total, total);
+
+      g_set_error (error, EOS_APP_LIST_MODEL_ERROR,
+                   EOS_APP_LIST_MODEL_ERROR_CANCELLED,
+                   _("Download of app '%s' cancelled by the user."),
+                   app_id);
+
+      goto out;
     }
 
   if (res < 0)
@@ -983,6 +997,15 @@ add_app_from_manager (EosAppListModel *self,
 
   if (!download_bundle_from_uri (self, desktop_id, bundle_uri, &bundle_path, cancellable, &error))
     {
+      /* cancel the transaction if the GCancellable was cancelled */
+      if ((error->domain == EOS_APP_LIST_MODEL_ERROR &&
+           error->code == EOS_APP_LIST_MODEL_ERROR_CANCELLED) ||
+          (error->domain == G_IO_ERROR &&
+           error->code == G_IO_ERROR_CANCELLED))
+        {
+          eos_app_manager_transaction_call_cancel_transaction_sync (transaction, NULL, NULL);
+        }
+
       g_object_unref (transaction);
       g_free (transaction_path);
       g_propagate_error (error_out, error);
