@@ -11,30 +11,35 @@ function get_app_categories() {
             widget: null,
             label: _("Education"),
             id: EosAppStorePrivate.AppCategory.EDUCATION,
+            icon: 'resource:///com/endlessm/appstore/icon_education-symbolic.svg'
         },
         {
             name: 'games',
             widget: null,
             label: _("Games"),
             id: EosAppStorePrivate.AppCategory.GAMES,
+            icon: 'resource:///com/endlessm/appstore/icon_games-symbolic.svg'
         },
         {
             name: 'resources',
             widget: null,
             label: _("Resources"),
             id: EosAppStorePrivate.AppCategory.RESOURCES,
+            icon: 'resource:///com/endlessm/appstore/icon_resources-symbolic.svg'
         },
         {
             name: 'utilities',
             widget: null,
             label: _("Utilities"),
             id: EosAppStorePrivate.AppCategory.UTILITIES,
+            icon: 'resource:///com/endlessm/appstore/icon_tools-symbolic.svg'
         },
         {
             name: 'installed',
             widget: null,
             label: _("Installed"),
             id: EosAppStorePrivate.AppCategory.INSTALLED,
+            icon: 'resource:///com/endlessm/appstore/icon_installed-symbolic.svg'
         },
     ];
 }

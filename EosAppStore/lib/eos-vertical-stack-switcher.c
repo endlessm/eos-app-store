@@ -26,13 +26,72 @@ eos_vertical_stack_switcher_finalize (GObject *object)
 }
 
 static void
-set_align_for_child (GtkWidget *widget)
+tweak_button_child (EosVerticalStackSwitcher *self,
+                    GtkWidget *button)
 {
   GtkWidget *child;
+  GtkWidget *stack;
+  GtkWidget *box;
+  GtkWidget *stack_child;
+  GtkWidget *widget;
+  gchar *icon_name, *title;
+  GIcon *icon;
+  GFile *gfile;
 
-  child = gtk_bin_get_child (GTK_BIN (widget));
+  stack_child = g_object_get_data (G_OBJECT (button), "stack-child");
+  if (stack_child == NULL)
+    return;
+
+  child = gtk_bin_get_child (GTK_BIN (button));
   if (child != NULL)
-    gtk_widget_set_halign (child, GTK_ALIGN_START);
+    {
+      if (GTK_IS_BOX (child))
+        return;
+
+      gtk_widget_destroy (child);
+    }
+
+  title = icon_name = NULL;
+  box = gtk_box_new (GTK_ORIENTATION_HORIZONTAL, 6);
+  stack = GTK_WIDGET (gtk_stack_switcher_get_stack (GTK_STACK_SWITCHER (self)));
+
+  gtk_container_child_get (GTK_CONTAINER (stack), stack_child,
+                           "title", &title,
+                           "icon-name", &icon_name,
+                           NULL);
+
+  if (icon_name != NULL)
+    {
+      gfile = g_file_new_for_uri (icon_name);
+      icon = g_file_icon_new (gfile);
+      g_object_unref (gfile);
+
+      widget = gtk_image_new_from_gicon (icon, GTK_ICON_SIZE_MENU);
+      gtk_container_add (GTK_CONTAINER (box), widget);
+      g_object_unref (icon);
+    }
+
+  if (title != NULL)
+    {
+      widget = gtk_label_new (title);
+      gtk_widget_set_halign (widget, GTK_ALIGN_START);
+      gtk_container_add (GTK_CONTAINER (box), widget);
+    }
+
+  gtk_widget_set_halign (box, GTK_ALIGN_START);
+  gtk_widget_show_all (box);
+  gtk_container_add (GTK_CONTAINER (button), box);
+
+  g_free (title);
+  g_free (icon_name);
+}
+
+static void
+button_child_added (GtkContainer *button,
+                    GtkWidget *child,
+                    EosVerticalStackSwitcher *self)
+{
+  tweak_button_child (self, GTK_WIDGET (button));
 }
 
 static GType
@@ -51,7 +110,7 @@ eos_vertical_stack_switcher_remove (GtkContainer *container,
   self = EOS_VERTICAL_STACK_SWITCHER (container);
   priv = eos_vertical_stack_switcher_get_instance_private (self);
 
-  g_signal_handlers_disconnect_by_func (widget, set_align_for_child, container);
+  g_signal_handlers_disconnect_by_func (widget, tweak_button_child, container);
   g_hash_table_remove (priv->buttons, widget);
 
   GTK_CONTAINER_CLASS (eos_vertical_stack_switcher_parent_class)->remove (container, widget);
@@ -71,10 +130,10 @@ eos_vertical_stack_switcher_add (GtkContainer *container,
 
   g_assert (GTK_IS_BUTTON (widget));
 
-  g_signal_connect (widget, "add", G_CALLBACK (set_align_for_child), container);
+  g_signal_connect (widget, "add", G_CALLBACK (button_child_added), self);
   g_hash_table_add (priv->buttons, widget);
 
-  set_align_for_child (widget);
+  tweak_button_child (self, widget);
 }
 
 static void

@@ -51,7 +51,14 @@
     <file compressed="true">generic-link_favicon.png</file>
     <file compressed="true">icon_alert.png</file>
     <file compressed="true">icon_arrow_thumb.png</file>
+    <file compressed="true">icon_education-symbolic.svg</file>
     <file compressed="true">icon_external-link.png</file>
+    <file compressed="true">icon_folder-symbolic.svg</file>
+    <file compressed="true">icon_games-symbolic.svg</file>
+    <file compressed="true">icon_installed-symbolic.svg</file>
+    <file compressed="true">icon_resources-symbolic.svg</file>
+    <file compressed="true">icon_tools-symbolic.svg</file>
+    <file compressed="true">icon_web-symbolic.svg</file>
     <file compressed="true">icon_blank.png</file>
     <file compressed="true">icon_installed_43x43.png</file>
     <file compressed="true">icon_website-symbolic.svg</file>
