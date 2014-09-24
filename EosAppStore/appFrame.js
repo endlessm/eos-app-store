@@ -323,7 +323,7 @@ const AppListBoxRow = new Lang.Class({
 
             if (error) {
                 this._maybeNotify(_("We could not install '%s'").format(this.appTitle), error);
-                this._updateDate();
+                this._updateState();
                 return;
             }
 
