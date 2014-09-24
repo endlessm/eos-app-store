@@ -169,6 +169,10 @@ const AppListBoxRow = new Lang.Class({
         this._installProgressBar.fraction = progress;
     },
 
+    get hasTransactionInProgress() {
+        return this._transactionInProgress;
+    },
+
     get appId() {
         return this._appId;
     },
@@ -279,33 +283,53 @@ const AppListBoxRow = new Lang.Class({
         }
     },
 
+    _pushTransaction: function(text, showProgressBar) {
+        this._transactionInProgress = true;
+
+        // show the box with the progress bar and the label
+        this._installProgress.show();
+
+        // show the label
+        this._installProgressLabel.set_text(text);
+
+        // conditionally show the progress bar
+        if (showProgressBar) {
+            this._installProgressBar.show();
+        }
+        else {
+            this._installProgressBar.hide();
+        }
+
+        let app = Gio.Application.get_default();
+        app.pushRunningOperation();
+    },
+
+    _popTransaction: function() {
+        this._transactionInProgress = false;
+
+        this._installProgress.hide();
+
+        let app = Gio.Application.get_default();
+        app.popRunningOperation();
+    },
+
     _installApp: function() {
         this._installButton.hide();
 
-        this._installProgressLabel.set_text(_("Installing..."));
-        this._installProgress.show();
-
-        Gio.Application.get_default().pushRunningOperation();
+        this._pushTransaction(_("Installing..."), true);
 
         this._model.install(this._appId, Lang.bind(this, function(error) {
-            this._installProgress.hide();
-
-            Gio.Application.get_default().popRunningOperation();
+            this._popTransaction();
 
             if (error) {
                 this._maybeNotify(_("We could not install '%s'").format(this.appTitle), error);
-            }
-            else {
-                this._maybeNotify(_("'%s' was installed successfully").format(this.appTitle));
-            }
-
-            if (error) {
                 this._updateState();
                 return;
             }
 
-            this._installedMessage.show();
+            this._maybeNotify(_("'%s' was installed successfully").format(this.appTitle));
 
+            this._installedMessage.show();
             Mainloop.timeout_add_seconds(3, Lang.bind(this, function() {
                 this._installedMessage.hide();
                 this._updateState();
@@ -338,16 +362,11 @@ const AppListBoxRow = new Lang.Class({
                 // or we add a launcher on the desktop
                 this._installButton.hide();
 
-                this._installProgressLabel.set_text(_("Installing..."));
-                this._installProgress.show();
-
-                Gio.Application.get_default().pushRunningOperation();
+                this._pushTransaction(_("Installing..."), false);
 
                 this._model.install(this._appId, Lang.bind(this, function(error) {
-                    this._installProgress.hide();
+                    this._popTransaction();
                     this._updateState();
-
-                    Gio.Application.get_default().popRunningOperation();
 
                     if (error) {
                         this._maybeNotify(_("We could not install '%s'").format(this.appTitle), error);
@@ -375,17 +394,11 @@ const AppListBoxRow = new Lang.Class({
             case EosAppStorePrivate.AppState.UPDATABLE:
                 this._installButton.hide();
 
-                this._installProgressLabel.set_text(_("Updating..."));
-                this._installProgress.show();
-
-                Gio.Application.get_default().pushRunningOperation();
+                this._pushTransaction(_("Updating..."), true);
 
                 this._model.updateApp(this._appId, Lang.bind(this, function(error) {
-                    this._installProgress.hide();
-
+                    this._popTransaction();
                     this._updateState();
-
-                    Gio.Application.get_default().popRunningOperation();
 
                     if (error) {
                         this._maybeNotify(_("We could not update '%s'").format(this.appTitle), error);
@@ -426,15 +439,10 @@ const AppListBoxRow = new Lang.Class({
             this._removeButton.hide();
             this._installButton.hide();
 
-            this._installProgressLabel.set_text(_("Removing..."));
-            this._installProgress.show();
-
-            app.pushRunningOperation();
+            this._pushTransaction(_("Removing..."), false);
 
             this._model.uninstall(this._appId, Lang.bind(this, function(error) {
-                this._installProgress.hide();
-
-                app.popRunningOperation();
+                this._popTransaction();
 
                 if (error) {
                     this._maybeNotify(_("We could not remove '%s'").format(this.appTitle), error);
@@ -593,18 +601,21 @@ const AppCategoryFrame = new Lang.Class({
     },
 
     _onCellActivated: function(grid, cell) {
-        let appBox = new AppListBoxRow(this._model, cell.app_info);
-        appBox.show();
+        if (!this._stack.get_child_by_name(cell.desktop_id)) {
+            let appBox = new AppListBoxRow(this._model, cell.app_info);
+            appBox.show();
 
-        this._stack.add_named(appBox, cell.desktop_id);
-        this._stack.transition_type = Gtk.StackTransitionType.SLIDE_LEFT;
-        this._stack.set_visible_child_name(cell.desktop_id);
+            this._stack.add_named(appBox, cell.desktop_id);
+            this._stack.transition_type = Gtk.StackTransitionType.SLIDE_LEFT;
+            this._stack.set_visible_child_name(cell.desktop_id);
+        }
 
         this._mainWindow.titleText = cell.app_info.get_title();
         this._mainWindow.subtitleText = cell.app_info.get_subtitle();
         this._mainWindow.headerIcon = this._model.getIcon(cell.desktop_id);
         this._mainWindow.headerInstalledVisible = this._model.isInstalled(cell.desktop_id);
         this._mainWindow.backButtonVisible = true;
+
         this._backClickedId =
             this._mainWindow.connect('back-clicked', Lang.bind(this, this._showGrid));
     },
@@ -623,8 +634,9 @@ const AppCategoryFrame = new Lang.Class({
             this._stack.set_visible_child(this._widget);
         }
 
-        if (curPage != this._widget) {
-            // application pages are recreated each time
+        // application pages are recreated each time, unless there's
+        // a transaction in progress
+        if (curPage != this._widget && !curPage.hasTransactionInProgress) {
             curPage.destroy();
         }
     },
