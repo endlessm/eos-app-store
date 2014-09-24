@@ -219,9 +219,18 @@ const AppStoreWindow = new Lang.Class({
 
         categories.forEach(Lang.bind(this, function(category) {
             this._stack.add_titled(category.widget, category.name, category.label);
+            this._stack.child_set_property(category.widget, 'icon-name', category.icon);
         }));
-        this._stack.add_titled(new WeblinkFrame.WeblinkFrame(this), 'web', _("Websites"));
-        this._stack.add_titled(new FolderFrame.FolderFrame(), 'folders', _("Folders"));
+
+        let weblinkFrame = new WeblinkFrame.WeblinkFrame(this);
+        this._stack.add_titled(weblinkFrame, 'web', _("Websites"));
+        this._stack.child_set_property(weblinkFrame, 'icon-name',
+                                       'resource:///com/endlessm/appstore/icon_web-symbolic.svg');
+
+        let folderFrame = new FolderFrame.FolderFrame();
+        this._stack.add_titled(folderFrame, 'folders', _("Folders"));
+        this._stack.child_set_property(folderFrame, 'icon-name',
+                                       'resource:///com/endlessm/appstore/icon_folder-symbolic.svg');
     },
 
     _onActiveWindowChanged: function(wmInspect, activeWindow) {
