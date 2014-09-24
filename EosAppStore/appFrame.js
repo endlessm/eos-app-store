@@ -63,6 +63,7 @@ const AppListBoxRow = new Lang.Class({
         '_installProgress',
         '_installProgressLabel',
         '_installProgressBar',
+        '_installProgressCancel',
         '_installedMessage',
         '_removeButton',
         '_removeButtonLabel',
@@ -292,12 +293,14 @@ const AppListBoxRow = new Lang.Class({
         // show the label
         this._installProgressLabel.set_text(text);
 
-        // conditionally show the progress bar
+        // conditionally show the progress bar and cancel button
         if (showProgressBar) {
             this._installProgressBar.show();
+            this._installProgressCancel.show();
         }
         else {
             this._installProgressBar.hide();
+            this._installProgressCancel.hide();
         }
 
         let app = Gio.Application.get_default();
@@ -415,6 +418,11 @@ const AppListBoxRow = new Lang.Class({
                 }));
                 break;
         }
+    },
+
+    _onInstallCancelButtonClicked: function() {
+        // this will trigger the error handling code in the install/update paths
+        this._model.cancel(this._appId);
     },
 
     _onRemoveButtonClicked: function() {

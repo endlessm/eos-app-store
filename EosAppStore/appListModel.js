@@ -21,6 +21,8 @@ const BaseList = new Lang.Class({
 
         this._model.connect('changed', Lang.bind(this, this._onModelChanged));
         this._onModelChanged(this._model);
+
+        this._cancellables = {};
     },
 
     _onModelChanged: function(model) {
@@ -68,10 +70,20 @@ const BaseList = new Lang.Class({
     },
 
     install: function(id, callback) {
+        if (this._cancellables[id]) {
+            log('Installation of app ' + id + ' already in progress.');
+            return;
+        }
+
         let application = Gio.Application.get_default();
         application.hold();
 
-        this._model.install_app_async(id, null, Lang.bind(this, function(model, res) {
+        let cancellable = new Gio.Cancellable();
+        this._cancellables[id] = cancellable;
+
+        this._model.install_app_async(id, cancellable, Lang.bind(this, function(model, res) {
+            this._cancellables[id] = null;
+
             try {
                 this._model.install_app_finish(res);
                 if (callback) {
@@ -87,6 +99,14 @@ const BaseList = new Lang.Class({
 
             application.release();
         }));
+    },
+
+    cancel: function(id) {
+        if (!this._cancellables[id]) {
+            return;
+        }
+
+        this._cancellables[id].cancel();
     },
 
     uninstall: function(id, callback) {
@@ -148,10 +168,20 @@ const AppList = new Lang.Class({
     },
 
     updateApp: function(id, callback) {
+        if (this._cancellables[id]) {
+            log('Update of app ' + id + ' already in progress.');
+            return;
+        }
+
         let application = Gio.Application.get_default();
         application.hold();
 
-        this._model.update_app_async(id, null, Lang.bind(this, function(model, res) {
+        let cancellable = new Gio.Cancellable();
+        this._cancellables[id] = cancellable;
+
+        this._model.update_app_async(id, cancellable, Lang.bind(this, function(model, res) {
+            this._cancellables[id] = null;
+
             try {
                 this._model.update_app_finish(res);
                 if (callback) {
