@@ -267,15 +267,22 @@ const AppStoreWindow = new Lang.Class({
     },
 
     _setDefaultTitle: function() {
-        let title = this.header_bar_title_label;
-        title.set_text(this._stack.get_visible_child().title);
+        let page = this._stack.visible_child;
+
+        if (page) {
+            let title = this.header_bar_title_label;
+            title.set_text(page.title);
+        }
     },
 
     _onStorePageChanged: function() {
-        let page = this._stack.visible_child;
         this.clearHeaderState();
 
-        page.reset();
+        let page = this._stack.visible_child;
+
+        if (page) {
+            page.reset();
+        }
     },
 
     _onAvailableAreaChanged: function() {
