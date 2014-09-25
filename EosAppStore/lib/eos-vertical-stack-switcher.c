@@ -51,6 +51,8 @@ tweak_button_child (EosVerticalStackSwitcher *self,
       gtk_widget_destroy (child);
     }
 
+  gtk_widget_set_tooltip_text (button, NULL);
+
   title = icon_name = NULL;
   box = gtk_box_new (GTK_ORIENTATION_HORIZONTAL, 10);
   stack = GTK_WIDGET (gtk_stack_switcher_get_stack (GTK_STACK_SWITCHER (self)));
