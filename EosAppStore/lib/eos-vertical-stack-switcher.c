@@ -51,8 +51,10 @@ tweak_button_child (EosVerticalStackSwitcher *self,
       gtk_widget_destroy (child);
     }
 
+  gtk_widget_set_tooltip_text (button, NULL);
+
   title = icon_name = NULL;
-  box = gtk_box_new (GTK_ORIENTATION_HORIZONTAL, 6);
+  box = gtk_box_new (GTK_ORIENTATION_HORIZONTAL, 10);
   stack = GTK_WIDGET (gtk_stack_switcher_get_stack (GTK_STACK_SWITCHER (self)));
 
   gtk_container_child_get (GTK_CONTAINER (stack), stack_child,
@@ -66,7 +68,7 @@ tweak_button_child (EosVerticalStackSwitcher *self,
       icon = g_file_icon_new (gfile);
       g_object_unref (gfile);
 
-      widget = gtk_image_new_from_gicon (icon, GTK_ICON_SIZE_MENU);
+      widget = gtk_image_new_from_gicon (icon, GTK_ICON_SIZE_LARGE_TOOLBAR);
       gtk_container_add (GTK_CONTAINER (box), widget);
       g_object_unref (icon);
     }
