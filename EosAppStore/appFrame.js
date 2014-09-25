@@ -77,6 +77,9 @@ const AppListBoxRow = new Lang.Class({
         let app = Gio.Application.get_default();
         let mainWindow = app.mainWindow;
 
+        this.initTemplate({ templateRoot: '_mainBox', bindChildren: true, connectSignals: true, });
+        this.add(this._mainBox);
+
         let width = mainWindow.getExpectedWidth();
         width = Math.max(width, AppStoreWindow.AppStoreSizes.VGA.screenWidth);
         let xgaWidth = AppStoreWindow.AppStoreSizes.XGA.screenWidth;
@@ -102,9 +105,6 @@ const AppListBoxRow = new Lang.Class({
         this._removeDialog = null;
         this._windowHideId = mainWindow.connect('hide', Lang.bind(this, this._destroyPendingDialogs));
         this.connect('destroy', Lang.bind(this, this._onDestroy));
-
-        this.initTemplate({ templateRoot: '_mainBox', bindChildren: true, connectSignals: true, });
-        this.add(this._mainBox);
 
         let separator = new Separator.FrameSeparator();
         this._mainBox.add(separator);
