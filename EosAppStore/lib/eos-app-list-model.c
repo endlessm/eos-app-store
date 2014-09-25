@@ -1613,6 +1613,9 @@ eos_app_list_model_get_app_can_remove (EosAppListModel *model,
 {
   const gchar *localized_id;
 
+  if (model->manager_installed_apps == NULL)
+    return FALSE;
+
   localized_id = app_get_localized_id_for_installed_app (model, desktop_id);
 
   /* Can only remove what the manager installed */
