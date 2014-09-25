@@ -686,10 +686,10 @@ const AppBroker = new Lang.Class({
     },
 
     _populateAllCategories: function() {
-        for (let c in this._categories) {
+        this._categories.forEach(Lang.bind(this, function(c) {
             c.widget.invalidate();
             c.widget.populate();
-        }
+        }));
     },
 
     get categories() {
