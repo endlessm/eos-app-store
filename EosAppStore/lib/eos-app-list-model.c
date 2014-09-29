@@ -1271,12 +1271,21 @@ app_get_localized_id_for_installed_app (EosAppListModel *model,
                                         const gchar *desktop_id)
 {
   GDesktopAppInfo *info;
+  char *localized_id;
 
-  info = eos_app_list_model_get_app_info (model, desktop_id);
-  if (info != NULL)
+  info = g_hash_table_lookup (model->gio_apps, desktop_id);
+  if (info)
+    goto out;
+
+  localized_id = localized_id_from_desktop_id (desktop_id);
+  info = g_hash_table_lookup (model->gio_apps, localized_id);
+  g_free (localized_id);
+
+ out:
+  if (info)
     return g_app_info_get_id (G_APP_INFO (info));
-
-  return NULL;
+  else
+    return NULL;
 }
 
 gboolean
