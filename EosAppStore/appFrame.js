@@ -492,6 +492,7 @@ const AppListBoxRow = new Lang.Class({
             dialog.modal = true;
             dialog.destroy_with_parent = true;
             dialog.text = message;
+            dialog.secondary_text = error.message;
             dialog.add_button(_("Dismiss"), Gtk.ResponseType.OK);
             dialog.show_all();
             this._errorDialog = dialog;
