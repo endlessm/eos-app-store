@@ -162,8 +162,20 @@ const AppListBoxRow = new Lang.Class({
         this.appState = this._model.getState(this._appId);
     },
 
-    _downloadProgress: function(model, appid, progress) {
+    _downloadProgress: function(model, appid, progress, current, total) {
         if (this.appId != appid) {
+            return;
+        }
+
+        if (current == 0) {
+            this._installProgressLabel.set_text(_("Downloading..."));
+            this._installProgressBar.fraction = 0.0;
+            return;
+        }
+
+        if (current == total) {
+            this._installProgressBar.set_text(_("Installing..."));
+            this._installProgressBar.fraction = 1.0;
             return;
         }
 
@@ -492,6 +504,7 @@ const AppListBoxRow = new Lang.Class({
             dialog.modal = true;
             dialog.destroy_with_parent = true;
             dialog.text = message;
+            dialog.secondary_text = error.message;
             dialog.add_button(_("Dismiss"), Gtk.ResponseType.OK);
             dialog.show_all();
             this._errorDialog = dialog;
@@ -615,8 +628,9 @@ const AppCategoryFrame = new Lang.Class({
 
             this._stack.add_named(appBox, cell.desktop_id);
             this._stack.transition_type = Gtk.StackTransitionType.SLIDE_LEFT;
-            this._stack.set_visible_child_name(cell.desktop_id);
         }
+
+        this._stack.set_visible_child_name(cell.desktop_id);
 
         this._mainWindow.titleText = cell.app_info.get_title();
         this._mainWindow.subtitleText = cell.app_info.get_subtitle();

@@ -8,8 +8,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: eos-app-store\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-09-22 23:37-0700\n"
-"PO-Revision-Date: 2014-09-30 22:06+0000\n"
+"POT-Creation-Date: 2014-10-03 13:29-0700\n"
+"PO-Revision-Date: 2014-10-03 20:30+0000\n"
 "Last-Translator: Roddy Shuler <roddy@endlessm.com>\n"
 "Language-Team: Arabic (http://www.transifex.com/projects/p/eos-app-store/language/ar/)\n"
 "MIME-Version: 1.0\n"
@@ -22,20 +22,24 @@ msgstr ""
 msgid "Create your own folder to organize your apps. First, choose an icon."
 msgstr "قم بإنشاء مجلد خاص بك لتنظيم تطبيقاتك. اختر رمزا أولا."
 
-#: ../data/eos-app-store-list-row.ui.h:1 ../EosAppStore/appFrame.js:240
-#: ../EosAppStore/appFrame.js:249
+#: ../data/eos-app-store-list-row.ui.h:1 ../EosAppStore/appFrame.js:276
+#: ../EosAppStore/appFrame.js:285
 msgid "Install app"
 msgstr "تثبيت التطبيق"
 
-#: ../data/eos-app-store-list-row.ui.h:2
+#: ../data/eos-app-store-list-row.ui.h:2 ../EosAppStore/appFrame.js:451
+msgid "Cancel"
+msgstr "إلغاء"
+
+#: ../data/eos-app-store-list-row.ui.h:3
 msgid "Installing"
 msgstr "جاري التثبيت"
 
-#: ../data/eos-app-store-list-row.ui.h:3
+#: ../data/eos-app-store-list-row.ui.h:4
 msgid "Installed successfully"
 msgstr "تم التثبيت بنجاح"
 
-#: ../data/eos-app-store-list-row.ui.h:4
+#: ../data/eos-app-store-list-row.ui.h:5
 msgid "Delete from device"
 msgstr "احذف من الجهاز"
 
@@ -43,91 +47,92 @@ msgstr "احذف من الجهاز"
 msgid "e.g.: http://www.globoesporte.com"
 msgstr "مثال: http://www.globoesporte.com"
 
-#: ../EosAppStore/appFrame.js:225
-msgid "Add to the desktop"
-msgstr "إضافة إلى سطح المكتب "
+#: ../EosAppStore/appFrame.js:171
+msgid "Downloading..."
+msgstr ""
 
-#: ../EosAppStore/appFrame.js:228
-msgid "Open app"
-msgstr "فتح التطبيق"
-
-#: ../EosAppStore/appFrame.js:246
-msgid "Update app"
-msgstr "تحديث التطبيق"
-
-#: ../EosAppStore/appFrame.js:266 ../EosAppStore/appFrame.js:320
+#: ../EosAppStore/appFrame.js:177 ../EosAppStore/appFrame.js:334
+#: ../EosAppStore/appFrame.js:380
 msgid "Installing..."
 msgstr "جاري التثبيت..."
 
-#: ../EosAppStore/appFrame.js:275 ../EosAppStore/appFrame.js:331
+#: ../EosAppStore/appFrame.js:261
+msgid "Add to the desktop"
+msgstr "إضافة إلى سطح المكتب "
+
+#: ../EosAppStore/appFrame.js:264
+msgid "Open app"
+msgstr "فتح التطبيق"
+
+#: ../EosAppStore/appFrame.js:282
+msgid "Update app"
+msgstr "تحديث التطبيق"
+
+#: ../EosAppStore/appFrame.js:340 ../EosAppStore/appFrame.js:387
 #, c-format
 msgid "We could not install '%s'"
 msgstr "لم نتمكن من تثبيت '%s'"
 
-#: ../EosAppStore/appFrame.js:278 ../EosAppStore/appFrame.js:334
+#: ../EosAppStore/appFrame.js:345 ../EosAppStore/appFrame.js:390
 #, c-format
 msgid "'%s' was installed successfully"
 msgstr "تم تثبيت '%s' بنجاح"
 
-#: ../EosAppStore/appFrame.js:356
+#: ../EosAppStore/appFrame.js:412
 msgid "Updating..."
 msgstr "جاري التحديث..."
 
-#: ../EosAppStore/appFrame.js:367
+#: ../EosAppStore/appFrame.js:419
 #, c-format
 msgid "We could not update '%s'"
 msgstr "لم نتمكن من تحديث '%s'"
 
-#: ../EosAppStore/appFrame.js:375
+#: ../EosAppStore/appFrame.js:427
 #, c-format
 msgid "'%s' was updated successfully"
 msgstr "تم تحديث '%s' بنجاح"
 
-#: ../EosAppStore/appFrame.js:390
+#: ../EosAppStore/appFrame.js:447
 msgid "Deleting app"
 msgstr "جاري حذف التطبيق"
 
-#: ../EosAppStore/appFrame.js:391
+#: ../EosAppStore/appFrame.js:448
 msgid ""
 "Deleting this app will remove it from the device for all users. You will "
 "need to download it from the internet in order to reinstall it."
 msgstr "سيقوم حذف هذا التطبيق بإزالته من الجهاز لجميع المستخدمين. سوف تحتاج إلى تحميله من الإنترنت من أجل إعادة تثبيته."
 
-#: ../EosAppStore/appFrame.js:392
+#: ../EosAppStore/appFrame.js:449
 msgid "Delete app"
 msgstr "احذف التطبيق"
 
-#: ../EosAppStore/appFrame.js:394
-msgid "Cancel"
-msgstr "إلغاء"
-
-#: ../EosAppStore/appFrame.js:405
+#: ../EosAppStore/appFrame.js:462
 msgid "Removing..."
 msgstr "جاري الحذف"
 
-#: ../EosAppStore/appFrame.js:414
+#: ../EosAppStore/appFrame.js:468
 #, c-format
 msgid "We could not remove '%s'"
 msgstr "لم نتمكن من إزالة '%s'"
 
-#: ../EosAppStore/appFrame.js:417
+#: ../EosAppStore/appFrame.js:471
 #, c-format
 msgid "'%s' was removed successfully"
 msgstr "تمت إزالة '%s' بنجاح"
 
-#: ../EosAppStore/appFrame.js:453
+#: ../EosAppStore/appFrame.js:508
 msgid "Dismiss"
 msgstr "استبعاد"
 
-#: ../EosAppStore/appFrame.js:612
+#: ../EosAppStore/appFrame.js:672
 msgid "Install apps"
 msgstr "تثبيت التطبيقات"
 
-#: ../EosAppStore/appStoreWindow.js:223
+#: ../EosAppStore/appStoreWindow.js:226
 msgid "Websites"
 msgstr "المواقع"
 
-#: ../EosAppStore/appStoreWindow.js:224
+#: ../EosAppStore/appStoreWindow.js:231
 msgid "Folders"
 msgstr "المجلدات "
 
@@ -136,39 +141,39 @@ msgstr "المجلدات "
 msgid "Education"
 msgstr "التعليم "
 
-#: ../EosAppStore/categories.js:18 ../EosAppStore/lib/eos-app-info.c:798
+#: ../EosAppStore/categories.js:19 ../EosAppStore/lib/eos-app-info.c:798
 msgid "Games"
 msgstr "ألعاب"
 
-#: ../EosAppStore/categories.js:24 ../EosAppStore/lib/eos-app-info.c:799
+#: ../EosAppStore/categories.js:26 ../EosAppStore/lib/eos-app-info.c:799
 msgid "Resources"
 msgstr "الموارد"
 
-#: ../EosAppStore/categories.js:30 ../EosAppStore/lib/eos-app-info.c:800
+#: ../EosAppStore/categories.js:33 ../EosAppStore/lib/eos-app-info.c:800
 msgid "Utilities"
 msgstr "المرافق"
 
-#: ../EosAppStore/categories.js:36
+#: ../EosAppStore/categories.js:40
 msgid "Installed"
 msgstr "مثبت"
 
-#: ../EosAppStore/categories.js:47
+#: ../EosAppStore/categories.js:52
 msgid "News"
 msgstr "الأخبار"
 
-#: ../EosAppStore/categories.js:53
+#: ../EosAppStore/categories.js:58
 msgid "Sports"
 msgstr "الرياضة "
 
-#: ../EosAppStore/categories.js:59
+#: ../EosAppStore/categories.js:64
 msgid "Education and Health"
 msgstr "التعليم و الصحة "
 
-#: ../EosAppStore/categories.js:65
+#: ../EosAppStore/categories.js:70
 msgid "Entertainment"
 msgstr "الترفيه"
 
-#: ../EosAppStore/categories.js:71
+#: ../EosAppStore/categories.js:76
 msgid "Local"
 msgstr "محلي"
 
@@ -218,39 +223,60 @@ msgstr "قم بإضافة المواقع المفضلة لديك على سطح �
 msgid "Install websites"
 msgstr "تثبيت المواقع"
 
-#: ../EosAppStore/lib/eos-app-list-model.c:709
+#: ../EosAppStore/lib/eos-app-list-model.c:766
+#, c-format
+msgid "Not enough space on device for downloading app"
+msgstr ""
+
+#: ../EosAppStore/lib/eos-app-list-model.c:792
+#, c-format
+msgid "Invalid URI for the app '%s' bundle: %s"
+msgstr ""
+
+#: ../EosAppStore/lib/eos-app-list-model.c:843
+#, c-format
+msgid "Unable to create the bundle file for app '%s': %s"
+msgstr ""
+
+#: ../EosAppStore/lib/eos-app-list-model.c:890
+#, c-format
+msgid "Download of app '%s' cancelled by the user."
+msgstr ""
+
+#: ../EosAppStore/lib/eos-app-list-model.c:963
+#: ../EosAppStore/lib/eos-app-list-model.c:991
 #, c-format
 msgid "Application '%s' could not be installed"
 msgstr "تعذر تثبيت التطبيق '%s'"
 
-#: ../EosAppStore/lib/eos-app-list-model.c:784
+#: ../EosAppStore/lib/eos-app-list-model.c:1093
 #, c-format
 msgid "Application '%s' could not be removed"
 msgstr "لا يمكن إزالة تطبيق '%s'"
 
-#: ../EosAppStore/lib/eos-app-list-model.c:831
+#: ../EosAppStore/lib/eos-app-list-model.c:1140
 #, c-format
 msgid "Application '%s' could not be updated"
 msgstr "تعذر تحديث تطبيق '%s'"
 
-#: ../EosAppStore/lib/eos-app-list-model.c:1091
-#: ../EosAppStore/lib/eos-app-list-model.c:1160
+#: ../EosAppStore/lib/eos-app-list-model.c:1409
+#: ../EosAppStore/lib/eos-app-list-model.c:1478
 #, c-format
 msgid "App %s not installable"
 msgstr "التطبيق ليس %s قابلا للتثبيت"
 
-#: ../EosAppStore/lib/eos-app-list-model.c:1102
+#: ../EosAppStore/lib/eos-app-list-model.c:1420
 #, c-format
 msgid "App %s already installed"
 msgstr "التطبيق %s مثبت مسبقا"
 
-#: ../EosAppStore/lib/eos-app-list-model.c:1171
+#: ../EosAppStore/lib/eos-app-list-model.c:1489
 #, c-format
 msgid "App %s is up to date"
 msgstr "التطبيق %s حديث"
 
-#: ../EosAppStore/lib/eos-app-list-model.c:1234
-#: ../EosAppStore/lib/eos-app-list-model.c:1267
+#: ../EosAppStore/lib/eos-app-list-model.c:1552
+#: ../EosAppStore/lib/eos-app-list-model.c:1585
 #, c-format
 msgid "App %s is not installed"
 msgstr "التطبيق %s غير مثبت"
