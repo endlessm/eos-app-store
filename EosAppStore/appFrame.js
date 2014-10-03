@@ -20,6 +20,7 @@ const Signals = imports.signals;
 
 const APP_TRANSITION_MS = 500;
 const CATEGORY_TRANSITION_MS = 500;
+const SHOW_DESKTOP_ICON_DELAY = 1;
 
 const CELL_DEFAULT_SIZE = 180;
 const CELL_DEFAULT_SPACING = 15;
@@ -345,7 +346,8 @@ const AppListBoxRow = new Lang.Class({
             this._maybeNotify(_("'%s' was installed successfully").format(this.appTitle));
 
             this._installedMessage.show();
-            Mainloop.timeout_add_seconds(3, Lang.bind(this, function() {
+            Mainloop.timeout_add_seconds(SHOW_DESKTOP_ICON_DELAY,
+                                         Lang.bind(this, function() {
                 this._installedMessage.hide();
                 this._updateState();
 
@@ -389,7 +391,8 @@ const AppListBoxRow = new Lang.Class({
                     else {
                         this._maybeNotify(_("'%s' was installed successfully").format(this.appTitle));
 
-                        Mainloop.timeout_add_seconds(3, Lang.bind(this, function() {
+                        Mainloop.timeout_add_seconds(SHOW_DESKTOP_ICON_DELAY,
+                                                     Lang.bind(this, function() {
                             let appWindow = Gio.Application.get_default().mainWindow;
                             if (appWindow && appWindow.is_visible()) {
                                 appWindow.hide();
