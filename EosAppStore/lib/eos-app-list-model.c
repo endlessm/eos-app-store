@@ -844,7 +844,7 @@ download_bundle_from_uri (EosAppListModel *self,
       goto out;
     }
 
-  out_stream = g_file_create (file, G_FILE_CREATE_NONE, cancellable, &internal_error);
+  out_stream = g_file_create (file, G_FILE_CREATE_REPLACE_DESTINATION, cancellable, &internal_error);
   if (internal_error != NULL)
     {
       g_propagate_error (error, internal_error);
