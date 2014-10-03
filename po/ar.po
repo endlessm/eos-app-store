@@ -8,8 +8,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: eos-app-store\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-10-03 13:29-0700\n"
-"PO-Revision-Date: 2014-10-03 20:30+0000\n"
+"POT-Creation-Date: 2014-10-03 15:40-0700\n"
+"PO-Revision-Date: 2014-10-03 22:40+0000\n"
 "Last-Translator: Roddy Shuler <roddy@endlessm.com>\n"
 "Language-Team: Arabic (http://www.transifex.com/projects/p/eos-app-store/language/ar/)\n"
 "MIME-Version: 1.0\n"
@@ -22,12 +22,12 @@ msgstr ""
 msgid "Create your own folder to organize your apps. First, choose an icon."
 msgstr "قم بإنشاء مجلد خاص بك لتنظيم تطبيقاتك. اختر رمزا أولا."
 
-#: ../data/eos-app-store-list-row.ui.h:1 ../EosAppStore/appFrame.js:276
-#: ../EosAppStore/appFrame.js:285
+#: ../data/eos-app-store-list-row.ui.h:1 ../EosAppStore/appFrame.js:277
+#: ../EosAppStore/appFrame.js:286
 msgid "Install app"
 msgstr "تثبيت التطبيق"
 
-#: ../data/eos-app-store-list-row.ui.h:2 ../EosAppStore/appFrame.js:451
+#: ../data/eos-app-store-list-row.ui.h:2 ../EosAppStore/appFrame.js:454
 msgid "Cancel"
 msgstr "إلغاء"
 
@@ -47,84 +47,84 @@ msgstr "احذف من الجهاز"
 msgid "e.g.: http://www.globoesporte.com"
 msgstr "مثال: http://www.globoesporte.com"
 
-#: ../EosAppStore/appFrame.js:171
+#: ../EosAppStore/appFrame.js:172
 msgid "Downloading..."
 msgstr ""
 
-#: ../EosAppStore/appFrame.js:177 ../EosAppStore/appFrame.js:334
-#: ../EosAppStore/appFrame.js:380
+#: ../EosAppStore/appFrame.js:178 ../EosAppStore/appFrame.js:335
+#: ../EosAppStore/appFrame.js:382
 msgid "Installing..."
 msgstr "جاري التثبيت..."
 
-#: ../EosAppStore/appFrame.js:261
+#: ../EosAppStore/appFrame.js:262
 msgid "Add to the desktop"
 msgstr "إضافة إلى سطح المكتب "
 
-#: ../EosAppStore/appFrame.js:264
+#: ../EosAppStore/appFrame.js:265
 msgid "Open app"
 msgstr "فتح التطبيق"
 
-#: ../EosAppStore/appFrame.js:282
+#: ../EosAppStore/appFrame.js:283
 msgid "Update app"
 msgstr "تحديث التطبيق"
 
-#: ../EosAppStore/appFrame.js:340 ../EosAppStore/appFrame.js:387
+#: ../EosAppStore/appFrame.js:341 ../EosAppStore/appFrame.js:389
 #, c-format
 msgid "We could not install '%s'"
 msgstr "لم نتمكن من تثبيت '%s'"
 
-#: ../EosAppStore/appFrame.js:345 ../EosAppStore/appFrame.js:390
+#: ../EosAppStore/appFrame.js:346 ../EosAppStore/appFrame.js:392
 #, c-format
 msgid "'%s' was installed successfully"
 msgstr "تم تثبيت '%s' بنجاح"
 
-#: ../EosAppStore/appFrame.js:412
+#: ../EosAppStore/appFrame.js:415
 msgid "Updating..."
 msgstr "جاري التحديث..."
 
-#: ../EosAppStore/appFrame.js:419
+#: ../EosAppStore/appFrame.js:422
 #, c-format
 msgid "We could not update '%s'"
 msgstr "لم نتمكن من تحديث '%s'"
 
-#: ../EosAppStore/appFrame.js:427
+#: ../EosAppStore/appFrame.js:430
 #, c-format
 msgid "'%s' was updated successfully"
 msgstr "تم تحديث '%s' بنجاح"
 
-#: ../EosAppStore/appFrame.js:447
+#: ../EosAppStore/appFrame.js:450
 msgid "Deleting app"
 msgstr "جاري حذف التطبيق"
 
-#: ../EosAppStore/appFrame.js:448
+#: ../EosAppStore/appFrame.js:451
 msgid ""
 "Deleting this app will remove it from the device for all users. You will "
 "need to download it from the internet in order to reinstall it."
 msgstr "سيقوم حذف هذا التطبيق بإزالته من الجهاز لجميع المستخدمين. سوف تحتاج إلى تحميله من الإنترنت من أجل إعادة تثبيته."
 
-#: ../EosAppStore/appFrame.js:449
+#: ../EosAppStore/appFrame.js:452
 msgid "Delete app"
 msgstr "احذف التطبيق"
 
-#: ../EosAppStore/appFrame.js:462
+#: ../EosAppStore/appFrame.js:465
 msgid "Removing..."
 msgstr "جاري الحذف"
 
-#: ../EosAppStore/appFrame.js:468
+#: ../EosAppStore/appFrame.js:471
 #, c-format
 msgid "We could not remove '%s'"
 msgstr "لم نتمكن من إزالة '%s'"
 
-#: ../EosAppStore/appFrame.js:471
+#: ../EosAppStore/appFrame.js:474
 #, c-format
 msgid "'%s' was removed successfully"
 msgstr "تمت إزالة '%s' بنجاح"
 
-#: ../EosAppStore/appFrame.js:508
+#: ../EosAppStore/appFrame.js:511
 msgid "Dismiss"
 msgstr "استبعاد"
 
-#: ../EosAppStore/appFrame.js:672
+#: ../EosAppStore/appFrame.js:675
 msgid "Install apps"
 msgstr "تثبيت التطبيقات"
 
@@ -230,12 +230,12 @@ msgstr ""
 
 #: ../EosAppStore/lib/eos-app-list-model.c:792
 #, c-format
-msgid "Invalid URI for the app '%s' bundle: %s"
+msgid "Invalid address for downloading '%s': %s"
 msgstr ""
 
 #: ../EosAppStore/lib/eos-app-list-model.c:843
 #, c-format
-msgid "Unable to create the bundle file for app '%s': %s"
+msgid "Unable to create the file for downloading '%s': %s"
 msgstr ""
 
 #: ../EosAppStore/lib/eos-app-list-model.c:890
