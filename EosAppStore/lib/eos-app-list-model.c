@@ -827,8 +827,12 @@ download_bundle_from_uri (EosAppListModel *self,
   GFile *file = g_file_new_for_path (target);
   GFile *parent = g_file_get_parent (file);
 
+  /* unlike g_mkdir_with_parents(), g_file_make_directory_with_parents() will
+   * fail if the directory exists
+   */
   g_file_make_directory_with_parents (parent, cancellable, &internal_error);
-  if (internal_error != NULL)
+  if (internal_error != NULL &&
+      !(internal_error->domain == G_IO_ERROR && internal_error->code == G_IO_ERROR_EXISTS))
     {
       g_propagate_error (error, internal_error);
       goto out;
