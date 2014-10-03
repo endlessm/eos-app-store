@@ -789,7 +789,7 @@ download_bundle_from_uri (EosAppListModel *self,
     {
       g_set_error (error, EOS_APP_LIST_MODEL_ERROR,
                    EOS_APP_LIST_MODEL_ERROR_NO_UPDATE,
-                   _("Invalid URI for the app '%s' bundle: %s"),
+                   _("Invalid address for downloading '%s': %s"),
                    app_id,
                    source_uri);
       return FALSE;
@@ -840,7 +840,7 @@ download_bundle_from_uri (EosAppListModel *self,
     {
       g_set_error (error, EOS_APP_LIST_MODEL_ERROR,
                    EOS_APP_LIST_MODEL_FAILED,
-                   _("Unable to create the bundle file for app '%s': %s"),
+                   _("Unable to create the file for downloading '%s': %s"),
                    app_id,
                    internal_error->message);
       g_error_free (internal_error);
