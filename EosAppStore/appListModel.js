@@ -19,10 +19,15 @@ const BaseList = new Lang.Class({
         let application = Gio.Application.get_default();
         this._model = application.appModel;
 
+        this._model.connect('download-progress', Lang.bind(this, this._onDownloadProgress));
         this._model.connect('changed', Lang.bind(this, this._onModelChanged));
         this._onModelChanged(this._model);
 
         this._cancellables = {};
+    },
+
+    _onDownloadProgress: function(model, appid, current, total) {
+        // do nothing here
     },
 
     _onModelChanged: function(model) {
@@ -150,7 +155,7 @@ const AppList = new Lang.Class({
             progress = current / total;
         }
 
-        this.emit('download-progress', appid, progress);
+        this.emit('download-progress', appid, progress, current, total);
     },
 
     _onModelChanged: function(model) {

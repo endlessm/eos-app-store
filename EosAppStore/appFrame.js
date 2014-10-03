@@ -162,8 +162,20 @@ const AppListBoxRow = new Lang.Class({
         this.appState = this._model.getState(this._appId);
     },
 
-    _downloadProgress: function(model, appid, progress) {
+    _downloadProgress: function(model, appid, progress, current, total) {
         if (this.appId != appid) {
+            return;
+        }
+
+        if (current == 0) {
+            this._installProgressLabel.set_text(_("Downloading..."));
+            this._installProgressBar.fraction = 0.0;
+            return;
+        }
+
+        if (current == total) {
+            this._installProgressBar.set_text(_("Installing..."));
+            this._installProgressBar.fraction = 1.0;
             return;
         }
 
