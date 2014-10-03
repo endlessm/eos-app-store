@@ -827,27 +827,23 @@ download_bundle_from_uri (EosAppListModel *self,
   GFile *file = g_file_new_for_path (target);
   GFile *parent = g_file_get_parent (file);
 
-  /* unlike g_mkdir_with_parents(), g_file_make_directory_with_parents() will
-   * fail if the directory exists
-   */
-  g_file_make_directory_with_parents (parent, cancellable, &internal_error);
-  if (internal_error != NULL &&
-      !(internal_error->domain == G_IO_ERROR && internal_error->code == G_IO_ERROR_EXISTS))
-    {
-      g_propagate_error (error, internal_error);
-      goto out;
-    }
-
   if (!check_available_space (parent, total, cancellable, &internal_error))
     {
       g_propagate_error (error, internal_error);
       goto out;
     }
 
+  g_file_make_directory_with_parents (parent, cancellable, NULL);
+  g_file_delete (file, cancellable, NULL);
   out_stream = g_file_create (file, G_FILE_CREATE_REPLACE_DESTINATION, cancellable, &internal_error);
   if (internal_error != NULL)
     {
-      g_propagate_error (error, internal_error);
+      g_set_error (error, EOS_APP_LIST_MODEL_ERROR,
+                   EOS_APP_LIST_MODEL_FAILED,
+                   "Unable to create the bundle file for app '%s': %s",
+                   app_id,
+                   internal_error->message);
+      g_error_free (internal_error);
       goto out;
     }
 
