@@ -997,14 +997,8 @@ add_app_from_manager (EosAppListModel *self,
 
   if (!download_bundle_from_uri (self, desktop_id, bundle_uri, &bundle_path, cancellable, &error))
     {
-      /* cancel the transaction if the GCancellable was cancelled */
-      if ((error->domain == EOS_APP_LIST_MODEL_ERROR &&
-           error->code == EOS_APP_LIST_MODEL_ERROR_CANCELLED) ||
-          (error->domain == G_IO_ERROR &&
-           error->code == G_IO_ERROR_CANCELLED))
-        {
-          eos_app_manager_transaction_call_cancel_transaction_sync (transaction, NULL, NULL);
-        }
+      /* cancel the transaction on error */ 
+      eos_app_manager_transaction_call_cancel_transaction_sync (transaction, NULL, NULL);
 
       g_object_unref (transaction);
       g_free (transaction_path);
