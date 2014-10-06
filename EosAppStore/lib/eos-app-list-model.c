@@ -6,6 +6,7 @@
 #include "eos-app-manager-transaction.h"
 
 #include <glib-object.h>
+#include <glib/gstdio.h>
 #include <gio/gio.h>
 #include <json-glib/json-glib.h>
 #include <glib/gi18n-lib.h>
@@ -827,15 +828,23 @@ download_bundle_from_uri (EosAppListModel *self,
   GFile *file = g_file_new_for_path (target);
   GFile *parent = g_file_get_parent (file);
 
+  char *parent_path = g_file_get_path (parent);
+  g_mkdir_with_parents (parent_path, 0755);
+  g_free (parent_path);
+
   if (!check_available_space (parent, total, cancellable, &internal_error))
     {
       g_propagate_error (error, internal_error);
       goto out;
     }
 
-  g_file_make_directory_with_parents (parent, cancellable, NULL);
-  g_file_delete (file, cancellable, NULL);
-  out_stream = g_file_create (file, G_FILE_CREATE_REPLACE_DESTINATION, cancellable, &internal_error);
+  /* we don't use GFile API because the error handling is weird,
+   * and we also know that the target is a local file, so there
+   * is no point in going through the abstraction
+   */
+  g_unlink (target);
+
+  out_stream = g_file_create (file, G_FILE_CREATE_NONE, cancellable, &internal_error);
   if (internal_error != NULL)
     {
       g_set_error (error, EOS_APP_LIST_MODEL_ERROR,
@@ -1013,6 +1022,9 @@ add_app_from_manager (EosAppListModel *self,
 
   g_object_unref (transaction);
   g_free (transaction_path);
+
+  /* delete the downloaded bundle */
+  g_unlink (bundle_path);
   g_free (bundle_path);
 
   if (error != NULL)
