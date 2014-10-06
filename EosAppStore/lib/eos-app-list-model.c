@@ -6,6 +6,7 @@
 #include "eos-app-manager-transaction.h"
 
 #include <glib-object.h>
+#include <glib/gstdio.h>
 #include <gio/gio.h>
 #include <json-glib/json-glib.h>
 #include <glib/gi18n-lib.h>
@@ -828,7 +829,7 @@ download_bundle_from_uri (EosAppListModel *self,
   GFile *parent = g_file_get_parent (file);
 
   char *parent_path = g_file_get_path (parent);
-  g_mkdir_with_parents (parent, 0755);
+  g_mkdir_with_parents (parent_path, 0755);
   g_free (parent_path);
 
   if (!check_available_space (parent, total, cancellable, &internal_error))
@@ -1021,6 +1022,9 @@ add_app_from_manager (EosAppListModel *self,
 
   g_object_unref (transaction);
   g_free (transaction_path);
+
+  /* delete the downloaded bundle */
+  g_unlink (bundle_path);
   g_free (bundle_path);
 
   if (error != NULL)
