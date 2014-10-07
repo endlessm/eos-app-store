@@ -325,6 +325,22 @@
     background-image: url("btn_update_pressed_icon.png");
 }
 
+.app-frame .state-button.cancel {
+    background-image: url("btn_remove_normal_middle.png");
+    border-image-source: url("btn_remove_normal_border.png");
+}
+
+.app-frame .state-button.cancel:hover {
+    background-image: url("btn_remove_hover_middle.png");
+    border-image-source: url("btn_remove_hover_border.png");
+}
+
+.app-frame .state-button.cancel:active,
+.app-frame .state-button.cancel:hover:active {
+    background-image: url("btn_remove_pressed_middle.png");
+    border-image-source: url("btn_remove_pressed_border.png");
+}
+
 .screenshot-box {
     opacity: 1;
     padding: 15px 15px;
