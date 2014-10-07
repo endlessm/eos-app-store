@@ -822,7 +822,7 @@ download_bundle_from_uri (EosAppListModel *self,
   goffset total = soup_request_get_content_length (request);
 
   char *bundle_file = g_strconcat (app_id, ".bundle", NULL);
-  char *target = g_build_filename (g_get_tmp_dir (), "eos-app-store", bundle_file, NULL);
+  char *target = g_build_filename (BUNDLEDIR, bundle_file, NULL);
   g_free (bundle_file);
 
   GFile *file = g_file_new_for_path (target);
