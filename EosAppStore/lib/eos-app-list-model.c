@@ -965,7 +965,7 @@ create_sha256sum (EosAppListModel *self,
   g_free (sha256_name);
 
   gchar *contents = g_strconcat (bundle_hash, "\t", bundle_path, "\n", NULL);
-  if (!g_file_set_contents (sha256_path, contents, -1, error))
+  if (!g_file_set_contents (sha256_path, contents, -1, &error))
     {
       g_free (contents);
       g_free (sha256_path);
