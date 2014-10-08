@@ -700,7 +700,7 @@ typedef void (* ProgressReportFunc) (const char *app_id,
 
 typedef struct {
   EosAppListModel *model;
-  char *app_id;
+  char *desktop_id;
   goffset current;
   goffset total;
 } ProgressClosure;
@@ -711,7 +711,7 @@ progress_closure_free (gpointer _data)
   ProgressClosure *data = _data;
 
   g_clear_object (&data->model);
-  g_free (data->app_id);
+  g_free (data->desktop_id);
 
   g_slice_free (ProgressClosure, data);
 }
@@ -722,7 +722,7 @@ emit_download_progress (gpointer _data)
   ProgressClosure *data = _data;
 
   g_signal_emit (data->model, eos_app_list_model_signals[DOWNLOAD_PROGRESS], 0,
-                 data->app_id,
+                 data->desktop_id,
                  data->current,
                  data->total);
 
@@ -739,7 +739,7 @@ queue_download_progress (const char      *app_id,
   ProgressClosure *clos = g_slice_new (ProgressClosure);
 
   clos->model = g_object_ref (self);
-  clos->app_id = desktop_id_from_app_id (app_id);
+  clos->desktop_id = desktop_id_from_app_id (app_id);
   clos->current = current;
   clos->total = total;
 
