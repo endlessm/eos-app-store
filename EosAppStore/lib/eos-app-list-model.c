@@ -75,6 +75,12 @@ app_id_from_desktop_id (const gchar *desktop_id)
 }
 
 static gchar *
+desktop_id_from_app_id (const gchar *app_id)
+{
+  return g_strconcat (app_id, ".desktop", NULL);
+}
+
+static gchar *
 localized_id_from_desktop_id (const gchar *desktop_id)
 {
   /* HACK: this should really be removed in favor of communicating the
@@ -687,6 +693,11 @@ add_app_to_shell (EosAppListModel *self,
   return TRUE;
 }
 
+typedef void (* ProgressReportFunc) (const char *app_id,
+                                     goffset current,
+                                     goffset total,
+                                     gpointer user_data);
+
 typedef struct {
   EosAppListModel *model;
   char *app_id;
@@ -719,15 +730,16 @@ emit_download_progress (gpointer _data)
 }
 
 static void
-queue_download_progress (EosAppListModel *self,
-                         const char      *app_id,
+queue_download_progress (const char      *app_id,
                          goffset          current,
-                         goffset          total)
+                         goffset          total,
+                         gpointer         user_data)
 {
+  EosAppListModel *self = user_data;
   ProgressClosure *clos = g_slice_new (ProgressClosure);
 
   clos->model = g_object_ref (self);
-  clos->app_id = g_strdup (app_id);
+  clos->app_id = desktop_id_from_app_id (app_id);
   clos->current = current;
   clos->total = total;
 
@@ -774,12 +786,14 @@ check_available_space (GFile         *path,
 }
 
 static gboolean
-download_bundle_from_uri (EosAppListModel *self,
-                          const char      *app_id,
-                          const char      *source_uri,
-                          char           **target_file,
-                          GCancellable    *cancellable,
-                          GError         **error)
+download_file_from_uri (EosAppListModel *self,
+                        const char      *app_id,
+                        const char      *source_uri,
+                        const char      *target_file,
+                        ProgressReportFunc progress_func,
+                        gpointer         progress_func_user_data,
+                        GCancellable    *cancellable,
+                        GError         **error)
 {
   GError *internal_error = NULL;
   gboolean retval = FALSE;
@@ -821,11 +835,7 @@ download_bundle_from_uri (EosAppListModel *self,
 
   goffset total = soup_request_get_content_length (request);
 
-  char *bundle_file = g_strconcat (app_id, ".bundle", NULL);
-  char *target = g_build_filename (BUNDLEDIR, bundle_file, NULL);
-  g_free (bundle_file);
-
-  GFile *file = g_file_new_for_path (target);
+  GFile *file = g_file_new_for_path (target_file);
   GFile *parent = g_file_get_parent (file);
 
   char *parent_path = g_file_get_path (parent);
@@ -842,7 +852,7 @@ download_bundle_from_uri (EosAppListModel *self,
    * and we also know that the target is a local file, so there
    * is no point in going through the abstraction
    */
-  g_unlink (target);
+  g_unlink (target_file);
 
   out_stream = g_file_create (file, G_FILE_CREATE_NONE, cancellable, &internal_error);
   if (internal_error != NULL)
@@ -859,7 +869,8 @@ download_bundle_from_uri (EosAppListModel *self,
 #define GET_DATA_BLOCK_SIZE     64 * 1024
 
   /* ensure we emit a progress notification at the beginning */
-  queue_download_progress (self, app_id, 0, total);
+  if (progress_func != NULL)
+    progress_func (app_id, 0, total, progress_func_user_data);
 
   gssize res = 0;
   gsize pos = 0;
@@ -886,13 +897,15 @@ download_bundle_from_uri (EosAppListModel *self,
 
       pos += res;
 
-      queue_download_progress (self, app_id, pos, total);
+      if (progress_func != NULL)
+        progress_func (app_id, pos, total, progress_func_user_data);
     }
 
   if (g_cancellable_is_cancelled (cancellable))
     {
       /* emit a progress notification for the whole file */
-      queue_download_progress (self, app_id, total, total);
+      if (progress_func != NULL)
+        progress_func (app_id, total, total, progress_func_user_data);
 
       g_set_error (error, EOS_APP_LIST_MODEL_ERROR,
                    EOS_APP_LIST_MODEL_ERROR_CANCELLED,
@@ -909,10 +922,8 @@ download_bundle_from_uri (EosAppListModel *self,
     }
 
   /* ensure we emit a progress notification for the whole size */
-  queue_download_progress (self, app_id, total, total);
-
-  if (target_file != NULL)
-    *target_file = g_strdup (target);
+  if (progress_func != NULL)
+    progress_func (app_id, total, total, progress_func_user_data);
 
   retval = TRUE;
 
@@ -923,11 +934,120 @@ out:
   g_clear_object (&in_stream);
   g_clear_object (&out_stream);
   g_clear_object (&request);
-  g_free (target);
 
 #undef GET_DATA_BLOCK_SIZE
 
   return retval;
+}
+
+static char *
+create_sha256sum (EosAppListModel *self,
+                  EosAppManagerTransaction *transaction,
+                  const char *bundle_path,
+                  GCancellable *cancellable,
+                  GError **error_out)
+{
+  GError *error = NULL;
+  const char *bundle_hash = eos_app_manager_transaction_get_bundle_hash (transaction);
+  const char *app_id = eos_app_manager_transaction_get_application_id (transaction);
+
+  if (bundle_hash == NULL || *bundle_hash == '\0')
+    {
+      g_set_error (error_out, EOS_APP_LIST_MODEL_ERROR,
+                   EOS_APP_LIST_MODEL_FAILED,
+                   _("Hash for application bundle '%s' could not be retrieved"),
+                   app_id);
+      return NULL;
+    }
+
+  char *sha256_name = g_strconcat (app_id, ".sha256", NULL);
+  char *sha256_path = g_build_filename (BUNDLEDIR, sha256_name, NULL);
+  g_free (sha256_name);
+
+  gchar *contents = g_strconcat (bundle_hash, "\t", bundle_path, "\n", NULL);
+  if (!g_file_set_contents (sha256_path, contents, -1, error))
+    {
+      g_free (contents);
+      g_free (sha256_path);
+      g_propagate_error (error_out, error);
+      return NULL;
+    }
+
+  g_free (contents);
+
+  return sha256_path;
+}
+
+static char *
+download_signature (EosAppListModel *self,
+                    EosAppManagerTransaction *transaction,
+                    GCancellable *cancellable,
+                    GError **error_out)
+{
+  GError *error = NULL;
+  const char *signature_uri = eos_app_manager_transaction_get_signature_uri (transaction);
+  const char *app_id = eos_app_manager_transaction_get_application_id (transaction);
+
+  if (signature_uri == NULL || *signature_uri == '\0')
+    {
+      g_set_error (error_out, EOS_APP_LIST_MODEL_ERROR,
+                   EOS_APP_LIST_MODEL_FAILED,
+                   _("Signature for application bundle '%s' could not be downloaded"),
+                   app_id);
+      return NULL;
+    }
+
+  char *signature_name = g_strconcat (app_id, ".asc", NULL);
+  char *signature_path = g_build_filename (BUNDLEDIR, signature_name, NULL);
+  g_free (signature_name);
+
+  if (!download_file_from_uri (self, app_id,
+                               signature_uri, signature_path,
+                               NULL, NULL,
+                               cancellable, &error))
+    {
+      g_free (signature_path);
+      g_propagate_error (error_out, error);
+      return NULL;
+    }
+
+  return signature_path;
+}
+
+static char *
+download_bundle (EosAppListModel *self,
+                 EosAppManagerTransaction *transaction,
+                 GCancellable *cancellable,
+                 GError **error_out)
+{
+  GError *error = NULL;
+  const char *bundle_uri = eos_app_manager_transaction_get_bundle_uri (transaction);
+  const char *app_id = eos_app_manager_transaction_get_application_id (transaction);
+
+  if (bundle_uri == NULL || *bundle_uri == '\0')
+    {
+      g_set_error (error_out, EOS_APP_LIST_MODEL_ERROR,
+                   EOS_APP_LIST_MODEL_FAILED,
+                   _("Application bundle '%s' could not be downloaded"),
+                   app_id);
+      return NULL;
+    }
+
+  char *bundle_name = g_strconcat (app_id, ".bundle", NULL);
+  char *bundle_path = g_build_filename (BUNDLEDIR, bundle_name, NULL);
+  g_free (bundle_name);
+
+  if (!download_file_from_uri (self, app_id,
+                               bundle_uri, bundle_path,
+                               queue_download_progress, self,
+                               cancellable, &error))
+    {
+      g_free (bundle_path);
+      g_propagate_error (error_out, error);
+      return NULL;
+    }
+
+  return bundle_path;
 }
 
 static gboolean
@@ -975,6 +1095,10 @@ add_app_from_manager (EosAppListModel *self,
       return FALSE;
     }
 
+  char *bundle_path = NULL;
+  char *signature_path = NULL;
+  char *sha256_path = NULL;
+
   EosAppManagerTransaction *transaction =
     eos_app_manager_transaction_proxy_new_sync (self->system_bus,
                                                 G_DBUS_PROXY_FLAGS_NONE,
@@ -982,56 +1106,58 @@ add_app_from_manager (EosAppListModel *self,
                                                 transaction_path,
                                                 cancellable,
                                                 &error);
+
   if (error != NULL)
-    {
-      g_free (transaction_path);
-      g_propagate_error (error_out, error);
-      return FALSE;
-    }
+    goto out;
 
-  const char *bundle_uri = eos_app_manager_transaction_get_bundle_uri (transaction);
+  /* download bundle */
+  bundle_path = download_bundle (self, transaction, cancellable, &error);
+  if (error != NULL)
+    goto out;
 
-  if (bundle_uri == NULL || *bundle_uri == '\0')
-    {
-      g_free (transaction_path);
-      g_object_unref (transaction);
-      g_set_error (error_out, EOS_APP_LIST_MODEL_ERROR,
-                   EOS_APP_LIST_MODEL_ERROR_NO_UPDATE,
-                   _("Application '%s' could not be installed"),
-                   desktop_id);
-      return FALSE;
-    }
+  /* now download signature */
+  signature_path = download_signature (self, transaction, cancellable, &error);
+  if (error != NULL)
+    goto out;
 
-  char *bundle_path = NULL;
+  /* now build sha256sum file */
+  sha256_path = create_sha256sum (self, transaction, bundle_path, cancellable, &error);
+  if (error != NULL)
+    goto out;
 
-  if (!download_bundle_from_uri (self, desktop_id, bundle_uri, &bundle_path, cancellable, &error))
-    {
-      /* cancel the transaction on error */ 
-      eos_app_manager_transaction_call_cancel_transaction_sync (transaction, NULL, NULL);
-
-      g_object_unref (transaction);
-      g_free (transaction_path);
-      g_propagate_error (error_out, error);
-      return FALSE;
-    }
-
-  eos_app_manager_transaction_call_complete_transaction_sync (transaction, bundle_path,
+  eos_app_manager_transaction_call_complete_transaction_sync (transaction,
+                                                              bundle_path,
                                                               &retval,
                                                               cancellable,
                                                               &error);
+  retval = TRUE;
 
-  g_object_unref (transaction);
-  g_free (transaction_path);
-
-  /* delete the downloaded bundle */
-  g_unlink (bundle_path);
-  g_free (bundle_path);
-
+ out:
   if (error != NULL)
     {
       g_propagate_error (error_out, error);
-      return FALSE;
+
+      if (transaction != NULL)
+        /* cancel the transaction on error */
+        eos_app_manager_transaction_call_cancel_transaction_sync (transaction, NULL, NULL);
+
+      retval = FALSE;
     }
+
+  g_clear_object (&transaction);
+  g_free (transaction_path);
+
+  /* delete the downloaded bundle and signature */
+  if (bundle_path)
+    g_unlink (bundle_path);
+  if (signature_path)
+    g_unlink (signature_path);
+  if (sha256_path)
+    g_unlink (sha256_path);
+
+  g_free (bundle_path);
+  g_free (signature_path);
+  g_free (sha256_path);
 
   return retval;
 }
