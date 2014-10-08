@@ -1051,10 +1051,10 @@ download_bundle (EosAppListModel *self,
 }
 
 static gboolean
-add_app_from_manager (EosAppListModel *self,
-                      const char *desktop_id,
-                      GCancellable *cancellable,
-                      GError **error_out)
+add_or_update_app_from_manager (EosAppListModel *self,
+                                const char *desktop_id,
+                                GCancellable *cancellable,
+                                GError **error_out)
 {
   GError *error = NULL;
   gboolean retval = FALSE;
@@ -1235,53 +1235,6 @@ remove_app_from_manager (EosAppListModel *self,
     }
 
   return retval;
-}
-
-static gboolean
-update_app_from_manager (EosAppListModel *self,
-                         const char *desktop_id,
-                         GCancellable *cancellable,
-                         GError **error_out)
-{
-  GError *error = NULL;
-  gboolean retval = FALSE;
-  char *app_id = app_id_from_desktop_id (desktop_id);
-  GVariant *res =
-    g_dbus_connection_call_sync (self->system_bus,
-                                 "com.endlessm.AppManager",
-                                 "/com/endlessm/AppManager",
-                                 "com.endlessm.AppManager", "Install",
-                                 g_variant_new ("(s)", app_id),
-                                 G_VARIANT_TYPE ("(b)"),
-                                 G_DBUS_CALL_FLAGS_NONE,
-                                 G_MAXINT,
-                                 NULL,
-                                 &error);
-  g_free (app_id);
-
-  if (error != NULL)
-    {
-      g_propagate_error (error_out, error);
-      return FALSE;
-    }
-
-  if (res != NULL)
-    {
-      g_variant_get (res, "(b)", &retval);
-      g_variant_unref (res);
-    }
-
-  if (!retval)
-    {
-      g_set_error (error_out, EOS_APP_LIST_MODEL_ERROR,
-                   EOS_APP_LIST_MODEL_ERROR_NO_UPDATE,
-                   _("Application '%s' could not be updated"),
-                   desktop_id);
-
-      return FALSE;
-    }
-
-  return TRUE;
 }
 
 /**
@@ -1503,7 +1456,7 @@ add_app_thread_func (GTask *task,
     {
       if (!desktop_id_is_web_link (desktop_id) &&
           model->can_install &&
-          !add_app_from_manager (model, desktop_id, cancellable, &error))
+          !add_or_update_app_from_manager (model, desktop_id, cancellable, &error))
         {
           g_task_return_error (task, error);
           return;
@@ -1585,7 +1538,7 @@ update_app_thread_func (GTask *task,
   EosAppListModel *model = source_object;
   const gchar *desktop_id = task_data;
 
-  if (!update_app_from_manager (model, desktop_id, cancellable, &error))
+  if (!add_or_update_app_from_manager (model, desktop_id, cancellable, &error))
     {
       g_task_return_error (task, error);
       return;
