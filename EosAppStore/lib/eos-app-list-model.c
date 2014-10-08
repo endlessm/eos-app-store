@@ -75,9 +75,42 @@ app_id_from_desktop_id (const gchar *desktop_id)
 }
 
 static gchar *
-desktop_id_from_app_id (const gchar *app_id)
+get_language_id (void)
 {
-  return g_strconcat (app_id, ".desktop", NULL);
+  const gchar * const * locales;
+  const gchar *locale_name;
+  gchar *lang_id;
+  gchar **variants;
+
+  locales = g_get_language_names ();
+  locale_name = locales[0];
+
+  variants = g_get_locale_variants (locale_name);
+  lang_id = g_strdup_printf ("-%s", variants[g_strv_length (variants) - 1]);
+  g_strfreev (variants);
+
+  return lang_id;
+}
+
+static gchar *
+unlocalized_desktop_id_from_app_id (const gchar *app_id)
+{
+  gchar *lang_id;
+  gchar *unlocalized_app_id;
+  gchar *retval;
+
+  lang_id = get_language_id ();
+  if (g_str_has_suffix (app_id, lang_id))
+    unlocalized_app_id = g_strndup (app_id, strlen (app_id) - strlen (lang_id));
+  else
+    unlocalized_app_id = g_strdup (app_id);
+
+  retval = g_strconcat (unlocalized_app_id, ".desktop", NULL);
+
+  g_free (lang_id);
+  g_free (unlocalized_app_id);
+
+  return retval;
 }
 
 static gchar *
@@ -86,24 +119,16 @@ localized_id_from_desktop_id (const gchar *desktop_id)
   /* HACK: this should really be removed in favor of communicating the
    * language to the app manager API...
    */
-  const gchar * const * locales;
-  const gchar *locale_name;
-  const gchar *lang_id;
-  gchar **variants;
   gchar *localized_id;
   gchar *app_id;
+  gchar *lang_id;
 
-  locales = g_get_language_names ();
-  locale_name = locales[0];
-
-  variants = g_get_locale_variants (locale_name);
-  lang_id = variants[g_strv_length (variants) - 1];
-
+  lang_id = get_language_id ();
   app_id = app_id_from_desktop_id (desktop_id);
-  localized_id = g_strdup_printf ("%s-%s.desktop", app_id, lang_id);
+  localized_id = g_strdup_printf ("%s%s.desktop", app_id, lang_id);
 
   g_free (app_id);
-  g_strfreev (variants);
+  g_free (lang_id);
 
   return localized_id;
 }
@@ -739,7 +764,7 @@ queue_download_progress (const char      *app_id,
   ProgressClosure *clos = g_slice_new (ProgressClosure);
 
   clos->model = g_object_ref (self);
-  clos->desktop_id = desktop_id_from_app_id (app_id);
+  clos->desktop_id = unlocalized_desktop_id_from_app_id (app_id);
   clos->current = current;
   clos->total = total;
 
