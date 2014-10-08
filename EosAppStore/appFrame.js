@@ -169,13 +169,13 @@ const AppListBoxRow = new Lang.Class({
         }
 
         if (current == 0) {
-            this._installProgressLabel.set_text(_("Downloading..."));
+            this._installProgressLabel.set_text(_("Downloading…"));
             this._installProgressBar.fraction = 0.0;
             return;
         }
 
         if (current == total) {
-            this._installProgressBar.set_text(_("Installing..."));
+            this._installProgressLabel.set_text(_("Installing…"));
             this._installProgressBar.fraction = 1.0;
             return;
         }
@@ -332,7 +332,7 @@ const AppListBoxRow = new Lang.Class({
     _installApp: function() {
         this._installButton.hide();
 
-        this._pushTransaction(_("Installing..."), true);
+        this._pushTransaction(_("Installing…"), true);
 
         this._model.install(this._appId, Lang.bind(this, function(error) {
             this._popTransaction();
@@ -379,7 +379,7 @@ const AppListBoxRow = new Lang.Class({
                 // or we add a launcher on the desktop
                 this._installButton.hide();
 
-                this._pushTransaction(_("Installing..."), false);
+                this._pushTransaction(_("Installing…"), false);
 
                 this._model.install(this._appId, Lang.bind(this, function(error) {
                     this._popTransaction();
@@ -412,7 +412,7 @@ const AppListBoxRow = new Lang.Class({
             case EosAppStorePrivate.AppState.UPDATABLE:
                 this._installButton.hide();
 
-                this._pushTransaction(_("Updating..."), true);
+                this._pushTransaction(_("Updating…"), true);
 
                 this._model.updateApp(this._appId, Lang.bind(this, function(error) {
                     this._popTransaction();
@@ -462,7 +462,7 @@ const AppListBoxRow = new Lang.Class({
             this._removeButton.hide();
             this._installButton.hide();
 
-            this._pushTransaction(_("Removing..."), false);
+            this._pushTransaction(_("Removing…"), false);
 
             this._model.uninstall(this._appId, Lang.bind(this, function(error) {
                 this._popTransaction();
