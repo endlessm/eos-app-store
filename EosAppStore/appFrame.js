@@ -492,6 +492,16 @@ const AppListBoxRow = new Lang.Class({
             appWindowVisible = false;
         }
 
+        // notify only if the error is not caused by a user
+        // cancellation
+        if (error &&
+            (error.matches(Gio.io_error_quark(),
+                           Gio.IOErrorEnum.CANCELLED) ||
+             error.matches(EosAppStorePrivate.app_list_model_error_quark(),
+                           EosAppStorePrivate.AppListModelError.CANCELLED))) {
+            return;
+        }
+
         // if the window is not visible, we emit a notification instead
         // of showing a dialog
         if (!appWindowVisible) {
