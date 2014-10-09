@@ -991,12 +991,7 @@ create_sha256sum (EosAppListModel *self,
 
   gchar *contents = g_strconcat (bundle_hash, "\t", bundle_path, "\n", NULL);
   if (!g_file_set_contents (sha256_path, contents, -1, &error))
-    {
-      g_free (contents);
-      g_free (sha256_path);
-      g_propagate_error (error_out, error);
-      return NULL;
-    }
+    g_propagate_error (error_out, error);
 
   g_free (contents);
 
@@ -1031,9 +1026,7 @@ download_signature (EosAppListModel *self,
                                NULL, NULL,
                                cancellable, &error))
     {
-      g_free (signature_path);
       g_propagate_error (error_out, error);
-      return NULL;
     }
 
   return signature_path;
@@ -1067,9 +1060,7 @@ download_bundle (EosAppListModel *self,
                                queue_download_progress, self,
                                cancellable, &error))
     {
-      g_free (bundle_path);
       g_propagate_error (error_out, error);
-      return NULL;
     }
 
   return bundle_path;
@@ -1157,7 +1148,7 @@ add_or_update_app_from_manager (EosAppListModel *self,
                                                               &error);
   retval = TRUE;
 
- out:
+out:
   if (error != NULL)
     {
       g_propagate_error (error_out, error);
