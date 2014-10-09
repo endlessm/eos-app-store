@@ -497,7 +497,7 @@ const AppListBoxRow = new Lang.Class({
         if (error &&
             (error.matches(Gio.io_error_quark(),
                            Gio.IOErrorEnum.CANCELLED) ||
-             error.matches(EosAppStorePrivate.app_list_model_error_quark(),
+             error.matches(EosAppStorePrivate.AppListModel.error_quark(),
                            EosAppStorePrivate.AppListModelError.CANCELLED))) {
             return;
         }
