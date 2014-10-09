@@ -161,6 +161,11 @@ const AppListBoxRow = new Lang.Class({
 
     _updateState: function() {
         this.appState = this._model.getState(this._appId);
+
+        if (this.hasTransactionInProgress) {
+            this._installButton.hide();
+            this._removeButton.hide();
+        }
     },
 
     _downloadProgress: function(model, appid, progress, current, total) {
