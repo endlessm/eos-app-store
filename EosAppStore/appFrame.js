@@ -161,11 +161,6 @@ const AppListBoxRow = new Lang.Class({
 
     _updateState: function() {
         this.appState = this._model.getState(this._appId);
-
-        if (this.hasTransactionInProgress) {
-            this._installButton.hide();
-            this._removeButton.hide();
-        }
     },
 
     _downloadProgress: function(model, appid, progress, current, total) {
@@ -256,6 +251,7 @@ const AppListBoxRow = new Lang.Class({
 
         this._setStyleClassFromState();
 
+        // start from a hidden state
         this._installButton.hide();
         this._removeButton.hide();
 
@@ -300,10 +296,22 @@ const AppListBoxRow = new Lang.Class({
                 log('The state of app "' + this._appId + '" is not known to the app store');
                 break;
         }
+
+        // force buttons to be hidden if there's a transaction
+        // in progress; we still want the various checks above
+        // to happen regardless
+        if (this.hasTransactionInProgress) {
+            this._installButton.hide();
+            this._removeButton.hide();
+        }
     },
 
     _pushTransaction: function(text, showProgressBar) {
         this._transactionInProgress = true;
+
+        // hide install/remove buttons
+        this._installButton.hide();
+        this._removeButton.hide();
 
         // show the box with the progress bar and the label
         this._installProgress.show();
@@ -335,8 +343,6 @@ const AppListBoxRow = new Lang.Class({
     },
 
     _installApp: function() {
-        this._installButton.hide();
-
         this._pushTransaction(_("Installing…"), true);
 
         this._model.install(this._appId, Lang.bind(this, function(error) {
@@ -382,8 +388,6 @@ const AppListBoxRow = new Lang.Class({
                 }
 
                 // or we add a launcher on the desktop
-                this._installButton.hide();
-
                 this._pushTransaction(_("Installing…"), false);
 
                 this._model.install(this._appId, Lang.bind(this, function(error) {
@@ -415,8 +419,6 @@ const AppListBoxRow = new Lang.Class({
 
             // if the application can be updated, we update it
             case EosAppStorePrivate.AppState.UPDATABLE:
-                this._installButton.hide();
-
                 this._pushTransaction(_("Updating…"), true);
 
                 this._model.updateApp(this._appId, Lang.bind(this, function(error) {
@@ -464,9 +466,6 @@ const AppListBoxRow = new Lang.Class({
         this._destroyRemoveDialog();
 
         if (responseId == Gtk.ResponseType.APPLY) {
-            this._removeButton.hide();
-            this._installButton.hide();
-
             this._pushTransaction(_("Removing…"), false);
 
             this._model.uninstall(this._appId, Lang.bind(this, function(error) {
