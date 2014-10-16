@@ -1091,7 +1091,41 @@ add_or_update_app_from_manager (EosAppListModel *self,
 
   if (error != NULL)
     {
-      g_propagate_error (error_out, error);
+      /* errors coming out of DBus are generally obscure and not
+       * useful for users; we log them on the session log, and
+       * report a generic error to the UI
+       */
+      g_warning ("Unable to install '%s': %s", desktop_id, error->message);
+      g_error_free (error);
+
+      /* the app manager may send us specific errors */
+      char *message = NULL;
+      if (g_dbus_error_is_remote_error (error))
+        {
+          char *code = g_dbus_error_get_remote_error (error);
+
+          if (g_strcmp0 (code, "com.endlessm.AppManager.Error.NotAuthorized") == 0)
+            message = _("you must be an administrator to install applications");
+
+          g_free (code);
+        }
+
+      if (message != NULL)
+        {
+          g_set_error (error_out, EOS_APP_LIST_MODEL_ERROR,
+                       EOS_APP_LIST_MODEL_ERROR_NO_UPDATE,
+                       _("Application '%s' could not be installed: %s"),
+                       desktop_id,
+                       message);
+        }
+      else
+        {
+          g_set_error (error_out, EOS_APP_LIST_MODEL_ERROR,
+                       EOS_APP_LIST_MODEL_ERROR_NO_UPDATE,
+                       _("Application '%s' could not be installed"),
+                       desktop_id);
+        }
+
       return FALSE;
     }
 
@@ -1151,11 +1185,33 @@ add_or_update_app_from_manager (EosAppListModel *self,
 out:
   if (error != NULL)
     {
-      g_propagate_error (error_out, error);
+      if (error->domain == EOS_APP_LIST_MODEL_ERROR)
+        {
+          /* propagate only the errors we generate as they are... */
+          g_propagate_error (error_out, error);
+        }
+      else
+        {
+          /* ... otherwise log them in the session, and generate a custom
+           * error for the UI
+           */
+          g_warning ("Unable to complete transaction '%s' for app '%s': %s",
+                     transaction_path,
+                     desktop_id,
+                     error->message);
+          g_error_free (error);
+
+          g_set_error (error_out, EOS_APP_LIST_MODEL_ERROR,
+                       EOS_APP_LIST_MODEL_ERROR_NO_UPDATE,
+                       _("Application '%s' could not be installed"),
+                       desktop_id);
+        }
 
       if (transaction != NULL)
-        /* cancel the transaction on error */
-        eos_app_manager_transaction_call_cancel_transaction_sync (transaction, NULL, NULL);
+        {
+          /* cancel the transaction on error */
+          eos_app_manager_transaction_call_cancel_transaction_sync (transaction, NULL, NULL);
+        }
 
       retval = FALSE;
     }
