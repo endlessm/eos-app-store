@@ -828,10 +828,9 @@ download_file_from_uri (EosAppListModel *self,
   if (uri == NULL)
     {
       g_set_error (error, EOS_APP_LIST_MODEL_ERROR,
-                   EOS_APP_LIST_MODEL_ERROR_NO_UPDATE,
-                   _("Invalid address for downloading '%s': %s"),
-                   app_id,
-                   source_uri);
+                   EOS_APP_LIST_MODEL_ERROR_INVALID_URL,
+                   _("No available bundle for '%s'"),
+                   app_id);
       return FALSE;
     }
 
@@ -883,7 +882,7 @@ download_file_from_uri (EosAppListModel *self,
   if (internal_error != NULL)
     {
       g_set_error (error, EOS_APP_LIST_MODEL_ERROR,
-                   EOS_APP_LIST_MODEL_FAILED,
+                   EOS_APP_LIST_MODEL_ERROR_FAILED,
                    _("Unable to create the file for downloading '%s': %s"),
                    app_id,
                    internal_error->message);
@@ -979,8 +978,8 @@ create_sha256sum (EosAppListModel *self,
   if (bundle_hash == NULL || *bundle_hash == '\0')
     {
       g_set_error (error_out, EOS_APP_LIST_MODEL_ERROR,
-                   EOS_APP_LIST_MODEL_FAILED,
-                   _("Hash for application bundle '%s' could not be retrieved"),
+                   EOS_APP_LIST_MODEL_ERROR_INVALID_URL,
+                   _("No verification available for app '%s'"),
                    app_id);
       return NULL;
     }
@@ -1011,8 +1010,8 @@ download_signature (EosAppListModel *self,
   if (signature_uri == NULL || *signature_uri == '\0')
     {
       g_set_error (error_out, EOS_APP_LIST_MODEL_ERROR,
-                   EOS_APP_LIST_MODEL_FAILED,
-                   _("Signature for application bundle '%s' could not be downloaded"),
+                   EOS_APP_LIST_MODEL_ERROR_INVALID_URL,
+                   _("No signature available for app '%s'")
                    app_id);
       return NULL;
     }
@@ -1045,7 +1044,7 @@ download_bundle (EosAppListModel *self,
   if (bundle_uri == NULL || *bundle_uri == '\0')
     {
       g_set_error (error_out, EOS_APP_LIST_MODEL_ERROR,
-                   EOS_APP_LIST_MODEL_FAILED,
+                   EOS_APP_LIST_MODEL_ERROR_FAILED,
                    _("Application bundle '%s' could not be downloaded"),
                    app_id);
       return NULL;
@@ -1105,7 +1104,7 @@ add_or_update_app_from_manager (EosAppListModel *self,
           char *code = g_dbus_error_get_remote_error (error);
 
           if (g_strcmp0 (code, "com.endlessm.AppManager.Error.NotAuthorized") == 0)
-            message = _("you must be an administrator to install applications");
+            message = _("You must be an administrator to install applications");
 
           g_free (code);
         }
@@ -1113,15 +1112,15 @@ add_or_update_app_from_manager (EosAppListModel *self,
       if (message != NULL)
         {
           g_set_error (error_out, EOS_APP_LIST_MODEL_ERROR,
-                       EOS_APP_LIST_MODEL_ERROR_NO_UPDATE,
-                       _("Application '%s' could not be installed: %s"),
+                       EOS_APP_LIST_MODEL_ERROR_INSTALL_FAILED,
+                       _("Application '%s' could not be installed. %s"),
                        desktop_id,
                        message);
         }
       else
         {
           g_set_error (error_out, EOS_APP_LIST_MODEL_ERROR,
-                       EOS_APP_LIST_MODEL_ERROR_NO_UPDATE,
+                       EOS_APP_LIST_MODEL_ERROR_INSTALL_FAILED,
                        _("Application '%s' could not be installed"),
                        desktop_id);
         }
@@ -1138,7 +1137,7 @@ add_or_update_app_from_manager (EosAppListModel *self,
   if (transaction_path == NULL || *transaction_path == '\0')
     {
       g_set_error (error_out, EOS_APP_LIST_MODEL_ERROR,
-                   EOS_APP_LIST_MODEL_ERROR_NO_UPDATE,
+                   EOS_APP_LIST_MODEL_ERROR_INSTALL_FAILED,
                    _("Application '%s' could not be installed"),
                    desktop_id);
 
@@ -1202,7 +1201,7 @@ out:
           g_error_free (error);
 
           g_set_error (error_out, EOS_APP_LIST_MODEL_ERROR,
-                       EOS_APP_LIST_MODEL_ERROR_NO_UPDATE,
+                       EOS_APP_LIST_MODEL_ERROR_INSTALL_FAILED,
                        _("Application '%s' could not be installed"),
                        desktop_id);
         }
@@ -1255,7 +1254,15 @@ remove_app_from_shell (EosAppListModel *self,
 
   if (error != NULL)
     {
-      g_propagate_error (error_out, error);
+      g_warning ("Unable to remove application '%s': %s",
+                 desktop_id, error->message);
+      g_error_free (error);
+
+      g_set_error (error_out, EOS_APP_LIST_MODEL_ERROR,
+                   EOS_APP_LIST_MODEL_ERROR_FAILED,
+                   _("Removing '%s' from the desktop failed"),
+                   desktop_id);
+
       return FALSE;
     }
 
@@ -1286,7 +1293,38 @@ remove_app_from_manager (EosAppListModel *self,
 
   if (error != NULL)
     {
-      g_propagate_error (error_out, error);
+      g_warning ("Unable to uninstall application '%s': %s",
+                 desktop_id, error->message);
+      g_error_free (error);
+
+      /* the app manager may send us specific errors */
+      char *message = NULL;
+      if (g_dbus_error_is_remote_error (error))
+        {
+          char *code = g_dbus_error_get_remote_error (error);
+
+          if (g_strcmp0 (code, "com.endlessm.AppManager.Error.NotAuthorized") == 0)
+            message = _("You must be an administrator to remove applications");
+
+          g_free (code);
+        }
+
+      if (message != NULL)
+        {
+          g_set_error (error_out, EOS_APP_LIST_MODEL_ERROR,
+                       EOS_APP_LIST_MODEL_ERROR_UNINSTALL_FAILED,
+                       _("Application '%s' could not be uninstalled. %s"),
+                       desktop_id,
+                       message);
+        }
+      else
+        {
+          g_set_error (error_out, EOS_APP_LIST_MODEL_ERROR,
+                       EOS_APP_LIST_MODEL_ERROR_UNINSTALL_FAILED,
+                       _("Application '%s' could not be uninstalled"),
+                       desktop_id);
+        }
+
       return FALSE;
     }
 
@@ -1299,7 +1337,7 @@ remove_app_from_manager (EosAppListModel *self,
   if (!retval)
     {
       g_set_error (error_out, EOS_APP_LIST_MODEL_ERROR,
-                   EOS_APP_LIST_MODEL_ERROR_NO_UPDATE,
+                   EOS_APP_LIST_MODEL_ERROR_UNINSTALL_FAILED,
                    _("Application '%s' could not be removed"),
                    desktop_id);
 
@@ -1568,7 +1606,7 @@ eos_app_list_model_install_app_async (EosAppListModel *model,
     {
       g_task_return_new_error (task,
                                eos_app_list_model_error_quark (),
-                               EOS_APP_LIST_MODEL_FAILED,
+                               EOS_APP_LIST_MODEL_ERROR_FAILED,
                                _("App %s not installable"),
                                desktop_id);
       g_object_unref (task);
@@ -1637,7 +1675,7 @@ eos_app_list_model_update_app_async (EosAppListModel *model,
     {
       g_task_return_new_error (task,
                                eos_app_list_model_error_quark (),
-                               EOS_APP_LIST_MODEL_FAILED,
+                               EOS_APP_LIST_MODEL_ERROR_FAILED,
                                _("App %s not installable"),
                                desktop_id);
       g_object_unref (task);
@@ -1648,7 +1686,7 @@ eos_app_list_model_update_app_async (EosAppListModel *model,
     {
       g_task_return_new_error (task,
                                eos_app_list_model_error_quark (),
-                               EOS_APP_LIST_MODEL_ERROR_NO_UPDATE,
+                               EOS_APP_LIST_MODEL_ERROR_NO_UPDATE_AVAILABLE,
                                _("App %s is up to date"),
                                desktop_id);
       g_object_unref (task);
