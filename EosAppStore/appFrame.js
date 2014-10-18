@@ -226,23 +226,55 @@ const AppListBoxRow = new Lang.Class({
     },
 
     _setStyleClassFromState: function() {
-        let classes = [ { state: EosAppStorePrivate.AppState.UNINSTALLED,
-                          style: 'install' },
-                        { state: EosAppStorePrivate.AppState.UPDATABLE,
-                          style: 'update' } ];
+        const INSTALL = 0;
+        const UPDATE = 1;
+        const ADD = 2;
+        const LAUNCH = 3;
+        let style = INSTALL;
+
+        switch (this._appState) {
+            case EosAppStorePrivate.AppState.INSTALLED:
+                if (this._model.hasLauncher(this._appId)) {
+                    style = LAUNCH;
+                }
+                else {
+                    style = ADD;
+                }
+                break;
+
+            case EosAppStorePrivate.AppState.UNINSTALLED:
+                style = INSTALL;
+                break;
+
+            case EosAppStorePrivate.AppState.UPDATABLE:
+                if (this._model.hasLauncher(this._appId)) {
+                    style = UPDATE;
+                }
+                else {
+                    style = ADD;
+                }
+                break;
+        }
 
         let context = this._installButton.get_style_context();
 
-        for (let idx in classes) {
-            let obj = classes[idx];
-            let state = obj.state;
-            let styleClass = obj.style;
+        switch (style) {
+            case INSTALL:
+            case ADD:
+                // Use the default install class for either of these
+                context.remove_class('update');
+                context.remove_class('launch');
+                break;
 
-            if (state == this._appState) {
-                context.add_class(styleClass);
-            } else {
-                context.remove_class(styleClass);
-            }
+            case UPDATE:
+                context.remove_class('launch');
+                context.add_class('update');
+                break;
+
+            case LAUNCH:
+                context.remove_class('update');
+                context.add_class('launch');
+                break;
         }
     },
 
