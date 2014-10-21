@@ -1011,7 +1011,7 @@ download_signature (EosAppListModel *self,
     {
       g_set_error (error_out, EOS_APP_LIST_MODEL_ERROR,
                    EOS_APP_LIST_MODEL_ERROR_INVALID_URL,
-                   _("No signature available for app '%s'")
+                   _("No signature available for app '%s'"),
                    app_id);
       return NULL;
     }
