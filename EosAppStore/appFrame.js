@@ -264,11 +264,11 @@ const AppListBoxRow = new Lang.Class({
             case EosAppStorePrivate.AppState.INSTALLED:
                 // wait for the message to hide
                 if (!this._installedMessage.visible) {
-                    if (!this._model.hasLauncher(this._appId)) {
-                        this._installButtonLabel.set_text(BUTTON_LABEL_ADD);
+                    if (this._model.hasLauncher(this._appId)) {
+                        this._installButtonLabel.set_text(BUTTON_LABEL_LAUNCH);
                     }
                     else {
-                        this._installButtonLabel.set_text(BUTTON_LABEL_LAUNCH);
+                        this._installButtonLabel.set_text(BUTTON_LABEL_ADD);
                     }
 
                     this._installButton.show();
