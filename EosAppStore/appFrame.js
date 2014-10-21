@@ -255,15 +255,20 @@ const AppListBoxRow = new Lang.Class({
         this._installButton.hide();
         this._removeButton.hide();
 
+        const BUTTON_LABEL_INSTALL = _("Install app");
+        const BUTTON_LABEL_UPDATE = _("Update app");
+        const BUTTON_LABEL_LAUNCH = _("Open app");
+        const BUTTON_LABEL_ADD = _("Add to the desktop");
+
         switch (this._appState) {
             case EosAppStorePrivate.AppState.INSTALLED:
                 // wait for the message to hide
                 if (!this._installedMessage.visible) {
                     if (!this._model.hasLauncher(this._appId)) {
-                        this._installButtonLabel.set_text(_("Add to the desktop"));
+                        this._installButtonLabel.set_text(BUTTON_LABEL_ADD);
                     }
                     else {
-                        this._installButtonLabel.set_text(_("Open app"));
+                        this._installButtonLabel.set_text(BUTTON_LABEL_LAUNCH);
                     }
 
                     this._installButton.show();
@@ -275,16 +280,16 @@ const AppListBoxRow = new Lang.Class({
                 break;
 
             case EosAppStorePrivate.AppState.UNINSTALLED:
-                this._installButtonLabel.set_text(_("Install app"));
+                this._installButtonLabel.set_text(BUTTON_LABEL_INSTALL);
                 this._installButton.show();
                 break;
 
             case EosAppStorePrivate.AppState.UPDATABLE:
                 if (this._model.hasLauncher(this._appId)) {
-                    this._installButtonLabel.set_text(_("Update app"));
+                    this._installButtonLabel.set_text(BUTTON_LABEL_UPDATE);
                 }
                 else {
-                    this._installButtonLabel.set_text(_("Install app"));
+                    this._installButtonLabel.set_text(BUTTON_LABEL_INSTALL);
                     // like the .INSTALLED case, we only show the 'delete app'
                     // button if the app does not have a launcher on the desktop
                     this._removeButton.show();
