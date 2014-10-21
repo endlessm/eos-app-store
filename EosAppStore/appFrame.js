@@ -388,13 +388,7 @@ const AppListBoxRow = new Lang.Class({
                 this._maybeNotify(_("We could not update '%s'").format(this.appTitle), error);
             }
             else {
-                // if not in the desktop, install it
-                if (!this._model.hasLauncher(this._appId)) {
-                    this._installApp();
-                }
-                else {
                     this._maybeNotify(_("'%s' was updated successfully").format(this.appTitle));
-                }
             }
         }));
     },
