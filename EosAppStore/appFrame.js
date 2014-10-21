@@ -289,7 +289,7 @@ const AppListBoxRow = new Lang.Class({
                     this._installButtonLabel.set_text(BUTTON_LABEL_UPDATE);
                 }
                 else {
-                    this._installButtonLabel.set_text(BUTTON_LABEL_INSTALL);
+                    this._installButtonLabel.set_text(BUTTON_LABEL_ADD);
                     // like the .INSTALLED case, we only show the 'delete app'
                     // button if the app does not have a launcher on the desktop
                     this._removeButton.show();
@@ -451,9 +451,16 @@ const AppListBoxRow = new Lang.Class({
                 this._installApp();
                 break;
 
-            // if the application can be updated, we update it
+            // if the application can be updated, we have two options
             case EosAppStorePrivate.AppState.UPDATABLE:
-                this._updateApp();
+                // we update it, if we have a launcher on the desktop
+                if (this._model.hasLauncher(this._appId)) {
+                    this._updateApp();
+                }
+                // or we add a launcher on the desktop
+                else {
+                    this._addToDesktop();
+                }
                 break;
         }
     },
