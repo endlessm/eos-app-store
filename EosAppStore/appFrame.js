@@ -377,44 +377,73 @@ const AppListBoxRow = new Lang.Class({
         }));
     },
 
+    _updateApp: function() {
+        this._pushTransaction(_("Updating…"), true);
+
+        this._model.updateApp(this._appId, Lang.bind(this, function(error) {
+            this._popTransaction();
+            this._updateState();
+
+            if (error) {
+                this._maybeNotify(_("We could not update '%s'").format(this.appTitle), error);
+            }
+            else {
+                // if not in the desktop, install it
+                if (!this._model.hasLauncher(this._appId)) {
+                    this._installApp();
+                }
+                else {
+                    this._maybeNotify(_("'%s' was updated successfully").format(this.appTitle));
+                }
+            }
+        }));
+    },
+
+    _launchApp: function() {
+        try {
+            this._model.launch(this._appId);
+        } catch (e) {
+            log("Failed to launch app '" + this._appId + "': " + e.message);
+        }
+    },
+
+    _addToDesktop: function() {
+        this._pushTransaction(_("Installing…"), false);
+
+        this._model.install(this._appId, Lang.bind(this, function(error) {
+            this._popTransaction();
+            this._updateState();
+
+            if (error) {
+                this._maybeNotify(_("We could not install '%s'").format(this.appTitle), error);
+            }
+            else {
+                this._maybeNotify(_("'%s' was installed successfully").format(this.appTitle));
+
+                Mainloop.timeout_add_seconds(SHOW_DESKTOP_ICON_DELAY,
+                                             Lang.bind(this, function() {
+                    let appWindow = Gio.Application.get_default().mainWindow;
+                    if (appWindow && appWindow.is_visible()) {
+                        appWindow.hide();
+                    }
+                    return false;
+                }));
+            }
+        }));
+    },
+
     _onInstallButtonClicked: function() {
         switch (this._appState) {
             // if the application is installed, we have two options
             case EosAppStorePrivate.AppState.INSTALLED:
                 // we launch it, if we have a launcher on the desktop
                 if (this._model.hasLauncher(this._appId)) {
-                    try {
-                        this._model.launch(this._appId);
-                    } catch (e) {
-                        log("Failed to launch app '" + this._appId + "': " + e.message);
-                    }
-
-                    return;
+                    this._launchApp();
                 }
-
                 // or we add a launcher on the desktop
-                this._pushTransaction(_("Installing…"), false);
-
-                this._model.install(this._appId, Lang.bind(this, function(error) {
-                    this._popTransaction();
-                    this._updateState();
-
-                    if (error) {
-                        this._maybeNotify(_("We could not install '%s'").format(this.appTitle), error);
-                    }
-                    else {
-                        this._maybeNotify(_("'%s' was installed successfully").format(this.appTitle));
-
-                        Mainloop.timeout_add_seconds(SHOW_DESKTOP_ICON_DELAY,
-                                                     Lang.bind(this, function() {
-                            let appWindow = Gio.Application.get_default().mainWindow;
-                            if (appWindow && appWindow.is_visible()) {
-                                appWindow.hide();
-                            }
-                            return false;
-                        }));
-                    }
-                }));
+                else {
+                    this._addToDesktop();
+                }
                 break;
 
             // if the application is uninstalled, we install it
@@ -424,25 +453,7 @@ const AppListBoxRow = new Lang.Class({
 
             // if the application can be updated, we update it
             case EosAppStorePrivate.AppState.UPDATABLE:
-                this._pushTransaction(_("Updating…"), true);
-
-                this._model.updateApp(this._appId, Lang.bind(this, function(error) {
-                    this._popTransaction();
-                    this._updateState();
-
-                    if (error) {
-                        this._maybeNotify(_("We could not update '%s'").format(this.appTitle), error);
-                    }
-                    else {
-                        // if not in the desktop, install it
-                        if (!this._model.hasLauncher(this._appId)) {
-                            this._installApp();
-                        }
-                        else {
-                            this._maybeNotify(_("'%s' was updated successfully").format(this.appTitle));
-                        }
-                    }
-                }));
+                this._updateApp();
                 break;
         }
     },
