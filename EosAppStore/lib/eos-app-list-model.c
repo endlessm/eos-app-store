@@ -1095,7 +1095,6 @@ add_or_update_app_from_manager (EosAppListModel *self,
        * report a generic error to the UI
        */
       g_warning ("Unable to install '%s': %s", desktop_id, error->message);
-      g_error_free (error);
 
       /* the app manager may send us specific errors */
       char *message = NULL;
@@ -1124,6 +1123,8 @@ add_or_update_app_from_manager (EosAppListModel *self,
                        _("Application '%s' could not be installed"),
                        desktop_id);
         }
+
+      g_error_free (error);
 
       return FALSE;
     }
@@ -1295,7 +1296,6 @@ remove_app_from_manager (EosAppListModel *self,
     {
       g_warning ("Unable to uninstall application '%s': %s",
                  desktop_id, error->message);
-      g_error_free (error);
 
       /* the app manager may send us specific errors */
       char *message = NULL;
@@ -1324,6 +1324,8 @@ remove_app_from_manager (EosAppListModel *self,
                        _("Application '%s' could not be uninstalled"),
                        desktop_id);
         }
+
+      g_error_free (error);
 
       return FALSE;
     }
