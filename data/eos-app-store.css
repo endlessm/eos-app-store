@@ -325,6 +325,18 @@
     background-image: url("btn_update_pressed_icon.png");
 }
 
+.app-frame .state-button.launch .state-image {
+    background-image: url("btn_launch_normal_icon.png");
+}
+
+.app-frame .state-button.launch .state-image:hover {
+    background-image: url("btn_launch_hover_icon.png");
+}
+
+.app-frame .state-button.launch .state-image:active {
+    background-image: url("btn_launch_pressed_icon.png");
+}
+
 .app-frame .state-button.cancel {
     background-image: url("btn_remove_normal_middle.png");
     border-image-source: url("btn_remove_normal_border.png");
