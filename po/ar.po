@@ -9,7 +9,7 @@ msgstr ""
 "Project-Id-Version: eos-app-store\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2014-10-09 09:53-0700\n"
-"PO-Revision-Date: 2014-10-09 16:46+0000\n"
+"PO-Revision-Date: 2014-10-22 12:24+0000\n"
 "Last-Translator: Roddy Shuler <roddy@endlessm.com>\n"
 "Language-Team: Arabic (http://www.transifex.com/projects/p/eos-app-store/language/ar/)\n"
 "MIME-Version: 1.0\n"
@@ -49,7 +49,7 @@ msgstr "مثال: http://www.globoesporte.com"
 
 #: ../EosAppStore/appFrame.js:177
 msgid "Downloading…"
-msgstr ""
+msgstr "جاري التنزيل..."
 
 #: ../EosAppStore/appFrame.js:183 ../EosAppStore/appFrame.js:340
 #: ../EosAppStore/appFrame.js:387
@@ -226,37 +226,37 @@ msgstr "تثبيت المواقع"
 #: ../EosAppStore/lib/eos-app-list-model.c:804
 #, c-format
 msgid "Not enough space on device for downloading app"
-msgstr ""
+msgstr "لا توجد مساحة كافية على الجهاز لتنزيل التطبيق"
 
 #: ../EosAppStore/lib/eos-app-list-model.c:832
 #, c-format
 msgid "Invalid address for downloading '%s': %s"
-msgstr ""
+msgstr "عنوان غير صالح لتنزيل '%s': %s"
 
 #: ../EosAppStore/lib/eos-app-list-model.c:887
 #, c-format
 msgid "Unable to create the file for downloading '%s': %s"
-msgstr ""
+msgstr "غير قادر على إنشاء الملف اللازم لتنزيل '%s': %s"
 
 #: ../EosAppStore/lib/eos-app-list-model.c:937
 #, c-format
 msgid "Download of app '%s' cancelled by the user."
-msgstr ""
+msgstr "ألغى المستخدم تنزيل تطبيق '%s' ."
 
 #: ../EosAppStore/lib/eos-app-list-model.c:983
 #, c-format
 msgid "Hash for application bundle '%s' could not be retrieved"
-msgstr ""
+msgstr "تعذر استرجاع هاش حزمة تطبيق '%s'"
 
 #: ../EosAppStore/lib/eos-app-list-model.c:1015
 #, c-format
 msgid "Signature for application bundle '%s' could not be downloaded"
-msgstr ""
+msgstr "تَعَذَر تنزيل توقيع حزمة التطبيق '%s' "
 
 #: ../EosAppStore/lib/eos-app-list-model.c:1049
 #, c-format
 msgid "Application bundle '%s' could not be downloaded"
-msgstr ""
+msgstr "تعذر تنزيل حزمة التطبيق '%s'"
 
 #: ../EosAppStore/lib/eos-app-list-model.c:1108
 #, c-format
