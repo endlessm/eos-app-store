@@ -380,7 +380,7 @@ const AppListBoxRow = new Lang.Class({
     },
 
     _installApp: function() {
-        this._pushTransaction(_("Installing…"), true);
+        this._pushTransaction(_("Downloading…"), true);
 
         this._model.install(this._appId, Lang.bind(this, function(error) {
             this._popTransaction();
