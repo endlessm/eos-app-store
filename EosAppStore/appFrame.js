@@ -60,6 +60,7 @@ const AppListBoxRow = new Lang.Class({
         '_contentBox',
         '_descriptionText',
         '_installButton',
+        '_installButtonImage',
         '_installButtonLabel',
         '_installProgress',
         '_installProgressLabel',
@@ -106,6 +107,8 @@ const AppListBoxRow = new Lang.Class({
         this._removeDialog = null;
         this._windowHideId = mainWindow.connect('hide', Lang.bind(this, this._destroyPendingDialogs));
         this.connect('destroy', Lang.bind(this, this._onDestroy));
+
+        this._installButton.connect('state-flags-changed', Lang.bind(this, this._onInstallButtonStateChanged));
 
         let separator = new Separator.FrameSeparator();
         this._mainBox.add(separator);
@@ -223,6 +226,14 @@ const AppListBoxRow = new Lang.Class({
     _onPreviewPress: function(widget, event) {
         EosAppStorePrivate.app_load_screenshot(this._screenshotImage, widget.path, this._screenshotLarge);
         return false;
+    },
+
+    _onInstallButtonStateChanged: function() {
+        // We use the background-image of a GtkFrame to set the image,
+        // and we need to forward the state flags to it, since GtkFrame
+        // can't track hover/active alone
+        let stateFlags = this._installButton.get_state_flags();
+        this._installButtonImage.set_state_flags(stateFlags, true);
     },
 
     _setStyleClassFromState: function() {
