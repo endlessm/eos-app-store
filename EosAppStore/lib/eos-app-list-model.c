@@ -493,22 +493,16 @@ load_manager_installed_apps (EosAppListModel *self)
 }
 
 static void
-load_shell_apps (EosAppListModel *self)
+on_shell_apps_loaded (GObject *source,
+                      GAsyncResult *result,
+                      gpointer user_data)
 {
+  EosAppListModel *self = user_data;
   GVariant *applications;
   GError *error = NULL;
 
-  applications =
-    g_dbus_connection_call_sync (self->session_bus,
-                                 "org.gnome.Shell",
-                                 "/org/gnome/Shell",
-                                 "org.gnome.Shell.AppStore",
-                                 "ListApplications",
-                                 NULL, NULL,
-                                 G_DBUS_CALL_FLAGS_NONE,
-                                 -1,
-                                 self->load_cancellable,
-                                 &error);
+  applications = g_dbus_connection_call_finish (G_DBUS_CONNECTION (source),
+                                                result, &error);
 
   if (error != NULL)
     {
@@ -518,10 +512,27 @@ load_shell_apps (EosAppListModel *self)
       return;
     }
 
+
   self->shell_apps = load_shell_apps_from_gvariant (applications);
   g_variant_unref (applications);
 
   g_signal_emit (self, eos_app_list_model_signals[CHANGED], 0);
+}
+
+static void
+load_shell_apps (EosAppListModel *self)
+{
+  g_dbus_connection_call (self->session_bus,
+                          "org.gnome.Shell",
+                          "/org/gnome/Shell",
+                          "org.gnome.Shell.AppStore",
+                          "ListApplications",
+                          NULL, NULL,
+                          G_DBUS_CALL_FLAGS_NONE,
+                          -1,
+                          self->load_cancellable,
+                          on_shell_apps_loaded,
+                          self);
 }
 
 static void
