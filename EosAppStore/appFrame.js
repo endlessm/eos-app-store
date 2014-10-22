@@ -358,6 +358,7 @@ const AppListBoxRow = new Lang.Class({
 
         // conditionally show the progress bar and cancel button
         if (showProgressBar) {
+            this._installProgressBar.fraction = 0.0;
             this._installProgressBar.show();
             this._installProgressCancel.show();
         }
