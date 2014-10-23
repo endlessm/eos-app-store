@@ -1,7 +1,7 @@
 # SOME DESCRIPTIVE TITLE.
 # Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
 # This file is distributed under the same license as the PACKAGE package.
-#
+# 
 # Translators:
 # Roddy Shuler <roddy@endlessm.com>, 2014
 msgid ""
@@ -9,21 +9,18 @@ msgstr ""
 "Project-Id-Version: eos-app-store\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2014-10-23 08:40-0700\n"
-"PO-Revision-Date: 2014-10-22 23:46+0000\n"
+"PO-Revision-Date: 2014-10-23 15:42+0000\n"
 "Last-Translator: Roddy Shuler <roddy@endlessm.com>\n"
-"Language-Team: French (http://www.transifex.com/projects/p/eos-app-store/"
-"language/fr/)\n"
-"Language: fr\n"
+"Language-Team: French (http://www.transifex.com/projects/p/eos-app-store/language/fr/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+"Language: fr\n"
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
 
 #: ../data/eos-app-store-folder-frame.ui.h:1
 msgid "Create your own folder to organize your apps. First, choose an icon."
-msgstr ""
-"Créez votre propre dossier pour organiser vos applications. D'abord, "
-"choisissez une icône."
+msgstr "Créez votre propre dossier pour organiser vos applications. D'abord, choisissez une icône."
 
 #: ../data/eos-app-store-list-row.ui.h:1 ../EosAppStore/appFrame.js:301
 msgid "Install app"
@@ -102,10 +99,7 @@ msgstr "Suppression de l'application"
 msgid ""
 "Deleting this app will remove it from the device for all users. You will "
 "need to download it from the internet in order to reinstall it."
-msgstr ""
-"La suppression de cette application l'éliminera du système pour tous les "
-"utilisateurs. Vous devrez la télécharger à partir d'internet pour la "
-"réinstaller."
+msgstr "La suppression de cette application l'éliminera du système pour tous les utilisateurs. Vous devrez la télécharger à partir d'internet pour la réinstaller."
 
 #: ../EosAppStore/appFrame.js:519
 msgid "Delete app"
@@ -200,9 +194,7 @@ msgstr "Installer les dossiers"
 
 #: ../EosAppStore/weblinkFrame.js:262
 msgid "Write the website you'd like to add here and press “Enter”"
-msgstr ""
-"Écrivez le site internet que vous aimeriez ajouter ici et appuyer sur "
-"«Entrée»"
+msgstr "Écrivez le site internet que vous aimeriez ajouter ici et appuyer sur «Entrée»"
 
 #: ../EosAppStore/weblinkFrame.js:328
 msgid "e.g.: http://www.prensalibre.com.gt"
@@ -222,11 +214,9 @@ msgstr "Ajouté avec succès !"
 
 #: ../EosAppStore/weblinkFrame.js:588
 msgid ""
-"Add your favorite websites to your desktop or choose suggested ones from our "
-"list."
-msgstr ""
-"Ajouter vos sites internet préférés à votre bureau ou choisissez parmi les "
-"suggestions de notre liste. "
+"Add your favorite websites to your desktop or choose suggested ones from our"
+" list."
+msgstr "Ajouter vos sites internet préférés à votre bureau ou choisissez parmi les suggestions de notre liste. "
 
 #: ../EosAppStore/weblinkFrame.js:774
 msgid "Install websites"
@@ -250,8 +240,7 @@ msgstr "Impossible de créer le fichier pour télécharger « %s » : %s"
 #: ../EosAppStore/lib/eos-app-list-model.c:947
 #, c-format
 msgid "Download of app '%s' cancelled by the user."
-msgstr ""
-"Le téléchargement de l'application « %s » a été annulé par l'utilisateur."
+msgstr "Le téléchargement de l'application « %s » a été annulé par l'utilisateur."
 
 #: ../EosAppStore/lib/eos-app-list-model.c:993
 #, c-format
@@ -273,9 +262,9 @@ msgid "You must be an administrator to install applications"
 msgstr ""
 
 #: ../EosAppStore/lib/eos-app-list-model.c:1126
-#, fuzzy, c-format
+#, c-format
 msgid "Application '%s' could not be installed. %s"
-msgstr "L'application « %s » n'a pas pu être installée"
+msgstr ""
 
 #: ../EosAppStore/lib/eos-app-list-model.c:1134
 #: ../EosAppStore/lib/eos-app-list-model.c:1153
@@ -294,14 +283,14 @@ msgid "You must be an administrator to remove applications"
 msgstr ""
 
 #: ../EosAppStore/lib/eos-app-list-model.c:1327
-#, fuzzy, c-format
+#, c-format
 msgid "Application '%s' could not be uninstalled. %s"
-msgstr "L'application « %s » n'a pas pu être installée"
+msgstr ""
 
 #: ../EosAppStore/lib/eos-app-list-model.c:1335
-#, fuzzy, c-format
+#, c-format
 msgid "Application '%s' could not be uninstalled"
-msgstr "L'application « %s » n'a pas pu être installée"
+msgstr ""
 
 #: ../EosAppStore/lib/eos-app-list-model.c:1354
 #, c-format
@@ -329,13 +318,3 @@ msgstr "« %s » de l'application est mis à jour"
 #, c-format
 msgid "App %s is not installed"
 msgstr "« %s » de l'application n'est pas installé"
-
-#~ msgid "Invalid address for downloading '%s': %s"
-#~ msgstr "Adresse invalide pour télécharger « %s » : %s"
-
-#~ msgid "Hash for application bundle '%s' could not be retrieved"
-#~ msgstr "Le hash du lot d'application « %s » n'a pas pu être récupéré"
-
-#~ msgid "Signature for application bundle '%s' could not be downloaded"
-#~ msgstr ""
-#~ "La signature pour le lot d'applications « %s » n'a pas pu être téléchargée"
