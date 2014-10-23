@@ -1,33 +1,34 @@
 # SOME DESCRIPTIVE TITLE.
 # Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
 # This file is distributed under the same license as the PACKAGE package.
-# 
+#
 # Translators:
 # Roddy Shuler <roddy@endlessm.com>, 2014
 msgid ""
 msgstr ""
 "Project-Id-Version: eos-app-store\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-10-09 09:53-0700\n"
+"POT-Creation-Date: 2014-10-23 08:40-0700\n"
 "PO-Revision-Date: 2014-10-22 12:24+0000\n"
 "Last-Translator: Roddy Shuler <roddy@endlessm.com>\n"
-"Language-Team: Arabic (http://www.transifex.com/projects/p/eos-app-store/language/ar/)\n"
+"Language-Team: Arabic (http://www.transifex.com/projects/p/eos-app-store/"
+"language/ar/)\n"
+"Language: ar\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Language: ar\n"
-"Plural-Forms: nplurals=6; plural=n==0 ? 0 : n==1 ? 1 : n==2 ? 2 : n%100>=3 && n%100<=10 ? 3 : n%100>=11 && n%100<=99 ? 4 : 5;\n"
+"Plural-Forms: nplurals=6; plural=n==0 ? 0 : n==1 ? 1 : n==2 ? 2 : n%100>=3 "
+"&& n%100<=10 ? 3 : n%100>=11 && n%100<=99 ? 4 : 5;\n"
 
 #: ../data/eos-app-store-folder-frame.ui.h:1
 msgid "Create your own folder to organize your apps. First, choose an icon."
 msgstr "قم بإنشاء مجلد خاص بك لتنظيم تطبيقاتك. اختر رمزا أولا."
 
-#: ../data/eos-app-store-list-row.ui.h:1 ../EosAppStore/appFrame.js:282
-#: ../EosAppStore/appFrame.js:291
+#: ../data/eos-app-store-list-row.ui.h:1 ../EosAppStore/appFrame.js:301
 msgid "Install app"
 msgstr "تثبيت التطبيق"
 
-#: ../data/eos-app-store-list-row.ui.h:2 ../EosAppStore/appFrame.js:459
+#: ../data/eos-app-store-list-row.ui.h:2 ../EosAppStore/appFrame.js:521
 msgid "Cancel"
 msgstr "إلغاء"
 
@@ -47,84 +48,86 @@ msgstr "احذف من الجهاز"
 msgid "e.g.: http://www.globoesporte.com"
 msgstr "مثال: http://www.globoesporte.com"
 
-#: ../EosAppStore/appFrame.js:177
+#: ../EosAppStore/appFrame.js:175
 msgid "Downloading…"
 msgstr "جاري التنزيل..."
 
-#: ../EosAppStore/appFrame.js:183 ../EosAppStore/appFrame.js:340
-#: ../EosAppStore/appFrame.js:387
+#: ../EosAppStore/appFrame.js:181 ../EosAppStore/appFrame.js:394
+#: ../EosAppStore/appFrame.js:448
 msgid "Installing…"
 msgstr "جاري التثبيت…"
 
-#: ../EosAppStore/appFrame.js:267
-msgid "Add to the desktop"
-msgstr "إضافة إلى سطح المكتب "
-
-#: ../EosAppStore/appFrame.js:270
-msgid "Open app"
-msgstr "فتح التطبيق"
-
-#: ../EosAppStore/appFrame.js:288
+#: ../EosAppStore/appFrame.js:302
 msgid "Update app"
 msgstr "تحديث التطبيق"
 
-#: ../EosAppStore/appFrame.js:346 ../EosAppStore/appFrame.js:394
+#: ../EosAppStore/appFrame.js:303
+msgid "Open app"
+msgstr "فتح التطبيق"
+
+#: ../EosAppStore/appFrame.js:304
+msgid "Add to the desktop"
+msgstr "إضافة إلى سطح المكتب "
+
+#: ../EosAppStore/appFrame.js:400 ../EosAppStore/appFrame.js:455
 #, c-format
 msgid "We could not install '%s'"
 msgstr "لم نتمكن من تثبيت '%s'"
 
-#: ../EosAppStore/appFrame.js:351 ../EosAppStore/appFrame.js:397
+#: ../EosAppStore/appFrame.js:405 ../EosAppStore/appFrame.js:458
 #, c-format
 msgid "'%s' was installed successfully"
 msgstr "تم تثبيت '%s' بنجاح"
 
-#: ../EosAppStore/appFrame.js:420
+#: ../EosAppStore/appFrame.js:424
 msgid "Updating…"
 msgstr "جاري التحديث…"
 
-#: ../EosAppStore/appFrame.js:427
+#: ../EosAppStore/appFrame.js:431
 #, c-format
 msgid "We could not update '%s'"
 msgstr "لم نتمكن من تحديث '%s'"
 
-#: ../EosAppStore/appFrame.js:435
+#: ../EosAppStore/appFrame.js:434
 #, c-format
 msgid "'%s' was updated successfully"
 msgstr "تم تحديث '%s' بنجاح"
 
-#: ../EosAppStore/appFrame.js:455
+#: ../EosAppStore/appFrame.js:517
 msgid "Deleting app"
 msgstr "جاري حذف التطبيق"
 
-#: ../EosAppStore/appFrame.js:456
+#: ../EosAppStore/appFrame.js:518
 msgid ""
 "Deleting this app will remove it from the device for all users. You will "
 "need to download it from the internet in order to reinstall it."
-msgstr "سيقوم حذف هذا التطبيق بإزالته من الجهاز لجميع المستخدمين. سوف تحتاج إلى تحميله من الإنترنت من أجل إعادة تثبيته."
+msgstr ""
+"سيقوم حذف هذا التطبيق بإزالته من الجهاز لجميع المستخدمين. سوف تحتاج إلى "
+"تحميله من الإنترنت من أجل إعادة تثبيته."
 
-#: ../EosAppStore/appFrame.js:457
+#: ../EosAppStore/appFrame.js:519
 msgid "Delete app"
 msgstr "احذف التطبيق"
 
-#: ../EosAppStore/appFrame.js:470
+#: ../EosAppStore/appFrame.js:529
 msgid "Removing…"
 msgstr "جاري الحذف"
 
-#: ../EosAppStore/appFrame.js:476
+#: ../EosAppStore/appFrame.js:535
 #, c-format
 msgid "We could not remove '%s'"
 msgstr "لم نتمكن من إزالة '%s'"
 
-#: ../EosAppStore/appFrame.js:479
+#: ../EosAppStore/appFrame.js:538
 #, c-format
 msgid "'%s' was removed successfully"
 msgstr "تمت إزالة '%s' بنجاح"
 
-#: ../EosAppStore/appFrame.js:526
+#: ../EosAppStore/appFrame.js:585
 msgid "Dismiss"
 msgstr "استبعاد"
 
-#: ../EosAppStore/appFrame.js:690
+#: ../EosAppStore/appFrame.js:749
 msgid "Install apps"
 msgstr "تثبيت التطبيقات"
 
@@ -215,77 +218,118 @@ msgstr "تمت الإضافة بنجاح!"
 
 #: ../EosAppStore/weblinkFrame.js:588
 msgid ""
-"Add your favorite websites to your desktop or choose suggested ones from our"
-" list."
-msgstr "قم بإضافة المواقع المفضلة لديك على سطح المكتب أو اختيار تلك المقترحة من قائمتنا."
+"Add your favorite websites to your desktop or choose suggested ones from our "
+"list."
+msgstr ""
+"قم بإضافة المواقع المفضلة لديك على سطح المكتب أو اختيار تلك المقترحة من "
+"قائمتنا."
 
 #: ../EosAppStore/weblinkFrame.js:774
 msgid "Install websites"
 msgstr "تثبيت المواقع"
 
-#: ../EosAppStore/lib/eos-app-list-model.c:804
+#: ../EosAppStore/lib/eos-app-list-model.c:815
 #, c-format
 msgid "Not enough space on device for downloading app"
 msgstr "لا توجد مساحة كافية على الجهاز لتنزيل التطبيق"
 
-#: ../EosAppStore/lib/eos-app-list-model.c:832
+#: ../EosAppStore/lib/eos-app-list-model.c:843
 #, c-format
-msgid "Invalid address for downloading '%s': %s"
-msgstr "عنوان غير صالح لتنزيل '%s': %s"
+msgid "No available bundle for '%s'"
+msgstr ""
 
-#: ../EosAppStore/lib/eos-app-list-model.c:887
+#: ../EosAppStore/lib/eos-app-list-model.c:897
 #, c-format
 msgid "Unable to create the file for downloading '%s': %s"
 msgstr "غير قادر على إنشاء الملف اللازم لتنزيل '%s': %s"
 
-#: ../EosAppStore/lib/eos-app-list-model.c:937
+#: ../EosAppStore/lib/eos-app-list-model.c:947
 #, c-format
 msgid "Download of app '%s' cancelled by the user."
 msgstr "ألغى المستخدم تنزيل تطبيق '%s' ."
 
-#: ../EosAppStore/lib/eos-app-list-model.c:983
+#: ../EosAppStore/lib/eos-app-list-model.c:993
 #, c-format
-msgid "Hash for application bundle '%s' could not be retrieved"
-msgstr "تعذر استرجاع هاش حزمة تطبيق '%s'"
+msgid "No verification available for app '%s'"
+msgstr ""
 
-#: ../EosAppStore/lib/eos-app-list-model.c:1015
+#: ../EosAppStore/lib/eos-app-list-model.c:1025
 #, c-format
-msgid "Signature for application bundle '%s' could not be downloaded"
-msgstr "تَعَذَر تنزيل توقيع حزمة التطبيق '%s' "
+msgid "No signature available for app '%s'"
+msgstr ""
 
-#: ../EosAppStore/lib/eos-app-list-model.c:1049
+#: ../EosAppStore/lib/eos-app-list-model.c:1059
 #, c-format
 msgid "Application bundle '%s' could not be downloaded"
 msgstr "تعذر تنزيل حزمة التطبيق '%s'"
 
-#: ../EosAppStore/lib/eos-app-list-model.c:1108
+#: ../EosAppStore/lib/eos-app-list-model.c:1117
+msgid "You must be an administrator to install applications"
+msgstr ""
+
+#: ../EosAppStore/lib/eos-app-list-model.c:1126
+#, fuzzy, c-format
+msgid "Application '%s' could not be installed. %s"
+msgstr "تعذر تثبيت التطبيق '%s'"
+
+#: ../EosAppStore/lib/eos-app-list-model.c:1134
+#: ../EosAppStore/lib/eos-app-list-model.c:1153
+#: ../EosAppStore/lib/eos-app-list-model.c:1217
 #, c-format
 msgid "Application '%s' could not be installed"
 msgstr "تعذر تثبيت التطبيق '%s'"
 
-#: ../EosAppStore/lib/eos-app-list-model.c:1247
+#: ../EosAppStore/lib/eos-app-list-model.c:1275
+#, c-format
+msgid "Removing '%s' from the desktop failed"
+msgstr ""
+
+#: ../EosAppStore/lib/eos-app-list-model.c:1318
+msgid "You must be an administrator to remove applications"
+msgstr ""
+
+#: ../EosAppStore/lib/eos-app-list-model.c:1327
+#, fuzzy, c-format
+msgid "Application '%s' could not be uninstalled. %s"
+msgstr "تعذر تثبيت التطبيق '%s'"
+
+#: ../EosAppStore/lib/eos-app-list-model.c:1335
+#, fuzzy, c-format
+msgid "Application '%s' could not be uninstalled"
+msgstr "تعذر تثبيت التطبيق '%s'"
+
+#: ../EosAppStore/lib/eos-app-list-model.c:1354
 #, c-format
 msgid "Application '%s' could not be removed"
 msgstr "لا يمكن إزالة تطبيق '%s'"
 
-#: ../EosAppStore/lib/eos-app-list-model.c:1516
-#: ../EosAppStore/lib/eos-app-list-model.c:1585
+#: ../EosAppStore/lib/eos-app-list-model.c:1623
+#: ../EosAppStore/lib/eos-app-list-model.c:1692
 #, c-format
 msgid "App %s not installable"
 msgstr "التطبيق ليس %s قابلا للتثبيت"
 
-#: ../EosAppStore/lib/eos-app-list-model.c:1527
+#: ../EosAppStore/lib/eos-app-list-model.c:1634
 #, c-format
 msgid "App %s already installed"
 msgstr "التطبيق %s مثبت مسبقا"
 
-#: ../EosAppStore/lib/eos-app-list-model.c:1596
+#: ../EosAppStore/lib/eos-app-list-model.c:1703
 #, c-format
 msgid "App %s is up to date"
 msgstr "التطبيق %s حديث"
 
-#: ../EosAppStore/lib/eos-app-list-model.c:1659
-#: ../EosAppStore/lib/eos-app-list-model.c:1692
+#: ../EosAppStore/lib/eos-app-list-model.c:1766
+#: ../EosAppStore/lib/eos-app-list-model.c:1799
 #, c-format
 msgid "App %s is not installed"
 msgstr "التطبيق %s غير مثبت"
+
+#~ msgid "Invalid address for downloading '%s': %s"
+#~ msgstr "عنوان غير صالح لتنزيل '%s': %s"
+
+#~ msgid "Hash for application bundle '%s' could not be retrieved"
+#~ msgstr "تعذر استرجاع هاش حزمة تطبيق '%s'"
+
+#~ msgid "Signature for application bundle '%s' could not be downloaded"
+#~ msgstr "تَعَذَر تنزيل توقيع حزمة التطبيق '%s' "
