@@ -369,6 +369,7 @@ const AppListBoxRow = new Lang.Class({
 
         // conditionally show the progress bar and cancel button
         if (showProgressBar) {
+            this._installProgressBar.fraction = 0.0;
             this._installProgressBar.show();
             this._installProgressCancel.show();
         }
@@ -391,7 +392,7 @@ const AppListBoxRow = new Lang.Class({
     },
 
     _installApp: function() {
-        this._pushTransaction(_("Installing…"), true);
+        this._pushTransaction(_("Downloading…"), true);
 
         this._model.install(this._appId, Lang.bind(this, function(error) {
             this._popTransaction();
