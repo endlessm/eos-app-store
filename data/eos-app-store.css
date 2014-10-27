@@ -112,6 +112,12 @@
     padding-right: 15px;
 }
 
+.app-frame:dir(rtl),
+.web-frame:dir(rtl),
+.folder-frame:dir(rtl) {
+    padding-left: 15px;
+}
+
 .frame-separator {
     color: alpha(white, 0.1);
 }
@@ -156,6 +162,10 @@
     icon-shadow: 0 1px black;
 }
 
+.close-button:dir(rtl) {
+    padding: 7px 0 0 8px;
+}
+
 .close-button:hover {
     color: @app_store_button_hover_fg;
 }
@@ -172,6 +182,11 @@
 .header-icon {
     padding-left: 15px;
     padding-right: 20px;
+}
+
+.header-icon:dir(rtl) {
+    padding-left: 20px;
+    padding-right: 15px;
 }
 
 .header-title {
@@ -213,6 +228,10 @@
     border-width: 1px 2px 2px 1px;
     border-color: transparent;
     border-style: solid;
+}
+
+.app-cell-frame.select:dir(rtl) {
+    border-width: 1px 1px 2px 2px;
 }
 
 .app-frame-description {
@@ -367,9 +386,11 @@
 }
 
 .new-site-frame-container {
-    padding-top: 13px;
-    padding-bottom: 24px;
-    padding-right: 23px;
+    padding: 13px 23px 24px 0;
+}
+
+.new-site-frame-container:dir(rtl) {
+    padding: 13px 0 24px 23px;
 }
 
 .new-site-frame {
@@ -381,6 +402,14 @@
 .new-site-frame .url-icon {
     background: alpha(black, 0.12);
     border-image: linear-gradient(to left,
+                                  alpha(white, 0.04),
+                                  alpha(white, 0.04) 1px,
+                                  alpha(black, 0.08) 1px) 0 2 0 0 / 0 2px 0 0;
+    color: #424244;
+}
+
+.new-site-frame .url-icon:dir(rtl) {
+    border-image: linear-gradient(to right,
                                   alpha(white, 0.04),
                                   alpha(white, 0.04) 1px,
                                   alpha(black, 0.08) 1px) 0 2 0 0 / 0 2px 0 0;
@@ -406,6 +435,10 @@
     border-radius: 26px;
 }
 
+.new-site-frame .url-entry:dir(rtl) {
+    padding: 7px 20px 7px 4px;
+}
+
 .new-site-frame .url-entry-error {
     box-shadow: inset 0px 0px 3px 3px #ffc000;
 }
@@ -425,6 +458,10 @@
     font-weight: bold;
     color: white;
     padding: 8px 0px 8px 6px;
+}
+
+.new-site-frame .url-label:dir(rtl) {
+    padding: 8px 6px 8px 0px;
 }
 
 .new-site-frame .alert-label {
@@ -515,6 +552,10 @@
     padding-right: 15px;
 
     -GtkScrolledWindow-scrollbars-within-bevel: false;
+}
+
+.weblink-scrolledwindow:dir(rtl) {
+    padding-left: 15px;
 }
 
 .weblink-row-image {
@@ -626,6 +667,10 @@
     font-weight: 600; /* semibold */
 
     padding-left: 10px;
+}
+
+.folder-bubble .entry:dir(rtl) {
+    padding-right: 10px;
 }
 
 .folder-bubble .entry:selected {
