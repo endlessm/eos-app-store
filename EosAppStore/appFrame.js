@@ -460,23 +460,28 @@ const AppListBoxRow = new Lang.Class({
 
         this._model.install(this._appId, Lang.bind(this, function(error) {
             this._popTransaction();
-            this._updateState();
 
             if (error) {
                 this._maybeNotify(_("We could not install '%s'").format(this.appTitle), error);
+                this._updateState();
+                return;
             }
-            else {
-                this._maybeNotify(_("'%s' was installed successfully").format(this.appTitle));
 
-                Mainloop.timeout_add_seconds(SHOW_DESKTOP_ICON_DELAY,
-                                             Lang.bind(this, function() {
-                    let appWindow = Gio.Application.get_default().mainWindow;
-                    if (appWindow && appWindow.is_visible()) {
-                        appWindow.hide();
-                    }
-                    return false;
-                }));
-            }
+            this._maybeNotify(_("'%s' was installed successfully").format(this.appTitle));
+
+            this._installedMessage.show();
+            Mainloop.timeout_add_seconds(SHOW_DESKTOP_ICON_DELAY,
+                                         Lang.bind(this, function() {
+                this._installedMessage.hide();
+                this._updateState();
+
+                let appWindow = Gio.Application.get_default().mainWindow;
+                if (appWindow && appWindow.is_visible()) {
+                    appWindow.hide();
+                }
+
+                return false;
+            }));
         }));
     },
 
