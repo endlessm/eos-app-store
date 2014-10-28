@@ -401,9 +401,7 @@ const AppListBoxRow = new Lang.Class({
         app.popRunningOperation();
     },
 
-    _installApp: function() {
-        this._pushTransaction(_("Downloading…"), true);
-
+    _installOrAddToDesktop: function() {
         this._model.install(this._appId, Lang.bind(this, function(error) {
             this._popTransaction();
 
@@ -429,6 +427,11 @@ const AppListBoxRow = new Lang.Class({
                 return false;
             }));
         }));
+    },
+
+    _installApp: function() {
+        this._pushTransaction(_("Downloading…"), true);
+        this._installOrAddToDesktop();
     },
 
     _updateApp: function() {
@@ -457,32 +460,7 @@ const AppListBoxRow = new Lang.Class({
 
     _addToDesktop: function() {
         this._pushTransaction(_("Installing…"), false);
-
-        this._model.install(this._appId, Lang.bind(this, function(error) {
-            this._popTransaction();
-
-            if (error) {
-                this._maybeNotify(_("We could not install '%s'").format(this.appTitle), error);
-                this._updateState();
-                return;
-            }
-
-            this._maybeNotify(_("'%s' was installed successfully").format(this.appTitle));
-
-            this._installedMessage.show();
-            Mainloop.timeout_add_seconds(SHOW_DESKTOP_ICON_DELAY,
-                                         Lang.bind(this, function() {
-                this._installedMessage.hide();
-                this._updateState();
-
-                let appWindow = Gio.Application.get_default().mainWindow;
-                if (appWindow && appWindow.is_visible()) {
-                    appWindow.hide();
-                }
-
-                return false;
-            }));
-        }));
+        this._installOrAddToDesktop();
     },
 
     _onInstallButtonClicked: function() {
