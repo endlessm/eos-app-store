@@ -1193,6 +1193,9 @@ add_or_update_app_from_manager (EosAppListModel *self,
                                                               &error);
   retval = TRUE;
 
+  /* we're done with the transaction now that we've called CompleteTransaction() */
+  g_clear_object (&transaction);
+
 out:
   if (error != NULL)
     {
