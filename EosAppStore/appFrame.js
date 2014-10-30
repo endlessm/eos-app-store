@@ -453,6 +453,11 @@ const AppListBoxRow = new Lang.Class({
     _launchApp: function() {
         try {
             this._model.launch(this._appId);
+
+            let appWindow = Gio.Application.get_default().mainWindow;
+            if (appWindow && appWindow.is_visible()) {
+                appWindow.hide();
+            }
         } catch (e) {
             log("Failed to launch app '" + this._appId + "': " + e.message);
         }
