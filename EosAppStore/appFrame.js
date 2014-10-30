@@ -452,7 +452,7 @@ const AppListBoxRow = new Lang.Class({
 
     _launchApp: function() {
         try {
-            this._model.launch(this._appId);
+            this._model.launch(this._appId, Gtk.get_current_event_time());
 
             let appWindow = Gio.Application.get_default().mainWindow;
             if (appWindow && appWindow.is_visible()) {

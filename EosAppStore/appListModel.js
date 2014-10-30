@@ -204,8 +204,8 @@ const AppList = new Lang.Class({
         }));
     },
 
-    launch: function(id) {
-        return this._model.launch_app(id);
+    launch: function(id, timestamp) {
+        return this._model.launch_app(id, timestamp);
     }
 });
 
