@@ -664,6 +664,7 @@ eos_app_list_model_new (void)
 static gboolean
 launch_app (EosAppListModel *self,
             const char *desktop_id,
+            guint32 timestamp,
             GCancellable *cancellable,
             GError **error_out)
 {
@@ -675,7 +676,9 @@ launch_app (EosAppListModel *self,
                                      "org.gnome.Shell",
                                      "/org/gnome/Shell",
                                      "org.gnome.Shell.AppLauncher", "Launch",
-                                     g_variant_new ("(s)", desktop_id),
+                                     g_variant_new ("(su)",
+                                                    desktop_id,
+                                                    timestamp),
                                      G_VARIANT_TYPE ("(b)"),
                                      G_DBUS_CALL_FLAGS_NONE,
                                      -1,
@@ -1186,12 +1189,23 @@ add_or_update_app_from_manager (EosAppListModel *self,
   if (error != NULL)
     goto out;
 
-  eos_app_manager_transaction_call_complete_transaction_sync (transaction,
-                                                              bundle_path,
-                                                              &retval,
-                                                              cancellable,
-                                                              &error);
-  retval = TRUE;
+  /* call this manually, since we want to specify a custom timeout */
+  res = g_dbus_proxy_call_sync (G_DBUS_PROXY (transaction),
+                                "CompleteTransaction",
+                                g_variant_new ("(s)",
+                                               bundle_path),
+                                G_DBUS_CALL_FLAGS_NONE,
+                                G_MAXINT,
+                                cancellable,
+                                &error);
+  if (res != NULL)
+    {
+      g_variant_get (res, "(b)", &retval);
+      g_variant_unref (res);
+    }
+
+  /* we're done with the transaction now that we've called CompleteTransaction() */
+  g_clear_object (&transaction);
 
 out:
   if (error != NULL)
@@ -1785,6 +1799,7 @@ eos_app_list_model_uninstall_app_finish (EosAppListModel *model,
 gboolean
 eos_app_list_model_launch_app (EosAppListModel *model,
                                const char *desktop_id,
+                               guint32 timestamp,
                                GError **error)
 {
   const gchar *localized_id;
@@ -1801,7 +1816,7 @@ eos_app_list_model_launch_app (EosAppListModel *model,
       return FALSE;
     }
 
-  return launch_app (model, localized_id, NULL, error);
+  return launch_app (model, localized_id, timestamp, NULL, error);
 }
 
 gboolean

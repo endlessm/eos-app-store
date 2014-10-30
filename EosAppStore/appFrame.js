@@ -68,6 +68,7 @@ const AppListBoxRow = new Lang.Class({
         '_installProgressCancel',
         '_installedMessage',
         '_removeButton',
+        '_removeButtonImage',
         '_removeButtonLabel',
         '_screenshotImage',
         '_screenshotPreviewBox',
@@ -109,6 +110,7 @@ const AppListBoxRow = new Lang.Class({
         this.connect('destroy', Lang.bind(this, this._onDestroy));
 
         this._installButton.connect('state-flags-changed', Lang.bind(this, this._onInstallButtonStateChanged));
+        this._removeButton.connect('state-flags-changed', Lang.bind(this, this._onRemoveButtonStateChanged));
 
         let separator = new Separator.FrameSeparator();
         this._mainBox.add(separator);
@@ -226,6 +228,14 @@ const AppListBoxRow = new Lang.Class({
     _onPreviewPress: function(widget, event) {
         EosAppStorePrivate.app_load_screenshot(this._screenshotImage, widget.path, this._screenshotLarge);
         return false;
+    },
+
+    _onRemoveButtonStateChanged: function() {
+        // We use the background-image of a GtkFrame to set the image,
+        // and we need to forward the state flags to it, since GtkFrame
+        // can't track hover/active alone
+        let stateFlags = this._removeButton.get_state_flags();
+        this._removeButtonImage.set_state_flags(stateFlags, true);
     },
 
     _onInstallButtonStateChanged: function() {
@@ -369,6 +379,7 @@ const AppListBoxRow = new Lang.Class({
 
         // conditionally show the progress bar and cancel button
         if (showProgressBar) {
+            this._installProgressBar.fraction = 0.0;
             this._installProgressBar.show();
             this._installProgressCancel.show();
         }
@@ -390,9 +401,7 @@ const AppListBoxRow = new Lang.Class({
         app.popRunningOperation();
     },
 
-    _installApp: function() {
-        this._pushTransaction(_("Installing…"), true);
-
+    _installOrAddToDesktop: function() {
         this._model.install(this._appId, Lang.bind(this, function(error) {
             this._popTransaction();
 
@@ -420,6 +429,11 @@ const AppListBoxRow = new Lang.Class({
         }));
     },
 
+    _installApp: function() {
+        this._pushTransaction(_("Downloading…"), true);
+        this._installOrAddToDesktop();
+    },
+
     _updateApp: function() {
         this._pushTransaction(_("Updating…"), true);
 
@@ -438,7 +452,12 @@ const AppListBoxRow = new Lang.Class({
 
     _launchApp: function() {
         try {
-            this._model.launch(this._appId);
+            this._model.launch(this._appId, Gtk.get_current_event_time());
+
+            let appWindow = Gio.Application.get_default().mainWindow;
+            if (appWindow && appWindow.is_visible()) {
+                appWindow.hide();
+            }
         } catch (e) {
             log("Failed to launch app '" + this._appId + "': " + e.message);
         }
@@ -446,27 +465,7 @@ const AppListBoxRow = new Lang.Class({
 
     _addToDesktop: function() {
         this._pushTransaction(_("Installing…"), false);
-
-        this._model.install(this._appId, Lang.bind(this, function(error) {
-            this._popTransaction();
-            this._updateState();
-
-            if (error) {
-                this._maybeNotify(_("We could not install '%s'").format(this.appTitle), error);
-            }
-            else {
-                this._maybeNotify(_("'%s' was installed successfully").format(this.appTitle));
-
-                Mainloop.timeout_add_seconds(SHOW_DESKTOP_ICON_DELAY,
-                                             Lang.bind(this, function() {
-                    let appWindow = Gio.Application.get_default().mainWindow;
-                    if (appWindow && appWindow.is_visible()) {
-                        appWindow.hide();
-                    }
-                    return false;
-                }));
-            }
-        }));
+        this._installOrAddToDesktop();
     },
 
     _onInstallButtonClicked: function() {
