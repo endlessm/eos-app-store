@@ -664,6 +664,7 @@ eos_app_list_model_new (void)
 static gboolean
 launch_app (EosAppListModel *self,
             const char *desktop_id,
+            guint32 timestamp,
             GCancellable *cancellable,
             GError **error_out)
 {
@@ -675,7 +676,9 @@ launch_app (EosAppListModel *self,
                                      "org.gnome.Shell",
                                      "/org/gnome/Shell",
                                      "org.gnome.Shell.AppLauncher", "Launch",
-                                     g_variant_new ("(s)", desktop_id),
+                                     g_variant_new ("(su)",
+                                                    desktop_id,
+                                                    timestamp),
                                      G_VARIANT_TYPE ("(b)"),
                                      G_DBUS_CALL_FLAGS_NONE,
                                      -1,
@@ -1796,6 +1799,7 @@ eos_app_list_model_uninstall_app_finish (EosAppListModel *model,
 gboolean
 eos_app_list_model_launch_app (EosAppListModel *model,
                                const char *desktop_id,
+                               guint32 timestamp,
                                GError **error)
 {
   const gchar *localized_id;
@@ -1812,7 +1816,7 @@ eos_app_list_model_launch_app (EosAppListModel *model,
       return FALSE;
     }
 
-  return launch_app (model, localized_id, NULL, error);
+  return launch_app (model, localized_id, timestamp, NULL, error);
 }
 
 gboolean

@@ -28,7 +28,7 @@ EosAppState eos_app_list_model_get_app_state (EosAppListModel *model, const char
 gboolean eos_app_list_model_get_app_has_launcher (EosAppListModel *model, const char *desktop_id);
 gboolean eos_app_list_model_get_app_can_remove (EosAppListModel *model, const char *desktop_id);
 
-gboolean eos_app_list_model_launch_app (EosAppListModel *model, const char *desktop_id, GError **error);
+gboolean eos_app_list_model_launch_app (EosAppListModel *model, const char *desktop_id, guint32 timestamp, GError **error);
 
 gboolean eos_app_list_model_has_app (EosAppListModel *model, const char *desktop_id);
 
