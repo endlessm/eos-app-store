@@ -76,10 +76,13 @@ const AppStoreWindow = new Lang.Class({
     ],
 
     _init: function(app) {
+        let rtl = Gtk.Widget.get_default_direction();
+
         this.parent({ application: app,
                         type_hint: Gdk.WindowTypeHint.DOCK,
                              type: Gtk.WindowType.TOPLEVEL,
-                             role: SIDE_COMPONENT_ROLE
+                             role: SIDE_COMPONENT_ROLE,
+                             gravity: rtl ? Gdk.Gravity.NORTH_EAST : Gdk.Gravity.NORTH_WEST
                     });
 
         this.initTemplate({ templateRoot: 'main-frame', bindChildren: true, connectSignals: true, });
