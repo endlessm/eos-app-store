@@ -9,7 +9,7 @@ msgstr ""
 "Project-Id-Version: eos-app-store\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2014-10-23 08:40-0700\n"
-"PO-Revision-Date: 2014-10-23 15:42+0000\n"
+"PO-Revision-Date: 2014-10-29 19:28+0000\n"
 "Last-Translator: Roddy Shuler <roddy@endlessm.com>\n"
 "Language-Team: Arabic (http://www.transifex.com/projects/p/eos-app-store/language/ar/)\n"
 "MIME-Version: 1.0\n"
@@ -230,7 +230,7 @@ msgstr "لا توجد مساحة كافية على الجهاز لتنزيل ا�
 #: ../EosAppStore/lib/eos-app-list-model.c:843
 #, c-format
 msgid "No available bundle for '%s'"
-msgstr ""
+msgstr "ليست هناك حزمة متوفرة من أجل '%s'"
 
 #: ../EosAppStore/lib/eos-app-list-model.c:897
 #, c-format
@@ -245,12 +245,12 @@ msgstr "ألغى المستخدم تنزيل تطبيق '%s' ."
 #: ../EosAppStore/lib/eos-app-list-model.c:993
 #, c-format
 msgid "No verification available for app '%s'"
-msgstr ""
+msgstr "ليس هناك تدقيق متوفر من أجل '%s'"
 
 #: ../EosAppStore/lib/eos-app-list-model.c:1025
 #, c-format
 msgid "No signature available for app '%s'"
-msgstr ""
+msgstr "ليس هناك توقيع متوفر من أجل '%s'"
 
 #: ../EosAppStore/lib/eos-app-list-model.c:1059
 #, c-format
@@ -259,12 +259,12 @@ msgstr "تعذر تنزيل حزمة التطبيق '%s'"
 
 #: ../EosAppStore/lib/eos-app-list-model.c:1117
 msgid "You must be an administrator to install applications"
-msgstr ""
+msgstr "لابد أن تكون مسؤولاً للتُثبِّت التطبيق"
 
 #: ../EosAppStore/lib/eos-app-list-model.c:1126
 #, c-format
 msgid "Application '%s' could not be installed. %s"
-msgstr ""
+msgstr "تطبيق '%s' لم يمكن تثبيته. %s "
 
 #: ../EosAppStore/lib/eos-app-list-model.c:1134
 #: ../EosAppStore/lib/eos-app-list-model.c:1153
@@ -276,21 +276,21 @@ msgstr "تعذر تثبيت التطبيق '%s'"
 #: ../EosAppStore/lib/eos-app-list-model.c:1275
 #, c-format
 msgid "Removing '%s' from the desktop failed"
-msgstr ""
+msgstr "إزالة '%s' من سطح المكتب فشلت"
 
 #: ../EosAppStore/lib/eos-app-list-model.c:1318
 msgid "You must be an administrator to remove applications"
-msgstr ""
+msgstr "لابد أن تكون مسؤولاً حتى تزيل التطبيق"
 
 #: ../EosAppStore/lib/eos-app-list-model.c:1327
 #, c-format
 msgid "Application '%s' could not be uninstalled. %s"
-msgstr ""
+msgstr "تطبيق'%s' لم يمكن إلغاء تثبيته. '%s' "
 
 #: ../EosAppStore/lib/eos-app-list-model.c:1335
 #, c-format
 msgid "Application '%s' could not be uninstalled"
-msgstr ""
+msgstr "تطبيق'%s' لم يمكن إلغاء تثبيته "
 
 #: ../EosAppStore/lib/eos-app-list-model.c:1354
 #, c-format
