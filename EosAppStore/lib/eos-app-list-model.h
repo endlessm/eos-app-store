@@ -21,6 +21,8 @@ GType eos_app_list_model_get_type (void);
 
 EosAppListModel *eos_app_list_model_new (void);
 
+void eos_app_list_model_refresh (EosAppListModel *model);
+
 GList *eos_app_list_model_get_all_apps (EosAppListModel *model);
 
 char *eos_app_list_model_get_app_icon_name (EosAppListModel *model, const char *desktop_id);

@@ -31,6 +31,7 @@ struct _EosAppListModel
 
   guint applications_changed_id;
   guint available_apps_changed_id;
+  guint changed_guard_id;
 
   gboolean can_install;
   gboolean can_uninstall;
@@ -54,6 +55,25 @@ static guint eos_app_list_model_signals[LAST_SIGNAL] = { 0, };
 
 G_DEFINE_TYPE (EosAppListModel, eos_app_list_model, G_TYPE_OBJECT)
 G_DEFINE_QUARK (eos-app-list-model-error-quark, eos_app_list_model_error)
+
+static gboolean
+emit_queued_changed (gpointer data)
+{
+  EosAppListModel *self = data;
+
+  self->changed_guard_id = 0;
+
+  g_signal_emit (self, eos_app_list_model_signals[CHANGED], 0);
+
+  return G_SOURCE_REMOVE;
+}
+
+static void
+eos_app_list_model_emit_changed (EosAppListModel *self)
+{
+  if (self->changed_guard_id == 0)
+    self->changed_guard_id = g_timeout_add (500, emit_queued_changed, self);
+}
 
 #define WEB_LINK_ID_PREFIX "eos-link-"
 
@@ -217,7 +237,7 @@ on_app_monitor_changed (GAppInfoMonitor *monitor,
   g_clear_pointer (&self->gio_apps, g_hash_table_unref);
   self->gio_apps = load_apps_from_gio ();
 
-  g_signal_emit (self, eos_app_list_model_signals[CHANGED], 0);
+  eos_app_list_model_emit_changed (self);
 
   /* queue a reload of the manager-installed apps */
   load_manager_installed_apps (self);
@@ -237,7 +257,7 @@ on_shell_applications_changed (GDBusConnection *connection,
   g_clear_pointer (&self->shell_apps, g_hash_table_unref);
   self->shell_apps = load_shell_apps_from_gvariant (parameters);
 
-  g_signal_emit (self, eos_app_list_model_signals[CHANGED], 0);
+  eos_app_list_model_emit_changed (self);
 }
 
 static void
@@ -264,7 +284,7 @@ on_app_manager_available_applications_changed (GDBusConnection *connection,
   g_variant_iter_free (iter1);
   g_variant_iter_free (iter2);
 
-  g_signal_emit (self, eos_app_list_model_signals[CHANGED], 0);
+  eos_app_list_model_emit_changed (self);
 }
 
 typedef struct {
@@ -307,7 +327,7 @@ on_app_manager_apps_loaded (GObject *source,
   self->installable_apps = g_hash_table_ref (data->installable_apps);
   self->updatable_apps = g_hash_table_ref (data->updatable_apps);
 
-  g_signal_emit (self, eos_app_list_model_signals[CHANGED], 0);
+  eos_app_list_model_emit_changed (self);
 }
 
 static gboolean
@@ -473,7 +493,7 @@ on_manager_installed_apps_loaded (GObject *source,
   g_variant_iter_free (iter);
   g_variant_unref (applications);
 
-  g_signal_emit (self, eos_app_list_model_signals[CHANGED], 0);
+  eos_app_list_model_emit_changed (self);
 }
 
 static void
@@ -512,11 +532,11 @@ on_shell_apps_loaded (GObject *source,
       return;
     }
 
-
+  g_clear_pointer (&self->shell_apps, g_hash_table_unref);
   self->shell_apps = load_shell_apps_from_gvariant (applications);
   g_variant_unref (applications);
 
-  g_signal_emit (self, eos_app_list_model_signals[CHANGED], 0);
+  eos_app_list_model_emit_changed (self);
 }
 
 static void
@@ -541,9 +561,11 @@ load_all_apps (EosAppListModel *self)
   GTask *task;
 
   /* Load GIO apps */
+  g_clear_pointer (&self->gio_apps, g_hash_table_unref);
   self->gio_apps = load_apps_from_gio ();
 
   /* Load app manager apps in a thread */
+  g_clear_object (&self->load_cancellable);
   self->load_cancellable = g_cancellable_new ();
   task = g_task_new (self, self->load_cancellable, on_app_manager_apps_loaded, NULL);
   g_task_run_in_thread (task, app_manager_apps_load_in_thread);
@@ -651,7 +673,6 @@ eos_app_list_model_init (EosAppListModel *self)
   g_signal_connect (self->app_monitor, "changed",
                     G_CALLBACK (on_app_monitor_changed),
                     self);
-
   load_all_apps (self);
 }
 
@@ -659,6 +680,12 @@ EosAppListModel *
 eos_app_list_model_new (void)
 {
   return g_object_new (EOS_TYPE_APP_LIST_MODEL, NULL);
+}
+
+void
+eos_app_list_model_refresh (EosAppListModel *self)
+{
+  load_all_apps (self);
 }
 
 static gboolean
