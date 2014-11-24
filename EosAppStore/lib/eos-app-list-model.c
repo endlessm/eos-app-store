@@ -12,6 +12,9 @@
 #include <glib/gi18n-lib.h>
 #include <libsoup/soup.h>
 
+/* The delay for the EosAppListModel::changed signal, in milliseconds */
+#define CHANGED_DELAY   500
+
 struct _EosAppListModel
 {
   GObject parent_instance;
@@ -72,7 +75,7 @@ static void
 eos_app_list_model_emit_changed (EosAppListModel *self)
 {
   if (self->changed_guard_id == 0)
-    self->changed_guard_id = g_timeout_add (500, emit_queued_changed, self);
+    self->changed_guard_id = g_timeout_add (CHANGED_DELAY, emit_queued_changed, self);
 }
 
 #define WEB_LINK_ID_PREFIX "eos-link-"
