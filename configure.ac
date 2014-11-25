@@ -55,13 +55,13 @@ AC_SUBST(GDBUS_CODEGEN)
 
 AC_CACHE_SAVE
 
+AC_PROG_CC_C99
+
 AC_ARG_ENABLE([maintainer-cflags],
               [AS_HELP_STRING([--enable-maintainer-cflags],
                               [Enable more compiler warnings])],
               [],
               [enable_maintainer_cflags=yes])
-
-MAINTAINER_CFLAGS="-std=c99"
 AS_IF([test "x$enable_maintainer_cflags" = "xyes"],
       [
         MAINTAINER_CFLAGS="$MAINTAINER_CFLAGS -Wall"
