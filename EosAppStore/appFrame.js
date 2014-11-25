@@ -757,6 +757,7 @@ const AppBroker = new Lang.Class({
 
         // initialize the applications model
         this._model = new AppListModel.AppList();
+        this._model.refresh(Lang.bind(this, this._populateAllCategories));
         this._model.connect('changed', Lang.bind(this, this._populateAllCategories));
 
         this._categories = Categories.get_app_categories();

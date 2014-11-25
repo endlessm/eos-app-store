@@ -95,10 +95,6 @@ const AppStore = new Lang.Class({
 
     _createMainWindow: function() {
         if (this._mainWindow == null) {
-            this._appManager.proxy.RefreshRemote(Lang.bind(this, function (res, error) {
-               this._appModel.refresh();
-            }));
-
             this._mainWindow = new AppStoreWindow.AppStoreWindow(this);
             this._mainWindow.connect('notify::visible',
                                      Lang.bind(this, this._onVisibilityChanged));
