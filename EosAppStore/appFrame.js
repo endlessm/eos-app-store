@@ -614,6 +614,9 @@ const AppCategoryFrame = new Lang.Class({
         this._lastCellSelected = null;
         this._widget = null;
 
+        this._spinner = new Gtk.Spinner({ hexpand: true, vexpand: true });
+        this._stack.add(this._spinner);
+
         this.show_all();
     },
 
@@ -622,6 +625,9 @@ const AppCategoryFrame = new Lang.Class({
             this._widget.destroy();
             this._widget = null;
         }
+
+        this._stack.visible_child = this._spinner;
+        this._spinner.start();
     },
 
     populate: function() {
@@ -681,6 +687,9 @@ const AppCategoryFrame = new Lang.Class({
         grid.connect('cell-activated', Lang.bind(this, this._onCellActivated));
 
         box.show_all();
+
+        this._stack.visible_child = this._widget;
+        this._spinner.stop();
     },
 
     _onCellSelected: function(grid, cell) {
