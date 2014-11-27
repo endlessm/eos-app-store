@@ -457,9 +457,6 @@ load_manager_available_apps (EosAppListModel *self,
   GHashTable *installable_apps;
   GHashTable *updatable_apps;
 
-  if (!load_user_capabilities (self, cancellable, &error))
-    goto out;
-
   if (!load_available_apps (self, &installable_apps, &updatable_apps,
                             cancellable, &error))
     goto out;
@@ -469,6 +466,9 @@ load_manager_available_apps (EosAppListModel *self,
 
   self->installable_apps = installable_apps;
   self->updatable_apps = updatable_apps;
+
+  if (!load_user_capabilities (self, cancellable, &error))
+    goto out;
 
 out:
   if (error != NULL)
@@ -573,9 +573,9 @@ load_all_apps (EosAppListModel *self,
   return TRUE;
 
 out:
-  g_set_error_literal (error, EOS_APP_LIST_MODEL_ERROR,
+  g_set_error_literal (error_out, EOS_APP_LIST_MODEL_ERROR,
                        EOS_APP_LIST_MODEL_ERROR_NO_UPDATE_AVAILABLE,
-                       "Unable to refresh the applications list");
+                       _("We were unable to update the list of applications"));
 
   return FALSE;
 }
@@ -707,13 +707,19 @@ refresh_app_manager (EosAppListModel *self,
       g_warning ("Unable to refresh the list of applications: %s",
                  error->message);
       g_error_free (error);
-      return FALSE;
+      retval = FALSE;
+      goto out;
     }
 
-  if (res != NULL)
+  g_variant_get (res, "(b)", &retval);
+  g_variant_unref (res);
+
+out:
+  if (!retval)
     {
-      g_variant_get (res, "(b)", &retval);
-      g_variant_unref (res);
+      g_set_error_literal (error_out, EOS_APP_LIST_MODEL_ERROR,
+                           EOS_APP_LIST_MODEL_ERROR_NO_UPDATE_AVAILABLE,
+                           _("We were unable to update the list of applications"));
     }
 
   return retval;
