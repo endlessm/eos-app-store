@@ -573,7 +573,7 @@ load_all_apps (EosAppListModel *self,
   return TRUE;
 
 out:
-  g_set_error_literal (error_out, EOS_APP_LIST_MODEL_ERROR,
+  g_set_error_literal (error, EOS_APP_LIST_MODEL_ERROR,
                        EOS_APP_LIST_MODEL_ERROR_NO_UPDATE_AVAILABLE,
                        _("We were unable to update the list of applications"));
 
