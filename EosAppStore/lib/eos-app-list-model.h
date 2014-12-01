@@ -21,6 +21,14 @@ GType eos_app_list_model_get_type (void);
 
 EosAppListModel *eos_app_list_model_new (void);
 
+void eos_app_list_model_refresh_async (EosAppListModel *model,
+                                       GCancellable *cancellable,
+                                       GAsyncReadyCallback callback,
+                                       gpointer user_data);
+gboolean eos_app_list_model_refresh_finish (EosAppListModel *model,
+                                            GAsyncResult *result,
+                                            GError **error);
+
 GList *eos_app_list_model_get_all_apps (EosAppListModel *model);
 
 char *eos_app_list_model_get_app_icon_name (EosAppListModel *model, const char *desktop_id);

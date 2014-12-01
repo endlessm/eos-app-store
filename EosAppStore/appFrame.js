@@ -614,6 +614,9 @@ const AppCategoryFrame = new Lang.Class({
         this._lastCellSelected = null;
         this._widget = null;
 
+        this._spinner = new Gtk.Spinner({ hexpand: true, vexpand: true });
+        this._stack.add(this._spinner);
+
         this.show_all();
     },
 
@@ -622,6 +625,9 @@ const AppCategoryFrame = new Lang.Class({
             this._widget.destroy();
             this._widget = null;
         }
+
+        this._stack.visible_child = this._spinner;
+        this._spinner.start();
     },
 
     populate: function() {
@@ -681,6 +687,9 @@ const AppCategoryFrame = new Lang.Class({
         grid.connect('cell-activated', Lang.bind(this, this._onCellActivated));
 
         box.show_all();
+
+        this._stack.visible_child = this._widget;
+        this._spinner.stop();
     },
 
     _onCellSelected: function(grid, cell) {
@@ -757,6 +766,7 @@ const AppBroker = new Lang.Class({
 
         // initialize the applications model
         this._model = new AppListModel.AppList();
+        this._model.refresh(Lang.bind(this, this._populateAllCategories));
         this._model.connect('changed', Lang.bind(this, this._populateAllCategories));
 
         this._categories = Categories.get_app_categories();

@@ -134,6 +134,28 @@ const BaseList = new Lang.Class({
 
             application.release();
         }));
+    },
+
+    refresh: function(callback) {
+        let application = Gio.Application.get_default();
+        application.hold();
+
+        this._model.refresh_async(null, Lang.bind(this, function(model, res) {
+            try {
+                this._model.refresh_finish(res);
+                if (callback) {
+                    callback();
+                }
+            }
+            catch (e) {
+                log('Failed to refresh the model: ' + e.message);
+                if (callback) {
+                    callback(e);
+                }
+            }
+
+            application.release();
+        }));
     }
 });
 Signals.addSignalMethods(BaseList.prototype);
