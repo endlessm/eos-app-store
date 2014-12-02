@@ -24,6 +24,8 @@ const BaseList = new Lang.Class({
         this._onModelChanged(this._model);
 
         this._cancellables = {};
+
+        this._isRefreshing = false;
     },
 
     _onDownloadProgress: function(model, appid, current, total) {
@@ -140,7 +142,10 @@ const BaseList = new Lang.Class({
         let application = Gio.Application.get_default();
         application.hold();
 
+        this._isRefreshing = true;
+
         this._model.refresh_async(null, Lang.bind(this, function(model, res) {
+            this._isRefreshing = false;
             try {
                 this._model.refresh_finish(res);
                 if (callback) {
@@ -156,6 +161,10 @@ const BaseList = new Lang.Class({
 
             application.release();
         }));
+    },
+
+    get isRefreshing() {
+        return this._isRefreshing;
     }
 });
 Signals.addSignalMethods(BaseList.prototype);
