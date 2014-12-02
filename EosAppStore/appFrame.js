@@ -748,7 +748,8 @@ const AppCategoryFrame = new Lang.Class({
 
         // application pages are recreated each time, unless there's
         // a transaction in progress
-        if (curPage != this._widget && !curPage.hasTransactionInProgress) {
+        if ((curPage != this._widget || curPage != this._spinner) &&
+            !curPage.hasTransactionInProgress) {
             curPage.destroy();
         }
     },
