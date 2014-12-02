@@ -635,6 +635,11 @@ const AppCategoryFrame = new Lang.Class({
             return;
         }
 
+        if (this._model.isRefreshing) {
+            log('populate: Model is still refreshing...');
+            return;
+        }
+
         let box = new Gtk.Box({ orientation: Gtk.Orientation.VERTICAL,
                                 hexpand: true,
                                 vexpand: true });
