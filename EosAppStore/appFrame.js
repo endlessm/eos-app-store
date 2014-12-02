@@ -754,6 +754,11 @@ const AppCategoryFrame = new Lang.Class({
     },
 
     reset: function() {
+        if (this._model.isRefreshing) {
+            log('reset: Model is still refreshing...');
+            return;
+        }
+
         this._showGrid();
         this.populate();
     },
