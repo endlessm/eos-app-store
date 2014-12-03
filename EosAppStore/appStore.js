@@ -70,8 +70,6 @@ const AppStore = new Lang.Class({
     vfunc_startup: function() {
         this.parent();
 
-        var loadTime = GLib.get_monotonic_time();
-
         // main style provider
         let provider = new Gtk.CssProvider();
         provider.load_from_file(Gio.File.new_for_uri(APP_STORE_CSS));
@@ -89,14 +87,10 @@ const AppStore = new Lang.Class({
 
         // no window by default
         this._mainWindow = null;
-
-        log('loadTime[startup]: ' + (GLib.get_monotonic_time() - loadTime) + 'ns');
     },
 
     vfunc_activate: function() {
-        var loadTime = GLib.get_monotonic_time();
         this._createMainWindow();
-        log('loadTime[activate]: ' + (GLib.get_monotonic_time() - loadTime) + 'ns');
     },
 
     _createMainWindow: function() {
