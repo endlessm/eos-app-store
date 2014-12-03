@@ -372,6 +372,11 @@
     border-image-source: url("btn_remove_pressed_border.png");
 }
 
+.app-frame GtkSpinner {
+    color: alpha(white, 0.9);
+    margin: 12px;
+}
+
 .screenshot-box {
     opacity: 1;
     padding: 15px 15px;

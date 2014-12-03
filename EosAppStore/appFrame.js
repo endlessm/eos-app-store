@@ -614,10 +614,24 @@ const AppCategoryFrame = new Lang.Class({
         this._lastCellSelected = null;
         this._widget = null;
 
-        this._spinner = new Gtk.Spinner({ hexpand: true, vexpand: true });
-        this._stack.add(this._spinner);
+        let box = new Gtk.Box({ orientation: Gtk.Orientation.VERTICAL,
+                                hexpand: true,
+                                vexpand: true });
+        this._stack.add_named(box, 'spinner');
+        box.show();
+        
+        box.add(new Separator.FrameSeparator());
+
+        this._spinner = new Gtk.Spinner({ halign: Gtk.Align.CENTER,
+                                          valign: Gtk.Align.CENTER,
+                                          hexpand: true,
+                                          vexpand: true });
+        box.add(this._spinner);
 
         this.show_all();
+
+        this._stack.set_visible_child_full('spinner', Gtk.StackTransitionType.CROSSFADE);
+        this._spinner.start();
     },
 
     invalidate: function() {
@@ -626,7 +640,7 @@ const AppCategoryFrame = new Lang.Class({
             this._widget = null;
         }
 
-        this._stack.visible_child = this._spinner;
+        this._stack.set_visible_child_full('spinner', Gtk.StackTransitionType.CROSSFADE);
         this._spinner.start();
     },
 
@@ -635,10 +649,14 @@ const AppCategoryFrame = new Lang.Class({
             return;
         }
 
+        if (this._model.isRefreshing) {
+            return;
+        }
+
         let box = new Gtk.Box({ orientation: Gtk.Orientation.VERTICAL,
                                 hexpand: true,
                                 vexpand: true });
-        this._stack.add(box);
+        this._stack.add_named(box, 'app-frame');
         this._widget = box;
 
         let separator = new Separator.FrameSeparator();
@@ -688,7 +706,7 @@ const AppCategoryFrame = new Lang.Class({
 
         box.show_all();
 
-        this._stack.visible_child = this._widget;
+        this._stack.set_visible_child_full('app-frame', Gtk.StackTransitionType.CROSSFADE);
         this._spinner.stop();
     },
 
@@ -743,12 +761,21 @@ const AppCategoryFrame = new Lang.Class({
 
         // application pages are recreated each time, unless there's
         // a transaction in progress
-        if (curPage != this._widget && !curPage.hasTransactionInProgress) {
+        let curPageName = this._stack.visible_child_name;
+        if (!(curPageName == 'app-frame' || curPageName == 'spinner') &&
+            !curPage.hasTransactionInProgress) {
             curPage.destroy();
         }
     },
 
     reset: function() {
+        if (this._model.isRefreshing) {
+            if (this._stack.visible_child_name != 'spinner') {
+                this._stack.set_visible_child_full('spinner', Gtk.StackTransitionType.CROSSFADE);
+            }
+            return;
+        }
+
         this._showGrid();
         this.populate();
     },
