@@ -734,12 +734,20 @@ refresh_thread_func (GTask *task,
   EosAppListModel *model = source_object;
   GError *error = NULL;
 
+  /* we want refreshing from the app manager to be an optional
+   * step, in case we don't have connectivity and we cannot
+   * refresh the list of updates.
+   */
   if (!refresh_app_manager (model, cancellable, &error))
     {
-      g_task_return_error (task, error);
-      return;
+      g_warning ("Unable to refresh applications from the manager: %s",
+                 error->message);
+      g_clear_error (&error);
     }
 
+  /* on the other hand, if we had an error loading the installed
+   * apps, then we really want to return an error
+   */
   if (!load_all_apps (model, cancellable, &error))
     {
       g_task_return_error (task, error);
