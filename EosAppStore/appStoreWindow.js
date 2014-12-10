@@ -86,6 +86,8 @@ const AppStoreWindow = new Lang.Class({
         this.set_decorated(false);
         this.get_style_context().add_class('main-window');
 
+        this.connect('draw', Lang.bind(this, this._onDraw));
+
         // do not destroy, just hide
         this.connect('delete-event', Lang.bind(this, function() {
             this.hide();
@@ -211,6 +213,7 @@ const AppStoreWindow = new Lang.Class({
                             Lang.bind(this, this._onStorePageChanged));
         this.side_pane_box.stack = this._stack;
         this.content_box.add(this._stack);
+        this._stack_contained = true;
         this._stack.show();
 
         let appFrame = new AppFrame.AppBroker(this);
@@ -288,6 +291,30 @@ const AppStoreWindow = new Lang.Class({
         this._updateGeometry();
         this._createStackPages();
         this._onStorePageChanged();
+    },
+
+    _onDraw: function() {
+        if (this._stack && !this._stack_contained) {
+            // HACK: now that we are drawing the gray background,
+            // we can add the stack back to the content box
+            // to start calculating the actual content
+            this.content_box.add(this._stack);
+            this._stack_contained = true;
+        }
+        return false;
+    },
+
+    show: function() {
+        if (this._stack && this._stack_contained) {
+            // HACK: to avoid showing a clone of the desktop
+            // while sliding in the app store,
+            // temporarily remove the stack from the content box
+            // so that the show operation can quickly redraw
+            // a gray background
+            this.content_box.remove(this._stack);
+            this._stack_contained = false;
+        }
+        this.parent();
     },
 
     doShow: function(reset, timestamp) {
