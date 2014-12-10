@@ -18,10 +18,6 @@ const Path = imports.path;
 const UIBuilder = imports.builder;
 const WMInspect = imports.wmInspect;
 
-const ANIMATION_TIME = (500 * 1000); // half a second
-
-const PAGE_TRANSITION_MS = 250;
-
 const SIDE_COMPONENT_ROLE = 'eos-side-component';
 
 const AppStoreSizes = {
