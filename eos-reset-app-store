@@ -38,7 +38,7 @@ while :; do
     esac
 done
 
-APP_STORE_PID=`ps ax | grep app-store | grep gjs-console | awk '{print $1}'`
+APP_STORE_PID=`pgrep -f 'gjs-console -I /usr/share/eos-app-store/js'`
 if [[ $APP_STORE_PID =~ ^[0-9]+$ ]]; then
     echo Killing the app store process
     kill $APP_STORE_PID
