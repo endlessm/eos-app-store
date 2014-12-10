@@ -38,12 +38,6 @@ while :; do
     esac
 done
 
-USERID=$(id -u)
-if [ "$USERID" != "0" ]; then
-    echo "Program requires superuser privileges"
-    exit 1
-fi
-
 APP_STORE_PID=`ps ax | grep app-store | grep gjs-console | awk '{print $1}'`
 if [[ $APP_STORE_PID =~ ^[0-9]+$ ]]; then
     echo Killing the app store process
@@ -53,11 +47,11 @@ else
 fi
 
 echo Killing the app manager process
-pkill eam
+sudo pkill eam
 
 if $CLEAR_CACHE; then
     echo Clearing the app manager cache
-    rm -f /var/cache/eos-app-manager/updates.json
+    sudo rm -f /var/cache/eos-app-manager/updates.json
 fi
 
 if $LAUNCH; then
