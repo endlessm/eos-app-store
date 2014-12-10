@@ -14,7 +14,11 @@ EXTRA_DIST += \
 	COPYING \
 	NEWS
 
-bin_SCRIPTS += eos-app-store-launcher eos-fill-desktop eos-reset-desktop
+bin_SCRIPTS += \
+	eos-app-store-launcher \
+	eos-fill-desktop \
+	eos-reset-app-store \
+	eos-reset-desktop
 libexec_SCRIPTS += eos-app-store
 
 do_subst = $(SED) \

@@ -1,0 +1,66 @@
+#!/bin/bash
+
+args=$(getopt -n "$0" -o "clh" \
+    -l "clear-cache,launch,help" -- "$@")
+eval set -- "$args"
+
+usage()
+{
+    cat <<EOF
+Usage: $0 [OPTION]...
+Kill existing app store and app manager, and optionally re-launch
+  -c, --clear-cache   Clear the app manager cache
+  -l, --launch        Launch the app store from the command line
+EOF
+}
+
+CLEAR_CACHE=false
+LAUNCH=false
+
+while :; do
+    case "$1" in
+        -c|--clear-cache)
+            CLEAR_CACHE=true
+            shift
+            ;;
+        -l|--launch)
+            LAUNCH=true
+            shift
+            ;;
+        -h|--help)
+            usage
+            exit 0
+            ;;
+        --)
+            shift
+            break
+            ;;
+    esac
+done
+
+USERID=$(id -u)
+if [ "$USERID" != "0" ]; then
+    echo "Program requires superuser privileges"
+    exit 1
+fi
+
+APP_STORE_PID=`ps ax | grep app-store | grep gjs-console | awk '{print $1}'`
+if [[ $APP_STORE_PID =~ ^[0-9]+$ ]]; then
+    echo Killing the app store process
+    kill $APP_STORE_PID
+else
+    echo No app store process running
+fi
+
+echo Killing the app manager process
+pkill eam
+
+if $CLEAR_CACHE; then
+    echo Clearing the app manager cache
+    rm -f /var/cache/eos-app-manager/updates.json
+fi
+
+if $LAUNCH; then
+    echo Launching the app store
+    /usr/lib/eos-app-store/eos-app-store
+fi
