@@ -18,10 +18,6 @@ const Path = imports.path;
 const UIBuilder = imports.builder;
 const WMInspect = imports.wmInspect;
 
-const ANIMATION_TIME = (500 * 1000); // half a second
-
-const PAGE_TRANSITION_MS = 250;
-
 const SIDE_COMPONENT_ROLE = 'eos-side-component';
 
 const AppStoreSizes = {
@@ -292,6 +288,29 @@ const AppStoreWindow = new Lang.Class({
         this._updateGeometry();
         this._createStackPages();
         this._onStorePageChanged();
+    },
+
+    vfunc_draw: function(cr) {
+        if (!this._stack.parent) {
+            // HACK: now that we are drawing the gray background,
+            // we can add the stack back to the content box
+            // to start calculating the actual content
+            this.content_box.add(this._stack);
+        }
+
+        return this.parent(cr);
+    },
+
+    show: function() {
+        if (this._stack.parent) {
+            // HACK: to avoid showing a clone of the desktop
+            // while sliding in the app store,
+            // temporarily remove the stack from the content box
+            // so that the show operation can quickly redraw
+            // a gray background
+            this.content_box.remove(this._stack);
+        }
+        this.parent();
     },
 
     doShow: function(reset, timestamp) {
