@@ -11,6 +11,7 @@ DISTCLEANFILES =
 
 EXTRA_DIST += \
 	autogen.sh \
+	eos-reset-app-store \
 	COPYING \
 	NEWS
 
