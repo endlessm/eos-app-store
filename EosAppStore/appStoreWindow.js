@@ -86,8 +86,6 @@ const AppStoreWindow = new Lang.Class({
         this.set_decorated(false);
         this.get_style_context().add_class('main-window');
 
-        this.connect('draw', Lang.bind(this, this._onDraw));
-
         // do not destroy, just hide
         this.connect('delete-event', Lang.bind(this, function() {
             this.hide();
@@ -292,14 +290,15 @@ const AppStoreWindow = new Lang.Class({
         this._onStorePageChanged();
     },
 
-    _onDraw: function() {
+    vfunc_draw: function(cr) {
         if (!this._stack.parent) {
             // HACK: now that we are drawing the gray background,
             // we can add the stack back to the content box
             // to start calculating the actual content
             this.content_box.add(this._stack);
         }
-        return false;
+
+        return this.parent(cr);
     },
 
     show: function() {
