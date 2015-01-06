@@ -29,6 +29,7 @@ struct _EosAppListModel
   GHashTable *installable_apps;
   GHashTable *updatable_apps;
   GHashTable *manager_installed_apps;
+  GHashTable *manager_removable_apps;
 
   GCancellable *load_cancellable;
 
@@ -505,14 +506,17 @@ load_manager_installed_apps (EosAppListModel *self,
       return FALSE;
     }
 
-  GVariantIter *iter;
+  GVariantIter *iter1, *iter2;
 
-  g_variant_get (applications, "(a(sss))", &iter);
+  g_variant_get (applications, "(a(sss)a(sss))", &iter1, &iter2);
 
   g_clear_pointer (&self->manager_installed_apps, g_hash_table_unref);
-  self->manager_installed_apps = load_installable_apps_from_gvariant (iter);
+  g_clear_pointer (&self->manager_removable_apps, g_hash_table_unref);
+  self->manager_installed_apps = load_installable_apps_from_gvariant (iter1);
+  self->manager_removable_apps = load_installable_apps_from_gvariant (iter2);
 
-  g_variant_iter_free (iter);
+  g_variant_iter_free (iter1);
+  g_variant_iter_free (iter2);
   g_variant_unref (applications);
 
   return TRUE;
@@ -614,6 +618,7 @@ eos_app_list_model_finalize (GObject *gobject)
   g_hash_table_unref (self->updatable_apps);
   g_hash_table_unref (self->installable_apps);
   g_hash_table_unref (self->manager_installed_apps);
+  g_hash_table_unref (self->manager_removable_apps);
 
   G_OBJECT_CLASS (eos_app_list_model_parent_class)->finalize (gobject);
 }
@@ -1966,6 +1971,13 @@ eos_app_list_model_get_app_can_remove (EosAppListModel *model,
 
   localized_id = app_get_localized_id_for_installed_app (model, desktop_id);
 
-  /* Can only remove what the manager installed */
-  return g_hash_table_contains (model->manager_installed_apps, localized_id);
+  /* Can only remove what the manager installed... */
+  if (!g_hash_table_contains (model->manager_installed_apps, localized_id))
+    return FALSE;
+
+  /* ... and what the manager tells us it's removable */
+  if (!g_hash_table_contains (model->manager_removable_apps, localized_id))
+    return FALSE;
+
+  return TRUE;
 }
