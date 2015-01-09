@@ -1721,13 +1721,10 @@ add_app_thread_func (GTask *task,
         }
      }
 
-  if (!app_has_launcher (model, desktop_id))
+  if (!add_app_to_shell (model, desktop_id, cancellable, &error))
     {
-      if (!add_app_to_shell (model, desktop_id, cancellable, &error))
-        {
-          g_task_return_error (task, error);
-          return;
-        }
+      g_task_return_error (task, error);
+      return;
     }
 
   g_task_return_boolean (task, TRUE);
