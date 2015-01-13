@@ -298,7 +298,9 @@ const AppStoreWindow = new Lang.Class({
             this.content_box.add(this._stack);
         }
 
-        return this.parent(cr);
+        this.parent(cr);
+        cr.$dispose();
+        return true;
     },
 
     show: function() {
