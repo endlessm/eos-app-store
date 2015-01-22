@@ -26,23 +26,40 @@ eaprivate_source_c = \
 	lib/eos-vertical-stack-switcher.c
 
 eaprivate_built_source = \
+	lib/eos-app-manager-service.c \
+	lib/eos-app-manager-service.h \
 	lib/eos-app-manager-transaction.c \
 	lib/eos-app-manager-transaction.h
 
 lib/eos-app-manager-transaction.h: Makefile $(top_srcdir)/data/eam-transaction-interface.xml
 	$(AM_V_GEN) $(MKDIR_P) lib && \
 	$(GDBUS_CODEGEN) \
-		--interface-prefix com.endlessm.AppManager. \
+		--interface-prefix com.endlessm. \
 		--generate-c-code lib/eos-app-manager-transaction \
-		--c-generate-object-manager \
-		--c-namespace EosAppManager \
+		--c-namespace Eos \
 		$(top_srcdir)/data/eam-transaction-interface.xml
-lib/eos-app-manager-transaction.c: lib/eos-app-manager-transaction.h
+lib/eos-app-manager-transaction.c: lib/eos-app-manager-service.h \
+		lib/eos-app-manager-transaction.h
 	@: # generated as a side-effect
 
 EXTRA_DIST += $(top_srcdir)/data/eam-transaction-interface.xml
 CLEANFILES += lib/eos-app-manager-transaction.c lib/eos-app-manager-transaction.h
 BUILT_SOURCES += lib/eos-app-manager-transaction.c lib/eos-app-manager-transaction.h
+
+lib/eos-app-manager-service.h: Makefile $(top_srcdir)/data/eam-service-interface.xml
+	$(AM_V_GEN) $(MKDIR_P) lib && \
+	$(GDBUS_CODEGEN) \
+		--interface-prefix com.endlessm. \
+		--generate-c-code lib/eos-app-manager-service \
+		--c-generate-object-manager \
+		--c-namespace Eos \
+		$(top_srcdir)/data/eam-service-interface.xml
+lib/eos-app-manager-service.c: lib/eos-app-manager-service.h
+	@: # generated as a side-effect
+
+EXTRA_DIST += $(top_srcdir)/data/eam-service-interface.xml
+CLEANFILES += lib/eos-app-manager-service.c lib/eos-app-manager-service.h
+BUILT_SOURCES += lib/eos-app-manager-service.c lib/eos-app-manager-service.h
 
 pkglib_LTLIBRARIES += libeaprivate-1.0.la
 
