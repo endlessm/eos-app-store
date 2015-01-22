@@ -1200,10 +1200,10 @@ download_bundle (EosAppListModel *self,
 }
 
 static gboolean
-add_or_update_app_from_manager (EosAppListModel *self,
-                                const char *desktop_id,
-                                GCancellable *cancellable,
-                                GError **error_out)
+add_app_from_manager (EosAppListModel *self,
+                      const char *desktop_id,
+                      GCancellable *cancellable,
+                      GError **error_out)
 {
   GError *error = NULL;
   gboolean retval = FALSE;
@@ -1377,6 +1377,15 @@ out:
   g_free (sha256_path);
 
   return retval;
+}
+
+static gboolean
+update_app_from_manager (EosAppListModel *self,
+                         const char *desktop_id,
+                         GCancellable *cancellable,
+                         GError **error_out)
+{
+  return add_app_from_manager(self, desktop_id, cancellable, error_out);
 }
 
 static gboolean
@@ -1714,7 +1723,7 @@ add_app_thread_func (GTask *task,
     {
       if (!desktop_id_is_web_link (desktop_id) &&
           model->can_install &&
-          !add_or_update_app_from_manager (model, desktop_id, cancellable, &error))
+          !add_app_from_manager (model, desktop_id, cancellable, &error))
         {
           g_task_return_error (task, error);
           return;
@@ -1793,7 +1802,7 @@ update_app_thread_func (GTask *task,
   EosAppListModel *model = source_object;
   const gchar *desktop_id = task_data;
 
-  if (!add_or_update_app_from_manager (model, desktop_id, cancellable, &error))
+  if (!update_app_from_manager (model, desktop_id, cancellable, &error))
     {
       g_task_return_error (task, error);
       return;
