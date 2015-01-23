@@ -1533,22 +1533,32 @@ remove_app_from_manager (EosAppListModel *self,
 {
   GError *error = NULL;
   gboolean retval = FALSE;
-  char *app_id = app_id_from_desktop_id (desktop_id);
-  GVariant *res =
-    g_dbus_connection_call_sync (self->system_bus,
-                                 "com.endlessm.AppManager",
-                                 "/com/endlessm/AppManager",
-                                 "com.endlessm.AppManager", "Uninstall",
-                                 g_variant_new ("(s)", app_id),
-                                 G_VARIANT_TYPE ("(b)"),
-                                 G_DBUS_CALL_FLAGS_NONE,
-                                 G_MAXINT,
-                                 cancellable,
-                                 &error);
+  gchar *app_id = app_id_from_desktop_id (desktop_id);
+
+  EosAppManager *proxy = get_eam_dbus_proxy();
+  if (proxy == NULL)
+    {
+      eos_app_log_error_message ("Could not get DBus proxy object - canceling");
+
+      g_set_error (error_out, EOS_APP_LIST_MODEL_ERROR,
+                   EOS_APP_LIST_MODEL_ERROR_UNINSTALL_FAILED,
+                   _("Application '%s' could not be uninstalled"),
+                   desktop_id);
+
+      return FALSE;
+    }
+
+  eos_app_log_info_message ("Trying to uninstall %s", app_id);
+
+  eos_app_manager_call_uninstall_sync (proxy, app_id, &retval, NULL, &error);
+
+  g_object_unref(proxy);
   g_free (app_id);
 
   if (error != NULL)
     {
+      eos_app_log_error_message ("Unable to uninstall application '%s': %s",
+                                 desktop_id, error->message);
       g_warning ("Unable to uninstall application '%s': %s",
                  desktop_id, error->message);
 
@@ -1585,21 +1595,15 @@ remove_app_from_manager (EosAppListModel *self,
       return FALSE;
     }
 
-  if (res != NULL)
-    {
-      g_variant_get (res, "(b)", &retval);
-      g_variant_unref (res);
-    }
-
   if (!retval)
-    {
-      g_set_error (error_out, EOS_APP_LIST_MODEL_ERROR,
-                   EOS_APP_LIST_MODEL_ERROR_UNINSTALL_FAILED,
-                   _("Application '%s' could not be removed"),
-                   desktop_id);
+    g_set_error (error_out, EOS_APP_LIST_MODEL_ERROR,
+                 EOS_APP_LIST_MODEL_ERROR_UNINSTALL_FAILED,
+                 _("Application '%s' could not be removed"),
+                 desktop_id);
 
-      return FALSE;
-    }
+
+  eos_app_log_info_message ("Uninstall return value from eam: %s",
+                            retval ? "OK" : "Fail");
 
   return retval;
 }
