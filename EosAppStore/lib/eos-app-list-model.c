@@ -2,6 +2,7 @@
 
 #include "config.h"
 
+#include "eos-app-log.h"
 #include "eos-app-list-model.h"
 #include "eos-app-manager-transaction.h"
 
@@ -918,11 +919,22 @@ check_available_space (GFile         *path,
   GFileInfo *info;
   gboolean retval = TRUE;
 
+  if (path == NULL) {
+    eos_app_log_error_message ("File doesn't exist");
+  }
+
+  eos_app_log_info_message ("Trying to get filesystem info from %s",
+                            g_file_get_path(path));
+
   info = g_file_query_filesystem_info (path, G_FILE_ATTRIBUTE_FILESYSTEM_FREE,
                                        cancellable,
                                        error);
-  if (info == NULL)
+  if (info == NULL) {
+    eos_app_log_error_message ("Can't get filesystem info to calculate"
+                               "the available space");
+
     return FALSE;
+  }
 
   guint64 free_space = g_file_info_get_attribute_uint64 (info, G_FILE_ATTRIBUTE_FILESYSTEM_FREE);
 
@@ -931,8 +943,12 @@ check_available_space (GFile         *path,
    */
   guint64 req_space = min_size * 2;
 
+  eos_app_log_info_message ("Space left on FS: %lld", (long long) req_space);
+
   if (free_space < req_space)
     {
+      eos_app_log_error_message ("Not enough space on device for downloading app");
+
       g_set_error (error, EOS_APP_LIST_MODEL_ERROR,
                    EOS_APP_LIST_MODEL_ERROR_DISK_FULL,
                    _("Not enough space on device for downloading app"));
@@ -961,6 +977,8 @@ download_file_from_uri (EosAppListModel *self,
 
   if (uri == NULL)
     {
+      eos_app_log_error_message ("Soap URI is NULL - canceling download");
+
       g_set_error (error, EOS_APP_LIST_MODEL_ERROR,
                    EOS_APP_LIST_MODEL_ERROR_INVALID_URL,
                    _("No available bundle for '%s'"),
@@ -968,8 +986,11 @@ download_file_from_uri (EosAppListModel *self,
       return FALSE;
     }
 
-  if (self->soup_session == NULL)
+  if (self->soup_session == NULL) {
+    eos_app_log_error_message ("Creating new soup session failed");
+
     self->soup_session = soup_session_new ();
+  }
 
   SoupRequest *request = soup_session_request_uri (self->soup_session, uri, &internal_error);
 
@@ -977,6 +998,8 @@ download_file_from_uri (EosAppListModel *self,
 
   if (internal_error != NULL)
     {
+      eos_app_log_error_message ("Soup request had an internal error");
+
       g_propagate_error (error, internal_error);
       return FALSE;
     }
@@ -986,6 +1009,8 @@ download_file_from_uri (EosAppListModel *self,
   GInputStream *in_stream = soup_request_send (request, cancellable, &internal_error);
   if (internal_error != NULL)
     {
+      eos_app_log_error_message ("Soup request sending had an internal error");
+
       g_propagate_error (error, internal_error);
       g_object_unref (request);
       return FALSE;
@@ -1002,6 +1027,8 @@ download_file_from_uri (EosAppListModel *self,
 
   if (!check_available_space (parent, total, cancellable, &internal_error))
     {
+      eos_app_log_error_message("Not enough space on FS - canceling download");
+
       g_propagate_error (error, internal_error);
       goto out;
     }
@@ -1015,6 +1042,8 @@ download_file_from_uri (EosAppListModel *self,
   out_stream = g_file_create (file, G_FILE_CREATE_NONE, cancellable, &internal_error);
   if (internal_error != NULL)
     {
+      eos_app_log_error_message ("Create file failed - canceling download");
+
       g_set_error (error, EOS_APP_LIST_MODEL_ERROR,
                    EOS_APP_LIST_MODEL_ERROR_FAILED,
                    _("Unable to create the file for downloading '%s': %s"),
@@ -1035,6 +1064,8 @@ download_file_from_uri (EosAppListModel *self,
   content = g_byte_array_new ();
   g_byte_array_set_size (content, GET_DATA_BLOCK_SIZE);
 
+  eos_app_log_info_message ("Downloading file chunks start");
+
   /* we don't use splice() because it does not have progress, and the
    * data is coming from a network request, so it won't have a file
    * descriptor we can use splice() on
@@ -1049,6 +1080,9 @@ download_file_from_uri (EosAppListModel *self,
                              &internal_error);
       if (internal_error != NULL)
         {
+          eos_app_log_error_message ("Downloading file failed during piecewise"
+                                     "transfer");
+
           g_propagate_error (error, internal_error);
           goto out;
         }
@@ -1061,6 +1095,8 @@ download_file_from_uri (EosAppListModel *self,
 
   if (g_cancellable_is_cancelled (cancellable))
     {
+      eos_app_log_info_message ("Canceled download");
+
       /* emit a progress notification for the whole file */
       if (progress_func != NULL)
         progress_func (app_id, total, total, progress_func_user_data);
@@ -1084,6 +1120,8 @@ download_file_from_uri (EosAppListModel *self,
     progress_func (app_id, total, total, progress_func_user_data);
 
   retval = TRUE;
+
+  eos_app_log_info_message ("Exiting download method normally");
 
 out:
   g_clear_pointer (&content, g_byte_array_unref);
@@ -1175,8 +1213,13 @@ download_bundle (EosAppListModel *self,
   const char *bundle_uri = eos_app_manager_transaction_get_bundle_uri (transaction);
   const char *app_id = eos_app_manager_transaction_get_application_id (transaction);
 
+  eos_app_log_info_message ("Downloading - bundle URI: %s", bundle_uri);
+  eos_app_log_info_message ("Downloading - bundle app id: %s", app_id);
+
   if (bundle_uri == NULL || *bundle_uri == '\0')
     {
+      eos_app_log_error_message ("Bundle URI is bad. Canceling");
+
       g_set_error (error_out, EOS_APP_LIST_MODEL_ERROR,
                    EOS_APP_LIST_MODEL_ERROR_FAILED,
                    _("Application bundle '%s' could not be downloaded"),
@@ -1188,11 +1231,15 @@ download_bundle (EosAppListModel *self,
   char *bundle_path = g_build_filename (BUNDLEDIR, bundle_name, NULL);
   g_free (bundle_name);
 
+  eos_app_log_info_message ("Bundle save path is %s", bundle_path);
+
   if (!download_file_from_uri (self, app_id,
                                bundle_uri, bundle_path,
                                queue_download_progress, self,
                                cancellable, &error))
     {
+      eos_app_log_error_message ("Download of bundle failed");
+
       g_propagate_error (error_out, error);
     }
 
@@ -1224,6 +1271,8 @@ add_app_from_manager (EosAppListModel *self,
 
   if (error != NULL)
     {
+      eos_app_log_error_message ("Got an error getting the transaction");
+
       /* errors coming out of DBus are generally obscure and not
        * useful for users; we log them on the session log, and
        * report a generic error to the UI
@@ -1271,6 +1320,8 @@ add_app_from_manager (EosAppListModel *self,
 
   if (transaction_path == NULL || *transaction_path == '\0')
     {
+      eos_app_log_error_message ("Transaction path is empty - canceling");
+
       g_set_error (error_out, EOS_APP_LIST_MODEL_ERROR,
                    EOS_APP_LIST_MODEL_ERROR_INSTALL_FAILED,
                    _("Application '%s' could not be installed"),
@@ -1279,9 +1330,13 @@ add_app_from_manager (EosAppListModel *self,
       return FALSE;
     }
 
+  eos_app_log_info_message ("Got transaction path: %s", transaction_path);
+
   char *bundle_path = NULL;
   char *signature_path = NULL;
   char *sha256_path = NULL;
+
+  eos_app_log_info_message ("Accessing dbus transaction");
 
   EosAppManagerTransaction *transaction =
     eos_app_manager_transaction_proxy_new_sync (self->system_bus,
@@ -1291,23 +1346,43 @@ add_app_from_manager (EosAppListModel *self,
                                                 cancellable,
                                                 &error);
 
-  if (error != NULL)
+  if (error != NULL) {
+    eos_app_log_error_message ("Getting dbus transaction failed");
+
     goto out;
+  }
+
+  eos_app_log_info_message ("Downloading bundle");
 
   /* download bundle */
   bundle_path = download_bundle (self, transaction, cancellable, &error);
-  if (error != NULL)
+  if (error != NULL) {
+    eos_app_log_info_message ("Download of bundle failed");
+
     goto out;
+  }
+
+  eos_app_log_info_message ("Downloading signature");
 
   /* now download signature */
   signature_path = download_signature (self, transaction, cancellable, &error);
-  if (error != NULL)
+  if (error != NULL) {
+    eos_app_log_error_message ("Signature download failed");
+
     goto out;
+  }
+
+  eos_app_log_info_message ("Downloading hash");
 
   /* now build sha256sum file */
   sha256_path = create_sha256sum (self, transaction, bundle_path, cancellable, &error);
-  if (error != NULL)
+  if (error != NULL) {
+    eos_app_log_error_message ("Hash download failed");
+
     goto out;
+  }
+
+  eos_app_log_info_message ("Completing transaction with eam");
 
   /* call this manually, since we want to specify a custom timeout */
   res = g_dbus_proxy_call_sync (G_DBUS_PROXY (transaction),
