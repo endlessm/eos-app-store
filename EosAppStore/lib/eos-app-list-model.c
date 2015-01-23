@@ -4,6 +4,7 @@
 
 #include "eos-app-log.h"
 #include "eos-app-list-model.h"
+#include "eos-app-manager-service.h"
 #include "eos-app-manager-transaction.h"
 
 #include <glib-object.h>
@@ -1256,17 +1257,38 @@ add_app_from_manager (EosAppListModel *self,
   gboolean retval = FALSE;
   char *app_id = app_id_from_desktop_id (desktop_id);
   char *transaction_path = NULL;
-  GVariant *res =
-    g_dbus_connection_call_sync (self->system_bus,
-                                 "com.endlessm.AppManager",
-                                 "/com/endlessm/AppManager",
-                                 "com.endlessm.AppManager", "Install",
-                                 g_variant_new ("(s)", app_id),
-                                 G_VARIANT_TYPE ("(o)"),
-                                 G_DBUS_CALL_FLAGS_NONE,
-                                 G_MAXINT,
-                                 NULL,
-                                 &error);
+
+  eos_app_log_info_message ("Creating proxy");
+
+  EosAppManager *proxy = eos_app_manager_proxy_new_for_bus_sync (G_BUS_TYPE_SYSTEM,
+                                                                 G_DBUS_PROXY_FLAGS_NONE,
+                                                                 "com.endlessm.AppManager",
+                                                                 "/com/endlessm/AppManager",
+                                                                 NULL, /* GCancellable* */
+                                                                 &error);
+
+  if (proxy == NULL)
+    {
+      eos_app_log_error_message ("Could not get DBus proxy object - canceling");
+
+      g_set_error (error_out, EOS_APP_LIST_MODEL_ERROR,
+                   EOS_APP_LIST_MODEL_ERROR_INSTALL_FAILED,
+                   _("Application '%s' could not be installed"),
+                   desktop_id);
+
+      g_free (app_id);
+
+      return FALSE;
+    }
+
+  eos_app_log_info_message ("Calling install dbus method with app_id: %s",
+                            app_id);
+
+  eos_app_manager_call_install_sync (proxy, app_id, &transaction_path,
+                                     NULL,
+                                     &error);
+
+  g_object_unref(proxy);
   g_free (app_id);
 
   if (error != NULL)
@@ -1310,12 +1332,6 @@ add_app_from_manager (EosAppListModel *self,
       g_error_free (error);
 
       return FALSE;
-    }
-
-  if (res != NULL)
-    {
-      g_variant_get (res, "(o)", &transaction_path);
-      g_variant_unref (res);
     }
 
   if (transaction_path == NULL || *transaction_path == '\0')
@@ -1385,14 +1401,14 @@ add_app_from_manager (EosAppListModel *self,
   eos_app_log_info_message ("Completing transaction with eam");
 
   /* call this manually, since we want to specify a custom timeout */
-  res = g_dbus_proxy_call_sync (G_DBUS_PROXY (transaction),
-                                "CompleteTransaction",
-                                g_variant_new ("(s)",
-                                               bundle_path),
-                                G_DBUS_CALL_FLAGS_NONE,
-                                G_MAXINT,
-                                cancellable,
-                                &error);
+  GVariant *res = g_dbus_proxy_call_sync (G_DBUS_PROXY (transaction),
+                                          "CompleteTransaction",
+                                          g_variant_new ("(s)",
+                                                         bundle_path),
+                                          G_DBUS_CALL_FLAGS_NONE,
+                                          G_MAXINT,
+                                          cancellable,
+                                          &error);
   if (res != NULL)
     {
       g_variant_get (res, "(b)", &retval);
