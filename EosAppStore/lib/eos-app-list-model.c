@@ -62,6 +62,24 @@ static guint eos_app_list_model_signals[LAST_SIGNAL] = { 0, };
 G_DEFINE_TYPE (EosAppListModel, eos_app_list_model, G_TYPE_OBJECT)
 G_DEFINE_QUARK (eos-app-list-model-error-quark, eos_app_list_model_error)
 
+static EosAppManager *
+get_eam_dbus_proxy ()
+{
+  GError *error = NULL;
+
+  EosAppManager *proxy = eos_app_manager_proxy_new_for_bus_sync (G_BUS_TYPE_SYSTEM,
+                                                                 G_DBUS_PROXY_FLAGS_NONE,
+                                                                 "com.endlessm.AppManager",
+                                                                 "/com/endlessm/AppManager",
+                                                                 NULL, /* GCancellable* */
+                                                                 &error);
+
+  if (error != NULL)
+    eos_app_log_error_message ("Unable to get requested dbus proxy");
+
+  return proxy;
+}
+
 static gboolean
 emit_queued_changed (gpointer data)
 {
@@ -1255,18 +1273,10 @@ add_app_from_manager (EosAppListModel *self,
 {
   GError *error = NULL;
   gboolean retval = FALSE;
-  char *app_id = app_id_from_desktop_id (desktop_id);
-  char *transaction_path = NULL;
 
   eos_app_log_info_message ("Creating proxy");
 
-  EosAppManager *proxy = eos_app_manager_proxy_new_for_bus_sync (G_BUS_TYPE_SYSTEM,
-                                                                 G_DBUS_PROXY_FLAGS_NONE,
-                                                                 "com.endlessm.AppManager",
-                                                                 "/com/endlessm/AppManager",
-                                                                 NULL, /* GCancellable* */
-                                                                 &error);
-
+  EosAppManager *proxy = get_eam_dbus_proxy();
   if (proxy == NULL)
     {
       eos_app_log_error_message ("Could not get DBus proxy object - canceling");
@@ -1276,13 +1286,15 @@ add_app_from_manager (EosAppListModel *self,
                    _("Application '%s' could not be installed"),
                    desktop_id);
 
-      g_free (app_id);
-
       return FALSE;
     }
 
+  char *app_id = app_id_from_desktop_id (desktop_id);
+  char *transaction_path = NULL;
+
   eos_app_log_info_message ("Calling install dbus method with app_id: %s",
                             app_id);
+
 
   eos_app_manager_call_install_sync (proxy, app_id, &transaction_path,
                                      NULL,
@@ -1293,12 +1305,13 @@ add_app_from_manager (EosAppListModel *self,
 
   if (error != NULL)
     {
+      /* errors coming out of DBus are generally obscure and not
+       * useful for users; we log them on the session log and journal
+       * but report a generic error to the UI
+       */
+
       eos_app_log_error_message ("Got an error getting the transaction");
 
-      /* errors coming out of DBus are generally obscure and not
-       * useful for users; we log them on the session log, and
-       * report a generic error to the UI
-       */
       g_warning ("Unable to install '%s': %s", desktop_id, error->message);
 
       /* the app manager may send us specific errors */
@@ -1370,7 +1383,6 @@ add_app_from_manager (EosAppListModel *self,
 
   eos_app_log_info_message ("Downloading bundle");
 
-  /* download bundle */
   bundle_path = download_bundle (self, transaction, cancellable, &error);
   if (error != NULL) {
     eos_app_log_info_message ("Download of bundle failed");
@@ -1380,7 +1392,6 @@ add_app_from_manager (EosAppListModel *self,
 
   eos_app_log_info_message ("Downloading signature");
 
-  /* now download signature */
   signature_path = download_signature (self, transaction, cancellable, &error);
   if (error != NULL) {
     eos_app_log_error_message ("Signature download failed");
@@ -1390,7 +1401,6 @@ add_app_from_manager (EosAppListModel *self,
 
   eos_app_log_info_message ("Downloading hash");
 
-  /* now build sha256sum file */
   sha256_path = create_sha256sum (self, transaction, bundle_path, cancellable, &error);
   if (error != NULL) {
     eos_app_log_error_message ("Hash download failed");
