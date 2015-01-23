@@ -10,6 +10,7 @@ eaprivate_cflags = \
 	$(EOS_APP_STORE_CFLAGS)
 
 eaprivate_source_h = \
+	lib/eos-app-log.h \
 	lib/eos-app-enums.h \
 	lib/eos-app-info.h \
 	lib/eos-app-list-model.h \
@@ -18,6 +19,7 @@ eaprivate_source_h = \
 	lib/eos-vertical-stack-switcher.h
 
 eaprivate_source_c = \
+	lib/eos-app-log.c \
 	lib/eos-app-enums.c \
 	lib/eos-app-info.c \
 	lib/eos-app-list-model.c \
