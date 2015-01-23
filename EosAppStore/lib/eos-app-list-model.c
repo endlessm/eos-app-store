@@ -716,19 +716,26 @@ refresh_app_manager (EosAppListModel *self,
   GError *error = NULL;
   gboolean retval = FALSE;
 
-  GVariant *res =
-    g_dbus_connection_call_sync (self->system_bus,
-                                 "com.endlessm.AppManager",
-                                 "/com/endlessm/AppManager",
-                                 "com.endlessm.AppManager", "Refresh",
-                                 NULL,
-                                 G_VARIANT_TYPE ("(b)"),
-                                 G_DBUS_CALL_FLAGS_NONE,
-                                 G_MAXINT,
-                                 cancellable,
-                                 &error);
+  eos_app_log_info_message ("Refresh of apps requested");
+
+  EosAppManager *proxy = get_eam_dbus_proxy();
+  if (proxy == NULL)
+    {
+      eos_app_log_error_message ("Could not get DBus proxy object - canceling");
+
+      return FALSE;
+    }
+
+  eos_app_log_info_message ("Trying to refresh app list");
+
+  eos_app_manager_call_refresh_sync (proxy, &retval, NULL, &error);
+
+  g_object_unref(proxy);
+
   if (error != NULL)
     {
+      eos_app_log_error_message ("Unable to refresh the list of applications: %s",
+                                 error->message);
       g_warning ("Unable to refresh the list of applications: %s",
                  error->message);
       g_error_free (error);
@@ -736,16 +743,17 @@ refresh_app_manager (EosAppListModel *self,
       goto out;
     }
 
-  g_variant_get (res, "(b)", &retval);
-  g_variant_unref (res);
-
 out:
   if (!retval)
     {
+      eos_app_log_error_message ("Unable to get the list of applications");
+
       g_set_error_literal (error_out, EOS_APP_LIST_MODEL_ERROR,
                            EOS_APP_LIST_MODEL_ERROR_NO_UPDATE_AVAILABLE,
                            _("We were unable to update the list of applications"));
     }
+
+  eos_app_log_info_message ("Refresh apps: %s", retval ? "OK" : "Fail");
 
   return retval;
 }
