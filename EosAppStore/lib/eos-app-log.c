@@ -8,8 +8,8 @@
 
 static void
 eos_app_log_messagev (int level,
-                  const char *fmt,
-                  va_list args)
+                      const char *fmt,
+                      va_list args)
 {
   static const char *eos_app_testing;
 
@@ -47,7 +47,7 @@ eos_app_log_messagev (int level,
 
 void
 eos_app_log_debug_message (const char *fmt,
-                       ...)
+                           ...)
 {
   va_list args;
 
@@ -60,7 +60,7 @@ eos_app_log_debug_message (const char *fmt,
 
 void
 eos_app_log_error_message (const char *fmt,
-                       ...)
+                           ...)
 {
   va_list args;
 
@@ -73,7 +73,7 @@ eos_app_log_error_message (const char *fmt,
 
 void
 eos_app_log_info_message (const char *fmt,
-                      ...)
+                          ...)
 {
   va_list args;
 
