@@ -437,35 +437,43 @@ load_user_capabilities (EosAppListModel *self,
   GVariant *capabilities;
   GError *error = NULL;
 
-  capabilities =
-    g_dbus_connection_call_sync (self->system_bus,
-                                 "com.endlessm.AppManager",
-                                 "/com/endlessm/AppManager",
-                                 "com.endlessm.AppManager",
-                                 "GetUserCapabilities",
-                                 NULL, NULL,
-                                 G_DBUS_CALL_FLAGS_NONE,
-                                 -1,
-                                 cancellable,
-                                 &error);
-
-  if (error != NULL)
+  EosAppManager *proxy = get_eam_dbus_proxy();
+  if (proxy == NULL)
     {
-      g_critical ("Unable to list retrieve user capabilities: %s",
-                  error->message);
-      g_propagate_error (error_out, error);
+      eos_app_log_error_message ("Could not get DBus proxy object - canceling");
+
       return FALSE;
     }
 
+  eos_app_log_info_message ("Trying to get user capabilities");
 
-  GVariant *caps;
-  caps = g_variant_get_child_value (capabilities, 0);
+  eos_app_manager_call_get_user_capabilities_sync (proxy,
+                                                   &capabilities,
+                                                   cancellable,
+                                                   &error);
 
-  g_variant_lookup (caps, "CanInstall", "b", &self->can_install);
-  g_variant_lookup (caps, "CanUninstall", "b", &self->can_uninstall);
+  g_object_unref(proxy);
 
-  g_variant_unref (caps);
+  if (error != NULL)
+    {
+      eos_app_log_error_message ("Unable to list retrieve user capabilities: %s",
+                                 error->message);
+      g_critical ("Unable to list retrieve user capabilities: %s",
+                  error->message);
+
+      g_propagate_error (error_out, error);
+
+      return FALSE;
+    }
+
+  g_variant_lookup (capabilities, "CanInstall", "b", &self->can_install);
+  g_variant_lookup (capabilities, "CanUninstall", "b", &self->can_uninstall);
   g_variant_unref (capabilities);
+
+  eos_app_log_debug_message ("CanInstall: %s",
+                             self->can_install ? "Yes" : "No");
+  eos_app_log_debug_message ("CanUninstall: %s",
+                             self->can_uninstall ? "Yes" : "No");
 
   return TRUE;
 }
