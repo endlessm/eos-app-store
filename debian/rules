@@ -11,3 +11,11 @@
 
 %:
 	dh $@ --with gir
+
+# Debug package setup. See https://wiki.debian.org/DebugPackage.
+override_dh_strip:
+	dh_strip --dbg-package=eos-app-store-dbg
+override_dh_auto_install:
+	dh_auto_install --destdir=debian/eos-app-store
+override_dh_installdocs:
+	dh_installdocs --link-doc=eos-app-store

@@ -33,3 +33,12 @@ Depends: ${gir:Depends},
          eos-shell-content
 Description: Endless OS App Store installation package
  This package will install the Endless OS App Store
+
+Package: eos-app-store-dbg
+Architecture: any
+Secton: debug
+Priority: extra
+Depends: ${misc:Depends},
+         eos-app-store (= ${binary:Version})
+Description: Endless OS App Store debugging symbols
+ This package contains the Endless OS App Store debugging symbols
