@@ -514,38 +514,64 @@ static gboolean
 load_manager_installed_apps (EosAppListModel *self,
                              GCancellable *cancellable)
 {
+  GVariant *installed_apps = NULL;
+  GVariant *removable_apps = NULL;
+
   GError *error = NULL;
 
-  GVariant *applications =
-    g_dbus_connection_call_sync (self->system_bus,
-                                 "com.endlessm.AppManager",
-                                 "/com/endlessm/AppManager",
-                                 "com.endlessm.AppManager",
-                                 "ListInstalled",
-                                 NULL, NULL,
-                                 G_DBUS_CALL_FLAGS_NONE,
-                                 -1,
-                                 cancellable,
-                                 &error);
-  if (error != NULL)
+  EosAppManager *proxy = get_eam_dbus_proxy();
+  if (proxy == NULL)
     {
-      g_critical ("Unable to list installed applications: %s", error->message);
-      g_error_free (error);
+      eos_app_log_error_message ("Could not get DBus proxy object - canceling");
+
       return FALSE;
     }
 
-  GVariantIter *iter1, *iter2;
+  eos_app_log_info_message ("Trying to get installed apps");
 
-  g_variant_get (applications, "(a(sss)a(sss))", &iter1, &iter2);
+  eos_app_manager_call_list_installed_sync (proxy,
+                                            &installed_apps,
+                                            &removable_apps,
+                                            cancellable,
+                                            &error);
+
+  g_object_unref(proxy);
+
+  eos_app_log_info_message ("Retrieved installed apps from eam manager");
+
+  if (error != NULL)
+    {
+      eos_app_log_error_message ("Unable to list installed applications: %s",
+                                 error->message);
+      g_critical ("Unable to list installed applications: %s", error->message);
+
+      g_error_free (error);
+
+      return FALSE;
+    }
+
+  eos_app_log_debug_message ("Parsing installed app return bjects");
+
+  GVariantIter *installed_apps_iter, *removable_apps_iter;
+  g_variant_get (installed_apps, "a(sss)", &installed_apps_iter);
+  g_variant_get (removable_apps, "a(sss)", &removable_apps_iter);
 
   g_clear_pointer (&self->manager_installed_apps, g_hash_table_unref);
   g_clear_pointer (&self->manager_removable_apps, g_hash_table_unref);
-  self->manager_installed_apps = load_installable_apps_from_gvariant (iter1);
-  self->manager_removable_apps = load_installable_apps_from_gvariant (iter2);
 
-  g_variant_iter_free (iter1);
-  g_variant_iter_free (iter2);
-  g_variant_unref (applications);
+  eos_app_log_debug_message ("Parsing installed app list");
+  self->manager_installed_apps = load_installable_apps_from_gvariant (installed_apps_iter);
+
+  eos_app_log_debug_message ("Parsing removable app list");
+  self->manager_installed_apps = load_installable_apps_from_gvariant (removable_apps_iter);
+
+  eos_app_log_debug_message ("Done retrieving installed apps");
+
+  g_variant_iter_free (installed_apps_iter);
+  g_variant_iter_free (removable_apps_iter);
+
+  g_variant_unref (installed_apps);
+  g_variant_unref (removable_apps);
 
   return TRUE;
 }
