@@ -375,7 +375,9 @@ load_available_apps (EosAppListModel *self,
                      GCancellable *cancellable,
                      GError **error_out)
 {
-  GVariant *applications;
+  GVariant *installable_apps = NULL;
+  GVariant *updatable_apps = NULL;
+
   GError *error = NULL;
 
   const char * const *locales = g_get_language_names ();
@@ -384,47 +386,70 @@ load_available_apps (EosAppListModel *self,
   char **variants = g_get_locale_variants (locale_name);
   const char *lang_id = variants[g_strv_length (variants) - 1];
 
-  GVariantBuilder builder;
+  GVariantBuilder filter_builder;
 
-  g_variant_builder_init (&builder, G_VARIANT_TYPE ("(a{sv})"));
-  g_variant_builder_open (&builder, G_VARIANT_TYPE ("a{sv}"));
-  g_variant_builder_add (&builder, "{sv}", "Locale", g_variant_new_string (lang_id));
-  g_variant_builder_close (&builder);
+  g_variant_builder_init (&filter_builder, G_VARIANT_TYPE ("a{sv}"));
+  g_variant_builder_open (&filter_builder, G_VARIANT_TYPE ("a{sv}"));
+  g_variant_builder_add (&filter_builder,
+                         "{sv}",
+                         "Locale",
+                         g_variant_new_string (lang_id));
+  g_variant_builder_close (&filter_builder);
 
   g_strfreev (variants);
 
-  applications =
-    g_dbus_connection_call_sync (self->system_bus,
-                                 "com.endlessm.AppManager",
-                                 "/com/endlessm/AppManager",
-                                 "com.endlessm.AppManager",
-                                 "ListAvailable",
-                                 g_variant_builder_end (&builder), NULL,
-                                 G_DBUS_CALL_FLAGS_NONE,
-                                 -1,
-                                 cancellable,
-                                 &error);
-
-  if (error != NULL)
+  EosAppManager *proxy = get_eam_dbus_proxy();
+  if (proxy == NULL)
     {
-      g_critical ("Unable to list available applications: %s",
-                  error->message);
-      g_propagate_error (error_out, error);
+      eos_app_log_error_message ("Could not get DBus proxy object - canceling");
+
       return FALSE;
     }
 
-  GVariantIter *iter1, *iter2;
+  eos_app_log_info_message ("Trying to get available apps");
 
-  g_variant_get (applications, "(a(sss)a(sss))", &iter1, &iter2);
+  eos_app_manager_call_list_available_sync (proxy,
+                                            g_variant_builder_end (&filter_builder),
+                                            &installable_apps,
+                                            &updatable_apps,
+                                            cancellable,
+                                            &error);
 
+  g_object_unref(proxy);
+
+  eos_app_log_info_message ("Retrieved available apps from eam manager");
+
+  if (error != NULL)
+    {
+      eos_app_log_error_message ("Unable to list available applications: %s",
+                                 error->message);
+      g_critical ("Unable to list available applications: %s",
+                  error->message);
+
+      g_propagate_error (error_out, error);
+
+      return FALSE;
+    }
+
+  GVariantIter *installable_apps_iter, *updatable_apps_iter;
+  g_variant_get (installable_apps, "a(sss)", &installable_apps_iter);
+  g_variant_get (updatable_apps, "a(sss)", &updatable_apps_iter);
+
+  eos_app_log_debug_message ("Parsing installable app list");
   if (installable_apps_out != NULL)
-    *installable_apps_out = create_app_hash_from_gvariant (iter1);
-  if (updatable_apps_out != NULL)
-    *updatable_apps_out = create_app_hash_from_gvariant (iter2);
+    *installable_apps_out = create_app_hash_from_gvariant (installable_apps_iter);
 
-  g_variant_iter_free (iter1);
-  g_variant_iter_free (iter2);
-  g_variant_unref (applications);
+  eos_app_log_debug_message ("Parsing updatable app list");
+  if (updatable_apps_out != NULL)
+    *updatable_apps_out = create_app_hash_from_gvariant (updatable_apps_iter);
+
+  eos_app_log_debug_message ("Done retrieving installed apps");
+
+  g_variant_iter_free (installable_apps_iter);
+  g_variant_iter_free (updatable_apps_iter);
+
+  g_variant_unref (installable_apps);
+  g_variant_unref (updatable_apps);
 
   return TRUE;
 }
