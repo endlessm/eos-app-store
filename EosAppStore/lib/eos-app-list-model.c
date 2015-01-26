@@ -1336,6 +1336,114 @@ download_bundle (EosAppListModel *self,
 }
 
 static gboolean
+get_bundle_artifacts(EosAppListModel *self,
+                     const char *desktop_id,
+                     char *transaction_path,
+                     GCancellable *cancellable,
+                     GError **error_out)
+{
+  GError *error = NULL;
+  gboolean retval = FALSE;
+
+  char *bundle_path = NULL;
+  char *signature_path = NULL;
+  char *sha256_path = NULL;
+
+  eos_app_log_info_message ("Accessing dbus transaction");
+
+  EosAppManagerTransaction *transaction =
+    eos_app_manager_transaction_proxy_new_sync (self->system_bus,
+                                                G_DBUS_PROXY_FLAGS_NONE,
+                                                "com.endlessm.AppManager",
+                                                transaction_path,
+                                                cancellable,
+                                                &error);
+
+  if (error != NULL) {
+    eos_app_log_error_message ("Getting dbus transaction failed");
+
+    goto out;
+  }
+
+  eos_app_log_info_message ("Downloading bundle");
+  bundle_path = download_bundle (self, transaction, cancellable, &error);
+  if (error != NULL) {
+    eos_app_log_info_message ("Download of bundle failed");
+
+    goto out;
+  }
+
+  eos_app_log_info_message ("Downloading signature");
+  signature_path = download_signature (self, transaction, cancellable, &error);
+  if (error != NULL) {
+    eos_app_log_error_message ("Signature download failed");
+
+    goto out;
+  }
+
+  eos_app_log_info_message ("Downloading hash");
+  sha256_path = create_sha256sum (self, transaction, bundle_path, cancellable, &error);
+  if (error != NULL) {
+    eos_app_log_error_message ("Hash download failed");
+
+    goto out;
+  }
+
+  eos_app_log_info_message ("Completing transaction with eam");
+
+  /* call this manually, since we want to specify a custom timeout */
+  GVariant *res = g_dbus_proxy_call_sync (G_DBUS_PROXY (transaction),
+                                          "CompleteTransaction",
+                                          g_variant_new ("(s)",
+                                                         bundle_path),
+                                          G_DBUS_CALL_FLAGS_NONE,
+                                          G_MAXINT,
+                                          cancellable,
+                                          &error);
+
+  if (res != NULL)
+    {
+      g_variant_get (res, "(b)", &retval);
+      g_variant_unref (res);
+    }
+
+out:
+  if (error != NULL) {
+    eos_app_log_error_message ("Completion of transaction %s failed",
+                               transaction_path);
+
+    if (transaction != NULL)
+      {
+        /* cancel the transaction on error */
+        eos_app_manager_transaction_call_cancel_transaction_sync (transaction, NULL, NULL);
+      }
+
+    /* delete the downloaded bundle and signature */
+    if (bundle_path)
+      g_unlink (bundle_path);
+    if (signature_path)
+      g_unlink (signature_path);
+    if (sha256_path)
+      g_unlink (sha256_path);
+
+    /* Bubble the error up */
+    g_propagate_error (error_out, error);
+
+    return FALSE;
+  }
+
+  /* We're done with the transaction now that we've called CompleteTransaction() */
+  if (transaction != NULL)
+    g_clear_object (&transaction);
+
+  g_free (bundle_path);
+  g_free (signature_path);
+  g_free (sha256_path);
+
+  return retval;
+}
+
+static gboolean
 add_app_from_manager (EosAppListModel *self,
                       const char *desktop_id,
                       GCancellable *cancellable,
@@ -1430,76 +1538,12 @@ add_app_from_manager (EosAppListModel *self,
 
   eos_app_log_info_message ("Got transaction path: %s", transaction_path);
 
-  char *bundle_path = NULL;
-  char *signature_path = NULL;
-  char *sha256_path = NULL;
+  retval = get_bundle_artifacts(self, desktop_id, transaction_path, cancellable, &error);
 
-  eos_app_log_info_message ("Accessing dbus transaction");
-
-  EosAppManagerTransaction *transaction =
-    eos_app_manager_transaction_proxy_new_sync (self->system_bus,
-                                                G_DBUS_PROXY_FLAGS_NONE,
-                                                "com.endlessm.AppManager",
-                                                transaction_path,
-                                                cancellable,
-                                                &error);
-
-  if (error != NULL) {
-    eos_app_log_error_message ("Getting dbus transaction failed");
-
-    goto out;
-  }
-
-  eos_app_log_info_message ("Downloading bundle");
-
-  bundle_path = download_bundle (self, transaction, cancellable, &error);
-  if (error != NULL) {
-    eos_app_log_info_message ("Download of bundle failed");
-
-    goto out;
-  }
-
-  eos_app_log_info_message ("Downloading signature");
-
-  signature_path = download_signature (self, transaction, cancellable, &error);
-  if (error != NULL) {
-    eos_app_log_error_message ("Signature download failed");
-
-    goto out;
-  }
-
-  eos_app_log_info_message ("Downloading hash");
-
-  sha256_path = create_sha256sum (self, transaction, bundle_path, cancellable, &error);
-  if (error != NULL) {
-    eos_app_log_error_message ("Hash download failed");
-
-    goto out;
-  }
-
-  eos_app_log_info_message ("Completing transaction with eam");
-
-  /* call this manually, since we want to specify a custom timeout */
-  GVariant *res = g_dbus_proxy_call_sync (G_DBUS_PROXY (transaction),
-                                          "CompleteTransaction",
-                                          g_variant_new ("(s)",
-                                                         bundle_path),
-                                          G_DBUS_CALL_FLAGS_NONE,
-                                          G_MAXINT,
-                                          cancellable,
-                                          &error);
-  if (res != NULL)
-    {
-      g_variant_get (res, "(b)", &retval);
-      g_variant_unref (res);
-    }
-
-  /* we're done with the transaction now that we've called CompleteTransaction() */
-  g_clear_object (&transaction);
-
-out:
   if (error != NULL)
     {
+      eos_app_log_error_message ("Transaction %s failed", transaction_path);
+
       if (error->domain == EOS_APP_LIST_MODEL_ERROR)
         {
           /* propagate only the errors we generate as they are... */
@@ -1522,29 +1566,9 @@ out:
                        desktop_id);
         }
 
-      if (transaction != NULL)
-        {
-          /* cancel the transaction on error */
-          eos_app_manager_transaction_call_cancel_transaction_sync (transaction, NULL, NULL);
-        }
-
-      retval = FALSE;
     }
 
-  g_clear_object (&transaction);
   g_free (transaction_path);
-
-  /* delete the downloaded bundle and signature */
-  if (bundle_path)
-    g_unlink (bundle_path);
-  if (signature_path)
-    g_unlink (signature_path);
-  if (sha256_path)
-    g_unlink (sha256_path);
-
-  g_free (bundle_path);
-  g_free (signature_path);
-  g_free (sha256_path);
 
   return retval;
 }
