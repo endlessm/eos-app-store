@@ -199,7 +199,7 @@ load_shell_apps_from_gvariant (GVariant *apps)
 }
 
 static GHashTable *
-load_installable_apps_from_gvariant (GVariantIter *apps)
+create_app_hash_from_gvariant (GVariantIter *apps)
 {
   GHashTable *retval;
   GVariantIter *iter;
@@ -359,8 +359,8 @@ on_app_manager_available_applications_changed (GDBusConnection *connection,
 
   g_variant_get (parameters, "(a(sss)a(sss))", &iter1, &iter2);
 
-  self->installable_apps = load_installable_apps_from_gvariant (iter1);
-  self->updatable_apps = load_installable_apps_from_gvariant (iter2);
+  self->installable_apps = create_app_hash_from_gvariant (iter1);
+  self->updatable_apps = create_app_hash_from_gvariant (iter2);
 
   g_variant_iter_free (iter1);
   g_variant_iter_free (iter2);
@@ -418,9 +418,9 @@ load_available_apps (EosAppListModel *self,
   g_variant_get (applications, "(a(sss)a(sss))", &iter1, &iter2);
 
   if (installable_apps_out != NULL)
-    *installable_apps_out = load_installable_apps_from_gvariant (iter1);
+    *installable_apps_out = create_app_hash_from_gvariant (iter1);
   if (updatable_apps_out != NULL)
-    *updatable_apps_out = load_installable_apps_from_gvariant (iter2);
+    *updatable_apps_out = create_app_hash_from_gvariant (iter2);
 
   g_variant_iter_free (iter1);
   g_variant_iter_free (iter2);
@@ -560,10 +560,10 @@ load_manager_installed_apps (EosAppListModel *self,
   g_clear_pointer (&self->manager_removable_apps, g_hash_table_unref);
 
   eos_app_log_debug_message ("Parsing installed app list");
-  self->manager_installed_apps = load_installable_apps_from_gvariant (installed_apps_iter);
+  self->manager_installed_apps = create_app_hash_from_gvariant (installed_apps_iter);
 
   eos_app_log_debug_message ("Parsing removable app list");
-  self->manager_installed_apps = load_installable_apps_from_gvariant (removable_apps_iter);
+  self->manager_installed_apps = create_app_hash_from_gvariant (removable_apps_iter);
 
   eos_app_log_debug_message ("Done retrieving installed apps");
 
