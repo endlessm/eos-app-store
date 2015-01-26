@@ -43,6 +43,8 @@ struct _EosAppListModel
   gboolean can_uninstall;
 
   SoupSession *soup_session;
+
+  EosAppManager *proxy;
 };
 
 struct _EosAppListModelClass
@@ -63,21 +65,28 @@ G_DEFINE_TYPE (EosAppListModel, eos_app_list_model, G_TYPE_OBJECT)
 G_DEFINE_QUARK (eos-app-list-model-error-quark, eos_app_list_model_error)
 
 static EosAppManager *
-get_eam_dbus_proxy ()
+get_eam_dbus_proxy (EosAppListModel *self)
 {
+  /* If we already have a proxy, return it */
+  if (self->proxy != NULL)
+    return self->proxy;
+
+  /* Otherwise create it */
   GError *error = NULL;
 
-  EosAppManager *proxy = eos_app_manager_proxy_new_for_bus_sync (G_BUS_TYPE_SYSTEM,
-                                                                 G_DBUS_PROXY_FLAGS_NONE,
-                                                                 "com.endlessm.AppManager",
-                                                                 "/com/endlessm/AppManager",
-                                                                 NULL, /* GCancellable* */
-                                                                 &error);
+  eos_app_log_debug_message ("Creating dbus proxy");
+
+  self->proxy = eos_app_manager_proxy_new_for_bus_sync (G_BUS_TYPE_SYSTEM,
+                                                        G_DBUS_PROXY_FLAGS_NONE,
+                                                        "com.endlessm.AppManager",
+                                                        "/com/endlessm/AppManager",
+                                                        NULL, /* GCancellable* */
+                                                        &error);
 
   if (error != NULL)
-    eos_app_log_error_message ("Unable to get requested dbus proxy");
+    eos_app_log_error_message ("Unable to create dbus proxy");
 
-  return proxy;
+  return self->proxy;
 }
 
 static gboolean
@@ -398,7 +407,7 @@ load_available_apps (EosAppListModel *self,
 
   g_strfreev (variants);
 
-  EosAppManager *proxy = get_eam_dbus_proxy();
+  EosAppManager *proxy = get_eam_dbus_proxy (self);
   if (proxy == NULL)
     {
       eos_app_log_error_message ("Could not get DBus proxy object - canceling");
@@ -414,8 +423,6 @@ load_available_apps (EosAppListModel *self,
                                             &updatable_apps,
                                             cancellable,
                                             &error);
-
-  g_object_unref(proxy);
 
   eos_app_log_info_message ("Retrieved available apps from eam manager");
 
@@ -462,7 +469,7 @@ load_user_capabilities (EosAppListModel *self,
   GVariant *capabilities;
   GError *error = NULL;
 
-  EosAppManager *proxy = get_eam_dbus_proxy();
+  EosAppManager *proxy = get_eam_dbus_proxy (self);
   if (proxy == NULL)
     {
       eos_app_log_error_message ("Could not get DBus proxy object - canceling");
@@ -476,8 +483,6 @@ load_user_capabilities (EosAppListModel *self,
                                                    &capabilities,
                                                    cancellable,
                                                    &error);
-
-  g_object_unref(proxy);
 
   if (error != NULL)
     {
@@ -544,7 +549,7 @@ load_manager_installed_apps (EosAppListModel *self,
 
   GError *error = NULL;
 
-  EosAppManager *proxy = get_eam_dbus_proxy();
+  EosAppManager *proxy = get_eam_dbus_proxy (self);
   if (proxy == NULL)
     {
       eos_app_log_error_message ("Could not get DBus proxy object - canceling");
@@ -559,8 +564,6 @@ load_manager_installed_apps (EosAppListModel *self,
                                             &removable_apps,
                                             cancellable,
                                             &error);
-
-  g_object_unref(proxy);
 
   eos_app_log_info_message ("Retrieved installed apps from eam manager");
 
@@ -687,6 +690,8 @@ eos_app_list_model_finalize (GObject *gobject)
       self->available_apps_changed_id = 0;
     }
 
+  g_object_unref (&self->proxy);
+
   g_clear_object (&self->soup_session);
   g_clear_object (&self->app_monitor);
   g_clear_object (&self->session_bus);
@@ -777,7 +782,7 @@ refresh_app_manager (EosAppListModel *self,
 
   eos_app_log_info_message ("Refresh of apps requested");
 
-  EosAppManager *proxy = get_eam_dbus_proxy();
+  EosAppManager *proxy = get_eam_dbus_proxy (self);
   if (proxy == NULL)
     {
       eos_app_log_error_message ("Could not get DBus proxy object - canceling");
@@ -788,8 +793,6 @@ refresh_app_manager (EosAppListModel *self,
   eos_app_log_info_message ("Trying to refresh app list");
 
   eos_app_manager_call_refresh_sync (proxy, &retval, NULL, &error);
-
-  g_object_unref(proxy);
 
   if (error != NULL)
     {
@@ -1073,7 +1076,7 @@ download_file_from_uri (EosAppListModel *self,
     }
 
   if (self->soup_session == NULL) {
-    eos_app_log_error_message ("Creating new soup session failed");
+    eos_app_log_error_message ("Creating new soup session");
 
     self->soup_session = soup_session_new ();
   }
@@ -1343,7 +1346,7 @@ add_app_from_manager (EosAppListModel *self,
 
   eos_app_log_info_message ("Creating proxy");
 
-  EosAppManager *proxy = get_eam_dbus_proxy();
+  EosAppManager *proxy = get_eam_dbus_proxy (self);
   if (proxy == NULL)
     {
       eos_app_log_error_message ("Could not get DBus proxy object - canceling");
@@ -1367,7 +1370,6 @@ add_app_from_manager (EosAppListModel *self,
                                      NULL,
                                      &error);
 
-  g_object_unref(proxy);
   g_free (app_id);
 
   if (error != NULL)
@@ -1602,7 +1604,7 @@ remove_app_from_manager (EosAppListModel *self,
   gboolean retval = FALSE;
   gchar *app_id = app_id_from_desktop_id (desktop_id);
 
-  EosAppManager *proxy = get_eam_dbus_proxy();
+  EosAppManager *proxy = get_eam_dbus_proxy (self);
   if (proxy == NULL)
     {
       eos_app_log_error_message ("Could not get DBus proxy object - canceling");
@@ -1619,7 +1621,6 @@ remove_app_from_manager (EosAppListModel *self,
 
   eos_app_manager_call_uninstall_sync (proxy, app_id, &retval, NULL, &error);
 
-  g_object_unref(proxy);
   g_free (app_id);
 
   if (error != NULL)
