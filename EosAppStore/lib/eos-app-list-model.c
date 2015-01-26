@@ -1445,6 +1445,38 @@ out:
   return retval;
 }
 
+static void
+set_app_installation_error (const char *desktop_id,
+                            const char *internal_message,
+                            const char *external_message,
+                            GError **error_out)
+{
+  /* Show errors in journal */
+  eos_app_log_error_message ("Error: %s", internal_message);
+  eos_app_log_error_message ("Error (user-visible): %s", external_message);
+
+  /* Show errors in session log */
+  g_warning ("Error: %s", internal_message);
+  g_warning ("Error (user-visible): %s", external_message);
+
+  /* Set user-visible error */
+  if (external_message == NULL)
+    {
+      g_set_error (error_out, EOS_APP_LIST_MODEL_ERROR,
+                   EOS_APP_LIST_MODEL_ERROR_INSTALL_FAILED,
+                   _("Application '%s' could not be installed"),
+                   desktop_id);
+    }
+  else
+    {
+      g_set_error (error_out, EOS_APP_LIST_MODEL_ERROR,
+                   EOS_APP_LIST_MODEL_ERROR_INSTALL_FAILED,
+                   _("Application '%s' could not be installed. %s"),
+                   desktop_id,
+                   external_message);
+    }
+}
+
 static gboolean
 add_app_from_manager (EosAppListModel *self,
                       const char *desktop_id,
@@ -1457,13 +1489,10 @@ add_app_from_manager (EosAppListModel *self,
   EosAppManager *proxy = get_eam_dbus_proxy (self);
   if (proxy == NULL)
     {
-      eos_app_log_error_message ("Could not get DBus proxy object - canceling");
-
-      g_set_error (error_out, EOS_APP_LIST_MODEL_ERROR,
-                   EOS_APP_LIST_MODEL_ERROR_INSTALL_FAILED,
-                   _("Application '%s' could not be installed"),
-                   desktop_id);
-
+      set_app_installation_error (desktop_id,
+                                  "Could not get DBus proxy object - canceling",
+                                  NULL, /* External error text */
+                                  error_out);
       return FALSE;
     }
 
@@ -1472,7 +1501,6 @@ add_app_from_manager (EosAppListModel *self,
 
   eos_app_log_info_message ("Calling install dbus method with app_id: %s",
                             app_id);
-
 
   eos_app_manager_call_install_sync (proxy, app_id, &transaction_path,
                                      NULL,
@@ -1503,21 +1531,10 @@ add_app_from_manager (EosAppListModel *self,
           g_free (code);
         }
 
-      if (message != NULL)
-        {
-          g_set_error (error_out, EOS_APP_LIST_MODEL_ERROR,
-                       EOS_APP_LIST_MODEL_ERROR_INSTALL_FAILED,
-                       _("Application '%s' could not be installed. %s"),
-                       desktop_id,
-                       message);
-        }
-      else
-        {
-          g_set_error (error_out, EOS_APP_LIST_MODEL_ERROR,
-                       EOS_APP_LIST_MODEL_ERROR_INSTALL_FAILED,
-                       _("Application '%s' could not be installed"),
-                       desktop_id);
-        }
+      set_app_installation_error (desktop_id,
+                                  "Installation of app failed",
+                                  message,
+                                  error_out);
 
       g_error_free (error);
 
@@ -1526,12 +1543,10 @@ add_app_from_manager (EosAppListModel *self,
 
   if (transaction_path == NULL || *transaction_path == '\0')
     {
-      eos_app_log_error_message ("Transaction path is empty - canceling");
-
-      g_set_error (error_out, EOS_APP_LIST_MODEL_ERROR,
-                   EOS_APP_LIST_MODEL_ERROR_INSTALL_FAILED,
-                   _("Application '%s' could not be installed"),
-                   desktop_id);
+      set_app_installation_error (desktop_id,
+                                  "Transaction path is empty - canceling",
+                                  NULL, /* External message */
+                                  error_out);
 
       return FALSE;
     }
@@ -1545,27 +1560,15 @@ add_app_from_manager (EosAppListModel *self,
       eos_app_log_error_message ("Transaction %s failed", transaction_path);
 
       if (error->domain == EOS_APP_LIST_MODEL_ERROR)
-        {
-          /* propagate only the errors we generate as they are... */
-          g_propagate_error (error_out, error);
-        }
+        /* propagate only the errors we generate as they are... */
+        g_propagate_error (error_out, error);
       else
-        {
-          /* ... otherwise log them in the session, and generate a custom
-           * error for the UI
-           */
-          g_warning ("Unable to complete transaction '%s' for app '%s': %s",
-                     transaction_path,
-                     desktop_id,
-                     error->message);
-          g_error_free (error);
+        set_app_installation_error (desktop_id,
+                                    error->message,
+                                    NULL, /* External message */
+                                    error_out);
 
-          g_set_error (error_out, EOS_APP_LIST_MODEL_ERROR,
-                       EOS_APP_LIST_MODEL_ERROR_INSTALL_FAILED,
-                       _("Application '%s' could not be installed"),
-                       desktop_id);
-        }
-
+      retval = FALSE;
     }
 
   g_free (transaction_path);
