@@ -67,6 +67,8 @@ G_DEFINE_QUARK (eos-app-list-model-error-quark, eos_app_list_model_error)
 static EosAppManager *
 get_eam_dbus_proxy (EosAppListModel *self)
 {
+  eos_app_log_debug_message ("Getting dbus proxy");
+
   /* If we already have a proxy, return it */
   if (self->proxy != NULL)
     return self->proxy;
@@ -74,7 +76,7 @@ get_eam_dbus_proxy (EosAppListModel *self)
   /* Otherwise create it */
   GError *error = NULL;
 
-  eos_app_log_debug_message ("Creating dbus proxy");
+  eos_app_log_debug_message ("No dbus proxy object yet - creating it");
 
   self->proxy = eos_app_manager_proxy_new_for_bus_sync (G_BUS_TYPE_SYSTEM,
                                                         G_DBUS_PROXY_FLAGS_NONE,
@@ -1451,8 +1453,6 @@ add_app_from_manager (EosAppListModel *self,
 {
   GError *error = NULL;
   gboolean retval = FALSE;
-
-  eos_app_log_info_message ("Creating proxy");
 
   EosAppManager *proxy = get_eam_dbus_proxy (self);
   if (proxy == NULL)
