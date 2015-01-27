@@ -1594,7 +1594,7 @@ add_app_from_manager (EosAppListModel *self,
 {
   return install_latest_app_version (self,
                                      desktop_id,
-                                     FALSE, /* Is upgrade? */
+                                     FALSE, /* Is update? */
                                      FALSE, /* Allow deltas (not applicable) */
                                      cancellable,
                                      error_out);
@@ -1606,9 +1606,24 @@ update_app_from_manager (EosAppListModel *self,
                          GCancellable *cancellable,
                          GError **error_out)
 {
+  gboolean retval = FALSE;
+
+  /* First try to do an xdelta upgrade */
+  retval = install_latest_app_version (self,
+                                       desktop_id,
+                                       TRUE, /* Is update? */
+                                       TRUE, /* Allow deltas */
+                                       cancellable,
+                                       error_out);
+
+  /* Incremental update worked. Nothing else is needed */
+  if (retval && error_out == NULL)
+    return TRUE;
+
+  /* Incremental update failed so we try the full update now */
   return install_latest_app_version (self,
                                      desktop_id,
-                                     TRUE, /* Is upgrade? */
+                                     TRUE, /* Is update? */
                                      FALSE, /* Allow deltas */
                                      cancellable,
                                      error_out);
