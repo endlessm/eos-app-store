@@ -1478,10 +1478,12 @@ set_app_installation_error (const char *desktop_id,
 }
 
 static gboolean
-add_app_from_manager (EosAppListModel *self,
-                      const char *desktop_id,
-                      GCancellable *cancellable,
-                      GError **error_out)
+install_latest_app_version (EosAppListModel *self,
+                            const char *desktop_id,
+                            const gboolean is_upgrade,
+                            const gboolean allow_deltas,
+                            GCancellable *cancellable,
+                            GError **error_out)
 {
   GError *error = NULL;
   gboolean retval = FALSE;
@@ -1502,9 +1504,17 @@ add_app_from_manager (EosAppListModel *self,
   eos_app_log_info_message ("Calling install dbus method with app_id: %s",
                             app_id);
 
-  eos_app_manager_call_install_sync (proxy, app_id, &transaction_path,
-                                     NULL,
-                                     &error);
+  /* We use different DBus targets but everything else is same */
+  if (is_upgrade)
+    eos_app_manager_call_update_sync (proxy, app_id, allow_deltas,
+                                      &transaction_path,
+                                      NULL,
+                                      &error);
+  else
+    eos_app_manager_call_install_sync (proxy, app_id,
+                                       &transaction_path,
+                                       NULL,
+                                       &error);
 
   g_free (app_id);
 
@@ -1577,12 +1587,31 @@ add_app_from_manager (EosAppListModel *self,
 }
 
 static gboolean
+add_app_from_manager (EosAppListModel *self,
+                      const char *desktop_id,
+                      GCancellable *cancellable,
+                      GError **error_out)
+{
+  return install_latest_app_version (self,
+                                     desktop_id,
+                                     FALSE, /* Is upgrade? */
+                                     FALSE, /* Allow deltas (not applicable) */
+                                     cancellable,
+                                     error_out);
+}
+
+static gboolean
 update_app_from_manager (EosAppListModel *self,
                          const char *desktop_id,
                          GCancellable *cancellable,
                          GError **error_out)
 {
-  return add_app_from_manager(self, desktop_id, cancellable, error_out);
+  return install_latest_app_version (self,
+                                     desktop_id,
+                                     TRUE, /* Is upgrade? */
+                                     FALSE, /* Allow deltas */
+                                     cancellable,
+                                     error_out);
 }
 
 static gboolean
