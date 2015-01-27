@@ -1592,6 +1592,8 @@ add_app_from_manager (EosAppListModel *self,
                       GCancellable *cancellable,
                       GError **error_out)
 {
+  eos_app_log_info_message ("Attempting to install %s", desktop_id);
+
   return install_latest_app_version (self,
                                      desktop_id,
                                      FALSE, /* Is update? */
@@ -1609,6 +1611,8 @@ update_app_from_manager (EosAppListModel *self,
   gboolean retval = FALSE;
 
   /* First try to do an xdelta upgrade */
+  eos_app_log_info_message ("Attempting to update %s using deltas", desktop_id);
+
   retval = install_latest_app_version (self,
                                        desktop_id,
                                        TRUE, /* Is update? */
@@ -1619,6 +1623,12 @@ update_app_from_manager (EosAppListModel *self,
   /* Incremental update worked. Nothing else is needed */
   if (retval && error_out == NULL)
     return TRUE;
+
+  eos_app_log_info_message ("Update of %s using deltas failed. Trying full update",
+                            desktop_id);
+
+  /* We don't care what the problem was (at this time) */
+  g_clear_error (error_out);
 
   /* Incremental update failed so we try the full update now */
   return install_latest_app_version (self,
