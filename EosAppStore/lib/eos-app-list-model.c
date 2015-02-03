@@ -17,6 +17,9 @@
 /* The delay for the EosAppListModel::changed signal, in milliseconds */
 #define CHANGED_DELAY   500
 
+/* Process owner of EAM */
+#define APP_MANAGER_USER   "eos-app-manager"
+
 struct _EosAppListModel
 {
   GObject parent_instance;
@@ -1052,6 +1055,35 @@ check_available_space (GFile         *path,
 }
 
 static gboolean
+fixup_downloaded_bundle_permissions (GFile *file)
+{
+  GError *error = NULL;
+  gboolean success = FALSE;
+
+  eos_app_log_info_message ("Changing fdownloaded file owner to: %s", APP_MANAGER_USER);
+
+  success = g_file_set_attribute_string (file,
+                                         G_FILE_ATTRIBUTE_OWNER_USER,
+                                         APP_MANAGER_USER,
+                                         G_FILE_QUERY_INFO_NONE,
+                                         NULL,
+                                         &error);
+
+  if (!success) {
+    if (error)
+      eos_app_log_debug_message ("Changing bundle owner failed: %s", error->message);
+    else
+      eos_app_log_debug_message ("Changing bundle owner failed");
+
+    return FALSE;
+  }
+
+  eos_app_log_debug_message ("Changing bundle owner complete");
+
+  return TRUE;
+}
+
+static gboolean
 download_file_from_uri (EosAppListModel *self,
                         const char      *app_id,
                         const char      *source_uri,
@@ -1211,6 +1243,8 @@ download_file_from_uri (EosAppListModel *self,
     progress_func (app_id, total, total, progress_func_user_data);
 
   retval = TRUE;
+
+  fixup_downloaded_bundle_permissions (file);
 
   eos_app_log_info_message ("Exiting download method normally");
 
