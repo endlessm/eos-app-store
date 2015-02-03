@@ -593,7 +593,7 @@ load_manager_installed_apps (EosAppListModel *self,
   self->manager_installed_apps = create_app_hash_from_gvariant (installed_apps_iter);
 
   eos_app_log_debug_message ("Parsing removable app list");
-  self->manager_installed_apps = create_app_hash_from_gvariant (removable_apps_iter);
+  self->manager_removable_apps = create_app_hash_from_gvariant (removable_apps_iter);
 
   eos_app_log_debug_message ("Done retrieving installed apps");
 
