@@ -977,7 +977,16 @@ download_file_from_uri (EosAppListModel *self,
 
   if (internal_error != NULL)
     {
-      g_propagate_error (error, internal_error);
+      if (g_error_matches (internal_error, G_TLS_ERROR, G_TLS_ERROR_BAD_CERTIFICATE))
+        {
+          g_set_error (error, EOS_APP_LIST_MODEL_ERROR,
+                       EOS_APP_LIST_MODEL_ERROR_BAD_CERTIFICATE,
+                       _("The certificate of the app store is invalid or expired"));
+          g_error_free (internal_error);
+        }
+      else
+        g_propagate_error (error, internal_error);
+
       return FALSE;
     }
 
