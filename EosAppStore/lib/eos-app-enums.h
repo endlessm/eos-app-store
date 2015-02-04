@@ -43,6 +43,16 @@ typedef enum {
 
 GType eos_link_category_get_type (void);
 
+#define EOS_TYPE_APP_LOG_LEVEL          (eos_app_log_level_get_type ())
+
+typedef enum {
+  EOS_APP_LOG_LEVEL_DEBUG,
+  EOS_APP_LOG_LEVEL_INFO,
+  EOS_APP_LOG_LEVEL_ERROR
+} EosAppLogLevel;
+
+GType eos_app_log_level_get_type (void);
+
 G_END_DECLS
 
 #endif /* __EOS_APP_ENUMS_H__ */

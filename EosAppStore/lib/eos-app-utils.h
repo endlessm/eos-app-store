@@ -36,6 +36,9 @@ void    eos_save_icon            (GdkPixbuf       *pixbuf,
 
 GdkNotifyType eos_get_event_notify_type (GdkEvent *event);
 
+void    eos_log_message          (EosAppLogLevel   level,
+                                  const char      *msg);
+
 G_END_DECLS
 
 #endif /* EOS_APP_UTILS_H */
