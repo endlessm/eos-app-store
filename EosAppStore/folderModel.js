@@ -3,6 +3,7 @@ const Gio = imports.gi.Gio;
 const GLib = imports.gi.GLib;
 const Gtk = imports.gi.Gtk;
 const AppListModel = imports.appListModel;
+const EosAppStorePrivate = imports.gi.EosAppStorePrivate;
 
 const Lang = imports.lang;
 
@@ -42,7 +43,8 @@ const FolderModel = new Lang.Class({
 
         // octal literals are deprecated in JS, so use parseInt
         if (GLib.mkdir_with_parents(dirpath, parseInt('0755', 8), null) < 0) {
-            log('could not create the directory ' + dirpath);
+            EosAppStorePrivate.log_message(EosAppStorePrivate.AppLogLevel.ERROR,
+                                           'could not create the directory ' + dirpath);
             return;
         }
 

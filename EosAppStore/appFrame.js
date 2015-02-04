@@ -351,7 +351,9 @@ const AppListBoxRow = new Lang.Class({
                 break;
 
             case EosAppStorePrivate.AppState.UNKNOWN:
-                log('The state of app "' + this._appId + '" is not known to the app store');
+                EosAppStorePrivate.log_message(EosAppStorePrivate.AppLogLevel.ERROR,
+                                               'The state of app "' + this._appId +
+                                               '" is not known to the app store');
                 break;
         }
 
@@ -445,7 +447,7 @@ const AppListBoxRow = new Lang.Class({
                 this._maybeNotify(_("We could not update '%s'").format(this.appTitle), error);
             }
             else {
-                    this._maybeNotify(_("'%s' was updated successfully").format(this.appTitle));
+                this._maybeNotify(_("'%s' was updated successfully").format(this.appTitle));
             }
         }));
     },
@@ -459,7 +461,9 @@ const AppListBoxRow = new Lang.Class({
                 appWindow.hide();
             }
         } catch (e) {
-            log("Failed to launch app '" + this._appId + "': " + e.message);
+            EosAppStorePrivate.log_message(EosAppStorePrivate.AppLogLevel.ERROR,
+                                           "Failed to launch app '" + this._appId + "': " +
+                                           e.message);
         }
     },
 
