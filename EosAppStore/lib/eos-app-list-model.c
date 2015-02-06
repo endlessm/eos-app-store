@@ -977,7 +977,38 @@ download_file_from_uri (EosAppListModel *self,
 
   if (internal_error != NULL)
     {
-      g_propagate_error (error, internal_error);
+      if (g_type_is_a (G_OBJECT_TYPE (request), SOUP_TYPE_REQUEST_HTTP) &&
+          g_error_matches (internal_error, G_TLS_ERROR, G_TLS_ERROR_BAD_CERTIFICATE))
+        {
+          SoupMessage *message;
+
+          message = soup_request_http_get_message (SOUP_REQUEST_HTTP (request));
+
+          GTlsCertificateFlags cert_flags = 0;
+
+          g_object_get (message, "tls-errors", &cert_flags, NULL);
+
+          const char *msg;
+
+          if ((cert_flags & G_TLS_CERTIFICATE_EXPIRED) != 0)
+            msg = _("The certificate of the app store is expired");
+          else if ((cert_flags & G_TLS_CERTIFICATE_REVOKED) != 0)
+            msg = _("The certificate of the app store has been revoked");
+          else if ((cert_flags & G_TLS_CERTIFICATE_BAD_IDENTITY) != 0)
+            msg = _("The certificate of the app store has a bad identity");
+          else if ((cert_flags & G_TLS_CERTIFICATE_UNKNOWN_CA) != 0)
+            msg = _("The certificate of the app store is from an unknown authority");
+          else
+            msg = _("The certificate of the app store is bad or invalid");
+
+          g_set_error (error, EOS_APP_LIST_MODEL_ERROR,
+                       EOS_APP_LIST_MODEL_ERROR_BAD_CERTIFICATE,
+                       msg);
+          g_error_free (internal_error);
+        }
+      else
+        g_propagate_error (error, internal_error);
+
       return FALSE;
     }
 
