@@ -399,6 +399,13 @@ eos_flexy_grid_get_preferred_width (GtkWidget *widget,
 
   int target_column_size = priv->cell_size < 0 ? DEFAULT_CELL_SIZE : priv->cell_size;
 
+  if (g_sequence_get_length (priv->children) == 0)
+    {
+      minimum_width = 0;
+      natural_width = 0;
+      goto out;
+    }
+
   /* minimum width: the biggest possible cell width */
   minimum_width = target_column_size * 2;
 
@@ -443,6 +450,7 @@ eos_flexy_grid_get_preferred_width (GtkWidget *widget,
 
   natural_width = width;
 
+out:
   if (minimum_width_out)
     *minimum_width_out = minimum_width;
   if (natural_width_out)
@@ -465,13 +473,20 @@ eos_flexy_grid_get_preferred_height_for_width (GtkWidget *widget,
                                                gint      *natural_height_out)
 {
   EosFlexyGridPrivate *priv = eos_flexy_grid_get_instance_private (EOS_FLEXY_GRID (widget));
+  int layout_height;
+
+  if (g_sequence_get_length (priv->children) == 0)
+    {
+      layout_height = 0;
+      goto out;
+    }
 
   int cell_size = priv->cell_size < 0 ? DEFAULT_CELL_SIZE : priv->cell_size;
   int cell_spacing = priv->cell_spacing < 0 ? DEFAULT_SPACING : priv->cell_spacing;
-  int layout_height;
 
   layout_height = distribute_layout (priv->children, for_width, cell_size, cell_spacing, FALSE);
 
+out:
   if (minimum_height_out)
     *minimum_height_out = layout_height;
 
@@ -505,6 +520,10 @@ eos_flexy_grid_size_allocate (GtkWidget     *widget,
                             allocation->height);
 
   EosFlexyGridPrivate *priv = eos_flexy_grid_get_instance_private (EOS_FLEXY_GRID (widget));
+
+  /* the sequence is empty, no need to distribute the layout */
+  if (g_sequence_get_length (priv->children) == 0)
+    return;
 
   int cell_size = priv->cell_size < 0 ? DEFAULT_CELL_SIZE : priv->cell_size;
   int cell_spacing = priv->cell_spacing < 0 ? DEFAULT_SPACING : priv->cell_spacing;
