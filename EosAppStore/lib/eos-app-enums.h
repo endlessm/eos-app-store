@@ -43,6 +43,29 @@ typedef enum {
 
 GType eos_link_category_get_type (void);
 
+#define EOS_TYPE_FLEXY_SHAPE            (eos_flexy_shape_get_type ())
+
+/**
+ * EosFlexyShape:
+ * @EOS_FLEXY_SHAPE_SMALL: 1x1 shape for small cells
+ * @EOS_FLEXY_SHAPE_MEDIUM_HORIZONTAL: 2x1 <quote>landscape</quote> shape for
+ * medium cells
+ * @EOS_FLEXY_SHAPE_MEDIUM_VERTICAL: 1x2 <quote>portrait</quote> shape for
+ * medium cells
+ * @EOS_FLEXY_SHAPE_LARGE: 2x2 shape for large cells
+ *
+ * Sizes for flexible-layout cells in `EosFlexyGrid`.
+ */
+typedef enum
+{
+  EOS_FLEXY_SHAPE_SMALL,
+  EOS_FLEXY_SHAPE_MEDIUM_HORIZONTAL,
+  EOS_FLEXY_SHAPE_MEDIUM_VERTICAL,
+  EOS_FLEXY_SHAPE_LARGE
+} EosFlexyShape;
+
+GType eos_flexy_shape_get_type (void) G_GNUC_CONST;
+
 G_END_DECLS
 
 #endif /* __EOS_APP_ENUMS_H__ */

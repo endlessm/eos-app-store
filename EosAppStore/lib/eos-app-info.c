@@ -7,8 +7,8 @@
 #include <locale.h>
 #include <glib/gi18n.h>
 #include <gdk-pixbuf/gdk-pixbuf.h>
-#include <endless/endless.h>
 
+#include "eos-flexy-grid.h"
 #include "eos-app-utils.h"
 
 /*

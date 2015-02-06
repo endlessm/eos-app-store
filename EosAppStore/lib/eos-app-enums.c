@@ -49,3 +49,10 @@ EOS_DEFINE_ENUM_TYPE (EosLinkCategory, eos_link_category,
                       EOS_ENUM_VALUE (EOS_LINK_CATEGORY_EDUCATION, education)
                       EOS_ENUM_VALUE (EOS_LINK_CATEGORY_ENTERTAINMENT, entertainment)
                       EOS_ENUM_VALUE (EOS_LINK_CATEGORY_LOCAL, local))
+
+EOS_DEFINE_ENUM_TYPE (EosFlexyShape, eos_flexy_shape,
+                      EOS_ENUM_VALUE (EOS_FLEXY_SHAPE_SMALL, small)
+                      EOS_ENUM_VALUE (EOS_FLEXY_SHAPE_MEDIUM_HORIZONTAL, medium-horizontal)
+                      EOS_ENUM_VALUE (EOS_FLEXY_SHAPE_MEDIUM_VERTICAL, medium-vertical)
+                      EOS_ENUM_VALUE (EOS_FLEXY_SHAPE_LARGE, large))
+
