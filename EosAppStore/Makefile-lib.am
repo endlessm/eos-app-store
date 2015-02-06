@@ -4,6 +4,7 @@ eaprivate_cflags = \
 	-DPREFIX=\"$(prefix)\" \
 	-DLIBDIR=\"$(libdir)\" \
 	-DDATADIR=\"$(datadir)\" \
+	-DSYSCONFDIR=\"$(sysconfdir)\" \
 	-DBUNDLEDIR=\"$(localstatedir)/tmp/eos-app-store\" \
 	-DG_LOG_DOMAIN=\"EosAppPrivate\" \
 	-DG_DISABLE_DEPRECATED \

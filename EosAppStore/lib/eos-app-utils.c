@@ -13,12 +13,64 @@
 #define APP_STORE_CONTENT_APPS  "apps"
 #define APP_STORE_CONTENT_LINKS "links"
 
+static const gchar *
+get_system_personality (void)
+{
+  static char *personality;
+
+  if (g_once_init_enter (&personality))
+    {
+      gchar *tmp;
+
+      tmp = g_strdup (g_getenv ("ENDLESS_OS_PERSONALITY"));
+      if (tmp != NULL && tmp[0] == '\0')
+        {
+          g_free (tmp);
+          tmp = NULL;
+        }
+
+      if (tmp == NULL)
+        {
+          GKeyFile *personality_file = g_key_file_new ();
+          char *path = g_build_filename (SYSCONFDIR,
+                                         "EndlessOS",
+                                         "personality.conf",
+                                         NULL);
+
+          GError *error = NULL;
+          g_key_file_load_from_file (personality_file, path,
+                                     G_KEY_FILE_NONE, &error);
+
+          if (error == NULL)
+            tmp = g_key_file_get_string (personality_file, "Personality",
+                                         "PersonalityName", &error);
+
+          if (error != NULL)
+            {
+              g_critical ("No personality defined: %s", error->message);
+              g_error_free (error);
+              tmp = NULL;
+            }
+
+          g_key_file_free (personality_file);
+          g_free (path);
+        }
+
+      if (tmp == NULL)
+        tmp = g_strdup ("default");
+
+      g_once_init_leave (&personality, tmp);
+    }
+
+  return personality;
+}
+
 static char *
 eos_get_content_dir (const gchar *content_type)
 {
   char *res = g_build_filename (DATADIR,
                                 APP_STORE_CONTENT_DIR,
-                                eos_get_system_personality (),
+                                get_system_personality (),
                                 content_type,
                                 NULL);
 
@@ -148,8 +200,7 @@ eos_app_load_content (EosAppCategory category,
                       EosAppFilterCallback callback,
                       gpointer data)
 {
-  JsonArray *array = eos_app_parse_resource_content (APP_STORE_CONTENT_APPS,
-                                                     "content");
+  JsonArray *array = eos_app_parse_resource_content (APP_STORE_CONTENT_APPS, "content");
 
   if (array == NULL)
     return NULL;
@@ -214,7 +265,7 @@ eos_link_load_content (EosLinkCategory category)
   JsonObject *obj;
   const gchar *category_name;
 
-  JsonArray *categories_array = eos_app_parse_resource_content (APP_STORE_CONTENT_LINKS, eos_get_system_personality());
+  JsonArray *categories_array = eos_app_parse_resource_content (APP_STORE_CONTENT_LINKS, get_system_personality ());
 
   if (categories_array == NULL)
     return NULL;
