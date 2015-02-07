@@ -1001,9 +1001,9 @@ download_file_from_uri (EosAppListModel *self,
           else
             msg = _("The certificate of the app store is bad or invalid");
 
-          g_set_error (error, EOS_APP_LIST_MODEL_ERROR,
-                       EOS_APP_LIST_MODEL_ERROR_BAD_CERTIFICATE,
-                       msg);
+          g_set_error_literal (error, EOS_APP_LIST_MODEL_ERROR,
+                               EOS_APP_LIST_MODEL_ERROR_BAD_CERTIFICATE,
+                               msg);
           g_error_free (internal_error);
         }
       else
