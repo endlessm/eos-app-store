@@ -49,3 +49,8 @@ EOS_DEFINE_ENUM_TYPE (EosLinkCategory, eos_link_category,
                       EOS_ENUM_VALUE (EOS_LINK_CATEGORY_EDUCATION, education)
                       EOS_ENUM_VALUE (EOS_LINK_CATEGORY_ENTERTAINMENT, entertainment)
                       EOS_ENUM_VALUE (EOS_LINK_CATEGORY_LOCAL, local))
+
+EOS_DEFINE_ENUM_TYPE (EosAppLogLevel, eos_app_log_level,
+                      EOS_ENUM_VALUE (EOS_APP_LOG_LEVEL_DEBUG, debug)
+                      EOS_ENUM_VALUE (EOS_APP_LOG_LEVEL_INFO, info)
+                      EOS_ENUM_VALUE (EOS_APP_LOG_LEVEL_ERROR, error))

@@ -7,6 +7,8 @@
 
 #include <locale.h>
 #include <glib/gi18n.h>
+#include <errno.h>
+#include <systemd/sd-journal.h>
 #include <json-glib/json-glib.h>
 
 #define APP_STORE_CONTENT_DIR   "application-store"
@@ -430,4 +432,31 @@ GdkNotifyType
 eos_get_event_notify_type (GdkEvent *event)
 {
   return ((GdkEventCrossing *) event)->detail;
+}
+
+void
+eos_log_message (EosAppLogLevel  level,
+                 const char     *msg)
+{
+  int log_level;
+
+  switch (level)
+    {
+    case EOS_APP_LOG_LEVEL_DEBUG:
+      log_level = LOG_DEBUG;
+      break;
+
+    case EOS_APP_LOG_LEVEL_INFO:
+      log_level = LOG_INFO;
+      break;
+
+    case EOS_APP_LOG_LEVEL_ERROR:
+      log_level = LOG_ERR;
+      break;
+
+    default:
+      g_assert_not_reached ();
+    }
+
+  sd_journal_print (log_level, msg);
 }

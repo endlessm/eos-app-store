@@ -186,8 +186,10 @@ const AppStore = new Lang.Class({
         this._runningOperations -= 1;
 
         if (this._runningOperations < 0) {
-            log("appStore.popRunningOperation() called without a previous call to " +
-                "appStore.pushRunningOperation().");
+            EosAppStorePrivate.log_message(EosAppStorePrivate.AppLogLevel.ERROR,
+                                           "appStore.popRunningOperation() called " +
+                                           "without a previous call to " +
+                                           "appStore.pushRunningOperation().");
             this._runningOperations = 0;
         }
 

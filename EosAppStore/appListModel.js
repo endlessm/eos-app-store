@@ -78,7 +78,8 @@ const BaseList = new Lang.Class({
 
     install: function(id, callback) {
         if (this._cancellables[id]) {
-            log('Installation of app ' + id + ' already in progress.');
+            EosAppStorePrivate.log_message(EosAppStorePrivate.AppLogLevel.ERROR,
+                                           'Installation of app ' + id + ' already in progress.');
             return;
         }
 
@@ -98,7 +99,9 @@ const BaseList = new Lang.Class({
                 }
             }
             catch (e) {
-                log('Failed to install app ' + id + ': ' + e.message);
+                EosAppStorePrivate.log_message(EosAppStorePrivate.AppLogLevel.ERROR,
+                                               'Failed to install app ' + id + ': ' +
+                                               e.message);
                 if (callback) {
                     callback(e);
                 }
@@ -128,7 +131,9 @@ const BaseList = new Lang.Class({
                 }
             }
             catch (e) {
-                log('Failed to uninstall app ' + id + ': ' + e.message);
+                EosAppStorePrivate.log_message(EosAppStorePrivate.AppLogLevel.ERROR,
+                                               'Failed to uninstall app ' + id + ': ' +
+                                               e.message);
                 if (callback) {
                     callback(e);
                 }
@@ -153,7 +158,9 @@ const BaseList = new Lang.Class({
                 }
             }
             catch (e) {
-                log('Failed to refresh the model: ' + e.message);
+                EosAppStorePrivate.log_message(EosAppStorePrivate.AppLogLevel.ERROR,
+                                               'Failed to refresh the model: ' +
+                                               e.message);
                 if (callback) {
                     callback(e);
                 }
@@ -205,7 +212,8 @@ const AppList = new Lang.Class({
 
     updateApp: function(id, callback) {
         if (this._cancellables[id]) {
-            log('Update of app ' + id + ' already in progress.');
+            EosAppStorePrivate.log_message(EosAppStorePrivate.AppLogLevel.ERROR,
+                                           'Update of app ' + id + ' already in progress.');
             return;
         }
 
@@ -225,7 +233,9 @@ const AppList = new Lang.Class({
                 }
             }
             catch (e) {
-                log('Failed to update app ' + id + ': ' + e.message);
+                EosAppStorePrivate.log_message(EosAppStorePrivate.AppLogLevel.ERROR,
+                                               'Failed to update app ' + id + ': ' +
+                                               e.message);
                 if (callback) {
                     callback(e);
                 }
