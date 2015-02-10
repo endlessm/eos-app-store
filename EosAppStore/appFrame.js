@@ -6,7 +6,6 @@ const GObject = imports.gi.GObject;
 const Gtk = imports.gi.Gtk;
 const EosAppStorePrivate = imports.gi.EosAppStorePrivate;
 const Mainloop = imports.mainloop;
-const Endless = imports.gi.Endless;
 
 const AppListModel = imports.appListModel;
 const AppStoreWindow = imports.appStoreWindow;
@@ -667,8 +666,8 @@ const AppCategoryFrame = new Lang.Class({
         box.add(scrollWindow);
 
         let cellMargin = EosAppStorePrivate.AppInfo.get_cell_margin();
-        let grid = new Endless.FlexyGrid({ cell_size: CELL_DEFAULT_SIZE + cellMargin,
-                                           cell_spacing: CELL_DEFAULT_SPACING - cellMargin });
+        let grid = new EosAppStorePrivate.FlexyGrid({ cell_size: CELL_DEFAULT_SIZE + cellMargin,
+                                                      cell_spacing: CELL_DEFAULT_SPACING - cellMargin });
         scrollWindow.add_with_viewport(grid);
 
         let appInfos = EosAppStorePrivate.app_load_content(this._category.id,
@@ -684,7 +683,7 @@ const AppCategoryFrame = new Lang.Class({
 
                 if (this._model.hasLauncher(id)) {
                     let cell = appInfos[i].create_cell(this._model.getIcon(id));
-                    cell.shape = Endless.FlexyShape.SMALL;
+                    cell.shape = EosAppStorePrivate.FlexyShape.SMALL;
                     grid.add(cell);
                 }
             }

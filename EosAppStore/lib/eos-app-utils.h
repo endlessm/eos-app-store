@@ -4,7 +4,6 @@
 #define EOS_APP_UTILS_H
 
 #include <glib.h>
-#include <endless/endless.h>
 #include <webkit2/webkit2.h>
 #include "eos-app-enums.h"
 #include "eos-app-info.h"
