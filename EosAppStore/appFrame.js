@@ -730,10 +730,9 @@ const AppCategoryFrame = new Lang.Class({
             appBox.show();
 
             this._stack.add_named(appBox, cell.desktop_id);
-            this._stack.transition_type = Gtk.StackTransitionType.SLIDE_LEFT;
         }
 
-        this._stack.set_visible_child_name(cell.desktop_id);
+        this._stack.set_visible_child_full(cell.desktop_id, Gtk.StackTransitionType.SLIDE_LEFT);
 
         this._mainWindow.titleText = cell.app_info.get_title();
         this._mainWindow.subtitleText = cell.app_info.get_subtitle();
