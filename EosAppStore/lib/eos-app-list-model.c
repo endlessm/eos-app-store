@@ -1259,6 +1259,25 @@ out:
   return retval;
 }
 
+static gboolean
+download_file_from_uri_with_retry (EosAppListModel *self,
+                                   const char      *app_id,
+                                   const char      *source_uri,
+                                   const char      *target_file,
+                                   ProgressReportFunc progress_func,
+                                   gpointer         progress_func_user_data,
+                                   GCancellable    *cancellable,
+                                   GError         **error)
+{
+    return download_file_from_uri (self, app_id, source_uri, target_file,
+                                   progress_func,
+                                   progress_func_user_data,
+                                   cancellable,
+                                   error);
+}
+
+
+
 static char *
 create_sha256sum (EosAppListModel *self,
                   EosAppManagerTransaction *transaction,
@@ -1315,10 +1334,10 @@ download_signature (EosAppListModel *self,
   char *signature_path = g_build_filename (BUNDLEDIR, signature_name, NULL);
   g_free (signature_name);
 
-  if (!download_file_from_uri (self, app_id,
-                               signature_uri, signature_path,
-                               NULL, NULL,
-                               cancellable, &error))
+  if (!download_file_from_uri_with_retry (self, app_id,
+                                          signature_uri, signature_path,
+                                          NULL, NULL,
+                                          cancellable, &error))
     {
       g_propagate_error (error_out, error);
     }
@@ -1356,10 +1375,10 @@ download_bundle (EosAppListModel *self,
 
   eos_app_log_info_message ("Bundle save path is %s", bundle_path);
 
-  if (!download_file_from_uri (self, app_id,
-                               bundle_uri, bundle_path,
-                               queue_download_progress, self,
-                               cancellable, &error))
+  if (!download_file_from_uri_with_retry (self, app_id,
+                                          bundle_uri, bundle_path,
+                                          queue_download_progress, self,
+                                          cancellable, &error))
     {
       eos_app_log_error_message ("Download of bundle failed");
 
