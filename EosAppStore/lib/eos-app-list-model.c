@@ -17,6 +17,14 @@
 /* The delay for the EosAppListModel::changed signal, in milliseconds */
 #define CHANGED_DELAY   500
 
+/* Amount of seconds that we should keep retrying to download the file after
+ * first interruption
+ */
+#define MAX_DOWNLOAD_RETRY_PERIOD 20
+
+/* Amount of seconds that we should wait before retrying a failed download */
+#define DOWNLOAD_RETRY_PERIOD 4
+
 struct _EosAppListModel
 {
   GObject parent_instance;
@@ -1278,12 +1286,12 @@ download_file_from_uri_with_retry (EosAppListModel *self,
 
     GError *error = NULL;
 
-    gint64 retry_time_limit = 20 * G_USEC_PER_SEC;
+    gint64 retry_time_limit = MAX_DOWNLOAD_RETRY_PERIOD * G_USEC_PER_SEC;
 
     gint64 error_retry_start = 0;
     gint64 error_retry_cutoff = 0;
 
-    /* Keep trying to donwload unless we finish successfully or we reach
+    /* Keep trying to download unless we finish successfully or we reach
      * the retry timeout
      */
     while (TRUE) {
@@ -1335,8 +1343,8 @@ download_file_from_uri_with_retry (EosAppListModel *self,
         if (progress_func != NULL)
             progress_func (app_id, 0, 0, progress_func_user_data);
 
-        /* Sleep for 4 seconds and try again */
-        g_usleep(4 * G_USEC_PER_SEC);
+        /* Sleep for n seconds and try again */
+        g_usleep(DOWNLOAD_RETRY_PERIOD * G_USEC_PER_SEC);
 
         eos_app_log_error_message ("Continuing download loop...");
     }
