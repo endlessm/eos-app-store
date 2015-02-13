@@ -2,7 +2,9 @@
 
 #include "config.h"
 
+#include "eos-app-log.h"
 #include "eos-app-list-model.h"
+#include "eos-app-manager-service.h"
 #include "eos-app-manager-transaction.h"
 
 #include <glib-object.h>
@@ -41,6 +43,8 @@ struct _EosAppListModel
   gboolean can_uninstall;
 
   SoupSession *soup_session;
+
+  EosAppManager *proxy;
 };
 
 struct _EosAppListModelClass
@@ -59,6 +63,33 @@ static guint eos_app_list_model_signals[LAST_SIGNAL] = { 0, };
 
 G_DEFINE_TYPE (EosAppListModel, eos_app_list_model, G_TYPE_OBJECT)
 G_DEFINE_QUARK (eos-app-list-model-error-quark, eos_app_list_model_error)
+
+static EosAppManager *
+get_eam_dbus_proxy (EosAppListModel *self)
+{
+  eos_app_log_debug_message ("Getting dbus proxy");
+
+  /* If we already have a proxy, return it */
+  if (self->proxy != NULL)
+    return self->proxy;
+
+  /* Otherwise create it */
+  GError *error = NULL;
+
+  eos_app_log_debug_message ("No dbus proxy object yet - creating it");
+
+  self->proxy = eos_app_manager_proxy_new_for_bus_sync (G_BUS_TYPE_SYSTEM,
+                                                        G_DBUS_PROXY_FLAGS_NONE,
+                                                        "com.endlessm.AppManager",
+                                                        "/com/endlessm/AppManager",
+                                                        NULL, /* GCancellable* */
+                                                        &error);
+
+  if (error != NULL)
+    eos_app_log_error_message ("Unable to create dbus proxy");
+
+  return self->proxy;
+}
 
 static gboolean
 emit_queued_changed (gpointer data)
@@ -179,7 +210,7 @@ load_shell_apps_from_gvariant (GVariant *apps)
 }
 
 static GHashTable *
-load_installable_apps_from_gvariant (GVariantIter *apps)
+create_app_hash_from_gvariant (GVariantIter *apps)
 {
   GHashTable *retval;
   GVariantIter *iter;
@@ -339,8 +370,8 @@ on_app_manager_available_applications_changed (GDBusConnection *connection,
 
   g_variant_get (parameters, "(a(sss)a(sss))", &iter1, &iter2);
 
-  self->installable_apps = load_installable_apps_from_gvariant (iter1);
-  self->updatable_apps = load_installable_apps_from_gvariant (iter2);
+  self->installable_apps = create_app_hash_from_gvariant (iter1);
+  self->updatable_apps = create_app_hash_from_gvariant (iter2);
 
   g_variant_iter_free (iter1);
   g_variant_iter_free (iter2);
@@ -355,7 +386,9 @@ load_available_apps (EosAppListModel *self,
                      GCancellable *cancellable,
                      GError **error_out)
 {
-  GVariant *applications;
+  GVariant *installable_apps = NULL;
+  GVariant *updatable_apps = NULL;
+
   GError *error = NULL;
 
   const char * const *locales = g_get_language_names ();
@@ -364,47 +397,68 @@ load_available_apps (EosAppListModel *self,
   char **variants = g_get_locale_variants (locale_name);
   const char *lang_id = variants[g_strv_length (variants) - 1];
 
-  GVariantBuilder builder;
+  GVariantBuilder filter_builder;
 
-  g_variant_builder_init (&builder, G_VARIANT_TYPE ("(a{sv})"));
-  g_variant_builder_open (&builder, G_VARIANT_TYPE ("a{sv}"));
-  g_variant_builder_add (&builder, "{sv}", "Locale", g_variant_new_string (lang_id));
-  g_variant_builder_close (&builder);
+  g_variant_builder_init (&filter_builder, G_VARIANT_TYPE ("a{sv}"));
+  g_variant_builder_open (&filter_builder, G_VARIANT_TYPE ("a{sv}"));
+  g_variant_builder_add (&filter_builder,
+                         "{sv}",
+                         "Locale",
+                         g_variant_new_string (lang_id));
+  g_variant_builder_close (&filter_builder);
 
   g_strfreev (variants);
 
-  applications =
-    g_dbus_connection_call_sync (self->system_bus,
-                                 "com.endlessm.AppManager",
-                                 "/com/endlessm/AppManager",
-                                 "com.endlessm.AppManager",
-                                 "ListAvailable",
-                                 g_variant_builder_end (&builder), NULL,
-                                 G_DBUS_CALL_FLAGS_NONE,
-                                 -1,
-                                 cancellable,
-                                 &error);
-
-  if (error != NULL)
+  EosAppManager *proxy = get_eam_dbus_proxy (self);
+  if (proxy == NULL)
     {
-      g_critical ("Unable to list available applications: %s",
-                  error->message);
-      g_propagate_error (error_out, error);
+      eos_app_log_error_message ("Could not get DBus proxy object - canceling");
+
       return FALSE;
     }
 
-  GVariantIter *iter1, *iter2;
+  eos_app_log_info_message ("Trying to get available apps");
 
-  g_variant_get (applications, "(a(sss)a(sss))", &iter1, &iter2);
+  eos_app_manager_call_list_available_sync (proxy,
+                                            g_variant_builder_end (&filter_builder),
+                                            &installable_apps,
+                                            &updatable_apps,
+                                            cancellable,
+                                            &error);
 
+  eos_app_log_info_message ("Retrieved available apps from eam manager");
+
+  if (error != NULL)
+    {
+      eos_app_log_error_message ("Unable to list available applications: %s",
+                                 error->message);
+      g_critical ("Unable to list available applications: %s",
+                  error->message);
+
+      g_propagate_error (error_out, error);
+
+      return FALSE;
+    }
+
+  GVariantIter *installable_apps_iter, *updatable_apps_iter;
+  g_variant_get (installable_apps, "a(sss)", &installable_apps_iter);
+  g_variant_get (updatable_apps, "a(sss)", &updatable_apps_iter);
+
+  eos_app_log_debug_message ("Parsing installable app list");
   if (installable_apps_out != NULL)
-    *installable_apps_out = load_installable_apps_from_gvariant (iter1);
-  if (updatable_apps_out != NULL)
-    *updatable_apps_out = load_installable_apps_from_gvariant (iter2);
+    *installable_apps_out = create_app_hash_from_gvariant (installable_apps_iter);
 
-  g_variant_iter_free (iter1);
-  g_variant_iter_free (iter2);
-  g_variant_unref (applications);
+  eos_app_log_debug_message ("Parsing updatable app list");
+  if (updatable_apps_out != NULL)
+    *updatable_apps_out = create_app_hash_from_gvariant (updatable_apps_iter);
+
+  eos_app_log_debug_message ("Done retrieving installed apps");
+
+  g_variant_iter_free (installable_apps_iter);
+  g_variant_iter_free (updatable_apps_iter);
+
+  g_variant_unref (installable_apps);
+  g_variant_unref (updatable_apps);
 
   return TRUE;
 }
@@ -417,35 +471,41 @@ load_user_capabilities (EosAppListModel *self,
   GVariant *capabilities;
   GError *error = NULL;
 
-  capabilities =
-    g_dbus_connection_call_sync (self->system_bus,
-                                 "com.endlessm.AppManager",
-                                 "/com/endlessm/AppManager",
-                                 "com.endlessm.AppManager",
-                                 "GetUserCapabilities",
-                                 NULL, NULL,
-                                 G_DBUS_CALL_FLAGS_NONE,
-                                 -1,
-                                 cancellable,
-                                 &error);
-
-  if (error != NULL)
+  EosAppManager *proxy = get_eam_dbus_proxy (self);
+  if (proxy == NULL)
     {
-      g_critical ("Unable to list retrieve user capabilities: %s",
-                  error->message);
-      g_propagate_error (error_out, error);
+      eos_app_log_error_message ("Could not get DBus proxy object - canceling");
+
       return FALSE;
     }
 
+  eos_app_log_info_message ("Trying to get user capabilities");
 
-  GVariant *caps;
-  caps = g_variant_get_child_value (capabilities, 0);
+  eos_app_manager_call_get_user_capabilities_sync (proxy,
+                                                   &capabilities,
+                                                   cancellable,
+                                                   &error);
 
-  g_variant_lookup (caps, "CanInstall", "b", &self->can_install);
-  g_variant_lookup (caps, "CanUninstall", "b", &self->can_uninstall);
+  if (error != NULL)
+    {
+      eos_app_log_error_message ("Unable to list retrieve user capabilities: %s",
+                                 error->message);
+      g_critical ("Unable to list retrieve user capabilities: %s",
+                  error->message);
 
-  g_variant_unref (caps);
+      g_propagate_error (error_out, error);
+
+      return FALSE;
+    }
+
+  g_variant_lookup (capabilities, "CanInstall", "b", &self->can_install);
+  g_variant_lookup (capabilities, "CanUninstall", "b", &self->can_uninstall);
   g_variant_unref (capabilities);
+
+  eos_app_log_debug_message ("CanInstall: %s",
+                             self->can_install ? "Yes" : "No");
+  eos_app_log_debug_message ("CanUninstall: %s",
+                             self->can_uninstall ? "Yes" : "No");
 
   return TRUE;
 }
@@ -486,38 +546,62 @@ static gboolean
 load_manager_installed_apps (EosAppListModel *self,
                              GCancellable *cancellable)
 {
+  GVariant *installed_apps = NULL;
+  GVariant *removable_apps = NULL;
+
   GError *error = NULL;
 
-  GVariant *applications =
-    g_dbus_connection_call_sync (self->system_bus,
-                                 "com.endlessm.AppManager",
-                                 "/com/endlessm/AppManager",
-                                 "com.endlessm.AppManager",
-                                 "ListInstalled",
-                                 NULL, NULL,
-                                 G_DBUS_CALL_FLAGS_NONE,
-                                 -1,
-                                 cancellable,
-                                 &error);
-  if (error != NULL)
+  EosAppManager *proxy = get_eam_dbus_proxy (self);
+  if (proxy == NULL)
     {
-      g_critical ("Unable to list installed applications: %s", error->message);
-      g_error_free (error);
+      eos_app_log_error_message ("Could not get DBus proxy object - canceling");
+
       return FALSE;
     }
 
-  GVariantIter *iter1, *iter2;
+  eos_app_log_info_message ("Trying to get installed apps");
 
-  g_variant_get (applications, "(a(sss)a(sss))", &iter1, &iter2);
+  eos_app_manager_call_list_installed_sync (proxy,
+                                            &installed_apps,
+                                            &removable_apps,
+                                            cancellable,
+                                            &error);
+
+  eos_app_log_info_message ("Retrieved installed apps from eam manager");
+
+  if (error != NULL)
+    {
+      eos_app_log_error_message ("Unable to list installed applications: %s",
+                                 error->message);
+      g_critical ("Unable to list installed applications: %s", error->message);
+
+      g_error_free (error);
+
+      return FALSE;
+    }
+
+  eos_app_log_debug_message ("Parsing installed app return bjects");
+
+  GVariantIter *installed_apps_iter, *removable_apps_iter;
+  g_variant_get (installed_apps, "a(sss)", &installed_apps_iter);
+  g_variant_get (removable_apps, "a(sss)", &removable_apps_iter);
 
   g_clear_pointer (&self->manager_installed_apps, g_hash_table_unref);
   g_clear_pointer (&self->manager_removable_apps, g_hash_table_unref);
-  self->manager_installed_apps = load_installable_apps_from_gvariant (iter1);
-  self->manager_removable_apps = load_installable_apps_from_gvariant (iter2);
 
-  g_variant_iter_free (iter1);
-  g_variant_iter_free (iter2);
-  g_variant_unref (applications);
+  eos_app_log_debug_message ("Parsing installed app list");
+  self->manager_installed_apps = create_app_hash_from_gvariant (installed_apps_iter);
+
+  eos_app_log_debug_message ("Parsing removable app list");
+  self->manager_removable_apps = create_app_hash_from_gvariant (removable_apps_iter);
+
+  eos_app_log_debug_message ("Done retrieving installed apps");
+
+  g_variant_iter_free (installed_apps_iter);
+  g_variant_iter_free (removable_apps_iter);
+
+  g_variant_unref (installed_apps);
+  g_variant_unref (removable_apps);
 
   return TRUE;
 }
@@ -608,6 +692,8 @@ eos_app_list_model_finalize (GObject *gobject)
       self->available_apps_changed_id = 0;
     }
 
+  g_object_unref (&self->proxy);
+
   g_clear_object (&self->soup_session);
   g_clear_object (&self->app_monitor);
   g_clear_object (&self->session_bus);
@@ -696,19 +782,24 @@ refresh_app_manager (EosAppListModel *self,
   GError *error = NULL;
   gboolean retval = FALSE;
 
-  GVariant *res =
-    g_dbus_connection_call_sync (self->system_bus,
-                                 "com.endlessm.AppManager",
-                                 "/com/endlessm/AppManager",
-                                 "com.endlessm.AppManager", "Refresh",
-                                 NULL,
-                                 G_VARIANT_TYPE ("(b)"),
-                                 G_DBUS_CALL_FLAGS_NONE,
-                                 G_MAXINT,
-                                 cancellable,
-                                 &error);
+  eos_app_log_info_message ("Refresh of apps requested");
+
+  EosAppManager *proxy = get_eam_dbus_proxy (self);
+  if (proxy == NULL)
+    {
+      eos_app_log_error_message ("Could not get DBus proxy object - canceling");
+
+      return FALSE;
+    }
+
+  eos_app_log_info_message ("Trying to refresh app list");
+
+  eos_app_manager_call_refresh_sync (proxy, &retval, NULL, &error);
+
   if (error != NULL)
     {
+      eos_app_log_error_message ("Unable to refresh the list of applications: %s",
+                                 error->message);
       g_warning ("Unable to refresh the list of applications: %s",
                  error->message);
       g_error_free (error);
@@ -716,16 +807,17 @@ refresh_app_manager (EosAppListModel *self,
       goto out;
     }
 
-  g_variant_get (res, "(b)", &retval);
-  g_variant_unref (res);
-
 out:
   if (!retval)
     {
+      eos_app_log_error_message ("Unable to get the list of applications");
+
       g_set_error_literal (error_out, EOS_APP_LIST_MODEL_ERROR,
                            EOS_APP_LIST_MODEL_ERROR_NO_UPDATE_AVAILABLE,
                            _("We were unable to update the list of applications"));
     }
+
+  eos_app_log_info_message ("Refresh apps: %s", retval ? "OK" : "Fail");
 
   return retval;
 }
@@ -918,11 +1010,22 @@ check_available_space (GFile         *path,
   GFileInfo *info;
   gboolean retval = TRUE;
 
+  if (path == NULL) {
+    eos_app_log_error_message ("File doesn't exist");
+  }
+
+  eos_app_log_info_message ("Trying to get filesystem info from %s",
+                            g_file_get_path(path));
+
   info = g_file_query_filesystem_info (path, G_FILE_ATTRIBUTE_FILESYSTEM_FREE,
                                        cancellable,
                                        error);
-  if (info == NULL)
+  if (info == NULL) {
+    eos_app_log_error_message ("Can't get filesystem info to calculate"
+                               "the available space");
+
     return FALSE;
+  }
 
   guint64 free_space = g_file_info_get_attribute_uint64 (info, G_FILE_ATTRIBUTE_FILESYSTEM_FREE);
 
@@ -931,8 +1034,12 @@ check_available_space (GFile         *path,
    */
   guint64 req_space = min_size * 2;
 
+  eos_app_log_info_message ("Space left on FS: %lld", (long long) req_space);
+
   if (free_space < req_space)
     {
+      eos_app_log_error_message ("Not enough space on device for downloading app");
+
       g_set_error (error, EOS_APP_LIST_MODEL_ERROR,
                    EOS_APP_LIST_MODEL_ERROR_DISK_FULL,
                    _("Not enough space on device for downloading app"));
@@ -961,6 +1068,8 @@ download_file_from_uri (EosAppListModel *self,
 
   if (uri == NULL)
     {
+      eos_app_log_error_message ("Soap URI is NULL - canceling download");
+
       g_set_error (error, EOS_APP_LIST_MODEL_ERROR,
                    EOS_APP_LIST_MODEL_ERROR_INVALID_URL,
                    _("No available bundle for '%s'"),
@@ -968,8 +1077,11 @@ download_file_from_uri (EosAppListModel *self,
       return FALSE;
     }
 
-  if (self->soup_session == NULL)
+  if (self->soup_session == NULL) {
+    eos_app_log_error_message ("Creating new soup session");
+
     self->soup_session = soup_session_new ();
+  }
 
   SoupRequest *request = soup_session_request_uri (self->soup_session, uri, &internal_error);
 
@@ -977,6 +1089,9 @@ download_file_from_uri (EosAppListModel *self,
 
   if (internal_error != NULL)
     {
+      eos_app_log_error_message ("Soup request had an internal error: %s",
+                                 internal_error->message);
+
       if (g_type_is_a (G_OBJECT_TYPE (request), SOUP_TYPE_REQUEST_HTTP) &&
           g_error_matches (internal_error, G_TLS_ERROR, G_TLS_ERROR_BAD_CERTIFICATE))
         {
@@ -1017,6 +1132,8 @@ download_file_from_uri (EosAppListModel *self,
   GInputStream *in_stream = soup_request_send (request, cancellable, &internal_error);
   if (internal_error != NULL)
     {
+      eos_app_log_error_message ("Soup request sending had an internal error");
+
       g_propagate_error (error, internal_error);
       g_object_unref (request);
       return FALSE;
@@ -1033,6 +1150,8 @@ download_file_from_uri (EosAppListModel *self,
 
   if (!check_available_space (parent, total, cancellable, &internal_error))
     {
+      eos_app_log_error_message("Not enough space on FS - canceling download");
+
       g_propagate_error (error, internal_error);
       goto out;
     }
@@ -1046,6 +1165,8 @@ download_file_from_uri (EosAppListModel *self,
   out_stream = g_file_create (file, G_FILE_CREATE_NONE, cancellable, &internal_error);
   if (internal_error != NULL)
     {
+      eos_app_log_error_message ("Create file failed - canceling download");
+
       g_set_error (error, EOS_APP_LIST_MODEL_ERROR,
                    EOS_APP_LIST_MODEL_ERROR_FAILED,
                    _("Unable to create the file for downloading '%s': %s"),
@@ -1066,6 +1187,8 @@ download_file_from_uri (EosAppListModel *self,
   content = g_byte_array_new ();
   g_byte_array_set_size (content, GET_DATA_BLOCK_SIZE);
 
+  eos_app_log_info_message ("Downloading file chunks start");
+
   /* we don't use splice() because it does not have progress, and the
    * data is coming from a network request, so it won't have a file
    * descriptor we can use splice() on
@@ -1080,6 +1203,9 @@ download_file_from_uri (EosAppListModel *self,
                              &internal_error);
       if (internal_error != NULL)
         {
+          eos_app_log_error_message ("Downloading file failed during piecewise"
+                                     "transfer");
+
           g_propagate_error (error, internal_error);
           goto out;
         }
@@ -1092,6 +1218,8 @@ download_file_from_uri (EosAppListModel *self,
 
   if (g_cancellable_is_cancelled (cancellable))
     {
+      eos_app_log_info_message ("Canceled download");
+
       /* emit a progress notification for the whole file */
       if (progress_func != NULL)
         progress_func (app_id, total, total, progress_func_user_data);
@@ -1115,6 +1243,8 @@ download_file_from_uri (EosAppListModel *self,
     progress_func (app_id, total, total, progress_func_user_data);
 
   retval = TRUE;
+
+  eos_app_log_info_message ("Exiting download method normally");
 
 out:
   g_clear_pointer (&content, g_byte_array_unref);
@@ -1206,8 +1336,13 @@ download_bundle (EosAppListModel *self,
   const char *bundle_uri = eos_app_manager_transaction_get_bundle_uri (transaction);
   const char *app_id = eos_app_manager_transaction_get_application_id (transaction);
 
+  eos_app_log_info_message ("Downloading - bundle URI: %s", bundle_uri);
+  eos_app_log_info_message ("Downloading - bundle app id: %s", app_id);
+
   if (bundle_uri == NULL || *bundle_uri == '\0')
     {
+      eos_app_log_error_message ("Bundle URI is bad. Canceling");
+
       g_set_error (error_out, EOS_APP_LIST_MODEL_ERROR,
                    EOS_APP_LIST_MODEL_ERROR_FAILED,
                    _("Application bundle '%s' could not be downloaded"),
@@ -1219,11 +1354,15 @@ download_bundle (EosAppListModel *self,
   char *bundle_path = g_build_filename (BUNDLEDIR, bundle_name, NULL);
   g_free (bundle_name);
 
+  eos_app_log_info_message ("Bundle save path is %s", bundle_path);
+
   if (!download_file_from_uri (self, app_id,
                                bundle_uri, bundle_path,
                                queue_download_progress, self,
                                cancellable, &error))
     {
+      eos_app_log_error_message ("Download of bundle failed");
+
       g_propagate_error (error_out, error);
     }
 
@@ -1231,34 +1370,195 @@ download_bundle (EosAppListModel *self,
 }
 
 static gboolean
-add_or_update_app_from_manager (EosAppListModel *self,
-                                const char *desktop_id,
-                                GCancellable *cancellable,
-                                GError **error_out)
+get_bundle_artifacts(EosAppListModel *self,
+                     const char *desktop_id,
+                     char *transaction_path,
+                     GCancellable *cancellable,
+                     GError **error_out)
 {
   GError *error = NULL;
   gboolean retval = FALSE;
+
+  char *bundle_path = NULL;
+  char *signature_path = NULL;
+  char *sha256_path = NULL;
+
+  eos_app_log_info_message ("Accessing dbus transaction");
+
+  EosAppManagerTransaction *transaction =
+    eos_app_manager_transaction_proxy_new_sync (self->system_bus,
+                                                G_DBUS_PROXY_FLAGS_NONE,
+                                                "com.endlessm.AppManager",
+                                                transaction_path,
+                                                cancellable,
+                                                &error);
+
+  if (error != NULL) {
+    eos_app_log_error_message ("Getting dbus transaction failed");
+
+    goto out;
+  }
+
+  eos_app_log_info_message ("Downloading bundle");
+  bundle_path = download_bundle (self, transaction, cancellable, &error);
+  if (error != NULL) {
+    eos_app_log_info_message ("Download of bundle failed");
+
+    goto out;
+  }
+
+  eos_app_log_info_message ("Downloading signature");
+  signature_path = download_signature (self, transaction, cancellable, &error);
+  if (error != NULL) {
+    eos_app_log_error_message ("Signature download failed");
+
+    goto out;
+  }
+
+  eos_app_log_info_message ("Downloading hash");
+  sha256_path = create_sha256sum (self, transaction, bundle_path, cancellable, &error);
+  if (error != NULL) {
+    eos_app_log_error_message ("Hash download failed");
+
+    goto out;
+  }
+
+  eos_app_log_info_message ("Completing transaction with eam");
+
+  /* call this manually, since we want to specify a custom timeout */
+  GVariant *res = g_dbus_proxy_call_sync (G_DBUS_PROXY (transaction),
+                                          "CompleteTransaction",
+                                          g_variant_new ("(s)",
+                                                         bundle_path),
+                                          G_DBUS_CALL_FLAGS_NONE,
+                                          G_MAXINT,
+                                          cancellable,
+                                          &error);
+
+  if (res != NULL)
+    {
+      g_variant_get (res, "(b)", &retval);
+      g_variant_unref (res);
+    }
+
+out:
+  if (error != NULL) {
+    eos_app_log_error_message ("Completion of transaction %s failed",
+                               transaction_path);
+
+    if (transaction != NULL)
+      {
+        /* cancel the transaction on error */
+        eos_app_manager_transaction_call_cancel_transaction_sync (transaction, NULL, NULL);
+      }
+
+    /* delete the downloaded bundle and signature */
+    if (bundle_path)
+      g_unlink (bundle_path);
+    if (signature_path)
+      g_unlink (signature_path);
+    if (sha256_path)
+      g_unlink (sha256_path);
+
+    /* Bubble the error up */
+    g_propagate_error (error_out, error);
+
+    return FALSE;
+  }
+
+  /* We're done with the transaction now that we've called CompleteTransaction() */
+  if (transaction != NULL)
+    g_clear_object (&transaction);
+
+  g_free (bundle_path);
+  g_free (signature_path);
+  g_free (sha256_path);
+
+  return retval;
+}
+
+static void
+set_app_installation_error (const char *desktop_id,
+                            const char *internal_message,
+                            const char *external_message,
+                            GError **error_out)
+{
+  /* Show errors in journal */
+  eos_app_log_error_message ("Error: %s", internal_message);
+  eos_app_log_error_message ("Error (user-visible): %s", external_message);
+
+  /* Show errors in session log */
+  g_warning ("Error: %s", internal_message);
+  g_warning ("Error (user-visible): %s", external_message);
+
+  /* Set user-visible error */
+  if (external_message == NULL)
+    {
+      g_set_error (error_out, EOS_APP_LIST_MODEL_ERROR,
+                   EOS_APP_LIST_MODEL_ERROR_INSTALL_FAILED,
+                   _("Application '%s' could not be installed"),
+                   desktop_id);
+    }
+  else
+    {
+      g_set_error (error_out, EOS_APP_LIST_MODEL_ERROR,
+                   EOS_APP_LIST_MODEL_ERROR_INSTALL_FAILED,
+                   _("Application '%s' could not be installed. %s"),
+                   desktop_id,
+                   external_message);
+    }
+}
+
+static gboolean
+install_latest_app_version (EosAppListModel *self,
+                            const char *desktop_id,
+                            const gboolean is_upgrade,
+                            const gboolean allow_deltas,
+                            GCancellable *cancellable,
+                            GError **error_out)
+{
+  GError *error = NULL;
+  gboolean retval = FALSE;
+
+  EosAppManager *proxy = get_eam_dbus_proxy (self);
+  if (proxy == NULL)
+    {
+      set_app_installation_error (desktop_id,
+                                  "Could not get DBus proxy object - canceling",
+                                  NULL, /* External error text */
+                                  error_out);
+      return FALSE;
+    }
+
   char *app_id = app_id_from_desktop_id (desktop_id);
   char *transaction_path = NULL;
-  GVariant *res =
-    g_dbus_connection_call_sync (self->system_bus,
-                                 "com.endlessm.AppManager",
-                                 "/com/endlessm/AppManager",
-                                 "com.endlessm.AppManager", "Install",
-                                 g_variant_new ("(s)", app_id),
-                                 G_VARIANT_TYPE ("(o)"),
-                                 G_DBUS_CALL_FLAGS_NONE,
-                                 G_MAXINT,
-                                 NULL,
-                                 &error);
+
+  eos_app_log_info_message ("Calling install dbus method with app_id: %s",
+                            app_id);
+
+  /* We use different DBus targets but everything else is same */
+  if (is_upgrade)
+    eos_app_manager_call_update_sync (proxy, app_id, allow_deltas,
+                                      &transaction_path,
+                                      NULL,
+                                      &error);
+  else
+    eos_app_manager_call_install_sync (proxy, app_id,
+                                       &transaction_path,
+                                       NULL,
+                                       &error);
+
   g_free (app_id);
 
   if (error != NULL)
     {
       /* errors coming out of DBus are generally obscure and not
-       * useful for users; we log them on the session log, and
-       * report a generic error to the UI
+       * useful for users; we log them on the session log and journal
+       * but report a generic error to the UI
        */
+
+      eos_app_log_error_message ("Got an error getting the transaction");
+
       g_warning ("Unable to install '%s': %s", desktop_id, error->message);
 
       /* the app manager may send us specific errors */
@@ -1273,141 +1573,102 @@ add_or_update_app_from_manager (EosAppListModel *self,
           g_free (code);
         }
 
-      if (message != NULL)
-        {
-          g_set_error (error_out, EOS_APP_LIST_MODEL_ERROR,
-                       EOS_APP_LIST_MODEL_ERROR_INSTALL_FAILED,
-                       _("Application '%s' could not be installed. %s"),
-                       desktop_id,
-                       message);
-        }
-      else
-        {
-          g_set_error (error_out, EOS_APP_LIST_MODEL_ERROR,
-                       EOS_APP_LIST_MODEL_ERROR_INSTALL_FAILED,
-                       _("Application '%s' could not be installed"),
-                       desktop_id);
-        }
+      set_app_installation_error (desktop_id,
+                                  "Installation of app failed",
+                                  message,
+                                  error_out);
 
       g_error_free (error);
 
       return FALSE;
     }
 
-  if (res != NULL)
-    {
-      g_variant_get (res, "(o)", &transaction_path);
-      g_variant_unref (res);
-    }
-
   if (transaction_path == NULL || *transaction_path == '\0')
     {
-      g_set_error (error_out, EOS_APP_LIST_MODEL_ERROR,
-                   EOS_APP_LIST_MODEL_ERROR_INSTALL_FAILED,
-                   _("Application '%s' could not be installed"),
-                   desktop_id);
+      set_app_installation_error (desktop_id,
+                                  "Transaction path is empty - canceling",
+                                  NULL, /* External message */
+                                  error_out);
 
       return FALSE;
     }
 
-  char *bundle_path = NULL;
-  char *signature_path = NULL;
-  char *sha256_path = NULL;
+  eos_app_log_info_message ("Got transaction path: %s", transaction_path);
 
-  EosAppManagerTransaction *transaction =
-    eos_app_manager_transaction_proxy_new_sync (self->system_bus,
-                                                G_DBUS_PROXY_FLAGS_NONE,
-                                                "com.endlessm.AppManager",
-                                                transaction_path,
-                                                cancellable,
-                                                &error);
+  retval = get_bundle_artifacts(self, desktop_id, transaction_path, cancellable, &error);
 
-  if (error != NULL)
-    goto out;
-
-  /* download bundle */
-  bundle_path = download_bundle (self, transaction, cancellable, &error);
-  if (error != NULL)
-    goto out;
-
-  /* now download signature */
-  signature_path = download_signature (self, transaction, cancellable, &error);
-  if (error != NULL)
-    goto out;
-
-  /* now build sha256sum file */
-  sha256_path = create_sha256sum (self, transaction, bundle_path, cancellable, &error);
-  if (error != NULL)
-    goto out;
-
-  /* call this manually, since we want to specify a custom timeout */
-  res = g_dbus_proxy_call_sync (G_DBUS_PROXY (transaction),
-                                "CompleteTransaction",
-                                g_variant_new ("(s)",
-                                               bundle_path),
-                                G_DBUS_CALL_FLAGS_NONE,
-                                G_MAXINT,
-                                cancellable,
-                                &error);
-  if (res != NULL)
-    {
-      g_variant_get (res, "(b)", &retval);
-      g_variant_unref (res);
-    }
-
-  /* we're done with the transaction now that we've called CompleteTransaction() */
-  g_clear_object (&transaction);
-
-out:
   if (error != NULL)
     {
+      eos_app_log_error_message ("Transaction %s failed", transaction_path);
+
       if (error->domain == EOS_APP_LIST_MODEL_ERROR)
-        {
-          /* propagate only the errors we generate as they are... */
-          g_propagate_error (error_out, error);
-        }
+        /* propagate only the errors we generate as they are... */
+        g_propagate_error (error_out, error);
       else
-        {
-          /* ... otherwise log them in the session, and generate a custom
-           * error for the UI
-           */
-          g_warning ("Unable to complete transaction '%s' for app '%s': %s",
-                     transaction_path,
-                     desktop_id,
-                     error->message);
-          g_error_free (error);
-
-          g_set_error (error_out, EOS_APP_LIST_MODEL_ERROR,
-                       EOS_APP_LIST_MODEL_ERROR_INSTALL_FAILED,
-                       _("Application '%s' could not be installed"),
-                       desktop_id);
-        }
-
-      if (transaction != NULL)
-        {
-          /* cancel the transaction on error */
-          eos_app_manager_transaction_call_cancel_transaction_sync (transaction, NULL, NULL);
-        }
+        set_app_installation_error (desktop_id,
+                                    error->message,
+                                    NULL, /* External message */
+                                    error_out);
 
       retval = FALSE;
     }
 
-  g_clear_object (&transaction);
   g_free (transaction_path);
 
-  /* delete the downloaded bundle and signature */
-  if (bundle_path)
-    g_unlink (bundle_path);
-  if (signature_path)
-    g_unlink (signature_path);
-  if (sha256_path)
-    g_unlink (sha256_path);
-
-  g_free (bundle_path);
-  g_free (signature_path);
-  g_free (sha256_path);
-
   return retval;
+}
+
+static gboolean
+add_app_from_manager (EosAppListModel *self,
+                      const char *desktop_id,
+                      GCancellable *cancellable,
+                      GError **error_out)
+{
+  eos_app_log_info_message ("Attempting to install %s", desktop_id);
+
+  return install_latest_app_version (self,
+                                     desktop_id,
+                                     FALSE, /* Is update? */
+                                     FALSE, /* Allow deltas (not applicable) */
+                                     cancellable,
+                                     error_out);
+}
+
+static gboolean
+update_app_from_manager (EosAppListModel *self,
+                         const char *desktop_id,
+                         GCancellable *cancellable,
+                         GError **error_out)
+{
+  gboolean retval = FALSE;
+
+  /* First try to do an xdelta upgrade */
+  eos_app_log_info_message ("Attempting to update %s using deltas", desktop_id);
+
+  retval = install_latest_app_version (self,
+                                       desktop_id,
+                                       TRUE, /* Is update? */
+                                       TRUE, /* Allow deltas */
+                                       cancellable,
+                                       error_out);
+
+  /* Incremental update worked. Nothing else is needed */
+  if (retval && error_out == NULL)
+    return TRUE;
+
+  eos_app_log_info_message ("Update of %s using deltas failed. Trying full update",
+                            desktop_id);
+
+  /* We don't care what the problem was (at this time) */
+  g_clear_error (error_out);
+
+  /* Incremental update failed so we try the full update now */
+  return install_latest_app_version (self,
+                                     desktop_id,
+                                     TRUE, /* Is update? */
+                                     FALSE, /* Allow deltas */
+                                     cancellable,
+                                     error_out);
 }
 
 static gboolean
@@ -1454,22 +1715,31 @@ remove_app_from_manager (EosAppListModel *self,
 {
   GError *error = NULL;
   gboolean retval = FALSE;
-  char *app_id = app_id_from_desktop_id (desktop_id);
-  GVariant *res =
-    g_dbus_connection_call_sync (self->system_bus,
-                                 "com.endlessm.AppManager",
-                                 "/com/endlessm/AppManager",
-                                 "com.endlessm.AppManager", "Uninstall",
-                                 g_variant_new ("(s)", app_id),
-                                 G_VARIANT_TYPE ("(b)"),
-                                 G_DBUS_CALL_FLAGS_NONE,
-                                 G_MAXINT,
-                                 cancellable,
-                                 &error);
+  gchar *app_id = app_id_from_desktop_id (desktop_id);
+
+  EosAppManager *proxy = get_eam_dbus_proxy (self);
+  if (proxy == NULL)
+    {
+      eos_app_log_error_message ("Could not get DBus proxy object - canceling");
+
+      g_set_error (error_out, EOS_APP_LIST_MODEL_ERROR,
+                   EOS_APP_LIST_MODEL_ERROR_UNINSTALL_FAILED,
+                   _("Application '%s' could not be uninstalled"),
+                   desktop_id);
+
+      return FALSE;
+    }
+
+  eos_app_log_info_message ("Trying to uninstall %s", app_id);
+
+  eos_app_manager_call_uninstall_sync (proxy, app_id, &retval, NULL, &error);
+
   g_free (app_id);
 
   if (error != NULL)
     {
+      eos_app_log_error_message ("Unable to uninstall application '%s': %s",
+                                 desktop_id, error->message);
       g_warning ("Unable to uninstall application '%s': %s",
                  desktop_id, error->message);
 
@@ -1506,21 +1776,15 @@ remove_app_from_manager (EosAppListModel *self,
       return FALSE;
     }
 
-  if (res != NULL)
-    {
-      g_variant_get (res, "(b)", &retval);
-      g_variant_unref (res);
-    }
-
   if (!retval)
-    {
-      g_set_error (error_out, EOS_APP_LIST_MODEL_ERROR,
-                   EOS_APP_LIST_MODEL_ERROR_UNINSTALL_FAILED,
-                   _("Application '%s' could not be removed"),
-                   desktop_id);
+    g_set_error (error_out, EOS_APP_LIST_MODEL_ERROR,
+                 EOS_APP_LIST_MODEL_ERROR_UNINSTALL_FAILED,
+                 _("Application '%s' could not be removed"),
+                 desktop_id);
 
-      return FALSE;
-    }
+
+  eos_app_log_info_message ("Uninstall return value from eam: %s",
+                            retval ? "OK" : "Fail");
 
   return retval;
 }
@@ -1745,7 +2009,7 @@ add_app_thread_func (GTask *task,
     {
       if (!desktop_id_is_web_link (desktop_id) &&
           model->can_install &&
-          !add_or_update_app_from_manager (model, desktop_id, cancellable, &error))
+          !add_app_from_manager (model, desktop_id, cancellable, &error))
         {
           g_task_return_error (task, error);
           return;
@@ -1824,7 +2088,7 @@ update_app_thread_func (GTask *task,
   EosAppListModel *model = source_object;
   const gchar *desktop_id = task_data;
 
-  if (!add_or_update_app_from_manager (model, desktop_id, cancellable, &error))
+  if (!update_app_from_manager (model, desktop_id, cancellable, &error))
     {
       g_task_return_error (task, error);
       return;

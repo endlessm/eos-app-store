@@ -21,51 +21,66 @@ GType eos_app_list_model_get_type (void);
 
 EosAppListModel *eos_app_list_model_new (void);
 
-void eos_app_list_model_refresh_async (EosAppListModel *model,
-                                       GCancellable *cancellable,
-                                       GAsyncReadyCallback callback,
-                                       gpointer user_data);
-gboolean eos_app_list_model_refresh_finish (EosAppListModel *model,
-                                            GAsyncResult *result,
-                                            GError **error);
+void eos_app_list_model_refresh_async               (EosAppListModel *model,
+                                                     GCancellable *cancellable,
+                                                     GAsyncReadyCallback callback,
+                                                     gpointer user_data);
 
-GList *eos_app_list_model_get_all_apps (EosAppListModel *model);
+gboolean eos_app_list_model_refresh_finish          (EosAppListModel *model,
+                                                     GAsyncResult *result,
+                                                     GError **error);
 
-char *eos_app_list_model_get_app_icon_name (EosAppListModel *model, const char *desktop_id);
-EosAppState eos_app_list_model_get_app_state (EosAppListModel *model, const char *desktop_id);
-gboolean eos_app_list_model_get_app_has_launcher (EosAppListModel *model, const char *desktop_id);
-gboolean eos_app_list_model_get_app_can_remove (EosAppListModel *model, const char *desktop_id);
+GList *eos_app_list_model_get_all_apps              (EosAppListModel *model);
 
-gboolean eos_app_list_model_launch_app (EosAppListModel *model, const char *desktop_id, guint32 timestamp, GError **error);
+char *eos_app_list_model_get_app_icon_name          (EosAppListModel *model,
+                                                     const char *desktop_id);
 
-gboolean eos_app_list_model_has_app (EosAppListModel *model, const char *desktop_id);
+EosAppState eos_app_list_model_get_app_state        (EosAppListModel *model,
+                                                     const char *desktop_id);
 
-void eos_app_list_model_install_app_async (EosAppListModel *model,
-                                           const gchar *desktop_id,
-                                           GCancellable *cancellable,
-                                           GAsyncReadyCallback callback,
-                                           gpointer user_data);
-gboolean eos_app_list_model_install_app_finish (EosAppListModel *model,
-                                                GAsyncResult *result,
-                                                GError **error);
+gboolean eos_app_list_model_get_app_has_launcher    (EosAppListModel *model,
+                                                     const char *desktop_id);
 
-void eos_app_list_model_uninstall_app_async (EosAppListModel *model,
-                                             const gchar *desktop_id,
-                                             GCancellable *cancellable,
-                                             GAsyncReadyCallback callback,
-                                             gpointer user_data);
-gboolean eos_app_list_model_uninstall_app_finish (EosAppListModel *model,
-                                                  GAsyncResult *result,
-                                                  GError **error);
+gboolean eos_app_list_model_get_app_can_remove      (EosAppListModel *model,
+                                                     const char *desktop_id);
 
-void eos_app_list_model_update_app_async (EosAppListModel *model,
-                                          const gchar *desktop_id,
-                                          GCancellable *cancellable,
-                                          GAsyncReadyCallback callbcak,
-                                          gpointer user_data);
-gboolean eos_app_list_model_update_app_finish (EosAppListModel *model,
-                                               GAsyncResult *result,
-                                               GError **error);
+gboolean eos_app_list_model_launch_app              (EosAppListModel *model,
+                                                     const char *desktop_id,
+                                                     guint32 timestamp,
+                                                     GError **error);
+
+gboolean eos_app_list_model_has_app                 (EosAppListModel *model,
+                                                     const char *desktop_id);
+
+void eos_app_list_model_install_app_async           (EosAppListModel *model,
+                                                     const gchar *desktop_id,
+                                                     GCancellable *cancellable,
+                                                     GAsyncReadyCallback callback,
+                                                     gpointer user_data);
+
+gboolean eos_app_list_model_install_app_finish      (EosAppListModel *model,
+                                                     GAsyncResult *result,
+                                                     GError **error);
+
+void eos_app_list_model_uninstall_app_async         (EosAppListModel *model,
+                                                     const gchar *desktop_id,
+                                                     GCancellable *cancellable,
+                                                     GAsyncReadyCallback callback,
+                                                     gpointer user_data);
+
+gboolean eos_app_list_model_uninstall_app_finish    (EosAppListModel *model,
+                                                     GAsyncResult *result,
+                                                     GError **error);
+
+void eos_app_list_model_update_app_async            (EosAppListModel *model,
+                                                     const gchar *desktop_id,
+                                                     GCancellable *cancellable,
+                                                     GAsyncReadyCallback callbcak,
+                                                     gpointer user_data);
+
+gboolean eos_app_list_model_update_app_finish       (EosAppListModel *model,
+                                                     GAsyncResult *result,
+                                                     GError **error);
 
 #define EOS_APP_LIST_MODEL_ERROR        (eos_app_list_model_error_quark ())
 

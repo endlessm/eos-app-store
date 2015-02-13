@@ -39,7 +39,7 @@ guint           eos_app_info_get_n_screenshots  (const EosAppInfo *info);
 char **         eos_app_info_get_screenshots    (const EosAppInfo *info);
 
 GtkWidget *     eos_app_info_create_cell        (const EosAppInfo *info,
-						 const gchar *icon_name);
+                                                 const gchar *icon_name);
 
 gint            eos_app_info_get_cell_margin    (void);
 
