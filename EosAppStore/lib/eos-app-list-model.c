@@ -1066,9 +1066,9 @@ download_file_from_uri (EosAppListModel *self,
                         const char      *target_file,
                         ProgressReportFunc progress_func,
                         gpointer         progress_func_user_data,
+                        gboolean        *reset_error_counter,
                         GCancellable    *cancellable,
-                        GError         **error,
-                        gboolean        *reset_error_counter)
+                        GError         **error)
 {
   GError *internal_error = NULL;
   gboolean retval = FALSE;
@@ -1301,9 +1301,9 @@ download_file_from_uri_with_retry (EosAppListModel *self,
                                                    target_file,
                                                    progress_func,
                                                    progress_func_user_data,
+                                                   &reset_error_counter,
                                                    cancellable,
-                                                   &error,
-                                                   &reset_error_counter);
+                                                   &error);
 
         /* We're done if we get the file or we're canceled so exit the loop */
         if (download_success)
