@@ -13,7 +13,7 @@ Build-Depends: cdbs (>= 0.4.90~),
                libgjs-dev,
                libjson-glib-dev,
                libwebkit2gtk-3.0-dev,
-               eos-sdk-dev
+               libsystemd-journal-dev
 Standards-Version: 3.9.2
 Homepage: http://www.endlessm.com
 
