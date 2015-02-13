@@ -40,6 +40,7 @@ PKG_CHECK_MODULES(EOS_APP_STORE,
                   json-glib-1.0
                   libsoup-2.4 >= 2.44.0
                   webkit2gtk-3.0
+                  systemd
                   libsystemd-journal)
 AC_SUBST(EOS_APP_STORE_CFLAGS)
 AC_SUBST(EOS_APP_STORE_LIBS)
