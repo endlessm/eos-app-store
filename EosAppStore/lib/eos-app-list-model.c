@@ -1073,6 +1073,9 @@ download_file_from_uri (EosAppListModel *self,
   GError *internal_error = NULL;
   gboolean retval = FALSE;
 
+  /* We assume that we won't get any data from the endpoint */
+  *reset_error_counter = FALSE;
+
   SoupURI *uri = soup_uri_new (source_uri);
 
   if (uri == NULL)
