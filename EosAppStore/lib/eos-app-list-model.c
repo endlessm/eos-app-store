@@ -1335,10 +1335,6 @@ download_file_from_uri_with_retry (EosAppListModel *self,
 
         eos_app_log_error_message ("Retrying to download the file after a short break");
 
-        /* Reset the progress position to beginning */
-        if (progress_func != NULL)
-            progress_func (app_id, 0, 0, progress_func_user_data);
-
         /* Sleep for n seconds and try again */
         g_usleep (DOWNLOAD_RETRY_PERIOD * G_USEC_PER_SEC);
 
