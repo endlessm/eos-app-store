@@ -17,6 +17,14 @@
 /* The delay for the EosAppListModel::changed signal, in milliseconds */
 #define CHANGED_DELAY   500
 
+/* Amount of seconds that we should keep retrying to download the file after
+ * first interruption
+ */
+#define MAX_DOWNLOAD_RETRY_PERIOD 20
+
+/* Amount of seconds that we should wait before retrying a failed download */
+#define DOWNLOAD_RETRY_PERIOD 4
+
 struct _EosAppListModel
 {
   GObject parent_instance;
@@ -1058,11 +1066,15 @@ download_file_from_uri (EosAppListModel *self,
                         const char      *target_file,
                         ProgressReportFunc progress_func,
                         gpointer         progress_func_user_data,
+                        gboolean        *reset_error_counter,
                         GCancellable    *cancellable,
                         GError         **error)
 {
   GError *internal_error = NULL;
   gboolean retval = FALSE;
+
+  /* We assume that we won't get any data from the endpoint */
+  *reset_error_counter = FALSE;
 
   SoupURI *uri = soup_uri_new (source_uri);
 
@@ -1212,6 +1224,9 @@ download_file_from_uri (EosAppListModel *self,
 
       pos += res;
 
+      /* Since we got some data, we can assume that network is back online */
+      *reset_error_counter = TRUE;
+
       if (progress_func != NULL)
         progress_func (app_id, pos, total, progress_func_user_data);
     }
@@ -1257,6 +1272,76 @@ out:
 #undef GET_DATA_BLOCK_SIZE
 
   return retval;
+}
+
+static gboolean
+download_file_from_uri_with_retry (EosAppListModel *self,
+                                   const char      *app_id,
+                                   const char      *source_uri,
+                                   const char      *target_file,
+                                   ProgressReportFunc progress_func,
+                                   gpointer         progress_func_user_data,
+                                   GCancellable    *cancellable,
+                                   GError         **error_out)
+{
+    gboolean download_success = FALSE;
+    gboolean reset_error_counter = FALSE;
+
+    GError *error = NULL;
+
+    gint64 retry_time_limit = MAX_DOWNLOAD_RETRY_PERIOD * G_USEC_PER_SEC;
+
+    gint64 error_retry_cutoff = 0;
+
+    /* Keep trying to download unless we finish successfully or we reach
+     * the retry timeout
+     */
+    while (TRUE) {
+        download_success = download_file_from_uri (self, app_id, source_uri,
+                                                   target_file,
+                                                   progress_func,
+                                                   progress_func_user_data,
+                                                   &reset_error_counter,
+                                                   cancellable,
+                                                   &error);
+
+        /* We're done if we get the file or we're canceled so exit the loop */
+        if (download_success)
+            break;
+
+        eos_app_log_error_message ("Error downloading. Checking if retries are needed");
+
+        if (reset_error_counter) {
+            eos_app_log_info_message ("Some data retrieved during download failure. "
+                                      "Resetting retry timeouts.");
+            error_retry_cutoff = 0;
+        }
+
+        /* If this is our first retry, record the start time */
+        if (error_retry_cutoff == 0)
+            error_retry_cutoff = g_get_monotonic_time () + retry_time_limit;
+
+        /* If we reached our limit of retry time, exit */
+        if (g_get_monotonic_time () >= error_retry_cutoff) {
+            eos_app_log_error_message ("Retry limit reached. Exiting with failure");
+
+            g_propagate_error (error_out, error);
+
+            break;
+        }
+
+        /* Ignore the error if we need to run again */
+        g_clear_error (&error);
+
+        eos_app_log_error_message ("Retrying to download the file after a short break");
+
+        /* Sleep for n seconds and try again */
+        g_usleep (DOWNLOAD_RETRY_PERIOD * G_USEC_PER_SEC);
+
+        eos_app_log_error_message ("Continuing download loop...");
+    }
+
+    return download_success;
 }
 
 static char *
@@ -1315,10 +1400,10 @@ download_signature (EosAppListModel *self,
   char *signature_path = g_build_filename (BUNDLEDIR, signature_name, NULL);
   g_free (signature_name);
 
-  if (!download_file_from_uri (self, app_id,
-                               signature_uri, signature_path,
-                               NULL, NULL,
-                               cancellable, &error))
+  if (!download_file_from_uri_with_retry (self, app_id,
+                                          signature_uri, signature_path,
+                                          NULL, NULL,
+                                          cancellable, &error))
     {
       g_propagate_error (error_out, error);
     }
@@ -1356,10 +1441,10 @@ download_bundle (EosAppListModel *self,
 
   eos_app_log_info_message ("Bundle save path is %s", bundle_path);
 
-  if (!download_file_from_uri (self, app_id,
-                               bundle_uri, bundle_path,
-                               queue_download_progress, self,
-                               cancellable, &error))
+  if (!download_file_from_uri_with_retry (self, app_id,
+                                          bundle_uri, bundle_path,
+                                          queue_download_progress, self,
+                                          cancellable, &error))
     {
       eos_app_log_error_message ("Download of bundle failed");
 
