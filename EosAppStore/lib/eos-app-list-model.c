@@ -1288,7 +1288,6 @@ download_file_from_uri_with_retry (EosAppListModel *self,
 
     gint64 retry_time_limit = MAX_DOWNLOAD_RETRY_PERIOD * G_USEC_PER_SEC;
 
-    gint64 error_retry_start = 0;
     gint64 error_retry_cutoff = 0;
 
     /* Keep trying to download unless we finish successfully or we reach
@@ -1315,15 +1314,12 @@ download_file_from_uri_with_retry (EosAppListModel *self,
         if (reset_error_counter) {
             eos_app_log_info_message ("Some data retrieved during download failure. "
                                       "Resetting retry timeouts.");
-            error_retry_start = 0;
             error_retry_cutoff = 0;
         }
 
         /* If this is our first retry, record the start time */
-        if (error_retry_start == 0) {
-            error_retry_start = g_get_monotonic_time ();
-            error_retry_cutoff = error_retry_start + retry_time_limit;
-        }
+        if (error_retry_cutoff == 0)
+            error_retry_cutoff = g_get_monotonic_time() + retry_time_limit;
 
         /* If we reached our limit of retry time, exit */
         if (g_get_monotonic_time () >= error_retry_cutoff) {
