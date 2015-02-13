@@ -1305,11 +1305,8 @@ download_file_from_uri_with_retry (EosAppListModel *self,
                                                    &error,
                                                    &reset_error_counter);
 
-        /* If there's an error, we didn't successfully download the file either */
-        download_success = download_success && (error == NULL);
-
         /* We're done if we get the file or we're canceled so exit the loop */
-        if (download_success || g_cancellable_is_cancelled(cancellable))
+        if (download_success)
             break;
 
         eos_app_log_error_message ("Error downloading. Checking if retries are needed");
@@ -1322,7 +1319,7 @@ download_file_from_uri_with_retry (EosAppListModel *self,
 
         /* If this is our first retry, record the start time */
         if (error_retry_cutoff == 0)
-            error_retry_cutoff = g_get_monotonic_time() + retry_time_limit;
+            error_retry_cutoff = g_get_monotonic_time () + retry_time_limit;
 
         /* If we reached our limit of retry time, exit */
         if (g_get_monotonic_time () >= error_retry_cutoff) {
@@ -1334,7 +1331,7 @@ download_file_from_uri_with_retry (EosAppListModel *self,
         }
 
         /* Ignore the error if we need to run again */
-        g_clear_error(&error);
+        g_clear_error (&error);
 
         eos_app_log_error_message ("Retrying to download the file after a short break");
 
@@ -1343,7 +1340,7 @@ download_file_from_uri_with_retry (EosAppListModel *self,
             progress_func (app_id, 0, 0, progress_func_user_data);
 
         /* Sleep for n seconds and try again */
-        g_usleep(DOWNLOAD_RETRY_PERIOD * G_USEC_PER_SEC);
+        g_usleep (DOWNLOAD_RETRY_PERIOD * G_USEC_PER_SEC);
 
         eos_app_log_error_message ("Continuing download loop...");
     }
