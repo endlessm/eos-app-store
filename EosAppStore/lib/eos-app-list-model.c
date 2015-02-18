@@ -223,12 +223,13 @@ create_app_hash_from_gvariant (GVariantIter *apps)
   GHashTable *retval;
   GVariantIter *iter;
   gchar *desktop_id, *id, *name, *version;
+  gint64 installed_size;
 
   retval = g_hash_table_new_full (g_str_hash, g_str_equal, g_free, NULL);
 
   iter = g_variant_iter_copy (apps);
 
-  while (g_variant_iter_loop (iter, "(sss)", &id, &name, &version))
+  while (g_variant_iter_loop (iter, "(sssx)", &id, &name, &version, &installed_size))
     {
       desktop_id = g_strdup_printf ("%s.desktop", id);
       g_hash_table_add (retval, desktop_id);
@@ -376,7 +377,7 @@ on_app_manager_available_applications_changed (GDBusConnection *connection,
 
   GVariantIter *iter1, *iter2;
 
-  g_variant_get (parameters, "(a(sss)a(sss))", &iter1, &iter2);
+  g_variant_get (parameters, "(a(sssx)a(sssx))", &iter1, &iter2);
 
   self->installable_apps = create_app_hash_from_gvariant (iter1);
   self->updatable_apps = create_app_hash_from_gvariant (iter2);
@@ -449,8 +450,8 @@ load_available_apps (EosAppListModel *self,
     }
 
   GVariantIter *installable_apps_iter, *updatable_apps_iter;
-  g_variant_get (installable_apps, "a(sss)", &installable_apps_iter);
-  g_variant_get (updatable_apps, "a(sss)", &updatable_apps_iter);
+  g_variant_get (installable_apps, "a(sssx)", &installable_apps_iter);
+  g_variant_get (updatable_apps, "a(sssx)", &updatable_apps_iter);
 
   eos_app_log_debug_message ("Parsing installable app list");
   if (installable_apps_out != NULL)
@@ -591,8 +592,8 @@ load_manager_installed_apps (EosAppListModel *self,
   eos_app_log_debug_message ("Parsing installed app return bjects");
 
   GVariantIter *installed_apps_iter, *removable_apps_iter;
-  g_variant_get (installed_apps, "a(sss)", &installed_apps_iter);
-  g_variant_get (removable_apps, "a(sss)", &removable_apps_iter);
+  g_variant_get (installed_apps, "a(sssx)", &installed_apps_iter);
+  g_variant_get (removable_apps, "a(sssx)", &removable_apps_iter);
 
   g_clear_pointer (&self->manager_installed_apps, g_hash_table_unref);
   g_clear_pointer (&self->manager_removable_apps, g_hash_table_unref);
