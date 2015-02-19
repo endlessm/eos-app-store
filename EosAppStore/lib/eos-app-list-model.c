@@ -1,5 +1,5 @@
 /* -*- mode: C; c-file-style: "gnu"; indent-tabs-mode: nil; -*- */
-/* vim: set ai ts=2 sw=2 et!: */
+/* vim: set ai ts=2 sw=2 : */
 
 #include "config.h"
 
@@ -38,7 +38,6 @@ struct _EosAppListModel
   GHashTable *gio_apps;
   GHashTable *shell_apps;
   GHashTable *apps;
-  GHashTable *updatable_apps;
   GHashTable *manager_installed_apps;
   GHashTable *manager_removable_apps;
 
@@ -481,15 +480,13 @@ on_app_manager_available_applications_changed (GDBusConnection *connection,
 {
   EosAppListModel *self = user_data;
 
-  g_clear_pointer (&self->updatable_apps, g_hash_table_unref);
-
   GVariantIter *iter1, *iter2;
 
   g_variant_get (parameters, "(a(sssx)a(sssx))", &iter1, &iter2);
 
   update_apps_info_from_gvariant (self, iter1, EOS_APP_STATE_AVAILABLE);
 
-  self->updatable_apps = create_app_hash_from_gvariant (iter2);
+  update_apps_info_from_gvariant (self, iter2, EOS_APP_STATE_UPDATABLE);
 
   g_variant_iter_free (iter1);
   g_variant_iter_free (iter2);
@@ -499,7 +496,6 @@ on_app_manager_available_applications_changed (GDBusConnection *connection,
 
 static gboolean
 load_available_apps (EosAppListModel *self,
-                     GHashTable **updatable_apps_out,
                      GCancellable *cancellable,
                      GError **error_out)
 {
@@ -565,8 +561,7 @@ load_available_apps (EosAppListModel *self,
   update_apps_info_from_gvariant (self, installable_apps_iter, EOS_APP_STATE_AVAILABLE);
 
   eos_app_log_debug_message ("Parsing updatable app list");
-  if (updatable_apps_out != NULL)
-    *updatable_apps_out = create_app_hash_from_gvariant (updatable_apps_iter);
+  update_apps_info_from_gvariant (self, updatable_apps_iter, EOS_APP_STATE_UPDATABLE);
 
   eos_app_log_debug_message ("Done retrieving installed apps");
 
@@ -631,14 +626,9 @@ load_manager_available_apps (EosAppListModel *self,
                              GCancellable *cancellable)
 {
   GError *error = NULL;
-  GHashTable *updatable_apps;
 
-  if (!load_available_apps (self, &updatable_apps, cancellable, &error))
+  if (!load_available_apps (self, cancellable, &error))
     goto out;
-
-  g_clear_pointer (&self->updatable_apps, g_hash_table_unref);
-
-  self->updatable_apps = updatable_apps;
 
   if (!load_user_capabilities (self, cancellable, &error))
     goto out;
@@ -814,7 +804,6 @@ eos_app_list_model_finalize (GObject *gobject)
 
   g_hash_table_unref (self->gio_apps);
   g_hash_table_unref (self->shell_apps);
-  g_hash_table_unref (self->updatable_apps);
   g_hash_table_unref (self->apps);
   g_hash_table_unref (self->manager_installed_apps);
   g_hash_table_unref (self->manager_removable_apps);
@@ -2093,10 +2082,17 @@ static gboolean
 app_is_updatable (EosAppListModel *model,
                   const char *desktop_id)
 {
-  if (model->updatable_apps == NULL)
+  EosAppListModelItem *item;
+
+  if (model->apps == NULL)
     return FALSE;
 
-  return g_hash_table_lookup (model->updatable_apps, desktop_id) != NULL;
+  if (!g_hash_table_contains (model->apps, desktop_id))
+    return FALSE;
+
+  item = g_hash_table_lookup (model->apps, desktop_id);
+
+  return item->state == EOS_APP_STATE_UPDATABLE;
 }
 
 static gboolean
