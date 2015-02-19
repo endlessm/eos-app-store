@@ -332,8 +332,18 @@ const AppListBoxRow = new Lang.Class({
                 break;
 
             case EosAppStorePrivate.AppState.AVAILABLE:
+                this._installButton.set_tooltip_text("");
                 this._installButtonLabel.set_text(BUTTON_LABEL_INSTALL);
+
+                // TODO: Invoke the proper API on model
+                // if (!this._model.hasSufficientInstallSpace(this._appId)) {
+                if (!true) {
+                    this._installButton.set_sensitive(false);
+                    this._installButton.set_tooltip_text(_("Insufficient space to install the app"));
+                }
+
                 this._installButton.show();
+
                 break;
 
             case EosAppStorePrivate.AppState.UPDATABLE:
