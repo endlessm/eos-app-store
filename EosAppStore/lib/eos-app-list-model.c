@@ -60,6 +60,14 @@ struct _EosAppListModelClass
   GObjectClass parent_class;
 };
 
+struct _EosAppListModelItem {
+  char  *desktop_id;
+  gint64 installed_size;
+  EosAppState state;
+};
+
+typedef struct _EosAppListModelItem EosAppListModelItem;
+
 enum {
   CHANGED,
   DOWNLOAD_PROGRESS,
