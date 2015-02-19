@@ -38,7 +38,6 @@ struct _EosAppListModel
   GHashTable *gio_apps;
   GHashTable *shell_apps;
   GHashTable *apps;
-  GHashTable *manager_installed_apps;
 
   GCancellable *load_cancellable;
 
@@ -62,7 +61,8 @@ struct _EosAppListModelClass
 enum _EosAppListModelUpdateType {
   EOS_APP_LIST_MODEL_UPDATE_TYPE_AVAILABLE,
   EOS_APP_LIST_MODEL_UPDATE_TYPE_UPDATABLE,
-  EOS_APP_LIST_MODEL_UPDATE_TYPE_EAM_REMOVABLE
+  EOS_APP_LIST_MODEL_UPDATE_TYPE_EAM_REMOVABLE,
+  EOS_APP_LIST_MODEL_UPDATE_TYPE_EAM_INSTALLED
 };
 
 typedef enum _EosAppListModelUpdateType EosAppListModelUpdateType;
@@ -237,29 +237,6 @@ load_shell_apps_from_gvariant (GVariant *apps)
   return retval;
 }
 
-static GHashTable *
-create_app_hash_from_gvariant (GVariantIter *apps)
-{
-  GHashTable *retval;
-  GVariantIter *iter;
-  gchar *desktop_id, *id, *name, *version;
-  gint64 installed_size;
-
-  retval = g_hash_table_new_full (g_str_hash, g_str_equal, g_free, NULL);
-
-  iter = g_variant_iter_copy (apps);
-
-  while (g_variant_iter_loop (iter, "(sssx)", &id, &name, &version, &installed_size))
-    {
-      desktop_id = g_strdup_printf ("%s.desktop", id);
-      g_hash_table_add (retval, desktop_id);
-    }
-
-  g_variant_iter_free (iter);
-
-  return retval;
-}
-
 static gboolean
 app_is_visible (GAppInfo *info)
 {
@@ -427,8 +404,10 @@ update_apps_info_item (GHashTable *apps,
       apps_item_info->state = EOS_APP_STATE_UPDATABLE;
       break;
     case EOS_APP_LIST_MODEL_UPDATE_TYPE_EAM_REMOVABLE:
-      apps_item_info->state = EOS_APP_STATE_INSTALLED;
       apps_item_info->can_remove = TRUE;
+      /* Intentional fall-through to EAM_INSTALLED */
+    case EOS_APP_LIST_MODEL_UPDATE_TYPE_EAM_INSTALLED:
+      apps_item_info->state = EOS_APP_STATE_INSTALLED;
       break;
   }
 
@@ -707,10 +686,9 @@ load_manager_installed_apps (EosAppListModel *self,
   g_variant_get (installed_apps, "a(sssx)", &installed_apps_iter);
   g_variant_get (removable_apps, "a(sssx)", &removable_apps_iter);
 
-  g_clear_pointer (&self->manager_installed_apps, g_hash_table_unref);
-
   eos_app_log_debug_message ("Parsing installed app list");
-  self->manager_installed_apps = create_app_hash_from_gvariant (installed_apps_iter);
+  update_apps_info_from_gvariant (self, installed_apps_iter,
+                                  EOS_APP_LIST_MODEL_UPDATE_TYPE_EAM_INSTALLED);
 
   eos_app_log_debug_message ("Parsing removable app list");
   update_apps_info_from_gvariant (self, removable_apps_iter,
@@ -824,7 +802,6 @@ eos_app_list_model_finalize (GObject *gobject)
   g_hash_table_unref (self->gio_apps);
   g_hash_table_unref (self->shell_apps);
   g_hash_table_unref (self->apps);
-  g_hash_table_unref (self->manager_installed_apps);
 
   G_OBJECT_CLASS (eos_app_list_model_parent_class)->finalize (gobject);
 }
