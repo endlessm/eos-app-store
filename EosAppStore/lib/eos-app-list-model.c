@@ -2472,12 +2472,49 @@ eos_app_list_model_get_app_can_remove (EosAppListModel *model,
   return item->can_remove;
 }
 
+static guint64
+get_fs_available_space ()
+{
+  GFile *current_directory = NULL;
+  GFileInfo *filesystem_info = NULL;
+  GError *error;
+
+  /* We start of with the assumtion that we have the space */
+  guint64 available_space = G_MAXUINT64;
+
+  /* Whatever FS we're on, check the space */
+  current_directory = g_file_new_for_path (".");
+
+  filesystem_info = g_file_query_filesystem_info (current_directory,
+                                                  G_FILE_ATTRIBUTE_FILESYSTEM_FREE,
+                                                  NULL, /* Cancellable */
+                                                  &error);
+
+  g_object_unref (current_directory);
+
+  if (error != NULL) {
+    eos_app_log_error_message ("Could not retrieve available space");
+    return available_space;
+  }
+
+  if (filesystem_info == NULL) {
+    eos_app_log_error_message ("Could not retrieve available space");
+    return available_space;
+  }
+
+  available_space = g_file_info_get_attribute_uint64 (filesystem_info,
+                                                      G_FILE_ATTRIBUTE_FILESYSTEM_FREE);
+
+  g_object_unref (filesystem_info);
+
+  return available_space;
+}
+
 gboolean
 eos_app_list_model_get_app_has_sufficient_install_space (EosAppListModel *model,
                                                          const char *desktop_id)
 {
-  gint64 installed_size = 0;
-  gint64 available_space = 0;
+  guint64 installed_size = 0;
 
   if (model->apps == NULL)
     return FALSE;
@@ -2494,9 +2531,9 @@ eos_app_list_model_get_app_has_sufficient_install_space (EosAppListModel *model,
     return FALSE;
 
   EosAppListModelItem *item = g_hash_table_lookup (model->apps, desktop_id);
-  installed_size = item->installed_size;
+  installed_size = item->installed_size; /* Implicit cast from gint64 to guint64 */
 
-  if (installed_size >= available_space)
+  if (installed_size <= get_fs_available_space ())
     return TRUE;
 
   return FALSE;
