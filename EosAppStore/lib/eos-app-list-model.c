@@ -2471,3 +2471,53 @@ eos_app_list_model_get_app_can_remove (EosAppListModel *model,
 
   return item->can_remove;
 }
+
+gboolean
+eos_app_list_model_get_app_has_sufficient_install_space (EosAppListModel *model,
+                                                         const char *desktop_id)
+{
+  gint64 installed_size = 0;
+  gint64 available_space = 0;
+
+  if (model->apps == NULL)
+    return FALSE;
+
+  if (desktop_id == NULL) {
+    eos_app_log_error_message ("Desktop ID for %s is NULL!", desktop_id);
+    return FALSE;
+  }
+
+  /* If we don't know about the app, then we can't really say that we
+   * can install it
+   */
+  if (!g_hash_table_contains (model->apps, desktop_id))
+    return FALSE;
+
+  EosAppListModelItem *item = g_hash_table_lookup (model->apps, desktop_id);
+  installed_size = item->installed_size;
+
+  if (installed_size >= available_space)
+    return TRUE;
+
+  return FALSE;
+}
+
+gint64
+eos_app_list_model_get_app_installed_size (EosAppListModel *model,
+                                           const char *desktop_id)
+{
+  if (model->apps == NULL)
+    return 0L;
+
+  if (desktop_id == NULL) {
+    eos_app_log_error_message ("Desktop ID for %s is NULL!", desktop_id);
+    return FALSE;
+  }
+
+  if (!g_hash_table_contains (model->apps, desktop_id))
+    return 0L;
+
+  EosAppListModelItem *item = g_hash_table_lookup (model->apps, desktop_id);
+
+  return item->installed_size;
+}

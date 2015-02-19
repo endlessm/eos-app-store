@@ -335,9 +335,7 @@ const AppListBoxRow = new Lang.Class({
                 this._installButton.set_tooltip_text("");
                 this._installButtonLabel.set_text(BUTTON_LABEL_INSTALL);
 
-                // TODO: Invoke the proper API on model
-                // if (!this._model.hasSufficientInstallSpace(this._appId)) {
-                if (!true) {
+                if (!this._model.hasSufficientInstallSpace(this._appId)) {
                     this._installButton.set_sensitive(false);
                     this._installButton.set_tooltip_text(_("Insufficient space to install the app"));
                 }
