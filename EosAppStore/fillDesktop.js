@@ -62,7 +62,7 @@ const FillDesktop = new Lang.Class({
             }
 
             let state = this._appList.getState(appId);
-            if (state == EosAppStorePrivate.AppState.UNINSTALLED) {
+            if (state == EosAppStorePrivate.AppState.AVAILABLE) {
                 return true;
             } else {
                 return false;

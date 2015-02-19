@@ -262,7 +262,7 @@ const AppListBoxRow = new Lang.Class({
                 }
                 break;
 
-            case EosAppStorePrivate.AppState.UNINSTALLED:
+            case EosAppStorePrivate.AppState.AVAILABLE:
                 style = INSTALL;
                 break;
 
@@ -331,7 +331,7 @@ const AppListBoxRow = new Lang.Class({
                 }
                 break;
 
-            case EosAppStorePrivate.AppState.UNINSTALLED:
+            case EosAppStorePrivate.AppState.AVAILABLE:
                 this._installButtonLabel.set_text(BUTTON_LABEL_INSTALL);
                 this._installButton.show();
                 break;
@@ -482,7 +482,7 @@ const AppListBoxRow = new Lang.Class({
                 break;
 
             // if the application is uninstalled, we install it
-            case EosAppStorePrivate.AppState.UNINSTALLED:
+            case EosAppStorePrivate.AppState.AVAILABLE:
                 this._installApp();
                 break;
 
