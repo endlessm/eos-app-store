@@ -382,14 +382,21 @@ update_apps_info_item (GHashTable *apps,
   /* We re-retrieve the pointer to ensure that it is in the list correctly */
   apps_item_info = g_hash_table_lookup (apps, desktop_id);
 
-  apps_item_info->desktop_id = g_strdup (desktop_id);
-
   /* Update properties if needed on the item */
-  if (name != NULL)
-    apps_item_info->name = g_strdup (name);
+  if (desktop_id != NULL && !g_strcmp0 (desktop_id, apps_item_info->desktop_id)) {
+    g_clear_pointer (&apps_item_info->desktop_id, g_free);
+    apps_item_info->desktop_id = g_strdup (desktop_id);
+  }
 
-  if (version != NULL)
+  if (name != NULL && !g_strcmp0 (name, apps_item_info->name)) {
+    g_clear_pointer (&apps_item_info->name, g_free);
+    apps_item_info->name = g_strdup (name);
+  }
+
+  if (version != NULL && !g_strcmp0 (version, apps_item_info->version)) {
+    g_clear_pointer (&apps_item_info->version, g_free);
     apps_item_info->version = g_strdup (version);
+  }
 
   if (apps_item_info->installed_size > 0)
     apps_item_info->installed_size = installed_size;
@@ -410,7 +417,6 @@ update_apps_info_item (GHashTable *apps,
       apps_item_info->state = EOS_APP_STATE_INSTALLED;
       break;
   }
-
 }
 
 /* Used to free the model-apps values */
