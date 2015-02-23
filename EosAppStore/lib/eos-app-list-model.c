@@ -2477,7 +2477,7 @@ get_fs_available_space ()
 {
   GFile *current_directory = NULL;
   GFileInfo *filesystem_info = NULL;
-  GError *error;
+  GError *error = NULL;
 
   /* We start of with the assumtion that we have the space */
   guint64 available_space = G_MAXUINT64;
@@ -2493,7 +2493,8 @@ get_fs_available_space ()
   g_object_unref (current_directory);
 
   if (error != NULL) {
-    eos_app_log_error_message ("Could not retrieve available space");
+    eos_app_log_error_message ("Could not retrieve available space: %s",
+                               error->message);
     return available_space;
   }
 
@@ -2505,7 +2506,7 @@ get_fs_available_space ()
   available_space = g_file_info_get_attribute_uint64 (filesystem_info,
                                                       G_FILE_ATTRIBUTE_FILESYSTEM_FREE);
 
-  eos_app_log_debug_message ("Available space %" G_GUINT64_FORMAT, available_space);
+  eos_app_log_debug_message ("Available space: %" G_GUINT64_FORMAT, available_space);
 
   g_object_unref (filesystem_info);
 
