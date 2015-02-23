@@ -462,10 +462,6 @@ update_apps_info_from_gvariant (EosAppListModel *self,
       g_free (desktop_id);
     }
 
-  g_free (id);
-  g_free (name);
-  g_free (version);
-
   g_variant_iter_free (iter);
 }
 
