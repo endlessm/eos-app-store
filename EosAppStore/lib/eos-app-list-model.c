@@ -2505,6 +2505,8 @@ get_fs_available_space ()
   available_space = g_file_info_get_attribute_uint64 (filesystem_info,
                                                       G_FILE_ATTRIBUTE_FILESYSTEM_FREE);
 
+  eos_app_log_debug_message ("Available space %" G_GUINT64_FORMAT, available_space);
+
   g_object_unref (filesystem_info);
 
   return available_space;
@@ -2515,6 +2517,7 @@ eos_app_list_model_get_app_has_sufficient_install_space (EosAppListModel *model,
                                                          const char *desktop_id)
 {
   guint64 installed_size = 0;
+  const gchar *real_desktop_id;
 
   if (model->apps == NULL)
     return FALSE;
@@ -2525,13 +2528,35 @@ eos_app_list_model_get_app_has_sufficient_install_space (EosAppListModel *model,
   }
 
   /* If we don't know about the app, then we can't really say that we
-   * can install it
+   * can install it.
    */
-  if (!g_hash_table_contains (model->apps, desktop_id))
-    return FALSE;
+  if (g_hash_table_contains (model->apps, desktop_id))
+    real_desktop_id = desktop_id;
+  else
+    {
+      /* Maybe we need a localized ID */
+      eos_app_log_debug_message ("Can't find the app ID (%s). "
+                                 "Trying a localized one.", desktop_id);
 
-  EosAppListModelItem *item = g_hash_table_lookup (model->apps, desktop_id);
+      /* XXX: We don't expect this to be hit for an installed app */
+      real_desktop_id = app_get_localized_id_for_installable_app (model, desktop_id);
+
+      /* Make sure that this ID is available */
+      if (!real_desktop_id || !g_hash_table_contains (model->apps,
+                                                      real_desktop_id)) {
+
+        eos_app_log_error_message ("Could not even find a localized ID (%s)!",
+                                   real_desktop_id);
+        return FALSE;
+      }
+    }
+
+  EosAppListModelItem *item = g_hash_table_lookup (model->apps, real_desktop_id);
   installed_size = item->installed_size; /* Implicit cast from gint64 to guint64 */
+
+  eos_app_log_debug_message ("App %s installed size: %" G_GINT64_FORMAT,
+                             desktop_id,
+                             installed_size);
 
   if (installed_size <= get_fs_available_space ())
     return TRUE;
@@ -2539,10 +2564,15 @@ eos_app_list_model_get_app_has_sufficient_install_space (EosAppListModel *model,
   return FALSE;
 }
 
+/* XXX: Unused from the UI for now but will be needed at some point to inform
+ *      the user about how much space the app requires.
+ */
 gint64
 eos_app_list_model_get_app_installed_size (EosAppListModel *model,
                                            const char *desktop_id)
 {
+  const gchar *real_desktop_id;
+
   if (model->apps == NULL)
     return 0L;
 
@@ -2551,10 +2581,28 @@ eos_app_list_model_get_app_installed_size (EosAppListModel *model,
     return FALSE;
   }
 
-  if (!g_hash_table_contains (model->apps, desktop_id))
-    return 0L;
+  if (g_hash_table_contains (model->apps, desktop_id))
+    real_desktop_id = desktop_id;
+  else
+    {
+      /* Maybe we need a localized ID */
+      eos_app_log_debug_message ("Can't find the app ID (%s). "
+                                 "Trying a localized one.", desktop_id);
 
-  EosAppListModelItem *item = g_hash_table_lookup (model->apps, desktop_id);
+      /* XXX: We don't expect this to be hit for an installable app */
+      real_desktop_id = app_get_localized_id_for_installed_app (model, desktop_id);
+
+      /* Make sure that this ID is available */
+      if (!real_desktop_id || !g_hash_table_contains (model->apps,
+                                                      real_desktop_id)) {
+
+        eos_app_log_error_message ("Could not even find a localized ID (%s)!",
+                                   real_desktop_id);
+        return 0L;
+      }
+    }
+
+  EosAppListModelItem *item = g_hash_table_lookup (model->apps, real_desktop_id);
 
   return item->installed_size;
 }
