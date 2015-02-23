@@ -432,6 +432,63 @@ destroy_app_list_model_item (gpointer data)
   g_slice_free (EosAppListModelItem, item);
 }
 
+/* This function goes through the app list and sets any states that would have
+ * been set by a previous update of the same type to a "uninitialized" state to
+ * ensure that the updated list implicitly removes the previous states.
+ *
+ * XXX: There is a tiny period of time where an app may have an "uninitialized"
+ * state after this function but before the update finishes which might not represent
+ * the true state of the app but it was done this way to avoid creating a list of
+ * removed items and iterating over updates and stored app list to figure out the
+ * differences. Since the UI is the only consumer of this data and it doesn't read
+ * the values until we're done, this is faster and has a smaller footprint than
+ * the other method mentioned.
+ */
+static void
+reset_outdated_apps_info_items (EosAppListModel *self,
+                               EosAppListModelUpdateType update_type)
+{
+  GHashTableIter iter;
+
+  gpointer key;
+  gpointer value;
+
+  EosAppListModelItem *apps_item_info;
+
+  if (!self->apps)
+    return;
+
+  eos_app_log_debug_message ("Resetting state of apps with matching state: %d",
+                             update_type);
+
+  g_hash_table_iter_init (&iter, self->apps);
+
+  while (g_hash_table_iter_next (&iter, &key, &value))
+    {
+      apps_item_info = (EosAppListModelItem *) value;
+
+      /* Update state flag based on the type of changes */
+      switch (update_type)
+      {
+        case EOS_APP_LIST_MODEL_UPDATE_TYPE_AVAILABLE:
+          if (apps_item_info->state == EOS_APP_STATE_AVAILABLE)
+            apps_item_info->state = EOS_APP_STATE_UNKNOWN;
+          break;
+        case EOS_APP_LIST_MODEL_UPDATE_TYPE_UPDATABLE:
+          if (apps_item_info->state == EOS_APP_STATE_UPDATABLE)
+            apps_item_info->state = EOS_APP_STATE_INSTALLED;
+          break;
+        case EOS_APP_LIST_MODEL_UPDATE_TYPE_EAM_REMOVABLE:
+          apps_item_info->can_remove = FALSE;
+          break;
+        case EOS_APP_LIST_MODEL_UPDATE_TYPE_EAM_INSTALLED:
+          if (apps_item_info->state == EOS_APP_STATE_INSTALLED)
+            apps_item_info->state = EOS_APP_STATE_UNKNOWN;
+          break;
+      }
+    }
+}
+
 static void
 update_apps_info_from_gvariant (EosAppListModel *self,
                                 GVariantIter *apps,
@@ -450,6 +507,13 @@ update_apps_info_from_gvariant (EosAppListModel *self,
                                         g_str_equal,
                                         g_free,
                                         destroy_app_list_model_item);
+
+  /* If we had incoming data that didn't mention items that it did before
+   * we need to make sure that they have the proper status. For example,
+   * if an app was updatabe before and now we get a new list that doesn't
+   * include it, we need to clear its UPDATABLE state
+   */
+  reset_outdated_apps_info_items (self, update_type);
 
   while (g_variant_iter_loop (iter, "(sssx)", &id, &name, &version, &installed_size))
     {
