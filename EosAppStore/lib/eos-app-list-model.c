@@ -1,4 +1,5 @@
 /* -*- mode: C; c-file-style: "gnu"; indent-tabs-mode: nil; -*- */
+/* vim: set ai ts=2 sw=2 : */
 
 #include "config.h"
 
@@ -36,10 +37,7 @@ struct _EosAppListModel
 
   GHashTable *gio_apps;
   GHashTable *shell_apps;
-  GHashTable *installable_apps;
-  GHashTable *updatable_apps;
-  GHashTable *manager_installed_apps;
-  GHashTable *manager_removable_apps;
+  GHashTable *apps;
 
   GCancellable *load_cancellable;
 
@@ -59,6 +57,28 @@ struct _EosAppListModelClass
 {
   GObjectClass parent_class;
 };
+
+enum _EosAppListModelUpdateType {
+  EOS_APP_LIST_MODEL_UPDATE_TYPE_AVAILABLE,
+  EOS_APP_LIST_MODEL_UPDATE_TYPE_UPDATABLE,
+  EOS_APP_LIST_MODEL_UPDATE_TYPE_EAM_REMOVABLE,
+  EOS_APP_LIST_MODEL_UPDATE_TYPE_EAM_INSTALLED
+};
+
+typedef enum _EosAppListModelUpdateType EosAppListModelUpdateType;
+
+struct _EosAppListModelItem {
+  char  *desktop_id;
+  char  *name;
+  char  *version;
+
+  gint64 installed_size;
+  gboolean can_remove;
+
+  EosAppState state;
+};
+
+typedef struct _EosAppListModelItem EosAppListModelItem;
 
 enum {
   CHANGED,
@@ -217,28 +237,6 @@ load_shell_apps_from_gvariant (GVariant *apps)
   return retval;
 }
 
-static GHashTable *
-create_app_hash_from_gvariant (GVariantIter *apps)
-{
-  GHashTable *retval;
-  GVariantIter *iter;
-  gchar *desktop_id, *id, *name, *version;
-
-  retval = g_hash_table_new_full (g_str_hash, g_str_equal, g_free, NULL);
-
-  iter = g_variant_iter_copy (apps);
-
-  while (g_variant_iter_loop (iter, "(sss)", &id, &name, &version))
-    {
-      desktop_id = g_strdup_printf ("%s.desktop", id);
-      g_hash_table_add (retval, desktop_id);
-    }
-
-  g_variant_iter_free (iter);
-
-  return retval;
-}
-
 static gboolean
 app_is_visible (GAppInfo *info)
 {
@@ -361,6 +359,177 @@ on_shell_applications_changed (GDBusConnection *connection,
 }
 
 static void
+update_apps_info_item (GHashTable *apps,
+                       char *desktop_id,
+                       char *name,
+                       char *version,
+                       EosAppListModelUpdateType update_type,
+                       gint64 installed_size)
+{
+  EosAppListModelItem *apps_item_info = NULL;
+
+  if (!g_hash_table_lookup_extended (apps, desktop_id, NULL, NULL)) {
+    apps_item_info = g_slice_new0 (EosAppListModelItem);
+
+    /* All 0s might not set the val to 0 on a signed int64 */
+    apps_item_info->installed_size = 0;
+
+    char *hash_key = g_strdup (desktop_id);
+
+    g_hash_table_insert (apps, hash_key, apps_item_info);
+  }
+
+  /* We re-retrieve the pointer to ensure that it is in the list correctly */
+  apps_item_info = g_hash_table_lookup (apps, desktop_id);
+
+  /* Update properties if needed on the item */
+  if (desktop_id != NULL && !g_strcmp0 (desktop_id, apps_item_info->desktop_id)) {
+    g_clear_pointer (&apps_item_info->desktop_id, g_free);
+    apps_item_info->desktop_id = g_strdup (desktop_id);
+  }
+
+  if (name != NULL && !g_strcmp0 (name, apps_item_info->name)) {
+    g_clear_pointer (&apps_item_info->name, g_free);
+    apps_item_info->name = g_strdup (name);
+  }
+
+  if (version != NULL && !g_strcmp0 (version, apps_item_info->version)) {
+    g_clear_pointer (&apps_item_info->version, g_free);
+    apps_item_info->version = g_strdup (version);
+  }
+
+  if (apps_item_info->installed_size > 0)
+    apps_item_info->installed_size = installed_size;
+
+  /* Update state flag based on the type of update */
+  switch (update_type)
+  {
+    case EOS_APP_LIST_MODEL_UPDATE_TYPE_AVAILABLE:
+      apps_item_info->state = EOS_APP_STATE_AVAILABLE;
+      break;
+    case EOS_APP_LIST_MODEL_UPDATE_TYPE_UPDATABLE:
+      apps_item_info->state = EOS_APP_STATE_UPDATABLE;
+      break;
+    case EOS_APP_LIST_MODEL_UPDATE_TYPE_EAM_REMOVABLE:
+      apps_item_info->can_remove = TRUE;
+      /* Intentional fall-through to EAM_INSTALLED */
+    case EOS_APP_LIST_MODEL_UPDATE_TYPE_EAM_INSTALLED:
+      apps_item_info->state = EOS_APP_STATE_INSTALLED;
+      break;
+  }
+}
+
+/* Used to free the model-apps values */
+static void
+destroy_app_list_model_item (gpointer data)
+{
+  EosAppListModelItem *item = (EosAppListModelItem *) data;
+
+  g_free (item->desktop_id);
+  g_free (item->name);
+  g_free (item->version);
+
+  g_slice_free (EosAppListModelItem, item);
+}
+
+/* This function goes through the app list and sets any states that would have
+ * been set by a previous update of the same type to a "uninitialized" state to
+ * ensure that the updated list implicitly removes the previous states.
+ *
+ * XXX: There is a tiny period of time where an app may have an "uninitialized"
+ * state after this function but before the update finishes which might not represent
+ * the true state of the app but it was done this way to avoid creating a list of
+ * removed items and iterating over updates and stored app list to figure out the
+ * differences. Since the UI is the only consumer of this data and it doesn't read
+ * the values until we're done, this is faster and has a smaller footprint than
+ * the other method mentioned.
+ */
+static void
+reset_outdated_apps_info_items (EosAppListModel *self,
+                               EosAppListModelUpdateType update_type)
+{
+  GHashTableIter iter;
+
+  gpointer key;
+  gpointer value;
+
+  EosAppListModelItem *apps_item_info;
+
+  if (!self->apps)
+    return;
+
+  eos_app_log_debug_message ("Resetting state of apps with matching state: %d",
+                             update_type);
+
+  g_hash_table_iter_init (&iter, self->apps);
+
+  while (g_hash_table_iter_next (&iter, &key, &value))
+    {
+      apps_item_info = (EosAppListModelItem *) value;
+
+      /* Update state flag based on the type of changes */
+      switch (update_type)
+      {
+        case EOS_APP_LIST_MODEL_UPDATE_TYPE_AVAILABLE:
+          if (apps_item_info->state == EOS_APP_STATE_AVAILABLE)
+            apps_item_info->state = EOS_APP_STATE_UNKNOWN;
+          break;
+        case EOS_APP_LIST_MODEL_UPDATE_TYPE_UPDATABLE:
+          if (apps_item_info->state == EOS_APP_STATE_UPDATABLE)
+            apps_item_info->state = EOS_APP_STATE_INSTALLED;
+          break;
+        case EOS_APP_LIST_MODEL_UPDATE_TYPE_EAM_REMOVABLE:
+          apps_item_info->can_remove = FALSE;
+          break;
+        case EOS_APP_LIST_MODEL_UPDATE_TYPE_EAM_INSTALLED:
+          if (apps_item_info->state == EOS_APP_STATE_INSTALLED)
+            apps_item_info->state = EOS_APP_STATE_UNKNOWN;
+          break;
+      }
+    }
+}
+
+static void
+update_apps_info_from_gvariant (EosAppListModel *self,
+                                GVariantIter *apps,
+                                EosAppListModelUpdateType update_type)
+{
+  gchar *desktop_id, *id, *name, *version;
+  gint64 installed_size;
+
+  GVariantIter *iter;
+
+  iter = g_variant_iter_copy (apps);
+
+  /* Create our master app list if we don't have one */
+  if (self->apps == NULL)
+    self->apps = g_hash_table_new_full (g_str_hash,
+                                        g_str_equal,
+                                        g_free,
+                                        destroy_app_list_model_item);
+
+  /* If we had incoming data that didn't mention items that it did before
+   * we need to make sure that they have the proper status. For example,
+   * if an app was updatabe before and now we get a new list that doesn't
+   * include it, we need to clear its UPDATABLE state
+   */
+  reset_outdated_apps_info_items (self, update_type);
+
+  while (g_variant_iter_loop (iter, "(sssx)", &id, &name, &version, &installed_size))
+    {
+      desktop_id = g_strdup_printf ("%s.desktop", id);
+
+      update_apps_info_item (self->apps, desktop_id, name, version,
+                             update_type,
+                             installed_size);
+
+      g_free (desktop_id);
+    }
+
+  g_variant_iter_free (iter);
+}
+
+static void
 on_app_manager_available_applications_changed (GDBusConnection *connection,
                                                const gchar     *sender_name,
                                                const gchar     *object_path,
@@ -371,26 +540,24 @@ on_app_manager_available_applications_changed (GDBusConnection *connection,
 {
   EosAppListModel *self = user_data;
 
-  g_clear_pointer (&self->installable_apps, g_hash_table_unref);
-  g_clear_pointer (&self->updatable_apps, g_hash_table_unref);
+  GVariantIter *available_apps_iter, *updatable_apps_iter;
 
-  GVariantIter *iter1, *iter2;
+  g_variant_get (parameters, "(a(sssx)a(sssx))", &available_apps_iter,
+                 &updatable_apps_iter);
 
-  g_variant_get (parameters, "(a(sss)a(sss))", &iter1, &iter2);
+  update_apps_info_from_gvariant (self, available_apps_iter,
+                                  EOS_APP_LIST_MODEL_UPDATE_TYPE_AVAILABLE);
+  update_apps_info_from_gvariant (self, updatable_apps_iter,
+                                  EOS_APP_LIST_MODEL_UPDATE_TYPE_UPDATABLE);
 
-  self->installable_apps = create_app_hash_from_gvariant (iter1);
-  self->updatable_apps = create_app_hash_from_gvariant (iter2);
-
-  g_variant_iter_free (iter1);
-  g_variant_iter_free (iter2);
+  g_variant_iter_free (available_apps_iter);
+  g_variant_iter_free (updatable_apps_iter);
 
   eos_app_list_model_emit_changed (self);
 }
 
 static gboolean
 load_available_apps (EosAppListModel *self,
-                     GHashTable **installable_apps_out,
-                     GHashTable **updatable_apps_out,
                      GCancellable *cancellable,
                      GError **error_out)
 {
@@ -449,16 +616,16 @@ load_available_apps (EosAppListModel *self,
     }
 
   GVariantIter *installable_apps_iter, *updatable_apps_iter;
-  g_variant_get (installable_apps, "a(sss)", &installable_apps_iter);
-  g_variant_get (updatable_apps, "a(sss)", &updatable_apps_iter);
+  g_variant_get (installable_apps, "a(sssx)", &installable_apps_iter);
+  g_variant_get (updatable_apps, "a(sssx)", &updatable_apps_iter);
 
   eos_app_log_debug_message ("Parsing installable app list");
-  if (installable_apps_out != NULL)
-    *installable_apps_out = create_app_hash_from_gvariant (installable_apps_iter);
+  update_apps_info_from_gvariant (self, installable_apps_iter,
+                                  EOS_APP_LIST_MODEL_UPDATE_TYPE_AVAILABLE);
 
   eos_app_log_debug_message ("Parsing updatable app list");
-  if (updatable_apps_out != NULL)
-    *updatable_apps_out = create_app_hash_from_gvariant (updatable_apps_iter);
+  update_apps_info_from_gvariant (self, updatable_apps_iter,
+                                  EOS_APP_LIST_MODEL_UPDATE_TYPE_UPDATABLE);
 
   eos_app_log_debug_message ("Done retrieving installed apps");
 
@@ -523,18 +690,9 @@ load_manager_available_apps (EosAppListModel *self,
                              GCancellable *cancellable)
 {
   GError *error = NULL;
-  GHashTable *installable_apps;
-  GHashTable *updatable_apps;
 
-  if (!load_available_apps (self, &installable_apps, &updatable_apps,
-                            cancellable, &error))
+  if (!load_available_apps (self, cancellable, &error))
     goto out;
-
-  g_clear_pointer (&self->installable_apps, g_hash_table_unref);
-  g_clear_pointer (&self->updatable_apps, g_hash_table_unref);
-
-  self->installable_apps = installable_apps;
-  self->updatable_apps = updatable_apps;
 
   if (!load_user_capabilities (self, cancellable, &error))
     goto out;
@@ -591,17 +749,16 @@ load_manager_installed_apps (EosAppListModel *self,
   eos_app_log_debug_message ("Parsing installed app return bjects");
 
   GVariantIter *installed_apps_iter, *removable_apps_iter;
-  g_variant_get (installed_apps, "a(sss)", &installed_apps_iter);
-  g_variant_get (removable_apps, "a(sss)", &removable_apps_iter);
-
-  g_clear_pointer (&self->manager_installed_apps, g_hash_table_unref);
-  g_clear_pointer (&self->manager_removable_apps, g_hash_table_unref);
+  g_variant_get (installed_apps, "a(sssx)", &installed_apps_iter);
+  g_variant_get (removable_apps, "a(sssx)", &removable_apps_iter);
 
   eos_app_log_debug_message ("Parsing installed app list");
-  self->manager_installed_apps = create_app_hash_from_gvariant (installed_apps_iter);
+  update_apps_info_from_gvariant (self, installed_apps_iter,
+                                  EOS_APP_LIST_MODEL_UPDATE_TYPE_EAM_INSTALLED);
 
   eos_app_log_debug_message ("Parsing removable app list");
-  self->manager_removable_apps = create_app_hash_from_gvariant (removable_apps_iter);
+  update_apps_info_from_gvariant (self, removable_apps_iter,
+                                  EOS_APP_LIST_MODEL_UPDATE_TYPE_EAM_REMOVABLE);
 
   eos_app_log_debug_message ("Done retrieving installed apps");
 
@@ -650,19 +807,20 @@ load_all_apps (EosAppListModel *self,
                GCancellable *cancellable,
                GError **error)
 {
-  /* Load GIO apps */
+  eos_app_log_debug_message ("Loading GIO apps");
   g_clear_pointer (&self->gio_apps, g_hash_table_unref);
   self->gio_apps = load_apps_from_gio ();
 
-  /* Load installed apps from the app manager */
+  eos_app_log_debug_message ("Loading installed apps from manager");
   if (!load_manager_installed_apps (self, cancellable))
     goto out;
 
-  /* Load available apps from the app manager*/
+  eos_app_log_debug_message ("Loading available apps from manager");
   if (!load_manager_available_apps (self, cancellable))
     goto out;
 
   /* Load apps with launcher from the shell */
+  eos_app_log_debug_message ("Loading apps with launcher from the shell");
   if (!load_shell_apps (self, cancellable))
     goto out;
 
@@ -709,10 +867,7 @@ eos_app_list_model_finalize (GObject *gobject)
 
   g_hash_table_unref (self->gio_apps);
   g_hash_table_unref (self->shell_apps);
-  g_hash_table_unref (self->updatable_apps);
-  g_hash_table_unref (self->installable_apps);
-  g_hash_table_unref (self->manager_installed_apps);
-  g_hash_table_unref (self->manager_removable_apps);
+  g_hash_table_unref (self->apps);
 
   G_OBJECT_CLASS (eos_app_list_model_parent_class)->finalize (gobject);
 }
@@ -1883,15 +2038,21 @@ remove_app_from_manager (EosAppListModel *self,
 GList *
 eos_app_list_model_get_all_apps (EosAppListModel *model)
 {
+  eos_app_log_debug_message ("Retrieving all installed and available apps");
+
   GList *gio_apps = NULL;
-  GList *installable_apps = NULL;
+  GList *apps = NULL;
 
   if (model->gio_apps)
     gio_apps = g_hash_table_get_keys (model->gio_apps);
-  if (model->installable_apps)
-    installable_apps = g_hash_table_get_keys (model->installable_apps);
 
-  return g_list_concat (gio_apps, installable_apps);
+  /* TODO: make sure that this only does available apps after
+   * we add handlers to different update state types to model->apps
+   */
+  if (model->apps)
+    apps = g_hash_table_get_keys (model->apps);
+
+  return g_list_concat (gio_apps, apps);
 }
 
 /**
@@ -1945,10 +2106,17 @@ static gboolean
 app_is_installable (EosAppListModel *model,
                     const char *desktop_id)
 {
-  if (model->installable_apps == NULL)
+  EosAppListModelItem *item;
+
+  if (model->apps == NULL)
     return FALSE;
 
-  return g_hash_table_contains (model->installable_apps, desktop_id);
+  if (!g_hash_table_contains (model->apps, desktop_id))
+    return FALSE;
+
+  item = g_hash_table_lookup (model->apps, desktop_id);
+
+  return item->state == EOS_APP_STATE_AVAILABLE;
 }
 
 static gchar *
@@ -1975,10 +2143,17 @@ static gboolean
 app_is_updatable (EosAppListModel *model,
                   const char *desktop_id)
 {
-  if (model->updatable_apps == NULL)
+  EosAppListModelItem *item;
+
+  if (model->apps == NULL)
     return FALSE;
 
-  return g_hash_table_lookup (model->updatable_apps, desktop_id) != NULL;
+  if (!g_hash_table_contains (model->apps, desktop_id))
+    return FALSE;
+
+  item = g_hash_table_lookup (model->apps, desktop_id);
+
+  return item->state == EOS_APP_STATE_UPDATABLE;
 }
 
 static gboolean
@@ -2075,7 +2250,7 @@ eos_app_list_model_get_app_state (EosAppListModel *model,
   else if (is_installed)
     retval = EOS_APP_STATE_INSTALLED;
   else
-    retval = EOS_APP_STATE_UNINSTALLED;
+    retval = EOS_APP_STATE_AVAILABLE;
 
   return retval;
 }
@@ -2343,18 +2518,152 @@ eos_app_list_model_get_app_can_remove (EosAppListModel *model,
 {
   const gchar *localized_id;
 
-  if (model->manager_installed_apps == NULL)
+  if (model->apps == NULL)
     return FALSE;
 
   localized_id = app_get_localized_id_for_installed_app (model, desktop_id);
 
   /* Can only remove what the manager installed... */
-  if (!g_hash_table_contains (model->manager_installed_apps, localized_id))
+  if (!g_hash_table_contains (model->apps, localized_id))
     return FALSE;
 
-  /* ... and what the manager tells us it's removable */
-  if (!g_hash_table_contains (model->manager_removable_apps, localized_id))
+  EosAppListModelItem *item = g_hash_table_lookup (model->apps, localized_id);
+
+  return item->can_remove;
+}
+
+static guint64
+get_fs_available_space ()
+{
+  GFile *current_directory = NULL;
+  GFileInfo *filesystem_info = NULL;
+  GError *error = NULL;
+
+  /* We start of with the assumtion that we have the space */
+  guint64 available_space = G_MAXUINT64;
+
+  /* Whatever FS we're on, check the space */
+  current_directory = g_file_new_for_path (".");
+
+  filesystem_info = g_file_query_filesystem_info (current_directory,
+                                                  G_FILE_ATTRIBUTE_FILESYSTEM_FREE,
+                                                  NULL, /* Cancellable */
+                                                  &error);
+
+  g_object_unref (current_directory);
+
+  if (error != NULL) {
+    eos_app_log_error_message ("Could not retrieve available space: %s",
+                               error->message);
+    return available_space;
+  }
+
+  if (filesystem_info == NULL) {
+    eos_app_log_error_message ("Could not retrieve available space");
+    return available_space;
+  }
+
+  available_space = g_file_info_get_attribute_uint64 (filesystem_info,
+                                                      G_FILE_ATTRIBUTE_FILESYSTEM_FREE);
+
+  eos_app_log_debug_message ("Available space: %" G_GUINT64_FORMAT, available_space);
+
+  g_object_unref (filesystem_info);
+
+  return available_space;
+}
+
+gboolean
+eos_app_list_model_get_app_has_sufficient_install_space (EosAppListModel *model,
+                                                         const char *desktop_id)
+{
+  guint64 installed_size = 0;
+  const gchar *real_desktop_id;
+
+  if (model->apps == NULL)
     return FALSE;
 
-  return TRUE;
+  if (desktop_id == NULL) {
+    eos_app_log_error_message ("Desktop ID for %s is NULL!", desktop_id);
+    return FALSE;
+  }
+
+  /* If we don't know about the app, then we can't really say that we
+   * can install it.
+   */
+  if (g_hash_table_contains (model->apps, desktop_id))
+    real_desktop_id = desktop_id;
+  else
+    {
+      /* Maybe we need a localized ID */
+      eos_app_log_debug_message ("Can't find the app ID (%s). "
+                                 "Trying a localized one.", desktop_id);
+
+      /* XXX: We don't expect this to be hit for an installed app */
+      real_desktop_id = app_get_localized_id_for_installable_app (model, desktop_id);
+
+      /* Make sure that this ID is available */
+      if (!real_desktop_id || !g_hash_table_contains (model->apps,
+                                                      real_desktop_id)) {
+
+        eos_app_log_error_message ("Could not even find a localized ID (%s)!",
+                                   real_desktop_id);
+        return FALSE;
+      }
+    }
+
+  EosAppListModelItem *item = g_hash_table_lookup (model->apps, real_desktop_id);
+  installed_size = item->installed_size; /* Implicit cast from gint64 to guint64 */
+
+  eos_app_log_debug_message ("App %s installed size: %" G_GINT64_FORMAT,
+                             desktop_id,
+                             installed_size);
+
+  if (installed_size <= get_fs_available_space ())
+    return TRUE;
+
+  return FALSE;
+}
+
+/* XXX: Unused from the UI for now but will be needed at some point to inform
+ *      the user about how much space the app requires.
+ */
+gint64
+eos_app_list_model_get_app_installed_size (EosAppListModel *model,
+                                           const char *desktop_id)
+{
+  const gchar *real_desktop_id;
+
+  if (model->apps == NULL)
+    return 0L;
+
+  if (desktop_id == NULL) {
+    eos_app_log_error_message ("Desktop ID for %s is NULL!", desktop_id);
+    return FALSE;
+  }
+
+  if (g_hash_table_contains (model->apps, desktop_id))
+    real_desktop_id = desktop_id;
+  else
+    {
+      /* Maybe we need a localized ID */
+      eos_app_log_debug_message ("Can't find the app ID (%s). "
+                                 "Trying a localized one.", desktop_id);
+
+      /* XXX: We don't expect this to be hit for an installable app */
+      real_desktop_id = app_get_localized_id_for_installed_app (model, desktop_id);
+
+      /* Make sure that this ID is available */
+      if (!real_desktop_id || !g_hash_table_contains (model->apps,
+                                                      real_desktop_id)) {
+
+        eos_app_log_error_message ("Could not even find a localized ID (%s)!",
+                                   real_desktop_id);
+        return 0L;
+      }
+    }
+
+  EosAppListModelItem *item = g_hash_table_lookup (model->apps, real_desktop_id);
+
+  return item->installed_size;
 }

@@ -320,6 +320,11 @@
     background-image: url("btn_install_pressed_icon.png");
 }
 
+.app-frame .state-button .state-image:insensitive {
+    background-color: rgba(0, 0, 0, 0.0);
+    background-image: url("btn_install_pressed_icon.png");
+}
+
 .app-frame .state-button.remove .state-image {
     background-image: url("btn_remove_normal_icon.png");
 }

@@ -66,6 +66,10 @@ const BaseList = new Lang.Class({
         return this._model.get_app_has_launcher(id);
     },
 
+    hasSufficientInstallSpace: function(id) {
+        return this._model.get_app_has_sufficient_install_space(id);
+    },
+
     canRemove: function(id) {
         // Only apps that don't have a launcher can be
         // removed from the system

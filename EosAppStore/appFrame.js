@@ -262,7 +262,7 @@ const AppListBoxRow = new Lang.Class({
                 }
                 break;
 
-            case EosAppStorePrivate.AppState.UNINSTALLED:
+            case EosAppStorePrivate.AppState.AVAILABLE:
                 style = INSTALL;
                 break;
 
@@ -331,9 +331,17 @@ const AppListBoxRow = new Lang.Class({
                 }
                 break;
 
-            case EosAppStorePrivate.AppState.UNINSTALLED:
+            case EosAppStorePrivate.AppState.AVAILABLE:
+                this._installButton.set_tooltip_text("");
                 this._installButtonLabel.set_text(BUTTON_LABEL_INSTALL);
+
+                if (!this._model.hasSufficientInstallSpace(this._appId)) {
+                    this._installButton.set_sensitive(false);
+                    this._installButton.set_tooltip_text(_("Insufficient space to install the app"));
+                }
+
                 this._installButton.show();
+
                 break;
 
             case EosAppStorePrivate.AppState.UPDATABLE:
@@ -482,7 +490,7 @@ const AppListBoxRow = new Lang.Class({
                 break;
 
             // if the application is uninstalled, we install it
-            case EosAppStorePrivate.AppState.UNINSTALLED:
+            case EosAppStorePrivate.AppState.AVAILABLE:
                 this._installApp();
                 break;
 

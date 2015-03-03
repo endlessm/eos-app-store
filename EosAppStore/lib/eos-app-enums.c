@@ -33,7 +33,7 @@ enum_type##_get_type (void) \
 EOS_DEFINE_ENUM_TYPE (EosAppState, eos_app_state,
                       EOS_ENUM_VALUE (EOS_APP_STATE_UNKNOWN, unknown)
                       EOS_ENUM_VALUE (EOS_APP_STATE_INSTALLED, installed)
-                      EOS_ENUM_VALUE (EOS_APP_STATE_UNINSTALLED, uninstalled)
+                      EOS_ENUM_VALUE (EOS_APP_STATE_AVAILABLE, available)
                       EOS_ENUM_VALUE (EOS_APP_STATE_UPDATABLE, updatable))
 
 EOS_DEFINE_ENUM_TYPE (EosAppCategory, eos_app_category,

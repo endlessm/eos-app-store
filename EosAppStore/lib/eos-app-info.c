@@ -960,7 +960,7 @@ eos_app_info_create_from_json (JsonNode *node)
                   language = my_language;
                   break;
                 }
-              
+
               g_free (my_language);
             }
 
