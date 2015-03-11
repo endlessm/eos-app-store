@@ -212,7 +212,7 @@ eos_app_load_content (EosAppCategory category,
     {
       JsonNode *element = json_array_get_element (array, i);
 
-      EosAppInfo *info = eos_app_info_create_from_json (element);
+      EosAppInfo *info = eos_app_info_create_from_content (element);
       if (info == NULL)
         continue;
 

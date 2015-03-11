@@ -11,26 +11,28 @@ eaprivate_cflags = \
 	$(EOS_APP_STORE_CFLAGS)
 
 eaprivate_source_h = \
-	lib/eos-app-log.h \
+	lib/eos-app-cell.h \
 	lib/eos-app-enums.h \
-	lib/eos-app-info.h \
 	lib/eos-app-list-model.h \
+	lib/eos-app-log.h \
+	lib/eos-app-info.h \
 	lib/eos-app-utils.h \
-	lib/eos-link-info.h \
-	lib/eos-vertical-stack-switcher.h \
 	lib/eos-flexy-grid-private.h \
-	lib/eos-flexy-grid.h
+	lib/eos-flexy-grid.h \
+	lib/eos-link-info.h \
+	lib/eos-vertical-stack-switcher.h
 
 eaprivate_source_c = \
-	lib/eos-app-log.c \
+	lib/eos-app-cell.c \
 	lib/eos-app-enums.c \
-	lib/eos-app-info.c \
 	lib/eos-app-list-model.c \
+	lib/eos-app-log.c \
+	lib/eos-app-info.c \
 	lib/eos-app-utils.c \
-	lib/eos-link-info.c \
-	lib/eos-vertical-stack-switcher.c \
+	lib/eos-flexy-grid-cell.c \
 	lib/eos-flexy-grid.c \
-	lib/eos-flexy-grid-cell.c
+	lib/eos-link-info.c \
+	lib/eos-vertical-stack-switcher.c
 
 eaprivate_built_source = \
 	lib/eos-app-manager-service.c \
