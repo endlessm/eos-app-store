@@ -341,6 +341,102 @@ get_screenshots (JsonArray *array,
   g_free (path);
 }
 
+/* installed keyfile keys */
+static const gchar *FILE_KEYS[] = {
+  "app_id",
+  "app_name",
+  "version",
+  "locale",
+  "installed_size",
+  "secondary_storage",
+};
+
+/* JSON fields from app server */
+static const gchar *JSON_KEYS[] = {
+  "appId",
+  "appName",
+  "codeVersion",
+  "Locale",
+  "installedSize",
+  "secondaryStorage",
+};
+
+/* Keep the key ids in sync with the names above */
+enum {
+  APP_ID,
+  APP_NAME,
+  CODE_VERSION,
+  LOCALE,
+  INSTALLED_SIZE,
+  SECONDARY_STORAGE
+};
+
+/*< private >*/
+EosAppInfo *
+eos_app_info_create_from_installed (GKeyFile *keyfile)
+{
+  g_return_val_if_fail (keyfile != NULL, NULL);
+
+  EosAppInfo *info = eos_app_info_new ();
+
+#define GROUP   "Bundle"
+
+  if (!g_key_file_has_group (keyfile, GROUP))
+    return info;
+
+  info->desktop_id = g_key_file_get_string (keyfile, GROUP, FILE_KEYS[APP_ID], NULL);
+  info->title = g_key_file_get_string (keyfile, GROUP, FILE_KEYS[APP_NAME], NULL);
+  info->version = g_key_file_get_string (keyfile, GROUP, FILE_KEYS[CODE_VERSION], NULL);
+  info->locale = g_key_file_get_string (keyfile, GROUP, FILE_KEYS[LOCALE], NULL);
+  info->installed_size = g_key_file_get_int64 (keyfile, GROUP, FILE_KEYS[INSTALLED_SIZE], NULL);
+  info->on_secondary_storage = g_key_file_get_boolean (keyfile, GROUP, FILE_KEYS[SECONDARY_STORAGE], NULL);
+
+#undef GROUP
+
+  return info;
+}
+
+/*< private >*/
+EosAppInfo *
+eos_app_info_create_from_server (JsonNode *node)
+{
+  g_return_val_if_fail (node != NULL, NULL);
+
+  if (!JSON_NODE_HOLDS_OBJECT (node))
+    return NULL;
+
+  JsonObject *obj = json_node_get_object (node);
+  EosAppInfo *info = eos_app_info_new ();
+  JsonNode *node;
+
+  node = json_object_get_member (obj, JSON_KEYS[APP_ID]);
+  if (node != NULL)
+    info->desktop_id = json_node_dup_string (node);
+
+  node = json_object_get_member (json, JSON_KEYS[APP_NAME]);
+  if (node != NULL)
+    info->title = json_node_dup_string (node);
+
+  node = json_object_get_member (json, JSON_KEYS[CODE_VERSION]);
+  if (node != NULL)
+    info->version = json_node_dup_string (node);
+
+  node = json_object_get_member (json, JSON_KEYS[LOCALE]);
+  if (node != NULL)
+    info->locale = json_node_dup_string (node);
+
+  node = json_object_get_member (json, JSON_KEYS[INSTALLED_SIZE]);
+  if (node != NULL)
+    info->installed_size = json_node_get_int (node);
+
+  node = json_object_get_member (json, JSON_KEYS[SECONDARY_STORAGE]);
+  if (node)
+    info->on_secondary_storage = json_node_get_boolean (node);
+
+bail:
+  return info;
+}
+
 /*< private >*/
 EosAppInfo *
 eos_app_info_create_from_content (JsonNode *node)
