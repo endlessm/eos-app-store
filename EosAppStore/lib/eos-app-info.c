@@ -22,6 +22,11 @@ struct _EosAppInfo
   char *title;
   char *subtitle;
   char *description;
+  char *locale;
+
+  char *version;
+
+  gint64 installed_size;
 
   char *square_img;
   char *featured_img;
@@ -34,7 +39,8 @@ struct _EosAppInfo
   EosAppCategory category;
 
   guint is_featured : 1;
-  guint is_offline  : 1;
+  guint is_offline : 1;
+  guint on_secondary_storage : 1;
 };
 
 G_DEFINE_BOXED_TYPE (EosAppInfo, eos_app_info, eos_app_info_ref, eos_app_info_unref)
@@ -75,6 +81,8 @@ eos_app_info_unref (EosAppInfo *info)
       g_free (info->description);
       g_free (info->square_img);
       g_free (info->featured_img);
+      g_free (info->version);
+      g_free (info->locale);
       g_strfreev (info->screenshots);
 
       g_slice_free (EosAppInfo, info);
@@ -117,6 +125,24 @@ eos_app_info_get_description (const EosAppInfo *info)
   return "";
 }
 
+const char *
+eos_app_info_get_version (const EosAppInfo *info)
+{
+  if (info->version != NULL)
+    return info->version;
+
+  return "";
+}
+
+const char *
+eos_app_info_get_locale (const EosAppInfo *info)
+{
+  if (info->locale != NULL)
+    return info->locale;
+
+  return "";
+}
+
 gboolean
 eos_app_info_is_featured (const EosAppInfo *info)
 {
@@ -133,6 +159,24 @@ eos_app_info_is_offline (const EosAppInfo *info)
     return info->is_offline;
 
   return FALSE;
+}
+
+gboolean
+eos_app_info_is_on_secondary_storage (const EosAppInfo *info)
+{
+  if (info != NULL)
+    return info->on_secondary_storage;
+
+  return FALSE;
+}
+
+gint64
+eos_app_info_get_installed_size (const EosAppInfo *info)
+{
+  if (info != NULL)
+    return info->installed_size;
+
+  return 0;
 }
 
 EosAppCategory
