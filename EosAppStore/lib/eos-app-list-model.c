@@ -138,6 +138,16 @@ unlocalized_desktop_id_from_app_id (const gchar *app_id)
   return retval;
 }
 
+static gboolean
+app_is_installable (EosAppListModel *model,
+                    const char *desktop_id)
+{
+  if (model->installable_apps == NULL)
+    return FALSE;
+
+  return g_hash_table_contains (model->installable_apps, desktop_id);
+}
+
 static gchar *
 localized_id_from_desktop_id (const gchar *desktop_id)
 {
@@ -156,6 +166,34 @@ localized_id_from_desktop_id (const gchar *desktop_id)
   g_free (lang_id);
 
   return localized_id;
+}
+
+static gchar *
+get_localized_desktop_id (EosAppListModel *model,
+                          const gchar *desktop_id)
+{
+  gchar *localized_id;
+
+  localized_id = localized_id_from_desktop_id (desktop_id);
+  if (app_is_installable (model, localized_id))
+    return localized_id;
+
+  g_free (localized_id);
+  return NULL;
+}
+
+static GDesktopAppInfo *
+get_localized_app_info (EosAppListModel *model,
+                        const gchar *desktop_id)
+{
+  GDesktopAppInfo *info;
+  gchar *localized_id;
+
+  localized_id = localized_id_from_desktop_id (desktop_id);
+  info = g_hash_table_lookup (model->gio_apps, localized_id);
+  g_free (localized_id);
+
+  return info;
 }
 
 static GHashTable *
@@ -1514,20 +1552,6 @@ eos_app_list_model_get_all_apps (EosAppListModel *model)
   return g_list_concat (gio_apps, installable_apps);
 }
 
-static GDesktopAppInfo *
-get_localized_app_info (EosAppListModel *model,
-                        const gchar *desktop_id)
-{
-  GDesktopAppInfo *info;
-  gchar *localized_id;
-
-  localized_id = localized_id_from_desktop_id (desktop_id);
-  info = g_hash_table_lookup (model->gio_apps, localized_id);
-  g_free (localized_id);
-
-  return info;
-}
-
 /**
  * eos_app_list_model_get_app_info:
  * @model: the app list model
@@ -1569,30 +1593,6 @@ app_has_launcher (EosAppListModel *model,
     return FALSE;
 
   return g_hash_table_contains (model->shell_apps, desktop_id);
-}
-
-static gboolean
-app_is_installable (EosAppListModel *model,
-                    const char *desktop_id)
-{
-  if (model->installable_apps == NULL)
-    return FALSE;
-
-  return g_hash_table_contains (model->installable_apps, desktop_id);
-}
-
-static gchar *
-get_localized_desktop_id (EosAppListModel *model,
-                          const gchar *desktop_id)
-{
-  gchar *localized_id;
-
-  localized_id = localized_id_from_desktop_id (desktop_id);
-  if (app_is_installable (model, localized_id))
-    return localized_id;
-
-  g_free (localized_id);
-  return NULL;
 }
 
 static gchar *
