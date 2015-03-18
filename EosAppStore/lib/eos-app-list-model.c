@@ -1500,6 +1500,17 @@ download_file_from_uri_with_retry (EosAppListModel *self,
 }
 
 static char *
+get_cache_path (const char *app_id,
+                const char *extension)
+{
+    char *filename = g_strconcat (app_id, extension, NULL);
+    char *cache_path = g_build_filename (BUNDLEDIR, filename, NULL);
+    g_free (filename);
+
+    return cache_path;
+}
+
+static char *
 create_sha256sum (EosAppListModel *self,
                   EosAppManagerTransaction *transaction,
                   const char *bundle_path,
@@ -1519,9 +1530,7 @@ create_sha256sum (EosAppListModel *self,
       return NULL;
     }
 
-  char *sha256_name = g_strconcat (app_id, ".sha256", NULL);
-  char *sha256_path = g_build_filename (BUNDLEDIR, sha256_name, NULL);
-  g_free (sha256_name);
+  char *sha256_path = get_cache_path (app_id, ".sha256");
 
   gchar *contents = g_strconcat (bundle_hash, "\t", bundle_path, "\n", NULL);
   if (!g_file_set_contents (sha256_path, contents, -1, &error))
@@ -1551,9 +1560,7 @@ download_signature (EosAppListModel *self,
       return NULL;
     }
 
-  char *signature_name = g_strconcat (app_id, ".asc", NULL);
-  char *signature_path = g_build_filename (BUNDLEDIR, signature_name, NULL);
-  g_free (signature_name);
+  char *signature_path = get_cache_path (app_id, ".asc");
 
   if (!download_file_from_uri_with_retry (self, app_id,
                                           signature_uri, signature_path,
@@ -1590,9 +1597,7 @@ download_bundle (EosAppListModel *self,
       return NULL;
     }
 
-  char *bundle_name = g_strconcat (app_id, ".bundle", NULL);
-  char *bundle_path = g_build_filename (BUNDLEDIR, bundle_name, NULL);
-  g_free (bundle_name);
+  char *bundle_path = get_cache_path (app_id, ".bundle");
 
   eos_app_log_info_message ("Bundle save path is %s", bundle_path);
 
