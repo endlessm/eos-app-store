@@ -3,6 +3,8 @@
 #include "config.h"
 
 #include "eos-app-utils.h"
+
+#include "eos-app-log.h"
 #include "eos-link-info.h"
 
 #include <locale.h>
@@ -13,8 +15,10 @@
 #define APP_STORE_CONTENT_APPS  "apps"
 #define APP_STORE_CONTENT_LINKS "links"
 
-static const gchar *
-get_system_personality (void)
+#define DOWNLOAD_DIR_DEFAULT    LOCALSTATEDIR "/tmp/eos-app-store"
+
+static const char *
+get_os_personality (void)
 {
   static char *personality;
 
@@ -65,12 +69,131 @@ get_system_personality (void)
   return personality;
 }
 
+static const char *
+get_download_url (void)
+{
+  static char *download_url;
+
+  if (g_once_init_enter (&download_url))
+    {
+      char *tmp = NULL;
+
+      GKeyFile *keyfile = g_key_file_new ();
+      char *path = g_build_filename (SYSCONFDIR, "eos-app-manager", "eam-default.cfg", NULL);
+      GError *error = NULL;
+      g_key_file_load_from_file (keyfile, path, G_KEY_FILE_NONE, &error);
+      if (error == NULL)
+        tmp = g_key_file_get_string (keyfile, "eam", "downloaddir", &error);
+
+      if (error != NULL)
+        {
+          eos_app_log_error_message ("Unable to load configuration: %s",
+                                     error->message);
+          g_error_free (error);
+          tmp = g_strdup (DOWNLOAD_DIR_DEFAULT);
+        }
+
+      g_once_init_leave (&download_url, tmp);
+    }
+
+  return download_url;
+}
+
+/*
+ * Parse the /etc/os-release file if present:
+ * http://www.freedesktop.org/software/systemd/man/os-release.html
+ */
+static gboolean
+parse_os_release_file (gchar  **version_id,
+                       GError **error)
+{
+  char *contents = NULL;
+  char **lines;
+  gint idx;
+
+  if (!g_file_get_contents (SYSCONFDIR "/os-release", &contents, NULL, error))
+    return FALSE;
+
+  lines = g_strsplit (contents, "\n", -1);
+  g_free (contents);
+
+  gboolean ret = FALSE;
+
+  for (idx = 0; lines[idx] != NULL; idx++)
+    {
+      const char *line = lines[idx];
+
+      line = g_strstrip (line);
+
+      if (!g_str_has_prefix (line, "VERSION_ID"))
+        continue;
+
+      char *p = strchr (line, '=');
+      if (p == NULL)
+        continue;
+
+      p += 1;
+      if (p == '\0')
+        continue;
+
+      while (g_ascii_isspace (*p) || *p == '"')
+        p++;
+
+      char *start = p + 1;
+      if (p == '\0')
+        continue;
+
+      while (*p != '"' && *p != '\0')
+        p++;
+
+      *version_id = g_strndup (start, p - start);
+      ret = TRUE;
+      break;
+    }
+
+  g_strfreev (lines);
+
+  return ret;
+}
+
+static const char *
+get_os_version (void)
+{
+  static char *os_version;
+
+  if (g_once_init_enter (&os_version))
+    {
+      char *tmp;
+
+      GError *error = NULL;
+      parse_os_release_file (&tmp, &error);
+      if (error != NULL)
+        {
+          eos_app_log_error_message ("Cannot parse os-release file: %s", error->message);
+          g_error_free (error);
+
+          tmp = g_strdup ("1.0");
+        }
+
+      g_once_init_leave (&os_version, tmp);
+    }
+
+  return os_version;
+}
+
+static const char *
+get_os_arch (void)
+{
+  /* Defined at configure time */
+  return EOS_ARCH;
+}
+
 static char *
 eos_get_content_dir (const gchar *content_type)
 {
   char *res = g_build_filename (DATADIR,
                                 APP_STORE_CONTENT_DIR,
-                                get_system_personality (),
+                                get_os_personality (),
                                 content_type,
                                 NULL);
 
@@ -265,7 +388,7 @@ eos_link_load_content (EosLinkCategory category)
   JsonObject *obj;
   const gchar *category_name;
 
-  JsonArray *categories_array = eos_app_parse_resource_content (APP_STORE_CONTENT_LINKS, get_system_personality ());
+  JsonArray *categories_array = eos_app_parse_resource_content (APP_STORE_CONTENT_LINKS, get_os_personality ());
 
   if (categories_array == NULL)
     return NULL;
@@ -481,4 +604,15 @@ GdkNotifyType
 eos_get_event_notify_type (GdkEvent *event)
 {
   return ((GdkEventCrossing *) event)->detail;
+}
+
+char *
+eos_get_all_updates_uri (void)
+{
+  return uri = g_strconcat (get_download_url (),
+                            "/api/v1/updates/",
+                            get_os_version (),
+                            "?arch=", get_os_arch (),
+                            "&personality=", get_os_personality (),
+                            NULL);
 }
