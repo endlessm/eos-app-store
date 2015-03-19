@@ -1292,15 +1292,15 @@ check_available_space (GFile         *path,
 }
 
 static gboolean
-download_file_from_uri (EosAppListModel *self,
-                        const char      *app_id,
-                        const char      *source_uri,
-                        const char      *target_file,
-                        ProgressReportFunc progress_func,
-                        gpointer         progress_func_user_data,
-                        gboolean        *reset_error_counter,
-                        GCancellable    *cancellable,
-                        GError         **error)
+download_app_file_from_uri (EosAppListModel *self,
+                            const char      *app_id,
+                            const char      *source_uri,
+                            const char      *target_file,
+                            ProgressReportFunc progress_func,
+                            gpointer         progress_func_user_data,
+                            gboolean        *reset_error_counter,
+                            GCancellable    *cancellable,
+                            GError         **error)
 {
   GError *internal_error = NULL;
   gboolean retval = FALSE;
@@ -1507,14 +1507,14 @@ out:
 }
 
 static gboolean
-download_file_from_uri_with_retry (EosAppListModel *self,
-                                   const char      *app_id,
-                                   const char      *source_uri,
-                                   const char      *target_file,
-                                   ProgressReportFunc progress_func,
-                                   gpointer         progress_func_user_data,
-                                   GCancellable    *cancellable,
-                                   GError         **error_out)
+download_app_file_from_uri_with_retry (EosAppListModel *self,
+                                       const char      *app_id,
+                                       const char      *source_uri,
+                                       const char      *target_file,
+                                       ProgressReportFunc progress_func,
+                                       gpointer         progress_func_user_data,
+                                       GCancellable    *cancellable,
+                                       GError         **error_out)
 {
     gboolean download_success = FALSE;
     gboolean reset_error_counter = FALSE;
@@ -1529,13 +1529,13 @@ download_file_from_uri_with_retry (EosAppListModel *self,
      * the retry timeout
      */
     while (TRUE) {
-        download_success = download_file_from_uri (self, app_id, source_uri,
-                                                   target_file,
-                                                   progress_func,
-                                                   progress_func_user_data,
-                                                   &reset_error_counter,
-                                                   cancellable,
-                                                   &error);
+        download_success = download_app_file_from_uri (self, app_id, source_uri,
+                                                       target_file,
+                                                       progress_func,
+                                                       progress_func_user_data,
+                                                       &reset_error_counter,
+                                                       cancellable,
+                                                       &error);
 
         /* We're done if we get the file */
         if (download_success)
@@ -1640,10 +1640,10 @@ download_signature (EosAppListModel *self,
   char *signature_path = g_build_filename (BUNDLEDIR, signature_name, NULL);
   g_free (signature_name);
 
-  if (!download_file_from_uri_with_retry (self, app_id,
-                                          signature_uri, signature_path,
-                                          NULL, NULL,
-                                          cancellable, &error))
+  if (!download_app_file_from_uri_with_retry (self, app_id,
+                                              signature_uri, signature_path,
+                                              NULL, NULL,
+                                              cancellable, &error))
     {
       g_propagate_error (error_out, error);
     }
@@ -1681,10 +1681,10 @@ download_bundle (EosAppListModel *self,
 
   eos_app_log_info_message ("Bundle save path is %s", bundle_path);
 
-  if (!download_file_from_uri_with_retry (self, app_id,
-                                          bundle_uri, bundle_path,
-                                          queue_download_progress, self,
-                                          cancellable, &error))
+  if (!download_app_file_from_uri_with_retry (self, app_id,
+                                              bundle_uri, bundle_path,
+                                              queue_download_progress, self,
+                                              cancellable, &error))
     {
       eos_app_log_error_message ("Download of bundle failed");
 
