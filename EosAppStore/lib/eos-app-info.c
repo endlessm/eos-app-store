@@ -371,39 +371,104 @@ enum {
   SECONDARY_STORAGE
 };
 
-/*< private >*/
-EosAppInfo *
-eos_app_info_create_from_installed (GKeyFile *keyfile)
+/*< private >
+ * check_secondary_storage:
+ * @filename: the full path to the bundle info file
+ *
+ * Returns: %TRUE if the bundle info resides on secondary storage
+ */
+static gboolean
+check_secondary_storage (const char *filename)
 {
-  g_return_val_if_fail (keyfile != NULL, NULL);
+  /* we have various heuristics in place to check if a bundle resides on
+   * the secondary storage device
+   */
 
-  EosAppInfo *info = eos_app_info_new ();
+  /* 1. check if the file is read-only; secondary storage is read-only
+   *    for the time being. we don't check for ENOENT or EACCESS, because
+   *    by the time this function is called, we know that we could load
+   *    the file in question.
+   */
+  int res = access (filename, W_OK);
+  if (res < 0)
+    return TRUE;
+
+  /* 2. we check if the file resides on a volume mounted using overlayfs.
+   *    this is a bit more convoluted; in theory, we could check if the
+   *    directory in which @filename is located has the overlayfs magic
+   *    bit, but that bit is not exposed by the kernel headers, so we would
+   *    have to do assume that the overlayfs magic bit never changes.
+   */
+  struct stat statbuf;
+  if (stat (filename, &statbuf) < 0)
+    return FALSE;
+
+  dev_t file_stdev = statbuf.st_dev;
+
+  /* and we compare them with the same fields of a list of known
+   * mount points
+   */
+  const char *known_mount_points[] = {
+    "/var/endless-extra",
+  };
+
+  for (int i = 0; i < G_N_ELEMENTS (known_mount_points); i++)
+   {
+      if (stat (known_mount_points[i], &statbuf) < 0)
+        return FALSE;
+
+      if (file_stdev == statbuf.st_dev)
+        return TRUE;
+    }
+
+  return FALSE;
+}
+
+/*< private >*/
+void
+eos_app_info_update_from_installed (EosAppInfo *info,
+                                    const char *filename)
+{
+  char *desktop_id = NULL;
+  GKeyFile *keyfile = g_key_file_new ();
+
+  if (!g_key_file_load_from_file (keyfile, filename, NULL))
+    goto out;
 
 #define GROUP   "Bundle"
 
   if (!g_key_file_has_group (keyfile, GROUP))
-    return info;
+    goto out;
 
-  info->desktop_id = g_key_file_get_string (keyfile, GROUP, FILE_KEYS[APP_ID], NULL);
-  info->title = g_key_file_get_string (keyfile, GROUP, FILE_KEYS[APP_NAME], NULL);
+  desktop_id = g_key_file_get_string (keyfile, GROUP, FILE_KEYS[APP_ID], NULL);
+  if (g_strcmp (desktop_id, info->desktop_id) != 0)
+    goto out;
+
   info->version = g_key_file_get_string (keyfile, GROUP, FILE_KEYS[CODE_VERSION], NULL);
   info->locale = g_key_file_get_string (keyfile, GROUP, FILE_KEYS[LOCALE], NULL);
   info->installed_size = g_key_file_get_int64 (keyfile, GROUP, FILE_KEYS[INSTALLED_SIZE], NULL);
-  info->on_secondary_storage = g_key_file_get_boolean (keyfile, GROUP, FILE_KEYS[SECONDARY_STORAGE], NULL);
+
+  if (g_key_file_has_key (keyfile, GROUP, FILE_KEYS[SECONDARY_STORAGE], NULL))
+    info->on_secondary_storage = g_key_file_get_boolean (keyfile, GROUP, FILE_KEYS[SECONDARY_STORAGE], NULL);
+  else
+    info->on_secondary_storage = check_secondary_storage (filename);
 
 #undef GROUP
 
-  return info;
+out:
+  g_free (desktop_id);
+  g_key_file_unref (keyfile);
 }
 
 /*< private >*/
-EosAppInfo *
-eos_app_info_create_from_server (JsonNode *node)
+void
+eos_app_info_update_from_server (EosAppInfo *info,
+                                 JsonNode *node)
 {
   g_return_val_if_fail (node != NULL, NULL);
 
   if (!JSON_NODE_HOLDS_OBJECT (node))
-    return NULL;
+    return;
 
   JsonObject *obj = json_node_get_object (node);
   EosAppInfo *info = eos_app_info_new ();
@@ -411,11 +476,10 @@ eos_app_info_create_from_server (JsonNode *node)
 
   node = json_object_get_member (obj, JSON_KEYS[APP_ID]);
   if (node != NULL)
-    info->desktop_id = json_node_dup_string (node);
-
-  node = json_object_get_member (json, JSON_KEYS[APP_NAME]);
-  if (node != NULL)
-    info->title = json_node_dup_string (node);
+    {
+      if (g_strcmp0 (info->desktop_id, json_node_get_string (node)) != 0)
+        return;
+    }
 
   node = json_object_get_member (json, JSON_KEYS[CODE_VERSION]);
   if (node != NULL)
@@ -432,9 +496,6 @@ eos_app_info_create_from_server (JsonNode *node)
   node = json_object_get_member (json, JSON_KEYS[SECONDARY_STORAGE]);
   if (node)
     info->on_secondary_storage = json_node_get_boolean (node);
-
-bail:
-  return info;
 }
 
 /*< private >*/

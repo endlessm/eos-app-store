@@ -43,9 +43,11 @@ char **         eos_app_info_get_screenshots            (const EosAppInfo *info)
 G_GNUC_INTERNAL
 EosAppInfo *    eos_app_info_create_from_content        (JsonNode *node);
 G_GNUC_INTERNAL
-EosAppInfo *    eos_app_info_create_from_server         (JsonNode *node);
+void            eos_app_info_update_from_server         (EosAppInfo *info,
+                                                         JsonNode *node);
 G_GNUC_INTERNAL
-EosAppInfo *    eos_app_info_create_from_installed      (GKeyFile *keyfile);
+void            eos_app_info_update_from_installed      (EosAppInfo *info,
+                                                         const char *filename);
 
 #endif
 
