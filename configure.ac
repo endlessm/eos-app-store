@@ -58,6 +58,31 @@ AC_CACHE_SAVE
 
 AC_PROG_CC_C99
 
+AC_ARG_WITH([eos-arch], [AS_HELP_STRING([--with-eos-arch=ARCH], [Specify the OS architecture])])
+
+AC_MSG_CHECKING([For EOS architecture])
+AS_IF([test "x$with_eos_arch" = x],
+      [
+        AS_CASE(["$host_os"],
+                [linux-gnueabihf], [EOS_ARCH=armhf],
+                [linux-gnueabi],   [EOS_ARCH=armel])
+
+        AS_CASE(["$host_cpu"],
+                [i?86],   [EOS_ARCH=i386],
+                [x86_64], [EOS_ARCH=amd64])
+
+        AS_IF([test "x$EOS_ARCH" = x], [EOS_ARCH="$host_cpu"])
+
+        AC_MSG_RESULT(["$EOS_ARCH (detected)"])
+      ],
+      [
+        EOS_ARCH="$with_eos_arch"
+        AC_MSG_RESULT(["$EOS_ARCH (forced)"])
+      ])
+
+AC_SUBST([EOS_ARCH])
+AC_DEFINE_UNQUOTED([EOS_ARCH], ["$EOS_ARCH"], [EOS application architecture])
+
 AC_ARG_ENABLE([maintainer-cflags],
               [AS_HELP_STRING([--enable-maintainer-cflags],
                               [Enable more compiler warnings])],
