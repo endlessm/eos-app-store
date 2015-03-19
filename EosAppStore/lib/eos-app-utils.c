@@ -16,6 +16,7 @@
 #define APP_STORE_CONTENT_LINKS "links"
 
 #define DOWNLOAD_DIR_DEFAULT    LOCALSTATEDIR "/tmp/eos-app-store"
+#define APP_DIR_DEFAULT         "/endless"
 
 static const char *
 get_os_personality (void)
@@ -69,8 +70,8 @@ get_os_personality (void)
   return personality;
 }
 
-static const char *
-get_download_url (void)
+const char *
+eos_get_download_dir (void)
 {
   static char *download_url;
 
@@ -97,6 +98,66 @@ get_download_url (void)
     }
 
   return download_url;
+}
+
+const char *
+eos_get_bundles_dir (void)
+{
+  static char *apps_dir;
+
+  if (g_once_init_enter (&apps_dir))
+    {
+      char *tmp;
+
+      GKeyFile *keyfile = g_key_file_new ();
+      char *path = g_build_filename (SYSCONFDIR, "eos-app-manager", "eam-default.cfg", NULL);
+      GError *error = NULL;
+      g_key_file_load_from_file (keyfile, path, G_KEY_FILE_NONE, &error);
+      if (error == NULL)
+        tmp = g_key_file_get_string (keyfile, "eam", "appdir", &error);
+
+      if (error != NULL)
+        {
+          eos_app_log_error_message ("Unable to load configuration: %s",
+                                     error->message);
+          g_error_free (error);
+          tmp = g_strdup (APP_DIR_DEFAULT);
+        }
+
+      g_once_init_leave (&apps_dir, tmp);
+    }
+
+  return apps_dir;
+}
+
+static const char *
+get_app_server_url (void)
+{
+  static char *server_url;
+
+  if (g_once_init_enter (&server_url))
+    {
+      char *tmp;
+
+      GKeyFile *keyfile = g_key_file_new ();
+      char *path = g_build_filename (SYSCONFDIR, "eos-app-manager", "eam-default.cfg", NULL);
+      GError *error = NULL;
+      g_key_file_load_from_file (keyfile, path, G_KEY_FILE_NONE, &error);
+      if (error == NULL)
+        tmp = g_key_file_get_string (keyfile, "eam", "serveraddress", &error);
+
+      if (error != NULL)
+        {
+          eos_app_log_error_message ("Unable to load configuration: %s",
+                                     error->message);
+          g_error_free (error);
+          tmp = g_strdup (APP_DIR_DEFAULT);
+        }
+
+      g_once_init_leave (&server_url, tmp);
+    }
+
+  return server_url;
 }
 
 /*
@@ -339,7 +400,8 @@ eos_app_load_content (EosAppCategory category,
       if (info == NULL)
         continue;
 
-      if (category == EOS_APP_CATEGORY_INSTALLED)
+      if (category == EOS_APP_CATEGORY_INSTALLED ||
+          category == EOS_APP_CATEGORY_ALL)
         {
           /* do nothing */
         }
@@ -607,12 +669,137 @@ eos_get_event_notify_type (GdkEvent *event)
 }
 
 char *
+eos_get_updates_file (void)
+{
+  return g_build_filename (get_dowload_dir (), "updates.json", NULL);
+}
+
+char *
 eos_get_all_updates_uri (void)
 {
-  return uri = g_strconcat (get_download_url (),
-                            "/api/v1/updates/",
-                            get_os_version (),
-                            "?arch=", get_os_arch (),
-                            "&personality=", get_os_personality (),
-                            NULL);
+  return g_strconcat (get_app_server_url (),
+                      "/api/v1/updates/",
+                      get_os_version (),
+                      "?arch=", get_os_arch (),
+                      "&personality=", get_os_personality (),
+                      NULL);
+}
+
+static gboolean
+is_app_id (const char *appid)
+{
+  static const char alsoallowed[] = "-+.";
+  static const char *reserveddirs[] = { "bin", "share", "lost+found" };
+
+  if (!appid || appid[0] == '\0')
+    return FALSE;
+
+  guint i;
+  for (i = 0; i < G_N_ELEMENTS (reserveddirs); i++)
+    {
+      if (g_strcmp0 (appid, reserveddirs[i]) == 0)
+        return FALSE;
+    }
+
+  if (!g_ascii_isalnum (appid[0]))
+    return FALSE; /* must start with an alphanumeric character */
+
+  int c;
+  while ((c = *appid++) != '\0')
+    {
+      if (!g_ascii_isalnum (c) && !strchr (alsoallowed, c))
+        break;
+    }
+
+  if (!c)
+    return TRUE;
+
+  return FALSE;
+}
+
+gboolean
+eos_app_load_installed_bundles (GHashTable *app_info,
+                                const char *appdir,
+                                GCancellable *cancellable,
+                                GError **error)
+{
+  GDir *dir = g_dir_open (appdir, 0, error);
+  if (dir == NULL)
+    return FALSE;
+
+  const char *appid;
+  while ((appid = g_dir_read_name (dir)) != NULL)
+    {
+      if (g_cancellable_is_cancelled (cancellable))
+        break;
+
+      if (!is_app_id (appid))
+        continue;
+
+      EosAppInfo *info = g_hash_table_lookup (app_info, info);
+      if (info == NULL)
+        continue;
+
+      char *info_path = g_build_filename (appdir, appid, ".info", NULL);
+
+      eos_app_info_update_from_installed (info, info_path);
+
+      g_free (info_path);
+    }
+
+  g_dir_close (dir);
+
+  return TRUE;
+}
+
+gboolean
+eos_app_load_available_apps (GHashTable *app_info,
+                             const char *data,
+                             GCancellable *cancellable,
+                             GError **error)
+{
+  JsonParser *parser = json_parser_new ();
+
+  if (!json_parser_load_from_data (parser, data, -1, error))
+    {
+      g_object_unref (parser);
+      return FALSE;
+    }
+
+  JsonNode *root = json_parser_get_root (parser);
+  if (!JSON_NODE_HOLDS_ARRAY (root))
+    {
+      g_object_unref (parser);
+      return FALSE;
+    }
+
+  JsonArray *array = json_node_get_array (root);
+  guint i, len = json_array_get_length (array);
+  for (i = 0; i < len; i++)
+    {
+      JsonNode *element;
+
+      if (g_cancellable_is_cancelled (cancellable))
+        break;
+
+      element = json_array_get_lement (array, i);
+
+      if (!JSON_NODE_HOLDS_OBJECT (element))
+        continue;
+
+      JsonObject *obj = json_node_get_object (element);
+      if (!json_object_has_member (obj, "appId"))
+        continue;
+
+      const char *appid = json_object_get_string_member (obj, "appId");
+      EosAppInfo *info = g_hash_table_lookup (app_info, appid);
+      if (info == NULL)
+        continue;
+
+      eos_app_info_update_from_server (info, element);
+    }
+
+  g_object_unref (parser);
+
+  return TRUE;
 }
