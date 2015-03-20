@@ -16,6 +16,7 @@ eaprivate_source_h = \
 	lib/eos-app-info.h \
 	lib/eos-app-list-model.h \
 	lib/eos-app-utils.h \
+	lib/eos-app-config.h \
 	lib/eos-link-info.h \
 	lib/eos-vertical-stack-switcher.h \
 	lib/eos-flexy-grid-private.h \
@@ -27,6 +28,7 @@ eaprivate_source_c = \
 	lib/eos-app-info.c \
 	lib/eos-app-list-model.c \
 	lib/eos-app-utils.c \
+	lib/eos-app-config.c \
 	lib/eos-link-info.c \
 	lib/eos-vertical-stack-switcher.c \
 	lib/eos-flexy-grid.c \
