@@ -1460,9 +1460,17 @@ download_file_from_uri_with_retry (EosAppListModel *self,
                                                    cancellable,
                                                    &error);
 
-        /* We're done if we get the file or we're canceled so exit the loop */
+        /* We're done if we get the file */
         if (download_success)
             break;
+
+        /* If we got canceled, also bail */
+        if (g_error_matches (error, EOS_APP_LIST_MODEL_ERROR,
+                             EOS_APP_LIST_MODEL_ERROR_CANCELLED)) {
+          eos_app_log_error_message ("Download cancelled. Breaking out of retry loop.");
+          g_propagate_error (error_out, error);
+          break;
+        }
 
         eos_app_log_error_message ("Error downloading. Checking if retries are needed");
 
