@@ -26,6 +26,15 @@
 /* Amount of seconds that we should wait before retrying a failed download */
 #define DOWNLOAD_RETRY_PERIOD 4
 
+/* HACK: This will be revisited for the next release,
+ * but for now we have a limited number of app language ids,
+ * with no country codes, so we can iterate through them
+ * looking for installed apps using other langauge ids.
+ * If not available in current language, English is the
+ * preferred next option, so list it first.
+ */
+static gchar *app_lang_ids[] = {"-en", "-ar", "-es", "-fr", "-pt", NULL};
+
 struct _EosAppListModel
 {
   GObject parent_instance;
@@ -215,21 +224,18 @@ app_is_installable (EosAppListModel *model,
 }
 
 static gchar *
-localized_id_from_desktop_id (const gchar *desktop_id)
+localized_id_from_desktop_id (const gchar *desktop_id, const gchar *lang_id)
 {
   /* HACK: this should really be removed in favor of communicating the
    * language to the app manager API...
    */
   gchar *localized_id;
   gchar *app_id;
-  gchar *lang_id;
 
-  lang_id = get_language_id ();
   app_id = app_id_from_desktop_id (desktop_id);
   localized_id = g_strdup_printf ("%s%s.desktop", app_id, lang_id);
 
   g_free (app_id);
-  g_free (lang_id);
 
   return localized_id;
 }
@@ -239,8 +245,12 @@ get_localized_desktop_id (EosAppListModel *model,
                           const gchar *desktop_id)
 {
   gchar *localized_id;
+  gchar *lang_id;
 
-  localized_id = localized_id_from_desktop_id (desktop_id);
+  lang_id = get_language_id ();
+  localized_id = localized_id_from_desktop_id (desktop_id, lang_id);
+  g_free (lang_id);
+
   if (app_is_installable (model, localized_id))
     return localized_id;
 
@@ -254,12 +264,34 @@ get_localized_app_info (EosAppListModel *model,
 {
   GDesktopAppInfo *info;
   gchar *localized_id;
+  gchar *lang_id;
+  gint idx;
 
-  localized_id = localized_id_from_desktop_id (desktop_id);
+  lang_id = get_language_id ();
+  localized_id = localized_id_from_desktop_id (desktop_id, lang_id);
+  g_free (lang_id);
+
   info = g_hash_table_lookup (model->gio_apps, localized_id);
   g_free (localized_id);
 
-  return info;
+  if (info)
+    return info;
+
+  /* If app is not installed in the user's current language,
+   * consider all other supported languages, starting with English.
+   */
+  for (idx = 0; app_lang_ids[idx] != NULL; idx++)
+    {
+      lang_id = app_lang_ids[idx];
+      localized_id = localized_id_from_desktop_id (desktop_id, lang_id);
+      info = g_hash_table_lookup (model->gio_apps, localized_id);
+      g_free (localized_id);
+
+      if (info)
+        return info;
+    }
+
+  return NULL;
 }
 
 static GHashTable *
