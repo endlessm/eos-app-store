@@ -41,6 +41,8 @@ struct _EosAppInfo
   guint is_featured : 1;
   guint is_offline : 1;
   guint on_secondary_storage : 1;
+  guint is_installed : 1;
+  guint update_available : 1;
 };
 
 G_DEFINE_BOXED_TYPE (EosAppInfo, eos_app_info, eos_app_info_ref, eos_app_info_unref)
@@ -177,6 +179,33 @@ eos_app_info_get_installed_size (const EosAppInfo *info)
     return info->installed_size;
 
   return 0;
+}
+
+gboolean
+eos_app_info_is_installable (const EosAppInfo *info)
+{
+  if (info != NULL)
+    return !info->is_installed;
+
+  return FALSE;
+}
+
+gboolean
+eos_app_info_is_updatable (const EosAppInfo *info)
+{
+  if (info != NULL)
+    return info->update_available;
+
+  return FALSE;
+}
+
+gboolean
+eos_app_info_is_removable (const EosAppInfo *info)
+{
+  if (info != NULL)
+    return !info->on_secondary_storage;
+
+  return FALSE;
 }
 
 EosAppCategory
@@ -453,6 +482,8 @@ eos_app_info_update_from_installed (EosAppInfo *info,
   else
     info->on_secondary_storage = check_secondary_storage (filename);
 
+  info->is_installed = TRUE;
+
 #undef GROUP
 
 out:
@@ -471,7 +502,6 @@ eos_app_info_update_from_server (EosAppInfo *info,
     return;
 
   JsonObject *obj = json_node_get_object (node);
-  EosAppInfo *info = eos_app_info_new ();
   JsonNode *node;
 
   node = json_object_get_member (obj, JSON_KEYS[APP_ID]);
@@ -483,7 +513,19 @@ eos_app_info_update_from_server (EosAppInfo *info,
 
   node = json_object_get_member (json, JSON_KEYS[CODE_VERSION]);
   if (node != NULL)
-    info->version = json_node_dup_string (node);
+    {
+      const char *version = json_node_get_string (node);
+
+      /* If the server returns a newer version, we update the related fields */
+      if (eos_compare_versions (info->version, version) < 0)
+        {
+          g_free (info->version);
+          info->version = g_strdup (version);
+          info->update_available = TRUE;
+        }
+      else
+        return;
+    }
 
   node = json_object_get_member (json, JSON_KEYS[LOCALE]);
   if (node != NULL)

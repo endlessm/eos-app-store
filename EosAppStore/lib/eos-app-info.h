@@ -37,6 +37,10 @@ char *          eos_app_info_get_featured_img           (const EosAppInfo *info)
 guint           eos_app_info_get_n_screenshots          (const EosAppInfo *info);
 char **         eos_app_info_get_screenshots            (const EosAppInfo *info);
 
+gboolean        eos_app_info_is_installable             (const EosAppInfo *info);
+gboolean        eos_app_info_is_updatable               (const EosAppInfo *info);
+gboolean        eos_app_info_is_removable               (const EosAppInfo *info);
+
 #ifndef __GI_SCANNER__
 
 /* private */
