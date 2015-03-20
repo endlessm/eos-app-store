@@ -803,3 +803,208 @@ eos_app_load_available_apps (GHashTable *app_info,
 
   return TRUE;
 }
+
+typedef struct {
+  char *version;
+  char *revision;
+  guint epoch;
+} PkgVersion;
+
+static gboolean
+pkg_version_init (PkgVersion *ver,
+                  const char *str)
+{
+  const gchar *end, *ptr;
+
+  if (str == NULL || *str == '\0')
+    return FALSE;
+
+  if (!g_str_is_ascii (str))
+    return FALSE;
+
+  /* Trim leading and trailing space. */
+  while (*str && g_ascii_isspace (*str))
+    str++;
+
+  /* String now points to the first non-whitespace char. */
+  end = str;
+
+  /* Find either the end of the string, or a whitespace char. */
+  while (*end && !g_ascii_isspace (*end))
+    end++;
+
+  /* Check for extra chars after trailing space. */
+  ptr = end;
+  while (*ptr && g_ascii_isspace (*ptr))
+    ptr++;
+
+  if (*ptr)
+    return FALSE; /* version string has embedded spaces */
+
+  char *colon = strchr (string, ':');
+  if (colon)
+    {
+      char *eepochcolon;
+      double epoch = g_strtod (string, &eepochcolon);
+
+      if (colon != eepochcolon)
+        return FALSE; /* epoch is not a number */
+
+      if (epoch < 0)
+        return FALSE; /* epoch is negative */
+
+      if (epoch > G_MAXINT)
+        return FALSE; /* epoch is too big */
+
+      if (!*++colon)
+        return FALSE; /* nothing after colon in version number */
+
+      str = colon;
+
+      ver->epoch = epoch;
+    }
+  else
+    ver->epoch = 0;
+
+  ver->version = g_strndup (str, end - str);
+
+  char *hyphen = strrchr (ver->version, '-');
+  if (hyphen)
+    *hyphen++ = '\0';
+
+  ver->revision = hyphen ? g_strdup (hyphen) : NULL;
+
+  ptr = ver->version;
+  if (ptr != NULL && *ptr && !g_ascii_isdigit (*ptr++))
+    return FALSE; /* version number doesn't start with digit */
+
+  for (; ptr && *ptr; ptr++)
+    {
+      if (!g_ascii_isdigit (*ptr) &&
+          !g_ascii_isalpha (*ptr) &&
+          strchr (".-+~:", *ptr) == NULL)
+        return FALSE; /* invalid character in version number */
+    }
+
+  for (ptr = ver->revision; ptr && *ptr; ptr++)
+    {
+      if (!g_ascii_isdigit (*ptr) &&
+          !g_ascii_isalpha (*ptr) &&
+          strchr (".+~", *ptr) == NULL)
+        return FALSE; /* invalid characters in revision number */
+    }
+
+  return TRUE;
+}
+
+static void
+pkg_version_clear (PkgVersion *ver)
+{
+  g_free (ver->version);
+  g_free (ver->revision);
+}
+
+static gint
+order (gint c)
+{
+  if (g_ascii_isdigit (c))
+    return 0;
+
+  if (g_ascii_isalpha (c))
+    return c;
+
+  if (c == '~')
+    return -1;
+
+  if (c)
+    return c + 256;
+
+  return 0;
+}
+
+static gint
+verrevcmp (const char *a,
+           const char *b)
+{
+  if (a == NULL)
+    a = "";
+  if (b == NULL)
+    b = "";
+
+  while (*a || *b) {
+    int first_diff = 0;
+
+    while ((*a && !g_ascii_isdigit (*a)) || (*b && !g_ascii_isdigit (*b))) {
+      int ac = order (*a);
+      int bc = order (*b);
+
+      if (ac != bc)
+        return ac - bc;
+
+      a++;
+      b++;
+    }
+
+    while (*a == '0')
+      a++;
+
+    while (*b == '0')
+      b++;
+
+    while (g_ascii_isdigit (*a) && g_ascii_isdigit (*b)) {
+      if (!first_diff)
+        first_diff = *a - *b;
+      a++;
+      b++;
+    }
+
+    if (g_ascii_isdigit (*a))
+      return 1;
+    if (g_ascii_isdigit (*b))
+      return -1;
+    if (first_diff)
+      return first_diff;
+  }
+
+  return 0;
+}
+
+static int
+pkg_version_compare (const PkgVersion *a,
+                     const PkgVersion *b)
+{
+  int rc;
+
+  if (a->epoch > b->epoch)
+    return 1;
+
+  if (a->epoch < b->epoch)
+    return -1;
+
+  rc = verrevcmp (a->version, b->version);
+  if (rc)
+    return rc;
+
+  return verrevcmp (a->revision, b->revision);
+}
+
+int
+eos_compare_versions (const char *a,
+                      const char *b)
+{
+  PkgVersion ver_a, ver_b;
+
+  /* Really quick shortcut */
+  if (g_strcmp0 (a, b) == 0)
+    return 0;
+
+  pkg_version_init (&ver_a, a);
+  pkg_version_init (&ver_b, b);
+
+  int res = pkg_version_compare (&ver_a, &ver_b);
+
+  pkg_version_clear (&ver_a);
+  pkg_version_clear (&ver_b);
+
+  return res;
+}
