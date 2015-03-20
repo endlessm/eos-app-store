@@ -1588,11 +1588,19 @@ static char *
 get_cache_path (const char *app_id,
                 const char *extension)
 {
-    char *filename = g_strconcat (app_id, extension, NULL);
-    char *cache_path = g_build_filename (BUNDLEDIR, filename, NULL);
-    g_free (filename);
+  char *cache_dir;
 
-    return cache_path;
+  cache_dir = eos_app_config_get_cache_dir ();
+  eos_app_log_info_message ("Using %s as the download directory", cache_dir);
+
+  /* Build the path for the filename that will be used within the cahce directory */
+  char *filename = g_strconcat (app_id, extension, NULL);
+  char *cache_path = g_build_filename (cache_dir, filename, NULL);
+
+  g_free (filename);
+  g_free (cache_dir);
+
+  return cache_path;
 }
 
 static char *
