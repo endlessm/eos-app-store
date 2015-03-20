@@ -7,6 +7,7 @@
 #include "eos-app-list-model.h"
 #include "eos-app-manager-service.h"
 #include "eos-app-manager-transaction.h"
+#include "eos-app-utils.h"
 
 #include <glib-object.h>
 #include <glib/gstdio.h>
@@ -46,7 +47,7 @@ struct _EosAppListModel
 
   GHashTable *gio_apps;
   GHashTable *shell_apps;
-  GHashTable *apps;
+  GHashTable *apps_by_id;
 
   GCancellable *load_cancellable;
 
@@ -210,17 +211,11 @@ static gboolean
 app_is_installable (EosAppListModel *model,
                     const char *desktop_id)
 {
-  EosAppListModelItem *item;
-
-  if (model->apps == NULL)
+  EosAppInfo *info = g_hash_table_lookup (model->apps_by_id, desktop_id);
+  if (info == NULL)
     return FALSE;
 
-  if (!g_hash_table_contains (model->apps, desktop_id))
-    return FALSE;
-
-  item = g_hash_table_lookup (model->apps, desktop_id);
-
-  return item->state == EOS_APP_STATE_AVAILABLE;
+  return eos_app_info_is_installable (info);
 }
 
 static gchar *
@@ -617,18 +612,7 @@ on_app_manager_available_applications_changed (GDBusConnection *connection,
 {
   EosAppListModel *self = user_data;
 
-  GVariantIter *available_apps_iter, *updatable_apps_iter;
-
-  g_variant_get (parameters, "(a(sssx)a(sssx))", &available_apps_iter,
-                 &updatable_apps_iter);
-
-  update_apps_info_from_gvariant (self, available_apps_iter,
-                                  EOS_APP_LIST_MODEL_UPDATE_TYPE_AVAILABLE);
-  update_apps_info_from_gvariant (self, updatable_apps_iter,
-                                  EOS_APP_LIST_MODEL_UPDATE_TYPE_UPDATABLE);
-
-  g_variant_iter_free (available_apps_iter);
-  g_variant_iter_free (updatable_apps_iter);
+  load_manager_installed_apps (self, NULL);
 
   eos_app_list_model_emit_changed (self);
 }
@@ -638,79 +622,32 @@ load_available_apps (EosAppListModel *self,
                      GCancellable *cancellable,
                      GError **error_out)
 {
-  GVariant *installable_apps = NULL;
-  GVariant *updatable_apps = NULL;
-
-  GError *error = NULL;
-
-  const char * const *locales = g_get_language_names ();
-  const char *locale_name = locales[0];
-
-  char **variants = g_get_locale_variants (locale_name);
-  const char *lang_id = variants[g_strv_length (variants) - 1];
-
-  GVariantBuilder filter_builder;
-
-  g_variant_builder_init (&filter_builder, G_VARIANT_TYPE ("a{sv}"));
-  g_variant_builder_open (&filter_builder, G_VARIANT_TYPE ("a{sv}"));
-  g_variant_builder_add (&filter_builder,
-                         "{sv}",
-                         "Locale",
-                         g_variant_new_string (lang_id));
-  g_variant_builder_close (&filter_builder);
-
-  g_strfreev (variants);
-
-  EosAppManager *proxy = get_eam_dbus_proxy (self);
-  if (proxy == NULL)
-    {
-      eos_app_log_error_message ("Could not get DBus proxy object - canceling");
-
-      return FALSE;
-    }
-
   eos_app_log_info_message ("Trying to get available apps");
 
-  eos_app_manager_call_list_available_sync (proxy,
-                                            g_variant_builder_end (&filter_builder),
-                                            &installable_apps,
-                                            &updatable_apps,
-                                            cancellable,
-                                            &error);
+  GError *error = NULL;
+  char *url = eos_get_all_updates_uri ();
+  char *target = eos_get_updates_file ();
+  char *data = NULL;
 
-  eos_app_log_info_message ("Retrieved available apps from eam manager");
-
-  if (error != NULL)
+  if (!download_file_from_uri (self, "application/json", url, target, &data, &error))
     {
-      eos_app_log_error_message ("Unable to list available applications: %s",
-                                 error->message);
-      g_critical ("Unable to list available applications: %s",
-                  error->message);
-
+      g_free (url);
+      g_free (target);
       g_propagate_error (error_out, error);
-
       return FALSE;
     }
 
-  GVariantIter *installable_apps_iter, *updatable_apps_iter;
-  g_variant_get (installable_apps, "a(sssx)", &installable_apps_iter);
-  g_variant_get (updatable_apps, "a(sssx)", &updatable_apps_iter);
+  g_free (url);
+  g_free (target);
 
-  eos_app_log_debug_message ("Parsing installable app list");
-  update_apps_info_from_gvariant (self, installable_apps_iter,
-                                  EOS_APP_LIST_MODEL_UPDATE_TYPE_AVAILABLE);
+  if (!eos_app_load_available_apps (self->app_info, data, &error))
+    {
+      g_free (data);
+      g_propagate_error (error_out, error);
+      return FALSE;
+    }
 
-  eos_app_log_debug_message ("Parsing updatable app list");
-  update_apps_info_from_gvariant (self, updatable_apps_iter,
-                                  EOS_APP_LIST_MODEL_UPDATE_TYPE_UPDATABLE);
-
-  eos_app_log_debug_message ("Done retrieving installed apps");
-
-  g_variant_iter_free (installable_apps_iter);
-  g_variant_iter_free (updatable_apps_iter);
-
-  g_variant_unref (installable_apps);
-  g_variant_unref (updatable_apps);
+  g_free (data);
 
   return TRUE;
 }
@@ -789,61 +726,17 @@ static gboolean
 load_manager_installed_apps (EosAppListModel *self,
                              GCancellable *cancellable)
 {
-  GVariant *installed_apps = NULL;
-  GVariant *removable_apps = NULL;
-
-  GError *error = NULL;
-
-  EosAppManager *proxy = get_eam_dbus_proxy (self);
-  if (proxy == NULL)
-    {
-      eos_app_log_error_message ("Could not get DBus proxy object - canceling");
-
-      return FALSE;
-    }
-
   eos_app_log_info_message ("Trying to get installed apps");
 
-  eos_app_manager_call_list_installed_sync (proxy,
-                                            &installed_apps,
-                                            &removable_apps,
-                                            cancellable,
-                                            &error);
+  const char *appdir = eos_get_bundles_dir ();
 
-  eos_app_log_info_message ("Retrieved installed apps from eam manager");
-
-  if (error != NULL)
+  GError *error = NULL;
+  if (!eos_app_load_installed_apps (self->apps_by_id, appdir, cancellable, &error))
     {
-      eos_app_log_error_message ("Unable to list installed applications: %s",
-                                 error->message);
-      g_critical ("Unable to list installed applications: %s", error->message);
-
+      eos_app_log_error_message ("Unable to list installed apps: %s", error->message);
       g_error_free (error);
-
       return FALSE;
     }
-
-  eos_app_log_debug_message ("Parsing installed app return bjects");
-
-  GVariantIter *installed_apps_iter, *removable_apps_iter;
-  g_variant_get (installed_apps, "a(sssx)", &installed_apps_iter);
-  g_variant_get (removable_apps, "a(sssx)", &removable_apps_iter);
-
-  eos_app_log_debug_message ("Parsing installed app list");
-  update_apps_info_from_gvariant (self, installed_apps_iter,
-                                  EOS_APP_LIST_MODEL_UPDATE_TYPE_EAM_INSTALLED);
-
-  eos_app_log_debug_message ("Parsing removable app list");
-  update_apps_info_from_gvariant (self, removable_apps_iter,
-                                  EOS_APP_LIST_MODEL_UPDATE_TYPE_EAM_REMOVABLE);
-
-  eos_app_log_debug_message ("Done retrieving installed apps");
-
-  g_variant_iter_free (installed_apps_iter);
-  g_variant_iter_free (removable_apps_iter);
-
-  g_variant_unref (installed_apps);
-  g_variant_unref (removable_apps);
 
   return TRUE;
 }
@@ -880,6 +773,28 @@ load_shell_apps (EosAppListModel *self,
 }
 
 static gboolean
+load_content_apps (EosAppListModel *self,
+                   GCancellable *cancellable)
+{
+  GList *all_info, *l;
+
+  all_info = eos_app_load_content (EOS_APP_CATEGORY_ALL, NULL, NULL);
+  for (l = all_info; l != NULL; l = l->next)
+    {
+      EosAppInfo *info = l->data;
+
+      if (g_cancellable_is_cancelled (cancellable))
+        break;
+
+      g_hash_table_replace (self->apps_by_id,
+                            eos_app_info_get_desktop_id (info),
+                            eos_app_info_ref (info));
+    }
+
+  g_list_free_full (all_info, (GDestroyNotify) eos_app_info_unref);
+}
+
+static gboolean
 load_all_apps (EosAppListModel *self,
                GCancellable *cancellable,
                GError **error)
@@ -887,6 +802,10 @@ load_all_apps (EosAppListModel *self,
   eos_app_log_debug_message ("Loading GIO apps");
   g_clear_pointer (&self->gio_apps, g_hash_table_unref);
   self->gio_apps = load_apps_from_gio ();
+
+  eos_app_log_debug_message ("Loading from content");
+  if (!load_content_apps (self, cancellable))
+    goto out;
 
   eos_app_log_debug_message ("Loading installed apps from manager");
   if (!load_manager_installed_apps (self, cancellable))
@@ -944,7 +863,7 @@ eos_app_list_model_finalize (GObject *gobject)
 
   g_hash_table_unref (self->gio_apps);
   g_hash_table_unref (self->shell_apps);
-  g_hash_table_unref (self->apps);
+  g_hash_table_unref (self->apps_by_id);
 
   G_OBJECT_CLASS (eos_app_list_model_parent_class)->finalize (gobject);
 }
@@ -1006,6 +925,10 @@ eos_app_list_model_init (EosAppListModel *self)
   g_signal_connect (self->app_monitor, "changed",
                     G_CALLBACK (on_app_monitor_changed),
                     self);
+
+  self->apps_by_id = g_hash_table_new_full (g_str_hash, g_str_equal,
+                                            NULL,
+                                            (GDestroyNotify) eos_app_info_unref);
 }
 
 EosAppListModel *
@@ -1287,6 +1210,214 @@ check_available_space (GFile         *path,
     }
 
   g_object_unref (info);
+
+  return retval;
+}
+
+static gboolean
+download_file_from_uri (EosAppListModel *self,
+                        const char      *content_type,
+                        const char      *source_uri,
+                        const char      *target_file,
+                        char           **buffer,
+                        GCancellable    *cancellable,
+                        GError         **error)
+{
+  GError *internal_error = NULL;
+  gboolean retval = FALSE;
+
+  SoupURI *uri = soup_uri_new (source_uri);
+
+  if (uri == NULL)
+    {
+      eos_app_log_error_message ("Soap URI is NULL - canceling download");
+
+      g_set_error_literal (error, EOS_APP_LIST_MODEL_ERROR,
+                           EOS_APP_LIST_MODEL_ERROR_INVALID_URL,
+                           _("No available data on the server"));
+      return FALSE;
+    }
+
+  if (self->soup_session == NULL) {
+    eos_app_log_error_message ("Creating new soup session");
+
+    self->soup_session = soup_session_new ();
+  }
+
+  SoupRequest *request = soup_session_request_uri (self->soup_session, uri, &internal_error);
+
+  soup_uri_free (uri);
+
+  if (internal_error != NULL)
+    {
+      eos_app_log_error_message ("Soup request had an internal error: %s",
+                                 internal_error->message);
+
+      if (g_type_is_a (G_OBJECT_TYPE (request), SOUP_TYPE_REQUEST_HTTP) &&
+          g_error_matches (internal_error, G_TLS_ERROR, G_TLS_ERROR_BAD_CERTIFICATE))
+        {
+          SoupMessage *message;
+
+          message = soup_request_http_get_message (SOUP_REQUEST_HTTP (request));
+
+          GTlsCertificateFlags cert_flags = 0;
+
+          g_object_get (message, "tls-errors", &cert_flags, NULL);
+
+          const char *msg;
+
+          if ((cert_flags & G_TLS_CERTIFICATE_EXPIRED) != 0)
+            msg = _("The certificate of the app store is expired");
+          else if ((cert_flags & G_TLS_CERTIFICATE_REVOKED) != 0)
+            msg = _("The certificate of the app store has been revoked");
+          else if ((cert_flags & G_TLS_CERTIFICATE_BAD_IDENTITY) != 0)
+            msg = _("The certificate of the app store has a bad identity");
+          else if ((cert_flags & G_TLS_CERTIFICATE_UNKNOWN_CA) != 0)
+            msg = _("The certificate of the app store is from an unknown authority");
+          else
+            msg = _("The certificate of the app store is bad or invalid");
+
+          g_set_error_literal (error, EOS_APP_LIST_MODEL_ERROR,
+                               EOS_APP_LIST_MODEL_ERROR_BAD_CERTIFICATE,
+                               msg);
+          g_error_free (internal_error);
+        }
+      else
+        g_propagate_error (error, internal_error);
+
+      return FALSE;
+    }
+
+  if (content_type != NULL)
+    {
+      SoupMessage *message = soup_request_http_get_message (SOUP_REQUEST_HTTP (request));
+      if (message != NULL)
+        {
+          soup_message_headers_append (message->request_headers, "Accept", content_type);
+          g_object_unref (message);
+        }
+    }
+
+  GByteArray *content = NULL;
+  GFileOutputStream *out_stream = NULL;
+  GInputStream *in_stream = soup_request_send (request, cancellable, &internal_error);
+  if (internal_error != NULL)
+    {
+      eos_app_log_error_message ("Soup request sending had an internal error");
+
+      g_propagate_error (error, internal_error);
+      g_object_unref (request);
+      return FALSE;
+    }
+
+  goffset total = soup_request_get_content_length (request);
+
+  GFile *file = g_file_new_for_path (target_file);
+  GFile *parent = g_file_get_parent (file);
+
+  char *parent_path = g_file_get_path (parent);
+  g_mkdir_with_parents (parent_path, 0755);
+  g_free (parent_path);
+
+  if (!check_available_space (parent, total, cancellable, &internal_error))
+    {
+      eos_app_log_error_message("Not enough space on FS - canceling download");
+
+      g_propagate_error (error, internal_error);
+      goto out;
+    }
+
+  /* we don't use GFile API because the error handling is weird,
+   * and we also know that the target is a local file, so there
+   * is no point in going through the abstraction
+   */
+  g_unlink (target_file);
+
+  out_stream = g_file_create (file, G_FILE_CREATE_NONE, cancellable, &internal_error);
+  if (internal_error != NULL)
+    {
+      eos_app_log_error_message ("Create file failed - canceling download");
+
+      g_set_error (error, EOS_APP_LIST_MODEL_ERROR,
+                   EOS_APP_LIST_MODEL_ERROR_FAILED,
+                   _("Unable to update the list of available applications: %s"),
+                   internal_error->message);
+      g_error_free (internal_error);
+      goto out;
+    }
+
+#define GET_DATA_BLOCK_SIZE     64 * 1024
+
+  gssize res = 0;
+  gsize pos = 0;
+  content = g_byte_array_new ();
+  g_byte_array_set_size (content, GET_DATA_BLOCK_SIZE + 1);
+
+  eos_app_log_info_message ("Downloading file chunks start");
+
+  /* we don't use splice() because it does not have progress, and the
+   * data is coming from a network request, so it won't have a file
+   * descriptor we can use splice() on; we also increase the size of
+   * the byte array because we want to return the buffer as an out
+   * parameter, instead of having the caller reload the file we just
+   * downloaded.
+   */
+  while (!g_cancellable_is_cancelled (cancellable) &&
+         (res = g_input_stream_read (in_stream, content->data + pos,
+                                     GET_DATA_BLOCK_SIZE,
+                                     cancellable, &internal_error)) > 0)
+    {
+      g_output_stream_write (G_OUTPUT_STREAM (out_stream), content->data + pos, res,
+                             cancellable,
+                             &internal_error);
+      if (internal_error != NULL)
+        {
+          eos_app_log_error_message ("Downloading file failed during piecewise transfer");
+          g_propagate_error (error, internal_error);
+          goto out;
+        }
+
+      pos += res;
+      g_byte_array_set_size (content, pos + GET_DATA_BLOCK_SIZE + 1);
+    }
+
+  if (g_cancellable_is_cancelled (cancellable))
+    {
+      eos_app_log_info_message ("Canceled download");
+
+      g_set_error_literal (error, EOS_APP_LIST_MODEL_ERROR,
+                           EOS_APP_LIST_MODEL_ERROR_CANCELLED,
+                           _("Refresh of available apps cancelled by the user."));
+
+      goto out;
+    }
+
+  if (res < 0)
+    {
+      g_propagate_error (error, internal_error);
+      goto out;
+    }
+
+  retval = TRUE;
+
+  eos_app_log_info_message ("Exiting download method normally");
+
+  if (buffer != NULL)
+    {
+      /* NUL-terminate the content */
+      content->data[pos] = 0;
+      *buffer = g_strdup (content->data);
+    }
+
+out:
+  g_clear_pointer (&content, g_byte_array_unref);
+  g_clear_object (&file);
+  g_clear_object (&parent);
+  g_clear_object (&in_stream);
+  g_clear_object (&out_stream);
+  g_clear_object (&request);
+
+#undef GET_DATA_BLOCK_SIZE
 
   return retval;
 }
@@ -2212,17 +2343,11 @@ static gboolean
 app_is_updatable (EosAppListModel *model,
                   const char *desktop_id)
 {
-  EosAppListModelItem *item;
-
-  if (model->apps == NULL)
+  EosAppInfo *info  = g_hash_table_lookup (model->apps, desktop_id);
+  if (info == NULL)
     return FALSE;
 
-  if (!g_hash_table_contains (model->apps, desktop_id))
-    return FALSE;
-
-  item = g_hash_table_lookup (model->apps, desktop_id);
-
-  return item->state == EOS_APP_STATE_UPDATABLE;
+  return eos_app_info_is_updatable (info);
 }
 
 static gboolean
