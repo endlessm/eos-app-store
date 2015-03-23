@@ -182,7 +182,7 @@ parse_os_release_file (gchar  **version_id,
 
   for (idx = 0; lines[idx] != NULL; idx++)
     {
-      const char *line = lines[idx];
+      char *line = lines[idx];
 
       line = g_strstrip (line);
 
@@ -224,7 +224,7 @@ get_os_version (void)
 
   if (g_once_init_enter (&os_version))
     {
-      char *tmp;
+      char *tmp = NULL;
 
       GError *error = NULL;
       parse_os_release_file (&tmp, &error);
@@ -671,7 +671,7 @@ eos_get_event_notify_type (GdkEvent *event)
 char *
 eos_get_updates_file (void)
 {
-  return g_build_filename (get_dowload_dir (), "updates.json", NULL);
+  return g_build_filename (eos_get_download_dir (), "updates.json", NULL);
 }
 
 char *
@@ -736,7 +736,7 @@ eos_app_load_installed_bundles (GHashTable *app_info,
       if (!is_app_id (appid))
         continue;
 
-      EosAppInfo *info = g_hash_table_lookup (app_info, info);
+      EosAppInfo *info = g_hash_table_lookup (app_info, appid);
       if (info == NULL)
         continue;
 
@@ -782,7 +782,7 @@ eos_app_load_available_apps (GHashTable *app_info,
       if (g_cancellable_is_cancelled (cancellable))
         break;
 
-      element = json_array_get_lement (array, i);
+      element = json_array_get_element (array, i);
 
       if (!JSON_NODE_HOLDS_OBJECT (element))
         continue;
@@ -841,11 +841,11 @@ pkg_version_init (PkgVersion *ver,
   if (*ptr)
     return FALSE; /* version string has embedded spaces */
 
-  char *colon = strchr (string, ':');
+  char *colon = strchr (str, ':');
   if (colon)
     {
       char *eepochcolon;
-      double epoch = g_strtod (string, &eepochcolon);
+      double epoch = g_strtod (str, &eepochcolon);
 
       if (colon != eepochcolon)
         return FALSE; /* epoch is not a number */

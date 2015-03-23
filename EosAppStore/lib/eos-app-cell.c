@@ -8,6 +8,7 @@
 #include <glib/gi18n.h>
 #include <gdk-pixbuf/gdk-pixbuf.h>
 
+#include "eos-app-info-private.h"
 #include "eos-flexy-grid.h"
 #include "eos-app-utils.h"
 
@@ -548,6 +549,18 @@ eos_app_info_get_cell_margin (void)
   g_object_unref (context);
 
   return retval;
+}
+
+static EosFlexyShape
+eos_app_info_get_shape_for_cell (const EosAppInfo *info)
+{
+  /* Everywhere else it's assumed that only
+   * featured apps get their large image.
+   */
+  if (eos_app_info_is_featured (info))
+    return info->shape;
+  else
+    return EOS_FLEXY_SHAPE_SMALL;
 }
 
 /**

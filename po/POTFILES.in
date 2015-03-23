@@ -25,6 +25,7 @@ EosAppStore/separator.js
 EosAppStore/shellAppStore.js
 EosAppStore/weblinkFrame.js
 EosAppStore/wmInspect.js
+EosAppStore/lib/eos-app-cell.c
 EosAppStore/lib/eos-app-enums.c
 EosAppStore/lib/eos-app-info.c
 EosAppStore/lib/eos-app-list-model.c

@@ -47,7 +47,7 @@ struct _EosAppListModel
 
   GHashTable *gio_apps;
   GHashTable *shell_apps;
-  GHashTable *apps_by_id;
+  GHashTable *apps;
 
   GCancellable *load_cancellable;
 
@@ -98,6 +98,15 @@ enum {
 };
 
 static guint eos_app_list_model_signals[LAST_SIGNAL] = { 0, };
+
+static gboolean
+download_file_from_uri (EosAppListModel *self,
+                        const char      *content_type,
+                        const char      *source_uri,
+                        const char      *target_file,
+                        char           **buffer,
+                        GCancellable    *cancellable,
+                        GError         **error);
 
 G_DEFINE_TYPE (EosAppListModel, eos_app_list_model, G_TYPE_OBJECT)
 G_DEFINE_QUARK (eos-app-list-model-error-quark, eos_app_list_model_error)
@@ -211,7 +220,7 @@ static gboolean
 app_is_installable (EosAppListModel *model,
                     const char *desktop_id)
 {
-  EosAppInfo *info = g_hash_table_lookup (model->apps_by_id, desktop_id);
+  EosAppInfo *info = g_hash_table_lookup (model->apps, desktop_id);
   if (info == NULL)
     return FALSE;
 
@@ -431,177 +440,6 @@ on_shell_applications_changed (GDBusConnection *connection,
 }
 
 static void
-update_apps_info_item (GHashTable *apps,
-                       char *desktop_id,
-                       char *name,
-                       char *version,
-                       EosAppListModelUpdateType update_type,
-                       gint64 installed_size)
-{
-  EosAppListModelItem *apps_item_info = NULL;
-
-  if (!g_hash_table_lookup_extended (apps, desktop_id, NULL, NULL)) {
-    apps_item_info = g_slice_new0 (EosAppListModelItem);
-
-    /* All 0s might not set the val to 0 on a signed int64 */
-    apps_item_info->installed_size = 0;
-
-    char *hash_key = g_strdup (desktop_id);
-
-    g_hash_table_insert (apps, hash_key, apps_item_info);
-  }
-
-  /* We re-retrieve the pointer to ensure that it is in the list correctly */
-  apps_item_info = g_hash_table_lookup (apps, desktop_id);
-
-  /* Update properties if needed on the item */
-  if (desktop_id != NULL && !g_strcmp0 (desktop_id, apps_item_info->desktop_id)) {
-    g_clear_pointer (&apps_item_info->desktop_id, g_free);
-    apps_item_info->desktop_id = g_strdup (desktop_id);
-  }
-
-  if (name != NULL && !g_strcmp0 (name, apps_item_info->name)) {
-    g_clear_pointer (&apps_item_info->name, g_free);
-    apps_item_info->name = g_strdup (name);
-  }
-
-  if (version != NULL && !g_strcmp0 (version, apps_item_info->version)) {
-    g_clear_pointer (&apps_item_info->version, g_free);
-    apps_item_info->version = g_strdup (version);
-  }
-
-  if (apps_item_info->installed_size > 0)
-    apps_item_info->installed_size = installed_size;
-
-  /* Update state flag based on the type of update */
-  switch (update_type)
-  {
-    case EOS_APP_LIST_MODEL_UPDATE_TYPE_AVAILABLE:
-      apps_item_info->state = EOS_APP_STATE_AVAILABLE;
-      break;
-    case EOS_APP_LIST_MODEL_UPDATE_TYPE_UPDATABLE:
-      apps_item_info->state = EOS_APP_STATE_UPDATABLE;
-      break;
-    case EOS_APP_LIST_MODEL_UPDATE_TYPE_EAM_REMOVABLE:
-      apps_item_info->can_remove = TRUE;
-      /* Intentional fall-through to EAM_INSTALLED */
-    case EOS_APP_LIST_MODEL_UPDATE_TYPE_EAM_INSTALLED:
-      apps_item_info->state = EOS_APP_STATE_INSTALLED;
-      break;
-  }
-}
-
-/* Used to free the model-apps values */
-static void
-destroy_app_list_model_item (gpointer data)
-{
-  EosAppListModelItem *item = (EosAppListModelItem *) data;
-
-  g_free (item->desktop_id);
-  g_free (item->name);
-  g_free (item->version);
-
-  g_slice_free (EosAppListModelItem, item);
-}
-
-/* This function goes through the app list and sets any states that would have
- * been set by a previous update of the same type to a "uninitialized" state to
- * ensure that the updated list implicitly removes the previous states.
- *
- * XXX: There is a tiny period of time where an app may have an "uninitialized"
- * state after this function but before the update finishes which might not represent
- * the true state of the app but it was done this way to avoid creating a list of
- * removed items and iterating over updates and stored app list to figure out the
- * differences. Since the UI is the only consumer of this data and it doesn't read
- * the values until we're done, this is faster and has a smaller footprint than
- * the other method mentioned.
- */
-static void
-reset_outdated_apps_info_items (EosAppListModel *self,
-                               EosAppListModelUpdateType update_type)
-{
-  GHashTableIter iter;
-
-  gpointer key;
-  gpointer value;
-
-  EosAppListModelItem *apps_item_info;
-
-  if (!self->apps)
-    return;
-
-  eos_app_log_debug_message ("Resetting state of apps with matching state: %d",
-                             update_type);
-
-  g_hash_table_iter_init (&iter, self->apps);
-
-  while (g_hash_table_iter_next (&iter, &key, &value))
-    {
-      apps_item_info = (EosAppListModelItem *) value;
-
-      /* Update state flag based on the type of changes */
-      switch (update_type)
-      {
-        case EOS_APP_LIST_MODEL_UPDATE_TYPE_AVAILABLE:
-          if (apps_item_info->state == EOS_APP_STATE_AVAILABLE)
-            apps_item_info->state = EOS_APP_STATE_UNKNOWN;
-          break;
-        case EOS_APP_LIST_MODEL_UPDATE_TYPE_UPDATABLE:
-          if (apps_item_info->state == EOS_APP_STATE_UPDATABLE)
-            apps_item_info->state = EOS_APP_STATE_INSTALLED;
-          break;
-        case EOS_APP_LIST_MODEL_UPDATE_TYPE_EAM_REMOVABLE:
-          apps_item_info->can_remove = FALSE;
-          break;
-        case EOS_APP_LIST_MODEL_UPDATE_TYPE_EAM_INSTALLED:
-          if (apps_item_info->state == EOS_APP_STATE_INSTALLED)
-            apps_item_info->state = EOS_APP_STATE_UNKNOWN;
-          break;
-      }
-    }
-}
-
-static void
-update_apps_info_from_gvariant (EosAppListModel *self,
-                                GVariantIter *apps,
-                                EosAppListModelUpdateType update_type)
-{
-  gchar *desktop_id, *id, *name, *version;
-  gint64 installed_size;
-
-  GVariantIter *iter;
-
-  iter = g_variant_iter_copy (apps);
-
-  /* Create our master app list if we don't have one */
-  if (self->apps == NULL)
-    self->apps = g_hash_table_new_full (g_str_hash,
-                                        g_str_equal,
-                                        g_free,
-                                        destroy_app_list_model_item);
-
-  /* If we had incoming data that didn't mention items that it did before
-   * we need to make sure that they have the proper status. For example,
-   * if an app was updatabe before and now we get a new list that doesn't
-   * include it, we need to clear its UPDATABLE state
-   */
-  reset_outdated_apps_info_items (self, update_type);
-
-  while (g_variant_iter_loop (iter, "(sssx)", &id, &name, &version, &installed_size))
-    {
-      desktop_id = g_strdup_printf ("%s.desktop", id);
-
-      update_apps_info_item (self->apps, desktop_id, name, version,
-                             update_type,
-                             installed_size);
-
-      g_free (desktop_id);
-    }
-
-  g_variant_iter_free (iter);
-}
-
-static void
 on_app_manager_available_applications_changed (GDBusConnection *connection,
                                                const gchar     *sender_name,
                                                const gchar     *object_path,
@@ -629,7 +467,7 @@ load_available_apps (EosAppListModel *self,
   char *target = eos_get_updates_file ();
   char *data = NULL;
 
-  if (!download_file_from_uri (self, "application/json", url, target, &data, &error))
+  if (!download_file_from_uri (self, "application/json", url, target, &data, cancellable, &error))
     {
       g_free (url);
       g_free (target);
@@ -640,7 +478,7 @@ load_available_apps (EosAppListModel *self,
   g_free (url);
   g_free (target);
 
-  if (!eos_app_load_available_apps (self->app_info, data, &error))
+  if (!eos_app_load_available_apps (self->apps, data, cancellable, &error))
     {
       g_free (data);
       g_propagate_error (error_out, error);
@@ -731,9 +569,9 @@ load_manager_installed_apps (EosAppListModel *self,
   const char *appdir = eos_get_bundles_dir ();
 
   GError *error = NULL;
-  if (!eos_app_load_installed_apps (self->apps_by_id, appdir, cancellable, &error))
+  if (!eos_app_load_installed_bundles (self->apps, appdir, cancellable, &error))
     {
-      eos_app_log_error_message ("Unable to list installed apps: %s", error->message);
+      eos_app_log_error_message ("Unable to list installed bundles: %s", error->message);
       g_error_free (error);
       return FALSE;
     }
@@ -786,12 +624,14 @@ load_content_apps (EosAppListModel *self,
       if (g_cancellable_is_cancelled (cancellable))
         break;
 
-      g_hash_table_replace (self->apps_by_id,
-                            eos_app_info_get_desktop_id (info),
+      g_hash_table_replace (self->apps,
+                            g_strdup (eos_app_info_get_desktop_id (info)),
                             eos_app_info_ref (info));
     }
 
   g_list_free_full (all_info, (GDestroyNotify) eos_app_info_unref);
+
+  return TRUE;
 }
 
 static gboolean
@@ -863,7 +703,7 @@ eos_app_list_model_finalize (GObject *gobject)
 
   g_hash_table_unref (self->gio_apps);
   g_hash_table_unref (self->shell_apps);
-  g_hash_table_unref (self->apps_by_id);
+  g_hash_table_unref (self->apps);
 
   G_OBJECT_CLASS (eos_app_list_model_parent_class)->finalize (gobject);
 }
@@ -926,9 +766,9 @@ eos_app_list_model_init (EosAppListModel *self)
                     G_CALLBACK (on_app_monitor_changed),
                     self);
 
-  self->apps_by_id = g_hash_table_new_full (g_str_hash, g_str_equal,
-                                            NULL,
-                                            (GDestroyNotify) eos_app_info_unref);
+  self->apps = g_hash_table_new_full (g_str_hash, g_str_equal,
+                                      g_free,
+                                      (GDestroyNotify) eos_app_info_unref);
 }
 
 EosAppListModel *
@@ -1406,7 +1246,7 @@ download_file_from_uri (EosAppListModel *self,
     {
       /* NUL-terminate the content */
       content->data[pos] = 0;
-      *buffer = g_strdup (content->data);
+      *buffer = g_memdup (content->data, sizeof (char*) * pos);
     }
 
 out:

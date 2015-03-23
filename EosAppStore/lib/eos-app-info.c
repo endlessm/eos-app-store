@@ -2,48 +2,17 @@
 
 #include "config.h"
 
-#include "eos-app-info.h"
+#include "eos-app-info-private.h"
 #include "eos-app-utils.h"
 #include "eos-app-enums.h"
 #include "eos-flexy-grid.h"
 
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <unistd.h>
+
 #include <locale.h>
 #include <glib/gi18n.h>
-
-/*
- * EosAppInfo
- */
-struct _EosAppInfo
-{
-  volatile int ref_count;
-
-  char *desktop_id;
-
-  char *title;
-  char *subtitle;
-  char *description;
-  char *locale;
-
-  char *version;
-
-  gint64 installed_size;
-
-  char *square_img;
-  char *featured_img;
-
-  char **screenshots;
-  guint n_screenshots;
-
-  EosFlexyShape shape;
-
-  EosAppCategory category;
-
-  guint is_featured : 1;
-  guint is_offline : 1;
-  guint on_secondary_storage : 1;
-  guint is_installed : 1;
-  guint update_available : 1;
-};
 
 G_DEFINE_BOXED_TYPE (EosAppInfo, eos_app_info, eos_app_info_ref, eos_app_info_unref)
 
@@ -215,18 +184,6 @@ eos_app_info_get_category (const EosAppInfo *info)
     return info->category;
 
   return EOS_APP_CATEGORY_UTILITIES;
-}
-
-static EosFlexyShape
-eos_app_info_get_shape_for_cell (const EosAppInfo *info)
-{
-  /* Everywhere else it's assumed that only
-   * featured apps get their large image.
-   */
-  if (eos_app_info_is_featured (info))
-    return info->shape;
-  else
-    return EOS_FLEXY_SHAPE_SMALL;
 }
 
 /**
@@ -461,7 +418,7 @@ eos_app_info_update_from_installed (EosAppInfo *info,
   char *desktop_id = NULL;
   GKeyFile *keyfile = g_key_file_new ();
 
-  if (!g_key_file_load_from_file (keyfile, filename, NULL))
+  if (!g_key_file_load_from_file (keyfile, filename, 0, NULL))
     goto out;
 
 #define GROUP   "Bundle"
@@ -470,7 +427,7 @@ eos_app_info_update_from_installed (EosAppInfo *info,
     goto out;
 
   desktop_id = g_key_file_get_string (keyfile, GROUP, FILE_KEYS[APP_ID], NULL);
-  if (g_strcmp (desktop_id, info->desktop_id) != 0)
+  if (g_strcmp0 (desktop_id, info->desktop_id) != 0)
     goto out;
 
   info->version = g_key_file_get_string (keyfile, GROUP, FILE_KEYS[CODE_VERSION], NULL);
@@ -494,14 +451,14 @@ out:
 /*< private >*/
 void
 eos_app_info_update_from_server (EosAppInfo *info,
-                                 JsonNode *node)
+                                 JsonNode *root)
 {
-  g_return_val_if_fail (node != NULL, NULL);
+  g_return_if_fail (root != NULL);
 
-  if (!JSON_NODE_HOLDS_OBJECT (node))
+  if (!JSON_NODE_HOLDS_OBJECT (root))
     return;
 
-  JsonObject *obj = json_node_get_object (node);
+  JsonObject *obj = json_node_get_object (root);
   JsonNode *node;
 
   node = json_object_get_member (obj, JSON_KEYS[APP_ID]);
@@ -511,7 +468,7 @@ eos_app_info_update_from_server (EosAppInfo *info,
         return;
     }
 
-  node = json_object_get_member (json, JSON_KEYS[CODE_VERSION]);
+  node = json_object_get_member (obj, JSON_KEYS[CODE_VERSION]);
   if (node != NULL)
     {
       const char *version = json_node_get_string (node);
@@ -527,15 +484,15 @@ eos_app_info_update_from_server (EosAppInfo *info,
         return;
     }
 
-  node = json_object_get_member (json, JSON_KEYS[LOCALE]);
+  node = json_object_get_member (obj, JSON_KEYS[LOCALE]);
   if (node != NULL)
     info->locale = json_node_dup_string (node);
 
-  node = json_object_get_member (json, JSON_KEYS[INSTALLED_SIZE]);
+  node = json_object_get_member (obj, JSON_KEYS[INSTALLED_SIZE]);
   if (node != NULL)
     info->installed_size = json_node_get_int (node);
 
-  node = json_object_get_member (json, JSON_KEYS[SECONDARY_STORAGE]);
+  node = json_object_get_member (obj, JSON_KEYS[SECONDARY_STORAGE]);
   if (node)
     info->on_secondary_storage = json_node_get_boolean (node);
 }

@@ -16,6 +16,7 @@ eaprivate_source_h = \
 	lib/eos-app-enums.h \
 	lib/eos-app-list-model.h \
 	lib/eos-app-log.h \
+	lib/eos-app-info-private.h \
 	lib/eos-app-info.h \
 	lib/eos-app-utils.h \
 	lib/eos-flexy-grid-private.h \
@@ -73,6 +74,8 @@ BUILT_SOURCES += lib/eos-app-manager-service.c lib/eos-app-manager-service.h
 
 pkglib_LTLIBRARIES += libeaprivate-1.0.la
 
+introspection_sources = $(filter-out *-private.h, $(eaprivate_source_h)) $(eaprivate_source_c)
+
 libeaprivate_1_0_la_LIBADD = $(EOS_APP_STORE_LIBS)
 libeaprivate_1_0_la_LDFLAGS = -avoid-version
 libeaprivate_1_0_la_CPPFLAGS = $(eaprivate_cflags)
@@ -88,6 +91,4 @@ EosAppStorePrivate_1_0_gir_LIBS = libeaprivate-1.0.la
 EosAppStorePrivate_1_0_gir_CFLAGS = $(AM_CPPFLAGS) $(eaprivate_cflags)
 EosAppStorePrivate_1_0_gir_SCANNERFLAGS = --warn-all --symbol-prefix=eos --identifier-prefix=Eos
 EosAppStorePrivate_1_0_gir_INCLUDES = Gtk-3.0 Json-1.0 WebKit2-3.0
-EosAppStorePrivate_1_0_gir_FILES = \
-	$(addprefix $(srcdir)/,$(eaprivate_source_h)) \
-	$(addprefix $(srcdir)/,$(eaprivate_source_c))
+EosAppStorePrivate_1_0_gir_FILES = $(addprefix $(srcdir)/,$(introspection_sources))
