@@ -295,6 +295,7 @@ eos_link_get_category_name (EosLinkCategory category)
 static JsonArray *
 eos_app_parse_resource_content (const char *content_type, const char *content_name)
 {
+  gint64 start_time = g_get_monotonic_time ();
   JsonArray *content_array = NULL;
   GError *error = NULL;
   JsonParser *parser = json_parser_new ();
@@ -330,6 +331,10 @@ eos_app_parse_resource_content (const char *content_type, const char *content_na
     }
 
   content_array = json_node_dup_array (node);
+
+  eos_app_log_debug_message ("Content type '%s' loading: %d msecs",
+                             content_type,
+                             (int) (g_get_monotonic_time () - start_time));
 
  out_error:
   g_object_unref (parser);
@@ -722,6 +727,9 @@ eos_app_load_installed_bundles (GHashTable *app_info,
   if (dir == NULL)
     return FALSE;
 
+  gint64 start_time = g_get_monotonic_time ();
+
+  int n_bundles = 0;
   const char *appid;
   while ((appid = g_dir_read_name (dir)) != NULL)
     {
@@ -748,11 +756,17 @@ eos_app_load_installed_bundles (GHashTable *app_info,
       eos_app_log_info_message ("Loading bundle info for '%s' from '%s'...", appid, info_path);
       eos_app_info_update_from_installed (info, info_path);
 
+      n_bundles += 1;
+
       g_free (desktop_id);
       g_free (info_path);
     }
 
   g_dir_close (dir);
+
+  eos_app_log_debug_message ("Bundle loading: %d bundles, %d msecs",
+                             n_bundles,
+                             (int) (g_get_monotonic_time () - start_time));
 
   return TRUE;
 }
@@ -764,6 +778,8 @@ eos_app_load_available_apps (GHashTable *app_info,
                              GError **error)
 {
   JsonParser *parser = json_parser_new ();
+
+  gint64 start_time = g_get_monotonic_time ();
 
   if (!json_parser_load_from_data (parser, data, -1, error))
     {
@@ -778,6 +794,7 @@ eos_app_load_available_apps (GHashTable *app_info,
       return FALSE;
     }
 
+  int n_available = 0;
   JsonArray *array = json_node_get_array (root);
   guint i, len = json_array_get_length (array);
   for (i = 0; i < len; i++)
@@ -796,15 +813,23 @@ eos_app_load_available_apps (GHashTable *app_info,
       if (!json_object_has_member (obj, "appId"))
         continue;
 
-      const char *appid = json_object_get_string_member (obj, "appId");
+      char *appid = g_strconcat (json_object_get_string_member (obj, "appId"), ".desktop", NULL);
       EosAppInfo *info = g_hash_table_lookup (app_info, appid);
+      g_free (appid);
+
       if (info == NULL)
         continue;
 
       eos_app_info_update_from_server (info, element);
+
+      n_available += 1;
     }
 
   g_object_unref (parser);
+
+  eos_app_log_debug_message ("Available bundles: %d bundles, %d msecs",
+                             n_available,
+                             (int) (g_get_monotonic_time () - start_time));
 
   return TRUE;
 }
