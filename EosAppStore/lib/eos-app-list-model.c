@@ -56,7 +56,6 @@ struct _EosAppListModel
   GCancellable *load_cancellable;
 
   guint applications_changed_id;
-  guint available_apps_changed_id;
   guint changed_guard_id;
 
   gboolean can_install;
@@ -430,22 +429,6 @@ on_shell_applications_changed (GDBusConnection *connection,
   eos_app_list_model_emit_changed (self);
 }
 
-static void
-on_app_manager_available_applications_changed (GDBusConnection *connection,
-                                               const gchar     *sender_name,
-                                               const gchar     *object_path,
-                                               const gchar     *interface_name,
-                                               const gchar     *signal_name,
-                                               GVariant        *parameters,
-                                               gpointer         user_data)
-{
-  EosAppListModel *self = user_data;
-
-  load_manager_installed_apps (self, NULL);
-
-  eos_app_list_model_emit_changed (self);
-}
-
 static gboolean
 load_available_apps (EosAppListModel *self,
                      GCancellable *cancellable,
@@ -680,13 +663,6 @@ eos_app_list_model_finalize (GObject *gobject)
       self->applications_changed_id = 0;
     }
 
-  if (self->available_apps_changed_id != 0)
-    {
-      g_dbus_connection_signal_unsubscribe (self->system_bus,
-                                            self->available_apps_changed_id);
-      self->available_apps_changed_id = 0;
-    }
-
   g_object_unref (&self->proxy);
 
   g_clear_object (&self->soup_session);
@@ -744,16 +720,6 @@ eos_app_list_model_init (EosAppListModel *self)
                                         on_shell_applications_changed,
                                         self, NULL);
 
-  self->available_apps_changed_id =
-    g_dbus_connection_signal_subscribe (self->system_bus,
-                                        "com.endlessm.AppManager",
-                                        "com.endlessm.AppManager",
-                                        "AvailableApplicationsChanged",
-                                        "/com/endlessm/AppManager",
-                                        NULL, G_DBUS_SIGNAL_FLAGS_NONE,
-                                        on_app_manager_available_applications_changed,
-                                        self, NULL);
-
   self->app_monitor = g_app_info_monitor_get ();
   g_signal_connect (self->app_monitor, "changed",
                     G_CALLBACK (on_app_monitor_changed),
@@ -770,54 +736,6 @@ eos_app_list_model_new (void)
   return g_object_new (EOS_TYPE_APP_LIST_MODEL, NULL);
 }
 
-static gboolean
-refresh_app_manager (EosAppListModel *self,
-                     GCancellable *cancellable,
-                     GError **error_out)
-{
-  GError *error = NULL;
-  gboolean retval = FALSE;
-
-  eos_app_log_info_message ("Refresh of apps requested");
-
-  EosAppManager *proxy = get_eam_dbus_proxy (self);
-  if (proxy == NULL)
-    {
-      eos_app_log_error_message ("Could not get DBus proxy object - canceling");
-
-      return FALSE;
-    }
-
-  eos_app_log_info_message ("Trying to refresh app list");
-
-  eos_app_manager_call_refresh_sync (proxy, &retval, NULL, &error);
-
-  if (error != NULL)
-    {
-      eos_app_log_error_message ("Unable to refresh the list of applications: %s",
-                                 error->message);
-      g_warning ("Unable to refresh the list of applications: %s",
-                 error->message);
-      g_error_free (error);
-      retval = FALSE;
-      goto out;
-    }
-
-out:
-  if (!retval)
-    {
-      eos_app_log_error_message ("Unable to get the list of applications");
-
-      g_set_error_literal (error_out, EOS_APP_LIST_MODEL_ERROR,
-                           EOS_APP_LIST_MODEL_ERROR_NO_UPDATE_AVAILABLE,
-                           _("We were unable to update the list of applications"));
-    }
-
-  eos_app_log_info_message ("Refresh apps: %s", retval ? "OK" : "Fail");
-
-  return retval;
-}
-
 static void
 refresh_thread_func (GTask *task,
                      gpointer source_object,
@@ -827,20 +745,6 @@ refresh_thread_func (GTask *task,
   EosAppListModel *model = source_object;
   GError *error = NULL;
 
-  /* we want refreshing from the app manager to be an optional
-   * step, in case we don't have connectivity and we cannot
-   * refresh the list of updates.
-   */
-  if (!refresh_app_manager (model, cancellable, &error))
-    {
-      g_warning ("Unable to refresh applications from the manager: %s",
-                 error->message);
-      g_clear_error (&error);
-    }
-
-  /* on the other hand, if we had an error loading the installed
-   * apps, then we really want to return an error
-   */
   if (!load_all_apps (model, cancellable, &error))
     {
       g_task_return_error (task, error);
@@ -1674,11 +1578,11 @@ download_bundle (EosAppListModel *self,
 }
 
 static gboolean
-get_bundle_artifacts(EosAppListModel *self,
-                     const char *desktop_id,
-                     char *transaction_path,
-                     GCancellable *cancellable,
-                     GError **error_out)
+get_bundle_artifacts (EosAppListModel *self,
+                      const char *desktop_id,
+                      char *transaction_path,
+                      GCancellable *cancellable,
+                      GError **error_out)
 {
   GError *error = NULL;
   gboolean retval = FALSE;
@@ -1899,7 +1803,7 @@ install_latest_app_version (EosAppListModel *self,
 
   eos_app_log_info_message ("Got transaction path: %s", transaction_path);
 
-  retval = get_bundle_artifacts(self, desktop_id, transaction_path, cancellable, &error);
+  retval = get_bundle_artifacts (self, desktop_id, transaction_path, cancellable, &error);
 
   if (error != NULL)
     {
@@ -1916,6 +1820,12 @@ install_latest_app_version (EosAppListModel *self,
 
       retval = FALSE;
     }
+
+  /* We do not fail the installation if we could not refresh the
+   * list of installed applications
+   */
+  load_manager_installed_apps (self, cancellable);
+  eos_app_list_model_emit_changed (self);
 
   g_free (transaction_path);
 
