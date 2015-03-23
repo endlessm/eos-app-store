@@ -1965,6 +1965,8 @@ update_app_from_manager (EosAppListModel *self,
                          GCancellable *cancellable,
                          GError **error_out)
 {
+  GError *error = NULL;
+
   gboolean retval = FALSE;
 
   /* First try to do an xdelta upgrade */
@@ -1975,17 +1977,24 @@ update_app_from_manager (EosAppListModel *self,
                                        TRUE, /* Is update? */
                                        TRUE, /* Allow deltas */
                                        cancellable,
-                                       error_out);
+                                       &error);
 
   /* Incremental update worked. Nothing else is needed */
-  if (retval && error_out == NULL)
+  if (retval && error == NULL)
     return TRUE;
 
-  eos_app_log_info_message ("Update of %s using deltas failed. Trying full update",
-                            desktop_id);
+  if (error)
+    {
+      eos_app_log_info_message ("Update of %s using deltas failed: %s",
+                                desktop_id,
+                                error->message);
 
-  /* We don't care what the problem was (at this time) */
-  g_clear_error (error_out);
+      /* We don't care what the problem was (at this time) */
+      g_clear_error (&error);
+    }
+
+  eos_app_log_info_message ("Trying full update of %s",
+                            desktop_id);
 
   /* Incremental update failed so we try the full update now */
   return install_latest_app_version (self,
