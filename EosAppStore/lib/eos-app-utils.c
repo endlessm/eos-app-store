@@ -64,6 +64,8 @@ get_os_personality (void)
       if (tmp == NULL)
         tmp = g_strdup ("default");
 
+      eos_app_log_info_message ("Personality: %s", tmp);
+
       g_once_init_leave (&personality, tmp);
     }
 
@@ -78,6 +80,8 @@ eos_get_download_dir (void)
   if (g_once_init_enter (&download_url))
     {
       char *tmp = g_build_filename (g_get_user_cache_dir (), "com.endlessm.AppStore", NULL);
+
+      eos_app_log_info_message ("Download dir: %s", tmp);
 
       g_once_init_leave (&download_url, tmp);
     }
@@ -109,6 +113,8 @@ eos_get_bundles_dir (void)
           tmp = g_strdup (APP_DIR_DEFAULT);
         }
 
+      eos_app_log_info_message ("Bundles dir: %s", tmp);
+
       g_once_init_leave (&apps_dir, tmp);
     }
 
@@ -136,8 +142,10 @@ get_app_server_url (void)
           eos_app_log_error_message ("Unable to load configuration: %s",
                                      error->message);
           g_error_free (error);
-          tmp = g_strdup (APP_DIR_DEFAULT);
+          tmp = g_strdup ("http://appupdates.endlessm.com/");
         }
+
+      eos_app_log_info_message ("Server address: %s", tmp);
 
       g_once_init_leave (&server_url, tmp);
     }
@@ -220,6 +228,8 @@ get_os_version (void)
 
           tmp = g_strdup ("1.0");
         }
+
+      eos_app_log_info_message ("OS Version: %s", tmp);
 
       g_once_init_leave (&os_version, tmp);
     }
