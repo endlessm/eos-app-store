@@ -1983,14 +1983,15 @@ update_app_from_manager (EosAppListModel *self,
   if (retval && error == NULL)
     return TRUE;
 
-  if (error) {
-    eos_app_log_info_message ("Update of %s using deltas failed: %s",
-                              desktop_id,
-                              error->message);
+  if (error)
+    {
+      eos_app_log_info_message ("Update of %s using deltas failed: %s",
+                                desktop_id,
+                                error->message);
 
-    /* We don't care what the problem was (at this time) */
-    g_clear_error (error_out);
-  }
+      /* We don't care what the problem was (at this time) */
+      g_clear_error (&error);
+    }
 
   eos_app_log_info_message ("Trying full update of %s",
                             desktop_id);
