@@ -193,7 +193,7 @@ parse_os_release_file (gchar  **version_id,
       while (g_ascii_isspace (*p) || *p == '"')
         p++;
 
-      char *start = p + 1;
+      char *start = p;
       if (p == '\0')
         continue;
 
