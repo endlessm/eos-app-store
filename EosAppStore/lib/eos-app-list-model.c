@@ -81,19 +81,6 @@ enum _EosAppListModelUpdateType {
 
 typedef enum _EosAppListModelUpdateType EosAppListModelUpdateType;
 
-struct _EosAppListModelItem {
-  char  *desktop_id;
-  char  *name;
-  char  *version;
-
-  gint64 installed_size;
-  gboolean can_remove;
-
-  EosAppState state;
-};
-
-typedef struct _EosAppListModelItem EosAppListModelItem;
-
 enum {
   CHANGED,
   DOWNLOAD_PROGRESS,
@@ -2580,13 +2567,13 @@ eos_app_list_model_get_app_can_remove (EosAppListModel *model,
   if (!g_hash_table_contains (model->apps, localized_id))
     return FALSE;
 
-  EosAppListModelItem *item = g_hash_table_lookup (model->apps, localized_id);
+  EosAppInfo *info = g_hash_table_lookup (model->apps, localized_id);
 
-  return item->can_remove;
+  return eos_app_info_is_removable (info);
 }
 
 static guint64
-get_fs_available_space ()
+get_fs_available_space (void)
 {
   GFile *current_directory = NULL;
   GFileInfo *filesystem_info = NULL;
@@ -2665,8 +2652,8 @@ eos_app_list_model_get_app_has_sufficient_install_space (EosAppListModel *model,
       }
     }
 
-  EosAppListModelItem *item = g_hash_table_lookup (model->apps, real_desktop_id);
-  installed_size = item->installed_size; /* Implicit cast from gint64 to guint64 */
+  EosAppInfo *info = g_hash_table_lookup (model->apps, real_desktop_id);
+  installed_size = eos_app_info_get_installed_size (info);
 
   eos_app_log_debug_message ("App %s installed size: %" G_GINT64_FORMAT,
                              desktop_id,
@@ -2716,7 +2703,7 @@ eos_app_list_model_get_app_installed_size (EosAppListModel *model,
       }
     }
 
-  EosAppListModelItem *item = g_hash_table_lookup (model->apps, real_desktop_id);
+  EosAppInfo *info = g_hash_table_lookup (model->apps, real_desktop_id);
 
-  return item->installed_size;
+  return eos_app_info_get_installed_size (info); 
 }
