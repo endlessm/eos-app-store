@@ -77,22 +77,7 @@ eos_get_download_dir (void)
 
   if (g_once_init_enter (&download_url))
     {
-      char *tmp = NULL;
-
-      GKeyFile *keyfile = g_key_file_new ();
-      char *path = g_build_filename (SYSCONFDIR, "eos-app-manager", "eam-default.cfg", NULL);
-      GError *error = NULL;
-      g_key_file_load_from_file (keyfile, path, G_KEY_FILE_NONE, &error);
-      if (error == NULL)
-        tmp = g_key_file_get_string (keyfile, "eam", "downloaddir", &error);
-
-      if (error != NULL)
-        {
-          eos_app_log_error_message ("Unable to load configuration: %s",
-                                     error->message);
-          g_error_free (error);
-          tmp = g_strdup (DOWNLOAD_DIR_DEFAULT);
-        }
+      char *tmp = g_build_filename (g_get_user_cache_dir (), "com.endlessm.AppStore", NULL);
 
       g_once_init_leave (&download_url, tmp);
     }
