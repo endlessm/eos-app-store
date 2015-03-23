@@ -729,16 +729,26 @@ eos_app_load_installed_bundles (GHashTable *app_info,
         break;
 
       if (!is_app_id (appid))
-        continue;
+        {
+          eos_app_log_info_message ("Skipping '%s'...", appid);
+          continue;
+        }
 
-      EosAppInfo *info = g_hash_table_lookup (app_info, appid);
+      char *desktop_id = g_strconcat (appid, ".desktop", NULL);
+      EosAppInfo *info = g_hash_table_lookup (app_info, desktop_id);
       if (info == NULL)
-        continue;
+        {
+          eos_app_log_info_message ("No content data for '%s'", appid);
+          g_free (desktop_id);
+          continue;
+        }
 
       char *info_path = g_build_filename (appdir, appid, ".info", NULL);
 
+      eos_app_log_info_message ("Loading bundle info for '%s' from '%s'...", appid, info_path);
       eos_app_info_update_from_installed (info, info_path);
 
+      g_free (desktop_id);
       g_free (info_path);
     }
 
