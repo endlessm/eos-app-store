@@ -12,6 +12,7 @@ struct _EosAppInfo
 {
   volatile int ref_count;
 
+  char *application_id;
   char *desktop_id;
 
   char *title;

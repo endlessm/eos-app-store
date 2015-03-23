@@ -46,6 +46,7 @@ eos_app_info_unref (EosAppInfo *info)
 
   if (g_atomic_int_dec_and_test (&(info->ref_count)))
     {
+      g_free (info->application_id);
       g_free (info->desktop_id);
       g_free (info->title);
       g_free (info->subtitle);
@@ -83,6 +84,15 @@ eos_app_info_get_desktop_id (const EosAppInfo *info)
 {
   if (info != NULL)
     return info->desktop_id;
+
+  return "";
+}
+
+const char *
+eos_app_info_get_application_id (const EosAppInfo *info)
+{
+  if (info != NULL)
+    return info->application_id;
 
   return "";
 }
@@ -509,10 +519,12 @@ eos_app_info_create_from_content (JsonNode *node)
   EosAppInfo *info = eos_app_info_new ();
 
   if (json_object_has_member (obj, "application-id"))
-    info->desktop_id = g_strdup_printf ("%s.desktop",
-                                        json_node_get_string (json_object_get_member (obj, "application-id")));
+    {
+      info->application_id = json_node_dup_string (json_object_get_member (obj, "application-id"));
+      info->desktop_id = g_strdup_printf ("%s.desktop", info->application_id);
+    }
   else
-    info->desktop_id = NULL;
+    info->application_id = info->desktop_id = NULL;
 
   if (json_object_has_member (obj, "title"))
     info->title = json_node_dup_string (json_object_get_member (obj, "title"));
