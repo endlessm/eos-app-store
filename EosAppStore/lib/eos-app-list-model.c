@@ -467,6 +467,8 @@ load_available_apps (EosAppListModel *self,
   char *target = eos_get_updates_file ();
   char *data = NULL;
 
+  eos_app_log_info_message ("Downloading list of available apps from: %s", url);
+
   if (!download_file_from_uri (self, "application/json", url, target, &data, cancellable, &error))
     {
       g_free (url);
@@ -649,11 +651,11 @@ load_all_apps (EosAppListModel *self,
 
   eos_app_log_debug_message ("Loading installed apps from manager");
   if (!load_manager_installed_apps (self, cancellable))
-    goto out;
+    eos_app_log_error_message ("Unable to load installed apps");
 
   eos_app_log_debug_message ("Loading available apps from manager");
   if (!load_manager_available_apps (self, cancellable))
-    goto out;
+    eos_app_log_error_message ("Unable to load available apps");
 
   /* Load apps with launcher from the shell */
   eos_app_log_debug_message ("Loading apps with launcher from the shell");
@@ -1246,7 +1248,7 @@ download_file_from_uri (EosAppListModel *self,
     {
       /* NUL-terminate the content */
       content->data[pos] = 0;
-      *buffer = g_memdup (content->data, sizeof (char*) * pos);
+      *buffer = g_strdup ((const char *) content->data);
     }
 
 out:
