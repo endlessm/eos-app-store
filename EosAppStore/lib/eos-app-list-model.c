@@ -9,6 +9,10 @@
 #include "eos-app-manager-transaction.h"
 #include "eos-app-utils.h"
 
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <unistd.h>
+
 #include <glib-object.h>
 #include <glib/gstdio.h>
 #include <gio/gio.h>
@@ -1067,6 +1071,21 @@ download_file_from_uri (EosAppListModel *self,
 {
   GError *internal_error = NULL;
   gboolean retval = FALSE;
+
+  struct stat buf;
+  if (stat (target_file, &buf) == 0)
+    {
+      time_t last_hour = (time_t) (g_get_monotonic_time () / 1000000) - 60 * 60;
+
+      if (buf.st_mtime >= last_hour)
+        {
+          eos_app_log_info_message ("Requested file '%s' is less than an hour old.", target_file);
+          if (buffer != NULL)
+            g_file_get_contents (target_file, buffer, NULL, NULL);
+
+          return TRUE;
+        }
+    }
 
   SoupURI *uri = soup_uri_new (source_uri);
 
