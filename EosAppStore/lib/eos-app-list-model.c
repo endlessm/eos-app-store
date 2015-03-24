@@ -9,6 +9,7 @@
 #include "eos-app-manager-transaction.h"
 #include "eos-app-utils.h"
 
+#include <time.h>
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <unistd.h>
@@ -960,23 +961,26 @@ download_file_from_uri (EosAppListModel *self,
                         GCancellable    *cancellable,
                         GError         **error)
 {
-  GError *internal_error = NULL;
-  gboolean retval = FALSE;
-
   struct stat buf;
   if (stat (target_file, &buf) == 0)
     {
-      time_t last_hour = (time_t) (g_get_monotonic_time () / 1000000) - 60 * 60;
+      time_t now = time (NULL); 
 
-      if (buf.st_mtime >= last_hour)
+      eos_app_log_debug_message ("Checking if the cached file is still good (now: %ld, mtime: %ld, diff: %ld)",
+                                 now, buf.st_mtime, (now - buf.st_mtime));
+      if (buf.st_mtime > now || (now - buf.st_mtime < 3600))
         {
-          eos_app_log_info_message ("Requested file '%s' is less than an hour old.", target_file);
+          eos_app_log_info_message ("Requested file '%s' is within cache allowance.",
+                                    target_file);
           if (buffer != NULL)
             g_file_get_contents (target_file, buffer, NULL, NULL);
 
           return TRUE;
         }
     }
+
+  GError *internal_error = NULL;
+  gboolean retval = FALSE;
 
   SoupURI *uri = soup_uri_new (source_uri);
 
