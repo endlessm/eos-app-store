@@ -973,9 +973,16 @@ download_file_from_uri (EosAppListModel *self,
           eos_app_log_info_message ("Requested file '%s' is within cache allowance.",
                                     target_file);
           if (buffer != NULL)
-            g_file_get_contents (target_file, buffer, NULL, NULL);
+            {
+              if (g_file_get_contents (target_file, buffer, NULL, &internal_error))
+                return TRUE;i
 
-          return TRUE;
+              /* Fall through, and re-download the file */
+              eos_app_log_error_message ("Could not read cached file '%s': %s",
+                                         target_file,
+                                         internal_error->message);
+              g_clear_error (&internal_error);
+            }
         }
     }
 
