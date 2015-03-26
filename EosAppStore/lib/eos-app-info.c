@@ -64,136 +64,91 @@ eos_app_info_unref (EosAppInfo *info)
 const char *
 eos_app_info_get_title (const EosAppInfo *info)
 {
-  if (info != NULL)
-    return g_dpgettext2 (CONTENT_GETTEXT_PACKAGE, "title", info->title);
-
-  return "";
+  return g_dpgettext2 (CONTENT_GETTEXT_PACKAGE, "title", info->title);
 }
 
 const char *
 eos_app_info_get_subtitle (const EosAppInfo *info)
 {
-  if (info != NULL)
-    return g_dpgettext2 (CONTENT_GETTEXT_PACKAGE, "subtitle", info->subtitle);
-
-  return "";
+  return g_dpgettext2 (CONTENT_GETTEXT_PACKAGE, "subtitle", info->subtitle);
 }
 
 const char *
 eos_app_info_get_desktop_id (const EosAppInfo *info)
 {
-  if (info != NULL)
-    return info->desktop_id;
-
-  return "";
+  return info->desktop_id;
 }
 
 const char *
 eos_app_info_get_application_id (const EosAppInfo *info)
 {
-  if (info != NULL)
-    return info->application_id;
-
-  return "";
+  return info->application_id;
 }
 
 const char *
 eos_app_info_get_description (const EosAppInfo *info)
 {
-  if (info != NULL)
-    return g_dpgettext2 (CONTENT_GETTEXT_PACKAGE, "description", info->description);
-
-  return "";
+  return g_dpgettext2 (CONTENT_GETTEXT_PACKAGE, "description", info->description);
 }
 
 const char *
 eos_app_info_get_version (const EosAppInfo *info)
 {
-  if (info->version != NULL)
-    return info->version;
-
-  return "";
+  return info->version;
 }
 
 const char *
 eos_app_info_get_locale (const EosAppInfo *info)
 {
-  if (info->locale != NULL)
-    return info->locale;
-
-  return "";
+  return info->locale;
 }
 
 gboolean
 eos_app_info_is_featured (const EosAppInfo *info)
 {
-  if (info != NULL)
-    return info->is_featured;
-
-  return FALSE;
+  return info->is_featured;
 }
 
 gboolean
 eos_app_info_is_offline (const EosAppInfo *info)
 {
-  if (info != NULL)
-    return info->is_offline;
-
-  return FALSE;
+  return info->is_offline;
 }
 
 gboolean
 eos_app_info_is_on_secondary_storage (const EosAppInfo *info)
 {
-  if (info != NULL)
-    return info->on_secondary_storage;
-
-  return FALSE;
+  return info->on_secondary_storage;
 }
 
 gint64
 eos_app_info_get_installed_size (const EosAppInfo *info)
 {
-  if (info != NULL)
-    return info->installed_size;
-
-  return 0;
+  return info->installed_size;
 }
 
 gboolean
 eos_app_info_is_installable (const EosAppInfo *info)
 {
-  if (info != NULL)
-    return !info->is_installed;
-
-  return FALSE;
+  return !info->is_installed;
 }
 
 gboolean
 eos_app_info_is_updatable (const EosAppInfo *info)
 {
-  if (info != NULL)
-    return info->update_available;
-
-  return FALSE;
+  return info->update_available;
 }
 
 gboolean
 eos_app_info_is_removable (const EosAppInfo *info)
 {
-  if (info != NULL)
-    return !info->on_secondary_storage;
-
-  return FALSE;
+  return !info->on_secondary_storage;
 }
 
 EosAppCategory
 eos_app_info_get_category (const EosAppInfo *info)
 {
-  if (info != NULL)
-    return info->category;
-
-  return EOS_APP_CATEGORY_UTILITIES;
+  return info->category;
 }
 
 /**
@@ -252,9 +207,6 @@ eos_app_info_get_n_screenshots (const EosAppInfo *info)
 char **
 eos_app_info_get_screenshots (const EosAppInfo *info)
 {
-  if (info == NULL)
-    return NULL;
-
   return g_strdupv (info->screenshots);
 }
 
