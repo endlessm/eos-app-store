@@ -1049,6 +1049,91 @@ prepare_soup_request (SoupSession  *session,
   return request;
 }
 
+static GInputStream *
+set_up_download_from_request (SoupRequest   *request,
+                              const char    *target_file,
+                              GCancellable  *cancellable,
+                              GError       **error)
+{
+  GError *internal_error = NULL;
+  GInputStream *in_stream = soup_request_send (request, cancellable, &internal_error);
+
+  if (internal_error != NULL)
+    {
+      eos_app_log_error_message ("Soup request sending had an internal error");
+
+      g_propagate_error (error, internal_error);
+      return NULL;
+    }
+
+  goffset total = soup_request_get_content_length (request);
+  GFile *file = g_file_new_for_path (target_file);
+  GFile *parent = g_file_get_parent (file);
+
+  char *parent_path = g_file_get_path (parent);
+  g_mkdir_with_parents (parent_path, 0755);
+  g_free (parent_path);
+
+  if (!check_available_space (parent, total, cancellable, &internal_error))
+    {
+      eos_app_log_error_message ("Not enough space on FS - canceling download");
+
+      g_propagate_error (error, internal_error);
+      g_clear_object (&in_stream);
+      goto out;
+    }
+
+  /* we don't use GFile API because the error handling is weird,
+   * and we also know that the target is a local file, so there
+   * is no point in going through the abstraction
+   */
+  g_unlink (target_file);
+
+ out:
+  g_object_unref (parent);
+  g_object_unref (file);
+
+  return in_stream;
+}
+
+static GOutputStream *
+prepare_out_stream (const char    *target_file,
+                    const char    *app_id,
+                    GCancellable  *cancellable,
+                    GError       **error)
+{
+  GError *internal_error = NULL;
+  GFileOutputStream *out_stream = NULL;
+  GFile *file = g_file_new_for_path (target_file);
+
+  out_stream = g_file_create (file, G_FILE_CREATE_NONE, cancellable, &internal_error);
+  if (internal_error != NULL)
+    {
+      char *error_message;
+
+      eos_app_log_error_message ("Create file failed - canceling download");
+
+      if (app_id != NULL)
+        error_message = g_strdup_printf (_("Unable to create the file for downloading '%s': %s"),
+                                         app_id,
+                                         internal_error->message);
+      else
+        error_message = g_strdup_printf (_("Unable to update the list of available applications: %s"),
+                                         internal_error->message);
+
+      g_set_error_literal (error, EOS_APP_LIST_MODEL_ERROR,
+                           EOS_APP_LIST_MODEL_ERROR_FAILED,
+                           error_message);
+
+      g_error_free (internal_error);
+      g_free (error_message);
+    }
+
+  g_object_unref (file);
+
+  return G_OUTPUT_STREAM (out_stream);
+}
+
 static gboolean
 download_file_from_uri (EosAppListModel *self,
                         const char      *content_type,
@@ -1088,66 +1173,27 @@ download_file_from_uri (EosAppListModel *self,
 
   ensure_soup_session (self);
 
+  GInputStream *in_stream = NULL;
+  GOutputStream *out_stream = NULL;
   SoupRequest *request = prepare_soup_request (self->soup_session, source_uri,
                                                content_type, NULL,
-                                               &internal_error);
-
+                                               error);
   if (request == NULL)
-    {
-      g_propagate_error (error, internal_error);
-      return FALSE;
-    }
+    goto out;
 
-  GByteArray *content = NULL;
-  GFileOutputStream *out_stream = NULL;
-  GInputStream *in_stream = soup_request_send (request, cancellable, &internal_error);
-  if (internal_error != NULL)
-    {
-      eos_app_log_error_message ("Soup request sending had an internal error");
+  in_stream = set_up_download_from_request (request, target_file,
+                                            cancellable, error);
+  if (in_stream == NULL)
+    goto out;
 
-      g_propagate_error (error, internal_error);
-      g_object_unref (request);
-      return FALSE;
-    }
-
-  goffset total = soup_request_get_content_length (request);
-
-  GFile *file = g_file_new_for_path (target_file);
-  GFile *parent = g_file_get_parent (file);
-
-  char *parent_path = g_file_get_path (parent);
-  g_mkdir_with_parents (parent_path, 0755);
-  g_free (parent_path);
-
-  if (!check_available_space (parent, total, cancellable, &internal_error))
-    {
-      eos_app_log_error_message ("Not enough space on FS - canceling download");
-
-      g_propagate_error (error, internal_error);
-      goto out;
-    }
-
-  /* we don't use GFile API because the error handling is weird,
-   * and we also know that the target is a local file, so there
-   * is no point in going through the abstraction
-   */
-  g_unlink (target_file);
-
-  out_stream = g_file_create (file, G_FILE_CREATE_NONE, cancellable, &internal_error);
-  if (internal_error != NULL)
-    {
-      eos_app_log_error_message ("Create file failed - canceling download");
-
-      g_set_error (error, EOS_APP_LIST_MODEL_ERROR,
-                   EOS_APP_LIST_MODEL_ERROR_FAILED,
-                   _("Unable to update the list of available applications: %s"),
-                   internal_error->message);
-      g_error_free (internal_error);
-      goto out;
-    }
+  out_stream = prepare_out_stream (target_file, NULL,
+                                   cancellable, error);
+  if (out_stream == NULL)
+    goto out;
 
 #define GET_DATA_BLOCK_SIZE     64 * 1024
 
+  GByteArray *content = NULL;
   gssize res = 0;
   gsize pos = 0;
   content = g_byte_array_new ();
@@ -1210,8 +1256,6 @@ download_file_from_uri (EosAppListModel *self,
 
 out:
   g_clear_pointer (&content, g_byte_array_unref);
-  g_clear_object (&file);
-  g_clear_object (&parent);
   g_clear_object (&in_stream);
   g_clear_object (&out_stream);
   g_clear_object (&request);
@@ -1240,71 +1284,33 @@ download_app_file_from_uri (EosAppListModel *self,
 
   ensure_soup_session (self);
 
+  GInputStream *in_stream = NULL;
+  GOutputStream *out_stream = NULL;
   SoupRequest *request = prepare_soup_request (self->soup_session, source_uri,
                                                NULL, app_id,
-                                               &internal_error);
-
+                                               error);
   if (request == NULL)
-    {
-      g_propagate_error (error, internal_error);
-      return FALSE;
-    }
+    goto out;
 
-  GByteArray *content = NULL;
-  GFileOutputStream *out_stream = NULL;
-  GInputStream *in_stream = soup_request_send (request, cancellable, &internal_error);
-  if (internal_error != NULL)
-    {
-      eos_app_log_error_message ("Soup request sending had an internal error");
+  in_stream = set_up_download_from_request (request, target_file,
+                                            cancellable, error);
+  if (in_stream == NULL)
+    goto out;
 
-      g_propagate_error (error, internal_error);
-      g_object_unref (request);
-      return FALSE;
-    }
-
-  goffset total = soup_request_get_content_length (request);
-
-  GFile *file = g_file_new_for_path (target_file);
-  GFile *parent = g_file_get_parent (file);
-
-  char *parent_path = g_file_get_path (parent);
-  g_mkdir_with_parents (parent_path, 0755);
-  g_free (parent_path);
-
-  if (!check_available_space (parent, total, cancellable, &internal_error))
-    {
-      eos_app_log_error_message ("Not enough space on FS - canceling download");
-
-      g_propagate_error (error, internal_error);
-      goto out;
-    }
-
-  /* we don't use GFile API because the error handling is weird,
-   * and we also know that the target is a local file, so there
-   * is no point in going through the abstraction
-   */
-  g_unlink (target_file);
-
-  out_stream = g_file_create (file, G_FILE_CREATE_NONE, cancellable, &internal_error);
-  if (internal_error != NULL)
-    {
-      eos_app_log_error_message ("Create file failed - canceling download");
-
-      g_set_error (error, EOS_APP_LIST_MODEL_ERROR,
-                   EOS_APP_LIST_MODEL_ERROR_FAILED,
-                   _("Unable to create the file for downloading '%s': %s"),
-                   app_id,
-                   internal_error->message);
-      g_error_free (internal_error);
-      goto out;
-    }
+  out_stream = prepare_out_stream (target_file, app_id,
+                                   cancellable, error);
+  if (out_stream == NULL)
+    goto out;
 
 #define GET_DATA_BLOCK_SIZE     64 * 1024
+
+  goffset total = soup_request_get_content_length (request);
 
   /* ensure we emit a progress notification at the beginning */
   if (progress_func != NULL)
     progress_func (app_id, 0, total, progress_func_user_data);
 
+  GByteArray *content = NULL;
   gssize res = 0;
   gsize pos = 0;
   content = g_byte_array_new ();
@@ -1374,8 +1380,6 @@ download_app_file_from_uri (EosAppListModel *self,
 
 out:
   g_clear_pointer (&content, g_byte_array_unref);
-  g_clear_object (&file);
-  g_clear_object (&parent);
   g_clear_object (&in_stream);
   g_clear_object (&out_stream);
   g_clear_object (&request);
