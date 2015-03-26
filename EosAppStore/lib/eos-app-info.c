@@ -328,24 +328,11 @@ enum {
 static gboolean
 check_secondary_storage (const char *filename)
 {
-  /* we have various heuristics in place to check if a bundle resides on
-   * the secondary storage device
-   */
-
-  /* 1. check if the file is read-only; secondary storage is read-only
-   *    for the time being. we don't check for ENOENT or EACCESS, because
-   *    by the time this function is called, we know that we could load
-   *    the file in question.
-   */
-  int res = access (filename, W_OK);
-  if (res < 0)
-    return TRUE;
-
-  /* 2. we check if the file resides on a volume mounted using overlayfs.
-   *    this is a bit more convoluted; in theory, we could check if the
-   *    directory in which @filename is located has the overlayfs magic
-   *    bit, but that bit is not exposed by the kernel headers, so we would
-   *    have to do assume that the overlayfs magic bit never changes.
+  /* we check if the file resides on a volume mounted using overlayfs.
+   * this is a bit more convoluted; in theory, we could check if the
+   * directory in which @filename is located has the overlayfs magic
+   * bit, but that bit is not exposed by the kernel headers, so we would
+   * have to do assume that the overlayfs magic bit never changes.
    */
   struct stat statbuf;
   if (stat (filename, &statbuf) < 0)
