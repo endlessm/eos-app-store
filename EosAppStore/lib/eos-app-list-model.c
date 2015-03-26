@@ -952,62 +952,47 @@ check_available_space (GFile         *path,
   return retval;
 }
 
-static gboolean
-download_file_from_uri (EosAppListModel *self,
-                        const char      *content_type,
-                        const char      *source_uri,
-                        const char      *target_file,
-                        char           **buffer,
-                        GCancellable    *cancellable,
-                        GError         **error)
+static void
+ensure_soup_session (EosAppListModel *self)
 {
-  struct stat buf;
-  if (stat (target_file, &buf) == 0)
+  if (self->soup_session == NULL)
     {
-      time_t now = time (NULL); 
+      eos_app_log_error_message ("Creating new soup session");
 
-      eos_app_log_debug_message ("Checking if the cached file is still good (now: %ld, mtime: %ld, diff: %ld)",
-                                 now, buf.st_mtime, (now - buf.st_mtime));
-      if (buf.st_mtime > now || (now - buf.st_mtime < 3600))
-        {
-          eos_app_log_info_message ("Requested file '%s' is within cache allowance.",
-                                    target_file);
-          if (buffer != NULL)
-            {
-              if (g_file_get_contents (target_file, buffer, NULL, &internal_error))
-                return TRUE;
-
-              /* Fall through, and re-download the file */
-              eos_app_log_error_message ("Could not read cached file '%s': %s",
-                                         target_file,
-                                         internal_error->message);
-              g_clear_error (&internal_error);
-            }
-        }
+      self->soup_session = soup_session_new ();
     }
+}
 
+static SoupRequest *
+prepare_soup_request (SoupSession  *session,
+                      const char   *source_uri,
+                      const char   *content_type,
+                      const char   *app_id,
+                      GError      **error)
+{
   GError *internal_error = NULL;
-  gboolean retval = FALSE;
-
   SoupURI *uri = soup_uri_new (source_uri);
 
   if (uri == NULL)
     {
+      char *error_message;
+
       eos_app_log_error_message ("Soap URI is NULL - canceling download");
+
+      if (app_id != NULL)
+        error_message = g_strdup_printf (_("No available bundle for '%s'"), app_id);
+      else
+        error_message = g_strdup (_("No available data on the server"));
 
       g_set_error_literal (error, EOS_APP_LIST_MODEL_ERROR,
                            EOS_APP_LIST_MODEL_ERROR_INVALID_URL,
-                           _("No available data on the server"));
-      return FALSE;
+                           error_message);
+      g_free (error_message);
+
+      return NULL;
     }
 
-  if (self->soup_session == NULL) {
-    eos_app_log_error_message ("Creating new soup session");
-
-    self->soup_session = soup_session_new ();
-  }
-
-  SoupRequest *request = soup_session_request_uri (self->soup_session, uri, &internal_error);
+  SoupRequest *request = soup_session_request_uri (session, uri, &internal_error);
 
   soup_uri_free (uri);
 
@@ -1048,7 +1033,7 @@ download_file_from_uri (EosAppListModel *self,
       else
         g_propagate_error (error, internal_error);
 
-      return FALSE;
+      return NULL;
     }
 
   if (content_type != NULL)
@@ -1059,6 +1044,58 @@ download_file_from_uri (EosAppListModel *self,
           soup_message_headers_append (message->request_headers, "Accept", content_type);
           g_object_unref (message);
         }
+    }
+
+  return request;
+}
+
+static gboolean
+download_file_from_uri (EosAppListModel *self,
+                        const char      *content_type,
+                        const char      *source_uri,
+                        const char      *target_file,
+                        char           **buffer,
+                        GCancellable    *cancellable,
+                        GError         **error)
+{
+  GError *internal_error = NULL;
+  gboolean retval = FALSE;
+
+  struct stat buf;
+  if (stat (target_file, &buf) == 0)
+    {
+      time_t now = time (NULL);
+
+      eos_app_log_debug_message ("Checking if the cached file is still good (now: %ld, mtime: %ld, diff: %ld)",
+                                 now, buf.st_mtime, (now - buf.st_mtime));
+      if (buf.st_mtime > now || (now - buf.st_mtime < 3600))
+        {
+          eos_app_log_info_message ("Requested file '%s' is within cache allowance.",
+                                    target_file);
+          if (buffer != NULL)
+            {
+              if (g_file_get_contents (target_file, buffer, NULL, &internal_error))
+                return TRUE;
+
+              /* Fall through, and re-download the file */
+              eos_app_log_error_message ("Could not read cached file '%s': %s",
+                                         target_file,
+                                         internal_error->message);
+              g_clear_error (&internal_error);
+            }
+        }
+    }
+
+  ensure_soup_session (self);
+
+  SoupRequest *request = prepare_soup_request (self->soup_session, source_uri,
+                                               content_type, NULL,
+                                               &internal_error);
+
+  if (request == NULL)
+    {
+      g_propagate_error (error, internal_error);
+      return FALSE;
     }
 
   GByteArray *content = NULL;
@@ -1201,66 +1238,15 @@ download_app_file_from_uri (EosAppListModel *self,
   /* We assume that we won't get any data from the endpoint */
   *reset_error_counter = FALSE;
 
-  SoupURI *uri = soup_uri_new (source_uri);
+  ensure_soup_session (self);
 
-  if (uri == NULL)
+  SoupRequest *request = prepare_soup_request (self->soup_session, source_uri,
+                                               NULL, app_id,
+                                               &internal_error);
+
+  if (request == NULL)
     {
-      eos_app_log_error_message ("Soap URI is NULL - canceling download");
-
-      g_set_error (error, EOS_APP_LIST_MODEL_ERROR,
-                   EOS_APP_LIST_MODEL_ERROR_INVALID_URL,
-                   _("No available bundle for '%s'"),
-                   app_id);
-      return FALSE;
-    }
-
-  if (self->soup_session == NULL) {
-    eos_app_log_error_message ("Creating new soup session");
-
-    self->soup_session = soup_session_new ();
-  }
-
-  SoupRequest *request = soup_session_request_uri (self->soup_session, uri, &internal_error);
-
-  soup_uri_free (uri);
-
-  if (internal_error != NULL)
-    {
-      eos_app_log_error_message ("Soup request had an internal error: %s",
-                                 internal_error->message);
-
-      if (g_type_is_a (G_OBJECT_TYPE (request), SOUP_TYPE_REQUEST_HTTP) &&
-          g_error_matches (internal_error, G_TLS_ERROR, G_TLS_ERROR_BAD_CERTIFICATE))
-        {
-          SoupMessage *message;
-
-          message = soup_request_http_get_message (SOUP_REQUEST_HTTP (request));
-
-          GTlsCertificateFlags cert_flags = 0;
-
-          g_object_get (message, "tls-errors", &cert_flags, NULL);
-
-          const char *msg;
-
-          if ((cert_flags & G_TLS_CERTIFICATE_EXPIRED) != 0)
-            msg = _("The certificate of the app store is expired");
-          else if ((cert_flags & G_TLS_CERTIFICATE_REVOKED) != 0)
-            msg = _("The certificate of the app store has been revoked");
-          else if ((cert_flags & G_TLS_CERTIFICATE_BAD_IDENTITY) != 0)
-            msg = _("The certificate of the app store has a bad identity");
-          else if ((cert_flags & G_TLS_CERTIFICATE_UNKNOWN_CA) != 0)
-            msg = _("The certificate of the app store is from an unknown authority");
-          else
-            msg = _("The certificate of the app store is bad or invalid");
-
-          g_set_error_literal (error, EOS_APP_LIST_MODEL_ERROR,
-                               EOS_APP_LIST_MODEL_ERROR_BAD_CERTIFICATE,
-                               msg);
-          g_error_free (internal_error);
-        }
-      else
-        g_propagate_error (error, internal_error);
-
+      g_propagate_error (error, internal_error);
       return FALSE;
     }
 
