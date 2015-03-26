@@ -1134,6 +1134,110 @@ prepare_out_stream (const char    *target_file,
   return G_OUTPUT_STREAM (out_stream);
 }
 
+typedef void (* ChunkFunc) (GByteArray *chunk,
+                            gsize       chunk_len,
+                            gsize       bytes_read,
+                            gpointer    chunk_func_user_data);
+
+static gboolean
+download_file_chunks (GInputStream   *in_stream,
+                      GOutputStream  *out_stream,
+                      const char     *app_id,
+                      gsize          *bytes_read,
+                      ChunkFunc       chunk_func,
+                      gpointer        chunk_func_user_data,
+                      GCancellable   *cancellable,
+                      GError        **error)
+{
+#define GET_DATA_BLOCK_SIZE     64 * 1024
+
+  gboolean retval = FALSE;
+  GError *internal_error = NULL;
+  gssize res = 0;
+  gsize pos = 0;
+  GByteArray *content = g_byte_array_sized_new (GET_DATA_BLOCK_SIZE);
+
+  eos_app_log_info_message ("Downloading file chunks start");
+
+  /* we don't use splice() because the data is coming from a network
+   * request, so it won't have a file descriptor we can use splice()
+   * on.
+   */
+  while (!g_cancellable_is_cancelled (cancellable) &&
+         (res = g_input_stream_read (in_stream, content->data,
+                                     GET_DATA_BLOCK_SIZE,
+                                     cancellable, &internal_error)) > 0)
+    {
+      g_output_stream_write (G_OUTPUT_STREAM (out_stream), content->data, res,
+                             cancellable,
+                             &internal_error);
+      if (internal_error != NULL)
+        {
+          eos_app_log_error_message ("Downloading file failed during piecewise transfer");
+          g_propagate_error (error, internal_error);
+          goto out;
+        }
+
+      pos += res;
+
+      if (chunk_func != NULL)
+        chunk_func (content, res, pos, chunk_func_user_data);
+    }
+
+  if (g_cancellable_is_cancelled (cancellable))
+    {
+      char *error_message;
+
+      eos_app_log_info_message ("Canceled download");
+
+      if (app_id != NULL)
+        error_message = g_strdup_printf (_("Download of app '%s' cancelled by the user."),
+                                         app_id);
+      else
+        error_message = g_strdup (_("Refresh of available apps cancelled by the user."));
+
+      g_set_error_literal (error, EOS_APP_LIST_MODEL_ERROR,
+                           EOS_APP_LIST_MODEL_ERROR_CANCELLED,
+                           error_message);
+      g_free (error_message);
+
+      goto out;
+    }
+
+  if (res < 0)
+    {
+      g_propagate_error (error, internal_error);
+      goto out;
+    }
+
+  retval = TRUE;
+
+  eos_app_log_info_message ("Exiting download method normally");
+
+out:
+  g_clear_pointer (&content, g_byte_array_unref);
+
+  if (bytes_read != NULL)
+    *bytes_read = pos;
+
+#undef GET_DATA_BLOCK_SIZE
+
+  return retval;
+}
+
+static void
+download_file_chunk_func (GByteArray *chunk,
+                          gsize       chunk_len,
+                          gsize       bytes_read,
+                          gpointer    chunk_func_user_data)
+{
+  GByteArray *all_content = chunk_func_user_data;
+  guint8 *buffer;
+
+  buffer = (guint8 *) g_strndup ((const char *) chunk->data, chunk_len);
+  g_byte_array_append (all_content, buffer, chunk_len);
+}
+
 static gboolean
 download_file_from_uri (EosAppListModel *self,
                         const char      *content_type,
@@ -1173,8 +1277,10 @@ download_file_from_uri (EosAppListModel *self,
 
   ensure_soup_session (self);
 
+  gsize bytes_read = 0;
   GInputStream *in_stream = NULL;
   GOutputStream *out_stream = NULL;
+  GByteArray *all_content = g_byte_array_new ();
   SoupRequest *request = prepare_soup_request (self->soup_session, source_uri,
                                                content_type, NULL,
                                                error);
@@ -1191,75 +1297,46 @@ download_file_from_uri (EosAppListModel *self,
   if (out_stream == NULL)
     goto out;
 
-#define GET_DATA_BLOCK_SIZE     64 * 1024
+  if (!download_file_chunks (in_stream, out_stream,
+                             NULL, &bytes_read,
+                             download_file_chunk_func, all_content,
+                             cancellable, error))
+    goto out;
 
-  gssize res = 0;
-  gsize pos = 0;
-  GByteArray *content = g_byte_array_sized_new (GET_DATA_BLOCK_SIZE);
-  GByteArray *all_content = g_byte_array_new ();
-
-  eos_app_log_info_message ("Downloading file chunks start");
-
-  /* we don't use splice() because the data is coming from a network
-   * request, so it won't have a file descriptor we can use splice()
-   * on
-   */
-  while (!g_cancellable_is_cancelled (cancellable) &&
-         (res = g_input_stream_read (in_stream, content->data,
-                                     GET_DATA_BLOCK_SIZE,
-                                     cancellable, &internal_error)) > 0)
-    {
-      g_output_stream_write (G_OUTPUT_STREAM (out_stream), content->data, res,
-                             cancellable,
-                             &internal_error);
-      if (internal_error != NULL)
-        {
-          eos_app_log_error_message ("Downloading file failed during piecewise transfer");
-          g_propagate_error (error, internal_error);
-          goto out;
-        }
-
-      pos += res;
-      g_byte_array_append (all_content, (const guint8 *) g_strndup ((const char *) content->data, res), res);
-    }
-
-  if (g_cancellable_is_cancelled (cancellable))
-    {
-      eos_app_log_info_message ("Canceled download");
-
-      g_set_error_literal (error, EOS_APP_LIST_MODEL_ERROR,
-                           EOS_APP_LIST_MODEL_ERROR_CANCELLED,
-                           _("Refresh of available apps cancelled by the user."));
-
-      goto out;
-    }
-
-  if (res < 0)
-    {
-      g_propagate_error (error, internal_error);
-      goto out;
-    }
+  /* NUL-terminate the content */
+  all_content->data[bytes_read] = 0;
+  *buffer = (char *) g_byte_array_free (all_content, FALSE);
 
   retval = TRUE;
 
-  eos_app_log_info_message ("Exiting download method normally");
-
-  if (buffer != NULL)
-    {
-      /* NUL-terminate the content */
-      all_content->data[pos] = 0;
-      *buffer = (char *) g_byte_array_free (all_content, FALSE);
-    }
-
 out:
-  g_clear_pointer (&content, g_byte_array_unref);
+  g_byte_array_unref (all_content);
   g_clear_object (&in_stream);
   g_clear_object (&out_stream);
   g_clear_object (&request);
 
-#undef GET_DATA_BLOCK_SIZE
-
   return retval;
+}
+
+typedef struct {
+  ProgressReportFunc  progress_func;
+  gpointer            progress_func_user_data;
+  const char         *app_id;
+  gsize               total_len;
+} DownloadAppFileClosure;
+
+static void
+download_app_file_chunk_func (GByteArray *chunk,
+                              gsize       chunk_len,
+                              gsize       bytes_read,
+                              gpointer    chunk_func_user_data)
+{
+  DownloadAppFileClosure *clos = chunk_func_user_data;
+
+  if (clos->progress_func != NULL)
+    clos->progress_func (clos->app_id,
+                         bytes_read, clos->total_len,
+                         clos->progress_func_user_data);
 }
 
 static gboolean
@@ -1273,7 +1350,6 @@ download_app_file_from_uri (EosAppListModel *self,
                             GCancellable    *cancellable,
                             GError         **error)
 {
-  GError *internal_error = NULL;
   gboolean retval = FALSE;
 
   /* We assume that we won't get any data from the endpoint */
@@ -1281,6 +1357,7 @@ download_app_file_from_uri (EosAppListModel *self,
 
   ensure_soup_session (self);
 
+  gsize bytes_read = 0;
   GInputStream *in_stream = NULL;
   GOutputStream *out_stream = NULL;
   SoupRequest *request = prepare_soup_request (self->soup_session, source_uri,
@@ -1299,89 +1376,37 @@ download_app_file_from_uri (EosAppListModel *self,
   if (out_stream == NULL)
     goto out;
 
-#define GET_DATA_BLOCK_SIZE     64 * 1024
-
   goffset total = soup_request_get_content_length (request);
 
   /* ensure we emit a progress notification at the beginning */
   if (progress_func != NULL)
     progress_func (app_id, 0, total, progress_func_user_data);
 
-  GByteArray *content = NULL;
-  gssize res = 0;
-  gsize pos = 0;
-  content = g_byte_array_new ();
-  g_byte_array_set_size (content, GET_DATA_BLOCK_SIZE);
+  DownloadAppFileClosure *clos = g_slice_new0 (DownloadAppFileClosure);
+  clos->progress_func = progress_func;
+  clos->progress_func_user_data = progress_func_user_data;
+  clos->app_id = app_id;
+  clos->total_len = total;
 
-  eos_app_log_info_message ("Downloading file chunks start");
+  retval = download_file_chunks (in_stream, out_stream,
+                                 app_id, &bytes_read,
+                                 download_app_file_chunk_func, clos,
+                                 cancellable, error);
 
-  /* we don't use splice() because it does not have progress, and the
-   * data is coming from a network request, so it won't have a file
-   * descriptor we can use splice() on
-   */
-  while (!g_cancellable_is_cancelled (cancellable) &&
-         (res = g_input_stream_read (in_stream, content->data,
-                                     GET_DATA_BLOCK_SIZE,
-                                     cancellable, &internal_error)) > 0)
-    {
-      g_output_stream_write (G_OUTPUT_STREAM (out_stream), content->data, res,
-                             cancellable,
-                             &internal_error);
-      if (internal_error != NULL)
-        {
-          eos_app_log_error_message ("Downloading file failed during piecewise"
-                                     "transfer");
+  g_slice_free (DownloadAppFileClosure, clos);
 
-          g_propagate_error (error, internal_error);
-          goto out;
-        }
+  /* Since we got some data, we can assume that network is back online */
+  if (bytes_read > 0)
+    *reset_error_counter = TRUE;
 
-      pos += res;
-
-      /* Since we got some data, we can assume that network is back online */
-      *reset_error_counter = TRUE;
-
-      if (progress_func != NULL)
-        progress_func (app_id, pos, total, progress_func_user_data);
-    }
-
-  if (g_cancellable_is_cancelled (cancellable))
-    {
-      eos_app_log_info_message ("Canceled download");
-
-      /* emit a progress notification for the whole file */
-      if (progress_func != NULL)
-        progress_func (app_id, total, total, progress_func_user_data);
-
-      g_set_error (error, EOS_APP_LIST_MODEL_ERROR,
-                   EOS_APP_LIST_MODEL_ERROR_CANCELLED,
-                   _("Download of app '%s' cancelled by the user."),
-                   app_id);
-
-      goto out;
-    }
-
-  if (res < 0)
-    {
-      g_propagate_error (error, internal_error);
-      goto out;
-    }
-
-  /* ensure we emit a progress notification for the whole size */
+  /* emit a progress notification for the whole file, in any case */
   if (progress_func != NULL)
     progress_func (app_id, total, total, progress_func_user_data);
 
-  retval = TRUE;
-
-  eos_app_log_info_message ("Exiting download method normally");
-
 out:
-  g_clear_pointer (&content, g_byte_array_unref);
   g_clear_object (&in_stream);
   g_clear_object (&out_stream);
   g_clear_object (&request);
-
-#undef GET_DATA_BLOCK_SIZE
 
   return retval;
 }
