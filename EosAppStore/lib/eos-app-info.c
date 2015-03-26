@@ -427,20 +427,25 @@ eos_app_info_update_from_server (EosAppInfo *info,
     {
       const char *version = json_node_get_string (node);
 
-      /* If the server returns a newer version, we update the related fields */
-      if (eos_compare_versions (info->version, version) < 0)
-        {
-          g_free (info->version);
-          info->version = g_strdup (version);
-          info->update_available = TRUE;
-        }
-      else
+      /* If the server returns a newer version, we update the related fields;
+       * otherwise, we keep what we have
+       */
+      if (eos_compare_versions (info->version, version) > 0)
         return;
+
+      g_free (info->version);
+      info->version = g_strdup (version);
+
+      /* Newer version means we have an update */
+      info->update_available = TRUE;
     }
 
   node = json_object_get_member (obj, JSON_KEYS[LOCALE]);
   if (node != NULL)
-    info->locale = json_node_dup_string (node);
+    {
+      g_free (info->locale);
+      info->locale = json_node_dup_string (node);
+    }
 
   node = json_object_get_member (obj, JSON_KEYS[INSTALLED_SIZE]);
   if (node != NULL)
