@@ -975,7 +975,7 @@ download_file_from_uri (EosAppListModel *self,
           if (buffer != NULL)
             {
               if (g_file_get_contents (target_file, buffer, NULL, &internal_error))
-                return TRUE;i
+                return TRUE;
 
               /* Fall through, and re-download the file */
               eos_app_log_error_message ("Could not read cached file '%s': %s",
@@ -1084,7 +1084,7 @@ download_file_from_uri (EosAppListModel *self,
 
   if (!check_available_space (parent, total, cancellable, &internal_error))
     {
-      eos_app_log_error_message("Not enough space on FS - canceling download");
+      eos_app_log_error_message ("Not enough space on FS - canceling download");
 
       g_propagate_error (error, internal_error);
       goto out;
@@ -1118,12 +1118,11 @@ download_file_from_uri (EosAppListModel *self,
 
   eos_app_log_info_message ("Downloading file chunks start");
 
-  /* we don't use splice() because it does not have progress, and the
-   * data is coming from a network request, so it won't have a file
-   * descriptor we can use splice() on; we also increase the size of
-   * the byte array because we want to return the buffer as an out
-   * parameter, instead of having the caller reload the file we just
-   * downloaded.
+  /* we don't use splice() because the data is coming from a network
+   * request, so it won't have a file descriptor we can use splice()
+   * on; we also increase the size of the byte array because we want
+   * to return the buffer as an out parameter, instead of having the
+   * caller reload the file we just downloaded
    */
   while (!g_cancellable_is_cancelled (cancellable) &&
          (res = g_input_stream_read (in_stream, content->data + pos,
@@ -1288,7 +1287,7 @@ download_app_file_from_uri (EosAppListModel *self,
 
   if (!check_available_space (parent, total, cancellable, &internal_error))
     {
-      eos_app_log_error_message("Not enough space on FS - canceling download");
+      eos_app_log_error_message ("Not enough space on FS - canceling download");
 
       g_propagate_error (error, internal_error);
       goto out;
