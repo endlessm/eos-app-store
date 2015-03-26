@@ -379,8 +379,12 @@ eos_app_info_update_from_installed (EosAppInfo *info,
   if (g_strcmp0 (desktop_id, info->desktop_id) != 0)
     goto out;
 
+  g_free (info->version);
   info->version = g_key_file_get_string (keyfile, GROUP, FILE_KEYS[CODE_VERSION], NULL);
+
+  g_free (info->locale);
   info->locale = g_key_file_get_string (keyfile, GROUP, FILE_KEYS[LOCALE], NULL);
+
   info->installed_size = g_key_file_get_int64 (keyfile, GROUP, FILE_KEYS[INSTALLED_SIZE], NULL);
 
   if (g_key_file_has_key (keyfile, GROUP, FILE_KEYS[SECONDARY_STORAGE], NULL))
@@ -388,6 +392,7 @@ eos_app_info_update_from_installed (EosAppInfo *info,
   else
     info->on_secondary_storage = check_secondary_storage (filename);
 
+  /* If we found it here, then it's installed */
   info->is_installed = TRUE;
 
 #undef GROUP
