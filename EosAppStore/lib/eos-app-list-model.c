@@ -1193,26 +1193,23 @@ download_file_from_uri (EosAppListModel *self,
 
 #define GET_DATA_BLOCK_SIZE     64 * 1024
 
-  GByteArray *content = NULL;
   gssize res = 0;
   gsize pos = 0;
-  content = g_byte_array_new ();
-  g_byte_array_set_size (content, GET_DATA_BLOCK_SIZE + 1);
+  GByteArray *content = g_byte_array_sized_new (GET_DATA_BLOCK_SIZE);
+  GByteArray *all_content = g_byte_array_new ();
 
   eos_app_log_info_message ("Downloading file chunks start");
 
   /* we don't use splice() because the data is coming from a network
    * request, so it won't have a file descriptor we can use splice()
-   * on; we also increase the size of the byte array because we want
-   * to return the buffer as an out parameter, instead of having the
-   * caller reload the file we just downloaded
+   * on
    */
   while (!g_cancellable_is_cancelled (cancellable) &&
-         (res = g_input_stream_read (in_stream, content->data + pos,
+         (res = g_input_stream_read (in_stream, content->data,
                                      GET_DATA_BLOCK_SIZE,
                                      cancellable, &internal_error)) > 0)
     {
-      g_output_stream_write (G_OUTPUT_STREAM (out_stream), content->data + pos, res,
+      g_output_stream_write (G_OUTPUT_STREAM (out_stream), content->data, res,
                              cancellable,
                              &internal_error);
       if (internal_error != NULL)
@@ -1223,7 +1220,7 @@ download_file_from_uri (EosAppListModel *self,
         }
 
       pos += res;
-      g_byte_array_set_size (content, pos + GET_DATA_BLOCK_SIZE + 1);
+      g_byte_array_append (all_content, (const guint8 *) g_strndup ((const char *) content->data, res), res);
     }
 
   if (g_cancellable_is_cancelled (cancellable))
@@ -1250,8 +1247,8 @@ download_file_from_uri (EosAppListModel *self,
   if (buffer != NULL)
     {
       /* NUL-terminate the content */
-      content->data[pos] = 0;
-      *buffer = g_strdup ((const char *) content->data);
+      all_content->data[pos] = 0;
+      *buffer = (char *) g_byte_array_free (all_content, FALSE);
     }
 
 out:
