@@ -339,7 +339,7 @@ eos_app_parse_resource_content (const char *content_type,
 
   eos_app_log_debug_message ("Content type '%s' loading: %d msecs",
                              content_type,
-                             (int) (g_get_monotonic_time () - start_time));
+                             (int) (g_get_monotonic_time () - start_time) / 1000);
 
  out_error:
   g_object_unref (parser);
@@ -778,7 +778,7 @@ eos_app_load_installed_apps (GHashTable *app_info,
 
   eos_app_log_debug_message ("Bundle loading: %d bundles, %d msecs",
                              n_bundles,
-                             (int) (g_get_monotonic_time () - start_time));
+                             (int) (g_get_monotonic_time () - start_time) / 1000);
 
   return TRUE;
 }
@@ -854,7 +854,7 @@ eos_app_load_available_apps (GHashTable *app_info,
 
   eos_app_log_debug_message ("Available bundles: %d bundles, %d msecs",
                              n_available,
-                             (int) (g_get_monotonic_time () - start_time));
+                             (int) (g_get_monotonic_time () - start_time) / 1000);
 
   return TRUE;
 }
