@@ -2025,8 +2025,7 @@ eos_app_list_model_get_all_apps (EosAppListModel *model)
   /* TODO: make sure that this only does available apps after
    * we add handlers to different update state types to model->apps
    */
-  if (model->apps)
-    apps = g_hash_table_get_keys (model->apps);
+  apps = g_hash_table_get_keys (model->apps);
 
   return g_list_concat (gio_apps, apps);
 }
@@ -2465,9 +2464,6 @@ eos_app_list_model_get_app_can_remove (EosAppListModel *model,
 {
   const gchar *localized_id;
 
-  if (model->apps == NULL)
-    return FALSE;
-
   localized_id = app_get_localized_id_for_installed_app (model, desktop_id);
 
   /* Can only remove what the manager installed... */
@@ -2527,9 +2523,6 @@ eos_app_list_model_get_app_has_sufficient_install_space (EosAppListModel *model,
   guint64 installed_size = 0;
   const gchar *real_desktop_id;
 
-  if (model->apps == NULL)
-    return FALSE;
-
   if (desktop_id == NULL) {
     eos_app_log_error_message ("Desktop ID for %s is NULL!", desktop_id);
     return FALSE;
@@ -2580,9 +2573,6 @@ eos_app_list_model_get_app_installed_size (EosAppListModel *model,
                                            const char *desktop_id)
 {
   const gchar *real_desktop_id;
-
-  if (model->apps == NULL)
-    return 0L;
 
   if (desktop_id == NULL) {
     eos_app_log_error_message ("Desktop ID for %s is NULL!", desktop_id);
