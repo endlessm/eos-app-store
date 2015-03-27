@@ -364,7 +364,7 @@ void
 eos_app_info_update_from_installed (EosAppInfo *info,
                                     const char *filename)
 {
-  char *desktop_id = NULL;
+  char *app_id = NULL;
   GKeyFile *keyfile = g_key_file_new ();
 
   if (!g_key_file_load_from_file (keyfile, filename, 0, NULL))
@@ -375,8 +375,8 @@ eos_app_info_update_from_installed (EosAppInfo *info,
   if (!g_key_file_has_group (keyfile, GROUP))
     goto out;
 
-  desktop_id = g_key_file_get_string (keyfile, GROUP, FILE_KEYS[APP_ID], NULL);
-  if (g_strcmp0 (desktop_id, info->desktop_id) != 0)
+  app_id = g_key_file_get_string (keyfile, GROUP, FILE_KEYS[APP_ID], NULL);
+  if (g_strcmp0 (app_id, info->application_id) != 0)
     goto out;
 
   g_free (info->version);
@@ -398,7 +398,7 @@ eos_app_info_update_from_installed (EosAppInfo *info,
 #undef GROUP
 
 out:
-  g_free (desktop_id);
+  g_free (app_id);
   g_key_file_unref (keyfile);
 }
 
@@ -418,7 +418,7 @@ eos_app_info_update_from_server (EosAppInfo *info,
   node = json_object_get_member (obj, JSON_KEYS[APP_ID]);
   if (node != NULL)
     {
-      if (g_strcmp0 (info->desktop_id, json_node_get_string (node)) != 0)
+      if (g_strcmp0 (info->application_id, json_node_get_string (node)) != 0)
         return;
     }
 
