@@ -1753,8 +1753,7 @@ get_bundle_artifacts(EosAppListModel *self,
   /* call this manually, since we want to specify a custom timeout */
   GVariant *res = g_dbus_proxy_call_sync (G_DBUS_PROXY (transaction),
                                           "CompleteTransaction",
-                                          g_variant_new ("(s)",
-                                                         bundle_path),
+                                          g_variant_new ("(s)", bundle_path),
                                           G_DBUS_CALL_FLAGS_NONE,
                                           G_MAXINT,
                                           cancellable,
@@ -1858,8 +1857,7 @@ install_latest_app_version (EosAppListModel *self,
   char *app_id = app_id_from_desktop_id (desktop_id);
   char *transaction_path = NULL;
 
-  eos_app_log_info_message ("Calling install dbus method with app_id: %s",
-                            app_id);
+  eos_app_log_info_message ("Calling install dbus method with app_id: %s", app_id);
 
   /* We use different DBus targets but everything else is same */
   if (is_upgrade)
