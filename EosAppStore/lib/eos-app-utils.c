@@ -1030,8 +1030,13 @@ eos_compare_versions (const char *a,
   if (g_strcmp0 (a, b) == 0)
     return 0;
 
-  pkg_version_init (&ver_a, a);
-  pkg_version_init (&ver_b, b);
+  /* Version A not valid or missing, so it's older */
+  if (!pkg_version_init (&ver_a, a))
+    return -1;
+
+  /* Version B not valid or missing, so it's older */
+  if (!pkg_version_init (&ver_b, b))
+    return 1;
 
   int res = pkg_version_compare (&ver_a, &ver_b);
 
