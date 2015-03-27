@@ -846,6 +846,8 @@ pkg_version_init (PkgVersion *ver,
 {
   const gchar *end, *ptr;
 
+  ver->version = ver->revision = NULL;
+
   if (str == NULL || *str == '\0')
     return FALSE;
 
