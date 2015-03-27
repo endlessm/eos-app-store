@@ -17,12 +17,15 @@
 G_DEFINE_BOXED_TYPE (EosAppInfo, eos_app_info, eos_app_info_ref, eos_app_info_unref)
 
 EosAppInfo *
-eos_app_info_new (void)
+eos_app_info_new (const char *application_id)
 {
   EosAppInfo *info = g_slice_new0 (EosAppInfo);
 
   info->shape = EOS_FLEXY_SHAPE_SMALL;
   info->ref_count = 1;
+
+  info->application_id = g_strdup (application_id);
+  info->desktop_id = g_strdup_printf ("%s.desktop", info->application_id);
 
   return info;
 }
@@ -360,12 +363,12 @@ check_secondary_storage (const char *filename)
 }
 
 /*< private >*/
-void
+gboolean
 eos_app_info_update_from_installed (EosAppInfo *info,
                                     const char *filename)
 {
-  char *app_id = NULL;
   GKeyFile *keyfile = g_key_file_new ();
+  gboolean retval = FALSE;
 
   if (!g_key_file_load_from_file (keyfile, filename, 0, NULL))
     goto out;
@@ -373,10 +376,6 @@ eos_app_info_update_from_installed (EosAppInfo *info,
 #define GROUP   "Bundle"
 
   if (!g_key_file_has_group (keyfile, GROUP))
-    goto out;
-
-  app_id = g_key_file_get_string (keyfile, GROUP, FILE_KEYS[APP_ID], NULL);
-  if (g_strcmp0 (app_id, info->application_id) != 0)
     goto out;
 
   g_free (info->version);
@@ -395,37 +394,30 @@ eos_app_info_update_from_installed (EosAppInfo *info,
   /* If we found it here, then it's installed */
   info->is_installed = TRUE;
 
+  retval = TRUE;
+
 #undef GROUP
 
 out:
-  g_free (app_id);
   g_key_file_unref (keyfile);
+
+  return retval;
 }
 
 /*< private >*/
-void
+gboolean
 eos_app_info_update_from_server (EosAppInfo *info,
                                  JsonNode *root)
 {
-  g_return_if_fail (root != NULL);
-
   if (!JSON_NODE_HOLDS_OBJECT (root))
-    return;
+    return FALSE;
 
   JsonObject *obj = json_node_get_object (root);
-  JsonNode *node;
-
-  node = json_object_get_member (obj, JSON_KEYS[APP_ID]);
-  if (node != NULL)
-    {
-      if (g_strcmp0 (info->application_id, json_node_get_string (node)) != 0)
-        return;
-    }
 
   /* If we found it here, then it's available */
   info->is_available = TRUE;
 
-  node = json_object_get_member (obj, JSON_KEYS[CODE_VERSION]);
+  JsonNode *node = json_object_get_member (obj, JSON_KEYS[CODE_VERSION]);
   if (node != NULL)
     {
       const char *version = json_node_get_string (node);
@@ -434,7 +426,7 @@ eos_app_info_update_from_server (EosAppInfo *info,
        * otherwise, we keep what we have
        */
       if (eos_compare_versions (info->version, version) > 0)
-        return;
+        return FALSE;
 
       g_free (info->version);
       info->version = g_strdup (version);
@@ -457,26 +449,26 @@ eos_app_info_update_from_server (EosAppInfo *info,
   node = json_object_get_member (obj, JSON_KEYS[SECONDARY_STORAGE]);
   if (node)
     info->on_secondary_storage = json_node_get_boolean (node);
+
+  return TRUE;
 }
 
 /*< private >*/
 EosAppInfo *
 eos_app_info_create_from_content (JsonNode *node)
 {
+  const char *app_id;
+
   if (!JSON_NODE_HOLDS_OBJECT (node))
     return NULL;
 
   JsonObject *obj = json_node_get_object (node);
+  if (!json_object_has_member (obj, "application-id"))
+    return NULL;
 
-  EosAppInfo *info = eos_app_info_new ();
+  app_id = json_object_get_string_member (obj, "application-id");
 
-  if (json_object_has_member (obj, "application-id"))
-    {
-      info->application_id = json_node_dup_string (json_object_get_member (obj, "application-id"));
-      info->desktop_id = g_strdup_printf ("%s.desktop", info->application_id);
-    }
-  else
-    info->application_id = info->desktop_id = NULL;
+  EosAppInfo *info = eos_app_info_new (app_id);
 
   if (json_object_has_member (obj, "title"))
     info->title = json_node_dup_string (json_object_get_member (obj, "title"));

@@ -72,15 +72,6 @@ struct _EosAppListModelClass
   GObjectClass parent_class;
 };
 
-enum _EosAppListModelUpdateType {
-  EOS_APP_LIST_MODEL_UPDATE_TYPE_AVAILABLE,
-  EOS_APP_LIST_MODEL_UPDATE_TYPE_UPDATABLE,
-  EOS_APP_LIST_MODEL_UPDATE_TYPE_EAM_REMOVABLE,
-  EOS_APP_LIST_MODEL_UPDATE_TYPE_EAM_INSTALLED
-};
-
-typedef enum _EosAppListModelUpdateType EosAppListModelUpdateType;
-
 enum {
   CHANGED,
   DOWNLOAD_PROGRESS,
@@ -219,11 +210,9 @@ app_is_installable (EosAppListModel *model,
 }
 
 static gchar *
-localized_id_from_desktop_id (const gchar *desktop_id, const gchar *lang_id)
+localized_id_from_desktop_id (const gchar *desktop_id,
+                              const gchar *lang_id)
 {
-  /* HACK: this should really be removed in favor of communicating the
-   * language to the app manager API...
-   */
   gchar *localized_id;
   gchar *app_id;
 
@@ -546,7 +535,7 @@ load_manager_installed_apps (EosAppListModel *self,
   const char *appdir = eos_get_bundles_dir ();
 
   GError *error = NULL;
-  if (!eos_app_load_installed_bundles (self->apps, appdir, cancellable, &error))
+  if (!eos_app_load_installed_apps (self->apps, appdir, cancellable, &error))
     {
       eos_app_log_error_message ("Unable to list installed bundles: %s", error->message);
       g_error_free (error);
@@ -588,34 +577,6 @@ load_shell_apps (EosAppListModel *self,
 }
 
 static gboolean
-load_content_apps (EosAppListModel *self,
-                   GCancellable *cancellable)
-{
-  GList *all_info, *l;
-  gboolean retval = FALSE;
-
-  all_info = eos_app_load_content (EOS_APP_CATEGORY_ALL, NULL, NULL);
-  for (l = all_info; l != NULL; l = l->next)
-    {
-      EosAppInfo *info = l->data;
-
-      if (g_cancellable_is_cancelled (cancellable))
-        goto out;
-
-      g_hash_table_replace (self->apps,
-                            g_strdup (eos_app_info_get_desktop_id (info)),
-                            eos_app_info_ref (info));
-    }
-
-  retval = TRUE;
-
- out:
-  g_list_free_full (all_info, (GDestroyNotify) eos_app_info_unref);
-
-  return retval;
-}
-
-static gboolean
 load_all_apps (EosAppListModel *self,
                GCancellable *cancellable,
                GError **error)
@@ -623,10 +584,6 @@ load_all_apps (EosAppListModel *self,
   eos_app_log_debug_message ("Loading GIO apps");
   g_clear_pointer (&self->gio_apps, g_hash_table_unref);
   self->gio_apps = load_apps_from_gio ();
-
-  eos_app_log_debug_message ("Loading from content");
-  if (!load_content_apps (self, cancellable))
-    goto out;
 
   eos_app_log_debug_message ("Loading installed apps from manager");
   if (!load_manager_installed_apps (self, cancellable))
@@ -2205,7 +2162,7 @@ eos_app_list_model_get_app_state (EosAppListModel *model,
                                   const char *desktop_id)
 {
   EosAppState retval = EOS_APP_STATE_UNKNOWN;
-  gboolean is_installed, is_updatable = FALSE;
+  gboolean is_installed, is_installable, is_updatable = FALSE;
 
   g_return_val_if_fail (EOS_IS_APP_LIST_MODEL (model), EOS_APP_STATE_UNKNOWN);
   g_return_val_if_fail (desktop_id != NULL, EOS_APP_STATE_UNKNOWN);
@@ -2218,11 +2175,15 @@ eos_app_list_model_get_app_state (EosAppListModel *model,
       is_updatable = app_is_updatable (model, localized_id);
     }
 
+  char *localized_installable_id = app_get_localized_id_for_installable_app (model, desktop_id);
+  is_installable = (localized_installable_id != NULL);
+  g_free (localized_installable_id);
+
   if (is_installed && is_updatable)
     retval = EOS_APP_STATE_UPDATABLE;
   else if (is_installed)
     retval = EOS_APP_STATE_INSTALLED;
-  else
+  else if (is_installable)
     retval = EOS_APP_STATE_AVAILABLE;
 
   return retval;

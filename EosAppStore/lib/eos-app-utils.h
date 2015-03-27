@@ -41,10 +41,18 @@ char *  eos_get_updates_file (void);
 const char *eos_get_bundles_dir (void);
 const char *eos_get_download_dir (void);
 
-gboolean eos_app_load_installed_bundles (GHashTable *app_info,
-                                         const char *appdir,
-                                         GCancellable *cancellable,
-                                         GError **error);
+gchar * eos_app_id_from_desktop_id (const gchar *desktop_id);
+gchar * eos_get_language_id (void);
+gchar * eos_localized_id_from_desktop_id (const gchar *desktop_id,
+                                          const gchar *lang_id);
+
+gboolean eos_app_load_content_apps (GHashTable *app_info,
+                                    GCancellable *cancellable,
+                                    GError **error);
+gboolean eos_app_load_installed_apps (GHashTable *app_info,
+                                      const char *appdir,
+                                      GCancellable *cancellable,
+                                      GError **error);
 gboolean eos_app_load_available_apps (GHashTable *app_info,
                                       const char *data,
                                       GCancellable *cancellable,

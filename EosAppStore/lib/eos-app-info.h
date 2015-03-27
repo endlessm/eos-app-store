@@ -14,7 +14,7 @@ typedef struct _EosAppInfo      EosAppInfo;
 
 GType eos_app_info_get_type (void);
 
-EosAppInfo *    eos_app_info_new                        (void);
+EosAppInfo *    eos_app_info_new                        (const char *application_id);
 EosAppInfo *    eos_app_info_ref                        (EosAppInfo *info);
 void            eos_app_info_unref                      (EosAppInfo *info);
 
@@ -48,10 +48,10 @@ gboolean        eos_app_info_is_removable               (const EosAppInfo *info)
 G_GNUC_INTERNAL
 EosAppInfo *    eos_app_info_create_from_content        (JsonNode *node);
 G_GNUC_INTERNAL
-void            eos_app_info_update_from_server         (EosAppInfo *info,
-                                                         JsonNode *node);
+gboolean        eos_app_info_update_from_server         (EosAppInfo *info,
+                                                         JsonNode   *node);
 G_GNUC_INTERNAL
-void            eos_app_info_update_from_installed      (EosAppInfo *info,
+gboolean        eos_app_info_update_from_installed      (EosAppInfo *info,
                                                          const char *filename);
 
 #endif

@@ -293,7 +293,9 @@ eos_link_get_category_name (EosLinkCategory category)
 }
 
 static JsonArray *
-eos_app_parse_resource_content (const char *content_type, const char *content_name)
+eos_app_parse_resource_content (const char *content_type,
+                                const char *content_name,
+                                GError **error_out)
 {
   gint64 start_time = g_get_monotonic_time ();
   JsonArray *content_array = NULL;
@@ -307,7 +309,7 @@ eos_app_parse_resource_content (const char *content_type, const char *content_na
   if (error != NULL)
     {
       g_critical ("Unable to load content from '%s': %s", content_file, error->message);
-      g_error_free (error);
+      g_propagate_error (error_out, error);
       goto out_error;
     }
 
@@ -319,14 +321,17 @@ eos_app_parse_resource_content (const char *content_type, const char *content_na
   if (error != NULL)
     {
       g_critical ("Unable to load content from '%s': %s", content_file, error->message);
-      g_error_free (error);
+      g_propagate_error (error_out, error);
       goto out_error;
     }
 
   JsonNode *node = json_parser_get_root (parser);
   if (!JSON_NODE_HOLDS_ARRAY (node))
     {
-      g_critical ("Expected array content");
+      g_set_error (error_out,
+                   JSON_READER_ERROR,
+                   JSON_READER_ERROR_NO_ARRAY,
+                   "Expected array content");
       goto out_error;
     }
 
@@ -384,7 +389,7 @@ eos_app_load_content (EosAppCategory category,
                       EosAppFilterCallback callback,
                       gpointer data)
 {
-  JsonArray *array = eos_app_parse_resource_content (APP_STORE_CONTENT_APPS, "content");
+  JsonArray *array = eos_app_parse_resource_content (APP_STORE_CONTENT_APPS, "content", NULL);
 
   if (array == NULL)
     return NULL;
@@ -450,7 +455,7 @@ eos_link_load_content (EosLinkCategory category)
   JsonObject *obj;
   const gchar *category_name;
 
-  JsonArray *categories_array = eos_app_parse_resource_content (APP_STORE_CONTENT_LINKS, get_os_personality ());
+  JsonArray *categories_array = eos_app_parse_resource_content (APP_STORE_CONTENT_LINKS, get_os_personality (), NULL);
 
   if (categories_array == NULL)
     return NULL;
@@ -718,10 +723,10 @@ is_app_id (const char *appid)
 }
 
 gboolean
-eos_app_load_installed_bundles (GHashTable *app_info,
-                                const char *appdir,
-                                GCancellable *cancellable,
-                                GError **error)
+eos_app_load_installed_apps (GHashTable *app_info,
+                             const char *appdir,
+                             GCancellable *cancellable,
+                             GError **error)
 {
   GDir *dir = g_dir_open (appdir, 0, error);
   if (dir == NULL)
@@ -742,23 +747,30 @@ eos_app_load_installed_bundles (GHashTable *app_info,
           continue;
         }
 
+      char *info_path = g_build_filename (appdir, appid, ".info", NULL);
+      eos_app_log_info_message ("Loading bundle info for '%s' from '%s'...", appid, info_path);
+
       char *desktop_id = g_strconcat (appid, ".desktop", NULL);
       EosAppInfo *info = g_hash_table_lookup (app_info, desktop_id);
+      g_free (desktop_id);
+
       if (info == NULL)
+        info = eos_app_info_new (appid);
+      else
+        eos_app_info_ref (info);
+
+      if (eos_app_info_update_from_installed (info, info_path))
         {
-          eos_app_log_info_message ("No content data for '%s'", appid);
-          g_free (desktop_id);
-          continue;
+          g_hash_table_replace (app_info,
+                                g_strdup (eos_app_info_get_desktop_id (info)),
+                                info);
+          n_bundles += 1;
+        }
+      else
+        {
+          eos_app_log_debug_message ("App '%s' failed to update from installed info", appid);
         }
 
-      char *info_path = g_build_filename (appdir, appid, ".info", NULL);
-
-      eos_app_log_info_message ("Loading bundle info for '%s' from '%s'...", appid, info_path);
-      eos_app_info_update_from_installed (info, info_path);
-
-      n_bundles += 1;
-
-      g_free (desktop_id);
       g_free (info_path);
     }
 
@@ -813,16 +825,29 @@ eos_app_load_available_apps (GHashTable *app_info,
       if (!json_object_has_member (obj, "appId"))
         continue;
 
-      char *appid = g_strconcat (json_object_get_string_member (obj, "appId"), ".desktop", NULL);
-      EosAppInfo *info = g_hash_table_lookup (app_info, appid);
-      g_free (appid);
+      const char *appid = json_object_get_string_member (obj, "appId");
+      eos_app_log_info_message ("Loading JSON server info for '%s'", appid);
+
+      char *desktop_id = g_strconcat (appid, ".desktop", NULL);
+      EosAppInfo *info = g_hash_table_lookup (app_info, desktop_id);
+      g_free (desktop_id);
 
       if (info == NULL)
-        continue;
+        info = eos_app_info_new (appid);
+      else
+        eos_app_info_ref (info);
 
-      eos_app_info_update_from_server (info, element);
-
-      n_available += 1;
+      if (eos_app_info_update_from_server (info, element))
+        {
+          g_hash_table_replace (app_info,
+                                g_strdup (eos_app_info_get_desktop_id (info)),
+                                info);
+          n_available += 1;
+        }
+      else
+        {
+          eos_app_log_debug_message ("App '%s' failed to update JSON", appid);
+        }
     }
 
   g_object_unref (parser);

@@ -700,8 +700,10 @@ const AppCategoryFrame = new Lang.Class({
             // ... while every other category only shows apps that can be added
             for (let i in appInfos) {
                 let id = appInfos[i].get_desktop_id();
+                let state = this._model.getState(id);
 
-                if (!this._model.hasLauncher(id)) {
+                if (!this._model.hasLauncher(id) &&
+                    state != EosAppStorePrivate.AppState.UNKNOWN) {
                     let cell = appInfos[i].create_cell(this._model.getIcon(id));
                     grid.add(cell);
                 }
