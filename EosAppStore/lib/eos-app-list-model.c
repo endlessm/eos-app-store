@@ -592,6 +592,7 @@ load_content_apps (EosAppListModel *self,
                    GCancellable *cancellable)
 {
   GList *all_info, *l;
+  gboolean retval = FALSE;
 
   all_info = eos_app_load_content (EOS_APP_CATEGORY_ALL, NULL, NULL);
   for (l = all_info; l != NULL; l = l->next)
@@ -599,16 +600,19 @@ load_content_apps (EosAppListModel *self,
       EosAppInfo *info = l->data;
 
       if (g_cancellable_is_cancelled (cancellable))
-        break;
+        goto out;
 
       g_hash_table_replace (self->apps,
                             g_strdup (eos_app_info_get_desktop_id (info)),
                             eos_app_info_ref (info));
     }
 
+  retval = TRUE;
+
+ out:
   g_list_free_full (all_info, (GDestroyNotify) eos_app_info_unref);
 
-  return TRUE;
+  return retval;
 }
 
 static gboolean
