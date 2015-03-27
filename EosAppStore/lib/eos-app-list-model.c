@@ -1452,14 +1452,14 @@ download_app_file_from_uri_with_retry (EosAppListModel *self,
 
 static char *
 create_sha256sum (EosAppListModel *self,
-                  EosAppManagerTransaction *transaction,
+                  EosAppInfo *info,
                   const char *bundle_path,
                   GCancellable *cancellable,
                   GError **error_out)
 {
   GError *error = NULL;
-  const char *bundle_hash = eos_app_manager_transaction_get_bundle_hash (transaction);
-  const char *app_id = eos_app_manager_transaction_get_application_id (transaction);
+  const char *bundle_hash = eos_app_info_get_bundle_hash (info);
+  const char *app_id = eos_app_info_get_application_id (info);
 
   if (bundle_hash == NULL || *bundle_hash == '\0')
     {
@@ -1485,13 +1485,13 @@ create_sha256sum (EosAppListModel *self,
 
 static char *
 download_signature (EosAppListModel *self,
-                    EosAppManagerTransaction *transaction,
+                    EosAppInfo *info,
                     GCancellable *cancellable,
                     GError **error_out)
 {
   GError *error = NULL;
-  const char *signature_uri = eos_app_manager_transaction_get_signature_uri (transaction);
-  const char *app_id = eos_app_manager_transaction_get_application_id (transaction);
+  const char *signature_uri = eos_app_info_get_signature_uri (info);
+  const char *app_id = eos_app_info_get_application_id (info);
 
   if (signature_uri == NULL || *signature_uri == '\0')
     {
@@ -1519,13 +1519,13 @@ download_signature (EosAppListModel *self,
 
 static char *
 download_bundle (EosAppListModel *self,
-                 EosAppManagerTransaction *transaction,
+                 EosAppInfo *info,
                  GCancellable *cancellable,
                  GError **error_out)
 {
   GError *error = NULL;
-  const char *bundle_uri = eos_app_manager_transaction_get_bundle_uri (transaction);
-  const char *app_id = eos_app_manager_transaction_get_application_id (transaction);
+  const char *bundle_uri = eos_app_info_get_bundle_uri (info);
+  const char *app_id = eos_app_info_get_application_id (info);
 
   eos_app_log_info_message ("Downloading - bundle URI: %s", bundle_uri);
   eos_app_log_info_message ("Downloading - bundle app id: %s", app_id);
@@ -1573,6 +1573,7 @@ get_bundle_artifacts (EosAppListModel *self,
   char *bundle_path = NULL;
   char *signature_path = NULL;
   char *sha256_path = NULL;
+  EosAppInfo *info;
 
   eos_app_log_info_message ("Accessing dbus transaction");
 
@@ -1590,8 +1591,15 @@ get_bundle_artifacts (EosAppListModel *self,
     goto out;
   }
 
+  info = g_hash_table_lookup (self->apps, desktop_id);
+  if (info == NULL) {
+    eos_app_log_error_message ("Getting EosAppInfo failed");
+
+    goto out;
+  }
+
   eos_app_log_info_message ("Downloading bundle");
-  bundle_path = download_bundle (self, transaction, cancellable, &error);
+  bundle_path = download_bundle (self, info, cancellable, &error);
   if (error != NULL) {
     eos_app_log_info_message ("Download of bundle failed");
 
@@ -1599,7 +1607,7 @@ get_bundle_artifacts (EosAppListModel *self,
   }
 
   eos_app_log_info_message ("Downloading signature");
-  signature_path = download_signature (self, transaction, cancellable, &error);
+  signature_path = download_signature (self, info, cancellable, &error);
   if (error != NULL) {
     eos_app_log_error_message ("Signature download failed");
 
@@ -1607,7 +1615,7 @@ get_bundle_artifacts (EosAppListModel *self,
   }
 
   eos_app_log_info_message ("Downloading hash");
-  sha256_path = create_sha256sum (self, transaction, bundle_path, cancellable, &error);
+  sha256_path = create_sha256sum (self, info, bundle_path, cancellable, &error);
   if (error != NULL) {
     eos_app_log_error_message ("Hash download failed");
 

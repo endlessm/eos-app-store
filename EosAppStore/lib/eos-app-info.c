@@ -58,6 +58,9 @@ eos_app_info_unref (EosAppInfo *info)
       g_free (info->featured_img);
       g_free (info->version);
       g_free (info->locale);
+      g_free (info->bundle_uri);
+      g_free (info->signature_uri);
+      g_free (info->bundle_hash);
       g_strfreev (info->screenshots);
 
       g_slice_free (EosAppInfo, info);
@@ -104,6 +107,24 @@ const char *
 eos_app_info_get_locale (const EosAppInfo *info)
 {
   return info->locale;
+}
+
+const char *
+eos_app_info_get_bundle_uri (const EosAppInfo *info)
+{
+  return info->bundle_uri;
+}
+
+const char *
+eos_app_info_get_signature_uri (const EosAppInfo *info)
+{
+  return info->signature_uri;
+}
+
+const char *
+eos_app_info_get_bundle_hash (const EosAppInfo *info)
+{
+  return info->bundle_hash;
 }
 
 gboolean
@@ -449,6 +470,27 @@ eos_app_info_update_from_server (EosAppInfo *info,
   node = json_object_get_member (obj, JSON_KEYS[SECONDARY_STORAGE]);
   if (node)
     info->on_secondary_storage = json_node_get_boolean (node);
+
+  node = json_object_get_member (obj, "downloadLink");
+  if (node != NULL)
+    {
+      g_free (info->bundle_uri);
+      info->bundle_uri = json_node_dup_string (node);
+    }
+
+  node = json_object_get_member (obj, "signatureLink");
+  if (node != NULL)
+    {
+      g_free (info->signature_uri);
+      info->signature_uri = json_node_dup_string (node);
+    }
+
+  node = json_object_get_member (obj, "shaHash");
+  if (node != NULL)
+    {
+      g_free (info->bundle_hash);
+      info->bundle_hash = json_node_dup_string (node);
+    }
 
   return TRUE;
 }
