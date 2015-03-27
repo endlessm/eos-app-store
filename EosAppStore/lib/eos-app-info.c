@@ -130,7 +130,7 @@ eos_app_info_get_installed_size (const EosAppInfo *info)
 gboolean
 eos_app_info_is_installable (const EosAppInfo *info)
 {
-  return !info->is_installed;
+  return !info->is_installed && info->is_available;
 }
 
 gboolean
@@ -421,6 +421,9 @@ eos_app_info_update_from_server (EosAppInfo *info,
       if (g_strcmp0 (info->desktop_id, json_node_get_string (node)) != 0)
         return;
     }
+
+  /* If we found it here, then it's available */
+  info->is_available = TRUE;
 
   node = json_object_get_member (obj, JSON_KEYS[CODE_VERSION]);
   if (node != NULL)

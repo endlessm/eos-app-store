@@ -37,6 +37,7 @@ struct _EosAppInfo
   guint is_featured : 1;
   guint is_offline : 1;
   guint on_secondary_storage : 1;
+  guint is_available : 1;
   guint is_installed : 1;
   guint update_available : 1;
 };
