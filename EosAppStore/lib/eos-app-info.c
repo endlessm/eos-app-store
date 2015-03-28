@@ -439,18 +439,22 @@ eos_app_info_update_from_server (EosAppInfo *info,
   if (node != NULL)
     {
       const char *version = json_node_get_string (node);
+      int version_cmp = eos_compare_versions (info->version, version);
 
       /* If the server returns a newer version, we update the related fields;
        * otherwise, we keep what we have
        */
-      if (eos_compare_versions (info->version, version) > 0)
+      if (version_cmp > 0)
         return FALSE;
 
-      g_free (info->version);
-      info->version = g_strdup (version);
+      if (version_cmp < 0)
+        {
+          g_free (info->version);
+          info->version = g_strdup (version);
 
-      /* Newer version means we have an update */
-      info->update_available = TRUE;
+          /* Newer version means we have an update */
+          info->update_available = TRUE;
+        }
     }
 
   /* If we found it here, then it's available */
