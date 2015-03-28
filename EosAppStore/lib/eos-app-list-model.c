@@ -334,72 +334,13 @@ load_apps_from_gio (void)
 }
 
 static void
-load_manager_installed_apps_thread_func (GTask *task,
-                                         gpointer source_object,
-                                         gpointer task_data,
-                                         GCancellable *cancellable)
-{
-  EosAppListModel *self = source_object;
-  GError *error = NULL;
-
-  if (!load_manager_installed_apps (self, cancellable))
-    {
-      g_set_error_literal (&error, EOS_APP_LIST_MODEL_ERROR,
-                           EOS_APP_LIST_MODEL_ERROR_NO_UPDATE_AVAILABLE,
-                           "Unable to refresh the applications list");
-      g_task_return_error (task, error);
-      return;
-    }
-
-  g_task_return_boolean (task, TRUE);
-}
-
-static void
-load_manager_installed_apps_async (EosAppListModel *self,
-                                   GCancellable *cancellable,
-                                   GAsyncReadyCallback callback,
-                                   gpointer user_data)
-{
-  GTask *task = g_task_new (self, cancellable, callback, user_data);
-  g_task_run_in_thread (task, load_manager_installed_apps_thread_func);
-  g_object_unref (task);
-}
-
-static gboolean
-load_manager_installed_apps_finish (EosAppListModel *self,
-                                    GAsyncResult *res,
-                                    GError **error)
-{
-  return g_task_propagate_boolean (G_TASK (res), error);
-}
-
-static void
-on_load_installed_apps (GObject *obj,
-                        GAsyncResult *res,
-                        gpointer data G_GNUC_UNUSED)
-{
-  EosAppListModel *self = EOS_APP_LIST_MODEL (obj);
-  GError *error = NULL;
-
-  if (!load_manager_installed_apps_finish (self, res, &error))
-    {
-      g_warning ("%s", error->message);
-      g_error_free (error);
-      return;
-    }
-
-  eos_app_list_model_emit_changed (self);
-}
-
-static void
 on_app_monitor_changed (GAppInfoMonitor *monitor,
                         EosAppListModel *self)
 {
   g_clear_pointer (&self->gio_apps, g_hash_table_unref);
   self->gio_apps = load_apps_from_gio ();
 
-  /* queue a reload of the manager-installed apps */
-  load_manager_installed_apps_async (self, NULL, on_load_installed_apps, NULL);
+  eos_app_list_model_emit_changed (self);
 }
 
 static void
@@ -2364,6 +2305,21 @@ remove_app_thread_func (GTask *task,
       g_task_return_error (task, error);
       return;
     }
+
+  eos_app_log_debug_message ("Re-loading available apps after uninstall");
+
+  /* Remove this info from the apps hash table, and let the code below
+   * take care of resetting the proper state.
+   */
+  g_hash_table_remove (model->apps, desktop_id);
+
+  if (!load_manager_installed_apps (model, cancellable))
+    eos_app_log_error_message ("Unable to re-load installed apps");
+
+  if (!load_manager_available_apps (model, cancellable))
+    eos_app_log_error_message ("Unable to re-load available apps");
+
+  eos_app_list_model_emit_changed (model);
 
   if (!remove_app_from_shell (model, desktop_id, cancellable, &error))
     {
