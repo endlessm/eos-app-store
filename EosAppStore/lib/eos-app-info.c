@@ -435,9 +435,6 @@ eos_app_info_update_from_server (EosAppInfo *info,
 
   JsonObject *obj = json_node_get_object (root);
 
-  /* If we found it here, then it's available */
-  info->is_available = TRUE;
-
   JsonNode *node = json_object_get_member (obj, JSON_KEYS[CODE_VERSION]);
   if (node != NULL)
     {
@@ -455,6 +452,9 @@ eos_app_info_update_from_server (EosAppInfo *info,
       /* Newer version means we have an update */
       info->update_available = TRUE;
     }
+
+  /* If we found it here, then it's available */
+  info->is_available = TRUE;
 
   node = json_object_get_member (obj, JSON_KEYS[LOCALE]);
   if (node != NULL)
