@@ -1802,7 +1802,7 @@ update_app_from_manager (EosAppListModel *self,
   retval = install_latest_app_version (self,
                                        desktop_id,
                                        TRUE, /* Is update? */
-                                       TRUE, /* Allow deltas */
+                                       eos_use_delta_updates (),
                                        cancellable,
                                        &error);
 
@@ -1819,6 +1819,10 @@ update_app_from_manager (EosAppListModel *self,
       /* We don't care what the problem was (at this time) */
       g_clear_error (&error);
     }
+
+  /* There's no point in testing full updates if xdelta was disabled */
+  if (!eos_use_delta_updates ())
+    return retval;
 
   eos_app_log_info_message ("Trying full update of %s",
                             desktop_id);
