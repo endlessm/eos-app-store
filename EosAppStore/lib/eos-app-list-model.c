@@ -556,6 +556,25 @@ out:
 }
 
 static void
+invalidate_app_info (EosAppListModel *self,
+                     const char *desktop_id,
+                     GCancellable *cancellable)
+{
+  /* Remove this info from the apps hash table, and let the code below
+   * take care of resetting the proper state.
+   */
+  g_hash_table_remove (self->apps, desktop_id);
+
+  if (!load_manager_installed_apps (self, cancellable))
+    eos_app_log_error_message ("Unable to re-load installed apps");
+
+  if (!load_manager_available_apps (self, cancellable))
+    eos_app_log_error_message ("Unable to re-load available apps");
+
+  eos_app_list_model_emit_changed (self);
+}
+
+static void
 eos_app_list_model_finalize (GObject *gobject)
 {
   EosAppListModel *self = EOS_APP_LIST_MODEL (gobject);
@@ -1759,18 +1778,7 @@ install_latest_app_version (EosAppListModel *self,
       retval = FALSE;
     }
 
-  /* Remove this info from the apps hash table, and let the code below
-   * take care of resetting the proper state.
-   */
-  g_hash_table_remove (self->apps, desktop_id);
-
-  if (!load_manager_installed_apps (self, cancellable))
-    eos_app_log_error_message ("Unable to re-load installed apps");
-
-  if (!load_manager_available_apps (self, cancellable))
-    eos_app_log_error_message ("Unable to re-load available apps");
-
-  eos_app_list_model_emit_changed (self);
+  invalidate_app_info (self, desktop_id, cancellable);
 
   g_free (transaction_path);
 
@@ -2323,18 +2331,7 @@ remove_app_thread_func (GTask *task,
 
   eos_app_log_debug_message ("Re-loading available apps after uninstall");
 
-  /* Remove this info from the apps hash table, and let the code below
-   * take care of resetting the proper state.
-   */
-  g_hash_table_remove (model->apps, desktop_id);
-
-  if (!load_manager_installed_apps (model, cancellable))
-    eos_app_log_error_message ("Unable to re-load installed apps");
-
-  if (!load_manager_available_apps (model, cancellable))
-    eos_app_log_error_message ("Unable to re-load available apps");
-
-  eos_app_list_model_emit_changed (model);
+  invalidate_app_info (model, desktop_id, cancellable);
 
   if (!remove_app_from_shell (model, desktop_id, cancellable, &error))
     {
