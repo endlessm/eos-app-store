@@ -337,9 +337,9 @@ eos_app_parse_resource_content (const char *content_type,
 
   content_array = json_node_dup_array (node);
 
-  eos_app_log_debug_message ("Content type '%s' loading: %d msecs",
+  eos_app_log_debug_message ("Content type '%s' loading: %.3f msecs",
                              content_type,
-                             (int) (g_get_monotonic_time () - start_time) / 1000);
+                             (double) (g_get_monotonic_time () - start_time) / 1000);
 
  out_error:
   g_object_unref (parser);
@@ -776,9 +776,9 @@ eos_app_load_installed_apps (GHashTable *app_info,
 
   g_dir_close (dir);
 
-  eos_app_log_debug_message ("Bundle loading: %d bundles, %d msecs",
+  eos_app_log_debug_message ("Bundle loading: %d bundles, %.3f msecs",
                              n_bundles,
-                             (int) (g_get_monotonic_time () - start_time) / 1000);
+                             (double) (g_get_monotonic_time () - start_time) / 1000);
 
   return TRUE;
 }
@@ -845,16 +845,14 @@ eos_app_load_available_apps (GHashTable *app_info,
           n_available += 1;
         }
       else
-        {
-          eos_app_log_debug_message ("App '%s' failed to update JSON", appid);
-        }
+        eos_app_log_debug_message ("App '%s' does not have updates", appid);
     }
 
   g_object_unref (parser);
 
-  eos_app_log_debug_message ("Available bundles: %d bundles, %d msecs",
+  eos_app_log_debug_message ("Available bundles: %d bundles, %.3f msecs",
                              n_available,
-                             (int) (g_get_monotonic_time () - start_time) / 1000);
+                             (double) (g_get_monotonic_time () - start_time) / 1000);
 
   return TRUE;
 }
