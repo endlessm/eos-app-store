@@ -478,7 +478,12 @@ eos_app_info_update_from_server (EosAppInfo *info,
        * otherwise, we keep what we have
        */
       if (version_cmp > 0)
-        return FALSE;
+        {
+          eos_app_log_info_message ("Application data for is for an "
+                                    "earlier version of '%s'",
+                                    eos_app_info_get_application_id (info));
+          return FALSE;
+        }
 
       if (version_cmp < 0)
         {
