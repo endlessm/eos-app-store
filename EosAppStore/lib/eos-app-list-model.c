@@ -1474,8 +1474,7 @@ download_bundle (EosAppListModel *self,
   const char *bundle_uri = eos_app_info_get_bundle_uri (info);
   const char *app_id = eos_app_info_get_application_id (info);
 
-  eos_app_log_info_message ("Downloading - bundle URI: %s", bundle_uri);
-  eos_app_log_info_message ("Downloading - bundle app id: %s", app_id);
+  eos_app_log_info_message ("Downloading - app id: %s, bundle URI: %s", app_id, bundle_uri);
 
   if (bundle_uri == NULL || *bundle_uri == '\0')
     {
@@ -1532,42 +1531,42 @@ get_bundle_artifacts (EosAppListModel *self,
                                                 cancellable,
                                                 &error);
 
-  if (error != NULL) {
-    eos_app_log_error_message ("Getting dbus transaction failed");
-
-    goto out;
-  }
+  if (error != NULL)
+    {
+      eos_app_log_error_message ("Getting dbus transaction failed");
+      goto out;
+    }
 
   info = g_hash_table_lookup (self->apps, desktop_id);
-  if (info == NULL) {
-    eos_app_log_error_message ("Getting EosAppInfo failed");
-
-    goto out;
-  }
+  if (info == NULL)
+    {
+      eos_app_log_error_message ("Getting EosAppInfo failed");
+      goto out;
+    }
 
   eos_app_log_info_message ("Downloading bundle");
   bundle_path = download_bundle (self, info, cancellable, &error);
-  if (error != NULL) {
-    eos_app_log_info_message ("Download of bundle failed");
-
-    goto out;
-  }
+  if (error != NULL)
+    {
+      eos_app_log_info_message ("Download of bundle failed");
+      goto out;
+    }
 
   eos_app_log_info_message ("Downloading signature");
   signature_path = download_signature (self, info, cancellable, &error);
-  if (error != NULL) {
-    eos_app_log_error_message ("Signature download failed");
-
-    goto out;
-  }
+  if (error != NULL)
+    {
+      eos_app_log_error_message ("Signature download failed");
+      goto out;
+    }
 
   eos_app_log_info_message ("Downloading hash");
   sha256_path = create_sha256sum (self, info, bundle_path, cancellable, &error);
-  if (error != NULL) {
-    eos_app_log_error_message ("Hash download failed");
-
-    goto out;
-  }
+  if (error != NULL)
+    {
+      eos_app_log_error_message ("Hash download failed");
+      goto out;
+    }
 
   eos_app_log_info_message ("Completing transaction with eam");
 
@@ -1587,34 +1586,31 @@ get_bundle_artifacts (EosAppListModel *self,
     }
 
 out:
-  if (error != NULL) {
-    eos_app_log_error_message ("Completion of transaction %s failed",
-                               transaction_path);
+  if (error != NULL)
+    {
+      eos_app_log_error_message ("Completion of transaction %s failed",
+                                 transaction_path);
 
-    if (transaction != NULL)
-      {
-        /* cancel the transaction on error */
+      /* cancel the transaction on error */
+      if (transaction != NULL)
         eos_app_manager_transaction_call_cancel_transaction_sync (transaction, NULL, NULL);
-      }
 
-    /* delete the downloaded bundle and signature */
-    if (bundle_path)
-      g_unlink (bundle_path);
-    if (signature_path)
-      g_unlink (signature_path);
-    if (sha256_path)
-      g_unlink (sha256_path);
+      /* delete the downloaded bundle and signature */
+      if (bundle_path)
+        g_unlink (bundle_path);
+      if (signature_path)
+        g_unlink (signature_path);
+      if (sha256_path)
+        g_unlink (sha256_path);
 
-    /* Bubble the error up */
-    g_propagate_error (error_out, error);
+      /* Bubble the error up */
+      g_propagate_error (error_out, error);
 
-    return FALSE;
-  }
+      retval = FALSE;
+    }
 
   /* We're done with the transaction now that we've called CompleteTransaction() */
-  if (transaction != NULL)
-    g_clear_object (&transaction);
-
+  g_clear_object (&transaction);
   g_free (bundle_path);
   g_free (signature_path);
   g_free (sha256_path);
