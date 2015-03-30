@@ -121,6 +121,41 @@ eos_get_bundles_dir (void)
   return apps_dir;
 }
 
+gboolean
+eos_use_delta_updates (void)
+{
+  static char *deltaupdates;
+
+  if (g_once_init_enter (&deltaupdates))
+    {
+      gboolean val = FALSE;
+      char *tmp;
+
+      GKeyFile *keyfile = g_key_file_new ();
+      char *path = g_build_filename (SYSCONFDIR, "eos-app-manager", "eam-default.cfg", NULL);
+      GError *error = NULL;
+      g_key_file_load_from_file (keyfile, path, G_KEY_FILE_NONE, &error);
+      if (error == NULL)
+        val = g_key_file_get_boolean (keyfile, "eam", "deltaupdates", &error);
+
+      if (error != NULL)
+        {
+          eos_app_log_error_message ("Unable to load configuration: %s",
+                                     error->message);
+          g_error_free (error);
+        }
+
+      eos_app_log_info_message ("Use delta updates: %s", val ? "yes" : "no");
+
+      /* Need this trick because g_once_init_leave() does not accept 0 */
+      tmp = val ? g_strdup ("true") : g_strdup ("false");
+
+      g_once_init_leave (&deltaupdates, tmp);
+    }
+
+  return g_strcmp0 (deltaupdates, "true") == 0;
+}
+
 static const char *
 get_app_server_url (void)
 {
