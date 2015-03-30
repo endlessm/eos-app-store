@@ -54,8 +54,6 @@ struct _EosAppListModel
   GHashTable *shell_apps;
   GHashTable *apps;
 
-  GCancellable *load_cancellable;
-
   guint applications_changed_id;
   guint changed_guard_id;
 
@@ -578,11 +576,6 @@ static void
 eos_app_list_model_finalize (GObject *gobject)
 {
   EosAppListModel *self = EOS_APP_LIST_MODEL (gobject);
-
-  if (self->load_cancellable != NULL)
-    g_cancellable_cancel (self->load_cancellable);
-
-  g_clear_object (&self->load_cancellable);
 
   if (self->applications_changed_id != 0)
     {
