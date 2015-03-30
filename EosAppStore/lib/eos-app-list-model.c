@@ -1759,10 +1759,17 @@ install_latest_app_version (EosAppListModel *self,
       retval = FALSE;
     }
 
-  /* We do not fail the installation if we could not refresh the
-   * list of installed applications
+  /* Remove this info from the apps hash table, and let the code below
+   * take care of resetting the proper state.
    */
-  load_manager_installed_apps (self, cancellable);
+  g_hash_table_remove (self->apps, desktop_id);
+
+  if (!load_manager_installed_apps (self, cancellable))
+    eos_app_log_error_message ("Unable to re-load installed apps");
+
+  if (!load_manager_available_apps (self, cancellable))
+    eos_app_log_error_message ("Unable to re-load available apps");
+
   eos_app_list_model_emit_changed (self);
 
   g_free (transaction_path);
@@ -2245,19 +2252,6 @@ update_app_thread_func (GTask *task,
       g_task_return_error (task, error);
       return;
     }
-
-  /* Remove this info from the apps hash table, and let the code below
-   * take care of resetting the proper state.
-   */
-  g_hash_table_remove (model->apps, desktop_id);
-
-  if (!load_manager_installed_apps (model, cancellable))
-    eos_app_log_error_message ("Unable to re-load installed apps");
-
-  if (!load_manager_available_apps (model, cancellable))
-    eos_app_log_error_message ("Unable to re-load available apps");
-
-  eos_app_list_model_emit_changed (model);
 
   g_task_return_boolean (task, TRUE);
 }
