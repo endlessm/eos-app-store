@@ -324,6 +324,7 @@ static const gchar *FILE_KEYS[] = {
   "secondary_storage",
   NULL,
   NULL,
+  NULL,
 };
 
 /* JSON fields from app server */
@@ -337,6 +338,7 @@ static const gchar *JSON_KEYS[] = {
   "downloadLink",
   "signatureLink",
   "shaHash",
+  "isDiff",
 };
 
 /* Keep the key ids in sync with the names above */
@@ -350,6 +352,7 @@ enum {
   DOWNLOAD_LINK,
   SIGNATURE_LINK,
   SHA_HASH,
+  IS_DIFF,
 
   N_KEYS
 };
@@ -450,7 +453,22 @@ eos_app_info_update_from_server (EosAppInfo *info,
 
   JsonObject *obj = json_node_get_object (root);
 
-  JsonNode *node = json_object_get_member (obj, JSON_KEYS[CODE_VERSION]);
+  JsonNode *node;
+
+  node = json_object_get_member (obj, JSON_KEYS[IS_DIFF]);
+  if (node != NULL)
+    {
+      if (json_node_get_boolean (node) && !eos_use_delta_updates ())
+        {
+          eos_app_log_info_message ("Application data is for a delta "
+                                    "update of '%s', and delta updates "
+                                    "are disabled.",
+                                    eos_app_info_get_application_id (info));
+          return FALSE;
+        }
+    }
+
+  node = json_object_get_member (obj, JSON_KEYS[CODE_VERSION]);
   if (node != NULL)
     {
       const char *version = json_node_get_string (node);
