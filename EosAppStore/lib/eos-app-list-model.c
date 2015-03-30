@@ -61,6 +61,7 @@ struct _EosAppListModel
 
   gboolean can_install;
   gboolean can_uninstall;
+  gboolean caps_loaded;
 
   SoupSession *soup_session;
 
@@ -405,6 +406,9 @@ load_user_capabilities (EosAppListModel *self,
   GVariant *capabilities;
   GError *error = NULL;
 
+  if (self->caps_loaded)
+    return TRUE;
+
   EosAppManager *proxy = get_eam_dbus_proxy (self);
   if (proxy == NULL)
     {
@@ -435,6 +439,8 @@ load_user_capabilities (EosAppListModel *self,
   g_variant_lookup (capabilities, "CanInstall", "b", &self->can_install);
   g_variant_lookup (capabilities, "CanUninstall", "b", &self->can_uninstall);
   g_variant_unref (capabilities);
+
+  self->caps_loaded = TRUE;
 
   eos_app_log_debug_message ("CanInstall: %s",
                              self->can_install ? "Yes" : "No");
