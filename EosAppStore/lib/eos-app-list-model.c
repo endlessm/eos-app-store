@@ -39,7 +39,7 @@
  * If not available in current language, English is the
  * preferred next option, so list it first.
  */
-static gchar *app_lang_ids[] = {"-en", "-ar", "-es", "-fr", "-pt", NULL};
+static const char *app_lang_ids[] = { "-en", "-ar", "-es", "-fr", "-pt", NULL };
 
 struct _EosAppListModel
 {
@@ -266,8 +266,8 @@ get_localized_app_info (EosAppListModel *model,
    */
   for (idx = 0; app_lang_ids[idx] != NULL; idx++)
     {
-      lang_id = app_lang_ids[idx];
-      localized_id = localized_id_from_desktop_id (desktop_id, lang_id);
+      const char *suffix = app_lang_ids[idx];
+      localized_id = localized_id_from_desktop_id (desktop_id, suffix);
       info = g_hash_table_lookup (model->gio_apps, localized_id);
       g_free (localized_id);
 
