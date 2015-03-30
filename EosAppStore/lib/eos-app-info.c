@@ -3,8 +3,9 @@
 #include "config.h"
 
 #include "eos-app-info-private.h"
-#include "eos-app-utils.h"
 #include "eos-app-enums.h"
+#include "eos-app-log.h"
+#include "eos-app-utils.h"
 #include "eos-flexy-grid.h"
 
 #include <sys/types.h>
@@ -441,7 +442,11 @@ eos_app_info_update_from_server (EosAppInfo *info,
                                  JsonNode *root)
 {
   if (!JSON_NODE_HOLDS_OBJECT (root))
-    return FALSE;
+    {
+      eos_app_log_error_message ("Application data for '%s' is malformed.",
+                                 eos_app_info_get_application_id (info));
+      return FALSE;
+    }
 
   JsonObject *obj = json_node_get_object (root);
 
@@ -465,6 +470,14 @@ eos_app_info_update_from_server (EosAppInfo *info,
           /* Newer version means we have an update */
           info->update_available = TRUE;
         }
+    }
+  else
+    {
+      eos_app_log_error_message ("Application data for '%s' is missing the "
+                                 "required '%s' field.",
+                                 eos_app_info_get_application_id (info),
+                                 JSON_KEYS[CODE_VERSION]);
+      return FALSE;
     }
 
   /* If we found it here, then it's available */
