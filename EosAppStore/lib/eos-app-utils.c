@@ -115,6 +115,9 @@ eos_get_bundles_dir (void)
 
       eos_app_log_info_message ("Bundles dir: %s", tmp);
 
+      g_free (path);
+      g_key_file_free (keyfile);
+
       g_once_init_leave (&apps_dir, tmp);
     }
 
@@ -149,6 +152,9 @@ eos_use_delta_updates (void)
 
       /* Need this trick because g_once_init_leave() does not accept 0 */
       tmp = val ? g_strdup ("true") : g_strdup ("false");
+
+      g_free (path);
+      g_key_file_free (keyfile);
 
       g_once_init_leave (&deltaupdates, tmp);
     }
