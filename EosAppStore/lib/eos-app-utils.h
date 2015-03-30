@@ -43,9 +43,6 @@ const char *eos_get_download_dir (void);
 
 gboolean eos_use_delta_updates (void);
 
-gboolean eos_app_load_content_apps (GHashTable *app_info,
-                                    GCancellable *cancellable,
-                                    GError **error);
 gboolean eos_app_load_installed_apps (GHashTable *app_info,
                                       const char *appdir,
                                       GCancellable *cancellable,
