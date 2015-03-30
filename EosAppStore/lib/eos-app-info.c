@@ -321,6 +321,8 @@ static const gchar *FILE_KEYS[] = {
   "locale",
   "installed_size",
   "secondary_storage",
+  NULL,
+  NULL,
 };
 
 /* JSON fields from app server */
@@ -331,6 +333,9 @@ static const gchar *JSON_KEYS[] = {
   "Locale",
   "installedSize",
   "secondaryStorage",
+  "downloadLink",
+  "signatureLink",
+  "shaHash",
 };
 
 /* Keep the key ids in sync with the names above */
@@ -340,7 +345,12 @@ enum {
   CODE_VERSION,
   LOCALE,
   INSTALLED_SIZE,
-  SECONDARY_STORAGE
+  SECONDARY_STORAGE,
+  DOWNLOAD_LINK,
+  SIGNATURE_LINK,
+  SHA_HASH,
+
+  N_KEYS
 };
 
 /*< private >
@@ -475,21 +485,21 @@ eos_app_info_update_from_server (EosAppInfo *info,
   if (node)
     info->on_secondary_storage = json_node_get_boolean (node);
 
-  node = json_object_get_member (obj, "downloadLink");
+  node = json_object_get_member (obj, JSON_KEYS[DOWNLOAD_LINK]);
   if (node != NULL)
     {
       g_free (info->bundle_uri);
       info->bundle_uri = json_node_dup_string (node);
     }
 
-  node = json_object_get_member (obj, "signatureLink");
+  node = json_object_get_member (obj, JSON_KEYS[SIGNATURE_LINK]);
   if (node != NULL)
     {
       g_free (info->signature_uri);
       info->signature_uri = json_node_dup_string (node);
     }
 
-  node = json_object_get_member (obj, "shaHash");
+  node = json_object_get_member (obj, JSON_KEYS[SHA_HASH]);
   if (node != NULL)
     {
       g_free (info->bundle_hash);
