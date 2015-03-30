@@ -810,6 +810,7 @@ eos_app_load_installed_apps (GHashTable *app_info,
       else
         {
           eos_app_log_debug_message ("App '%s' failed to update from installed info", appid);
+          eos_app_info_unref (info);
         }
 
       g_free (info_path);
@@ -886,7 +887,10 @@ eos_app_load_available_apps (GHashTable *app_info,
           n_available += 1;
         }
       else
-        eos_app_log_debug_message ("App '%s' does not have updates", appid);
+        {
+          eos_app_log_debug_message ("App '%s' does not have updates", appid);
+          eos_app_info_unref (info);
+        }
     }
 
   g_object_unref (parser);
