@@ -1595,19 +1595,19 @@ out:
       if (transaction != NULL)
         eos_app_manager_transaction_call_cancel_transaction_sync (transaction, NULL, NULL);
 
-      /* delete the downloaded bundle and signature */
-      if (bundle_path)
-        g_unlink (bundle_path);
-      if (signature_path)
-        g_unlink (signature_path);
-      if (sha256_path)
-        g_unlink (sha256_path);
-
       /* Bubble the error up */
       g_propagate_error (error_out, error);
 
       retval = FALSE;
     }
+
+  /* delete the downloaded bundle and signature */
+  if (bundle_path)
+    g_unlink (bundle_path);
+  if (signature_path)
+    g_unlink (signature_path);
+  if (sha256_path)
+    g_unlink (sha256_path);
 
   /* We're done with the transaction now that we've called CompleteTransaction() */
   g_clear_object (&transaction);
