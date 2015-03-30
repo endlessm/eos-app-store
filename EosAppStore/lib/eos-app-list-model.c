@@ -1681,7 +1681,9 @@ install_latest_app_version (EosAppListModel *self,
   /* We use different DBus targets but everything else is same */
   if (is_upgrade)
     {
-      eos_app_log_info_message ("Calling update dbus method with app_id: %s", app_id);
+      eos_app_log_info_message ("Calling update (deltas: %s) dbus method with app_id: %s",
+                                allow_deltas ? "enabled" : "disabled",
+                                app_id);
       eos_app_manager_call_update_sync (proxy, app_id, allow_deltas,
                                         &transaction_path,
                                         NULL,
