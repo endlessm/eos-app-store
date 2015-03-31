@@ -167,8 +167,8 @@ const AppListBoxRow = new Lang.Class({
         this.appState = this._model.getState(this._appId);
     },
 
-    _downloadProgress: function(model, appid, progress, current, total) {
-        if (this.appId != appid) {
+    _downloadProgress: function(model, contentId, progress, current, total) {
+        if (this.appInfo.get_content_id() != contentId) {
             return;
         }
 

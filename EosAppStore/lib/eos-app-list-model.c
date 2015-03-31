@@ -176,27 +176,6 @@ get_language_id (void)
   return lang_id;
 }
 
-static gchar *
-unlocalized_desktop_id_from_app_id (const gchar *app_id)
-{
-  gchar *lang_id;
-  gchar *unlocalized_app_id;
-  gchar *retval;
-
-  lang_id = get_language_id ();
-  if (g_str_has_suffix (app_id, lang_id))
-    unlocalized_app_id = g_strndup (app_id, strlen (app_id) - strlen (lang_id));
-  else
-    unlocalized_app_id = g_strdup (app_id);
-
-  retval = g_strconcat (unlocalized_app_id, ".desktop", NULL);
-
-  g_free (lang_id);
-  g_free (unlocalized_app_id);
-
-  return retval;
-}
-
 static gboolean
 app_is_installable (EosAppListModel *model,
                     const char *desktop_id)
@@ -765,14 +744,14 @@ add_app_to_shell (EosAppListModel *self,
   return TRUE;
 }
 
-typedef void (* ProgressReportFunc) (const char *app_id,
+typedef void (* ProgressReportFunc) (EosAppInfo *info,
                                      goffset current,
                                      goffset total,
                                      gpointer user_data);
 
 typedef struct {
   EosAppListModel *model;
-  char *desktop_id;
+  EosAppInfo *info;
   goffset current;
   goffset total;
 } ProgressClosure;
@@ -783,7 +762,7 @@ progress_closure_free (gpointer _data)
   ProgressClosure *data = _data;
 
   g_clear_object (&data->model);
-  g_free (data->desktop_id);
+  eos_app_info_unref (data->info);
 
   g_slice_free (ProgressClosure, data);
 }
@@ -794,7 +773,7 @@ emit_download_progress (gpointer _data)
   ProgressClosure *data = _data;
 
   g_signal_emit (data->model, eos_app_list_model_signals[DOWNLOAD_PROGRESS], 0,
-                 data->desktop_id,
+                 eos_app_info_get_content_id (data->info),
                  data->current,
                  data->total);
 
@@ -802,16 +781,16 @@ emit_download_progress (gpointer _data)
 }
 
 static void
-queue_download_progress (const char      *app_id,
-                         goffset          current,
-                         goffset          total,
-                         gpointer         user_data)
+queue_download_progress (EosAppInfo *info,
+                         goffset     current,
+                         goffset     total,
+                         gpointer    user_data)
 {
   EosAppListModel *self = user_data;
   ProgressClosure *clos = g_slice_new (ProgressClosure);
 
   clos->model = g_object_ref (self);
-  clos->desktop_id = unlocalized_desktop_id_from_app_id (app_id);
+  clos->info = eos_app_info_ref (info);
   clos->current = current;
   clos->total = total;
 
@@ -886,7 +865,7 @@ static SoupRequest *
 prepare_soup_request (SoupSession  *session,
                       const char   *source_uri,
                       const char   *content_type,
-                      const char   *app_id,
+                      EosAppInfo   *info,
                       GError      **error)
 {
   GError *internal_error = NULL;
@@ -898,8 +877,9 @@ prepare_soup_request (SoupSession  *session,
 
       eos_app_log_error_message ("Soap URI is NULL - canceling download");
 
-      if (app_id != NULL)
-        error_message = g_strdup_printf (_("No available bundle for '%s'"), app_id);
+      if (info != NULL)
+        error_message = g_strdup_printf (_("No available bundle for '%s'"),
+                                         eos_app_info_get_application_id (info));
       else
         error_message = g_strdup (_("No available data on the server"));
 
@@ -1017,7 +997,7 @@ set_up_download_from_request (SoupRequest   *request,
 
 static GOutputStream *
 prepare_out_stream (const char    *target_file,
-                    const char    *app_id,
+                    EosAppInfo    *info,
                     GCancellable  *cancellable,
                     GError       **error)
 {
@@ -1032,9 +1012,9 @@ prepare_out_stream (const char    *target_file,
 
       eos_app_log_error_message ("Create file failed - canceling download");
 
-      if (app_id != NULL)
+      if (info != NULL)
         error_message = g_strdup_printf (_("Unable to create the file for downloading '%s': %s"),
-                                         app_id,
+                                         eos_app_info_get_application_id (info),
                                          internal_error->message);
       else
         error_message = g_strdup_printf (_("Unable to update the list of available applications: %s"),
@@ -1061,7 +1041,7 @@ typedef void (* ChunkFunc) (GByteArray *chunk,
 static gboolean
 download_file_chunks (GInputStream   *in_stream,
                       GOutputStream  *out_stream,
-                      const char     *app_id,
+                      EosAppInfo     *info,
                       gsize          *bytes_read,
                       ChunkFunc       chunk_func,
                       gpointer        chunk_func_user_data,
@@ -1109,9 +1089,9 @@ download_file_chunks (GInputStream   *in_stream,
 
       eos_app_log_info_message ("Canceled download");
 
-      if (app_id != NULL)
+      if (info != NULL)
         error_message = g_strdup_printf (_("Download of app '%s' cancelled by the user."),
-                                         app_id);
+                                         eos_app_info_get_application_id (info));
       else
         error_message = g_strdup (_("Refresh of available apps cancelled by the user."));
 
@@ -1240,7 +1220,7 @@ out:
 typedef struct {
   ProgressReportFunc  progress_func;
   gpointer            progress_func_user_data;
-  const char         *app_id;
+  EosAppInfo         *info;
   gsize               total_len;
 } DownloadAppFileClosure;
 
@@ -1253,14 +1233,14 @@ download_app_file_chunk_func (GByteArray *chunk,
   DownloadAppFileClosure *clos = chunk_func_user_data;
 
   if (clos->progress_func != NULL)
-    clos->progress_func (clos->app_id,
+    clos->progress_func (clos->info,
                          bytes_read, clos->total_len,
                          clos->progress_func_user_data);
 }
 
 static gboolean
 download_app_file_from_uri (EosAppListModel *self,
-                            const char      *app_id,
+                            EosAppInfo      *info,
                             const char      *source_uri,
                             const char      *target_file,
                             ProgressReportFunc progress_func,
@@ -1280,7 +1260,7 @@ download_app_file_from_uri (EosAppListModel *self,
   GInputStream *in_stream = NULL;
   GOutputStream *out_stream = NULL;
   SoupRequest *request = prepare_soup_request (self->soup_session, source_uri,
-                                               NULL, app_id,
+                                               NULL, info,
                                                error);
   if (request == NULL)
     goto out;
@@ -1290,7 +1270,7 @@ download_app_file_from_uri (EosAppListModel *self,
   if (in_stream == NULL)
     goto out;
 
-  out_stream = prepare_out_stream (target_file, app_id,
+  out_stream = prepare_out_stream (target_file, info,
                                    cancellable, error);
   if (out_stream == NULL)
     goto out;
@@ -1299,16 +1279,16 @@ download_app_file_from_uri (EosAppListModel *self,
 
   /* ensure we emit a progress notification at the beginning */
   if (progress_func != NULL)
-    progress_func (app_id, 0, total, progress_func_user_data);
+    progress_func (info, 0, total, progress_func_user_data);
 
   DownloadAppFileClosure *clos = g_slice_new0 (DownloadAppFileClosure);
   clos->progress_func = progress_func;
   clos->progress_func_user_data = progress_func_user_data;
-  clos->app_id = app_id;
+  clos->info = info;
   clos->total_len = total;
 
   retval = download_file_chunks (in_stream, out_stream,
-                                 app_id, &bytes_read,
+                                 info, &bytes_read,
                                  download_app_file_chunk_func, clos,
                                  cancellable, error);
 
@@ -1320,7 +1300,7 @@ download_app_file_from_uri (EosAppListModel *self,
 
   /* emit a progress notification for the whole file, in any case */
   if (progress_func != NULL)
-    progress_func (app_id, total, total, progress_func_user_data);
+    progress_func (info, total, total, progress_func_user_data);
 
 out:
   g_clear_object (&in_stream);
@@ -1332,7 +1312,7 @@ out:
 
 static gboolean
 download_app_file_from_uri_with_retry (EosAppListModel *self,
-                                       const char      *app_id,
+                                       EosAppInfo      *info,
                                        const char      *source_uri,
                                        const char      *target_file,
                                        ProgressReportFunc progress_func,
@@ -1354,7 +1334,7 @@ download_app_file_from_uri_with_retry (EosAppListModel *self,
      */
     while (TRUE)
       {
-        download_success = download_app_file_from_uri (self, app_id, source_uri,
+        download_success = download_app_file_from_uri (self, info, source_uri,
                                                        target_file,
                                                        progress_func,
                                                        progress_func_user_data,
@@ -1468,7 +1448,7 @@ download_signature (EosAppListModel *self,
   char *signature_path = g_build_filename (BUNDLEDIR, signature_name, NULL);
   g_free (signature_name);
 
-  if (!download_app_file_from_uri_with_retry (self, app_id,
+  if (!download_app_file_from_uri_with_retry (self, info,
                                               signature_uri, signature_path,
                                               NULL, NULL,
                                               cancellable, &error))
@@ -1508,7 +1488,7 @@ download_bundle (EosAppListModel *self,
 
   eos_app_log_info_message ("Bundle save path is %s", bundle_path);
 
-  if (!download_app_file_from_uri_with_retry (self, app_id,
+  if (!download_app_file_from_uri_with_retry (self, info,
                                               bundle_uri, bundle_path,
                                               queue_download_progress, self,
                                               cancellable, &error))

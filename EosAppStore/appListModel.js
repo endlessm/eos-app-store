@@ -176,7 +176,7 @@ const AppList = new Lang.Class({
     Name: 'AppList',
     Extends: BaseList,
 
-    _onDownloadProgress: function(model, appid, current, total) {
+    _onDownloadProgress: function(model, contentId, current, total) {
         let progress;
 
         if (current == 0) {
@@ -189,7 +189,7 @@ const AppList = new Lang.Class({
             progress = current / total;
         }
 
-        this.emit('download-progress', appid, progress, current, total);
+        this.emit('download-progress', contentId, progress, current, total);
     },
 
     _onModelChanged: function(model) {
