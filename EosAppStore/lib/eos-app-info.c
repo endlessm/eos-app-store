@@ -34,9 +34,6 @@ eos_app_info_new (const char *application_id)
 EosAppInfo *
 eos_app_info_ref (EosAppInfo *info)
 {
-  if (info == NULL)
-    return NULL;
-
   g_atomic_int_inc (&(info->ref_count));
 
   return info;
@@ -45,9 +42,6 @@ eos_app_info_ref (EosAppInfo *info)
 void
 eos_app_info_unref (EosAppInfo *info)
 {
-  if (info == NULL)
-    return;
-
   if (g_atomic_int_dec_and_test (&(info->ref_count)))
     {
       g_free (info->application_id);
@@ -187,7 +181,7 @@ eos_app_info_get_category (const EosAppInfo *info)
 char *
 eos_app_info_get_square_img (const EosAppInfo *info)
 {
-  if (info == NULL || info->square_img == NULL || info->square_img[0] == '\0')
+  if (info->square_img == NULL || info->square_img[0] == '\0')
     return NULL;
 
   return g_strdup_printf ("resource:///com/endlessm/appstore-content/apps/%s",
@@ -205,7 +199,7 @@ eos_app_info_get_square_img (const EosAppInfo *info)
 char *
 eos_app_info_get_featured_img (const EosAppInfo *info)
 {
-  if (info == NULL || info->featured_img == NULL || info->featured_img[0] == '\0')
+  if (info->featured_img == NULL || info->featured_img[0] == '\0')
     return NULL;
 
   return g_strdup_printf ("resource:///com/endlessm/appstore-content/apps/%s",
@@ -215,9 +209,6 @@ eos_app_info_get_featured_img (const EosAppInfo *info)
 guint
 eos_app_info_get_n_screenshots (const EosAppInfo *info)
 {
-  if (info == NULL)
-    return 0;
-
   return info->n_screenshots;
 }
 
