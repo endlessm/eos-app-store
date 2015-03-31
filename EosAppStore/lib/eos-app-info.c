@@ -74,12 +74,30 @@ eos_app_info_get_subtitle (const EosAppInfo *info)
   return g_dpgettext2 (CONTENT_GETTEXT_PACKAGE, "subtitle", info->subtitle);
 }
 
+/**
+ * eos_app_info_get_desktop_id:
+ * @info: an #EosAppInfo
+ *
+ * Returns the application ID of @info. This is the application ID
+ * with a .desktop suffix.
+ *
+ * Returns: the desktop ID.
+ */
 const char *
 eos_app_info_get_desktop_id (const EosAppInfo *info)
 {
   return info->desktop_id;
 }
 
+/**
+ * eos_app_info_get_application_id:
+ * @info: an #EosAppInfo
+ *
+ * Returns the application ID of @info. This is the desktop ID
+ * without the .desktop suffix.
+ *
+ * Returns: the application ID.
+ */
 const char *
 eos_app_info_get_application_id (const EosAppInfo *info)
 {
