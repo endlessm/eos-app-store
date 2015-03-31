@@ -831,9 +831,8 @@ check_available_space (GFile         *path,
   GFileInfo *info;
   gboolean retval = TRUE;
 
-  if (path == NULL) {
+  if (path == NULL)
     eos_app_log_error_message ("File doesn't exist");
-  }
 
   eos_app_log_info_message ("Trying to get filesystem info from %s",
                             g_file_get_path(path));
@@ -841,12 +840,12 @@ check_available_space (GFile         *path,
   info = g_file_query_filesystem_info (path, G_FILE_ATTRIBUTE_FILESYSTEM_FREE,
                                        cancellable,
                                        error);
-  if (info == NULL) {
-    eos_app_log_error_message ("Can't get filesystem info to calculate"
-                               "the available space");
-
-    return FALSE;
-  }
+  if (info == NULL)
+    {
+      eos_app_log_error_message ("Can't get filesystem info to calculate"
+                                 "the available space");
+      return FALSE;
+    }
 
   guint64 free_space = g_file_info_get_attribute_uint64 (info, G_FILE_ATTRIBUTE_FILESYSTEM_FREE);
 
@@ -1353,7 +1352,8 @@ download_app_file_from_uri_with_retry (EosAppListModel *self,
     /* Keep trying to download unless we finish successfully or we reach
      * the retry timeout
      */
-    while (TRUE) {
+    while (TRUE)
+      {
         download_success = download_app_file_from_uri (self, app_id, source_uri,
                                                        target_file,
                                                        progress_func,
@@ -1368,32 +1368,35 @@ download_app_file_from_uri_with_retry (EosAppListModel *self,
 
         /* If we got canceled, also bail */
         if (g_error_matches (error, EOS_APP_LIST_MODEL_ERROR,
-                             EOS_APP_LIST_MODEL_ERROR_CANCELLED)) {
-          eos_app_log_error_message ("Download cancelled. Breaking out of retry loop.");
-          g_propagate_error (error_out, error);
-          break;
-        }
+                             EOS_APP_LIST_MODEL_ERROR_CANCELLED))
+          {
+            eos_app_log_error_message ("Download cancelled. Breaking out of retry loop.");
+            g_propagate_error (error_out, error);
+            break;
+          }
 
         eos_app_log_error_message ("Error downloading. Checking if retries are needed");
 
-        if (reset_error_counter) {
+        if (reset_error_counter)
+          {
             eos_app_log_info_message ("Some data retrieved during download failure. "
                                       "Resetting retry timeouts.");
             error_retry_cutoff = 0;
-        }
+          }
 
         /* If this is our first retry, record the start time */
         if (error_retry_cutoff == 0)
             error_retry_cutoff = g_get_monotonic_time () + retry_time_limit;
 
         /* If we reached our limit of retry time, exit */
-        if (g_get_monotonic_time () >= error_retry_cutoff) {
+        if (g_get_monotonic_time () >= error_retry_cutoff)
+          {
             eos_app_log_error_message ("Retry limit reached. Exiting with failure");
 
             g_propagate_error (error_out, error);
 
             break;
-        }
+          }
 
         /* Ignore the error if we need to run again */
         g_clear_error (&error);
@@ -1404,7 +1407,7 @@ download_app_file_from_uri_with_retry (EosAppListModel *self,
         g_usleep (DOWNLOAD_RETRY_PERIOD * G_USEC_PER_SEC);
 
         eos_app_log_error_message ("Continuing download loop...");
-    }
+      }
 
     return download_success;
 }
@@ -2443,9 +2446,6 @@ get_fs_available_space (void)
   GFileInfo *filesystem_info = NULL;
   GError *error = NULL;
 
-  /* We start of with the assumtion that we have the space */
-  guint64 available_space = G_MAXUINT64;
-
   /* Whatever FS we're on, check the space */
   current_directory = g_file_new_for_path (".");
 
@@ -2456,19 +2456,18 @@ get_fs_available_space (void)
 
   g_object_unref (current_directory);
 
-  if (error != NULL) {
-    eos_app_log_error_message ("Could not retrieve available space: %s",
-                               error->message);
-    return available_space;
-  }
+  if (error != NULL)
+    {
+      eos_app_log_error_message ("Could not retrieve available space: %s",
+                                 error->message);
+      g_error_free (error);
 
-  if (filesystem_info == NULL) {
-    eos_app_log_error_message ("Could not retrieve available space");
-    return available_space;
-  }
+      /* Assume we have the space */
+      return G_MAXUINT64;
+    }
 
-  available_space = g_file_info_get_attribute_uint64 (filesystem_info,
-                                                      G_FILE_ATTRIBUTE_FILESYSTEM_FREE);
+  guint64 available_space = g_file_info_get_attribute_uint64 (filesystem_info,
+                                                              G_FILE_ATTRIBUTE_FILESYSTEM_FREE);
 
   eos_app_log_debug_message ("Available space: %" G_GUINT64_FORMAT, available_space);
 
@@ -2482,38 +2481,17 @@ eos_app_list_model_get_app_has_sufficient_install_space (EosAppListModel *model,
                                                          const char *desktop_id)
 {
   guint64 installed_size = 0;
-  const gchar *real_desktop_id;
+  gchar *localized_id;
 
-  if (desktop_id == NULL) {
-    eos_app_log_error_message ("Desktop ID for %s is NULL!", desktop_id);
-    return FALSE;
-  }
-
-  /* If we don't know about the app, then we can't really say that we
-   * can install it.
-   */
-  if (g_hash_table_contains (model->apps, desktop_id))
-    real_desktop_id = desktop_id;
-  else
+  localized_id = app_get_localized_id_for_installable_app (model, desktop_id);
+  if (localized_id == NULL)
     {
-      /* Maybe we need a localized ID */
-      eos_app_log_debug_message ("Can't find the app ID (%s). "
-                                 "Trying a localized one.", desktop_id);
-
-      /* XXX: We don't expect this to be hit for an installed app */
-      real_desktop_id = app_get_localized_id_for_installable_app (model, desktop_id);
-
-      /* Make sure that this ID is available */
-      if (!real_desktop_id || !g_hash_table_contains (model->apps,
-                                                      real_desktop_id)) {
-
-        eos_app_log_error_message ("Could not even find a localized ID (%s)!",
-                                   real_desktop_id);
+        eos_app_log_error_message ("Can't find app ID matching %s while checking install space",
+                                   desktop_id);
         return FALSE;
-      }
     }
 
-  EosAppInfo *info = g_hash_table_lookup (model->apps, real_desktop_id);
+  EosAppInfo *info = g_hash_table_lookup (model->apps, localized_id);
   installed_size = eos_app_info_get_installed_size (info);
 
   eos_app_log_debug_message ("App %s installed size: %" G_GINT64_FORMAT,
