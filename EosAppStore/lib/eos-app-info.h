@@ -9,45 +9,54 @@
 G_BEGIN_DECLS
 
 #define EOS_TYPE_APP_INFO       (eos_app_info_get_type ())
-#define EOS_TYPE_APP_CELL       (eos_app_cell_get_type ())
 
 typedef struct _EosAppInfo      EosAppInfo;
 
-typedef struct _EosAppCell      EosAppCell;
-typedef struct _EosAppCellClass EosAppCellClass;
-
-GType eos_app_cell_get_type (void);
 GType eos_app_info_get_type (void);
 
-EosAppInfo *    eos_app_info_new                (void);
-EosAppInfo *    eos_app_info_ref                (EosAppInfo *info);
-void            eos_app_info_unref              (EosAppInfo *info);
+EosAppInfo *    eos_app_info_new                        (const char *application_id);
+EosAppInfo *    eos_app_info_ref                        (EosAppInfo *info);
+void            eos_app_info_unref                      (EosAppInfo *info);
 
-const char *    eos_app_info_get_title          (const EosAppInfo *info);
-const char *    eos_app_info_get_subtitle       (const EosAppInfo *info);
-const char *    eos_app_info_get_desktop_id     (const EosAppInfo *info);
-const char *    eos_app_info_get_description    (const EosAppInfo *info);
+const char *    eos_app_info_get_application_id         (const EosAppInfo *info);
+const char *    eos_app_info_get_title                  (const EosAppInfo *info);
+const char *    eos_app_info_get_subtitle               (const EosAppInfo *info);
+const char *    eos_app_info_get_desktop_id             (const EosAppInfo *info);
+const char *    eos_app_info_get_description            (const EosAppInfo *info);
+const char *    eos_app_info_get_version                (const EosAppInfo *info);
+gint64          eos_app_info_get_installed_size         (const EosAppInfo *info);
+const char *    eos_app_info_get_locale                 (const EosAppInfo *info);
 
-gboolean        eos_app_info_is_featured        (const EosAppInfo *info);
-gboolean        eos_app_info_is_offline         (const EosAppInfo *info);
-EosAppCategory  eos_app_info_get_category       (const EosAppInfo *info);
+gboolean        eos_app_info_is_featured                (const EosAppInfo *info);
+gboolean        eos_app_info_is_offline                 (const EosAppInfo *info);
+gboolean        eos_app_info_is_on_secondary_storage    (const EosAppInfo *info);
+EosAppCategory  eos_app_info_get_category               (const EosAppInfo *info);
 
-char *          eos_app_info_get_square_img     (const EosAppInfo *info);
-char *          eos_app_info_get_featured_img   (const EosAppInfo *info);
+char *          eos_app_info_get_square_img             (const EosAppInfo *info);
+char *          eos_app_info_get_featured_img           (const EosAppInfo *info);
 
-guint           eos_app_info_get_n_screenshots  (const EosAppInfo *info);
-char **         eos_app_info_get_screenshots    (const EosAppInfo *info);
+const char *    eos_app_info_get_bundle_uri             (const EosAppInfo *info);
+const char *    eos_app_info_get_signature_uri          (const EosAppInfo *info);
+const char *    eos_app_info_get_bundle_hash            (const EosAppInfo *info);
 
-GtkWidget *     eos_app_info_create_cell        (const EosAppInfo *info,
-                                                 const gchar *icon_name);
+guint           eos_app_info_get_n_screenshots          (const EosAppInfo *info);
+char **         eos_app_info_get_screenshots            (const EosAppInfo *info);
 
-gint            eos_app_info_get_cell_margin    (void);
+gboolean        eos_app_info_is_installable             (const EosAppInfo *info);
+gboolean        eos_app_info_is_updatable               (const EosAppInfo *info);
+gboolean        eos_app_info_is_removable               (const EosAppInfo *info);
 
 #ifndef __GI_SCANNER__
 
 /* private */
 G_GNUC_INTERNAL
-EosAppInfo *    eos_app_info_create_from_json   (JsonNode *node);
+EosAppInfo *    eos_app_info_create_from_content        (JsonNode *node);
+G_GNUC_INTERNAL
+gboolean        eos_app_info_update_from_server         (EosAppInfo *info,
+                                                         JsonNode   *node);
+G_GNUC_INTERNAL
+gboolean        eos_app_info_update_from_installed      (EosAppInfo *info,
+                                                         const char *filename);
 
 #endif
 

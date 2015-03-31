@@ -3,7 +3,7 @@
 #ifndef EOS_APP_UTILS_H
 #define EOS_APP_UTILS_H
 
-#include <glib.h>
+#include <gio/gio.h>
 #include <webkit2/webkit2.h>
 #include "eos-app-enums.h"
 #include "eos-app-info.h"
@@ -34,6 +34,26 @@ void    eos_save_icon            (GdkPixbuf       *pixbuf,
                                   const gchar     *filename);
 
 GdkNotifyType eos_get_event_notify_type (GdkEvent *event);
+
+char *  eos_get_all_updates_uri (void);
+char *  eos_get_updates_file (void);
+
+const char *eos_get_bundles_dir (void);
+const char *eos_get_download_dir (void);
+
+gboolean eos_use_delta_updates (void);
+
+gboolean eos_app_load_installed_apps (GHashTable *app_info,
+                                      const char *appdir,
+                                      GCancellable *cancellable,
+                                      GError **error);
+gboolean eos_app_load_available_apps (GHashTable *app_info,
+                                      const char *data,
+                                      GCancellable *cancellable,
+                                      GError **error);
+
+int eos_compare_versions (const char *a,
+                          const char *b);
 
 G_END_DECLS
 

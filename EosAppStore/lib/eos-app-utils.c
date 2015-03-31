@@ -3,6 +3,8 @@
 #include "config.h"
 
 #include "eos-app-utils.h"
+
+#include "eos-app-log.h"
 #include "eos-link-info.h"
 
 #include <locale.h>
@@ -13,8 +15,11 @@
 #define APP_STORE_CONTENT_APPS  "apps"
 #define APP_STORE_CONTENT_LINKS "links"
 
-static const gchar *
-get_system_personality (void)
+#define DOWNLOAD_DIR_DEFAULT    LOCALSTATEDIR "/tmp/eos-app-store"
+#define APP_DIR_DEFAULT         "/endless"
+
+static const char *
+get_os_personality (void)
 {
   static char *personality;
 
@@ -59,10 +64,225 @@ get_system_personality (void)
       if (tmp == NULL)
         tmp = g_strdup ("default");
 
+      eos_app_log_info_message ("Personality: %s", tmp);
+
       g_once_init_leave (&personality, tmp);
     }
 
   return personality;
+}
+
+const char *
+eos_get_download_dir (void)
+{
+  static char *download_url;
+
+  if (g_once_init_enter (&download_url))
+    {
+      char *tmp = g_build_filename (g_get_user_cache_dir (), "com.endlessm.AppStore", NULL);
+
+      eos_app_log_info_message ("Download dir: %s", tmp);
+
+      g_once_init_leave (&download_url, tmp);
+    }
+
+  return download_url;
+}
+
+const char *
+eos_get_bundles_dir (void)
+{
+  static char *apps_dir;
+
+  if (g_once_init_enter (&apps_dir))
+    {
+      char *tmp;
+
+      GKeyFile *keyfile = g_key_file_new ();
+      char *path = g_build_filename (SYSCONFDIR, "eos-app-manager", "eam-default.cfg", NULL);
+      GError *error = NULL;
+      g_key_file_load_from_file (keyfile, path, G_KEY_FILE_NONE, &error);
+      if (error == NULL)
+        tmp = g_key_file_get_string (keyfile, "eam", "appdir", &error);
+
+      if (error != NULL)
+        {
+          eos_app_log_error_message ("Unable to load configuration: %s",
+                                     error->message);
+          g_error_free (error);
+          tmp = g_strdup (APP_DIR_DEFAULT);
+        }
+
+      eos_app_log_info_message ("Bundles dir: %s", tmp);
+
+      g_free (path);
+      g_key_file_free (keyfile);
+
+      g_once_init_leave (&apps_dir, tmp);
+    }
+
+  return apps_dir;
+}
+
+gboolean
+eos_use_delta_updates (void)
+{
+  static char *deltaupdates;
+
+  if (g_once_init_enter (&deltaupdates))
+    {
+      gboolean val = FALSE;
+      char *tmp;
+
+      GKeyFile *keyfile = g_key_file_new ();
+      char *path = g_build_filename (SYSCONFDIR, "eos-app-manager", "eam-default.cfg", NULL);
+      GError *error = NULL;
+      g_key_file_load_from_file (keyfile, path, G_KEY_FILE_NONE, &error);
+      if (error == NULL)
+        val = g_key_file_get_boolean (keyfile, "eam", "deltaupdates", &error);
+
+      if (error != NULL)
+        {
+          eos_app_log_error_message ("Unable to load configuration: %s",
+                                     error->message);
+          g_error_free (error);
+        }
+
+      eos_app_log_info_message ("Use delta updates: %s", val ? "yes" : "no");
+
+      /* Need this trick because g_once_init_leave() does not accept 0 */
+      tmp = val ? g_strdup ("true") : g_strdup ("false");
+
+      g_free (path);
+      g_key_file_free (keyfile);
+
+      g_once_init_leave (&deltaupdates, tmp);
+    }
+
+  return g_strcmp0 (deltaupdates, "true") == 0;
+}
+
+static const char *
+get_app_server_url (void)
+{
+  static char *server_url;
+
+  if (g_once_init_enter (&server_url))
+    {
+      char *tmp;
+
+      GKeyFile *keyfile = g_key_file_new ();
+      char *path = g_build_filename (SYSCONFDIR, "eos-app-manager", "eam-default.cfg", NULL);
+      GError *error = NULL;
+      g_key_file_load_from_file (keyfile, path, G_KEY_FILE_NONE, &error);
+      if (error == NULL)
+        tmp = g_key_file_get_string (keyfile, "eam", "serveraddress", &error);
+
+      if (error != NULL)
+        {
+          eos_app_log_error_message ("Unable to load configuration: %s",
+                                     error->message);
+          g_error_free (error);
+          tmp = g_strdup ("http://appupdates.endlessm.com/");
+        }
+
+      eos_app_log_info_message ("Server address: %s", tmp);
+
+      g_once_init_leave (&server_url, tmp);
+    }
+
+  return server_url;
+}
+
+/*
+ * Parse the /etc/os-release file if present:
+ * http://www.freedesktop.org/software/systemd/man/os-release.html
+ */
+static gboolean
+parse_os_release_file (gchar  **version_id,
+                       GError **error)
+{
+  char *contents = NULL;
+  char **lines;
+  gint idx;
+
+  if (!g_file_get_contents (SYSCONFDIR "/os-release", &contents, NULL, error))
+    return FALSE;
+
+  lines = g_strsplit (contents, "\n", -1);
+  g_free (contents);
+
+  gboolean ret = FALSE;
+
+  for (idx = 0; lines[idx] != NULL; idx++)
+    {
+      char *line = lines[idx];
+
+      line = g_strstrip (line);
+
+      if (!g_str_has_prefix (line, "VERSION_ID"))
+        continue;
+
+      char *p = strchr (line, '=');
+      if (p == NULL)
+        continue;
+
+      p += 1;
+      if (p == '\0')
+        continue;
+
+      while (g_ascii_isspace (*p) || *p == '"')
+        p++;
+
+      char *start = p;
+      if (p == '\0')
+        continue;
+
+      while (*p != '"' && *p != '\0')
+        p++;
+
+      *version_id = g_strndup (start, p - start);
+      ret = TRUE;
+      break;
+    }
+
+  g_strfreev (lines);
+
+  return ret;
+}
+
+static const char *
+get_os_version (void)
+{
+  static char *os_version;
+
+  if (g_once_init_enter (&os_version))
+    {
+      char *tmp = NULL;
+
+      GError *error = NULL;
+      parse_os_release_file (&tmp, &error);
+      if (error != NULL)
+        {
+          eos_app_log_error_message ("Cannot parse os-release file: %s", error->message);
+          g_error_free (error);
+
+          tmp = g_strdup ("1.0");
+        }
+
+      eos_app_log_info_message ("OS Version: %s", tmp);
+
+      g_once_init_leave (&os_version, tmp);
+    }
+
+  return os_version;
+}
+
+static const char *
+get_os_arch (void)
+{
+  /* Defined at configure time */
+  return EOS_ARCH;
 }
 
 static char *
@@ -70,7 +290,7 @@ eos_get_content_dir (const gchar *content_type)
 {
   char *res = g_build_filename (DATADIR,
                                 APP_STORE_CONTENT_DIR,
-                                get_system_personality (),
+                                get_os_personality (),
                                 content_type,
                                 NULL);
 
@@ -114,8 +334,11 @@ eos_link_get_category_name (EosLinkCategory category)
 }
 
 static JsonArray *
-eos_app_parse_resource_content (const char *content_type, const char *content_name)
+eos_app_parse_resource_content (const char *content_type,
+                                const char *content_name,
+                                GError **error_out)
 {
+  gint64 start_time = g_get_monotonic_time ();
   JsonArray *content_array = NULL;
   GError *error = NULL;
   JsonParser *parser = json_parser_new ();
@@ -127,7 +350,7 @@ eos_app_parse_resource_content (const char *content_type, const char *content_na
   if (error != NULL)
     {
       g_critical ("Unable to load content from '%s': %s", content_file, error->message);
-      g_error_free (error);
+      g_propagate_error (error_out, error);
       goto out_error;
     }
 
@@ -139,18 +362,25 @@ eos_app_parse_resource_content (const char *content_type, const char *content_na
   if (error != NULL)
     {
       g_critical ("Unable to load content from '%s': %s", content_file, error->message);
-      g_error_free (error);
+      g_propagate_error (error_out, error);
       goto out_error;
     }
 
   JsonNode *node = json_parser_get_root (parser);
   if (!JSON_NODE_HOLDS_ARRAY (node))
     {
-      g_critical ("Expected array content");
+      g_set_error (error_out,
+                   JSON_READER_ERROR,
+                   JSON_READER_ERROR_NO_ARRAY,
+                   "Expected array content");
       goto out_error;
     }
 
   content_array = json_node_dup_array (node);
+
+  eos_app_log_debug_message ("Content type '%s' loading: %.3f msecs",
+                             content_type,
+                             (double) (g_get_monotonic_time () - start_time) / 1000);
 
  out_error:
   g_object_unref (parser);
@@ -200,7 +430,7 @@ eos_app_load_content (EosAppCategory category,
                       EosAppFilterCallback callback,
                       gpointer data)
 {
-  JsonArray *array = eos_app_parse_resource_content (APP_STORE_CONTENT_APPS, "content");
+  JsonArray *array = eos_app_parse_resource_content (APP_STORE_CONTENT_APPS, "content", NULL);
 
   if (array == NULL)
     return NULL;
@@ -212,11 +442,12 @@ eos_app_load_content (EosAppCategory category,
     {
       JsonNode *element = json_array_get_element (array, i);
 
-      EosAppInfo *info = eos_app_info_create_from_json (element);
+      EosAppInfo *info = eos_app_info_create_from_content (element);
       if (info == NULL)
         continue;
 
-      if (category == EOS_APP_CATEGORY_INSTALLED)
+      if (category == EOS_APP_CATEGORY_INSTALLED ||
+          category == EOS_APP_CATEGORY_ALL)
         {
           /* do nothing */
         }
@@ -265,7 +496,7 @@ eos_link_load_content (EosLinkCategory category)
   JsonObject *obj;
   const gchar *category_name;
 
-  JsonArray *categories_array = eos_app_parse_resource_content (APP_STORE_CONTENT_LINKS, get_system_personality ());
+  JsonArray *categories_array = eos_app_parse_resource_content (APP_STORE_CONTENT_LINKS, get_os_personality (), NULL);
 
   if (categories_array == NULL)
     return NULL;
@@ -481,4 +712,404 @@ GdkNotifyType
 eos_get_event_notify_type (GdkEvent *event)
 {
   return ((GdkEventCrossing *) event)->detail;
+}
+
+char *
+eos_get_updates_file (void)
+{
+  return g_build_filename (eos_get_download_dir (), "updates.json", NULL);
+}
+
+char *
+eos_get_all_updates_uri (void)
+{
+  return g_strconcat (get_app_server_url (),
+                      "/api/v1/updates/",
+                      get_os_version (),
+                      "?arch=", get_os_arch (),
+                      "&personality=", get_os_personality (),
+                      NULL);
+}
+
+static gboolean
+is_app_id (const char *appid)
+{
+  static const char alsoallowed[] = "-+.";
+  static const char *reserveddirs[] = { "bin", "share", "lost+found", "xdg", };
+
+  if (!appid || appid[0] == '\0')
+    return FALSE;
+
+  guint i;
+  for (i = 0; i < G_N_ELEMENTS (reserveddirs); i++)
+    {
+      if (g_strcmp0 (appid, reserveddirs[i]) == 0)
+        return FALSE;
+    }
+
+  if (!g_ascii_isalnum (appid[0]))
+    return FALSE; /* must start with an alphanumeric character */
+
+  int c;
+  while ((c = *appid++) != '\0')
+    {
+      if (!g_ascii_isalnum (c) && !strchr (alsoallowed, c))
+        break;
+    }
+
+  if (!c)
+    return TRUE;
+
+  return FALSE;
+}
+
+gboolean
+eos_app_load_installed_apps (GHashTable *app_info,
+                             const char *appdir,
+                             GCancellable *cancellable,
+                             GError **error)
+{
+  GDir *dir = g_dir_open (appdir, 0, error);
+  if (dir == NULL)
+    return FALSE;
+
+  gint64 start_time = g_get_monotonic_time ();
+
+  int n_bundles = 0;
+  const char *appid;
+  while ((appid = g_dir_read_name (dir)) != NULL)
+    {
+      if (g_cancellable_is_cancelled (cancellable))
+        break;
+
+      if (!is_app_id (appid))
+        {
+          eos_app_log_info_message ("Skipping '%s'...", appid);
+          continue;
+        }
+
+      char *info_path = g_build_filename (appdir, appid, ".info", NULL);
+      eos_app_log_info_message ("Loading bundle info for '%s' from '%s'...", appid, info_path);
+
+      char *desktop_id = g_strconcat (appid, ".desktop", NULL);
+      EosAppInfo *info = g_hash_table_lookup (app_info, desktop_id);
+      g_free (desktop_id);
+
+      if (info == NULL)
+        info = eos_app_info_new (appid);
+      else
+        eos_app_info_ref (info);
+
+      if (eos_app_info_update_from_installed (info, info_path))
+        {
+          g_hash_table_replace (app_info,
+                                g_strdup (eos_app_info_get_desktop_id (info)),
+                                info);
+          n_bundles += 1;
+        }
+      else
+        {
+          eos_app_log_debug_message ("App '%s' failed to update from installed info", appid);
+          eos_app_info_unref (info);
+        }
+
+      g_free (info_path);
+    }
+
+  g_dir_close (dir);
+
+  eos_app_log_debug_message ("Bundle loading: %d bundles, %.3f msecs",
+                             n_bundles,
+                             (double) (g_get_monotonic_time () - start_time) / 1000);
+
+  return TRUE;
+}
+
+gboolean
+eos_app_load_available_apps (GHashTable *app_info,
+                             const char *data,
+                             GCancellable *cancellable,
+                             GError **error)
+{
+  JsonParser *parser = json_parser_new ();
+
+  gint64 start_time = g_get_monotonic_time ();
+
+  if (!json_parser_load_from_data (parser, data, -1, error))
+    {
+      g_object_unref (parser);
+      return FALSE;
+    }
+
+  JsonNode *root = json_parser_get_root (parser);
+  if (!JSON_NODE_HOLDS_ARRAY (root))
+    {
+      g_object_unref (parser);
+      return FALSE;
+    }
+
+  int n_available = 0;
+  JsonArray *array = json_node_get_array (root);
+  guint i, len = json_array_get_length (array);
+  for (i = 0; i < len; i++)
+    {
+      JsonNode *element;
+
+      if (g_cancellable_is_cancelled (cancellable))
+        break;
+
+      element = json_array_get_element (array, i);
+
+      if (!JSON_NODE_HOLDS_OBJECT (element))
+        continue;
+
+      JsonObject *obj = json_node_get_object (element);
+      if (!json_object_has_member (obj, "appId"))
+        continue;
+
+      const char *appid = json_object_get_string_member (obj, "appId");
+      eos_app_log_info_message ("Loading JSON server info for '%s'", appid);
+
+      char *desktop_id = g_strconcat (appid, ".desktop", NULL);
+      EosAppInfo *info = g_hash_table_lookup (app_info, desktop_id);
+      g_free (desktop_id);
+
+      if (info == NULL)
+        info = eos_app_info_new (appid);
+      else
+        eos_app_info_ref (info);
+
+      if (eos_app_info_update_from_server (info, element))
+        {
+          g_hash_table_replace (app_info,
+                                g_strdup (eos_app_info_get_desktop_id (info)),
+                                info);
+          n_available += 1;
+        }
+      else
+        {
+          eos_app_log_debug_message ("App '%s' does not have updates", appid);
+          eos_app_info_unref (info);
+        }
+    }
+
+  g_object_unref (parser);
+
+  eos_app_log_debug_message ("Available bundles: %d bundles, %.3f msecs",
+                             n_available,
+                             (double) (g_get_monotonic_time () - start_time) / 1000);
+
+  return TRUE;
+}
+
+typedef struct {
+  char *version;
+  char *revision;
+  guint epoch;
+} PkgVersion;
+
+static gboolean
+pkg_version_init (PkgVersion *ver,
+                  const char *str)
+{
+  const gchar *end, *ptr;
+
+  ver->version = ver->revision = NULL;
+
+  if (str == NULL || *str == '\0')
+    return FALSE;
+
+  if (!g_str_is_ascii (str))
+    return FALSE;
+
+  /* Trim leading and trailing space. */
+  while (*str && g_ascii_isspace (*str))
+    str++;
+
+  /* String now points to the first non-whitespace char. */
+  end = str;
+
+  /* Find either the end of the string, or a whitespace char. */
+  while (*end && !g_ascii_isspace (*end))
+    end++;
+
+  /* Check for extra chars after trailing space. */
+  ptr = end;
+  while (*ptr && g_ascii_isspace (*ptr))
+    ptr++;
+
+  if (*ptr)
+    return FALSE; /* version string has embedded spaces */
+
+  char *colon = strchr (str, ':');
+  if (colon)
+    {
+      char *eepochcolon;
+      double epoch = g_strtod (str, &eepochcolon);
+
+      if (colon != eepochcolon)
+        return FALSE; /* epoch is not a number */
+
+      if (epoch < 0)
+        return FALSE; /* epoch is negative */
+
+      if (epoch > G_MAXINT)
+        return FALSE; /* epoch is too big */
+
+      if (!*++colon)
+        return FALSE; /* nothing after colon in version number */
+
+      str = colon;
+
+      ver->epoch = epoch;
+    }
+  else
+    ver->epoch = 0;
+
+  ver->version = g_strndup (str, end - str);
+
+  char *hyphen = strrchr (ver->version, '-');
+  if (hyphen)
+    *hyphen++ = '\0';
+
+  ver->revision = hyphen ? g_strdup (hyphen) : NULL;
+
+  ptr = ver->version;
+  if (ptr != NULL && *ptr && !g_ascii_isdigit (*ptr++))
+    return FALSE; /* version number doesn't start with digit */
+
+  for (; ptr && *ptr; ptr++)
+    {
+      if (!g_ascii_isdigit (*ptr) &&
+          !g_ascii_isalpha (*ptr) &&
+          strchr (".-+~:", *ptr) == NULL)
+        return FALSE; /* invalid character in version number */
+    }
+
+  for (ptr = ver->revision; ptr && *ptr; ptr++)
+    {
+      if (!g_ascii_isdigit (*ptr) &&
+          !g_ascii_isalpha (*ptr) &&
+          strchr (".+~", *ptr) == NULL)
+        return FALSE; /* invalid characters in revision number */
+    }
+
+  return TRUE;
+}
+
+static void
+pkg_version_clear (PkgVersion *ver)
+{
+  g_free (ver->version);
+  g_free (ver->revision);
+}
+
+static gint
+order (gint c)
+{
+  if (g_ascii_isdigit (c))
+    return 0;
+
+  if (g_ascii_isalpha (c))
+    return c;
+
+  if (c == '~')
+    return -1;
+
+  if (c)
+    return c + 256;
+
+  return 0;
+}
+
+static gint
+verrevcmp (const char *a,
+           const char *b)
+{
+  if (a == NULL)
+    a = "";
+  if (b == NULL)
+    b = "";
+
+  while (*a || *b) {
+    int first_diff = 0;
+
+    while ((*a && !g_ascii_isdigit (*a)) || (*b && !g_ascii_isdigit (*b))) {
+      int ac = order (*a);
+      int bc = order (*b);
+
+      if (ac != bc)
+        return ac - bc;
+
+      a++;
+      b++;
+    }
+
+    while (*a == '0')
+      a++;
+
+    while (*b == '0')
+      b++;
+
+    while (g_ascii_isdigit (*a) && g_ascii_isdigit (*b)) {
+      if (!first_diff)
+        first_diff = *a - *b;
+      a++;
+      b++;
+    }
+
+    if (g_ascii_isdigit (*a))
+      return 1;
+    if (g_ascii_isdigit (*b))
+      return -1;
+    if (first_diff)
+      return first_diff;
+  }
+
+  return 0;
+}
+
+static int
+pkg_version_compare (const PkgVersion *a,
+                     const PkgVersion *b)
+{
+  int rc;
+
+  if (a->epoch > b->epoch)
+    return 1;
+
+  if (a->epoch < b->epoch)
+    return -1;
+
+  rc = verrevcmp (a->version, b->version);
+  if (rc)
+    return rc;
+
+  return verrevcmp (a->revision, b->revision);
+}
+
+int
+eos_compare_versions (const char *a,
+                      const char *b)
+{
+  PkgVersion ver_a, ver_b;
+
+  /* Really quick shortcut */
+  if (g_strcmp0 (a, b) == 0)
+    return 0;
+
+  /* Version A not valid or missing, so it's older */
+  if (!pkg_version_init (&ver_a, a))
+    return -1;
+
+  /* Version B not valid or missing, so it's older */
+  if (!pkg_version_init (&ver_b, b))
+    return 1;
+
+  int res = pkg_version_compare (&ver_a, &ver_b);
+
+  pkg_version_clear (&ver_a);
+  pkg_version_clear (&ver_b);
+
+  return res;
 }

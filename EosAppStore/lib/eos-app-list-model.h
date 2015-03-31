@@ -48,9 +48,6 @@ gboolean eos_app_list_model_get_app_has_sufficient_install_space
                                                     (EosAppListModel *model,
                                                      const char *desktop_id);
 
-gint64 eos_app_list_model_get_app_installed_size    (EosAppListModel *model,
-                                                     const char *desktop_id);
-
 gboolean eos_app_list_model_launch_app              (EosAppListModel *model,
                                                      const char *desktop_id,
                                                      guint32 timestamp,
