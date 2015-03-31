@@ -1798,22 +1798,22 @@ update_app_from_manager (EosAppListModel *self,
                                        &error);
 
   /* Incremental update worked. Nothing else is needed */
-  if (retval && error == NULL)
+  if (retval)
     return TRUE;
 
-  if (error)
-    {
-      eos_app_log_info_message ("Update of %s using deltas failed: %s",
-                                desktop_id,
-                                error->message);
-
-      /* We don't care what the problem was (at this time) */
-      g_clear_error (&error);
-    }
+  eos_app_log_info_message ("Update of %s using deltas failed: %s",
+                            desktop_id,
+                            error->message);
 
   /* There's no point in testing full updates if xdelta was disabled */
   if (!eos_use_delta_updates ())
-    return retval;
+    {
+      g_propagate_error (error_out, error);
+      return FALSE;
+    }
+
+  /* We don't care what the problem was (at this time) */
+  g_clear_error (&error);
 
   eos_app_log_info_message ("Trying full update of %s",
                             desktop_id);
