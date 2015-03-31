@@ -19,9 +19,10 @@ EosAppInfo *    eos_app_info_ref                        (EosAppInfo *info);
 void            eos_app_info_unref                      (EosAppInfo *info);
 
 const char *    eos_app_info_get_application_id         (const EosAppInfo *info);
+const char *    eos_app_info_get_desktop_id             (const EosAppInfo *info);
+const char *    eos_app_info_get_content_id             (const EosAppInfo *info);
 const char *    eos_app_info_get_title                  (const EosAppInfo *info);
 const char *    eos_app_info_get_subtitle               (const EosAppInfo *info);
-const char *    eos_app_info_get_desktop_id             (const EosAppInfo *info);
 const char *    eos_app_info_get_description            (const EosAppInfo *info);
 const char *    eos_app_info_get_version                (const EosAppInfo *info);
 gint64          eos_app_info_get_installed_size         (const EosAppInfo *info);

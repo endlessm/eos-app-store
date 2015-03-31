@@ -17,6 +17,48 @@
 
 G_DEFINE_BOXED_TYPE (EosAppInfo, eos_app_info, eos_app_info_ref, eos_app_info_unref)
 
+static gboolean
+language_is_valid (const char *id)
+{
+  int len = strlen (id);
+
+  /* This is a bit hacky for now. We limit locales to
+   * be of the xx or xx_YY forms.
+   */
+  if (len != 5 && len != 2)
+    return FALSE;
+
+  if (!g_ascii_islower (id[0]) || !g_ascii_islower (id[1]))
+    return FALSE;
+
+  if (len == 5 &&
+      (!g_ascii_isupper (id[3]) || !g_ascii_isupper (id[4])))
+    return FALSE;
+
+  return TRUE;
+}
+
+static char *
+content_id_from_application_id (const char *application_id)
+{
+  /* This function translates an application ID to the ID used in the content
+   * JSON. These two will typically be the same, except for endless knowledge apps.
+   */
+  if (!g_str_has_prefix (application_id, "com.endlessm."))
+    return g_strdup (application_id);
+
+  /* Find the last dash in the application ID */
+  char *ptr = g_strrstr (application_id, "-");
+  if (ptr == NULL)
+    return g_strdup (application_id);
+
+  /* Verify that this is a valid locale */
+  if (language_is_valid (ptr + 1))
+    return g_strndup (application_id, ptr - application_id);
+
+  return g_strdup (application_id);
+}
+
 EosAppInfo *
 eos_app_info_new (const char *application_id)
 {
@@ -26,6 +68,7 @@ eos_app_info_new (const char *application_id)
   info->ref_count = 1;
 
   info->application_id = g_strdup (application_id);
+  info->content_id = content_id_from_application_id (application_id);
   info->desktop_id = g_strdup_printf ("%s.desktop", info->application_id);
 
   return info;
@@ -46,6 +89,7 @@ eos_app_info_unref (EosAppInfo *info)
     {
       g_free (info->application_id);
       g_free (info->desktop_id);
+      g_free (info->content_id);
       g_free (info->title);
       g_free (info->subtitle);
       g_free (info->description);
@@ -102,6 +146,12 @@ const char *
 eos_app_info_get_application_id (const EosAppInfo *info)
 {
   return info->application_id;
+}
+
+const char *
+eos_app_info_get_content_id (const EosAppInfo *info)
+{
+  return info->content_id;
 }
 
 const char *
