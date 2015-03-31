@@ -1753,8 +1753,10 @@ install_latest_app_version (EosAppListModel *self,
 
       retval = FALSE;
     }
-
-  invalidate_app_info (self, desktop_id, cancellable);
+  else
+    {
+      invalidate_app_info (self, desktop_id, cancellable);
+    }
 
   g_free (transaction_path);
 
