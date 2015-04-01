@@ -405,7 +405,7 @@ load_user_capabilities (EosAppListModel *self,
     {
       eos_app_log_error_message ("Unable to list retrieve user capabilities: %s",
                                  error->message);
-      g_critical ("Unable to list retrieve user capabilities: %s",
+      g_critical ("Unable to retrieve user capabilities: %s",
                   error->message);
 
       g_propagate_error (error_out, error);
@@ -433,13 +433,8 @@ load_manager_available_apps (EosAppListModel *self,
 {
   GError *error = NULL;
 
-  if (!load_available_apps (self, cancellable, &error))
-    goto out;
+  load_available_apps (self, cancellable, &error);
 
-  if (!load_user_capabilities (self, cancellable, &error))
-    goto out;
-
-out:
   if (error != NULL)
     {
       g_critical ("Unable to list available apps: %s", error->message);
@@ -650,6 +645,8 @@ refresh_thread_func (GTask *task,
 {
   EosAppListModel *model = source_object;
   GError *error = NULL;
+
+  load_user_capabilities (model, cancellable, NULL);
 
   if (!load_all_apps (model, cancellable, &error))
     {
