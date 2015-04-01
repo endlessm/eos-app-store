@@ -39,7 +39,7 @@
  * If not available in current language, English is the
  * preferred next option, so list it first.
  */
-static const char *app_lang_ids[] = { "-en", "-ar", "-es", "-fr", "-pt", NULL };
+static const char *app_lang_ids[] = { "-en", "-ar", "-es_GT", "-es", "-fr", "-pt", NULL };
 
 struct _EosAppListModel
 {
