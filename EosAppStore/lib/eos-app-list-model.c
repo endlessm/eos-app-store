@@ -2387,7 +2387,7 @@ eos_app_list_model_has_app (EosAppListModel *model,
 {
   gchar *localized_id;
 
-  if (eos_app_list_model_get_app_info (model, desktop_id) != NULL)
+  if (app_is_installed (model, desktop_id))
     return TRUE;
 
   if (app_is_installable (model, desktop_id))
