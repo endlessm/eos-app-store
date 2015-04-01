@@ -140,9 +140,6 @@ eos_app_list_model_emit_changed (EosAppListModel *self)
 
 #define WEB_LINK_ID_PREFIX "eos-link-"
 
-static gboolean load_manager_installed_apps (EosAppListModel *self,
-                                             GCancellable *cancellable);
-
 static gboolean
 desktop_id_is_web_link (const gchar *desktop_id)
 {
