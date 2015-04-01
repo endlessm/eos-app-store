@@ -377,8 +377,7 @@ load_available_apps (EosAppListModel *self,
 
 static gboolean
 load_user_capabilities (EosAppListModel *self,
-                        GCancellable *cancellable,
-                        GError **error_out)
+                        GCancellable *cancellable)
 {
   GVariant *capabilities;
   GError *error = NULL;
@@ -407,8 +406,6 @@ load_user_capabilities (EosAppListModel *self,
                                  error->message);
       g_critical ("Unable to retrieve user capabilities: %s",
                   error->message);
-
-      g_propagate_error (error_out, error);
 
       return FALSE;
     }
@@ -646,7 +643,7 @@ refresh_thread_func (GTask *task,
   EosAppListModel *model = source_object;
   GError *error = NULL;
 
-  load_user_capabilities (model, cancellable, NULL);
+  load_user_capabilities (model, cancellable);
 
   if (!load_all_apps (model, cancellable, &error))
     {
