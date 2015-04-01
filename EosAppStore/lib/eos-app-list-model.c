@@ -563,6 +563,12 @@ eos_app_list_model_finalize (GObject *gobject)
       self->applications_changed_id = 0;
     }
 
+  if (self->changed_guard_id != 0)
+    {
+      g_source_remove (self->changed_guard_id);
+      self->changed_guard_id = 0;
+    }
+
   g_object_unref (&self->proxy);
 
   g_clear_object (&self->soup_session);
