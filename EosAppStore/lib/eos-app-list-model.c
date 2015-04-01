@@ -155,22 +155,37 @@ app_id_from_desktop_id (const gchar *desktop_id)
   return g_strndup (desktop_id, len - 8); /* the 8 here is the length of ".desktop" */
 }
 
-static gchar *
-get_language_id (void)
+static gchar **
+get_language_ids (void)
 {
   const gchar * const * locales;
   const gchar *locale_name;
-  gchar *lang_id;
   gchar **variants;
+  GPtrArray *lang_ids;
+  gint idx;
 
+  lang_ids = g_ptr_array_new ();
   locales = g_get_language_names ();
   locale_name = locales[0];
 
+  /* We want to return an array with all the possible variants
+   * for the current locale, except those that specify an encoding,
+   * since our language IDs all assume UTF-8.
+   */
   variants = g_get_locale_variants (locale_name);
-  lang_id = g_strdup_printf ("-%s", variants[g_strv_length (variants) - 1]);
+  for (idx = 0; variants[idx] != NULL; idx++)
+    {
+      /* Variants with encoding are identified with a dot */
+      if (g_strrstr (variants[idx], ".") != NULL)
+        continue;
+
+      g_ptr_array_add (lang_ids, g_strdup_printf ("-%s", variants[idx]));
+    }
+
+  g_ptr_array_add (lang_ids, NULL);
   g_strfreev (variants);
 
-  return lang_id;
+  return (gchar **) g_ptr_array_free (lang_ids, FALSE);
 }
 
 static gboolean
@@ -204,16 +219,26 @@ get_localized_desktop_id (EosAppListModel *model,
                           const gchar *desktop_id)
 {
   gchar *localized_id;
-  gchar *lang_id;
+  gchar **lang_ids;
+  gint idx;
 
-  lang_id = get_language_id ();
-  localized_id = localized_id_from_desktop_id (desktop_id, lang_id);
-  g_free (lang_id);
+  lang_ids = get_language_ids ();
 
-  if (app_is_installable (model, localized_id))
-    return localized_id;
+  for (idx = 0; lang_ids[idx] != NULL; idx++)
+    {
+      localized_id = localized_id_from_desktop_id (desktop_id, lang_ids[idx]);
 
-  g_free (localized_id);
+      if (app_is_installable (model, localized_id))
+        {
+          g_strfreev (lang_ids);
+          return localized_id;
+        }
+
+      g_free (localized_id);
+    }
+
+  g_strfreev (lang_ids);
+
   return NULL;
 }
 
@@ -223,18 +248,26 @@ get_localized_app_info (EosAppListModel *model,
 {
   GDesktopAppInfo *info;
   gchar *localized_id;
-  gchar *lang_id;
+  gchar **lang_ids;
   gint idx;
 
-  lang_id = get_language_id ();
-  localized_id = localized_id_from_desktop_id (desktop_id, lang_id);
-  g_free (lang_id);
+  lang_ids = get_language_ids ();
 
-  info = g_hash_table_lookup (model->gio_apps, localized_id);
-  g_free (localized_id);
+  for (idx = 0; lang_ids[idx] != NULL; idx++)
+    {
+      localized_id = localized_id_from_desktop_id (desktop_id, lang_ids[idx]);
 
-  if (info)
-    return info;
+      info = g_hash_table_lookup (model->gio_apps, localized_id);
+      g_free (localized_id);
+
+      if (info)
+        {
+          g_strfreev (lang_ids);
+          return info;
+        }
+    }
+
+  g_strfreev (lang_ids);
 
   /* If app is not installed in the user's current language,
    * consider all other supported languages, starting with English.
