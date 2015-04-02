@@ -17,6 +17,48 @@
 
 G_DEFINE_BOXED_TYPE (EosAppInfo, eos_app_info, eos_app_info_ref, eos_app_info_unref)
 
+static gboolean
+language_is_valid (const char *id)
+{
+  int len = strlen (id);
+
+  /* This is a bit hacky for now. We limit locales to
+   * be of the xx or xx_YY forms.
+   */
+  if (len != 5 && len != 2)
+    return FALSE;
+
+  if (!g_ascii_islower (id[0]) || !g_ascii_islower (id[1]))
+    return FALSE;
+
+  if (len == 5 &&
+      (id[2] != '_' || !g_ascii_isupper (id[3]) || !g_ascii_isupper (id[4])))
+    return FALSE;
+
+  return TRUE;
+}
+
+static char *
+content_id_from_application_id (const char *application_id)
+{
+  /* This function translates an application ID to the ID used in the content
+   * JSON. These two will typically be the same, except for endless knowledge apps.
+   */
+  if (!g_str_has_prefix (application_id, "com.endlessm."))
+    return g_strdup (application_id);
+
+  /* Find the last dash in the application ID */
+  char *ptr = g_strrstr (application_id, "-");
+  if (ptr == NULL)
+    return g_strdup (application_id);
+
+  /* Verify that this is a valid locale */
+  if (language_is_valid (ptr + 1))
+    return g_strndup (application_id, ptr - application_id);
+
+  return g_strdup (application_id);
+}
+
 EosAppInfo *
 eos_app_info_new (const char *application_id)
 {
@@ -26,6 +68,7 @@ eos_app_info_new (const char *application_id)
   info->ref_count = 1;
 
   info->application_id = g_strdup (application_id);
+  info->content_id = content_id_from_application_id (application_id);
   info->desktop_id = g_strdup_printf ("%s.desktop", info->application_id);
 
   return info;
@@ -34,9 +77,6 @@ eos_app_info_new (const char *application_id)
 EosAppInfo *
 eos_app_info_ref (EosAppInfo *info)
 {
-  if (info == NULL)
-    return NULL;
-
   g_atomic_int_inc (&(info->ref_count));
 
   return info;
@@ -45,13 +85,11 @@ eos_app_info_ref (EosAppInfo *info)
 void
 eos_app_info_unref (EosAppInfo *info)
 {
-  if (info == NULL)
-    return;
-
   if (g_atomic_int_dec_and_test (&(info->ref_count)))
     {
       g_free (info->application_id);
       g_free (info->desktop_id);
+      g_free (info->content_id);
       g_free (info->title);
       g_free (info->subtitle);
       g_free (info->description);
@@ -80,16 +118,40 @@ eos_app_info_get_subtitle (const EosAppInfo *info)
   return g_dpgettext2 (CONTENT_GETTEXT_PACKAGE, "subtitle", info->subtitle);
 }
 
+/**
+ * eos_app_info_get_desktop_id:
+ * @info: an #EosAppInfo
+ *
+ * Returns the desktop ID of @info. This is the application ID
+ * with a .desktop suffix.
+ *
+ * Returns: the desktop ID.
+ */
 const char *
 eos_app_info_get_desktop_id (const EosAppInfo *info)
 {
   return info->desktop_id;
 }
 
+/**
+ * eos_app_info_get_application_id:
+ * @info: an #EosAppInfo
+ *
+ * Returns the application ID of @info. This is the desktop ID
+ * without the .desktop suffix.
+ *
+ * Returns: the application ID.
+ */
 const char *
 eos_app_info_get_application_id (const EosAppInfo *info)
 {
   return info->application_id;
+}
+
+const char *
+eos_app_info_get_content_id (const EosAppInfo *info)
+{
+  return info->content_id;
 }
 
 const char *
@@ -187,7 +249,7 @@ eos_app_info_get_category (const EosAppInfo *info)
 char *
 eos_app_info_get_square_img (const EosAppInfo *info)
 {
-  if (info == NULL || info->square_img == NULL || info->square_img[0] == '\0')
+  if (info->square_img == NULL || info->square_img[0] == '\0')
     return NULL;
 
   return g_strdup_printf ("resource:///com/endlessm/appstore-content/apps/%s",
@@ -205,7 +267,7 @@ eos_app_info_get_square_img (const EosAppInfo *info)
 char *
 eos_app_info_get_featured_img (const EosAppInfo *info)
 {
-  if (info == NULL || info->featured_img == NULL || info->featured_img[0] == '\0')
+  if (info->featured_img == NULL || info->featured_img[0] == '\0')
     return NULL;
 
   return g_strdup_printf ("resource:///com/endlessm/appstore-content/apps/%s",
@@ -215,9 +277,6 @@ eos_app_info_get_featured_img (const EosAppInfo *info)
 guint
 eos_app_info_get_n_screenshots (const EosAppInfo *info)
 {
-  if (info == NULL)
-    return 0;
-
   return info->n_screenshots;
 }
 

@@ -39,7 +39,7 @@
  * If not available in current language, English is the
  * preferred next option, so list it first.
  */
-static const char *app_lang_ids[] = { "-en", "-ar", "-es", "-fr", "-pt", NULL };
+static const char *app_lang_ids[] = { "-en", "-ar", "-es_GT", "-es", "-fr", "-pt", NULL };
 
 struct _EosAppListModel
 {
@@ -140,9 +140,6 @@ eos_app_list_model_emit_changed (EosAppListModel *self)
 
 #define WEB_LINK_ID_PREFIX "eos-link-"
 
-static gboolean load_manager_installed_apps (EosAppListModel *self,
-                                             GCancellable *cancellable);
-
 static gboolean
 desktop_id_is_web_link (const gchar *desktop_id)
 {
@@ -158,43 +155,37 @@ app_id_from_desktop_id (const gchar *desktop_id)
   return g_strndup (desktop_id, len - 8); /* the 8 here is the length of ".desktop" */
 }
 
-static gchar *
-get_language_id (void)
+static gchar **
+get_language_ids (void)
 {
   const gchar * const * locales;
   const gchar *locale_name;
-  gchar *lang_id;
   gchar **variants;
+  GPtrArray *lang_ids;
+  gint idx;
 
+  lang_ids = g_ptr_array_new ();
   locales = g_get_language_names ();
   locale_name = locales[0];
 
+  /* We want to return an array with all the possible variants
+   * for the current locale, except those that specify an encoding,
+   * since our language IDs all assume UTF-8.
+   */
   variants = g_get_locale_variants (locale_name);
-  lang_id = g_strdup_printf ("-%s", variants[g_strv_length (variants) - 1]);
+  for (idx = 0; variants[idx] != NULL; idx++)
+    {
+      /* Variants with encoding are identified with a dot */
+      if (g_strrstr (variants[idx], ".") != NULL)
+        continue;
+
+      g_ptr_array_add (lang_ids, g_strdup_printf ("-%s", variants[idx]));
+    }
+
+  g_ptr_array_add (lang_ids, NULL);
   g_strfreev (variants);
 
-  return lang_id;
-}
-
-static gchar *
-unlocalized_desktop_id_from_app_id (const gchar *app_id)
-{
-  gchar *lang_id;
-  gchar *unlocalized_app_id;
-  gchar *retval;
-
-  lang_id = get_language_id ();
-  if (g_str_has_suffix (app_id, lang_id))
-    unlocalized_app_id = g_strndup (app_id, strlen (app_id) - strlen (lang_id));
-  else
-    unlocalized_app_id = g_strdup (app_id);
-
-  retval = g_strconcat (unlocalized_app_id, ".desktop", NULL);
-
-  g_free (lang_id);
-  g_free (unlocalized_app_id);
-
-  return retval;
+  return (gchar **) g_ptr_array_free (lang_ids, FALSE);
 }
 
 static gboolean
@@ -228,16 +219,26 @@ get_localized_desktop_id (EosAppListModel *model,
                           const gchar *desktop_id)
 {
   gchar *localized_id;
-  gchar *lang_id;
+  gchar **lang_ids;
+  gint idx;
 
-  lang_id = get_language_id ();
-  localized_id = localized_id_from_desktop_id (desktop_id, lang_id);
-  g_free (lang_id);
+  lang_ids = get_language_ids ();
 
-  if (app_is_installable (model, localized_id))
-    return localized_id;
+  for (idx = 0; lang_ids[idx] != NULL; idx++)
+    {
+      localized_id = localized_id_from_desktop_id (desktop_id, lang_ids[idx]);
 
-  g_free (localized_id);
+      if (app_is_installable (model, localized_id))
+        {
+          g_strfreev (lang_ids);
+          return localized_id;
+        }
+
+      g_free (localized_id);
+    }
+
+  g_strfreev (lang_ids);
+
   return NULL;
 }
 
@@ -247,18 +248,26 @@ get_localized_app_info (EosAppListModel *model,
 {
   GDesktopAppInfo *info;
   gchar *localized_id;
-  gchar *lang_id;
+  gchar **lang_ids;
   gint idx;
 
-  lang_id = get_language_id ();
-  localized_id = localized_id_from_desktop_id (desktop_id, lang_id);
-  g_free (lang_id);
+  lang_ids = get_language_ids ();
 
-  info = g_hash_table_lookup (model->gio_apps, localized_id);
-  g_free (localized_id);
+  for (idx = 0; lang_ids[idx] != NULL; idx++)
+    {
+      localized_id = localized_id_from_desktop_id (desktop_id, lang_ids[idx]);
 
-  if (info)
-    return info;
+      info = g_hash_table_lookup (model->gio_apps, localized_id);
+      g_free (localized_id);
+
+      if (info)
+        {
+          g_strfreev (lang_ids);
+          return info;
+        }
+    }
+
+  g_strfreev (lang_ids);
 
   /* If app is not installed in the user's current language,
    * consider all other supported languages, starting with English.
@@ -398,8 +407,7 @@ load_available_apps (EosAppListModel *self,
 
 static gboolean
 load_user_capabilities (EosAppListModel *self,
-                        GCancellable *cancellable,
-                        GError **error_out)
+                        GCancellable *cancellable)
 {
   GVariant *capabilities;
   GError *error = NULL;
@@ -426,10 +434,8 @@ load_user_capabilities (EosAppListModel *self,
     {
       eos_app_log_error_message ("Unable to list retrieve user capabilities: %s",
                                  error->message);
-      g_critical ("Unable to list retrieve user capabilities: %s",
+      g_critical ("Unable to retrieve user capabilities: %s",
                   error->message);
-
-      g_propagate_error (error_out, error);
 
       return FALSE;
     }
@@ -454,13 +460,8 @@ load_manager_available_apps (EosAppListModel *self,
 {
   GError *error = NULL;
 
-  if (!load_available_apps (self, cancellable, &error))
-    goto out;
+  load_available_apps (self, cancellable, &error);
 
-  if (!load_user_capabilities (self, cancellable, &error))
-    goto out;
-
-out:
   if (error != NULL)
     {
       g_critical ("Unable to list available apps: %s", error->message);
@@ -584,6 +585,12 @@ eos_app_list_model_finalize (GObject *gobject)
       self->applications_changed_id = 0;
     }
 
+  if (self->changed_guard_id != 0)
+    {
+      g_source_remove (self->changed_guard_id);
+      self->changed_guard_id = 0;
+    }
+
   g_object_unref (&self->proxy);
 
   g_clear_object (&self->soup_session);
@@ -665,6 +672,8 @@ refresh_thread_func (GTask *task,
 {
   EosAppListModel *model = source_object;
   GError *error = NULL;
+
+  load_user_capabilities (model, cancellable);
 
   if (!load_all_apps (model, cancellable, &error))
     {
@@ -765,14 +774,14 @@ add_app_to_shell (EosAppListModel *self,
   return TRUE;
 }
 
-typedef void (* ProgressReportFunc) (const char *app_id,
+typedef void (* ProgressReportFunc) (EosAppInfo *info,
                                      goffset current,
                                      goffset total,
                                      gpointer user_data);
 
 typedef struct {
   EosAppListModel *model;
-  char *desktop_id;
+  EosAppInfo *info;
   goffset current;
   goffset total;
 } ProgressClosure;
@@ -783,7 +792,7 @@ progress_closure_free (gpointer _data)
   ProgressClosure *data = _data;
 
   g_clear_object (&data->model);
-  g_free (data->desktop_id);
+  eos_app_info_unref (data->info);
 
   g_slice_free (ProgressClosure, data);
 }
@@ -794,7 +803,7 @@ emit_download_progress (gpointer _data)
   ProgressClosure *data = _data;
 
   g_signal_emit (data->model, eos_app_list_model_signals[DOWNLOAD_PROGRESS], 0,
-                 data->desktop_id,
+                 eos_app_info_get_content_id (data->info),
                  data->current,
                  data->total);
 
@@ -802,16 +811,16 @@ emit_download_progress (gpointer _data)
 }
 
 static void
-queue_download_progress (const char      *app_id,
-                         goffset          current,
-                         goffset          total,
-                         gpointer         user_data)
+queue_download_progress (EosAppInfo *info,
+                         goffset     current,
+                         goffset     total,
+                         gpointer    user_data)
 {
   EosAppListModel *self = user_data;
   ProgressClosure *clos = g_slice_new (ProgressClosure);
 
   clos->model = g_object_ref (self);
-  clos->desktop_id = unlocalized_desktop_id_from_app_id (app_id);
+  clos->info = eos_app_info_ref (info);
   clos->current = current;
   clos->total = total;
 
@@ -886,7 +895,7 @@ static SoupRequest *
 prepare_soup_request (SoupSession  *session,
                       const char   *source_uri,
                       const char   *content_type,
-                      const char   *app_id,
+                      EosAppInfo   *info,
                       GError      **error)
 {
   GError *internal_error = NULL;
@@ -898,8 +907,9 @@ prepare_soup_request (SoupSession  *session,
 
       eos_app_log_error_message ("Soap URI is NULL - canceling download");
 
-      if (app_id != NULL)
-        error_message = g_strdup_printf (_("No available bundle for '%s'"), app_id);
+      if (info != NULL)
+        error_message = g_strdup_printf (_("No available bundle for '%s'"),
+                                         eos_app_info_get_application_id (info));
       else
         error_message = g_strdup (_("No available data on the server"));
 
@@ -1017,7 +1027,7 @@ set_up_download_from_request (SoupRequest   *request,
 
 static GOutputStream *
 prepare_out_stream (const char    *target_file,
-                    const char    *app_id,
+                    EosAppInfo    *info,
                     GCancellable  *cancellable,
                     GError       **error)
 {
@@ -1032,9 +1042,9 @@ prepare_out_stream (const char    *target_file,
 
       eos_app_log_error_message ("Create file failed - canceling download");
 
-      if (app_id != NULL)
+      if (info != NULL)
         error_message = g_strdup_printf (_("Unable to create the file for downloading '%s': %s"),
-                                         app_id,
+                                         eos_app_info_get_application_id (info),
                                          internal_error->message);
       else
         error_message = g_strdup_printf (_("Unable to update the list of available applications: %s"),
@@ -1061,7 +1071,7 @@ typedef void (* ChunkFunc) (GByteArray *chunk,
 static gboolean
 download_file_chunks (GInputStream   *in_stream,
                       GOutputStream  *out_stream,
-                      const char     *app_id,
+                      EosAppInfo     *info,
                       gsize          *bytes_read,
                       ChunkFunc       chunk_func,
                       gpointer        chunk_func_user_data,
@@ -1109,9 +1119,9 @@ download_file_chunks (GInputStream   *in_stream,
 
       eos_app_log_info_message ("Canceled download");
 
-      if (app_id != NULL)
+      if (info != NULL)
         error_message = g_strdup_printf (_("Download of app '%s' cancelled by the user."),
-                                         app_id);
+                                         eos_app_info_get_application_id (info));
       else
         error_message = g_strdup (_("Refresh of available apps cancelled by the user."));
 
@@ -1240,7 +1250,7 @@ out:
 typedef struct {
   ProgressReportFunc  progress_func;
   gpointer            progress_func_user_data;
-  const char         *app_id;
+  EosAppInfo         *info;
   gsize               total_len;
 } DownloadAppFileClosure;
 
@@ -1253,14 +1263,14 @@ download_app_file_chunk_func (GByteArray *chunk,
   DownloadAppFileClosure *clos = chunk_func_user_data;
 
   if (clos->progress_func != NULL)
-    clos->progress_func (clos->app_id,
+    clos->progress_func (clos->info,
                          bytes_read, clos->total_len,
                          clos->progress_func_user_data);
 }
 
 static gboolean
 download_app_file_from_uri (EosAppListModel *self,
-                            const char      *app_id,
+                            EosAppInfo      *info,
                             const char      *source_uri,
                             const char      *target_file,
                             ProgressReportFunc progress_func,
@@ -1280,7 +1290,7 @@ download_app_file_from_uri (EosAppListModel *self,
   GInputStream *in_stream = NULL;
   GOutputStream *out_stream = NULL;
   SoupRequest *request = prepare_soup_request (self->soup_session, source_uri,
-                                               NULL, app_id,
+                                               NULL, info,
                                                error);
   if (request == NULL)
     goto out;
@@ -1290,7 +1300,7 @@ download_app_file_from_uri (EosAppListModel *self,
   if (in_stream == NULL)
     goto out;
 
-  out_stream = prepare_out_stream (target_file, app_id,
+  out_stream = prepare_out_stream (target_file, info,
                                    cancellable, error);
   if (out_stream == NULL)
     goto out;
@@ -1299,16 +1309,16 @@ download_app_file_from_uri (EosAppListModel *self,
 
   /* ensure we emit a progress notification at the beginning */
   if (progress_func != NULL)
-    progress_func (app_id, 0, total, progress_func_user_data);
+    progress_func (info, 0, total, progress_func_user_data);
 
   DownloadAppFileClosure *clos = g_slice_new0 (DownloadAppFileClosure);
   clos->progress_func = progress_func;
   clos->progress_func_user_data = progress_func_user_data;
-  clos->app_id = app_id;
+  clos->info = info;
   clos->total_len = total;
 
   retval = download_file_chunks (in_stream, out_stream,
-                                 app_id, &bytes_read,
+                                 info, &bytes_read,
                                  download_app_file_chunk_func, clos,
                                  cancellable, error);
 
@@ -1320,7 +1330,7 @@ download_app_file_from_uri (EosAppListModel *self,
 
   /* emit a progress notification for the whole file, in any case */
   if (progress_func != NULL)
-    progress_func (app_id, total, total, progress_func_user_data);
+    progress_func (info, total, total, progress_func_user_data);
 
 out:
   g_clear_object (&in_stream);
@@ -1332,7 +1342,7 @@ out:
 
 static gboolean
 download_app_file_from_uri_with_retry (EosAppListModel *self,
-                                       const char      *app_id,
+                                       EosAppInfo      *info,
                                        const char      *source_uri,
                                        const char      *target_file,
                                        ProgressReportFunc progress_func,
@@ -1354,7 +1364,7 @@ download_app_file_from_uri_with_retry (EosAppListModel *self,
      */
     while (TRUE)
       {
-        download_success = download_app_file_from_uri (self, app_id, source_uri,
+        download_success = download_app_file_from_uri (self, info, source_uri,
                                                        target_file,
                                                        progress_func,
                                                        progress_func_user_data,
@@ -1468,7 +1478,7 @@ download_signature (EosAppListModel *self,
   char *signature_path = g_build_filename (BUNDLEDIR, signature_name, NULL);
   g_free (signature_name);
 
-  if (!download_app_file_from_uri_with_retry (self, app_id,
+  if (!download_app_file_from_uri_with_retry (self, info,
                                               signature_uri, signature_path,
                                               NULL, NULL,
                                               cancellable, &error))
@@ -1508,7 +1518,7 @@ download_bundle (EosAppListModel *self,
 
   eos_app_log_info_message ("Bundle save path is %s", bundle_path);
 
-  if (!download_app_file_from_uri_with_retry (self, app_id,
+  if (!download_app_file_from_uri_with_retry (self, info,
                                               bundle_uri, bundle_path,
                                               queue_download_progress, self,
                                               cancellable, &error))
@@ -1773,8 +1783,10 @@ install_latest_app_version (EosAppListModel *self,
 
       retval = FALSE;
     }
-
-  invalidate_app_info (self, desktop_id, cancellable);
+  else
+    {
+      invalidate_app_info (self, desktop_id, cancellable);
+    }
 
   g_free (transaction_path);
 
@@ -1818,22 +1830,22 @@ update_app_from_manager (EosAppListModel *self,
                                        &error);
 
   /* Incremental update worked. Nothing else is needed */
-  if (retval && error == NULL)
+  if (retval)
     return TRUE;
 
-  if (error)
-    {
-      eos_app_log_info_message ("Update of %s using deltas failed: %s",
-                                desktop_id,
-                                error->message);
-
-      /* We don't care what the problem was (at this time) */
-      g_clear_error (&error);
-    }
+  eos_app_log_info_message ("Update of %s using deltas failed: %s",
+                            desktop_id,
+                            error->message);
 
   /* There's no point in testing full updates if xdelta was disabled */
   if (!eos_use_delta_updates ())
-    return retval;
+    {
+      g_propagate_error (error_out, error);
+      return FALSE;
+    }
+
+  /* We don't care what the problem was (at this time) */
+  g_clear_error (&error);
 
   eos_app_log_info_message ("Trying full update of %s",
                             desktop_id);
@@ -2405,7 +2417,7 @@ eos_app_list_model_has_app (EosAppListModel *model,
 {
   gchar *localized_id;
 
-  if (eos_app_list_model_get_app_info (model, desktop_id) != NULL)
+  if (app_is_installed (model, desktop_id))
     return TRUE;
 
   if (app_is_installable (model, desktop_id))
