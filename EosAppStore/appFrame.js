@@ -619,7 +619,7 @@ const AppCategoryFrame = new Lang.Class({
 
         this._backClickedId = 0;
         this._lastCellSelected = null;
-        this._widget = null;
+        this._gridBox = null;
 
         let box = new Gtk.Box({ orientation: Gtk.Orientation.VERTICAL,
                                 hexpand: true,
@@ -636,42 +636,45 @@ const AppCategoryFrame = new Lang.Class({
         box.add(this._spinner);
 
         this.show_all();
+    },
 
-        this._stack.set_visible_child_full('spinner', Gtk.StackTransitionType.CROSSFADE);
-        this._spinner.start();
+    set spinning(v) {
+        if (v) {
+            this._stack.set_visible_child_full('spinner', Gtk.StackTransitionType.CROSSFADE);
+            this._spinner.start();
+        } else {
+            this._stack.set_visible_child_full('app-frame', Gtk.StackTransitionType.CROSSFADE);
+            this._spinner.stop();
+        }
+    },
+
+    get spinning() {
+        return (this._stack.visible_child_name == 'spinner');
     },
 
     invalidate: function() {
-        if (this._widget) {
-            this._widget.destroy();
-            this._widget = null;
+        if (this._gridBox) {
+            this._gridBox.destroy();
+            this._gridBox = null;
         }
-
-        this._stack.set_visible_child_full('spinner', Gtk.StackTransitionType.CROSSFADE);
-        this._spinner.start();
     },
 
     populate: function() {
-        if (this._widget) {
+        if (this._gridBox) {
             return;
         }
 
-        if (this._model.isRefreshing) {
-            return;
-        }
-
-        let box = new Gtk.Box({ orientation: Gtk.Orientation.VERTICAL,
-                                hexpand: true,
-                                vexpand: true });
-        this._stack.add_named(box, 'app-frame');
-        this._widget = box;
+        this._gridBox = new Gtk.Box({ orientation: Gtk.Orientation.VERTICAL,
+                                      hexpand: true,
+                                      vexpand: true });
+        this._stack.add_named(this._gridBox, 'app-frame');
 
         let separator = new Separator.FrameSeparator();
-        box.add(separator);
+        this._gridBox.add(separator);
 
         let scrollWindow = new Gtk.ScrolledWindow({ hscrollbar_policy: Gtk.PolicyType.NEVER,
                                                     vscrollbar_policy: Gtk.PolicyType.AUTOMATIC });
-        box.add(scrollWindow);
+        this._gridBox.add(scrollWindow);
 
         let cellMargin = EosAppStorePrivate.AppInfo.get_cell_margin();
         let grid = new EosAppStorePrivate.FlexyGrid({ cell_size: CELL_DEFAULT_SIZE + cellMargin,
@@ -713,10 +716,7 @@ const AppCategoryFrame = new Lang.Class({
         grid.connect('cell-selected', Lang.bind(this, this._onCellSelected));
         grid.connect('cell-activated', Lang.bind(this, this._onCellActivated));
 
-        box.show_all();
-
-        this._stack.set_visible_child_full('app-frame', Gtk.StackTransitionType.CROSSFADE);
-        this._spinner.stop();
+        this._gridBox.show_all();
     },
 
     _onCellSelected: function(grid, cell) {
@@ -762,9 +762,9 @@ const AppCategoryFrame = new Lang.Class({
             this._backClickedId = 0;
         }
 
-        if (this._widget) {
+        if (this._gridBox) {
             this._stack.transition_type = Gtk.StackTransitionType.SLIDE_RIGHT;
-            this._stack.set_visible_child(this._widget);
+            this._stack.set_visible_child(this._gridBox);
         }
 
         // application pages are recreated each time, unless there's
@@ -777,8 +777,7 @@ const AppCategoryFrame = new Lang.Class({
     },
 
     reset: function() {
-        if (this._model.isRefreshing) {
-            this._stack.set_visible_child_full('spinner', Gtk.StackTransitionType.CROSSFADE);
+        if (this.spinning) {
             return;
         }
 
@@ -799,12 +798,13 @@ const AppBroker = new Lang.Class({
 
         // initialize the applications model
         this._model = new AppListModel.AppList();
-        this._model.refresh(Lang.bind(this, this._populateAllCategories));
+        this._model.refresh(Lang.bind(this, this._onRefreshDone));
         this._model.connect('changed', Lang.bind(this, this._populateAllCategories));
 
         this._categories = Categories.get_app_categories();
         this._categories.forEach(Lang.bind(this, function(category) {
             category.widget = new AppCategoryFrame(category, this._model, mainWindow);
+            category.widget.spinning = true;
         }));
 
         let content_dir = EosAppStorePrivate.app_get_content_dir();
@@ -816,6 +816,14 @@ const AppBroker = new Lang.Class({
 
     _onContentChanged: function(monitor, file, other_file, event_type) {
         this._populateAllCategories();
+    },
+
+    _onRefreshDone: function(model) {
+        this._populateAllCategories();
+
+        this._categories.forEach(Lang.bind(this, function(c) {
+            c.widget.spinning = false;
+        }));
     },
 
     _populateAllCategories: function() {
