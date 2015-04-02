@@ -32,7 +32,7 @@ language_is_valid (const char *id)
     return FALSE;
 
   if (len == 5 &&
-      (!g_ascii_isupper (id[3]) || !g_ascii_isupper (id[4])))
+      (id[2] != '_' || !g_ascii_isupper (id[3]) || !g_ascii_isupper (id[4])))
     return FALSE;
 
   return TRUE;
