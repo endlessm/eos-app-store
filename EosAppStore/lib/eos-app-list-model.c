@@ -112,6 +112,7 @@ get_eam_dbus_proxy (EosAppListModel *self)
                                                         "/com/endlessm/AppManager",
                                                         NULL, /* GCancellable* */
                                                         &error);
+  g_dbus_proxy_set_default_timeout (G_DBUS_PROXY (self->proxy), G_MAXINT);
 
   if (error != NULL)
     eos_app_log_error_message ("Unable to create dbus proxy");
@@ -1555,6 +1556,7 @@ get_bundle_artifacts (EosAppListModel *self,
                                                 transaction_path,
                                                 cancellable,
                                                 &error);
+  g_dbus_proxy_set_default_timeout (G_DBUS_PROXY (transaction), G_MAXINT);
 
   if (error != NULL)
     {
@@ -1595,20 +1597,11 @@ get_bundle_artifacts (EosAppListModel *self,
 
   eos_app_log_info_message ("Completing transaction with eam");
 
-  /* call this manually, since we want to specify a custom timeout */
-  GVariant *res = g_dbus_proxy_call_sync (G_DBUS_PROXY (transaction),
-                                          "CompleteTransaction",
-                                          g_variant_new ("(s)", bundle_path),
-                                          G_DBUS_CALL_FLAGS_NONE,
-                                          G_MAXINT,
-                                          cancellable,
-                                          &error);
-
-  if (res != NULL)
-    {
-      g_variant_get (res, "(b)", &retval);
-      g_variant_unref (res);
-    }
+  eos_app_manager_transaction_call_complete_transaction_sync (transaction,
+                                                              bundle_path,
+                                                              &retval,
+                                                              cancellable,
+                                                              &error);
 
 out:
   if (error != NULL)
