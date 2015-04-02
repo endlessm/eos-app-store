@@ -778,9 +778,7 @@ const AppCategoryFrame = new Lang.Class({
 
     reset: function() {
         if (this._model.isRefreshing) {
-            if (this._stack.visible_child_name != 'spinner') {
-                this._stack.set_visible_child_full('spinner', Gtk.StackTransitionType.CROSSFADE);
-            }
+            this._stack.set_visible_child_full('spinner', Gtk.StackTransitionType.CROSSFADE);
             return;
         }
 
