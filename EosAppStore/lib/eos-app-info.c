@@ -122,7 +122,7 @@ eos_app_info_get_subtitle (const EosAppInfo *info)
  * eos_app_info_get_desktop_id:
  * @info: an #EosAppInfo
  *
- * Returns the application ID of @info. This is the application ID
+ * Returns the desktop ID of @info. This is the application ID
  * with a .desktop suffix.
  *
  * Returns: the desktop ID.
