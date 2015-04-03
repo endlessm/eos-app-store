@@ -1809,16 +1809,17 @@ update_app_from_manager (EosAppListModel *self,
                          GError **error_out)
 {
   GError *error = NULL;
-
   gboolean retval = FALSE;
+  gboolean use_deltas = eos_use_delta_updates ();
 
   /* First try to do an xdelta upgrade */
-  eos_app_log_info_message ("Attempting to update %s using deltas", desktop_id);
+  eos_app_log_info_message ("Attempting to update '%s' (using deltas: %s)",
+                            desktop_id, use_deltas ? "true" : "false");
 
   retval = install_latest_app_version (self,
                                        desktop_id,
                                        TRUE, /* Is update? */
-                                       eos_use_delta_updates (),
+                                       use_deltas,
                                        cancellable,
                                        &error);
 
@@ -1826,12 +1827,12 @@ update_app_from_manager (EosAppListModel *self,
   if (retval)
     return TRUE;
 
-  eos_app_log_info_message ("Update of %s using deltas failed: %s",
-                            desktop_id,
+  eos_app_log_info_message ("Update of '%s' (using deltas: %s) failed: %s",
+                            desktop_id, use_deltas ? "true" : "false",
                             error->message);
 
   /* There's no point in testing full updates if xdelta was disabled */
-  if (!eos_use_delta_updates ())
+  if (!use_deltas)
     {
       g_propagate_error (error_out, error);
       return FALSE;
