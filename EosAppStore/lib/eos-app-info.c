@@ -100,6 +100,7 @@ eos_app_info_unref (EosAppInfo *info)
       g_free (info->bundle_uri);
       g_free (info->signature_uri);
       g_free (info->bundle_hash);
+      g_free (info->icon_name);
       g_strfreev (info->screenshots);
 
       g_slice_free (EosAppInfo, info);
@@ -215,6 +216,12 @@ eos_app_info_get_installed_size (const EosAppInfo *info)
 }
 
 gboolean
+eos_app_info_is_installed (const EosAppInfo *info)
+{
+  return info->is_installed;
+}
+
+gboolean
 eos_app_info_is_installable (const EosAppInfo *info)
 {
   return !info->is_installed && info->is_available;
@@ -242,6 +249,19 @@ gboolean
 eos_app_info_get_has_launcher (const EosAppInfo *info)
 {
   return info->has_launcher;
+}
+
+char *
+eos_app_info_get_icon_name (const EosAppInfo *info)
+{
+  if (info->icon_name != NULL)
+    return g_strdup (info->icon_name);
+
+  /* TODO: for applications that are not on the system, just return
+   * a hardcoded default for now. Eventually we want to get this information
+   * from the server.
+   */
+  return g_strdup_printf ("eos-app-%s", eos_app_info_get_content_id (info));
 }
 
 /**
@@ -612,10 +632,36 @@ eos_app_info_update_from_server (EosAppInfo *info,
 
 /*< private >*/
 void
+eos_app_info_update_from_gio (EosAppInfo *info,
+                              GDesktopAppInfo *desktop_info)
+{
+  /* Do not update icon again if we already seen this desktop file
+   * as a GIO override.
+   */
+  if (info->has_override)
+    return;
+
+  info->has_override = g_str_has_prefix (g_app_info_get_id (G_APP_INFO (desktop_info)),
+                                         "eos-app-");
+
+  g_free (info->icon_name);
+  info->icon_name = g_desktop_app_info_get_string (desktop_info, G_KEY_FILE_DESKTOP_KEY_ICON);
+}
+
+/*< private >*/
+void
 eos_app_info_set_has_launcher (EosAppInfo *info,
                                gboolean has_launcher)
 {
   info->has_launcher = has_launcher;
+}
+
+/*< private >*/
+void
+eos_app_info_set_is_installed (EosAppInfo *info,
+                               gboolean is_installed)
+{
+  info->is_installed = is_installed;
 }
 
 /*< private >*/

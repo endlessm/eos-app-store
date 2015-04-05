@@ -902,6 +902,99 @@ eos_app_load_available_apps (GHashTable *app_info,
   return TRUE;
 }
 
+static gchar *
+app_id_from_gio_desktop_id (const gchar *desktop_id)
+{
+  gint len;
+  const char *ptr = desktop_id;
+
+  if (g_str_has_prefix (ptr, "eos-app-"))
+    ptr += 8; /* the 8 here is the length of "eos-app-" */
+
+  len = strlen (ptr);
+  return g_strndup (ptr, len - 8); /* the 8 here is the length of ".desktop" */
+}
+
+static gboolean
+app_is_visible (GAppInfo *info)
+{
+  GDesktopAppInfo *desktop_info = G_DESKTOP_APP_INFO (info);
+
+  return !g_desktop_app_info_get_nodisplay (desktop_info) &&
+    !g_desktop_app_info_get_is_hidden (desktop_info);
+}
+
+static GHashTable *
+load_apps_from_gio (void)
+{
+  GList *all_infos, *l;
+  GAppInfo *info;
+  GHashTable *set;
+
+  all_infos = g_app_info_get_all ();
+  set = g_hash_table_new_full (g_str_hash, g_str_equal,
+                               NULL,
+                               g_object_unref);
+
+  for (l = all_infos; l != NULL; l = l->next)
+    {
+      info = l->data;
+
+      if (app_is_visible (info))
+        g_hash_table_insert (set, (gpointer) g_app_info_get_id (info), info);
+      else
+        g_object_unref (info);
+    }
+
+  g_list_free (all_infos);
+  return set;
+}
+
+void
+eos_app_load_gio_apps (GHashTable *app_info)
+{
+  GList *l, *gio_apps;
+  GHashTable *apps;
+  GHashTableIter iter;
+  const char *desktop_id;
+  EosAppInfo *info;
+
+  apps = load_apps_from_gio ();
+  gio_apps = g_hash_table_get_values (apps);
+
+  for (l = gio_apps; l != NULL; l = l->next)
+    {
+      GDesktopAppInfo *desktop_info = l->data;
+
+      desktop_id = g_app_info_get_id (G_APP_INFO (desktop_info));
+
+      char *app_id = app_id_from_gio_desktop_id (desktop_id);
+      char *sanitized_desktop_id = g_strconcat (app_id, ".desktop", NULL);
+
+      info = g_hash_table_lookup (app_info, sanitized_desktop_id);
+
+      if (info == NULL)
+        {
+          info = eos_app_info_new (app_id);
+          g_hash_table_replace (app_info, g_strdup (sanitized_desktop_id), info);
+        }
+
+      g_free (app_id);
+      g_free (sanitized_desktop_id);
+
+      eos_app_info_update_from_gio (info, desktop_info);
+    }
+
+  g_list_free (gio_apps);
+
+  g_hash_table_iter_init (&iter, app_info);
+  while (g_hash_table_iter_next (&iter, (gpointer *) &desktop_id, (gpointer *) &info))
+    eos_app_info_set_is_installed (info,
+                                   g_hash_table_contains (apps, desktop_id));
+
+  g_hash_table_unref (apps);
+}
+
 static GHashTable *
 load_shell_apps_from_gvariant (GVariant *apps)
 {
