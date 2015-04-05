@@ -79,7 +79,7 @@ enum {
 static guint eos_app_list_model_signals[LAST_SIGNAL] = { 0, };
 
 static gboolean
-download_file_from_uri (EosAppListModel *self,
+download_file_from_uri (SoupSession     *session,
                         const char      *content_type,
                         const char      *source_uri,
                         const char      *target_file,
@@ -310,7 +310,7 @@ load_available_apps (EosAppListModel *self,
 
   eos_app_log_info_message ("Downloading list of available apps from: %s", url);
 
-  if (!download_file_from_uri (self, "application/json", url, target, &data, cancellable, &error))
+  if (!download_file_from_uri (self->soup_session, "application/json", url, target, &data, cancellable, &error))
     {
       g_free (url);
       g_free (target);
@@ -580,6 +580,10 @@ eos_app_list_model_init (EosAppListModel *self)
   self->apps = g_hash_table_new_full (g_str_hash, g_str_equal,
                                       g_free,
                                       (GDestroyNotify) eos_app_info_unref);
+
+  eos_app_log_error_message ("Creating new soup session");
+
+  self->soup_session = soup_session_new ();
 }
 
 EosAppListModel *
@@ -803,17 +807,6 @@ check_available_space (GFile         *path,
   g_object_unref (info);
 
   return retval;
-}
-
-static void
-ensure_soup_session (EosAppListModel *self)
-{
-  if (self->soup_session == NULL)
-    {
-      eos_app_log_error_message ("Creating new soup session");
-
-      self->soup_session = soup_session_new ();
-    }
 }
 
 static SoupRequest *
@@ -1093,7 +1086,7 @@ download_file_chunk_func (GByteArray *chunk,
 }
 
 static gboolean
-download_file_from_uri (EosAppListModel *self,
+download_file_from_uri (SoupSession     *session,
                         const char      *content_type,
                         const char      *source_uri,
                         const char      *target_file,
@@ -1129,13 +1122,11 @@ download_file_from_uri (EosAppListModel *self,
         }
     }
 
-  ensure_soup_session (self);
-
   gsize bytes_read = 0;
   GInputStream *in_stream = NULL;
   GOutputStream *out_stream = NULL;
   GByteArray *all_content = g_byte_array_new ();
-  SoupRequest *request = prepare_soup_request (self->soup_session, source_uri,
+  SoupRequest *request = prepare_soup_request (session, source_uri,
                                                content_type, NULL,
                                                error);
   if (request == NULL)
@@ -1194,7 +1185,7 @@ download_app_file_chunk_func (GByteArray *chunk,
 }
 
 static gboolean
-download_app_file_from_uri (EosAppListModel *self,
+download_app_file_from_uri (SoupSession     *session,
                             EosAppInfo      *info,
                             const char      *source_uri,
                             const char      *target_file,
@@ -1209,12 +1200,10 @@ download_app_file_from_uri (EosAppListModel *self,
   /* We assume that we won't get any data from the endpoint */
   *reset_error_counter = FALSE;
 
-  ensure_soup_session (self);
-
   gsize bytes_read = 0;
   GInputStream *in_stream = NULL;
   GOutputStream *out_stream = NULL;
-  SoupRequest *request = prepare_soup_request (self->soup_session, source_uri,
+  SoupRequest *request = prepare_soup_request (session, source_uri,
                                                NULL, info,
                                                error);
   if (request == NULL)
@@ -1266,7 +1255,7 @@ out:
 }
 
 static gboolean
-download_app_file_from_uri_with_retry (EosAppListModel *self,
+download_app_file_from_uri_with_retry (SoupSession     *session,
                                        EosAppInfo      *info,
                                        const char      *source_uri,
                                        const char      *target_file,
@@ -1289,7 +1278,7 @@ download_app_file_from_uri_with_retry (EosAppListModel *self,
      */
     while (TRUE)
       {
-        download_success = download_app_file_from_uri (self, info, source_uri,
+        download_success = download_app_file_from_uri (session, info, source_uri,
                                                        target_file,
                                                        progress_func,
                                                        progress_func_user_data,
@@ -1403,7 +1392,7 @@ download_signature (EosAppListModel *self,
   char *signature_path = g_build_filename (BUNDLEDIR, signature_name, NULL);
   g_free (signature_name);
 
-  if (!download_app_file_from_uri_with_retry (self, info,
+  if (!download_app_file_from_uri_with_retry (self->soup_session, info,
                                               signature_uri, signature_path,
                                               NULL, NULL,
                                               cancellable, &error))
@@ -1443,7 +1432,7 @@ download_bundle (EosAppListModel *self,
 
   eos_app_log_info_message ("Bundle save path is %s", bundle_path);
 
-  if (!download_app_file_from_uri_with_retry (self, info,
+  if (!download_app_file_from_uri_with_retry (self->soup_session, info,
                                               bundle_uri, bundle_path,
                                               queue_download_progress, self,
                                               cancellable, &error))
