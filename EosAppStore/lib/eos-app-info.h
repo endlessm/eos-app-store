@@ -55,7 +55,8 @@ gboolean        eos_app_info_get_has_launcher           (const EosAppInfo *info)
 
 /* private */
 G_GNUC_INTERNAL
-EosAppInfo *    eos_app_info_create_from_content        (JsonNode *node);
+gboolean        eos_app_info_update_from_content        (EosAppInfo *info,
+							 JsonNode   *node);
 G_GNUC_INTERNAL
 gboolean        eos_app_info_update_from_server         (EosAppInfo *info,
                                                          JsonNode   *node);

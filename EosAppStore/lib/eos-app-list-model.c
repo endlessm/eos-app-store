@@ -450,6 +450,43 @@ load_shell_apps (EosAppListModel *self,
 }
 
 static gboolean
+load_content_apps (EosAppListModel *self,
+                   GCancellable *cancellable)
+{
+  JsonArray *array = eos_app_parse_resource_content ("apps", "content", NULL);
+
+  if (array == NULL)
+    return FALSE;
+
+  guint i, n_elements = json_array_get_length (array);
+  for (i = 0; i < n_elements; i++)
+    {
+      JsonNode *element = json_array_get_element (array, i);
+
+      JsonObject *obj = json_node_get_object (element);
+      if (!json_object_has_member (obj, "application-id"))
+        continue;
+
+      const char *app_id = json_object_get_string_member (obj, "application-id");
+      char *desktop_id = g_strconcat (app_id, ".desktop", NULL);
+
+      EosAppInfo *info = eos_app_list_model_get_app_info (self, desktop_id);
+      g_free (desktop_id);
+
+      eos_app_log_info_message ("Updating content info for %s", info ? eos_app_info_get_desktop_id (info) : "null");
+
+      if (info == NULL)
+        continue;
+
+      eos_app_info_update_from_content (info, element);
+    }
+
+  json_array_unref (array);
+
+  return TRUE;
+}
+
+static gboolean
 load_all_apps (EosAppListModel *self,
                GCancellable *cancellable,
                GError **error)
@@ -468,6 +505,10 @@ load_all_apps (EosAppListModel *self,
   /* Load apps with launcher from the shell */
   eos_app_log_debug_message ("Loading apps with launcher from the shell");
   if (!load_shell_apps (self, cancellable))
+    goto out;
+
+  eos_app_log_debug_message ("Loading apps from content");
+  if (!load_content_apps (self, cancellable))
     goto out;
 
   return TRUE;
@@ -1881,6 +1922,56 @@ eos_app_list_model_get_all_apps (EosAppListModel *model)
   return g_hash_table_get_keys (model->apps);
 }
 
+/**
+ * eos_app_list_model_get_apps_for_category:
+ * @model:
+ * @category:
+ *
+ * Returns: (transfer container) (element-type EosAppInfo):
+ */
+GList *
+eos_app_list_model_get_apps_for_category (EosAppListModel *model,
+                                          EosAppCategory category)
+{
+  GList *apps = NULL;
+  JsonArray *array = eos_app_parse_resource_content ("apps", "content", NULL);
+
+  if (array == NULL)
+    return NULL;
+
+  guint i, n_elements = json_array_get_length (array);
+  for (i = 0; i < n_elements; i++)
+    {
+      JsonNode *element = json_array_get_element (array, i);
+
+      JsonObject *obj = json_node_get_object (element);
+      const char *category_id = json_object_get_string_member (obj, "category");
+      EosAppCategory obj_category = eos_app_category_from_id (category_id);
+
+      if (category == obj_category ||
+          category == EOS_APP_CATEGORY_INSTALLED ||
+          category == EOS_APP_CATEGORY_ALL)
+        {
+          const char *app_id = json_object_get_string_member (obj, "application-id");
+          char *desktop_id = g_strconcat (app_id, ".desktop", NULL);
+
+          EosAppInfo *info = g_hash_table_lookup (model->apps, desktop_id);
+
+          if (info == NULL)
+            info = get_localized_app_info (model, desktop_id, FALSE);
+
+          g_free (desktop_id);
+
+          if (info != NULL)
+            apps = g_list_prepend (apps, info);
+        }
+    }
+
+  json_array_unref (array);
+
+  return g_list_reverse (apps);
+}
+
 gboolean
 eos_app_list_model_get_app_has_launcher (EosAppListModel *model,
                                          const char *desktop_id)
@@ -2162,18 +2253,6 @@ eos_app_list_model_launch_app (EosAppListModel *model,
     }
 
   return launch_app (model, info, timestamp, NULL, error);
-}
-
-gboolean
-eos_app_list_model_has_app (EosAppListModel *model,
-                            const char *desktop_id)
-{
-  EosAppInfo *info = g_hash_table_lookup (model->apps, desktop_id);
-
-  if (info == NULL)
-    info = get_localized_app_info (model, desktop_id, FALSE);
-
-  return (info != NULL);
 }
 
 gboolean

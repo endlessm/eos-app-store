@@ -52,10 +52,6 @@ const BaseList = new Lang.Class({
         return false;
     },
 
-    hasApp: function(id) {
-        return this._model.has_app(id);
-    },
-
     hasLauncher: function(id) {
         if (!this.isInstalled(id)) {
             return false;
@@ -195,6 +191,10 @@ const AppList = new Lang.Class({
             return true;
         }));
         this.emit('changed', apps);
+    },
+
+    loadCategory: function(categoryId) {
+        return this._model.get_apps_for_category(categoryId);
     },
 
     updateApp: function(id, callback) {

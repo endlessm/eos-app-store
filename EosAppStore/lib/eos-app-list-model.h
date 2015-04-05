@@ -31,6 +31,8 @@ gboolean eos_app_list_model_refresh_finish          (EosAppListModel *model,
                                                      GError **error);
 
 GList *eos_app_list_model_get_all_apps              (EosAppListModel *model);
+GList * eos_app_list_model_get_apps_for_category    (EosAppListModel *model,
+                                                     EosAppCategory category);
 
 char *eos_app_list_model_get_app_icon_name          (EosAppListModel *model,
                                                      const char *desktop_id);
@@ -52,9 +54,6 @@ gboolean eos_app_list_model_launch_app              (EosAppListModel *model,
                                                      const char *desktop_id,
                                                      guint32 timestamp,
                                                      GError **error);
-
-gboolean eos_app_list_model_has_app                 (EosAppListModel *model,
-                                                     const char *desktop_id);
 
 void eos_app_list_model_install_app_async           (EosAppListModel *model,
                                                      const gchar *desktop_id,

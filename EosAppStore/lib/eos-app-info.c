@@ -320,37 +320,6 @@ eos_app_info_get_screenshots (const EosAppInfo *info)
   return g_strdupv (info->screenshots);
 }
 
-/* Keep in the same order as the EosAppCategory enumeration */
-static const struct {
-  const EosAppCategory category;
-  const char *id;
-} categories[] = {
-  /* Translators: use the same string used to install the app store content JSON */
-  { EOS_APP_CATEGORY_EDUCATION,     N_("Education") },
-  { EOS_APP_CATEGORY_GAMES,         N_("Games") },
-  { EOS_APP_CATEGORY_RESOURCES,     N_("Resources") },
-  { EOS_APP_CATEGORY_UTILITIES,     N_("Utilities") },
-};
-
-static const guint n_categories = G_N_ELEMENTS (categories);
-
-static EosAppCategory
-get_category_from_id (const char *p)
-{
-  guint i;
-
-  if (p == NULL || *p == '\0')
-    return EOS_APP_CATEGORY_UTILITIES;
-
-  for (i = 0; i < n_categories; i++)
-    {
-      if (strcmp (categories[i].id, p) == 0)
-        return categories[i].category;
-    }
-
-  return EOS_APP_CATEGORY_UTILITIES;
-}
-
 static EosFlexyShape
 get_shape_from_id (const char *p)
 {
@@ -665,21 +634,14 @@ eos_app_info_set_is_installed (EosAppInfo *info,
 }
 
 /*< private >*/
-EosAppInfo *
-eos_app_info_create_from_content (JsonNode *node)
+gboolean
+eos_app_info_update_from_content (EosAppInfo *info,
+                                  JsonNode *node)
 {
-  const char *app_id;
-
   if (!JSON_NODE_HOLDS_OBJECT (node))
-    return NULL;
+    return FALSE;
 
   JsonObject *obj = json_node_get_object (node);
-  if (!json_object_has_member (obj, "application-id"))
-    return NULL;
-
-  app_id = json_object_get_string_member (obj, "application-id");
-
-  EosAppInfo *info = eos_app_info_new (app_id);
 
   if (json_object_has_member (obj, "title"))
     info->title = json_node_dup_string (json_object_get_member (obj, "title"));
@@ -733,7 +695,7 @@ eos_app_info_create_from_content (JsonNode *node)
     {
       const char *category = json_object_get_string_member (obj, "category");
 
-      info->category = get_category_from_id (category);
+      info->category = eos_app_category_from_id (category);
     }
   else
     info->category = EOS_APP_CATEGORY_UTILITIES;
@@ -773,5 +735,5 @@ eos_app_info_create_from_content (JsonNode *node)
   else
     info->n_screenshots = 0;
 
-  return info;
+  return TRUE;
 }

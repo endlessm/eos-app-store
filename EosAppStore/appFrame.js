@@ -681,19 +681,15 @@ const AppCategoryFrame = new Lang.Class({
                                                       cell_spacing: CELL_DEFAULT_SPACING - cellMargin });
         scrollWindow.add_with_viewport(grid);
 
-        let appInfos = EosAppStorePrivate.app_load_content(this._category.id,
-                                                           Lang.bind(this, function(appInfo) {
-            let id = appInfo.get_desktop_id();
-            return this._model.hasApp(id);
-        }));
+        let appInfos = this._model.loadCategory(this._category.id);
 
         if (this._category.id == EosAppStorePrivate.AppCategory.INSTALLED) {
             // 'Installed' only shows apps available on the desktop...
             for (let i in appInfos) {
-                let id = appInfos[i].get_desktop_id();
+                let info = appInfos[i];
 
-                if (this._model.hasLauncher(id)) {
-                    let cell = appInfos[i].create_cell(this._model.getIcon(id));
+                if (info.get_has_launcher()) {
+                    let cell = info.create_cell(info.get_icon_name());
                     cell.shape = EosAppStorePrivate.FlexyShape.SMALL;
                     grid.add(cell);
                 }
@@ -702,12 +698,13 @@ const AppCategoryFrame = new Lang.Class({
         else {
             // ... while every other category only shows apps that can be added
             for (let i in appInfos) {
+                let info = appInfos[i];
                 let id = appInfos[i].get_desktop_id();
                 let state = this._model.getState(id);
 
-                if (!this._model.hasLauncher(id) &&
+                if (!info.get_has_launcher() &&
                     state != EosAppStorePrivate.AppState.UNKNOWN) {
-                    let cell = appInfos[i].create_cell(this._model.getIcon(id));
+                    let cell = info.create_cell(info.get_icon_name());
                     grid.add(cell);
                 }
             }
