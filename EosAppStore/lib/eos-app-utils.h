@@ -51,6 +51,8 @@ gboolean eos_app_load_available_apps (GHashTable *app_info,
                                       const char *data,
                                       GCancellable *cancellable,
                                       GError **error);
+void eos_app_load_shell_apps (GHashTable *app_info,
+                              GVariant *shell_apps);
 
 int eos_compare_versions (const char *a,
                           const char *b);

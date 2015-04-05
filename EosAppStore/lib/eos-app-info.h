@@ -46,6 +46,7 @@ char **         eos_app_info_get_screenshots            (const EosAppInfo *info)
 gboolean        eos_app_info_is_installable             (const EosAppInfo *info);
 gboolean        eos_app_info_is_updatable               (const EosAppInfo *info);
 gboolean        eos_app_info_is_removable               (const EosAppInfo *info);
+gboolean        eos_app_info_get_has_launcher           (const EosAppInfo *info);
 
 #ifndef __GI_SCANNER__
 
@@ -58,6 +59,9 @@ gboolean        eos_app_info_update_from_server         (EosAppInfo *info,
 G_GNUC_INTERNAL
 gboolean        eos_app_info_update_from_installed      (EosAppInfo *info,
                                                          const char *filename);
+G_GNUC_INTERNAL
+void            eos_app_info_set_has_launcher           (EosAppInfo *info,
+							 gboolean    has_launcher);
 
 #endif
 

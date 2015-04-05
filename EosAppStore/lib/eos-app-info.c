@@ -238,6 +238,12 @@ eos_app_info_get_category (const EosAppInfo *info)
   return info->category;
 }
 
+gboolean
+eos_app_info_get_has_launcher (const EosAppInfo *info)
+{
+  return info->has_launcher;
+}
+
 /**
  * eos_app_info_get_square_img:
  * @info: ...
@@ -602,6 +608,14 @@ eos_app_info_update_from_server (EosAppInfo *info,
     }
 
   return TRUE;
+}
+
+/*< private >*/
+void
+eos_app_info_set_has_launcher (EosAppInfo *info,
+                               gboolean has_launcher)
+{
+  info->has_launcher = has_launcher;
 }
 
 /*< private >*/

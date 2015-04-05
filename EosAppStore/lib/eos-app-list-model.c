@@ -51,7 +51,6 @@ struct _EosAppListModel
   GAppInfoMonitor *app_monitor;
 
   GHashTable *gio_apps;
-  GHashTable *shell_apps;
   GHashTable *apps;
 
   guint applications_changed_id;
@@ -287,26 +286,6 @@ get_localized_app_info (EosAppListModel *model,
   return NULL;
 }
 
-static GHashTable *
-load_shell_apps_from_gvariant (GVariant *apps)
-{
-  GHashTable *retval;
-  GVariantIter *iter;
-  gchar *application;
-
-  retval = g_hash_table_new_full (g_str_hash, g_str_equal,
-                                  g_free, NULL);
-
-  g_variant_get (apps, "(as)", &iter);
-
-  while (g_variant_iter_loop (iter, "s", &application))
-    g_hash_table_add (retval, g_strdup (application));
-
-  g_variant_iter_free (iter);
-
-  return retval;
-}
-
 static gboolean
 app_is_visible (GAppInfo *info)
 {
@@ -363,8 +342,7 @@ on_shell_applications_changed (GDBusConnection *connection,
 {
   EosAppListModel *self = user_data;
 
-  g_clear_pointer (&self->shell_apps, g_hash_table_unref);
-  self->shell_apps = load_shell_apps_from_gvariant (parameters);
+  eos_app_load_shell_apps (self->apps, parameters);
 
   eos_app_list_model_emit_changed (self);
 }
@@ -516,8 +494,7 @@ load_shell_apps (EosAppListModel *self,
       return FALSE;
     }
 
-  g_clear_pointer (&self->shell_apps, g_hash_table_unref);
-  self->shell_apps = load_shell_apps_from_gvariant (applications);
+  eos_app_load_shell_apps (self->apps, applications);
   g_variant_unref (applications);
 
   return TRUE;
@@ -600,7 +577,6 @@ eos_app_list_model_finalize (GObject *gobject)
   g_clear_object (&self->system_bus);
 
   g_hash_table_unref (self->gio_apps);
-  g_hash_table_unref (self->shell_apps);
   g_hash_table_unref (self->apps);
 
   G_OBJECT_CLASS (eos_app_list_model_parent_class)->finalize (gobject);
@@ -2032,11 +2008,13 @@ static gboolean
 app_has_launcher (EosAppListModel *model,
                   const char      *desktop_id)
 {
-  /* Note that this doesn't mean that the application is installed */
-  if (model->shell_apps == NULL)
+  EosAppInfo *info;
+
+  info = g_hash_table_lookup (model->apps, desktop_id);
+  if (info == NULL)
     return FALSE;
 
-  return g_hash_table_contains (model->shell_apps, desktop_id);
+  return eos_app_info_get_has_launcher (info);
 }
 
 static gchar *
@@ -2099,9 +2077,6 @@ eos_app_list_model_get_app_has_launcher (EosAppListModel *model,
 
   g_return_val_if_fail (EOS_IS_APP_LIST_MODEL (model), FALSE);
   g_return_val_if_fail (desktop_id != NULL, FALSE);
-
-  if (app_has_launcher (model, desktop_id))
-    return TRUE;
 
   localized_id = app_get_localized_id_for_installed_app (model, desktop_id);
   return app_has_launcher (model, localized_id);

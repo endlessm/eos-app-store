@@ -902,6 +902,45 @@ eos_app_load_available_apps (GHashTable *app_info,
   return TRUE;
 }
 
+static GHashTable *
+load_shell_apps_from_gvariant (GVariant *apps)
+{
+  GHashTable *retval;
+  GVariantIter *iter;
+  gchar *application;
+
+  retval = g_hash_table_new_full (g_str_hash, g_str_equal,
+                                  g_free, NULL);
+
+  g_variant_get (apps, "(as)", &iter);
+
+  while (g_variant_iter_loop (iter, "s", &application))
+    g_hash_table_add (retval, g_strdup (application));
+
+  g_variant_iter_free (iter);
+
+  return retval;
+}
+
+void
+eos_app_load_shell_apps (GHashTable *app_info,
+                         GVariant *shell_apps)
+{
+  GHashTable *apps;
+  GHashTableIter iter;
+  char *desktop_id;
+  EosAppInfo *info;
+
+  apps = load_shell_apps_from_gvariant (shell_apps);
+
+  g_hash_table_iter_init (&iter, app_info);
+  while (g_hash_table_iter_next (&iter, (gpointer *) &desktop_id, (gpointer *) &info))
+    eos_app_info_set_has_launcher (info,
+                                   g_hash_table_contains (apps, desktop_id));
+
+  g_hash_table_unref (apps);
+}
+
 typedef struct {
   char *version;
   char *revision;

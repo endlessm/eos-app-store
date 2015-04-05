@@ -45,6 +45,7 @@ struct _EosAppInfo
   guint is_available : 1;
   guint is_installed : 1;
   guint update_available : 1;
+  guint has_launcher : 1;
 };
 
 G_END_DECLS
