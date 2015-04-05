@@ -49,7 +49,10 @@ gboolean        eos_app_info_is_installable             (const EosAppInfo *info)
 gboolean        eos_app_info_is_installed               (const EosAppInfo *info);
 gboolean        eos_app_info_is_updatable               (const EosAppInfo *info);
 gboolean        eos_app_info_is_removable               (const EosAppInfo *info);
+
 gboolean        eos_app_info_get_has_launcher           (const EosAppInfo *info);
+EosAppState     eos_app_info_get_state                  (const EosAppInfo *info);
+gboolean        eos_app_info_get_has_sufficient_install_space (const EosAppInfo *info);
 
 #ifndef __GI_SCANNER__
 

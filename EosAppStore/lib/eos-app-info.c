@@ -248,7 +248,7 @@ eos_app_info_get_category (const EosAppInfo *info)
 gboolean
 eos_app_info_get_has_launcher (const EosAppInfo *info)
 {
-  return info->has_launcher;
+  return info->has_launcher && info->is_installed;
 }
 
 char *
@@ -262,6 +262,26 @@ eos_app_info_get_icon_name (const EosAppInfo *info)
    * from the server.
    */
   return g_strdup_printf ("eos-app-%s", eos_app_info_get_content_id (info));
+}
+
+EosAppState
+eos_app_info_get_state (const EosAppInfo *info)
+{
+  EosAppState retval = EOS_APP_STATE_UNKNOWN;
+  gboolean is_installed, is_installable, is_updatable;
+
+  is_installed = eos_app_info_is_installed (info);
+  is_updatable = eos_app_info_is_updatable (info);
+  is_installable = eos_app_info_is_installable (info);
+
+  if (is_installed && is_updatable)
+    retval = EOS_APP_STATE_UPDATABLE;
+  else if (is_installed)
+    retval = EOS_APP_STATE_INSTALLED;
+  else if (is_installable)
+    retval = EOS_APP_STATE_AVAILABLE;
+
+  return retval;
 }
 
 /**
@@ -366,6 +386,60 @@ get_screenshots (JsonArray *array,
                                              NULL);
 
   g_free (path);
+}
+
+static guint64
+get_fs_available_space (void)
+{
+  GFile *current_directory = NULL;
+  GFileInfo *filesystem_info = NULL;
+  GError *error = NULL;
+
+  /* Whatever FS we're on, check the space */
+  current_directory = g_file_new_for_path (".");
+
+  filesystem_info = g_file_query_filesystem_info (current_directory,
+                                                  G_FILE_ATTRIBUTE_FILESYSTEM_FREE,
+                                                  NULL, /* Cancellable */
+                                                  &error);
+
+  g_object_unref (current_directory);
+
+  if (error != NULL)
+    {
+      eos_app_log_error_message ("Could not retrieve available space: %s",
+                                 error->message);
+      g_error_free (error);
+
+      /* Assume we have the space */
+      return G_MAXUINT64;
+    }
+
+  guint64 available_space = g_file_info_get_attribute_uint64 (filesystem_info,
+                                                              G_FILE_ATTRIBUTE_FILESYSTEM_FREE);
+
+  eos_app_log_debug_message ("Available space: %" G_GUINT64_FORMAT, available_space);
+
+  g_object_unref (filesystem_info);
+
+  return available_space;
+}
+
+gboolean
+eos_app_info_get_has_sufficient_install_space (const EosAppInfo *info)
+{
+  guint64 installed_size = 0;
+
+  installed_size = eos_app_info_get_installed_size (info);
+
+  eos_app_log_debug_message ("App %s installed size: %" G_GINT64_FORMAT,
+                             eos_app_info_get_desktop_id (info),
+                             installed_size);
+
+  if (installed_size <= get_fs_available_space ())
+    return TRUE;
+
+  return FALSE;
 }
 
 /* installed keyfile keys */

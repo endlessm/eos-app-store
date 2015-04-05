@@ -1909,20 +1909,6 @@ remove_app_from_manager (EosAppListModel *self,
 }
 
 /**
- * eos_app_list_model_get_all_apps:
- * @model:
- *
- * Returns: (transfer container) (element-type utf8):
- */
-GList *
-eos_app_list_model_get_all_apps (EosAppListModel *model)
-{
-  eos_app_log_debug_message ("Retrieving all installed and available apps");
-
-  return g_hash_table_get_keys (model->apps);
-}
-
-/**
  * eos_app_list_model_get_apps_for_category:
  * @model:
  * @category:
@@ -1981,45 +1967,6 @@ eos_app_list_model_get_app_has_launcher (EosAppListModel *model,
     return FALSE;
 
   return eos_app_info_get_has_launcher (info);
-}
-
-char *
-eos_app_list_model_get_app_icon_name (EosAppListModel *model,
-                                      const char *desktop_id)
-{
-  EosAppInfo *info = eos_app_list_model_get_app_info (model, desktop_id);
-  if (info == NULL)
-    return NULL;
-
-  return eos_app_info_get_icon_name (info);
-}
-
-EosAppState
-eos_app_list_model_get_app_state (EosAppListModel *model,
-                                  const char *desktop_id)
-{
-  g_return_val_if_fail (EOS_IS_APP_LIST_MODEL (model), EOS_APP_STATE_UNKNOWN);
-  g_return_val_if_fail (desktop_id != NULL, EOS_APP_STATE_UNKNOWN);
-
-  EosAppInfo *info = eos_app_list_model_get_app_info (model, desktop_id);
-  if (info == NULL)
-    return EOS_APP_STATE_UNKNOWN;
-
-  EosAppState retval = EOS_APP_STATE_UNKNOWN;
-  gboolean is_installed, is_installable, is_updatable;
-
-  is_installed = eos_app_info_is_installed (info);
-  is_updatable = eos_app_info_is_updatable (info);
-  is_installable = eos_app_info_is_installable (info);
-
-  if (is_installed && is_updatable)
-    retval = EOS_APP_STATE_UPDATABLE;
-  else if (is_installed)
-    retval = EOS_APP_STATE_INSTALLED;
-  else if (is_installable)
-    retval = EOS_APP_STATE_AVAILABLE;
-
-  return retval;
 }
 
 static void
@@ -2253,78 +2200,4 @@ eos_app_list_model_launch_app (EosAppListModel *model,
     }
 
   return launch_app (model, info, timestamp, NULL, error);
-}
-
-gboolean
-eos_app_list_model_get_app_can_remove (EosAppListModel *model,
-                                       const char *desktop_id)
-{
-  EosAppInfo *info = eos_app_list_model_get_app_info (model, desktop_id);
-  if (info == NULL)
-    return FALSE;
-
-  return eos_app_info_is_removable (info);
-}
-
-static guint64
-get_fs_available_space (void)
-{
-  GFile *current_directory = NULL;
-  GFileInfo *filesystem_info = NULL;
-  GError *error = NULL;
-
-  /* Whatever FS we're on, check the space */
-  current_directory = g_file_new_for_path (".");
-
-  filesystem_info = g_file_query_filesystem_info (current_directory,
-                                                  G_FILE_ATTRIBUTE_FILESYSTEM_FREE,
-                                                  NULL, /* Cancellable */
-                                                  &error);
-
-  g_object_unref (current_directory);
-
-  if (error != NULL)
-    {
-      eos_app_log_error_message ("Could not retrieve available space: %s",
-                                 error->message);
-      g_error_free (error);
-
-      /* Assume we have the space */
-      return G_MAXUINT64;
-    }
-
-  guint64 available_space = g_file_info_get_attribute_uint64 (filesystem_info,
-                                                              G_FILE_ATTRIBUTE_FILESYSTEM_FREE);
-
-  eos_app_log_debug_message ("Available space: %" G_GUINT64_FORMAT, available_space);
-
-  g_object_unref (filesystem_info);
-
-  return available_space;
-}
-
-gboolean
-eos_app_list_model_get_app_has_sufficient_install_space (EosAppListModel *model,
-                                                         const char *desktop_id)
-{
-  guint64 installed_size = 0;
-  EosAppInfo *info = eos_app_list_model_get_app_info (model, desktop_id);
-
-  if (info == NULL)
-    {
-        eos_app_log_error_message ("Can't find app ID matching %s while checking install space",
-                                   desktop_id);
-        return FALSE;
-    }
-
-  installed_size = eos_app_info_get_installed_size (info);
-
-  eos_app_log_debug_message ("App %s installed size: %" G_GINT64_FORMAT,
-                             desktop_id,
-                             installed_size);
-
-  if (installed_size <= get_fs_available_space ())
-    return TRUE;
-
-  return FALSE;
 }

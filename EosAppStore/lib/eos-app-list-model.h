@@ -30,24 +30,10 @@ gboolean eos_app_list_model_refresh_finish          (EosAppListModel *model,
                                                      GAsyncResult *result,
                                                      GError **error);
 
-GList *eos_app_list_model_get_all_apps              (EosAppListModel *model);
 GList * eos_app_list_model_get_apps_for_category    (EosAppListModel *model,
                                                      EosAppCategory category);
 
-char *eos_app_list_model_get_app_icon_name          (EosAppListModel *model,
-                                                     const char *desktop_id);
-
-EosAppState eos_app_list_model_get_app_state        (EosAppListModel *model,
-                                                     const char *desktop_id);
-
 gboolean eos_app_list_model_get_app_has_launcher    (EosAppListModel *model,
-                                                     const char *desktop_id);
-
-gboolean eos_app_list_model_get_app_can_remove      (EosAppListModel *model,
-                                                     const char *desktop_id);
-
-gboolean eos_app_list_model_get_app_has_sufficient_install_space
-                                                    (EosAppListModel *model,
                                                      const char *desktop_id);
 
 gboolean eos_app_list_model_launch_app              (EosAppListModel *model,
