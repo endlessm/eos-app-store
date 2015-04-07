@@ -11,7 +11,6 @@ const Mainloop = imports.mainloop;
 const Signals = imports.signals;
 const _ = imports.gettext.gettext;
 
-const AppManager = imports.appManager;
 const AppStoreWindow = imports.appStoreWindow;
 const Categories = imports.categories;
 const Config = imports.config;
@@ -78,9 +77,6 @@ const AppStore = new Lang.Class({
 
         // the app store shell proxy
         this._shellProxy = new ShellAppStore.ShellAppStore();
-
-        // the app manager proxy
-        this._appManager = new AppManager.AppManager();
 
         // the backing app list model
         this._appModel = new EosAppStorePrivate.AppListModel();
