@@ -51,7 +51,7 @@ sudo pkill eam
 
 if $CLEAR_CACHE; then
     echo Clearing the app manager cache
-    sudo rm -f /var/cache/eos-app-manager/updates.json
+    rm ~/.cache/com.endlessm.AppStore/updates.json
 fi
 
 if $LAUNCH; then
