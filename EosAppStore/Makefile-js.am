@@ -3,7 +3,6 @@ dist_js_DATA = \
 	$(js_built_sources) \
 	appFrame.js \
 	appListModel.js \
-	appManager.js \
 	appStoreLauncher.js \
 	appStoreWindow.js \
 	appStore.js \
