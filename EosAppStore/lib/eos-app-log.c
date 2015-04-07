@@ -21,14 +21,6 @@ eos_app_log_messagev (int level,
       eos_app_testing = "0";
   }
 
-  /* if we're not under a test environment, then we send
-   * everything to the journal
-   */
-  if (*eos_app_testing == '0') {
-    sd_journal_printv (level, fmt, args);
-    return;
-  }
-
   switch (level) {
     case LOG_DEBUG:
       g_logv (G_LOG_DOMAIN, G_LOG_LEVEL_DEBUG, fmt, args);
@@ -38,9 +30,19 @@ eos_app_log_messagev (int level,
       g_logv (G_LOG_DOMAIN, G_LOG_LEVEL_INFO, fmt, args);
       return;
 
+    case LOG_ERR:
+      /* if we're not under a test environment, then we send
+       * errors to the journal
+       */
+      if (*eos_app_testing == '0') {
+	sd_journal_printv (level, fmt, args);
+      } else {
+	vfprintf (stderr, fmt, args);
+	fputc ('\n', stderr);
+      }
+      return;
+
     default:
-      vfprintf (stderr, fmt, args);
-      fputc ('\n', stderr);
       break;
   }
 }
