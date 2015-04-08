@@ -10,13 +10,95 @@
 #include <locale.h>
 #include <glib/gi18n.h>
 #include <json-glib/json-glib.h>
+#include <errno.h>
 
 #define APP_STORE_CONTENT_DIR   "application-store"
 #define APP_STORE_CONTENT_APPS  "apps"
 #define APP_STORE_CONTENT_LINKS "links"
 
-#define DOWNLOAD_DIR_DEFAULT    LOCALSTATEDIR "/tmp/eos-app-store"
+#define BUNDLE_DIR              LOCALSTATEDIR "/tmp"
+#define BUNDLE_DIR_TEMPLATE     LOCALSTATEDIR "/tmp/eos-app-store.XXXXXX"
 #define APP_DIR_DEFAULT         "/endless"
+
+const char *
+eos_get_bundle_download_dir (void)
+{
+  static char *bundle_dir;
+
+  if (g_once_init_enter (&bundle_dir))
+    {
+      g_mkdir_with_parents (BUNDLE_DIR, 0755);
+
+      char *tmp = g_strdup (BUNDLE_DIR_TEMPLATE);
+      while (g_mkdtemp_full (tmp, 0755) == NULL)
+        {
+          int saved_errno = errno;
+
+          eos_app_log_error_message ("Unable to create temporary directory: %s",
+                                     g_strerror (saved_errno));
+        }
+
+      eos_app_log_info_message ("Bundle dir: %s", tmp);
+
+      g_once_init_leave (&bundle_dir, tmp);
+    }
+
+  return bundle_dir;
+}
+
+void
+eos_clear_bundle_download_dir (void)
+{
+  GFile *dir = g_file_new_for_path (eos_get_bundle_download_dir ());
+
+  GError *error = NULL;
+  GFileEnumerator *enumerator = g_file_enumerate_children (dir, G_FILE_ATTRIBUTE_STANDARD_NAME,
+                                                           G_FILE_QUERY_INFO_NOFOLLOW_SYMLINKS,
+                                                           NULL,
+                                                           &error);
+  if (error != NULL)
+    {
+      eos_app_log_error_message ("Unable to enumerate bundle dir '%s': %s",
+                                 eos_get_bundle_download_dir (),
+                                 error->message);
+      g_error_free (error);
+      g_object_unref (dir);
+      return;
+    }
+
+  GFileInfo *child_info = NULL;
+  while ((child_info = g_file_enumerator_next_file (enumerator, NULL, &error)) != NULL)
+    {
+      GFile *child = g_file_get_child (dir, g_file_info_get_name (child_info));
+
+      g_file_delete (child, NULL, &error);
+      if (error != NULL)
+        {
+          eos_app_log_error_message ("Unable to delete file: %s", error->message);
+          g_clear_error (&error);
+        }
+
+      g_clear_object (&child_info);
+      g_object_unref (child);
+    }
+
+  if (error != NULL)
+    {
+      eos_app_log_error_message ("Enumeration failed: %s", error->message);
+      g_clear_error (&error);
+    }
+
+  g_object_unref (enumerator);
+
+  g_file_delete (dir, NULL, &error);
+  if (error != NULL)
+    {
+      eos_app_log_error_message ("Unable to delete download dir: %s", error->message);
+      g_clear_error (&error);
+    }
+
+  g_object_unref (dir);
+}
 
 static const char *
 get_os_personality (void)
@@ -73,7 +155,7 @@ get_os_personality (void)
 }
 
 const char *
-eos_get_download_dir (void)
+eos_get_cache_dir (void)
 {
   static char *download_url;
 
@@ -717,7 +799,7 @@ eos_get_event_notify_type (GdkEvent *event)
 char *
 eos_get_updates_file (void)
 {
-  return g_build_filename (eos_get_download_dir (), "updates.json", NULL);
+  return g_build_filename (eos_get_cache_dir (), "updates.json", NULL);
 }
 
 char *

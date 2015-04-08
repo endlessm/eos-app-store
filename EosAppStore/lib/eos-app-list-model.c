@@ -13,6 +13,7 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <unistd.h>
+#include <errno.h>
 
 #include <glib-object.h>
 #include <glib/gstdio.h>
@@ -979,6 +980,34 @@ prepare_soup_request (SoupSession  *session,
   return request;
 }
 
+static gboolean
+set_up_target_dir (const char *target_file,
+                   GError    **error)
+{
+  GFile *file = g_file_new_for_path (target_file);
+  GFile *parent = g_file_get_parent (file);
+  gboolean res = TRUE;
+
+  char *parent_path = g_file_get_path (parent);
+  if (g_mkdir_with_parents (parent_path, 0755) == -1)
+    {
+      int saved_errno = errno;
+
+      g_set_error (error, EOS_APP_LIST_MODEL_ERROR,
+                   EOS_APP_LIST_MODEL_ERROR_FAILED,
+                   "Unable to create directory: %s",
+                   g_strerror (saved_errno));
+      res = FALSE;
+    }
+
+  g_free (parent_path);
+
+  g_object_unref (parent);
+  g_object_unref (file);
+
+  return res;
+}
+
 static GInputStream *
 set_up_download_from_request (SoupRequest   *request,
                               const char    *target_file,
@@ -999,10 +1028,6 @@ set_up_download_from_request (SoupRequest   *request,
   goffset total = soup_request_get_content_length (request);
   GFile *file = g_file_new_for_path (target_file);
   GFile *parent = g_file_get_parent (file);
-
-  char *parent_path = g_file_get_path (parent);
-  g_mkdir_with_parents (parent_path, 0755);
-  g_free (parent_path);
 
   if (!check_available_space (parent, total, cancellable, &internal_error))
     {
@@ -1217,6 +1242,13 @@ download_file_from_uri (EosAppListModel *self,
   if (request == NULL)
     goto out;
 
+  /* For non-bundle artifacts files we cannot rely on the target directory
+   * to exist, so we always try and create it. If the directory already
+   * exists, this is a no-op.
+   */ 
+  if (!set_up_target_dir (target_file, error))
+    goto out;
+
   in_stream = set_up_download_from_request (request, target_file,
                                             cancellable, error);
   if (in_stream == NULL)
@@ -1296,6 +1328,9 @@ download_app_file_from_uri (EosAppListModel *self,
   if (request == NULL)
     goto out;
 
+  /* For app bundles artifacts we are guaranteed that the download directory
+   * exists and has been successfully created by eos_get_bundle_download_dir().
+   */
   in_stream = set_up_download_from_request (request, target_file,
                                             cancellable, error);
   if (in_stream == NULL)
@@ -1444,7 +1479,7 @@ create_sha256sum (EosAppListModel *self,
     }
 
   char *sha256_name = g_strconcat (app_id, ".sha256", NULL);
-  char *sha256_path = g_build_filename (BUNDLEDIR, sha256_name, NULL);
+  char *sha256_path = g_build_filename (eos_get_bundle_download_dir (), sha256_name, NULL);
   g_free (sha256_name);
 
   gchar *contents = g_strconcat (bundle_hash, "\t", bundle_path, "\n", NULL);
@@ -1476,7 +1511,7 @@ download_signature (EosAppListModel *self,
     }
 
   char *signature_name = g_strconcat (app_id, ".asc", NULL);
-  char *signature_path = g_build_filename (BUNDLEDIR, signature_name, NULL);
+  char *signature_path = g_build_filename (eos_get_bundle_download_dir (), signature_name, NULL);
   g_free (signature_name);
 
   if (!download_app_file_from_uri_with_retry (self, info,
@@ -1514,7 +1549,7 @@ download_bundle (EosAppListModel *self,
     }
 
   char *bundle_name = g_strconcat (app_id, ".bundle", NULL);
-  char *bundle_path = g_build_filename (BUNDLEDIR, bundle_name, NULL);
+  char *bundle_path = g_build_filename (eos_get_bundle_download_dir (), bundle_name, NULL);
   g_free (bundle_name);
 
   eos_app_log_info_message ("Bundle save path is %s", bundle_path);
