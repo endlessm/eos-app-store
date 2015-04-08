@@ -89,6 +89,13 @@ const AppStore = new Lang.Class({
         this._createMainWindow();
     },
 
+    vfunc_shutdown: function() {
+        // Clear the directory where we download bundle artifacts when quitting
+        EosAppStorePrivate.clear_bundle_download_dir();
+
+        this.parent();
+    },
+
     _createMainWindow: function() {
         if (this._mainWindow == null) {
             this._mainWindow = new AppStoreWindow.AppStoreWindow(this);
