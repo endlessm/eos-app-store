@@ -30,7 +30,7 @@ eos_get_bundle_download_dir (void)
       g_mkdir_with_parents (BUNDLE_DIR, 0755);
 
       char *tmp = g_strdup (BUNDLE_DIR_TEMPLATE);
-      while ((tmp = g_mkdtemp_full (tmp, 0755)) == NULL)
+      while (g_mkdtemp_full (tmp, 0755) == NULL)
         {
           int saved_errno = errno;
 
