@@ -39,7 +39,9 @@ char *  eos_get_all_updates_uri (void);
 char *  eos_get_updates_file (void);
 
 const char *eos_get_bundles_dir (void);
-const char *eos_get_download_dir (void);
+const char *eos_get_cache_dir (void);
+const char *eos_get_bundle_download_dir (void);
+void        eos_clear_bundle_download_dir (void);
 
 gboolean eos_use_delta_updates (void);
 
