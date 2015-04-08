@@ -717,6 +717,7 @@ const AppCategoryFrame = new Lang.Class({
         grid.connect('cell-activated', Lang.bind(this, this._onCellActivated));
 
         this._gridBox.show_all();
+        this.spinning = false;
     },
 
     _onCellSelected: function(grid, cell) {
@@ -798,7 +799,7 @@ const AppBroker = new Lang.Class({
 
         // initialize the applications model
         this._model = new AppListModel.AppList();
-        this._model.refresh(Lang.bind(this, this._onRefreshDone));
+        this._model.refresh(Lang.bind(this, this._populateAllCategories));
         this._model.connect('changed', Lang.bind(this, this._populateAllCategories));
 
         this._categories = Categories.get_app_categories();
@@ -816,14 +817,6 @@ const AppBroker = new Lang.Class({
 
     _onContentChanged: function(monitor, file, other_file, event_type) {
         this._populateAllCategories();
-    },
-
-    _onRefreshDone: function(model) {
-        this._populateAllCategories();
-
-        this._categories.forEach(Lang.bind(this, function(c) {
-            c.widget.spinning = false;
-        }));
     },
 
     _populateAllCategories: function() {
