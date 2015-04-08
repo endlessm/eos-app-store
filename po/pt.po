@@ -19,7 +19,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: eos-app-store\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-03-31 01:21+0000\n"
+"POT-Creation-Date: 2015-04-07 01:22+0000\n"
 "PO-Revision-Date: 2015-03-31 01:21+0000\n"
 "Last-Translator: endlessmobile_build <philip@endlessm.com>\n"
 "Language-Team: Portuguese (http://www.transifex.com/projects/p/eos-app-store/language/pt/)\n"
@@ -137,7 +137,7 @@ msgstr " '%s' foi excluído com sucesso"
 msgid "Dismiss"
 msgstr "Descartar"
 
-#: ../EosAppStore/appFrame.js:792
+#: ../EosAppStore/appFrame.js:789
 msgid "Install apps"
 msgstr "Instalar programas"
 
@@ -150,19 +150,19 @@ msgid "Folders"
 msgstr "Pastas"
 
 #. Translators: use the same string used to install the app store content JSON
-#: ../EosAppStore/categories.js:12 ../EosAppStore/lib/eos-app-info.c:244
+#: ../EosAppStore/categories.js:12 ../EosAppStore/lib/eos-app-info.c:303
 msgid "Education"
 msgstr "Educação"
 
-#: ../EosAppStore/categories.js:19 ../EosAppStore/lib/eos-app-info.c:245
+#: ../EosAppStore/categories.js:19 ../EosAppStore/lib/eos-app-info.c:304
 msgid "Games"
 msgstr "Jogos"
 
-#: ../EosAppStore/categories.js:26 ../EosAppStore/lib/eos-app-info.c:246
+#: ../EosAppStore/categories.js:26 ../EosAppStore/lib/eos-app-info.c:305
 msgid "Resources"
 msgstr "Recursos"
 
-#: ../EosAppStore/categories.js:33 ../EosAppStore/lib/eos-app-info.c:247
+#: ../EosAppStore/categories.js:33 ../EosAppStore/lib/eos-app-info.c:306
 msgid "Utilities"
 msgstr "Utilidades"
 
@@ -236,135 +236,135 @@ msgstr "Adicione seus sites favoritos à sua área de trabalho ou escolha entre 
 msgid "Install websites"
 msgstr "Adicionar atalhos para sites"
 
-#: ../EosAppStore/lib/eos-app-list-model.c:551
+#: ../EosAppStore/lib/eos-app-list-model.c:553
 msgid "We were unable to update the list of applications"
 msgstr "Não foi possível atualizar a lista de aplicativos"
 
-#: ../EosAppStore/lib/eos-app-list-model.c:865
+#: ../EosAppStore/lib/eos-app-list-model.c:875
 #, c-format
 msgid "Not enough space on device for downloading app"
 msgstr "O dispositivo não tem espaço suficiente para baixar o programa"
 
-#: ../EosAppStore/lib/eos-app-list-model.c:902
+#: ../EosAppStore/lib/eos-app-list-model.c:912
 #, c-format
 msgid "No available bundle for '%s'"
 msgstr "Pacote não disponível para '%s'"
 
-#: ../EosAppStore/lib/eos-app-list-model.c:904
+#: ../EosAppStore/lib/eos-app-list-model.c:915
 msgid "No available data on the server"
 msgstr ""
 
-#: ../EosAppStore/lib/eos-app-list-model.c:937
+#: ../EosAppStore/lib/eos-app-list-model.c:948
 msgid "The certificate of the app store is expired"
 msgstr "O certificado de \"Mais programas\" expirou"
 
-#: ../EosAppStore/lib/eos-app-list-model.c:939
+#: ../EosAppStore/lib/eos-app-list-model.c:950
 msgid "The certificate of the app store has been revoked"
 msgstr "O certificado de \"Mais programas\" foi revogado"
 
-#: ../EosAppStore/lib/eos-app-list-model.c:941
+#: ../EosAppStore/lib/eos-app-list-model.c:952
 msgid "The certificate of the app store has a bad identity"
 msgstr "O certificado de \"Mais programas\"  tem um erro de identidade"
 
-#: ../EosAppStore/lib/eos-app-list-model.c:943
+#: ../EosAppStore/lib/eos-app-list-model.c:954
 msgid "The certificate of the app store is from an unknown authority"
 msgstr "O certificado de \"Mais programas\"  é de uma autoridade desconhecida"
 
-#: ../EosAppStore/lib/eos-app-list-model.c:945
+#: ../EosAppStore/lib/eos-app-list-model.c:956
 msgid "The certificate of the app store is bad or invalid"
 msgstr "O certificado de \"Mais programas\" está errado ou inválido"
 
-#: ../EosAppStore/lib/eos-app-list-model.c:1036
+#: ../EosAppStore/lib/eos-app-list-model.c:1047
 #, c-format
 msgid "Unable to create the file for downloading '%s': %s"
 msgstr "Não é possível criar o arquivo para baixar '%s': %s"
 
-#: ../EosAppStore/lib/eos-app-list-model.c:1040
+#: ../EosAppStore/lib/eos-app-list-model.c:1051
 #, c-format
 msgid "Unable to update the list of available applications: %s"
 msgstr ""
 
-#: ../EosAppStore/lib/eos-app-list-model.c:1113
+#: ../EosAppStore/lib/eos-app-list-model.c:1124
 #, c-format
 msgid "Download of app '%s' cancelled by the user."
 msgstr "O download do programa '%s' foi cancelado pelo usuário."
 
-#: ../EosAppStore/lib/eos-app-list-model.c:1116
+#: ../EosAppStore/lib/eos-app-list-model.c:1127
 msgid "Refresh of available apps cancelled by the user."
 msgstr ""
 
-#: ../EosAppStore/lib/eos-app-list-model.c:1430
+#: ../EosAppStore/lib/eos-app-list-model.c:1441
 #, c-format
 msgid "No verification available for app '%s'"
 msgstr "Nenhuma verificação disponível para o programa '%s'"
 
-#: ../EosAppStore/lib/eos-app-list-model.c:1462
+#: ../EosAppStore/lib/eos-app-list-model.c:1473
 #, c-format
 msgid "No signature available for app '%s'"
 msgstr "Nenhuma assinatura disponível para o programa '%s'"
 
-#: ../EosAppStore/lib/eos-app-list-model.c:1500
+#: ../EosAppStore/lib/eos-app-list-model.c:1511
 #, c-format
 msgid "Application bundle '%s' could not be downloaded"
 msgstr "Não foi possível baixar o pacote de programas '%s'"
 
-#: ../EosAppStore/lib/eos-app-list-model.c:1655
+#: ../EosAppStore/lib/eos-app-list-model.c:1658
 #, c-format
 msgid "Application '%s' could not be installed"
 msgstr "Programa '%s' não pôde ser instalado "
 
-#: ../EosAppStore/lib/eos-app-list-model.c:1662
+#: ../EosAppStore/lib/eos-app-list-model.c:1665
 #, c-format
 msgid "Application '%s' could not be installed. %s"
 msgstr "O programa '%s' não pôde ser instalado.  %s"
 
-#: ../EosAppStore/lib/eos-app-list-model.c:1732
+#: ../EosAppStore/lib/eos-app-list-model.c:1735
 msgid "You must be an administrator to install applications"
 msgstr "Você deve ser um administrador para instalar programas"
 
-#: ../EosAppStore/lib/eos-app-list-model.c:1877
+#: ../EosAppStore/lib/eos-app-list-model.c:1883
 #, c-format
 msgid "Removing '%s' from the desktop failed"
 msgstr "A remoção do programa %s' da área de trabalho falhou"
 
-#: ../EosAppStore/lib/eos-app-list-model.c:1903
-#: ../EosAppStore/lib/eos-app-list-model.c:1946
+#: ../EosAppStore/lib/eos-app-list-model.c:1909
+#: ../EosAppStore/lib/eos-app-list-model.c:1952
 #, c-format
 msgid "Application '%s' could not be uninstalled"
 msgstr "O programa '%s' não pode ser desinstalado. "
 
-#: ../EosAppStore/lib/eos-app-list-model.c:1929
+#: ../EosAppStore/lib/eos-app-list-model.c:1935
 msgid "You must be an administrator to remove applications"
 msgstr "Você deve ser um administrador para remover programas"
 
-#: ../EosAppStore/lib/eos-app-list-model.c:1938
+#: ../EosAppStore/lib/eos-app-list-model.c:1944
 #, c-format
 msgid "Application '%s' could not be uninstalled. %s"
 msgstr "O programa '%s' não pode ser desinstalado. %s"
 
-#: ../EosAppStore/lib/eos-app-list-model.c:1958
+#: ../EosAppStore/lib/eos-app-list-model.c:1964
 #, c-format
 msgid "Application '%s' could not be removed"
 msgstr "Programa '%s' não pôde ser removido"
 
-#: ../EosAppStore/lib/eos-app-list-model.c:2213
-#: ../EosAppStore/lib/eos-app-list-model.c:2282
+#: ../EosAppStore/lib/eos-app-list-model.c:2219
+#: ../EosAppStore/lib/eos-app-list-model.c:2288
 #, c-format
 msgid "App %s not installable"
 msgstr "Não é possível instalar o programa %s "
 
-#: ../EosAppStore/lib/eos-app-list-model.c:2224
+#: ../EosAppStore/lib/eos-app-list-model.c:2230
 #, c-format
 msgid "App %s already installed"
 msgstr "O programa %s já está instalado"
 
-#: ../EosAppStore/lib/eos-app-list-model.c:2293
+#: ../EosAppStore/lib/eos-app-list-model.c:2299
 #, c-format
 msgid "App %s is up to date"
 msgstr "O programa %s está atualizado"
 
-#: ../EosAppStore/lib/eos-app-list-model.c:2360
-#: ../EosAppStore/lib/eos-app-list-model.c:2394
+#: ../EosAppStore/lib/eos-app-list-model.c:2366
+#: ../EosAppStore/lib/eos-app-list-model.c:2400
 #, c-format
 msgid "App %s is not installed"
 msgstr " O programa %s não está instalado"
