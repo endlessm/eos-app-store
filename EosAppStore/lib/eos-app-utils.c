@@ -62,6 +62,7 @@ eos_clear_bundle_download_dir (void)
                                  eos_get_bundle_download_dir (),
                                  error->message);
       g_error_free (error);
+      g_object_unref (dir);
       return;
     }
 
