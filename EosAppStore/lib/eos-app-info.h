@@ -4,6 +4,7 @@
 #include <glib-object.h>
 #include <gtk/gtk.h>
 #include <json-glib/json-glib.h>
+#include <gio/gdesktopappinfo.h>
 #include "eos-app-enums.h"
 
 G_BEGIN_DECLS
@@ -35,6 +36,7 @@ EosAppCategory  eos_app_info_get_category               (const EosAppInfo *info)
 
 char *          eos_app_info_get_square_img             (const EosAppInfo *info);
 char *          eos_app_info_get_featured_img           (const EosAppInfo *info);
+char *          eos_app_info_get_icon_name              (const EosAppInfo *info);
 
 const char *    eos_app_info_get_bundle_uri             (const EosAppInfo *info);
 const char *    eos_app_info_get_signature_uri          (const EosAppInfo *info);
@@ -44,20 +46,35 @@ guint           eos_app_info_get_n_screenshots          (const EosAppInfo *info)
 char **         eos_app_info_get_screenshots            (const EosAppInfo *info);
 
 gboolean        eos_app_info_is_installable             (const EosAppInfo *info);
+gboolean        eos_app_info_is_installed               (const EosAppInfo *info);
 gboolean        eos_app_info_is_updatable               (const EosAppInfo *info);
 gboolean        eos_app_info_is_removable               (const EosAppInfo *info);
+
+gboolean        eos_app_info_get_has_launcher           (const EosAppInfo *info);
+EosAppState     eos_app_info_get_state                  (const EosAppInfo *info);
+gboolean        eos_app_info_get_has_sufficient_install_space (const EosAppInfo *info);
 
 #ifndef __GI_SCANNER__
 
 /* private */
 G_GNUC_INTERNAL
-EosAppInfo *    eos_app_info_create_from_content        (JsonNode *node);
+gboolean        eos_app_info_update_from_content        (EosAppInfo *info,
+							 JsonNode   *node);
 G_GNUC_INTERNAL
 gboolean        eos_app_info_update_from_server         (EosAppInfo *info,
                                                          JsonNode   *node);
 G_GNUC_INTERNAL
 gboolean        eos_app_info_update_from_installed      (EosAppInfo *info,
                                                          const char *filename);
+G_GNUC_INTERNAL
+void            eos_app_info_update_from_gio            (EosAppInfo *info,
+							 GDesktopAppInfo *desktop_info);
+G_GNUC_INTERNAL
+void            eos_app_info_set_has_launcher           (EosAppInfo *info,
+							 gboolean    has_launcher);
+G_GNUC_INTERNAL
+void            eos_app_info_set_is_installed           (EosAppInfo *info,
+							 gboolean    is_installed);
 
 #endif
 

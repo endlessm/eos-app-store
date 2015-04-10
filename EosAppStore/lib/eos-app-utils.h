@@ -10,16 +10,13 @@
 
 G_BEGIN_DECLS
 
-typedef gboolean (* EosAppFilterCallback) (EosAppInfo *info,
-                                           gpointer data);
-
 char *  eos_app_get_content_dir  (void);
 
 char *  eos_link_get_content_dir (void);
 
-GList * eos_app_load_content     (EosAppCategory   category,
-                                  EosAppFilterCallback callback,
-                                  gpointer data);
+JsonArray * eos_app_parse_resource_content (const char *content_type,
+                                            const char *content_name,
+                                            GError **error_out);
 
 GList * eos_link_load_content    (EosLinkCategory  category);
 
@@ -53,9 +50,14 @@ gboolean eos_app_load_available_apps (GHashTable *app_info,
                                       const char *data,
                                       GCancellable *cancellable,
                                       GError **error);
+void eos_app_load_gio_apps (GHashTable *app_info);
+void eos_app_load_shell_apps (GHashTable *app_info,
+                              GVariant *shell_apps);
 
 int eos_compare_versions (const char *a,
                           const char *b);
+
+EosAppCategory  eos_app_category_from_id (const char *p);
 
 G_END_DECLS
 

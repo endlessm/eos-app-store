@@ -415,7 +415,7 @@ eos_link_get_category_name (EosLinkCategory category)
     }
 }
 
-static JsonArray *
+JsonArray *
 eos_app_parse_resource_content (const char *content_type,
                                 const char *content_name,
                                 GError **error_out)
@@ -495,72 +495,6 @@ char *
 eos_link_get_content_dir (void)
 {
   return eos_get_content_dir (APP_STORE_CONTENT_LINKS);
-}
-
-/**
- * eos_app_load_content:
- * @category: ...
- * @callback: (allow-none) (scope call) (closure data): ...
- * @data: (allow-none): ...
- *
- * ...
- *
- * Return value: (transfer full) (element-type EosAppInfo): ...
- */
-GList *
-eos_app_load_content (EosAppCategory category,
-                      EosAppFilterCallback callback,
-                      gpointer data)
-{
-  JsonArray *array = eos_app_parse_resource_content (APP_STORE_CONTENT_APPS, "content", NULL);
-
-  if (array == NULL)
-    return NULL;
-
-  GList *infos = NULL;
-
-  guint i, n_elements = json_array_get_length (array);
-  for (i = 0; i < n_elements; i++)
-    {
-      JsonNode *element = json_array_get_element (array, i);
-
-      EosAppInfo *info = eos_app_info_create_from_content (element);
-      if (info == NULL)
-        continue;
-
-      if (category == EOS_APP_CATEGORY_INSTALLED ||
-          category == EOS_APP_CATEGORY_ALL)
-        {
-          /* do nothing */
-        }
-      else
-        {
-          if (category != eos_app_info_get_category (info))
-            {
-              eos_app_info_unref (info);
-              continue;
-            }
-
-        }
-
-      if (callback != NULL)
-        {
-          gboolean res;
-
-          res = callback (info, data);
-          if (!res)
-            {
-              eos_app_info_unref (info);
-              continue;
-            }
-        }
-
-      infos = g_list_prepend (infos, info);
-    }
-
-  json_array_unref (array);
-
-  return g_list_reverse (infos);
 }
 
 /**
@@ -982,6 +916,169 @@ eos_app_load_available_apps (GHashTable *app_info,
                              (double) (g_get_monotonic_time () - start_time) / 1000);
 
   return TRUE;
+}
+
+static gchar *
+app_id_from_gio_desktop_id (const gchar *desktop_id)
+{
+  gint len;
+  const char *ptr = desktop_id;
+
+  if (g_str_has_prefix (ptr, "eos-app-"))
+    ptr += 8; /* the 8 here is the length of "eos-app-" */
+
+  len = strlen (ptr);
+  return g_strndup (ptr, len - 8); /* the 8 here is the length of ".desktop" */
+}
+
+static gboolean
+app_is_visible (GAppInfo *info)
+{
+  GDesktopAppInfo *desktop_info = G_DESKTOP_APP_INFO (info);
+
+  return !g_desktop_app_info_get_nodisplay (desktop_info) &&
+    !g_desktop_app_info_get_is_hidden (desktop_info);
+}
+
+static GHashTable *
+load_apps_from_gio (void)
+{
+  GList *all_infos, *l;
+  GAppInfo *info;
+  GHashTable *set;
+
+  all_infos = g_app_info_get_all ();
+  set = g_hash_table_new_full (g_str_hash, g_str_equal,
+                               NULL,
+                               g_object_unref);
+
+  for (l = all_infos; l != NULL; l = l->next)
+    {
+      info = l->data;
+
+      if (app_is_visible (info))
+        g_hash_table_insert (set, (gpointer) g_app_info_get_id (info), info);
+      else
+        g_object_unref (info);
+    }
+
+  g_list_free (all_infos);
+  return set;
+}
+
+void
+eos_app_load_gio_apps (GHashTable *app_info)
+{
+  GList *l, *gio_apps;
+  GHashTable *apps;
+  GHashTableIter iter;
+  const char *desktop_id;
+  EosAppInfo *info;
+
+  apps = load_apps_from_gio ();
+  gio_apps = g_hash_table_get_values (apps);
+
+  for (l = gio_apps; l != NULL; l = l->next)
+    {
+      GDesktopAppInfo *desktop_info = l->data;
+
+      desktop_id = g_app_info_get_id (G_APP_INFO (desktop_info));
+
+      char *app_id = app_id_from_gio_desktop_id (desktop_id);
+      char *sanitized_desktop_id = g_strconcat (app_id, ".desktop", NULL);
+
+      info = g_hash_table_lookup (app_info, sanitized_desktop_id);
+
+      if (info == NULL)
+        {
+          info = eos_app_info_new (app_id);
+          g_hash_table_replace (app_info, g_strdup (sanitized_desktop_id), info);
+        }
+
+      g_free (app_id);
+      g_free (sanitized_desktop_id);
+
+      eos_app_info_update_from_gio (info, desktop_info);
+    }
+
+  g_list_free (gio_apps);
+
+  g_hash_table_iter_init (&iter, app_info);
+  while (g_hash_table_iter_next (&iter, (gpointer *) &desktop_id, (gpointer *) &info))
+    eos_app_info_set_is_installed (info,
+                                   g_hash_table_contains (apps, desktop_id));
+
+  g_hash_table_unref (apps);
+}
+
+static GHashTable *
+load_shell_apps_from_gvariant (GVariant *apps)
+{
+  GHashTable *retval;
+  GVariantIter *iter;
+  gchar *application;
+
+  retval = g_hash_table_new_full (g_str_hash, g_str_equal,
+                                  g_free, NULL);
+
+  g_variant_get (apps, "(as)", &iter);
+
+  while (g_variant_iter_loop (iter, "s", &application))
+    g_hash_table_add (retval, g_strdup (application));
+
+  g_variant_iter_free (iter);
+
+  return retval;
+}
+
+void
+eos_app_load_shell_apps (GHashTable *app_info,
+                         GVariant *shell_apps)
+{
+  GHashTable *apps;
+  GHashTableIter iter;
+  char *desktop_id;
+  EosAppInfo *info;
+
+  apps = load_shell_apps_from_gvariant (shell_apps);
+
+  g_hash_table_iter_init (&iter, app_info);
+  while (g_hash_table_iter_next (&iter, (gpointer *) &desktop_id, (gpointer *) &info))
+    eos_app_info_set_has_launcher (info,
+                                   g_hash_table_contains (apps, desktop_id));
+
+  g_hash_table_unref (apps);
+}
+
+/* Keep in the same order as the EosAppCategory enumeration */
+static const struct {
+  const EosAppCategory category;
+  const char *id;
+} categories[] = {
+  /* Translators: use the same string used to install the app store content JSON */
+  { EOS_APP_CATEGORY_EDUCATION,     N_("Education") },
+  { EOS_APP_CATEGORY_GAMES,         N_("Games") },
+  { EOS_APP_CATEGORY_RESOURCES,     N_("Resources") },
+  { EOS_APP_CATEGORY_UTILITIES,     N_("Utilities") },
+};
+
+static const guint n_categories = G_N_ELEMENTS (categories);
+
+EosAppCategory
+eos_app_category_from_id (const char *p)
+{
+  guint i;
+
+  if (p == NULL || *p == '\0')
+    return EOS_APP_CATEGORY_UTILITIES;
+
+  for (i = 0; i < n_categories; i++)
+    {
+      if (strcmp (categories[i].id, p) == 0)
+        return categories[i].category;
+    }
+
+  return EOS_APP_CATEGORY_UTILITIES;
 }
 
 typedef struct {

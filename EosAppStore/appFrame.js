@@ -164,7 +164,7 @@ const AppListBoxRow = new Lang.Class({
     },
 
     _updateState: function() {
-        this.appState = this._model.getState(this._appId);
+        this.appState = this.appInfo.get_state();
     },
 
     _downloadProgress: function(model, contentId, progress, current, total) {
@@ -254,7 +254,7 @@ const AppListBoxRow = new Lang.Class({
 
         switch (this._appState) {
             case EosAppStorePrivate.AppState.INSTALLED:
-                if (this._model.hasLauncher(this._appId)) {
+                if (this.appInfo.get_has_launcher()) {
                     style = LAUNCH;
                 }
                 else {
@@ -267,7 +267,7 @@ const AppListBoxRow = new Lang.Class({
                 break;
 
             case EosAppStorePrivate.AppState.UPDATABLE:
-                if (this._model.hasLauncher(this._appId)) {
+                if (this.appInfo.get_has_launcher()) {
                     style = UPDATE;
                 }
                 else {
@@ -316,7 +316,7 @@ const AppListBoxRow = new Lang.Class({
             case EosAppStorePrivate.AppState.INSTALLED:
                 // wait for the message to hide
                 if (!this._installedMessage.visible) {
-                    if (this._model.hasLauncher(this._appId)) {
+                    if (this.appInfo.get_has_launcher()) {
                         this._installButtonLabel.set_text(BUTTON_LABEL_LAUNCH);
                     }
                     else {
@@ -325,7 +325,9 @@ const AppListBoxRow = new Lang.Class({
 
                     this._installButton.show();
 
-                    if (this._model.canRemove(this._appId)) {
+                    // Only apps that don't have a launcher can be
+                    // removed from the system
+                    if (!this.appInfo.get_has_launcher() && this.appInfo.is_removable()) {
                         this._removeButton.show();
                     }
                 }
@@ -335,7 +337,7 @@ const AppListBoxRow = new Lang.Class({
                 this._installButton.set_tooltip_text("");
                 this._installButtonLabel.set_text(BUTTON_LABEL_INSTALL);
 
-                if (!this._model.hasSufficientInstallSpace(this._appId)) {
+                if (!this.appInfo.get_has_sufficient_install_space()) {
                     this._installButton.set_sensitive(false);
                     this._installButton.set_tooltip_text(_("Insufficient space to install the app"));
                 }
@@ -345,7 +347,7 @@ const AppListBoxRow = new Lang.Class({
                 break;
 
             case EosAppStorePrivate.AppState.UPDATABLE:
-                if (this._model.hasLauncher(this._appId)) {
+                if (this.appInfo.get_has_launcher()) {
                     this._installButtonLabel.set_text(BUTTON_LABEL_UPDATE);
                 }
                 else {
@@ -480,7 +482,7 @@ const AppListBoxRow = new Lang.Class({
             // if the application is installed, we have two options
             case EosAppStorePrivate.AppState.INSTALLED:
                 // we launch it, if we have a launcher on the desktop
-                if (this._model.hasLauncher(this._appId)) {
+                if (this.appInfo.get_has_launcher()) {
                     this._launchApp();
                 }
                 // or we add a launcher on the desktop
@@ -497,7 +499,7 @@ const AppListBoxRow = new Lang.Class({
             // if the application can be updated, we have two options
             case EosAppStorePrivate.AppState.UPDATABLE:
                 // we update it, if we have a launcher on the desktop
-                if (this._model.hasLauncher(this._appId)) {
+                if (this.appInfo.get_has_launcher()) {
                     this._updateApp();
                 }
                 // or we add a launcher on the desktop
@@ -681,19 +683,15 @@ const AppCategoryFrame = new Lang.Class({
                                                       cell_spacing: CELL_DEFAULT_SPACING - cellMargin });
         scrollWindow.add_with_viewport(grid);
 
-        let appInfos = EosAppStorePrivate.app_load_content(this._category.id,
-                                                           Lang.bind(this, function(appInfo) {
-            let id = appInfo.get_desktop_id();
-            return this._model.hasApp(id);
-        }));
+        let appInfos = this._model.loadCategory(this._category.id);
 
         if (this._category.id == EosAppStorePrivate.AppCategory.INSTALLED) {
             // 'Installed' only shows apps available on the desktop...
             for (let i in appInfos) {
-                let id = appInfos[i].get_desktop_id();
+                let info = appInfos[i];
 
-                if (this._model.hasLauncher(id)) {
-                    let cell = appInfos[i].create_cell(this._model.getIcon(id));
+                if (info.get_has_launcher()) {
+                    let cell = info.create_cell(info.get_icon_name());
                     cell.shape = EosAppStorePrivate.FlexyShape.SMALL;
                     grid.add(cell);
                 }
@@ -702,12 +700,10 @@ const AppCategoryFrame = new Lang.Class({
         else {
             // ... while every other category only shows apps that can be added
             for (let i in appInfos) {
-                let id = appInfos[i].get_desktop_id();
-                let state = this._model.getState(id);
+                let info = appInfos[i];
 
-                if (!this._model.hasLauncher(id) &&
-                    state != EosAppStorePrivate.AppState.UNKNOWN) {
-                    let cell = appInfos[i].create_cell(this._model.getIcon(id));
+                if (!info.get_has_launcher()) {
+                    let cell = info.create_cell(info.get_icon_name());
                     grid.add(cell);
                 }
             }
@@ -746,8 +742,8 @@ const AppCategoryFrame = new Lang.Class({
 
         this._mainWindow.titleText = cell.app_info.get_title();
         this._mainWindow.subtitleText = cell.app_info.get_subtitle();
-        this._mainWindow.headerIcon = this._model.getIcon(cell.desktop_id);
-        this._mainWindow.headerInstalledVisible = this._model.isInstalled(cell.desktop_id);
+        this._mainWindow.headerIcon = cell.app_info.get_icon_name();
+        this._mainWindow.headerInstalledVisible = cell.app_info.is_installed();
         this._mainWindow.backButtonVisible = true;
 
         this._backClickedId =

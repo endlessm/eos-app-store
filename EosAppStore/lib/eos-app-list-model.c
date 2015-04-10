@@ -51,8 +51,6 @@ struct _EosAppListModel
 
   GAppInfoMonitor *app_monitor;
 
-  GHashTable *gio_apps;
-  GHashTable *shell_apps;
   GHashTable *apps;
 
   guint applications_changed_id;
@@ -82,7 +80,7 @@ enum {
 static guint eos_app_list_model_signals[LAST_SIGNAL] = { 0, };
 
 static gboolean
-download_file_from_uri (EosAppListModel *self,
+download_file_from_uri (SoupSession     *session,
                         const char      *content_type,
                         const char      *source_uri,
                         const char      *target_file,
@@ -190,17 +188,6 @@ get_language_ids (void)
   return (gchar **) g_ptr_array_free (lang_ids, FALSE);
 }
 
-static gboolean
-app_is_installable (EosAppListModel *model,
-                    const char *desktop_id)
-{
-  EosAppInfo *info = g_hash_table_lookup (model->apps, desktop_id);
-  if (info == NULL)
-    return FALSE;
-
-  return eos_app_info_is_installable (info);
-}
-
 static gchar *
 localized_id_from_desktop_id (const gchar *desktop_id,
                               const gchar *lang_id)
@@ -216,39 +203,12 @@ localized_id_from_desktop_id (const gchar *desktop_id,
   return localized_id;
 }
 
-static gchar *
-get_localized_desktop_id (EosAppListModel *model,
-                          const gchar *desktop_id)
-{
-  gchar *localized_id;
-  gchar **lang_ids;
-  gint idx;
-
-  lang_ids = get_language_ids ();
-
-  for (idx = 0; lang_ids[idx] != NULL; idx++)
-    {
-      localized_id = localized_id_from_desktop_id (desktop_id, lang_ids[idx]);
-
-      if (app_is_installable (model, localized_id))
-        {
-          g_strfreev (lang_ids);
-          return localized_id;
-        }
-
-      g_free (localized_id);
-    }
-
-  g_strfreev (lang_ids);
-
-  return NULL;
-}
-
-static GDesktopAppInfo *
+static EosAppInfo *
 get_localized_app_info (EosAppListModel *model,
-                        const gchar *desktop_id)
+                        const gchar *desktop_id,
+                        gboolean language_fallback)
 {
-  GDesktopAppInfo *info;
+  EosAppInfo *info;
   gchar *localized_id;
   gchar **lang_ids;
   gint idx;
@@ -259,7 +219,7 @@ get_localized_app_info (EosAppListModel *model,
     {
       localized_id = localized_id_from_desktop_id (desktop_id, lang_ids[idx]);
 
-      info = g_hash_table_lookup (model->gio_apps, localized_id);
+      info = g_hash_table_lookup (model->apps, localized_id);
       g_free (localized_id);
 
       if (info)
@@ -271,6 +231,9 @@ get_localized_app_info (EosAppListModel *model,
 
   g_strfreev (lang_ids);
 
+  if (!language_fallback)
+    return NULL;
+
   /* If app is not installed in the user's current language,
    * consider all other supported languages, starting with English.
    */
@@ -278,7 +241,7 @@ get_localized_app_info (EosAppListModel *model,
     {
       const char *suffix = app_lang_ids[idx];
       localized_id = localized_id_from_desktop_id (desktop_id, suffix);
-      info = g_hash_table_lookup (model->gio_apps, localized_id);
+      info = g_hash_table_lookup (model->apps, localized_id);
       g_free (localized_id);
 
       if (info)
@@ -288,67 +251,32 @@ get_localized_app_info (EosAppListModel *model,
   return NULL;
 }
 
-static GHashTable *
-load_shell_apps_from_gvariant (GVariant *apps)
+/**
+ * eos_app_list_model_get_app_info:
+ * @model: the app list model
+ * @desktop_id : the id of the app
+ *
+ * Returns the #EosAppInfo for the given app.
+ *
+ * Returns: (transfer none): A #EosAppInfo
+ */
+static EosAppInfo *
+eos_app_list_model_get_app_info (EosAppListModel *model,
+                                 const char *desktop_id)
 {
-  GHashTable *retval;
-  GVariantIter *iter;
-  gchar *application;
+  EosAppInfo *info = g_hash_table_lookup (model->apps, desktop_id);
 
-  retval = g_hash_table_new_full (g_str_hash, g_str_equal,
-                                  g_free, NULL);
+  if (info == NULL)
+    info = get_localized_app_info (model, desktop_id, TRUE);
 
-  g_variant_get (apps, "(as)", &iter);
-
-  while (g_variant_iter_loop (iter, "s", &application))
-    g_hash_table_add (retval, g_strdup (application));
-
-  g_variant_iter_free (iter);
-
-  return retval;
-}
-
-static gboolean
-app_is_visible (GAppInfo *info)
-{
-  GDesktopAppInfo *desktop_info = G_DESKTOP_APP_INFO (info);
-
-  return !g_desktop_app_info_get_nodisplay (desktop_info) &&
-    !g_desktop_app_info_get_is_hidden (desktop_info);
-}
-
-static GHashTable *
-load_apps_from_gio (void)
-{
-  GList *all_infos, *l;
-  GAppInfo *info;
-  GHashTable *set;
-
-  all_infos = g_app_info_get_all ();
-  set = g_hash_table_new_full (g_str_hash, g_str_equal,
-                               NULL,
-                               g_object_unref);
-
-  for (l = all_infos; l != NULL; l = l->next)
-    {
-      info = l->data;
-
-      if (app_is_visible (info))
-        g_hash_table_insert (set, (gpointer) g_app_info_get_id (info), info);
-      else
-        g_object_unref (info);
-    }
-
-  g_list_free (all_infos);
-  return set;
+  return info;
 }
 
 static void
 on_app_monitor_changed (GAppInfoMonitor *monitor,
                         EosAppListModel *self)
 {
-  g_clear_pointer (&self->gio_apps, g_hash_table_unref);
-  self->gio_apps = load_apps_from_gio ();
+  eos_app_load_gio_apps (self->apps);
 
   eos_app_list_model_emit_changed (self);
 }
@@ -364,8 +292,7 @@ on_shell_applications_changed (GDBusConnection *connection,
 {
   EosAppListModel *self = user_data;
 
-  g_clear_pointer (&self->shell_apps, g_hash_table_unref);
-  self->shell_apps = load_shell_apps_from_gvariant (parameters);
+  eos_app_load_shell_apps (self->apps, parameters);
 
   eos_app_list_model_emit_changed (self);
 }
@@ -384,7 +311,7 @@ load_available_apps (EosAppListModel *self,
 
   eos_app_log_info_message ("Downloading list of available apps from: %s", url);
 
-  if (!download_file_from_uri (self, "application/json", url, target, &data, cancellable, &error))
+  if (!download_file_from_uri (self->soup_session, "application/json", url, target, &data, cancellable, &error))
     {
       g_free (url);
       g_free (target);
@@ -517,9 +444,45 @@ load_shell_apps (EosAppListModel *self,
       return FALSE;
     }
 
-  g_clear_pointer (&self->shell_apps, g_hash_table_unref);
-  self->shell_apps = load_shell_apps_from_gvariant (applications);
+  eos_app_load_shell_apps (self->apps, applications);
   g_variant_unref (applications);
+
+  return TRUE;
+}
+
+static gboolean
+load_content_apps (EosAppListModel *self,
+                   GCancellable *cancellable)
+{
+  JsonArray *array = eos_app_parse_resource_content ("apps", "content", NULL);
+
+  if (array == NULL)
+    return FALSE;
+
+  guint i, n_elements = json_array_get_length (array);
+  for (i = 0; i < n_elements; i++)
+    {
+      JsonNode *element = json_array_get_element (array, i);
+
+      JsonObject *obj = json_node_get_object (element);
+      if (!json_object_has_member (obj, "application-id"))
+        continue;
+
+      const char *app_id = json_object_get_string_member (obj, "application-id");
+      char *desktop_id = g_strconcat (app_id, ".desktop", NULL);
+
+      EosAppInfo *info = eos_app_list_model_get_app_info (self, desktop_id);
+      g_free (desktop_id);
+
+      eos_app_log_info_message ("Updating content info for %s", info ? eos_app_info_get_desktop_id (info) : "null");
+
+      if (info == NULL)
+        continue;
+
+      eos_app_info_update_from_content (info, element);
+    }
+
+  json_array_unref (array);
 
   return TRUE;
 }
@@ -530,8 +493,7 @@ load_all_apps (EosAppListModel *self,
                GError **error)
 {
   eos_app_log_debug_message ("Loading GIO apps");
-  g_clear_pointer (&self->gio_apps, g_hash_table_unref);
-  self->gio_apps = load_apps_from_gio ();
+  eos_app_load_gio_apps (self->apps);
 
   eos_app_log_debug_message ("Loading installed apps from manager");
   if (!load_manager_installed_apps (self, cancellable))
@@ -546,6 +508,10 @@ load_all_apps (EosAppListModel *self,
   if (!load_shell_apps (self, cancellable))
     goto out;
 
+  eos_app_log_debug_message ("Loading apps from content");
+  if (!load_content_apps (self, cancellable))
+    goto out;
+
   return TRUE;
 
 out:
@@ -558,13 +524,13 @@ out:
 
 static void
 invalidate_app_info (EosAppListModel *self,
-                     const char *desktop_id,
+                     EosAppInfo *info,
                      GCancellable *cancellable)
 {
   /* Remove this info from the apps hash table, and let the code below
    * take care of resetting the proper state.
    */
-  g_hash_table_remove (self->apps, desktop_id);
+  g_hash_table_remove (self->apps, eos_app_info_get_desktop_id (info));
 
   if (!load_manager_installed_apps (self, cancellable))
     eos_app_log_error_message ("Unable to re-load installed apps");
@@ -600,8 +566,6 @@ eos_app_list_model_finalize (GObject *gobject)
   g_clear_object (&self->session_bus);
   g_clear_object (&self->system_bus);
 
-  g_hash_table_unref (self->gio_apps);
-  g_hash_table_unref (self->shell_apps);
   g_hash_table_unref (self->apps);
 
   G_OBJECT_CLASS (eos_app_list_model_parent_class)->finalize (gobject);
@@ -658,6 +622,10 @@ eos_app_list_model_init (EosAppListModel *self)
   self->apps = g_hash_table_new_full (g_str_hash, g_str_equal,
                                       g_free,
                                       (GDestroyNotify) eos_app_info_unref);
+
+  eos_app_log_error_message ("Creating new soup session");
+
+  self->soup_session = soup_session_new ();
 }
 
 EosAppListModel *
@@ -707,13 +675,14 @@ eos_app_list_model_refresh_finish (EosAppListModel *model,
 
 static gboolean
 launch_app (EosAppListModel *self,
-            const char *desktop_id,
+            EosAppInfo *info,
             guint32 timestamp,
             GCancellable *cancellable,
             GError **error_out)
 {
   GError *error = NULL;
   gboolean retval = FALSE;
+  const char *desktop_id = eos_app_info_get_desktop_id (info);
   GVariant *res;
 
   res = g_dbus_connection_call_sync (self->session_bus,
@@ -750,7 +719,7 @@ launch_app (EosAppListModel *self,
 
 static gboolean
 add_app_to_shell (EosAppListModel *self,
-                  const char *desktop_id,
+                  EosAppInfo *info,
                   GCancellable *cancellable,
                   GError **error_out)
 {
@@ -760,7 +729,7 @@ add_app_to_shell (EosAppListModel *self,
                                "org.gnome.Shell",
                                "/org/gnome/Shell",
                                "org.gnome.Shell.AppStore", "AddApplication",
-                               g_variant_new ("(s)", desktop_id),
+                               g_variant_new ("(s)", eos_app_info_get_desktop_id (info)),
                                NULL,
                                G_DBUS_CALL_FLAGS_NONE,
                                -1,
@@ -880,17 +849,6 @@ check_available_space (GFile         *path,
   g_object_unref (info);
 
   return retval;
-}
-
-static void
-ensure_soup_session (EosAppListModel *self)
-{
-  if (self->soup_session == NULL)
-    {
-      eos_app_log_error_message ("Creating new soup session");
-
-      self->soup_session = soup_session_new ();
-    }
 }
 
 static SoupRequest *
@@ -1194,7 +1152,7 @@ download_file_chunk_func (GByteArray *chunk,
 }
 
 static gboolean
-download_file_from_uri (EosAppListModel *self,
+download_file_from_uri (SoupSession     *session,
                         const char      *content_type,
                         const char      *source_uri,
                         const char      *target_file,
@@ -1230,13 +1188,11 @@ download_file_from_uri (EosAppListModel *self,
         }
     }
 
-  ensure_soup_session (self);
-
   gsize bytes_read = 0;
   GInputStream *in_stream = NULL;
   GOutputStream *out_stream = NULL;
   GByteArray *all_content = g_byte_array_new ();
-  SoupRequest *request = prepare_soup_request (self->soup_session, source_uri,
+  SoupRequest *request = prepare_soup_request (session, source_uri,
                                                content_type, NULL,
                                                error);
   if (request == NULL)
@@ -1302,7 +1258,7 @@ download_app_file_chunk_func (GByteArray *chunk,
 }
 
 static gboolean
-download_app_file_from_uri (EosAppListModel *self,
+download_app_file_from_uri (SoupSession     *session,
                             EosAppInfo      *info,
                             const char      *source_uri,
                             const char      *target_file,
@@ -1317,12 +1273,10 @@ download_app_file_from_uri (EosAppListModel *self,
   /* We assume that we won't get any data from the endpoint */
   *reset_error_counter = FALSE;
 
-  ensure_soup_session (self);
-
   gsize bytes_read = 0;
   GInputStream *in_stream = NULL;
   GOutputStream *out_stream = NULL;
-  SoupRequest *request = prepare_soup_request (self->soup_session, source_uri,
+  SoupRequest *request = prepare_soup_request (session, source_uri,
                                                NULL, info,
                                                error);
   if (request == NULL)
@@ -1377,7 +1331,7 @@ out:
 }
 
 static gboolean
-download_app_file_from_uri_with_retry (EosAppListModel *self,
+download_app_file_from_uri_with_retry (SoupSession     *session,
                                        EosAppInfo      *info,
                                        const char      *source_uri,
                                        const char      *target_file,
@@ -1400,7 +1354,7 @@ download_app_file_from_uri_with_retry (EosAppListModel *self,
      */
     while (TRUE)
       {
-        download_success = download_app_file_from_uri (self, info, source_uri,
+        download_success = download_app_file_from_uri (session, info, source_uri,
                                                        target_file,
                                                        progress_func,
                                                        progress_func_user_data,
@@ -1514,7 +1468,7 @@ download_signature (EosAppListModel *self,
   char *signature_path = g_build_filename (eos_get_bundle_download_dir (), signature_name, NULL);
   g_free (signature_name);
 
-  if (!download_app_file_from_uri_with_retry (self, info,
+  if (!download_app_file_from_uri_with_retry (self->soup_session, info,
                                               signature_uri, signature_path,
                                               NULL, NULL,
                                               cancellable, &error))
@@ -1554,7 +1508,7 @@ download_bundle (EosAppListModel *self,
 
   eos_app_log_info_message ("Bundle save path is %s", bundle_path);
 
-  if (!download_app_file_from_uri_with_retry (self, info,
+  if (!download_app_file_from_uri_with_retry (self->soup_session, info,
                                               bundle_uri, bundle_path,
                                               queue_download_progress, self,
                                               cancellable, &error))
@@ -1569,7 +1523,7 @@ download_bundle (EosAppListModel *self,
 
 static gboolean
 get_bundle_artifacts (EosAppListModel *self,
-                      const char *desktop_id,
+                      EosAppInfo *info,
                       char *transaction_path,
                       GCancellable *cancellable,
                       GError **error_out)
@@ -1580,7 +1534,6 @@ get_bundle_artifacts (EosAppListModel *self,
   char *bundle_path = NULL;
   char *signature_path = NULL;
   char *sha256_path = NULL;
-  EosAppInfo *info;
 
   eos_app_log_info_message ("Accessing dbus transaction");
 
@@ -1596,13 +1549,6 @@ get_bundle_artifacts (EosAppListModel *self,
   if (error != NULL)
     {
       eos_app_log_error_message ("Getting dbus transaction failed");
-      goto out;
-    }
-
-  info = g_hash_table_lookup (self->apps, desktop_id);
-  if (info == NULL)
-    {
-      eos_app_log_error_message ("Getting EosAppInfo failed");
       goto out;
     }
 
@@ -1705,7 +1651,7 @@ set_app_installation_error (const char *desktop_id,
 
 static gboolean
 install_latest_app_version (EosAppListModel *self,
-                            const char *desktop_id,
+                            EosAppInfo *info,
                             const gboolean is_upgrade,
                             const gboolean allow_deltas,
                             GCancellable *cancellable,
@@ -1713,6 +1659,9 @@ install_latest_app_version (EosAppListModel *self,
 {
   GError *error = NULL;
   gboolean retval = FALSE;
+
+  const char *app_id = eos_app_info_get_application_id (info);
+  const char *desktop_id = eos_app_info_get_desktop_id (info);
 
   EosAppManager *proxy = get_eam_dbus_proxy (self);
   if (proxy == NULL)
@@ -1724,7 +1673,6 @@ install_latest_app_version (EosAppListModel *self,
       return FALSE;
     }
 
-  char *app_id = app_id_from_desktop_id (desktop_id);
   char *transaction_path = NULL;
 
   /* We use different DBus targets but everything else is same */
@@ -1746,8 +1694,6 @@ install_latest_app_version (EosAppListModel *self,
                                          NULL,
                                          &error);
     }
-
-  g_free (app_id);
 
   if (error != NULL)
     {
@@ -1794,7 +1740,7 @@ install_latest_app_version (EosAppListModel *self,
 
   eos_app_log_info_message ("Got transaction path: %s", transaction_path);
 
-  retval = get_bundle_artifacts (self, desktop_id, transaction_path, cancellable, &error);
+  retval = get_bundle_artifacts (self, info, transaction_path, cancellable, &error);
 
   if (error != NULL)
     {
@@ -1813,7 +1759,7 @@ install_latest_app_version (EosAppListModel *self,
     }
   else
     {
-      invalidate_app_info (self, desktop_id, cancellable);
+      invalidate_app_info (self, info, cancellable);
     }
 
   g_free (transaction_path);
@@ -1823,14 +1769,12 @@ install_latest_app_version (EosAppListModel *self,
 
 static gboolean
 add_app_from_manager (EosAppListModel *self,
-                      const char *desktop_id,
+                      EosAppInfo *info,
                       GCancellable *cancellable,
                       GError **error_out)
 {
-  eos_app_log_info_message ("Attempting to install %s", desktop_id);
-
   return install_latest_app_version (self,
-                                     desktop_id,
+                                     info,
                                      FALSE, /* Is update? */
                                      FALSE, /* Allow deltas (not applicable) */
                                      cancellable,
@@ -1839,20 +1783,21 @@ add_app_from_manager (EosAppListModel *self,
 
 static gboolean
 update_app_from_manager (EosAppListModel *self,
-                         const char *desktop_id,
+                         EosAppInfo *info,
                          GCancellable *cancellable,
                          GError **error_out)
 {
   GError *error = NULL;
   gboolean retval = FALSE;
   gboolean use_deltas = eos_use_delta_updates ();
+  const char *desktop_id = eos_app_info_get_desktop_id (info);
 
   /* First try to do an xdelta upgrade */
   eos_app_log_info_message ("Attempting to update '%s' (using deltas: %s)",
                             desktop_id, use_deltas ? "true" : "false");
 
   retval = install_latest_app_version (self,
-                                       desktop_id,
+                                       info,
                                        TRUE, /* Is update? */
                                        use_deltas,
                                        cancellable,
@@ -1881,7 +1826,7 @@ update_app_from_manager (EosAppListModel *self,
 
   /* Incremental update failed so we try the full update now */
   return install_latest_app_version (self,
-                                     desktop_id,
+                                     info,
                                      TRUE, /* Is update? */
                                      FALSE, /* Allow deltas */
                                      cancellable,
@@ -1890,7 +1835,7 @@ update_app_from_manager (EosAppListModel *self,
 
 static gboolean
 remove_app_from_shell (EosAppListModel *self,
-                       const char *desktop_id,
+                       EosAppInfo *info,
                        GCancellable *cancellable,
                        GError **error_out)
 {
@@ -1900,7 +1845,7 @@ remove_app_from_shell (EosAppListModel *self,
                                "org.gnome.Shell",
                                "/org/gnome/Shell",
                                "org.gnome.Shell.AppStore", "RemoveApplication",
-                               g_variant_new ("(s)", desktop_id),
+                               g_variant_new ("(s)", eos_app_info_get_desktop_id (info)),
                                NULL,
                                G_DBUS_CALL_FLAGS_NONE,
                                -1,
@@ -1909,15 +1854,7 @@ remove_app_from_shell (EosAppListModel *self,
 
   if (error != NULL)
     {
-      g_warning ("Unable to remove application '%s': %s",
-                 desktop_id, error->message);
-      g_error_free (error);
-
-      g_set_error (error_out, EOS_APP_LIST_MODEL_ERROR,
-                   EOS_APP_LIST_MODEL_ERROR_FAILED,
-                   _("Removing '%s' from the desktop failed"),
-                   desktop_id);
-
+      g_propagate_error (error_out, error);
       return FALSE;
     }
 
@@ -1926,13 +1863,15 @@ remove_app_from_shell (EosAppListModel *self,
 
 static gboolean
 remove_app_from_manager (EosAppListModel *self,
-                         const char *desktop_id,
+                         EosAppInfo *info,
                          GCancellable *cancellable,
                          GError **error_out)
 {
   GError *error = NULL;
   gboolean retval = FALSE;
-  gchar *app_id = app_id_from_desktop_id (desktop_id);
+
+  const char *app_id = eos_app_info_get_application_id (info);
+  const char *desktop_id = eos_app_info_get_desktop_id (info);
 
   EosAppManager *proxy = get_eam_dbus_proxy (self);
   if (proxy == NULL)
@@ -1950,8 +1889,6 @@ remove_app_from_manager (EosAppListModel *self,
   eos_app_log_info_message ("Trying to uninstall %s", app_id);
 
   eos_app_manager_call_uninstall_sync (proxy, app_id, &retval, NULL, &error);
-
-  g_free (app_id);
 
   if (error != NULL)
     {
@@ -2007,196 +1944,64 @@ remove_app_from_manager (EosAppListModel *self,
 }
 
 /**
- * eos_app_list_model_get_all_apps:
+ * eos_app_list_model_get_apps_for_category:
  * @model:
+ * @category:
  *
- * Returns: (transfer container) (element-type utf8):
+ * Returns: (transfer container) (element-type EosAppInfo):
  */
 GList *
-eos_app_list_model_get_all_apps (EosAppListModel *model)
+eos_app_list_model_get_apps_for_category (EosAppListModel *model,
+                                          EosAppCategory category)
 {
-  eos_app_log_debug_message ("Retrieving all installed and available apps");
-
-  GList *gio_apps = NULL;
   GList *apps = NULL;
+  JsonArray *array = eos_app_parse_resource_content ("apps", "content", NULL);
 
-  if (model->gio_apps)
-    gio_apps = g_hash_table_get_keys (model->gio_apps);
-
-  /* TODO: make sure that this only does available apps after
-   * we add handlers to different update state types to model->apps
-   */
-  apps = g_hash_table_get_keys (model->apps);
-
-  return g_list_concat (gio_apps, apps);
-}
-
-/**
- * eos_app_list_model_get_app_info:
- * @model: the app list model
- * @desktop_id : the id of the app
- *
- * Returns the #GDesktopAppInfo for the given app.
- *
- * Returns: (transfer none): A #GDesktopAppInfo
- */
-static GDesktopAppInfo *
-eos_app_list_model_get_app_info (EosAppListModel *model,
-                                 const char *desktop_id)
-{
-  gchar *override_desktop_id;
-  GDesktopAppInfo *info;
-
-  if (model->gio_apps == NULL)
+  if (array == NULL)
     return NULL;
 
-  override_desktop_id = g_strdup_printf ("eos-app-%s", desktop_id);
-  info = g_hash_table_lookup (model->gio_apps, override_desktop_id);
-  g_free (override_desktop_id);
+  guint i, n_elements = json_array_get_length (array);
+  for (i = 0; i < n_elements; i++)
+    {
+      JsonNode *element = json_array_get_element (array, i);
 
-  if (info == NULL)
-    info = g_hash_table_lookup (model->gio_apps, desktop_id);
+      JsonObject *obj = json_node_get_object (element);
+      const char *category_id = json_object_get_string_member (obj, "category");
+      EosAppCategory obj_category = eos_app_category_from_id (category_id);
 
-  if (info == NULL)
-    info = get_localized_app_info (model, desktop_id);
+      if (category == obj_category ||
+          category == EOS_APP_CATEGORY_INSTALLED ||
+          category == EOS_APP_CATEGORY_ALL)
+        {
+          const char *app_id = json_object_get_string_member (obj, "application-id");
+          char *desktop_id = g_strconcat (app_id, ".desktop", NULL);
 
-  return info;
-}
+          EosAppInfo *info = g_hash_table_lookup (model->apps, desktop_id);
 
-static gboolean
-app_has_launcher (EosAppListModel *model,
-                  const char      *desktop_id)
-{
-  /* Note that this doesn't mean that the application is installed */
-  if (model->shell_apps == NULL)
-    return FALSE;
+          if (info == NULL)
+            info = get_localized_app_info (model, desktop_id, FALSE);
 
-  return g_hash_table_contains (model->shell_apps, desktop_id);
-}
+          g_free (desktop_id);
 
-static gchar *
-app_get_localized_id_for_installable_app (EosAppListModel *model,
-                                          const gchar *desktop_id)
-{
-  gchar *localized_id;
+          if (info != NULL)
+            apps = g_list_prepend (apps, info);
+        }
+    }
 
-  if (desktop_id_is_web_link (desktop_id))
-    return g_strdup (desktop_id);
+  json_array_unref (array);
 
-  if (app_is_installable (model, desktop_id))
-    return g_strdup (desktop_id);
-
-  localized_id = get_localized_desktop_id (model, desktop_id);
-  return localized_id;
-}
-
-static gboolean
-app_is_updatable (EosAppListModel *model,
-                  const char *desktop_id)
-{
-  EosAppInfo *info  = g_hash_table_lookup (model->apps, desktop_id);
-  if (info == NULL)
-    return FALSE;
-
-  return eos_app_info_is_updatable (info);
-}
-
-static gboolean
-app_is_installed (EosAppListModel *model,
-                  const char      *desktop_id)
-{
-  /* An app is installed if GIO knows about it */
-  return (eos_app_list_model_get_app_info (model, desktop_id) != NULL);
-}
-
-static const gchar *
-app_get_localized_id_for_installed_app (EosAppListModel *model,
-                                        const gchar *desktop_id)
-{
-  GDesktopAppInfo *info;
-
-  info = g_hash_table_lookup (model->gio_apps, desktop_id);
-
-  if (!info)
-    info = get_localized_app_info (model, desktop_id);
-
-  if (info)
-    return g_app_info_get_id (G_APP_INFO (info));
-  else
-    return NULL;
+  return g_list_reverse (apps);
 }
 
 gboolean
 eos_app_list_model_get_app_has_launcher (EosAppListModel *model,
                                          const char *desktop_id)
 {
-  const gchar *localized_id;
-
-  g_return_val_if_fail (EOS_IS_APP_LIST_MODEL (model), FALSE);
-  g_return_val_if_fail (desktop_id != NULL, FALSE);
-
-  if (app_has_launcher (model, desktop_id))
-    return TRUE;
-
-  localized_id = app_get_localized_id_for_installed_app (model, desktop_id);
-  return app_has_launcher (model, localized_id);
-}
-
-char *
-eos_app_list_model_get_app_icon_name (EosAppListModel *model,
-                                      const char *desktop_id)
-{
-  GDesktopAppInfo *info;
-  g_return_val_if_fail (EOS_IS_APP_LIST_MODEL (model), NULL);
-  g_return_val_if_fail (desktop_id != NULL, NULL);
-
-  info = eos_app_list_model_get_app_info (model, desktop_id);
+  EosAppInfo *info = eos_app_list_model_get_app_info (model, desktop_id);
   if (info == NULL)
-    {
-      /* TODO: for applications that are not on the system, just return
-       * a hardcoded default for now. Eventually we want to get this information
-       * from the server, through the app manager.
-       */
-      gchar *app_id = app_id_from_desktop_id (desktop_id);
-      gchar *icon_name = g_strdup_printf ("eos-app-%s", app_id);
-      g_free (app_id);
+    return FALSE;
 
-      return icon_name;
-    }
-
-  return g_desktop_app_info_get_string (info, G_KEY_FILE_DESKTOP_KEY_ICON);
-}
-
-EosAppState
-eos_app_list_model_get_app_state (EosAppListModel *model,
-                                  const char *desktop_id)
-{
-  EosAppState retval = EOS_APP_STATE_UNKNOWN;
-  gboolean is_installed, is_installable, is_updatable = FALSE;
-
-  g_return_val_if_fail (EOS_IS_APP_LIST_MODEL (model), EOS_APP_STATE_UNKNOWN);
-  g_return_val_if_fail (desktop_id != NULL, EOS_APP_STATE_UNKNOWN);
-
-  is_installed = app_is_installed (model, desktop_id);
-  if (is_installed)
-    {
-      const char *localized_id;
-      localized_id = app_get_localized_id_for_installed_app (model, desktop_id);
-      is_updatable = app_is_updatable (model, localized_id);
-    }
-
-  char *localized_installable_id = app_get_localized_id_for_installable_app (model, desktop_id);
-  is_installable = (localized_installable_id != NULL);
-  g_free (localized_installable_id);
-
-  if (is_installed && is_updatable)
-    retval = EOS_APP_STATE_UPDATABLE;
-  else if (is_installed)
-    retval = EOS_APP_STATE_INSTALLED;
-  else if (is_installable)
-    retval = EOS_APP_STATE_AVAILABLE;
-
-  return retval;
+  return eos_app_info_get_has_launcher (info);
 }
 
 static void
@@ -2207,20 +2012,20 @@ add_app_thread_func (GTask *task,
 {
   GError *error = NULL;
   EosAppListModel *model = source_object;
-  const gchar *desktop_id = task_data;
+  EosAppInfo *info = task_data;
 
-  if (!app_is_installed (model, desktop_id))
+  if (!eos_app_info_is_installed (info))
     {
-      if (!desktop_id_is_web_link (desktop_id) &&
+      if (!desktop_id_is_web_link (eos_app_info_get_desktop_id (info)) &&
           model->can_install &&
-          !add_app_from_manager (model, desktop_id, cancellable, &error))
+          !add_app_from_manager (model, info, cancellable, &error))
         {
           g_task_return_error (task, error);
           return;
         }
      }
 
-  if (!add_app_to_shell (model, desktop_id, cancellable, &error))
+  if (!add_app_to_shell (model, info, cancellable, &error))
     {
       g_task_return_error (task, error);
       return;
@@ -2237,16 +2042,12 @@ eos_app_list_model_install_app_async (EosAppListModel *model,
                                       gpointer user_data)
 {
   GTask *task;
-  char *localized_id;
+  EosAppInfo *info;
 
   task = g_task_new (model, cancellable, callback, user_data);
+  info = eos_app_list_model_get_app_info (model, desktop_id);
 
-  if (app_is_installed (model, desktop_id))
-    localized_id = g_strdup (app_get_localized_id_for_installed_app (model, desktop_id));
-  else
-    localized_id = app_get_localized_id_for_installable_app (model, desktop_id);
-
-  if (localized_id == NULL)
+  if (info == NULL)
     {
       g_task_return_new_error (task,
                                eos_app_list_model_error_quark (),
@@ -2257,7 +2058,8 @@ eos_app_list_model_install_app_async (EosAppListModel *model,
       return;
     }
 
-  if (app_is_installed (model, localized_id) && app_has_launcher (model, localized_id))
+  if (eos_app_info_is_installed (info) &&
+      eos_app_info_get_has_launcher (info))
     {
       g_task_return_new_error (task,
                                eos_app_list_model_error_quark (),
@@ -2265,11 +2067,10 @@ eos_app_list_model_install_app_async (EosAppListModel *model,
                                _("App %s already installed"),
                                desktop_id);
       g_object_unref (task);
-      g_free (localized_id);
       return;
     }
 
-  g_task_set_task_data (task, localized_id, (GDestroyNotify) g_free);
+  g_task_set_task_data (task, eos_app_info_ref (info), (GDestroyNotify) eos_app_info_unref);
   g_task_run_in_thread (task, add_app_thread_func);
   g_object_unref (task);
 }
@@ -2290,9 +2091,9 @@ update_app_thread_func (GTask *task,
 {
   GError *error = NULL;
   EosAppListModel *model = source_object;
-  const gchar *desktop_id = task_data;
+  EosAppInfo *info = task_data;
 
-  if (!update_app_from_manager (model, desktop_id, cancellable, &error))
+  if (!update_app_from_manager (model, info, cancellable, &error))
     {
       g_task_return_error (task, error);
       return;
@@ -2309,13 +2110,12 @@ eos_app_list_model_update_app_async (EosAppListModel *model,
                                      gpointer user_data)
 {
   GTask *task;
-  const char *localized_id;
+  EosAppInfo *info;
 
   task = g_task_new (model, cancellable, callback, user_data);
+  info = eos_app_list_model_get_app_info (model, desktop_id);
 
-  localized_id = app_get_localized_id_for_installed_app (model, desktop_id);
-
-  if (localized_id == NULL)
+  if (info == NULL)
     {
       g_task_return_new_error (task,
                                eos_app_list_model_error_quark (),
@@ -2326,7 +2126,7 @@ eos_app_list_model_update_app_async (EosAppListModel *model,
       return;
     }
 
-  if (!app_is_updatable (model, localized_id))
+  if (!eos_app_info_is_updatable (info))
     {
       g_task_return_new_error (task,
                                eos_app_list_model_error_quark (),
@@ -2337,7 +2137,7 @@ eos_app_list_model_update_app_async (EosAppListModel *model,
       return;
     }
 
-  g_task_set_task_data (task, g_strdup (localized_id), (GDestroyNotify) g_free);
+  g_task_set_task_data (task, eos_app_info_ref (info), (GDestroyNotify) eos_app_info_unref);
   g_task_run_in_thread (task, update_app_thread_func);
   g_object_unref (task);
 }
@@ -2358,9 +2158,9 @@ remove_app_thread_func (GTask *task,
 {
   GError *error = NULL;
   EosAppListModel *model = source_object;
-  const gchar *desktop_id = task_data;
+  EosAppInfo *info = task_data;
 
-  if (model->can_uninstall && !remove_app_from_manager (model, desktop_id, cancellable, &error))
+  if (model->can_uninstall && !remove_app_from_manager (model, info, cancellable, &error))
     {
       g_task_return_error (task, error);
       return;
@@ -2368,9 +2168,9 @@ remove_app_thread_func (GTask *task,
 
   eos_app_log_debug_message ("Re-loading available apps after uninstall");
 
-  invalidate_app_info (model, desktop_id, cancellable);
+  invalidate_app_info (model, info, cancellable);
 
-  if (!remove_app_from_shell (model, desktop_id, cancellable, &error))
+  if (!remove_app_from_shell (model, info, cancellable, &error))
     {
       g_task_return_error (task, error);
       return;
@@ -2387,13 +2187,12 @@ eos_app_list_model_uninstall_app_async (EosAppListModel *model,
                                         gpointer user_data)
 {
   GTask *task;
-  const gchar *localized_id;
+  EosAppInfo *info;
 
   task = g_task_new (model, cancellable, callback, user_data);
+  info = eos_app_list_model_get_app_info (model, desktop_id);
 
-  localized_id = app_get_localized_id_for_installed_app (model, desktop_id);
-
-  if ((localized_id == NULL) || !app_is_installed (model, localized_id))
+  if (info == NULL || !eos_app_info_is_installed (info))
     {
       g_task_return_new_error (task,
                                eos_app_list_model_error_quark (),
@@ -2404,7 +2203,7 @@ eos_app_list_model_uninstall_app_async (EosAppListModel *model,
       return;
     }
 
-  g_task_set_task_data (task, g_strdup (localized_id), (GDestroyNotify) g_free);
+  g_task_set_task_data (task, eos_app_info_ref (info), (GDestroyNotify) eos_app_info_unref);
   g_task_run_in_thread (task, remove_app_thread_func);
   g_object_unref (task);
 }
@@ -2423,11 +2222,9 @@ eos_app_list_model_launch_app (EosAppListModel *model,
                                guint32 timestamp,
                                GError **error)
 {
-  const gchar *localized_id;
+  EosAppInfo *info = eos_app_list_model_get_app_info (model, desktop_id);
 
-  localized_id = app_get_localized_id_for_installed_app (model, desktop_id);
-
-  if ((localized_id == NULL) || !app_is_installed (model, localized_id))
+  if ((info == NULL) || !eos_app_info_is_installed (info))
     {
       g_set_error (error,
                    eos_app_list_model_error_quark (),
@@ -2437,110 +2234,5 @@ eos_app_list_model_launch_app (EosAppListModel *model,
       return FALSE;
     }
 
-  return launch_app (model, localized_id, timestamp, NULL, error);
-}
-
-gboolean
-eos_app_list_model_has_app (EosAppListModel *model,
-                            const char *desktop_id)
-{
-  gchar *localized_id;
-
-  if (app_is_installed (model, desktop_id))
-    return TRUE;
-
-  if (app_is_installable (model, desktop_id))
-    return TRUE;
-
-  localized_id = get_localized_desktop_id (model, desktop_id);
-
-  if (localized_id)
-    {
-      g_free (localized_id);
-      return TRUE;
-    }
-
-  return FALSE;
-}
-
-gboolean
-eos_app_list_model_get_app_can_remove (EosAppListModel *model,
-                                       const char *desktop_id)
-{
-  const gchar *localized_id;
-
-  localized_id = app_get_localized_id_for_installed_app (model, desktop_id);
-
-  /* Can only remove what the manager installed... */
-  if (!g_hash_table_contains (model->apps, localized_id))
-    return FALSE;
-
-  EosAppInfo *info = g_hash_table_lookup (model->apps, localized_id);
-
-  return eos_app_info_is_removable (info);
-}
-
-static guint64
-get_fs_available_space (void)
-{
-  GFile *current_directory = NULL;
-  GFileInfo *filesystem_info = NULL;
-  GError *error = NULL;
-
-  /* Whatever FS we're on, check the space */
-  current_directory = g_file_new_for_path (".");
-
-  filesystem_info = g_file_query_filesystem_info (current_directory,
-                                                  G_FILE_ATTRIBUTE_FILESYSTEM_FREE,
-                                                  NULL, /* Cancellable */
-                                                  &error);
-
-  g_object_unref (current_directory);
-
-  if (error != NULL)
-    {
-      eos_app_log_error_message ("Could not retrieve available space: %s",
-                                 error->message);
-      g_error_free (error);
-
-      /* Assume we have the space */
-      return G_MAXUINT64;
-    }
-
-  guint64 available_space = g_file_info_get_attribute_uint64 (filesystem_info,
-                                                              G_FILE_ATTRIBUTE_FILESYSTEM_FREE);
-
-  eos_app_log_debug_message ("Available space: %" G_GUINT64_FORMAT, available_space);
-
-  g_object_unref (filesystem_info);
-
-  return available_space;
-}
-
-gboolean
-eos_app_list_model_get_app_has_sufficient_install_space (EosAppListModel *model,
-                                                         const char *desktop_id)
-{
-  guint64 installed_size = 0;
-  gchar *localized_id;
-
-  localized_id = app_get_localized_id_for_installable_app (model, desktop_id);
-  if (localized_id == NULL)
-    {
-        eos_app_log_error_message ("Can't find app ID matching %s while checking install space",
-                                   desktop_id);
-        return FALSE;
-    }
-
-  EosAppInfo *info = g_hash_table_lookup (model->apps, localized_id);
-  installed_size = eos_app_info_get_installed_size (info);
-
-  eos_app_log_debug_message ("App %s installed size: %" G_GINT64_FORMAT,
-                             desktop_id,
-                             installed_size);
-
-  if (installed_size <= get_fs_available_space ())
-    return TRUE;
-
-  return FALSE;
+  return launch_app (model, info, timestamp, NULL, error);
 }

@@ -100,6 +100,7 @@ eos_app_info_unref (EosAppInfo *info)
       g_free (info->bundle_uri);
       g_free (info->signature_uri);
       g_free (info->bundle_hash);
+      g_free (info->icon_name);
       g_strfreev (info->screenshots);
 
       g_slice_free (EosAppInfo, info);
@@ -215,6 +216,12 @@ eos_app_info_get_installed_size (const EosAppInfo *info)
 }
 
 gboolean
+eos_app_info_is_installed (const EosAppInfo *info)
+{
+  return info->is_installed;
+}
+
+gboolean
 eos_app_info_is_installable (const EosAppInfo *info)
 {
   return !info->is_installed && info->is_available;
@@ -236,6 +243,45 @@ EosAppCategory
 eos_app_info_get_category (const EosAppInfo *info)
 {
   return info->category;
+}
+
+gboolean
+eos_app_info_get_has_launcher (const EosAppInfo *info)
+{
+  return info->has_launcher && info->is_installed;
+}
+
+char *
+eos_app_info_get_icon_name (const EosAppInfo *info)
+{
+  if (info->icon_name != NULL)
+    return g_strdup (info->icon_name);
+
+  /* TODO: for applications that are not on the system, just return
+   * a hardcoded default for now. Eventually we want to get this information
+   * from the server.
+   */
+  return g_strdup_printf ("eos-app-%s", eos_app_info_get_content_id (info));
+}
+
+EosAppState
+eos_app_info_get_state (const EosAppInfo *info)
+{
+  EosAppState retval = EOS_APP_STATE_UNKNOWN;
+  gboolean is_installed, is_installable, is_updatable;
+
+  is_installed = eos_app_info_is_installed (info);
+  is_updatable = eos_app_info_is_updatable (info);
+  is_installable = eos_app_info_is_installable (info);
+
+  if (is_installed && is_updatable)
+    retval = EOS_APP_STATE_UPDATABLE;
+  else if (is_installed)
+    retval = EOS_APP_STATE_INSTALLED;
+  else if (is_installable)
+    retval = EOS_APP_STATE_AVAILABLE;
+
+  return retval;
 }
 
 /**
@@ -294,37 +340,6 @@ eos_app_info_get_screenshots (const EosAppInfo *info)
   return g_strdupv (info->screenshots);
 }
 
-/* Keep in the same order as the EosAppCategory enumeration */
-static const struct {
-  const EosAppCategory category;
-  const char *id;
-} categories[] = {
-  /* Translators: use the same string used to install the app store content JSON */
-  { EOS_APP_CATEGORY_EDUCATION,     N_("Education") },
-  { EOS_APP_CATEGORY_GAMES,         N_("Games") },
-  { EOS_APP_CATEGORY_RESOURCES,     N_("Resources") },
-  { EOS_APP_CATEGORY_UTILITIES,     N_("Utilities") },
-};
-
-static const guint n_categories = G_N_ELEMENTS (categories);
-
-static EosAppCategory
-get_category_from_id (const char *p)
-{
-  guint i;
-
-  if (p == NULL || *p == '\0')
-    return EOS_APP_CATEGORY_UTILITIES;
-
-  for (i = 0; i < n_categories; i++)
-    {
-      if (strcmp (categories[i].id, p) == 0)
-        return categories[i].category;
-    }
-
-  return EOS_APP_CATEGORY_UTILITIES;
-}
-
 static EosFlexyShape
 get_shape_from_id (const char *p)
 {
@@ -371,6 +386,60 @@ get_screenshots (JsonArray *array,
                                              NULL);
 
   g_free (path);
+}
+
+static guint64
+get_fs_available_space (void)
+{
+  GFile *current_directory = NULL;
+  GFileInfo *filesystem_info = NULL;
+  GError *error = NULL;
+
+  /* Whatever FS we're on, check the space */
+  current_directory = g_file_new_for_path (".");
+
+  filesystem_info = g_file_query_filesystem_info (current_directory,
+                                                  G_FILE_ATTRIBUTE_FILESYSTEM_FREE,
+                                                  NULL, /* Cancellable */
+                                                  &error);
+
+  g_object_unref (current_directory);
+
+  if (error != NULL)
+    {
+      eos_app_log_error_message ("Could not retrieve available space: %s",
+                                 error->message);
+      g_error_free (error);
+
+      /* Assume we have the space */
+      return G_MAXUINT64;
+    }
+
+  guint64 available_space = g_file_info_get_attribute_uint64 (filesystem_info,
+                                                              G_FILE_ATTRIBUTE_FILESYSTEM_FREE);
+
+  eos_app_log_debug_message ("Available space: %" G_GUINT64_FORMAT, available_space);
+
+  g_object_unref (filesystem_info);
+
+  return available_space;
+}
+
+gboolean
+eos_app_info_get_has_sufficient_install_space (const EosAppInfo *info)
+{
+  guint64 installed_size = 0;
+
+  installed_size = eos_app_info_get_installed_size (info);
+
+  eos_app_log_debug_message ("App %s installed size: %" G_GINT64_FORMAT,
+                             eos_app_info_get_desktop_id (info),
+                             installed_size);
+
+  if (installed_size <= get_fs_available_space ())
+    return TRUE;
+
+  return FALSE;
 }
 
 /* installed keyfile keys */
@@ -605,21 +674,48 @@ eos_app_info_update_from_server (EosAppInfo *info,
 }
 
 /*< private >*/
-EosAppInfo *
-eos_app_info_create_from_content (JsonNode *node)
+void
+eos_app_info_update_from_gio (EosAppInfo *info,
+                              GDesktopAppInfo *desktop_info)
 {
-  const char *app_id;
+  /* Do not update icon again if we already seen this desktop file
+   * as a GIO override.
+   */
+  if (info->has_override)
+    return;
 
+  info->has_override = g_str_has_prefix (g_app_info_get_id (G_APP_INFO (desktop_info)),
+                                         "eos-app-");
+
+  g_free (info->icon_name);
+  info->icon_name = g_desktop_app_info_get_string (desktop_info, G_KEY_FILE_DESKTOP_KEY_ICON);
+}
+
+/*< private >*/
+void
+eos_app_info_set_has_launcher (EosAppInfo *info,
+                               gboolean has_launcher)
+{
+  info->has_launcher = has_launcher;
+}
+
+/*< private >*/
+void
+eos_app_info_set_is_installed (EosAppInfo *info,
+                               gboolean is_installed)
+{
+  info->is_installed = is_installed;
+}
+
+/*< private >*/
+gboolean
+eos_app_info_update_from_content (EosAppInfo *info,
+                                  JsonNode *node)
+{
   if (!JSON_NODE_HOLDS_OBJECT (node))
-    return NULL;
+    return FALSE;
 
   JsonObject *obj = json_node_get_object (node);
-  if (!json_object_has_member (obj, "application-id"))
-    return NULL;
-
-  app_id = json_object_get_string_member (obj, "application-id");
-
-  EosAppInfo *info = eos_app_info_new (app_id);
 
   if (json_object_has_member (obj, "title"))
     info->title = json_node_dup_string (json_object_get_member (obj, "title"));
@@ -673,7 +769,7 @@ eos_app_info_create_from_content (JsonNode *node)
     {
       const char *category = json_object_get_string_member (obj, "category");
 
-      info->category = get_category_from_id (category);
+      info->category = eos_app_category_from_id (category);
     }
   else
     info->category = EOS_APP_CATEGORY_UTILITIES;
@@ -713,5 +809,5 @@ eos_app_info_create_from_content (JsonNode *node)
   else
     info->n_screenshots = 0;
 
-  return info;
+  return TRUE;
 }

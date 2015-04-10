@@ -31,6 +31,7 @@ struct _EosAppInfo
 
   char *square_img;
   char *featured_img;
+  char *icon_name;
 
   char **screenshots;
   guint n_screenshots;
@@ -45,6 +46,8 @@ struct _EosAppInfo
   guint is_available : 1;
   guint is_installed : 1;
   guint update_available : 1;
+  guint has_launcher : 1;
+  guint has_override : 1;
 };
 
 G_END_DECLS

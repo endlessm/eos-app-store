@@ -8,8 +8,6 @@ const Lang = imports.lang;
 const Path = imports.path;
 const Signals = imports.signals;
 
-const EOS_LINK_PREFIX = 'eos-link-';
-
 const BaseList = new Lang.Class({
     Name: 'BaseList',
     Abstract: true,
@@ -30,51 +28,11 @@ const BaseList = new Lang.Class({
     },
 
     _onModelChanged: function(model) {
-        // do nothing here
-    },
-
-    getIcon: function(id) {
-        return this._model.get_app_icon_name(id);
-    },
-
-    getState: function(id) {
-        return this._model.get_app_state(id);
-    },
-
-    isInstalled: function(id) {
-        let appState = this._model.get_app_state(id);
-
-        if (appState == EosAppStorePrivate.AppState.INSTALLED ||
-            appState == EosAppStorePrivate.AppState.UPDATABLE) {
-            return true;
-        }
-
-        return false;
-    },
-
-    hasApp: function(id) {
-        return this._model.has_app(id);
+        this.emit('changed');
     },
 
     hasLauncher: function(id) {
-        if (!this.isInstalled(id)) {
-            return false;
-        }
-
         return this._model.get_app_has_launcher(id);
-    },
-
-    hasSufficientInstallSpace: function(id) {
-        return this._model.get_app_has_sufficient_install_space(id);
-    },
-
-    canRemove: function(id) {
-        // Only apps that don't have a launcher can be
-        // removed from the system
-        if (this.hasLauncher(id))
-            return false;
-
-        return this._model.get_app_can_remove(id);
     },
 
     install: function(id, callback) {
@@ -183,18 +141,8 @@ const AppList = new Lang.Class({
         this.emit('download-progress', contentId, progress, current, total);
     },
 
-    _onModelChanged: function(model) {
-        let items = model.get_all_apps();
-        let apps = items.filter(Lang.bind(this, function(item) {
-            if (item.indexOf(EOS_LINK_PREFIX) == 0) {
-                // web links are ignored
-                return false;
-            }
-
-            // TODO: filter language from ID for Endless apps on the server
-            return true;
-        }));
-        this.emit('changed', apps);
+    loadCategory: function(categoryId) {
+        return this._model.get_apps_for_category(categoryId);
     },
 
     updateApp: function(id, callback) {
@@ -237,17 +185,4 @@ const AppList = new Lang.Class({
 const WeblinkList = new Lang.Class({
     Name: 'WeblinkList',
     Extends: BaseList,
-
-    _onModelChanged: function(model) {
-        let items = model.get_all_apps();
-        let weblinks = items.filter(Lang.bind(this, function(item) {
-            if (item.indexOf(EOS_LINK_PREFIX) == -1) {
-                // only take web links into account
-                return false;
-            }
-
-            return true;
-        }));
-        this.emit('changed', weblinks);
-    }
 });
