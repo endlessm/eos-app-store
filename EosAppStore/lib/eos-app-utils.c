@@ -816,7 +816,7 @@ eos_get_all_updates_uri (void)
 static gboolean
 is_app_id (const char *appid)
 {
-  static const char alsoallowed[] = "-+.";
+  static const char alsoallowed[] = "_-+.";
   static const char *reserveddirs[] = { "bin", "share", "lost+found", "xdg", };
 
   if (!appid || appid[0] == '\0')
