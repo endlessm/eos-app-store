@@ -686,9 +686,13 @@ const AppCategoryFrame = new Lang.Class({
         let appInfos = this._model.loadCategory(this._category.id);
 
         if (this._category.id == EosAppStorePrivate.AppCategory.INSTALLED) {
+            let sortedAppInfos = appInfos.sort(function(a, b) {
+                return b.get_installation_time() - a.get_installation_time();
+            });
+
             // 'Installed' only shows apps available on the desktop...
-            for (let i in appInfos) {
-                let info = appInfos[i];
+            for (let i in sortedAppInfos) {
+                let info = sortedAppInfos[i];
 
                 if (info.get_has_launcher()) {
                     let cell = info.create_cell(info.get_icon_name());
