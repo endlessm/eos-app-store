@@ -488,10 +488,11 @@ load_content_apps (EosAppListModel *self,
 }
 
 static gboolean
-load_all_apps (EosAppListModel *self,
-               GCancellable *cancellable,
-               GError **error)
+reload_model (EosAppListModel *self,
+              GCancellable *cancellable)
 {
+  gboolean retval = FALSE;
+
   eos_app_log_debug_message ("Loading GIO apps");
   eos_app_load_gio_apps (self->apps);
 
@@ -506,20 +507,37 @@ load_all_apps (EosAppListModel *self,
   /* Load apps with launcher from the shell */
   eos_app_log_debug_message ("Loading apps with launcher from the shell");
   if (!load_shell_apps (self, cancellable))
-    goto out;
+    {
+      eos_app_log_error_message ("Unable to load shell apps");
+      goto out;
+    }
 
   eos_app_log_debug_message ("Loading apps from content");
   if (!load_content_apps (self, cancellable))
-    goto out;
+    {
+      eos_app_log_error_message ("Unable to load content apps");
+      goto out;
+    }
 
-  return TRUE;
+  retval = TRUE;
 
-out:
-  g_set_error_literal (error, EOS_APP_LIST_MODEL_ERROR,
-                       EOS_APP_LIST_MODEL_ERROR_NO_UPDATE_AVAILABLE,
-                       _("We were unable to update the list of applications"));
+ out:
+  return retval;
+}
 
-  return FALSE;
+static gboolean
+load_all_apps (EosAppListModel *self,
+               GCancellable *cancellable,
+               GError **error)
+{
+  gboolean retval = reload_model (self, cancellable);
+
+  if (!retval)
+    g_set_error_literal (error, EOS_APP_LIST_MODEL_ERROR,
+                         EOS_APP_LIST_MODEL_ERROR_NO_UPDATE_AVAILABLE,
+                         _("We were unable to update the list of applications"));
+
+  return retval;
 }
 
 static void
@@ -532,12 +550,7 @@ invalidate_app_info (EosAppListModel *self,
    */
   g_hash_table_remove (self->apps, eos_app_info_get_desktop_id (info));
 
-  if (!load_manager_installed_apps (self, cancellable))
-    eos_app_log_error_message ("Unable to re-load installed apps");
-
-  if (!load_manager_available_apps (self, cancellable))
-    eos_app_log_error_message ("Unable to re-load available apps");
-
+  reload_model (self, cancellable);
   eos_app_list_model_emit_changed (self);
 }
 
