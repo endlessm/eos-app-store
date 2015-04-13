@@ -54,6 +54,8 @@ gboolean        eos_app_info_get_has_launcher           (const EosAppInfo *info)
 EosAppState     eos_app_info_get_state                  (const EosAppInfo *info);
 gboolean        eos_app_info_get_has_sufficient_install_space (const EosAppInfo *info);
 
+gint64          eos_app_info_get_installation_time      (const EosAppInfo *info);
+
 #ifndef __GI_SCANNER__
 
 /* private */

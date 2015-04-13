@@ -71,6 +71,8 @@ eos_app_info_new (const char *application_id)
   info->content_id = content_id_from_application_id (application_id);
   info->desktop_id = g_strdup_printf ("%s.desktop", info->application_id);
 
+  info->installation_time = -1;
+
   return info;
 }
 
@@ -284,6 +286,12 @@ eos_app_info_get_state (const EosAppInfo *info)
   return retval;
 }
 
+gint64
+eos_app_info_get_installation_time (const EosAppInfo *info)
+{
+  return info->installation_time;
+}
+
 /**
  * eos_app_info_get_square_img:
  * @info: ...
@@ -485,15 +493,28 @@ enum {
   N_KEYS
 };
 
+/* Keep this list updated with the locations we use for
+ * installing app bundles
+ */
+static const char *known_mount_points[] = {
+  "/var/endless-extra",
+};
+
 /*< private >
- * check_secondary_storage:
+ * check_info_storage:
+ * @info: the #EosAppInfo to update
  * @filename: the full path to the bundle info file
  *
- * Returns: %TRUE if the bundle info resides on secondary storage
+ * Updates file system related fields of @info.
  */
-static gboolean
-check_secondary_storage (const char *filename)
+static void
+check_info_storage (EosAppInfo *info,
+                    const char *filename)
 {
+  /* Default values */
+  info->on_secondary_storage = FALSE;
+  info->installation_time = -1;
+
   /* we check if the file resides on a volume mounted using overlayfs.
    * this is a bit more convoluted; in theory, we could check if the
    * directory in which @filename is located has the overlayfs magic
@@ -502,27 +523,29 @@ check_secondary_storage (const char *filename)
    */
   struct stat statbuf;
   if (stat (filename, &statbuf) < 0)
-    return FALSE;
+    return;
+
+  /* We use second resolution for the installation time, because
+   * nanosecond resolution is not interesting for us
+   */
+  info->installation_time = statbuf.st_ctim.tv_sec;
 
   dev_t file_stdev = statbuf.st_dev;
 
   /* and we compare them with the same fields of a list of known
    * mount points
    */
-  const char *known_mount_points[] = {
-    "/var/endless-extra",
-  };
-
   for (int i = 0; i < G_N_ELEMENTS (known_mount_points); i++)
    {
       if (stat (known_mount_points[i], &statbuf) < 0)
-        return FALSE;
+        break;
 
       if (file_stdev == statbuf.st_dev)
-        return TRUE;
+        {
+          info->on_secondary_storage = TRUE;
+          break;
+        }
     }
-
-  return FALSE;
 }
 
 /*< private >*/
@@ -549,10 +572,11 @@ eos_app_info_update_from_installed (EosAppInfo *info,
 
   info->installed_size = g_key_file_get_int64 (keyfile, GROUP, FILE_KEYS[INSTALLED_SIZE], NULL);
 
+  check_info_storage (info, filename);
+
+  /* Data coming from the keyfile takes precedence */
   if (g_key_file_has_key (keyfile, GROUP, FILE_KEYS[SECONDARY_STORAGE], NULL))
     info->on_secondary_storage = g_key_file_get_boolean (keyfile, GROUP, FILE_KEYS[SECONDARY_STORAGE], NULL);
-  else
-    info->on_secondary_storage = check_secondary_storage (filename);
 
   /* If we found it here, then it's installed */
   info->is_installed = TRUE;
