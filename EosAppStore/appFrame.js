@@ -799,7 +799,7 @@ const AppBroker = new Lang.Class({
 
         // initialize the applications model
         this._model = new AppListModel.AppList();
-        this._model.refresh(Lang.bind(this, this._populateAllCategories));
+        this._model.refresh(Lang.bind(this, this._onModelRefresh));
         this._model.connect('changed', Lang.bind(this, this._populateAllCategories));
 
         this._categories = Categories.get_app_categories();
@@ -813,6 +813,24 @@ const AppBroker = new Lang.Class({
         let content_file = Gio.File.new_for_path(content_path);
         this._contentMonitor = content_file.monitor_file(Gio.FileMonitorFlags.NONE, null);
         this._contentMonitor.connect('changed', Lang.bind(this, this._onContentChanged));
+    },
+
+    _onModelRefresh: function(model, error) {
+        if (error) {
+            let dialog = new Gtk.MessageDialog();
+            dialog.set_transient_for(app.mainWindow);
+            dialog.modal = true;
+            dialog.destroy_with_parent = true;
+            dialog.text = _("Update failed");
+            dialog.secondary_text = error.message;
+            dialog.add_button(_("Dismiss"), Gtk.ResponseType.OK);
+            dialog.show_all();
+            dialog.run();
+            dialog.destroy();
+            return;
+        }
+
+        this._populateAllCategories();
     },
 
     _onContentChanged: function(monitor, file, other_file, event_type) {
