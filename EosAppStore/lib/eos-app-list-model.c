@@ -298,9 +298,9 @@ on_shell_applications_changed (GDBusConnection *connection,
 }
 
 static gboolean
-load_available_apps (EosAppListModel *self,
-                     GCancellable *cancellable,
-                     GError **error_out)
+load_manager_available_apps (EosAppListModel *self,
+                             GCancellable *cancellable,
+                             GError **error_out)
 {
   eos_app_log_info_message ("Trying to get available apps");
 
@@ -384,40 +384,13 @@ load_user_capabilities (EosAppListModel *self,
 }
 
 static gboolean
-load_manager_available_apps (EosAppListModel *self,
-                             GCancellable *cancellable)
-{
-  GError *error = NULL;
-
-  load_available_apps (self, cancellable, &error);
-
-  if (error != NULL)
-    {
-      g_critical ("Unable to list available apps: %s", error->message);
-      g_error_free (error);
-      return FALSE;
-    }
-
-  return TRUE;
-}
-
-static gboolean
 load_manager_installed_apps (EosAppListModel *self,
-                             GCancellable *cancellable)
+                             GCancellable *cancellable,
+                             GError **error)
 {
   eos_app_log_info_message ("Trying to get installed apps");
 
-  const char *appdir = eos_get_bundles_dir ();
-
-  GError *error = NULL;
-  if (!eos_app_load_installed_apps (self->apps, appdir, cancellable, &error))
-    {
-      eos_app_log_error_message ("Unable to list installed bundles: %s", error->message);
-      g_error_free (error);
-      return FALSE;
-    }
-
-  return TRUE;
+  return eos_app_load_installed_apps (self->apps, eos_get_bundles_dir (), cancellable, error);
 }
 
 static gboolean
@@ -489,7 +462,8 @@ load_content_apps (EosAppListModel *self,
 
 static gboolean
 reload_model (EosAppListModel *self,
-              GCancellable *cancellable)
+              GCancellable *cancellable,
+              GError **error)
 {
   gboolean retval = FALSE;
 
@@ -497,11 +471,11 @@ reload_model (EosAppListModel *self,
   eos_app_load_gio_apps (self->apps);
 
   eos_app_log_debug_message ("Loading installed apps from manager");
-  if (!load_manager_installed_apps (self, cancellable))
+  if (!load_manager_installed_apps (self, cancellable, error))
     eos_app_log_error_message ("Unable to load installed apps");
 
   eos_app_log_debug_message ("Loading available apps from manager");
-  if (!load_manager_available_apps (self, cancellable))
+  if (!load_manager_available_apps (self, cancellable, error))
     eos_app_log_error_message ("Unable to load available apps");
 
   /* Load apps with launcher from the shell */
@@ -521,7 +495,7 @@ reload_model (EosAppListModel *self,
 
   retval = TRUE;
 
- out:
+out:
   return retval;
 }
 
@@ -530,12 +504,26 @@ load_all_apps (EosAppListModel *self,
                GCancellable *cancellable,
                GError **error)
 {
-  gboolean retval = reload_model (self, cancellable);
+  GError *internal_error = NULL;
+  gboolean retval = reload_model (self, cancellable, &internal_error);
 
   if (!retval)
-    g_set_error_literal (error, EOS_APP_LIST_MODEL_ERROR,
-                         EOS_APP_LIST_MODEL_ERROR_NO_UPDATE_AVAILABLE,
-                         _("We were unable to update the list of applications"));
+    {
+      if (internal_error == NULL || internal_error->domain != EOS_APP_LIST_MODEL_ERROR)
+        {
+          if (internal_error != NULL)
+            {
+              eos_app_log_error_message ("%s", internal_error->message);
+              g_error_free (internal_error);
+            }
+
+          g_set_error_literal (error, EOS_APP_LIST_MODEL_ERROR,
+                               EOS_APP_LIST_MODEL_ERROR_NO_UPDATE_AVAILABLE,
+                               _("We were unable to update the list of applications"));
+        }
+      else
+        g_propagate_error (error, internal_error);
+    }
 
   return retval;
 }
@@ -550,7 +538,17 @@ invalidate_app_info (EosAppListModel *self,
    */
   g_hash_table_remove (self->apps, eos_app_info_get_desktop_id (info));
 
-  reload_model (self, cancellable);
+  GError *error = NULL;
+  if (!reload_model (self, cancellable, &error))
+    {
+      eos_app_log_error_message ("Unable to reload the model after "
+                                 "invalidating app info for '%s': %s",
+                                 eos_app_info_get_application_id (info),
+                                 error != NULL ? error->message : "internal error");
+      if (error != NULL)
+        g_error_free (error);
+    }
+
   eos_app_list_model_emit_changed (self);
 }
 
