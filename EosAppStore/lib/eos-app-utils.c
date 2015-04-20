@@ -787,7 +787,10 @@ eos_app_load_installed_apps (GHashTable *app_info,
 {
   GDir *dir = g_dir_open (appdir, 0, error);
   if (dir == NULL)
-    return FALSE;
+    {
+      eos_app_log_error_message ("Unable to open '%s': %s", appdir, error->message);
+      return FALSE;
+    }
 
   gint64 start_time = g_get_monotonic_time ();
 
@@ -800,7 +803,7 @@ eos_app_load_installed_apps (GHashTable *app_info,
 
       if (!is_app_id (appid))
         {
-          eos_app_log_info_message ("Skipping '%s'...", appid);
+          eos_app_log_info_message ("Skipping '%s/%s': not a valid app directory", appdir, appid);
           continue;
         }
 
@@ -825,7 +828,7 @@ eos_app_load_installed_apps (GHashTable *app_info,
         }
       else
         {
-          eos_app_log_debug_message ("App '%s' failed to update from installed info", appid);
+          eos_app_log_error_message ("App '%s' failed to update from installed info", appid);
           eos_app_info_unref (info);
         }
 
