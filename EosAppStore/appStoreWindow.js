@@ -142,6 +142,11 @@ const AppStoreWindow = new Lang.Class({
         let monitor = screen.get_primary_monitor();
         let workArea = screen.get_monitor_workarea(monitor);
 
+        let forcedWidth = GLib.getenv('EOS_APP_STORE_WIDTH');
+        if (forcedWidth) {
+            return { x: workArea.x, y: workArea.y, width: forcedWidth, height: workArea.height };
+        }
+
         return workArea;
     },
 
