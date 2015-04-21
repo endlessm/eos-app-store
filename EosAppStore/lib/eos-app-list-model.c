@@ -347,8 +347,13 @@ load_user_capabilities (EosAppListModel *self,
   EosAppManager *proxy = get_eam_dbus_proxy (self);
   if (proxy == NULL)
     {
-      eos_app_log_error_message ("Could not get DBus proxy object - canceling");
-
+      set_app_installation_error (desktop_id,
+                                  "Could not get DBus proxy object - canceling",
+                                  _("The app store has detected a fatal error and "
+                                    "cannot continue with the installation. Please, "
+                                    "restart your system. If the problem persists, "
+                                    "please contact support."),
+                                  error_out);
       return FALSE;
     }
 
@@ -1677,9 +1682,16 @@ install_latest_app_version (EosAppListModel *self,
   EosAppManager *proxy = get_eam_dbus_proxy (self);
   if (proxy == NULL)
     {
+      /* The app manager will fail to start if various conditions are not
+       * met: missing configuration; broken file system layout; or a broken
+       * installation.
+       */
       set_app_installation_error (desktop_id,
                                   "Could not get DBus proxy object - canceling",
-                                  NULL, /* External error text */
+                                  _("The app store has detected a fatal error and "
+                                    "cannot continue with the installation. Please, "
+                                    "restart your system. If the problem persists, "
+                                    "please contact support."),
                                   error_out);
       return FALSE;
     }
@@ -1887,13 +1899,13 @@ remove_app_from_manager (EosAppListModel *self,
   EosAppManager *proxy = get_eam_dbus_proxy (self);
   if (proxy == NULL)
     {
-      eos_app_log_error_message ("Could not get DBus proxy object - canceling");
-
-      g_set_error (error_out, EOS_APP_LIST_MODEL_ERROR,
-                   EOS_APP_LIST_MODEL_ERROR_UNINSTALL_FAILED,
-                   _("Application '%s' could not be uninstalled"),
-                   desktop_id);
-
+      set_app_installation_error (desktop_id,
+                                  "Could not get DBus proxy object - canceling",
+                                  _("The app store has detected a fatal error and "
+                                    "cannot continue with the installation. Please, "
+                                    "restart your system. If the problem persists, "
+                                    "please contact support."),
+                                  error_out);
       return FALSE;
     }
 
