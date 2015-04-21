@@ -588,6 +588,8 @@ const WeblinkFrame = new Lang.Class({
         let description = new Gtk.Label({ label: _("Add your favorite websites to your desktop or choose suggested ones from our list.") });
         description.get_style_context().add_class('weblink-description');
         description.set_alignment(0, 0.5);
+        description.set_line_wrap(true);
+        description.set_max_width_chars(60);
         this._mainBox.add(description);
         this._mainBox.reorder_child(description, 0);
 

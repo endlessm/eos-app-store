@@ -19,6 +19,8 @@
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
                 <property name="xalign">0</property>
+                <property name="wrap">True</property>
+                <property name="max_width_chars">60</property>
                 <property name="label" translatable="yes">Create your own folder to organize your apps. First, choose an icon.</property>
                 <style>
                   <class name="folder-description"/>
