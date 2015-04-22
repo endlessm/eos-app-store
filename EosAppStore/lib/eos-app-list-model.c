@@ -1915,8 +1915,13 @@ remove_app_from_manager (EosAppListModel *self,
   const char *app_id = eos_app_info_get_application_id (info);
   const char *desktop_id = eos_app_info_get_desktop_id (info);
 
+  /* We do a double check here, to catch the case where the app manager
+   * proxy was successfully created, but the app bundles directory was
+   * removed afterwards
+   */
   EosAppManager *proxy = get_eam_dbus_proxy (self);
-  if (proxy == NULL)
+  if (proxy == NULL ||
+      !g_file_test (eos_get_bundles_dir (), G_FILE_TEST_EXISTS))
     {
       set_app_installation_error (desktop_id,
                                   "Could not get DBus proxy object - canceling",
