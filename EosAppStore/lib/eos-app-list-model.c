@@ -664,7 +664,11 @@ refresh_thread_func (GTask *task,
   EosAppListModel *model = source_object;
   GError *error = NULL;
 
-  load_user_capabilities (model, cancellable);
+  if (!load_user_capabilities (model, cancellable, &error))
+    {
+      g_task_return_error (task, error);
+      return;
+    }
 
   if (!load_all_apps (model, cancellable, &error))
     {
