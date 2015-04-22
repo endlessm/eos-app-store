@@ -785,10 +785,12 @@ eos_app_load_installed_apps (GHashTable *app_info,
                              GCancellable *cancellable,
                              GError **error)
 {
-  GDir *dir = g_dir_open (appdir, 0, error);
+  GError *internal_error = NULL;
+  GDir *dir = g_dir_open (appdir, 0, &internal_error);
   if (dir == NULL)
     {
-      eos_app_log_error_message ("Unable to open '%s': %s", appdir, error->message);
+      eos_app_log_error_message ("Unable to open '%s': %s", appdir, internal_error->message);
+      g_propagate_error (error, internal_error);
       return FALSE;
     }
 
