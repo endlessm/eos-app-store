@@ -87,6 +87,11 @@ download_file_from_uri (SoupSession     *session,
                         char           **buffer,
                         GCancellable    *cancellable,
                         GError         **error);
+static void
+set_app_installation_error (const char *desktop_id,
+                            const char *internal_message,
+                            const char *external_message,
+                            GError **error_out);
 
 G_DEFINE_TYPE (EosAppListModel, eos_app_list_model, G_TYPE_OBJECT)
 G_DEFINE_QUARK (eos-app-list-model-error-quark, eos_app_list_model_error)
@@ -336,7 +341,8 @@ load_manager_available_apps (EosAppListModel *self,
 
 static gboolean
 load_user_capabilities (EosAppListModel *self,
-                        GCancellable *cancellable)
+                        GCancellable *cancellable,
+                        GError **error_out)
 {
   GVariant *capabilities;
   GError *error = NULL;
@@ -347,13 +353,12 @@ load_user_capabilities (EosAppListModel *self,
   EosAppManager *proxy = get_eam_dbus_proxy (self);
   if (proxy == NULL)
     {
-      set_app_installation_error (desktop_id,
-                                  "Could not get DBus proxy object - canceling",
-                                  _("The app store has detected a fatal error and "
-                                    "cannot continue with the installation. Please, "
-                                    "restart your system. If the problem persists, "
-                                    "please contact support."),
-                                  error_out);
+      g_set_error_literal (error_out, EOS_APP_LIST_MODEL_ERROR,
+                           EOS_APP_LIST_MODEL_ERROR_FAILED,
+                           _("The app store has detected a fatal error and "
+                             "cannot continue with the installation. Please, "
+                             "restart your system. If the problem persists, "
+                             "please contact support."));
       return FALSE;
     }
 
