@@ -347,8 +347,13 @@ load_user_capabilities (EosAppListModel *self,
   EosAppManager *proxy = get_eam_dbus_proxy (self);
   if (proxy == NULL)
     {
-      eos_app_log_error_message ("Could not get DBus proxy object - canceling");
-
+      set_app_installation_error (desktop_id,
+                                  "Could not get DBus proxy object - canceling",
+                                  _("The app store has detected a fatal error and "
+                                    "cannot continue with the installation. Please, "
+                                    "restart your system. If the problem persists, "
+                                    "please contact support."),
+                                  error_out);
       return FALSE;
     }
 
@@ -1677,9 +1682,16 @@ install_latest_app_version (EosAppListModel *self,
   EosAppManager *proxy = get_eam_dbus_proxy (self);
   if (proxy == NULL)
     {
+      /* The app manager will fail to start if various conditions are not
+       * met: missing configuration; broken file system layout; or a broken
+       * installation.
+       */
       set_app_installation_error (desktop_id,
                                   "Could not get DBus proxy object - canceling",
-                                  NULL, /* External error text */
+                                  _("The app store has detected a fatal error and "
+                                    "cannot continue with the installation. Please, "
+                                    "restart your system. If the problem persists, "
+                                    "please contact support."),
                                   error_out);
       return FALSE;
     }
@@ -1749,6 +1761,23 @@ install_latest_app_version (EosAppListModel *self,
       return FALSE;
     }
 
+  /* This check covers the case in which we managed to start the
+   * app manager with a consistent file system, and then something
+   * deleted the applications directory
+   */
+  if (!g_file_test (eos_get_bundles_dir (), G_FILE_TEST_EXISTS))
+    {
+      g_free (transaction_path);
+      set_app_installation_error (desktop_id,
+                                  "Applications directory is missing",
+                                  _("The app store has detected a fatal error and "
+                                    "cannot continue with the installation. Please, "
+                                    "restart your system. If the problem persists, "
+                                    "please contact support."),
+                                  error_out);
+      return FALSE;
+    }
+
   eos_app_log_info_message ("Got transaction path: %s", transaction_path);
 
   retval = get_bundle_artifacts (self, info, transaction_path, cancellable, &error);
@@ -1758,8 +1787,10 @@ install_latest_app_version (EosAppListModel *self,
       eos_app_log_error_message ("Transaction %s failed", transaction_path);
 
       if (error->domain == EOS_APP_LIST_MODEL_ERROR)
-        /* propagate only the errors we generate as they are... */
-        g_propagate_error (error_out, error);
+        {
+          /* propagate only the errors we generate as they are... */
+          g_propagate_error (error_out, error);
+        }
       else
         set_app_installation_error (desktop_id,
                                     error->message,
@@ -1884,16 +1915,21 @@ remove_app_from_manager (EosAppListModel *self,
   const char *app_id = eos_app_info_get_application_id (info);
   const char *desktop_id = eos_app_info_get_desktop_id (info);
 
+  /* We do a double check here, to catch the case where the app manager
+   * proxy was successfully created, but the app bundles directory was
+   * removed afterwards
+   */
   EosAppManager *proxy = get_eam_dbus_proxy (self);
-  if (proxy == NULL)
+  if (proxy == NULL ||
+      !g_file_test (eos_get_bundles_dir (), G_FILE_TEST_EXISTS))
     {
-      eos_app_log_error_message ("Could not get DBus proxy object - canceling");
-
-      g_set_error (error_out, EOS_APP_LIST_MODEL_ERROR,
-                   EOS_APP_LIST_MODEL_ERROR_UNINSTALL_FAILED,
-                   _("Application '%s' could not be uninstalled"),
-                   desktop_id);
-
+      set_app_installation_error (desktop_id,
+                                  "Could not get DBus proxy object - canceling",
+                                  _("The app store has detected a fatal error and "
+                                    "cannot continue with the installation. Please, "
+                                    "restart your system. If the problem persists, "
+                                    "please contact support."),
+                                  error_out);
       return FALSE;
     }
 
