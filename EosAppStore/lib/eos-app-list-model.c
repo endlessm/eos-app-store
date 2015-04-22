@@ -1761,6 +1761,23 @@ install_latest_app_version (EosAppListModel *self,
       return FALSE;
     }
 
+  /* This check covers the case in which we managed to start the
+   * app manager with a consistent file system, and then something
+   * deleted the applications directory
+   */
+  if (!g_file_test (eos_get_bundles_dir (), G_FILE_TEST_EXISTS))
+    {
+      g_free (transaction_path);
+      set_app_installation_error (desktop_id,
+                                  "Applications directory is missing",
+                                  _("The app store has detected a fatal error and "
+                                    "cannot continue with the installation. Please, "
+                                    "restart your system. If the problem persists, "
+                                    "please contact support."),
+                                  error_out);
+      return FALSE;
+    }
+
   eos_app_log_info_message ("Got transaction path: %s", transaction_path);
 
   retval = get_bundle_artifacts (self, info, transaction_path, cancellable, &error);
@@ -1770,8 +1787,10 @@ install_latest_app_version (EosAppListModel *self,
       eos_app_log_error_message ("Transaction %s failed", transaction_path);
 
       if (error->domain == EOS_APP_LIST_MODEL_ERROR)
-        /* propagate only the errors we generate as they are... */
-        g_propagate_error (error_out, error);
+        {
+          /* propagate only the errors we generate as they are... */
+          g_propagate_error (error_out, error);
+        }
       else
         set_app_installation_error (desktop_id,
                                     error->message,
