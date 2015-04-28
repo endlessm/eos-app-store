@@ -116,15 +116,14 @@ const AppListBoxRow = new Lang.Class({
         this._mainBox.reorder_child(separator, 0);
         this._mainBox.show();
 
-        let monitor = Gio.NetworkMonitor.get_default();
-        monitor.connect('network-changed', Lang.bind(this, this._onNetworkMonitorChanged));
-        this._networkAvailable = monitor.get_network_available();
+        this._networkAvailable = this._model.networkAvailable;
+        this._networkChangeId = this._model.connect('network-changed', Lang.bind(this, this._onNetworkMonitorChanged));
 
         this._updateState();
     },
 
     _onNetworkMonitorChanged: function() {
-        this._networkAvailable = monitor.get_network_available();
+        this._networkAvailable = this._model.networkAvailable;
         this._updateState();
     },
 
@@ -169,6 +168,11 @@ const AppListBoxRow = new Lang.Class({
         if (this._progressId != 0) {
             this._model.disconnect(this._progressId);
             this._progressId = 0;
+        }
+
+        if (this._networkChangeId != 0) {
+            this._model.disconnect(this._networkChangeId);
+            this._networkChangeId = 0;
         }
     },
 
