@@ -8,8 +8,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: eos-app-store\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-04-14 01:22+0000\n"
-"PO-Revision-Date: 2015-04-14 01:22+0000\n"
+"POT-Creation-Date: 2015-04-21 01:22+0000\n"
+"PO-Revision-Date: 2015-04-21 01:22+0000\n"
 "Last-Translator: endlessmobile_build <philip@endlessm.com>\n"
 "Language-Team: Arabic (http://www.transifex.com/projects/p/eos-app-store/language/ar/)\n"
 "MIME-Version: 1.0\n"
@@ -122,13 +122,17 @@ msgstr "لم نتمكن من إزالة '%s'"
 msgid "'%s' was removed successfully"
 msgstr "تمت إزالة '%s' بنجاح"
 
-#: ../EosAppStore/appFrame.js:593
+#: ../EosAppStore/appFrame.js:593 ../EosAppStore/appFrame.js:826
 msgid "Dismiss"
 msgstr "استبعاد"
 
 #: ../EosAppStore/appFrame.js:790
 msgid "Install apps"
 msgstr "تثبيت التطبيقات"
+
+#: ../EosAppStore/appFrame.js:824
+msgid "Update failed"
+msgstr ""
 
 #: ../EosAppStore/appStoreWindow.js:224
 msgid "Websites"
@@ -225,130 +229,130 @@ msgstr "قم بإضافة المواقع المفضلة لديك على سطح �
 msgid "Install websites"
 msgstr "تثبيت المواقع"
 
-#: ../EosAppStore/lib/eos-app-list-model.c:538
+#: ../EosAppStore/lib/eos-app-list-model.c:522
 msgid "We were unable to update the list of applications"
 msgstr "يتعذر علينا تحديث قائمة التطبيقات"
 
-#: ../EosAppStore/lib/eos-app-list-model.c:858
+#: ../EosAppStore/lib/eos-app-list-model.c:856
 #, c-format
 msgid "Not enough space on device for downloading app"
 msgstr "لا توجد مساحة كافية على الجهاز لتنزيل التطبيق"
 
-#: ../EosAppStore/lib/eos-app-list-model.c:884
+#: ../EosAppStore/lib/eos-app-list-model.c:882
 #, c-format
 msgid "No available bundle for '%s'"
 msgstr "ليست هناك حزمة متوفرة من أجل '%s'"
 
-#: ../EosAppStore/lib/eos-app-list-model.c:887
+#: ../EosAppStore/lib/eos-app-list-model.c:885
 msgid "No available data on the server"
 msgstr "لا توجد بيانات متوفرة على هذا الخادم "
 
-#: ../EosAppStore/lib/eos-app-list-model.c:920
+#: ../EosAppStore/lib/eos-app-list-model.c:918
 msgid "The certificate of the app store is expired"
 msgstr "لقد إنتهت صلاحية شهادة متجر التطبيقات"
 
-#: ../EosAppStore/lib/eos-app-list-model.c:922
+#: ../EosAppStore/lib/eos-app-list-model.c:920
 msgid "The certificate of the app store has been revoked"
 msgstr "لقد تم إبطال شهادة متجر التطبيقات"
 
-#: ../EosAppStore/lib/eos-app-list-model.c:924
+#: ../EosAppStore/lib/eos-app-list-model.c:922
 msgid "The certificate of the app store has a bad identity"
 msgstr "لدى شهادة متجر التطبيقات هويه سيئة"
 
-#: ../EosAppStore/lib/eos-app-list-model.c:926
+#: ../EosAppStore/lib/eos-app-list-model.c:924
 msgid "The certificate of the app store is from an unknown authority"
 msgstr "شهادة متجر التطبيقات من جهة مجهولة"
 
-#: ../EosAppStore/lib/eos-app-list-model.c:928
+#: ../EosAppStore/lib/eos-app-list-model.c:926
 msgid "The certificate of the app store is bad or invalid"
 msgstr "شهادة متجر التطبيقات سيئة أو غير صالحة"
 
-#: ../EosAppStore/lib/eos-app-list-model.c:1043
+#: ../EosAppStore/lib/eos-app-list-model.c:1041
 #, c-format
 msgid "Unable to create the file for downloading '%s': %s"
 msgstr "غير قادر على إنشاء الملف اللازم لتنزيل '%s': %s"
 
-#: ../EosAppStore/lib/eos-app-list-model.c:1047
+#: ../EosAppStore/lib/eos-app-list-model.c:1045
 #, c-format
 msgid "Unable to update the list of available applications: %s"
 msgstr "غير قادر على تحديث قائمة التطبيقات المتوفرة: %s"
 
-#: ../EosAppStore/lib/eos-app-list-model.c:1120
+#: ../EosAppStore/lib/eos-app-list-model.c:1118
 #, c-format
 msgid "Download of app '%s' cancelled by the user."
 msgstr "ألغى المستخدم تنزيل تطبيق '%s' ."
 
-#: ../EosAppStore/lib/eos-app-list-model.c:1123
+#: ../EosAppStore/lib/eos-app-list-model.c:1121
 msgid "Refresh of available apps cancelled by the user."
 msgstr "قام المستخدم بإلغاء إعادة تحميل التطبيقات المتاحة. "
 
-#: ../EosAppStore/lib/eos-app-list-model.c:1443
+#: ../EosAppStore/lib/eos-app-list-model.c:1441
 #, c-format
 msgid "No verification available for app '%s'"
 msgstr "ليس هناك تدقيق متوفر من أجل '%s'"
 
-#: ../EosAppStore/lib/eos-app-list-model.c:1475
+#: ../EosAppStore/lib/eos-app-list-model.c:1473
 #, c-format
 msgid "No signature available for app '%s'"
 msgstr "ليس هناك توقيع متوفر من أجل '%s'"
 
-#: ../EosAppStore/lib/eos-app-list-model.c:1513
+#: ../EosAppStore/lib/eos-app-list-model.c:1511
 #, c-format
 msgid "Application bundle '%s' could not be downloaded"
 msgstr "تعذر تنزيل حزمة التطبيق '%s'"
 
-#: ../EosAppStore/lib/eos-app-list-model.c:1652
+#: ../EosAppStore/lib/eos-app-list-model.c:1650
 #, c-format
 msgid "Application '%s' could not be installed"
 msgstr "تعذر تثبيت التطبيق '%s'"
 
-#: ../EosAppStore/lib/eos-app-list-model.c:1659
+#: ../EosAppStore/lib/eos-app-list-model.c:1657
 #, c-format
 msgid "Application '%s' could not be installed. %s"
 msgstr "تطبيق '%s' لم يمكن تثبيته. %s "
 
-#: ../EosAppStore/lib/eos-app-list-model.c:1729
+#: ../EosAppStore/lib/eos-app-list-model.c:1727
 msgid "You must be an administrator to install applications"
 msgstr "لابد أن تكون مسؤولاً للتُثبِّت التطبيق"
 
-#: ../EosAppStore/lib/eos-app-list-model.c:1896
-#: ../EosAppStore/lib/eos-app-list-model.c:1937
+#: ../EosAppStore/lib/eos-app-list-model.c:1894
+#: ../EosAppStore/lib/eos-app-list-model.c:1935
 #, c-format
 msgid "Application '%s' could not be uninstalled"
 msgstr "تطبيق'%s' لم يمكن إلغاء تثبيته "
 
-#: ../EosAppStore/lib/eos-app-list-model.c:1920
+#: ../EosAppStore/lib/eos-app-list-model.c:1918
 msgid "You must be an administrator to remove applications"
 msgstr "لابد أن تكون مسؤولاً حتى تزيل التطبيق"
 
-#: ../EosAppStore/lib/eos-app-list-model.c:1929
+#: ../EosAppStore/lib/eos-app-list-model.c:1927
 #, c-format
 msgid "Application '%s' could not be uninstalled. %s"
 msgstr "تطبيق'%s' لم يمكن إلغاء تثبيته. '%s' "
 
-#: ../EosAppStore/lib/eos-app-list-model.c:1949
+#: ../EosAppStore/lib/eos-app-list-model.c:1947
 #, c-format
 msgid "Application '%s' could not be removed"
 msgstr "لا يمكن إزالة تطبيق '%s'"
 
-#: ../EosAppStore/lib/eos-app-list-model.c:2068
-#: ../EosAppStore/lib/eos-app-list-model.c:2136
+#: ../EosAppStore/lib/eos-app-list-model.c:2066
+#: ../EosAppStore/lib/eos-app-list-model.c:2134
 #, c-format
 msgid "App %s not installable"
 msgstr "التطبيق ليس %s قابلا للتثبيت"
 
-#: ../EosAppStore/lib/eos-app-list-model.c:2080
+#: ../EosAppStore/lib/eos-app-list-model.c:2078
 #, c-format
 msgid "App %s already installed"
 msgstr "التطبيق %s مثبت مسبقا"
 
-#: ../EosAppStore/lib/eos-app-list-model.c:2147
+#: ../EosAppStore/lib/eos-app-list-model.c:2145
 #, c-format
 msgid "App %s is up to date"
 msgstr "التطبيق %s حديث"
 
-#: ../EosAppStore/lib/eos-app-list-model.c:2213
-#: ../EosAppStore/lib/eos-app-list-model.c:2245
+#: ../EosAppStore/lib/eos-app-list-model.c:2211
+#: ../EosAppStore/lib/eos-app-list-model.c:2243
 #, c-format
 msgid "App %s is not installed"
 msgstr "التطبيق %s غير مثبت"
