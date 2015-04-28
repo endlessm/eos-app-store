@@ -21,6 +21,10 @@ const BaseList = new Lang.Class({
         this._onModelChanged(this._model);
 
         this._cancellables = {};
+
+        this._netMonitor = Gio.NetworkMonitor.get_default();
+        this._networkAvailable = this._netMonitor.get_network_available();
+        this._netMonitor.connect('network-changed', Lang.bind(this, this._onNetworkChanged));
     },
 
     _onDownloadProgress: function(model, appid, current, total) {
@@ -29,6 +33,11 @@ const BaseList = new Lang.Class({
 
     _onModelChanged: function(model) {
         this.emit('changed');
+    },
+
+    _onNetworkChanged: function(model) {
+        this._networkAvailable = this._netMonitor.get_network_available();
+        this.emit('network-changed');
     },
 
     hasLauncher: function(id) {
@@ -117,6 +126,10 @@ const BaseList = new Lang.Class({
 
             application.release();
         }));
+    },
+
+    get networkAvailable() {
+        return this._networkAvailable;
     }
 });
 Signals.addSignalMethods(BaseList.prototype);
