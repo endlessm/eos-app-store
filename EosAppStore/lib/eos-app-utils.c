@@ -244,8 +244,8 @@ eos_use_delta_updates (void)
   return g_strcmp0 (deltaupdates, "true") == 0;
 }
 
-static const char *
-get_app_server_url (void)
+const char *
+eos_get_app_server_url (void)
 {
   static char *server_url;
 
@@ -739,7 +739,7 @@ eos_get_updates_file (void)
 char *
 eos_get_all_updates_uri (void)
 {
-  return g_strconcat (get_app_server_url (),
+  return g_strconcat (eos_get_app_server_url (),
                       "/api/v1/updates/",
                       get_os_version (),
                       "?arch=", get_os_arch (),

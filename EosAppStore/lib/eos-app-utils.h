@@ -39,6 +39,7 @@ const char *eos_get_bundles_dir (void);
 const char *eos_get_cache_dir (void);
 const char *eos_get_bundle_download_dir (void);
 void        eos_clear_bundle_download_dir (void);
+const char *eos_get_app_server_url (void);
 
 gboolean eos_use_delta_updates (void);
 
