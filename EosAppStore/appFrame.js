@@ -116,6 +116,15 @@ const AppListBoxRow = new Lang.Class({
         this._mainBox.reorder_child(separator, 0);
         this._mainBox.show();
 
+        let monitor = Gio.NetworkMonitor.get_default();
+        monitor.connect('network-changed', Lang.bind(this, this._onNetworkMonitorChanged));
+        this._networkAvailable = monitor.get_network_available();
+
+        this._updateState();
+    },
+
+    _onNetworkMonitorChanged: function() {
+        this._networkAvailable = monitor.get_network_available();
         this._updateState();
     },
 
@@ -311,6 +320,7 @@ const AppListBoxRow = new Lang.Class({
         const BUTTON_LABEL_UPDATE = _("Update app");
         const BUTTON_LABEL_LAUNCH = _("Open app");
         const BUTTON_LABEL_ADD = _("Add to the desktop");
+        const BUTTON_TOOLTIP_NO_NETWORK = _("No network connection is available");
 
         switch (this._appState) {
             case EosAppStorePrivate.AppState.INSTALLED:
@@ -337,7 +347,11 @@ const AppListBoxRow = new Lang.Class({
                 this._installButton.set_tooltip_text("");
                 this._installButtonLabel.set_text(BUTTON_LABEL_INSTALL);
 
-                if (!this.appInfo.get_has_sufficient_install_space()) {
+                if (!this._networkAvailable) {
+                    this._installButton.set_sensitive(false);
+                    this._installButton.set_tooltip_text(BUTTON_TOOLTIP_NO_NETWORK);
+                }
+                else if (!this.appInfo.get_has_sufficient_install_space()) {
                     this._installButton.set_sensitive(false);
                     this._installButton.set_tooltip_text(_("Insufficient space to install the app"));
                 }
@@ -348,6 +362,11 @@ const AppListBoxRow = new Lang.Class({
 
             case EosAppStorePrivate.AppState.UPDATABLE:
                 if (this.appInfo.get_has_launcher()) {
+                    if (!this._networkAvailable) {
+                        this._installButton.set_sensitive(false);
+                        this._installButton.set_tooltip_text(BUTTON_TOOLTIP_NO_NETWORK);
+                    }
+
                     this._installButtonLabel.set_text(BUTTON_LABEL_UPDATE);
                 }
                 else {
