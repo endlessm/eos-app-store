@@ -3,6 +3,7 @@ const EosAppStorePrivate = imports.gi.EosAppStorePrivate;
 const GdkPixbuf = imports.gi.GdkPixbuf;
 const Gio = imports.gi.Gio;
 const GLib = imports.gi.GLib;
+const Soup = imports.gi.Soup;
 
 const Lang = imports.lang;
 const Path = imports.path;
@@ -23,8 +24,8 @@ const BaseList = new Lang.Class({
         this._cancellables = {};
 
         this._netMonitor = Gio.NetworkMonitor.get_default();
-        this._networkAvailable = this._netMonitor.get_network_available();
         this._netMonitor.connect('network-changed', Lang.bind(this, this._onNetworkChanged));
+        this._networkAvailable = this._netMonitor.get_network_available();
     },
 
     _onDownloadProgress: function(model, appid, current, total) {
@@ -36,6 +37,7 @@ const BaseList = new Lang.Class({
     },
 
     _onNetworkChanged: function(model) {
+        // For the base model we only care about being able to get on the network
         this._networkAvailable = this._netMonitor.get_network_available();
         this.emit('network-changed');
     },
@@ -192,6 +194,39 @@ const AppList = new Lang.Class({
 
     launch: function(id, timestamp) {
         return this._model.launch_app(id, timestamp);
+    },
+
+    _onNetworkChanged: function() {
+        // As a first approximation, we simply check if the network is available
+        this._networkAvailable = this._netMonitor.get_network_available();
+
+        // If we cannot get on the network, there's no point in doing any other work
+        if (!this._networkAvailable) {
+            this.emit('network-changed');
+            return;
+        }
+
+        // We start an async check to see if we can reach our app server
+        let uri = Soup.URI.new(EosAppStorePrivate.get_app_server_url());
+        if (!uri) {
+            this._networkAvailable = false;
+            this.emit('network-changed');
+            return;
+        }
+
+        let addr = new Gio.NetworkAddress({ hostname: uri.get_host(), port: uri.get_port() });
+        this._netMonitor.can_reach_async(addr, null, Lang.bind(this, function(monitor, res) {
+            try {
+                this._netMonitor.can_reach_finish(res);
+                this._networkAvailable = true;
+            }
+            catch (e) {
+                log('Unable to reach app server: ' + e.message);
+                this._networkAvailable = false;
+            }
+
+            this.emit('network-changed');
+        }));
     }
 });
 
