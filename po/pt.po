@@ -143,7 +143,7 @@ msgstr "Instalar programas"
 
 #: ../EosAppStore/appStoreWindow.js:224
 msgid "Websites"
-msgstr "Atalhos para sites"
+msgstr "Sites"
 
 #: ../EosAppStore/appStoreWindow.js:229
 msgid "Folders"
