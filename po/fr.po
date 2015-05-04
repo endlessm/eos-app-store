@@ -149,7 +149,7 @@ msgstr "Jeux"
 
 #: ../EosAppStore/categories.js:26 ../EosAppStore/lib/eos-app-info.c:305
 msgid "Resources"
-msgstr "Documentations "
+msgstr "Ressources"
 
 #: ../EosAppStore/categories.js:33 ../EosAppStore/lib/eos-app-info.c:306
 msgid "Utilities"
