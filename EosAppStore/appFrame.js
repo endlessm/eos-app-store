@@ -325,6 +325,7 @@ const AppListBoxRow = new Lang.Class({
         const BUTTON_LABEL_LAUNCH = _("Open app");
         const BUTTON_LABEL_ADD = _("Add to the desktop");
         const BUTTON_TOOLTIP_NO_NETWORK = _("No network connection is available");
+        const BUTTON_TOOLTIP_NO_SPACE = _("Insufficient space to install the app");
 
         switch (this._appState) {
             case EosAppStorePrivate.AppState.INSTALLED:
@@ -357,7 +358,7 @@ const AppListBoxRow = new Lang.Class({
                 }
                 else if (!this.appInfo.get_has_sufficient_install_space()) {
                     this._installButton.set_sensitive(false);
-                    this._installButton.set_tooltip_text(_("Insufficient space to install the app"));
+                    this._installButton.set_tooltip_text(BUTTON_TOOLTIP_NO_SPACE);
                 }
 
                 this._installButton.show();
