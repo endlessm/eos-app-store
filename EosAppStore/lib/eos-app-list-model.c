@@ -1187,6 +1187,7 @@ check_cached_file (const char *target_file,
     return FALSE;
 
   GNetworkMonitor *monitor = g_network_monitor_get_default ();
+  gboolean network_available = g_network_monitor_get_network_available (monitor);
 
   time_t now = time (NULL);
 
@@ -1196,10 +1197,14 @@ check_cached_file (const char *target_file,
   /* We want the cached file if we're not online (and can't get an updated
    * version anyway), or if the cached file is new enough
    */
-  if (!g_network_monitor_get_network_available (monitor) ||
-      buf.st_mtime > now || (now - buf.st_mtime < ONE_HOUR))
+  if (!network_available ||
+      (buf.st_mtime > now || (now - buf.st_mtime < ONE_HOUR)))
     {
-      eos_app_log_info_message ("Requested file '%s' is within cache allowance.", target_file);
+      if (network_available)
+        eos_app_log_info_message ("Requested file '%s' is within cache allowance.", target_file);
+      else
+        eos_app_log_info_message ("No network available, using cached file");
+
       if (buffer != NULL)
         {
           GError *internal_error = NULL;
