@@ -314,29 +314,54 @@ on_shell_applications_changed (GDBusConnection *connection,
 }
 
 static gboolean
+is_app_list_update_needed ()
+{
+  gboolean retval = TRUE;
+  eos_app_log_info_message ("Checking if app list update is needed");
+
+  eos_app_log_info_message ("App list update is %sneeded", retval ? "" : "not ");
+
+  return retval;
+}
+
+static gboolean
 load_available_apps (EosAppListModel *self,
-                             GCancellable *cancellable,
-                             GError **error_out)
+                     GCancellable *cancellable,
+                     GError **error_out)
 {
   eos_app_log_info_message ("Trying to get available apps");
 
   GError *error = NULL;
-  char *url = eos_get_all_updates_uri ();
-  char *target = eos_get_updates_file ();
   char *data = NULL;
 
-  eos_app_log_info_message ("Downloading list of available apps from: %s", url);
-
-  if (!download_file_from_uri (self->soup_session, "application/json", url, target, &data, cancellable, &error))
+  if (is_app_list_update_needed())
     {
+      char *url = eos_get_all_updates_uri ();
+      char *target = eos_get_updates_file ();
+
+      eos_app_log_info_message ("Downloading list of available apps from: %s", url);
+
+      if (!download_file_from_uri (self->soup_session,
+                                   "application/json",
+                                   url,
+                                   target,
+                                   &data,
+                                   cancellable,
+                                   &error))
+        {
+          g_free (url);
+          g_free (target);
+          g_propagate_error (error_out, error);
+          return FALSE;
+        }
+
       g_free (url);
       g_free (target);
-      g_propagate_error (error_out, error);
-      return FALSE;
     }
-
-  g_free (url);
-  g_free (target);
+  else
+    {
+      /* TODO: Populate *data with file content */
+    }
 
   if (!eos_app_load_available_apps (self->apps, data, cancellable, &error))
     {
