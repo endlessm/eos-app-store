@@ -314,10 +314,39 @@ on_shell_applications_changed (GDBusConnection *connection,
 }
 
 static gboolean
-is_app_list_update_needed ()
+is_app_list_update_needed (EosAppListModel *self,
+                           GCancellable *cancellable,
+                           GError **error_out)
 {
   gboolean retval = TRUE;
+  char *data = NULL;
+  GError *error = NULL;
+
   eos_app_log_info_message ("Checking if app list update is needed");
+
+  char *url = eos_get_updates_meta_record_uri ();
+  char *target = eos_get_updates_meta_record_file ();
+
+  eos_app_log_info_message ("Downloading updates meta record from: %s", url);
+
+  if (!download_file_from_uri (self->soup_session,
+                               "application/json",
+                               url,
+                               target,
+                               &data,
+                               cancellable,
+                               &error))
+    {
+      g_free (url);
+      g_free (target);
+      g_propagate_error (error_out, error);
+      return FALSE;
+    }
+
+  g_free (url);
+  g_free (target);
+
+  /* TODO: Add processing of returned *data JSON */
 
   eos_app_log_info_message ("App list update is %sneeded", retval ? "" : "not ");
 
@@ -332,22 +361,24 @@ load_available_apps (EosAppListModel *self,
   eos_app_log_info_message ("Trying to get available apps");
 
   GError *error = NULL;
+
   char *data = NULL;
 
-  if (is_app_list_update_needed())
+  if (is_app_list_update_needed(self, cancellable, &error))
     {
       char *url = eos_get_all_updates_uri ();
       char *target = eos_get_updates_file ();
 
       eos_app_log_info_message ("Downloading list of available apps from: %s", url);
 
-      if (!download_file_from_uri (self->soup_session,
-                                   "application/json",
-                                   url,
-                                   target,
-                                   &data,
-                                   cancellable,
-                                   &error))
+      if (!download_file_from_uri2 (self->soup_session,
+                                    "application/json",
+                                    url,
+                                    target,
+                                    &data,
+                                    FALSE,
+                                    cancellable,
+                                    &error))
         {
           g_free (url);
           g_free (target);
@@ -360,6 +391,7 @@ load_available_apps (EosAppListModel *self,
     }
   else
     {
+      /* TODO: Propagate is_app_list_update_needed error */
       /* TODO: Populate *data with file content */
     }
 
