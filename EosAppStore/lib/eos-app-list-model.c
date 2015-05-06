@@ -1345,7 +1345,7 @@ download_file_from_uri (SoupSession     *session,
                                   source_uri,
                                   target_file,
                                   buffer,
-                                  true,       /* Use cached file if available */
+                                  TRUE,    /* Use cached file if available */
                                   cancellable,
                                   error);
 }
