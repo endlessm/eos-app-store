@@ -303,7 +303,7 @@ on_shell_applications_changed (GDBusConnection *connection,
 }
 
 static gboolean
-load_manager_available_apps (EosAppListModel *self,
+load_available_apps (EosAppListModel *self,
                              GCancellable *cancellable,
                              GError **error_out)
 {
@@ -394,7 +394,7 @@ load_user_capabilities (EosAppListModel *self,
 }
 
 static gboolean
-load_manager_installed_apps (EosAppListModel *self,
+load_installed_apps (EosAppListModel *self,
                              GCancellable *cancellable,
                              GError **error)
 {
@@ -481,11 +481,11 @@ reload_model (EosAppListModel *self,
   eos_app_load_gio_apps (self->apps);
 
   eos_app_log_debug_message ("Loading installed apps from manager");
-  if (!load_manager_installed_apps (self, cancellable, error))
+  if (!load_installed_apps (self, cancellable, error))
     eos_app_log_error_message ("Unable to load installed apps");
 
   eos_app_log_debug_message ("Loading available apps from manager");
-  if (!load_manager_available_apps (self, cancellable, error))
+  if (!load_available_apps (self, cancellable, error))
     eos_app_log_error_message ("Unable to load available apps");
 
   /* Load apps with launcher from the shell */
