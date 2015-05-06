@@ -747,6 +747,15 @@ eos_get_all_updates_uri (void)
                       NULL);
 }
 
+char *
+eos_get_updates_meta_record_uri (void)
+{
+  return g_strconcat (get_app_server_url (),
+                      "/api/v1/meta_records",
+                      "?type=updates",
+                      NULL);
+}
+
 static gboolean
 is_app_id (const char *appid)
 {
