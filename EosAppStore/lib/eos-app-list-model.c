@@ -87,6 +87,17 @@ download_file_from_uri (SoupSession     *session,
                         char           **buffer,
                         GCancellable    *cancellable,
                         GError         **error);
+
+static gboolean
+download_file_from_uri2 (SoupSession     *session,
+                         const char      *content_type,
+                         const char      *source_uri,
+                         const char      *target_file,
+                         char           **buffer,
+                         gboolean         use_cache,
+                         GCancellable    *cancellable,
+                         GError         **error);
+
 static void
 set_app_installation_error (const char *desktop_id,
                             const char *internal_message,
@@ -1201,7 +1212,8 @@ check_cached_file (const char *target_file,
       (buf.st_mtime > now || (now - buf.st_mtime < ONE_HOUR)))
     {
       if (network_available)
-        eos_app_log_info_message ("Requested file '%s' is within cache allowance.", target_file);
+        eos_app_log_info_message ("Requested file '%s' is within cache allowance.",
+                                  target_file);
       else
         eos_app_log_info_message ("No network available, using cached file");
 
@@ -1228,15 +1240,21 @@ check_cached_file (const char *target_file,
 }
 
 static gboolean
-download_file_from_uri (SoupSession     *session,
-                        const char      *content_type,
-                        const char      *source_uri,
-                        const char      *target_file,
-                        char           **buffer,
-                        GCancellable    *cancellable,
-                        GError         **error)
+download_file_from_uri2 (SoupSession     *session,
+                         const char      *content_type,
+                         const char      *source_uri,
+                         const char      *target_file,
+                         char           **buffer,
+                         gboolean         use_cache,
+                         GCancellable    *cancellable,
+                         GError         **error)
 {
-  if (check_cached_file (target_file, buffer))
+  eos_app_log_debug_message ("Downloading file from %s to %s. Cache: %s",
+                             source_uri,
+                             target_file,
+                             use_cache ? "true" : "false");
+
+  if (use_cache && check_cached_file (target_file, buffer))
     return TRUE;
 
   gboolean retval = FALSE;
@@ -1287,6 +1305,26 @@ out:
 
   return retval;
 }
+
+static gboolean
+download_file_from_uri (SoupSession     *session,
+                        const char      *content_type,
+                        const char      *source_uri,
+                        const char      *target_file,
+                        char           **buffer,
+                        GCancellable    *cancellable,
+                        GError         **error)
+{
+  return download_file_from_uri2 (session,
+                                  content_type,
+                                  source_uri,
+                                  target_file,
+                                  buffer,
+                                  true,       /* Use cached file if available */
+                                  cancellable,
+                                  error);
+}
+
 
 typedef struct {
   ProgressReportFunc  progress_func;
