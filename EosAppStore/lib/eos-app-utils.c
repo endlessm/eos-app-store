@@ -748,6 +748,12 @@ eos_get_all_updates_uri (void)
 }
 
 char *
+eos_get_updates_meta_record_file (void)
+{
+  return g_build_filename (eos_get_cache_dir (), "updates_meta.json", NULL);
+}
+
+char *
 eos_get_updates_meta_record_uri (void)
 {
   return g_strconcat (get_app_server_url (),

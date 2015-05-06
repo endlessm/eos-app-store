@@ -36,6 +36,7 @@ char *  eos_get_all_updates_uri (void);
 char *  eos_get_updates_file (void);
 
 char *  eos_get_updates_meta_record_uri (void);
+char *  eos_get_updates_meta_record_file (void);
 
 const char *eos_get_bundles_dir (void);
 const char *eos_get_cache_dir (void);
