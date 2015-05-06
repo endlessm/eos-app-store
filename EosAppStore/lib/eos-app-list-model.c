@@ -87,6 +87,17 @@ download_file_from_uri (SoupSession     *session,
                         char           **buffer,
                         GCancellable    *cancellable,
                         GError         **error);
+
+static gboolean
+download_file_from_uri2 (SoupSession     *session,
+                         const char      *content_type,
+                         const char      *source_uri,
+                         const char      *target_file,
+                         char           **buffer,
+                         gboolean         use_cache,
+                         GCancellable    *cancellable,
+                         GError         **error);
+
 static void
 set_app_installation_error (const char *desktop_id,
                             const char *internal_message,
@@ -1177,19 +1188,25 @@ download_file_chunk_func (GByteArray *chunk,
 }
 
 static gboolean
-download_file_from_uri (SoupSession     *session,
-                        const char      *content_type,
-                        const char      *source_uri,
-                        const char      *target_file,
-                        char           **buffer,
-                        GCancellable    *cancellable,
-                        GError         **error)
+download_file_from_uri2 (SoupSession     *session,
+                         const char      *content_type,
+                         const char      *source_uri,
+                         const char      *target_file,
+                         char           **buffer,
+                         gboolean         use_cache,
+                         GCancellable    *cancellable,
+                         GError         **error)
 {
   GError *internal_error = NULL;
   gboolean retval = FALSE;
 
+  eos_app_log_debug_message ("Downloading file from %s to %s. Cache: %s",
+                             source_uri,
+                             target_file,
+                             use_cache ? "true" : "false");
+
   struct stat buf;
-  if (stat (target_file, &buf) == 0)
+  if (use_cache && stat (target_file, &buf) == 0)
     {
       time_t now = time (NULL);
 
@@ -1260,6 +1277,26 @@ out:
 
   return retval;
 }
+
+static gboolean
+download_file_from_uri (SoupSession     *session,
+                        const char      *content_type,
+                        const char      *source_uri,
+                        const char      *target_file,
+                        char           **buffer,
+                        GCancellable    *cancellable,
+                        GError         **error)
+{
+  return download_file_from_uri2 (session,
+                                  content_type,
+                                  source_uri,
+                                  target_file,
+                                  buffer,
+                                  true,       /* Use cached file if available */
+                                  cancellable,
+                                  error);
+}
+
 
 typedef struct {
   ProgressReportFunc  progress_func;
