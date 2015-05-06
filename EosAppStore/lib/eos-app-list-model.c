@@ -33,6 +33,9 @@
 /* Amount of seconds that we should wait before retrying a failed download */
 #define DOWNLOAD_RETRY_PERIOD 4
 
+/* Amount of seconds before a downloaded file is considered stale */
+#define DOWNLOADED_FILE_STALE_THRESHOLD 3600
+
 /* HACK: This will be revisited for the next release,
  * but for now we have a limited number of app language ids,
  * with no country codes, so we can iterate through them
@@ -1244,8 +1247,6 @@ download_file_chunk_func (GByteArray *chunk,
   g_byte_array_append (all_content, buffer, chunk_len);
 }
 
-#define ONE_HOUR  (60 * 60)
-
 static gboolean
 check_cached_file (const char *target_file,
                    char      **buffer)
@@ -1266,7 +1267,7 @@ check_cached_file (const char *target_file,
    * version anyway), or if the cached file is new enough
    */
   if (!network_available ||
-      (buf.st_mtime > now || (now - buf.st_mtime < ONE_HOUR)))
+      (buf.st_mtime > now || (now - buf.st_mtime < DOWNLOADED_FILE_STALE_THRESHOLD)))
     {
       if (network_available)
         eos_app_log_info_message ("Requested file '%s' is within cache allowance.",
@@ -1282,7 +1283,8 @@ check_cached_file (const char *target_file,
 
           if (internal_error != NULL)
             {
-              eos_app_log_error_message ("Cached file '%s': %s",
+              /* Fall through, and re-download the file */
+              eos_app_log_error_message ("Could not read cached file '%s': %s",
                                          target_file,
                                          internal_error->message);
               g_clear_error (&internal_error);
