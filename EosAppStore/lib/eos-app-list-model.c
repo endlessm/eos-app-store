@@ -33,6 +33,9 @@
 /* Amount of seconds that we should wait before retrying a failed download */
 #define DOWNLOAD_RETRY_PERIOD 4
 
+/* Amount of seconds before a downloaded file is considered stale */
+#define DOWNLOADED_FILE_STALE_THRESHOLD 3600
+
 /* HACK: This will be revisited for the next release,
  * but for now we have a limited number of app language ids,
  * with no country codes, so we can iterate through them
@@ -1269,7 +1272,8 @@ download_file_from_uri2 (SoupSession     *session,
 
       eos_app_log_debug_message ("Checking if the cached file is still good (now: %ld, mtime: %ld, diff: %ld)",
                                  now, buf.st_mtime, (now - buf.st_mtime));
-      if (buf.st_mtime > now || (now - buf.st_mtime < 3600))
+      if (buf.st_mtime > now ||
+          (now - buf.st_mtime < DOWNLOADED_FILE_STALE_THRESHOLD))
         {
           eos_app_log_info_message ("Requested file '%s' is within cache allowance.",
                                     target_file);
