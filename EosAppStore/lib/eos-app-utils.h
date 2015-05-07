@@ -45,14 +45,21 @@ void        eos_clear_bundle_download_dir (void);
 
 gboolean eos_use_delta_updates (void);
 
-gboolean eos_app_load_installed_apps (GHashTable *app_info,
-                                      const char *appdir,
-                                      GCancellable *cancellable,
-                                      GError **error);
-gboolean eos_app_load_available_apps (GHashTable *app_info,
-                                      const char *data,
-                                      GCancellable *cancellable,
-                                      GError **error);
+gboolean eos_app_load_installed_apps      (GHashTable *app_info,
+                                           const char *appdir,
+                                           GCancellable *cancellable,
+                                           GError **error);
+
+gboolean eos_app_load_available_apps      (GHashTable *app_info,
+                                           const char *data,
+                                           GCancellable *cancellable,
+                                           GError **error);
+
+gboolean eos_app_load_updates_meta_record (guint *monotonic_update_id,
+                                           const char *data,
+                                           GCancellable *cancellable,
+                                           GError **error);
+
 void eos_app_load_gio_apps   (GHashTable *app_info);
 void eos_app_load_shell_apps (GHashTable *app_info,
                               GVariant *shell_apps);
