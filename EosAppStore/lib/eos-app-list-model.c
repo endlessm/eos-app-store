@@ -339,9 +339,7 @@ check_is_app_list_update_needed (EosAppListModel *self,
   eos_app_log_info_message ("Checking if app list update is needed");
 
   eos_app_log_info_message ("Downloading updates meta record from: %s", url);
-  if (!download_file_from_uri (self->soup_session,
-                               "application/json",
-                               url,
+  if (!download_file_from_uri (self->soup_session, "application/json", url,
                                target,
                                &data,
                                cancellable,
@@ -351,9 +349,7 @@ check_is_app_list_update_needed (EosAppListModel *self,
       goto out;
     }
 
-  if (!eos_app_load_updates_meta_record (&monotonic_id,
-                                         data,
-                                         cancellable,
+  if (!eos_app_load_updates_meta_record (&monotonic_id, data, cancellable,
                                          &error))
     {
       eos_app_log_error_message ("Unable to parse updates meta record!");
@@ -366,6 +362,7 @@ check_is_app_list_update_needed (EosAppListModel *self,
                             self->monotonic_update_id,
                             monotonic_id);
 
+  /* If monotonic IDs don't match, we need to update our app list */
   if (monotonic_id != self->monotonic_update_id)
       *update_needed = FALSE;
 
@@ -380,6 +377,7 @@ out:
   if (target) g_free (target);
   if (data)   g_free (data);
 
+  /* Propagate error if there's any */
   if (error)
       g_propagate_error (error_out, error);
 
@@ -405,26 +403,46 @@ load_available_apps (EosAppListModel *self,
       eos_app_log_error_message ("Failed checkng if update is needed!");
 
       g_free (target);
-
       g_propagate_error (error_out, error);
 
       return FALSE;
     }
 
-  if (update_needed)
+  /* Try a manual load of the data */
+  if (!update_needed)
+    {
+      eos_app_log_info_message ("Loading cached all updates");
+      if (!eos_app_load_file_to_buffer (target, &data, &error))
+        {
+          eos_app_log_error_message ("Loading cached all updates failed."
+                                     "Need to re-download it");
+
+          /* We clear the error because we want to force a re-download */
+          g_clear_error (&error);
+
+          if (data) {
+            g_free (data);
+
+            data = NULL;
+          }
+        }
+    }
+
+  /* If update needed or we couldn't load cached file, get it again */
+  if (!data)
     {
       char *url = eos_get_all_updates_uri ();
       gboolean updates_download_success;
 
       eos_app_log_info_message ("Downloading list of available apps from: %s", url);
-      updates_download_success = !download_file_from_uri2 (self->soup_session,
-                                                           "application/json",
-                                                           url,
-                                                           target,
-                                                           &data,
-                                                           FALSE,
-                                                           cancellable,
-                                                           &error);
+      updates_download_success = download_file_from_uri2 (self->soup_session,
+                                                          "application/json",
+                                                          url,
+                                                          target,
+                                                          &data,
+                                                          FALSE,
+                                                          cancellable,
+                                                          &error);
 
       g_free (url);
 
@@ -434,28 +452,6 @@ load_available_apps (EosAppListModel *self,
 
           g_free (target);
           g_propagate_error (error_out, error);
-          return FALSE;
-        }
-    }
-  else
-    {
-      /* TODO: Clean up the logic here */
-      if (error) {
-          g_free (target);
-          g_propagate_error (error_out, error);
-
-          return FALSE;
-        }
-
-      eos_app_log_info_message ("Loading cached all updates");
-      if (!eos_app_load_file_to_buffer (target, &data, &error))
-        {
-          eos_app_log_error_message ("Loading cached all updates failed."
-                                     "Need to re-download it");
-          g_free (target);
-          g_propagate_error (error_out, error);
-
-          /* TODO: Re-download the actual updates */
 
           return FALSE;
         }
@@ -463,8 +459,11 @@ load_available_apps (EosAppListModel *self,
 
   if (!eos_app_load_available_apps (self->apps, data, cancellable, &error))
     {
+      eos_app_log_error_message ("Parsing of all updates failed!");
+
       g_free (data);
       g_propagate_error (error_out, error);
+
       return FALSE;
     }
 
