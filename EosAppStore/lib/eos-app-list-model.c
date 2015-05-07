@@ -319,28 +319,26 @@ on_shell_applications_changed (GDBusConnection *connection,
 }
 
 static gboolean
-is_app_list_update_needed (EosAppListModel *self,
-                           GCancellable *cancellable,
-                           GError **error_out)
+check_is_app_list_update_needed (EosAppListModel *self,
+                                 gboolean *update_needed,
+                                 GCancellable *cancellable,
+                                 GError **error_out)
 {
-  /* TODO: Return success bool from func and return
-   *       state as a passed in var to keep in line
-   *       with other code
-   */
-  gboolean retval = TRUE;
-
   char *url = eos_get_updates_meta_record_uri ();
   char *target = eos_get_updates_meta_record_file ();
   char *data = NULL;
 
   gint64 monotonic_id = 0;
+  gboolean retval = FALSE;
 
   GError *error = NULL;
+
+  /* By deafult we want updates */
+  *update_needed = TRUE;
 
   eos_app_log_info_message ("Checking if app list update is needed");
 
   eos_app_log_info_message ("Downloading updates meta record from: %s", url);
-
   if (!download_file_from_uri (self->soup_session,
                                "application/json",
                                url,
@@ -350,14 +348,8 @@ is_app_list_update_needed (EosAppListModel *self,
                                &error))
     {
       eos_app_log_error_message ("Unable to get updates meta record!");
-      g_free (url);
-      g_free (target);
-      g_propagate_error (error_out, error);
       goto out;
     }
-
-  g_free (url);
-  g_free (target);
 
   if (!eos_app_load_updates_meta_record (&monotonic_id,
                                          data,
@@ -365,34 +357,31 @@ is_app_list_update_needed (EosAppListModel *self,
                                          &error))
     {
       eos_app_log_error_message ("Unable to parse updates meta record!");
-
-      g_free (data);
-      g_propagate_error (error_out, error);
       goto out;
     }
 
-  g_free (data);
+  eos_app_log_info_message ("Comparing monotonic update ID."
+                            " Old: %" G_GINT64_FORMAT ","
+                            " New: %" G_GINT64_FORMAT ".",
+                            self->monotonic_update_id,
+                            monotonic_id);
 
   if (monotonic_id != self->monotonic_update_id)
-    {
-      eos_app_log_info_message ("Monotonic update ID changed."
-                                " Old: %" G_GINT64_FORMAT ","
-                                " New: %" G_GINT64_FORMAT ".",
-                                self->monotonic_update_id,
-                                monotonic_id);
-    }
-  else
-    {
-      eos_app_log_info_message ("Monotonic update ID unchanged."
-                                " Old: %" G_GINT64_FORMAT ","
-                                " New: %" G_GINT64_FORMAT ".",
-                                self->monotonic_update_id,
-                                monotonic_id);
-      retval = FALSE;
-    }
+      *update_needed = FALSE;
+
+  retval = TRUE;
 
 out:
-  eos_app_log_info_message ("App list update is %sneeded", retval ? "" : "not ");
+  eos_app_log_info_message ("App list update is %sneeded",
+                            *update_needed ? "" : "not ");
+
+  /* Clean up */
+  if (url)    g_free (url);
+  if (target) g_free (target);
+  if (data)   g_free (data);
+
+  if (error)
+      g_propagate_error (error_out, error);
 
   return retval;
 }
@@ -404,12 +393,25 @@ load_available_apps (EosAppListModel *self,
 {
   eos_app_log_info_message ("Trying to get available apps");
 
-  GError *error = NULL;
-
   char *target = eos_get_updates_file ();
   char *data = NULL;
+  gboolean update_needed = NULL;
 
-  if (is_app_list_update_needed(self, cancellable, &error))
+  GError *error = NULL;
+
+  if (!check_is_app_list_update_needed(self, &update_needed, cancellable,
+                                       &error))
+    {
+      eos_app_log_error_message ("Failed checkng if update is needed!");
+
+      g_free (target);
+
+      g_propagate_error (error_out, error);
+
+      return FALSE;
+    }
+
+  if (update_needed)
     {
       char *url = eos_get_all_updates_uri ();
       gboolean updates_download_success;
@@ -437,7 +439,7 @@ load_available_apps (EosAppListModel *self,
     }
   else
     {
-
+      /* TODO: Clean up the logic here */
       if (error) {
           g_free (target);
           g_propagate_error (error_out, error);
