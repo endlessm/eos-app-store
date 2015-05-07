@@ -756,6 +756,8 @@ eos_get_updates_meta_record_file (void)
 char *
 eos_get_updates_meta_record_uri (void)
 {
+  /* TODO: Ensure that changing the server endpoint uses a different file */
+
   return g_strconcat (get_app_server_url (),
                       "/api/v1/meta_records",
                       "?type=updates",
@@ -862,7 +864,7 @@ eos_app_load_installed_apps (GHashTable *app_info,
 }
 
 gboolean
-eos_app_load_updates_meta_record (guint *monotonic_update_id,
+eos_app_load_updates_meta_record (gint64 *monotonic_update_id,
                                   const char *data,
                                   GCancellable *cancellable,
                                   GError **error)
@@ -871,9 +873,41 @@ eos_app_load_updates_meta_record (guint *monotonic_update_id,
 
   JsonParser *parser = json_parser_new ();
 
+  if (!json_parser_load_from_data (parser, data, -1, error))
+    {
+      eos_app_log_error_message ("Updates meta record wasn't able to be parsed");
+      g_object_unref (parser);
+      return FALSE;
+    }
+
+  JsonNode *root = json_parser_get_root (parser);
+  if (!JSON_NODE_HOLDS_OBJECT (root))
+    {
+      eos_app_log_error_message ("Updates meta record did not contain"
+                                 "expected structure");
+      g_object_unref (parser);
+      return FALSE;
+    }
+
+  JsonObject *obj = json_node_get_object (root);
+  if (!json_object_has_member (obj, "monotonic_id"))
+    {
+      eos_app_log_error_message ("Updates meta record did not contain"
+                                 "expected attributes");
+      g_object_unref (parser);
+      return FALSE;
+    }
+
+  eos_app_log_debug_message ("Loading JSON update meta record monotonic id");
+
+  *monotonic_update_id = json_object_get_int_member (obj, "monotonic_id");
+
+  eos_app_log_debug_message ("Update meta record monotonic id: %" G_GINT64_FORMAT,
+                             *monotonic_update_id);
+
   g_object_unref (parser);
 
-  return FALSE;
+  return TRUE;
 }
 
 gboolean
