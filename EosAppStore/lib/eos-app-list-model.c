@@ -1176,6 +1176,57 @@ download_file_chunk_func (GByteArray *chunk,
   g_byte_array_append (all_content, buffer, chunk_len);
 }
 
+#define ONE_HOUR  (60 * 60)
+
+static gboolean
+check_cached_file (const char *target_file,
+                   char      **buffer)
+{
+  struct stat buf;
+  if (stat (target_file, &buf) != 0)
+    return FALSE;
+
+  GNetworkMonitor *monitor = g_network_monitor_get_default ();
+  gboolean network_available = g_network_monitor_get_network_available (monitor);
+
+  time_t now = time (NULL);
+
+  eos_app_log_debug_message ("Checking if the cached file is still good (now: %ld, mtime: %ld, diff: %ld)",
+                             now, buf.st_mtime, (now - buf.st_mtime));
+
+  /* We want the cached file if we're not online (and can't get an updated
+   * version anyway), or if the cached file is new enough
+   */
+  if (!network_available ||
+      (buf.st_mtime > now || (now - buf.st_mtime < ONE_HOUR)))
+    {
+      if (network_available)
+        eos_app_log_info_message ("Requested file '%s' is within cache allowance.", target_file);
+      else
+        eos_app_log_info_message ("No network available, using cached file");
+
+      if (buffer != NULL)
+        {
+          GError *internal_error = NULL;
+
+          g_file_get_contents (target_file, buffer, NULL, &internal_error);
+
+          if (internal_error != NULL)
+            {
+              eos_app_log_error_message ("Cached file '%s': %s",
+                                         target_file,
+                                         internal_error->message);
+              g_clear_error (&internal_error);
+              return FALSE;
+            }
+        }
+
+      return TRUE;
+    }
+
+  return FALSE;
+}
+
 static gboolean
 download_file_from_uri (SoupSession     *session,
                         const char      *content_type,
@@ -1185,34 +1236,10 @@ download_file_from_uri (SoupSession     *session,
                         GCancellable    *cancellable,
                         GError         **error)
 {
-  GError *internal_error = NULL;
+  if (check_cached_file (target_file, buffer))
+    return TRUE;
+
   gboolean retval = FALSE;
-
-  struct stat buf;
-  if (stat (target_file, &buf) == 0)
-    {
-      time_t now = time (NULL);
-
-      eos_app_log_debug_message ("Checking if the cached file is still good (now: %ld, mtime: %ld, diff: %ld)",
-                                 now, buf.st_mtime, (now - buf.st_mtime));
-      if (buf.st_mtime > now || (now - buf.st_mtime < 3600))
-        {
-          eos_app_log_info_message ("Requested file '%s' is within cache allowance.",
-                                    target_file);
-          if (buffer != NULL)
-            {
-              if (g_file_get_contents (target_file, buffer, NULL, &internal_error))
-                return TRUE;
-
-              /* Fall through, and re-download the file */
-              eos_app_log_error_message ("Could not read cached file '%s': %s",
-                                         target_file,
-                                         internal_error->message);
-              g_clear_error (&internal_error);
-            }
-        }
-    }
-
   gsize bytes_read = 0;
   GInputStream *in_stream = NULL;
   GOutputStream *out_stream = NULL;
