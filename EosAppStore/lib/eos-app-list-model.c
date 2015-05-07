@@ -323,14 +323,21 @@ is_app_list_update_needed (EosAppListModel *self,
                            GCancellable *cancellable,
                            GError **error_out)
 {
+  /* TODO: Return success bool from func and return
+   *       state as a passed in var to keep in line
+   *       with other code
+   */
   gboolean retval = TRUE;
-  char *data = NULL;
-  GError *error = NULL;
-
-  eos_app_log_info_message ("Checking if app list update is needed");
 
   char *url = eos_get_updates_meta_record_uri ();
   char *target = eos_get_updates_meta_record_file ();
+  char *data = NULL;
+
+  gint64 monotonic_id = 0;
+
+  GError *error = NULL;
+
+  eos_app_log_info_message ("Checking if app list update is needed");
 
   eos_app_log_info_message ("Downloading updates meta record from: %s", url);
 
@@ -352,7 +359,7 @@ is_app_list_update_needed (EosAppListModel *self,
   g_free (url);
   g_free (target);
 
-  if (!eos_app_load_updates_meta_record (&self->monotonic_update_id,
+  if (!eos_app_load_updates_meta_record (&monotonic_id,
                                          data,
                                          cancellable,
                                          &error))
@@ -363,13 +370,26 @@ is_app_list_update_needed (EosAppListModel *self,
       g_propagate_error (error_out, error);
       goto out;
     }
-  else
-    {
-      eos_app_log_error_message ("Not implemented");
-      /* TODO: Do something with result */
-    }
 
   g_free (data);
+
+  if (monotonic_id != self->monotonic_update_id)
+    {
+      eos_app_log_info_message ("Monotonic update ID changed."
+                                " Old: %" G_GINT64_FORMAT ","
+                                " New: %" G_GINT64_FORMAT ".",
+                                self->monotonic_update_id,
+                                monotonic_id);
+    }
+  else
+    {
+      eos_app_log_info_message ("Monotonic update ID unchanged."
+                                " Old: %" G_GINT64_FORMAT ","
+                                " New: %" G_GINT64_FORMAT ".",
+                                self->monotonic_update_id,
+                                monotonic_id);
+      retval = FALSE;
+    }
 
 out:
   eos_app_log_info_message ("App list update is %sneeded", retval ? "" : "not ");
@@ -417,6 +437,10 @@ load_available_apps (EosAppListModel *self,
     {
       /* TODO: Propagate is_app_list_update_needed error */
       /* TODO: Populate *data with file content */
+      eos_app_log_error_message ("Not implemented!");
+      g_free (data);
+
+      return FALSE;
     }
 
   if (!eos_app_load_available_apps (self->apps, data, cancellable, &error))
