@@ -56,7 +56,7 @@ struct _EosAppListModel
 
   GHashTable *apps;
 
-  guint monotonic_update_id;
+  gint64 monotonic_update_id;
 
   guint applications_changed_id;
   guint changed_guard_id;

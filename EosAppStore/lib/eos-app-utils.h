@@ -56,7 +56,7 @@ gboolean eos_app_load_available_apps      (GHashTable *app_info,
                                            GCancellable *cancellable,
                                            GError **error);
 
-gboolean eos_app_load_updates_meta_record (guint *monotonic_update_id,
+gboolean eos_app_load_updates_meta_record (gint64 *monotonic_update_id,
                                            const char *data,
                                            GCancellable *cancellable,
                                            GError **error);
