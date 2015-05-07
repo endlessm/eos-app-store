@@ -56,6 +56,8 @@ struct _EosAppListModel
 
   GHashTable *apps;
 
+  guint monotonic_update_id;
+
   guint applications_changed_id;
   guint changed_guard_id;
 
@@ -340,17 +342,36 @@ is_app_list_update_needed (EosAppListModel *self,
                                cancellable,
                                &error))
     {
+      eos_app_log_error_message ("Unable to get updates meta record!");
       g_free (url);
       g_free (target);
       g_propagate_error (error_out, error);
-      return FALSE;
+      goto out;
     }
 
   g_free (url);
   g_free (target);
 
-  /* TODO: Add processing of returned *data JSON */
+  if (!eos_app_load_updates_meta_record (&self->monotonic_update_id,
+                                         data,
+                                         cancellable,
+                                         &error))
+    {
+      eos_app_log_error_message ("Unable to parse updates meta record!");
 
+      g_free (data);
+      g_propagate_error (error_out, error);
+      goto out;
+    }
+  else
+    {
+      eos_app_log_error_message ("Not implemented");
+      /* TODO: Do something with result */
+    }
+
+  g_free (data);
+
+out:
   eos_app_log_info_message ("App list update is %sneeded", retval ? "" : "not ");
 
   return retval;
@@ -718,6 +739,8 @@ eos_app_list_model_init (EosAppListModel *self)
   eos_app_log_error_message ("Creating new soup session");
 
   self->soup_session = soup_session_new ();
+
+  self->monotonic_update_id = 0;
 }
 
 EosAppListModel *
