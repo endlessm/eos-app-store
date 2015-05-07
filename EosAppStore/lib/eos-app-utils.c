@@ -863,6 +863,33 @@ eos_app_load_installed_apps (GHashTable *app_info,
 }
 
 gboolean
+eos_app_load_file_to_buffer (const char  *target_file,
+                             char       **buffer,
+                             GError     **error_out)
+{
+  GError *error = NULL;
+
+  if (buffer != NULL)
+    {
+      if (g_file_get_contents (target_file, buffer, NULL, &error))
+        return TRUE;
+
+      /* We might not have the error set */
+      eos_app_log_error_message ("Unable to read local file '%s'", target_file);
+
+      if (error)
+        {
+          eos_app_log_error_message ("Unable to load content from '%s': %s",
+                                     target_file,
+                                     error->message);
+          g_propagate_error (error_out, error);
+        }
+  }
+
+  return FALSE;
+}
+
+gboolean
 eos_app_load_updates_meta_record (gint64 *monotonic_update_id,
                                   const char *data,
                                   GCancellable *cancellable,
