@@ -412,33 +412,37 @@ load_available_apps (EosAppListModel *self,
     {
       char *url = eos_get_all_updates_uri ();
       char *target = eos_get_updates_file ();
+      gboolean updates_download_success;
 
       eos_app_log_info_message ("Downloading list of available apps from: %s", url);
-
-      if (!download_file_from_uri2 (self->soup_session,
-                                    "application/json",
-                                    url,
-                                    target,
-                                    &data,
-                                    FALSE,
-                                    cancellable,
-                                    &error))
-        {
-          g_free (url);
-          g_free (target);
-          g_propagate_error (error_out, error);
-          return FALSE;
-        }
+      updates_download_success = !download_file_from_uri2 (self->soup_session,
+                                                           "application/json",
+                                                           url,
+                                                           target,
+                                                           &data,
+                                                           FALSE,
+                                                           cancellable,
+                                                           &error);
 
       g_free (url);
       g_free (target);
+
+      if (!updates_download_success)
+        {
+          eos_app_log_error_message ("Download of all updates failed!");
+          g_propagate_error (error_out, error);
+          return FALSE;
+        }
     }
   else
     {
-      /* TODO: Propagate is_app_list_update_needed error */
+      eos_app_log_error_message ("Not fully implemented!");
+
+      if (error)
+          g_propagate_error (error_out, error);
+
       /* TODO: Populate *data with file content */
-      eos_app_log_error_message ("Not implemented!");
-      g_free (data);
+
 
       return FALSE;
     }
