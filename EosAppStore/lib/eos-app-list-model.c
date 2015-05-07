@@ -406,12 +406,12 @@ load_available_apps (EosAppListModel *self,
 
   GError *error = NULL;
 
+  char *target = eos_get_updates_file ();
   char *data = NULL;
 
   if (is_app_list_update_needed(self, cancellable, &error))
     {
       char *url = eos_get_all_updates_uri ();
-      char *target = eos_get_updates_file ();
       gboolean updates_download_success;
 
       eos_app_log_info_message ("Downloading list of available apps from: %s", url);
@@ -425,26 +425,38 @@ load_available_apps (EosAppListModel *self,
                                                            &error);
 
       g_free (url);
-      g_free (target);
 
       if (!updates_download_success)
         {
           eos_app_log_error_message ("Download of all updates failed!");
+
+          g_free (target);
           g_propagate_error (error_out, error);
           return FALSE;
         }
     }
   else
     {
-      eos_app_log_error_message ("Not fully implemented!");
 
-      if (error)
+      if (error) {
+          g_free (target);
           g_propagate_error (error_out, error);
 
-      /* TODO: Populate *data with file content */
+          return FALSE;
+        }
 
+      eos_app_log_info_message ("Loading cached all updates");
+      if (!eos_app_load_file_to_buffer (target, &data, &error))
+        {
+          eos_app_log_error_message ("Loading cached all updates failed."
+                                     "Need to re-download it");
+          g_free (target);
+          g_propagate_error (error_out, error);
 
-      return FALSE;
+          /* TODO: Re-download the actual updates */
+
+          return FALSE;
+        }
     }
 
   if (!eos_app_load_available_apps (self->apps, data, cancellable, &error))
@@ -1328,17 +1340,12 @@ download_file_from_uri2 (SoupSession     *session,
         {
           eos_app_log_info_message ("Requested file '%s' is within cache allowance.",
                                     target_file);
-          if (buffer != NULL)
-            {
-              if (g_file_get_contents (target_file, buffer, NULL, &internal_error))
-                return TRUE;
 
-              /* Fall through, and re-download the file */
-              eos_app_log_error_message ("Could not read cached file '%s': %s",
-                                         target_file,
-                                         internal_error->message);
-              g_clear_error (&internal_error);
-            }
+          if (eos_app_load_file_to_buffer (target_file, buffer, &internal_error))
+              return TRUE;
+
+          /* Fall through, and re-download the file */
+          g_clear_error (&internal_error);
         }
     }
 
