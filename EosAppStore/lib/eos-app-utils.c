@@ -862,6 +862,21 @@ eos_app_load_installed_apps (GHashTable *app_info,
 }
 
 gboolean
+eos_app_load_updates_meta_record (guint *monotonic_update_id,
+                                  const char *data,
+                                  GCancellable *cancellable,
+                                  GError **error)
+{
+  eos_app_log_debug_message ("Parsing updates meta record");
+
+  JsonParser *parser = json_parser_new ();
+
+  g_object_unref (parser);
+
+  return FALSE;
+}
+
+gboolean
 eos_app_load_available_apps (GHashTable *app_info,
                              const char *data,
                              GCancellable *cancellable,
