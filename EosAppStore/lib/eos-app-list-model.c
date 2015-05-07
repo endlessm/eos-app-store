@@ -318,6 +318,45 @@ on_shell_applications_changed (GDBusConnection *connection,
   eos_app_list_model_emit_changed (self);
 }
 
+static gint64
+get_local_updates_monotonic_id (EosAppListModel *self)
+{
+  char *url = eos_get_updates_meta_record_uri ();
+  char *target = eos_get_updates_meta_record_file ();
+  char *data = NULL;
+
+  GError *error = NULL;
+
+  gint64 monotonic_id = -1;
+
+  if (!eos_app_load_file_to_buffer (target, &data, &error))
+    {
+      eos_app_log_error_message ("Unable to load updates meta record: %s: %s!",
+                                 target,
+                                 error->message);
+
+      goto out;
+    }
+
+  if (!eos_app_load_updates_meta_record (&monotonic_id, data, NULL,
+                                         &error))
+    {
+      eos_app_log_error_message ("Unable to parse updates meta record: %s: %s!",
+                                 target,
+                                 error->message);
+      goto out;
+    }
+
+out:
+  g_free (url);
+  g_free (target);
+
+  if (data)
+    g_free (data);
+
+  return monotonic_id;
+}
+
 static gboolean
 check_is_app_list_update_needed (EosAppListModel *self,
                                  gboolean *update_needed,
@@ -363,7 +402,7 @@ check_is_app_list_update_needed (EosAppListModel *self,
                             monotonic_id);
 
   /* If monotonic IDs don't match, we need to update our app list */
-  if (monotonic_id != self->monotonic_update_id)
+  if (monotonic_id == self->monotonic_update_id)
       *update_needed = FALSE;
 
   retval = TRUE;
@@ -781,7 +820,7 @@ eos_app_list_model_init (EosAppListModel *self)
 
   self->soup_session = soup_session_new ();
 
-  self->monotonic_update_id = 0;
+  self->monotonic_update_id = get_local_updates_monotonic_id(self);
 }
 
 EosAppListModel *
