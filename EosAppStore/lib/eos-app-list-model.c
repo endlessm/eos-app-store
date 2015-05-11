@@ -319,7 +319,7 @@ on_shell_applications_changed (GDBusConnection *connection,
 }
 
 static gint64
-get_local_updates_monotonic_id (EosAppListModel *self)
+get_local_updates_monotonic_id (void)
 {
   char *url = eos_get_updates_meta_record_uri ();
   char *target = eos_get_updates_meta_record_file ();
@@ -820,7 +820,7 @@ eos_app_list_model_init (EosAppListModel *self)
 
   self->soup_session = soup_session_new ();
 
-  self->monotonic_update_id = get_local_updates_monotonic_id(self);
+  self->monotonic_update_id = get_local_updates_monotonic_id ();
 }
 
 EosAppListModel *
