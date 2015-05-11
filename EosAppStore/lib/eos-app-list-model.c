@@ -90,18 +90,9 @@ download_file_from_uri (SoupSession     *session,
                         const char      *source_uri,
                         const char      *target_file,
                         char           **buffer,
+                        gboolean         use_cache,
                         GCancellable    *cancellable,
                         GError         **error);
-
-static gboolean
-download_file_from_uri2 (SoupSession     *session,
-                         const char      *content_type,
-                         const char      *source_uri,
-                         const char      *target_file,
-                         char           **buffer,
-                         gboolean         use_cache,
-                         GCancellable    *cancellable,
-                         GError         **error);
 
 static void
 set_app_installation_error (const char *desktop_id,
@@ -378,6 +369,7 @@ check_is_app_list_update_needed (EosAppListModel *self,
   if (!download_file_from_uri (self->soup_session, "application/json", url,
                                target,
                                &data,
+                               TRUE, /* Use cached copy if we have it */
                                cancellable,
                                &error))
     {
@@ -467,14 +459,14 @@ load_available_apps (EosAppListModel *self,
       gboolean updates_download_success;
 
       eos_app_log_info_message ("Downloading list of available apps from: %s", url);
-      updates_download_success = download_file_from_uri2 (self->soup_session,
-                                                          "application/json",
-                                                          url,
-                                                          target,
-                                                          &data,
-                                                          FALSE,
-                                                          cancellable,
-                                                          &error);
+      updates_download_success = download_file_from_uri (self->soup_session,
+                                                         "application/json",
+                                                         url,
+                                                         target,
+                                                         &data,
+                                                         FALSE, /* Don't use a cache if we have it */
+                                                         cancellable,
+                                                         &error);
 
       g_free (url);
 
@@ -1396,14 +1388,14 @@ check_cached_file (const char *target_file,
 }
 
 static gboolean
-download_file_from_uri2 (SoupSession     *session,
-                         const char      *content_type,
-                         const char      *source_uri,
-                         const char      *target_file,
-                         char           **buffer,
-                         gboolean         use_cache,
-                         GCancellable    *cancellable,
-                         GError         **error)
+download_file_from_uri (SoupSession     *session,
+                        const char      *content_type,
+                        const char      *source_uri,
+                        const char      *target_file,
+                        char           **buffer,
+                        gboolean         use_cache,
+                        GCancellable    *cancellable,
+                        GError         **error)
 {
   eos_app_log_debug_message ("Downloading file from %s to %s. Cache: %s",
                              source_uri,
@@ -1460,25 +1452,6 @@ out:
   g_clear_object (&request);
 
   return retval;
-}
-
-static gboolean
-download_file_from_uri (SoupSession     *session,
-                        const char      *content_type,
-                        const char      *source_uri,
-                        const char      *target_file,
-                        char           **buffer,
-                        GCancellable    *cancellable,
-                        GError         **error)
-{
-  return download_file_from_uri2 (session,
-                                  content_type,
-                                  source_uri,
-                                  target_file,
-                                  buffer,
-                                  TRUE,    /* Use cached file if available */
-                                  cancellable,
-                                  error);
 }
 
 typedef struct {
