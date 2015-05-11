@@ -1488,7 +1488,6 @@ download_file_from_uri (SoupSession     *session,
                                   error);
 }
 
-
 typedef struct {
   ProgressReportFunc  progress_func;
   gpointer            progress_func_user_data;
