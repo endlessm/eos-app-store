@@ -349,9 +349,7 @@ get_local_updates_monotonic_id (void)
 out:
   g_free (url);
   g_free (target);
-
-  if (data)
-    g_free (data);
+  g_free (data);
 
   return monotonic_id;
 }
@@ -411,9 +409,9 @@ out:
                             *update_needed ? "" : "not ");
 
   /* Clean up */
-  if (url)    g_free (url);
-  if (target) g_free (target);
-  if (data)   g_free (data);
+  g_free (url);
+  g_free (target);
+  g_free (data);
 
   /* Propagate error if there's any */
   if (error)
@@ -458,11 +456,7 @@ load_available_apps (EosAppListModel *self,
           g_clear_error (&error);
 
           if (data)
-            {
-              g_free (data);
-
-              data = NULL;
-            }
+            g_clear_pointer (&data, g_free);
         }
     }
 
