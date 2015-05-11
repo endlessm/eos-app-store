@@ -338,8 +338,7 @@ get_local_updates_monotonic_id (void)
       goto out;
     }
 
-  if (!eos_app_load_updates_meta_record (&monotonic_id, data, NULL,
-                                         &error))
+  if (!eos_app_load_updates_meta_record (&monotonic_id, data, NULL, &error))
     {
       eos_app_log_error_message ("Unable to parse updates meta record: %s: %s!",
                                  target,
@@ -403,7 +402,7 @@ check_is_app_list_update_needed (EosAppListModel *self,
 
   /* If monotonic IDs don't match, we need to update our app list */
   if (monotonic_id == self->monotonic_update_id)
-      *update_needed = FALSE;
+    *update_needed = FALSE;
 
   retval = TRUE;
 
@@ -418,7 +417,7 @@ out:
 
   /* Propagate error if there's any */
   if (error)
-      g_propagate_error (error_out, error);
+    g_propagate_error (error_out, error);
 
   return retval;
 }
@@ -436,8 +435,7 @@ load_available_apps (EosAppListModel *self,
 
   GError *error = NULL;
 
-  if (!check_is_app_list_update_needed(self, &update_needed, cancellable,
-                                       &error))
+  if (!check_is_app_list_update_needed (self, &update_needed, cancellable, &error))
     {
       eos_app_log_error_message ("Failed checkng if update is needed!");
 
@@ -453,17 +451,18 @@ load_available_apps (EosAppListModel *self,
       eos_app_log_info_message ("Loading cached all updates");
       if (!eos_app_load_file_to_buffer (target, &data, &error))
         {
-          eos_app_log_error_message ("Loading cached all updates failed."
+          eos_app_log_error_message ("Loading cached all updates failed. "
                                      "Need to re-download it");
 
           /* We clear the error because we want to force a re-download */
           g_clear_error (&error);
 
-          if (data) {
-            g_free (data);
+          if (data)
+            {
+              g_free (data);
 
-            data = NULL;
-          }
+              data = NULL;
+            }
         }
     }
 
