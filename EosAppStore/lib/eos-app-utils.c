@@ -925,6 +925,14 @@ eos_app_load_updates_meta_record (gint64 *monotonic_update_id,
 
   eos_app_log_debug_message ("Loading JSON update meta record monotonic id");
 
+  if (json_object_get_null_member (obj, "monotonic_id"))
+    {
+      eos_app_log_error_message ("Updates meta record did not contain "
+                                 "valid metadata_id attribute value");
+      g_object_unref (parser);
+      return FALSE;
+    }
+
   *monotonic_update_id = json_object_get_int_member (obj, "monotonic_id");
 
   eos_app_log_debug_message ("Update meta record monotonic id: %" G_GINT64_FORMAT,
