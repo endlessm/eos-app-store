@@ -883,7 +883,7 @@ eos_app_load_file_to_buffer (const char  *target_file,
                                      error->message);
           g_propagate_error (error_out, error);
         }
-  }
+    }
 
   return FALSE;
 }
@@ -908,7 +908,7 @@ eos_app_load_updates_meta_record (gint64 *monotonic_update_id,
   JsonNode *root = json_parser_get_root (parser);
   if (!JSON_NODE_HOLDS_OBJECT (root))
     {
-      eos_app_log_error_message ("Updates meta record did not contain"
+      eos_app_log_error_message ("Updates meta record did not contain "
                                  "expected structure");
       g_object_unref (parser);
       return FALSE;
@@ -917,7 +917,7 @@ eos_app_load_updates_meta_record (gint64 *monotonic_update_id,
   JsonObject *obj = json_node_get_object (root);
   if (!json_object_has_member (obj, "monotonic_id"))
     {
-      eos_app_log_error_message ("Updates meta record did not contain"
+      eos_app_log_error_message ("Updates meta record did not contain "
                                  "expected attributes");
       g_object_unref (parser);
       return FALSE;
