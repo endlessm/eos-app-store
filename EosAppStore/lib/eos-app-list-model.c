@@ -342,6 +342,8 @@ out:
   g_free (target);
   g_free (data);
 
+  g_clear_error (&error);
+
   return monotonic_id;
 }
 
