@@ -756,7 +756,6 @@ eos_get_updates_meta_record_file (void)
 char *
 eos_get_updates_meta_record_uri (void)
 {
-  /* TODO: Ensure that changing the server endpoint uses a different file */
   return g_strconcat (eos_get_app_server_url (),
                       "/api/v1/meta_records",
                       "?type=updates",
