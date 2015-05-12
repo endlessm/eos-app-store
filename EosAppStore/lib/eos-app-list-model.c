@@ -423,18 +423,19 @@ load_available_apps (EosAppListModel *self,
 
   char *target = eos_get_updates_file ();
   char *data = NULL;
-  gboolean update_needed = NULL;
+  gboolean update_needed;
 
   GError *error = NULL;
 
   if (!check_is_app_list_update_needed (self, &update_needed, cancellable, &error))
     {
-      eos_app_log_error_message ("Failed checkng if update is needed!");
+      eos_app_log_error_message ("Failed checkng if update is needed!: %s"
+                                 "Assuming that the update is needed",
+                                 error->message);
 
-      g_free (target);
-      g_propagate_error (error_out, error);
-
-      return FALSE;
+      /* Assume that we can just get a new version downlaoded */
+      g_clear_error (&error);
+      update_needed = TRUE;
     }
 
   /* Try a manual load of the data */
@@ -448,9 +449,7 @@ load_available_apps (EosAppListModel *self,
 
           /* We clear the error because we want to force a re-download */
           g_clear_error (&error);
-
-          if (data)
-            g_clear_pointer (&data, g_free);
+          g_clear_pointer (&data, g_free);
         }
     }
 
@@ -494,6 +493,7 @@ load_available_apps (EosAppListModel *self,
     }
 
   g_free (data);
+  g_free (target);
 
   return TRUE;
 }
