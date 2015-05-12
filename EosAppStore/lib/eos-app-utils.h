@@ -61,10 +61,6 @@ gboolean eos_app_load_updates_meta_record (gint64        *monotonic_update_id,
                                            GCancellable  *cancellable,
                                            GError       **error);
 
-gboolean eos_app_load_file_to_buffer      (const char  *target_file,
-                                           char       **buffer,
-                                           GError     **error_out);
-
 void eos_app_load_gio_apps   (GHashTable *app_info);
 void eos_app_load_shell_apps (GHashTable *app_info,
                               GVariant *shell_apps);

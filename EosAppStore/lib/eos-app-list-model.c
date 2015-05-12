@@ -320,7 +320,7 @@ get_local_updates_monotonic_id (void)
 
   gint64 monotonic_id = -1;
 
-  if (!eos_app_load_file_to_buffer (target, &data, &error))
+  if (!g_file_get_contents (target, &data, NULL, &error))
     {
       eos_app_log_error_message ("Unable to load updates meta record: %s: %s!",
                                  target,
@@ -442,7 +442,7 @@ load_available_apps (EosAppListModel *self,
   if (!update_needed)
     {
       eos_app_log_info_message ("Loading cached all updates");
-      if (!eos_app_load_file_to_buffer (target, &data, &error))
+      if (!g_file_get_contents (target, &data, NULL, &error))
         {
           eos_app_log_error_message ("Loading cached all updates failed. "
                                      "Need to re-download it");
@@ -1369,8 +1369,8 @@ check_cached_file (const char *target_file,
         {
           GError *internal_error = NULL;
 
-          if (eos_app_load_file_to_buffer (target_file, buffer, &internal_error))
-              return TRUE;
+          if (g_file_get_contents (target_file, buffer, NULL, &internal_error))
+            return TRUE;
 
           if (internal_error != NULL)
             {
