@@ -1379,7 +1379,7 @@ check_cached_file (const char *target_file,
   /* If we have a future date set on the file, something is really
    * wrong and if we have the network, don't use it.
    */
-  if (network_available && buf.st_mtime > now)
+  if (network_available && (now - buf.st_mtime < 0))
     {
       eos_app_log_error_message ("File has future date set. "
                                  "We can't use the cached version");
