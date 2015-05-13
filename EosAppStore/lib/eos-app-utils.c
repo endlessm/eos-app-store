@@ -872,7 +872,15 @@ eos_app_load_updates_meta_record (gint64 *monotonic_update_id,
   eos_app_log_debug_message ("Parsing updates meta record");
 
   if (g_cancellable_is_cancelled (cancellable))
-    return TRUE;
+    {
+      g_set_error_literal (error, EOS_APP_UTILS_ERROR,
+                           EOS_APP_UTILS_ERROR_OPERATION_CANCELLED,
+                           _("Operation cancelled"));
+
+      eos_app_log_error_message ("Operation cancelled");
+
+      return TRUE;
+    }
 
   JsonParser *parser = json_parser_new ();
 
