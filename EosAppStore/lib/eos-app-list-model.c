@@ -449,7 +449,6 @@ load_available_apps (EosAppListModel *self,
 
           /* We clear the error because we want to force a re-download */
           g_clear_error (&error);
-          g_clear_pointer (&data, g_free);
         }
     }
 
