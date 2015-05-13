@@ -70,6 +70,16 @@ int eos_compare_versions (const char *a,
 
 EosAppCategory  eos_app_category_from_id (const char *p);
 
+#define EOS_APP_UTILS_ERROR        (eos_app_utils_error_quark ())
+
+GQuark eos_app_utils_error_quark (void);
+
+typedef enum {
+  EOS_APP_UTILS_ERROR_JSON_UNEXPECTED_STRUCTURE,
+  EOS_APP_UTILS_ERROR_JSON_MISSING_ATTRIBUTE,
+  EOS_APP_UTILS_ERROR_JSON_UNEXPECTED_VALUE
+} EosAppUtilsError;
+
 G_END_DECLS
 
 #endif /* EOS_APP_UTILS_H */

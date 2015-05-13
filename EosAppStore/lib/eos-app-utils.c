@@ -20,6 +20,8 @@
 #define BUNDLE_DIR_TEMPLATE     LOCALSTATEDIR "/tmp/eos-app-store.XXXXXX"
 #define APP_DIR_DEFAULT         "/endless"
 
+G_DEFINE_QUARK (eos-app-utils-error-quark, eos_app_utils_error)
+
 const char *
 eos_get_bundle_download_dir (void)
 {
@@ -884,6 +886,11 @@ eos_app_load_updates_meta_record (gint64 *monotonic_update_id,
   JsonNode *root = json_parser_get_root (parser);
   if (!JSON_NODE_HOLDS_OBJECT (root))
     {
+      g_set_error_literal (error, EOS_APP_UTILS_ERROR,
+                           EOS_APP_UTILS_ERROR_JSON_UNEXPECTED_STRUCTURE,
+                           _("Updates meta record did not contain "
+                             "expected structure"));
+
       eos_app_log_error_message ("Updates meta record did not contain "
                                  "expected structure");
       g_object_unref (parser);
@@ -893,6 +900,11 @@ eos_app_load_updates_meta_record (gint64 *monotonic_update_id,
   JsonObject *obj = json_node_get_object (root);
   if (!json_object_has_member (obj, "monotonic_id"))
     {
+      g_set_error_literal (error, EOS_APP_UTILS_ERROR,
+                           EOS_APP_UTILS_ERROR_JSON_MISSING_ATTRIBUTE,
+                           _("Updates meta record did not contain "
+                             "expected attributes"));
+
       eos_app_log_error_message ("Updates meta record did not contain "
                                  "expected attributes");
       g_object_unref (parser);
@@ -903,6 +915,11 @@ eos_app_load_updates_meta_record (gint64 *monotonic_update_id,
 
   if (json_object_get_null_member (obj, "monotonic_id"))
     {
+      g_set_error_literal (error, EOS_APP_UTILS_ERROR,
+                           EOS_APP_UTILS_ERROR_JSON_UNEXPECTED_VALUE,
+                           _("Updates meta record did not contain "
+                             "valid metadata_id attribute value"));
+
       eos_app_log_error_message ("Updates meta record did not contain "
                                  "valid metadata_id attribute value");
       g_object_unref (parser);
