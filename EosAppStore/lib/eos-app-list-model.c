@@ -1347,45 +1347,56 @@ check_cached_file (const char *target_file,
   GNetworkMonitor *monitor = g_network_monitor_get_default ();
   gboolean network_available = g_network_monitor_get_network_available (monitor);
 
+  GError *internal_error = NULL;
+
   time_t now = time (NULL);
 
   eos_app_log_debug_message ("Checking if the cached file is still good (now: %ld, mtime: %ld, diff: %ld)",
                              now, buf.st_mtime, (now - buf.st_mtime));
 
-  /* We want the cached file if we're not online (and can't get an updated
-   * version anyway), or if the cached file is new enough
+  /* We don't want to use cache if we have the network and the cached
+   * file is stale.
    */
-  if (!network_available ||
-      (buf.st_mtime > now || (now - buf.st_mtime < DOWNLOADED_FILE_STALE_THRESHOLD)))
+  if (network_available && (now - buf.st_mtime > DOWNLOADED_FILE_STALE_THRESHOLD))
     {
-      if (network_available)
-        eos_app_log_info_message ("Requested file '%s' is within cache allowance.",
-                                  target_file);
-      else
-        eos_app_log_info_message ("No network available, using cached file");
-
-      if (buffer != NULL)
-        {
-          GError *internal_error = NULL;
-
-          if (g_file_get_contents (target_file, buffer, NULL, &internal_error))
-            return TRUE;
-
-          if (internal_error != NULL)
-            {
-              /* Fall through, and re-download the file */
-              eos_app_log_error_message ("Could not read cached file '%s': %s",
-                                         target_file,
-                                         internal_error->message);
-              g_clear_error (&internal_error);
-              return FALSE;
-            }
-        }
-
-      return TRUE;
+      eos_app_log_info_message ("Stale file and we have network. "
+                                "Not using cached version");
+      return FALSE;
     }
 
-  return FALSE;
+  /* If we have a future date set on the file, something is really
+   * wrong and if we have the network, don't use it.
+   */
+  if (network_available && buf.st_mtime > now)
+    {
+      eos_app_log_error_message ("File has future date set. "
+                                 "We can't use the cached version");
+      return FALSE;
+    }
+
+  if (network_available)
+    eos_app_log_info_message ("Requested file '%s' is within cache allowance.",
+                              target_file);
+  else
+    eos_app_log_info_message ("No network available, using cached file");
+
+  if (buffer == NULL)
+    {
+      eos_app_log_error_message ("Trying to read a file into an em empty pointer!");
+      return FALSE;
+    }
+
+  if (!g_file_get_contents (target_file, buffer, NULL, &internal_error))
+    {
+      /* Fall through, and re-download the file */
+      eos_app_log_error_message ("Could not read cached file '%s': %s",
+                                 target_file,
+                                 internal_error->message);
+      g_clear_error (&internal_error);
+      return FALSE;
+    }
+
+  return TRUE;
 }
 
 static gboolean
