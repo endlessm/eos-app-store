@@ -453,10 +453,10 @@ load_available_apps (EosAppListModel *self,
   /* Try a manual load of the data */
   if (!update_needed)
     {
-      eos_app_log_info_message ("Loading cached all updates");
+      eos_app_log_info_message ("Loading cached updates.json");
       if (!g_file_get_contents (target, &data, NULL, &error))
         {
-          eos_app_log_error_message ("Loading cached all updates failed. "
+          eos_app_log_error_message ("Loading cached updates.json failed. "
                                      "Need to re-download it");
 
           /* We clear the error because we want to force a re-download */
@@ -1394,7 +1394,7 @@ check_cached_file (const char *target_file,
 
   if (buffer == NULL)
     {
-      eos_app_log_error_message ("Trying to read a file into an em empty pointer!");
+      eos_app_log_error_message ("Trying to read a file into an empty pointer!");
       return FALSE;
     }
 
