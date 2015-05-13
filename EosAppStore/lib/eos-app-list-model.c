@@ -354,22 +354,18 @@ out:
 }
 
 static gboolean
-check_is_app_list_update_needed (EosAppListModel *self,
-                                 gboolean *update_needed,
-                                 GCancellable *cancellable,
-                                 GError **error_out)
+check_is_app_list_current (EosAppListModel *self,
+                           GCancellable *cancellable,
+                           GError **error_out)
 {
   char *url = eos_get_updates_meta_record_uri ();
   char *target = eos_get_updates_meta_record_file ();
   char *data = NULL;
 
   gint64 monotonic_id = 0;
-  gboolean retval = FALSE;
+  gboolean updates_current = FALSE;
 
   GError *error = NULL;
-
-  /* By deafult we want updates */
-  *update_needed = TRUE;
 
   eos_app_log_info_message ("Checking if app list update is needed");
 
@@ -406,13 +402,11 @@ check_is_app_list_update_needed (EosAppListModel *self,
 
   /* If monotonic IDs don't match, we need to update our app list */
   if (monotonic_id == self->monotonic_update_id)
-    *update_needed = FALSE;
-
-  retval = TRUE;
+    updates_current = TRUE;
 
 out:
-  eos_app_log_info_message ("App list update is %sneeded",
-                            *update_needed ? "" : "not ");
+  eos_app_log_info_message ("App list updates are %scurrent",
+                            updates_current ? "" : "not ");
 
   /* Clean up */
   g_free (url);
@@ -423,7 +417,7 @@ out:
   if (error)
     g_propagate_error (error_out, error);
 
-  return retval;
+  return updates_current;
 }
 
 static gboolean
@@ -435,23 +429,24 @@ load_available_apps (EosAppListModel *self,
 
   char *target = eos_get_updates_file ();
   char *data = NULL;
-  gboolean update_needed;
+  gboolean updates_current;
 
   GError *error = NULL;
 
-  if (!check_is_app_list_update_needed (self, &update_needed, cancellable, &error))
-    {
+  updates_current = check_is_app_list_current (self, cancellable,
+                                               &error);
+
+  if (!updates_current && error) {
       eos_app_log_error_message ("Failed checkng if update is needed!: %s. "
-                                 "Assuming that the update is needed",
+                                 "Ignoring and assuming that update is needed",
                                  error->message);
 
       /* Assume that we can just get a new version downlaoded */
       g_clear_error (&error);
-      update_needed = TRUE;
-    }
+  }
 
   /* Try a manual load of the data */
-  if (!update_needed)
+  if (updates_current)
     {
       eos_app_log_info_message ("Loading cached updates.json");
       if (!g_file_get_contents (target, &data, NULL, &error))
