@@ -879,6 +879,7 @@ eos_app_load_updates_meta_record (gint64 *monotonic_update_id,
   if (!json_parser_load_from_data (parser, data, -1, error))
     {
       eos_app_log_error_message ("Updates meta record wasn't able to be parsed");
+
       g_object_unref (parser);
       return FALSE;
     }
@@ -893,6 +894,7 @@ eos_app_load_updates_meta_record (gint64 *monotonic_update_id,
 
       eos_app_log_error_message ("Updates meta record did not contain "
                                  "expected structure");
+
       g_object_unref (parser);
       return FALSE;
     }
@@ -907,6 +909,7 @@ eos_app_load_updates_meta_record (gint64 *monotonic_update_id,
 
       eos_app_log_error_message ("Updates meta record did not contain "
                                  "expected attributes");
+
       g_object_unref (parser);
       return FALSE;
     }
@@ -922,6 +925,7 @@ eos_app_load_updates_meta_record (gint64 *monotonic_update_id,
 
       eos_app_log_error_message ("Updates meta record did not contain "
                                  "valid metadata_id attribute value");
+
       g_object_unref (parser);
       return FALSE;
     }

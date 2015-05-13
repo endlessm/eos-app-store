@@ -331,9 +331,15 @@ get_local_updates_monotonic_id (void)
 
   if (!eos_app_load_updates_meta_record (&monotonic_id, data, NULL, &error))
     {
-      eos_app_log_error_message ("Unable to parse updates meta record: %s: %s!",
+      eos_app_log_error_message ("Unable to parse updates meta record: %s: %s! "
+                                 "Removing file from system",
                                  target,
                                  error->message);
+
+      /* If we have parsing issues with the file, we want it removed from the
+       * system regardless of the reasons */
+      g_unlink (target);
+
       goto out;
     }
 
@@ -382,7 +388,13 @@ check_is_app_list_update_needed (EosAppListModel *self,
   if (!eos_app_load_updates_meta_record (&monotonic_id, data, cancellable,
                                          &error))
     {
-      eos_app_log_error_message ("Unable to parse updates meta record!");
+      eos_app_log_error_message ("Unable to parse updates meta record! "
+                                 "Removing cached file.");
+
+      /* If we have parsing issues with the file, we want it removed from the
+       * system regardless of the reasons */
+      g_unlink (target);
+
       goto out;
     }
 
@@ -429,7 +441,7 @@ load_available_apps (EosAppListModel *self,
 
   if (!check_is_app_list_update_needed (self, &update_needed, cancellable, &error))
     {
-      eos_app_log_error_message ("Failed checkng if update is needed!: %s"
+      eos_app_log_error_message ("Failed checkng if update is needed!: %s. "
                                  "Assuming that the update is needed",
                                  error->message);
 
