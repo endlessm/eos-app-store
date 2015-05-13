@@ -35,6 +35,9 @@ GdkNotifyType eos_get_event_notify_type (GdkEvent *event);
 char *  eos_get_all_updates_uri (void);
 char *  eos_get_updates_file (void);
 
+char *  eos_get_updates_meta_record_uri (void);
+char *  eos_get_updates_meta_record_file (void);
+
 const char *eos_get_bundles_dir (void);
 const char *eos_get_cache_dir (void);
 const char *eos_get_bundle_download_dir (void);
@@ -43,15 +46,22 @@ const char *eos_get_app_server_url (void);
 
 gboolean eos_use_delta_updates (void);
 
-gboolean eos_app_load_installed_apps (GHashTable *app_info,
-                                      const char *appdir,
-                                      GCancellable *cancellable,
-                                      GError **error);
-gboolean eos_app_load_available_apps (GHashTable *app_info,
-                                      const char *data,
-                                      GCancellable *cancellable,
-                                      GError **error);
-void eos_app_load_gio_apps (GHashTable *app_info);
+gboolean eos_app_load_installed_apps      (GHashTable    *app_info,
+                                           const char    *appdir,
+                                           GCancellable  *cancellable,
+                                           GError       **error);
+
+gboolean eos_app_load_available_apps      (GHashTable    *app_info,
+                                           const char    *data,
+                                           GCancellable  *cancellable,
+                                           GError       **error);
+
+gboolean eos_app_load_updates_meta_record (gint64        *monotonic_update_id,
+                                           const char    *data,
+                                           GCancellable  *cancellable,
+                                           GError       **error);
+
+void eos_app_load_gio_apps   (GHashTable *app_info);
 void eos_app_load_shell_apps (GHashTable *app_info,
                               GVariant *shell_apps);
 
@@ -59,6 +69,16 @@ int eos_compare_versions (const char *a,
                           const char *b);
 
 EosAppCategory  eos_app_category_from_id (const char *p);
+
+#define EOS_APP_UTILS_ERROR        (eos_app_utils_error_quark ())
+
+GQuark eos_app_utils_error_quark (void);
+
+typedef enum {
+  EOS_APP_UTILS_ERROR_JSON_UNEXPECTED_STRUCTURE,
+  EOS_APP_UTILS_ERROR_JSON_MISSING_ATTRIBUTE,
+  EOS_APP_UTILS_ERROR_JSON_UNEXPECTED_VALUE
+} EosAppUtilsError;
 
 G_END_DECLS
 

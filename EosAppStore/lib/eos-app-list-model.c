@@ -33,6 +33,9 @@
 /* Amount of seconds that we should wait before retrying a failed download */
 #define DOWNLOAD_RETRY_PERIOD 4
 
+/* Amount of seconds before a downloaded file is considered stale */
+#define DOWNLOADED_FILE_STALE_THRESHOLD 3600
+
 /* HACK: This will be revisited for the next release,
  * but for now we have a limited number of app language ids,
  * with no country codes, so we can iterate through them
@@ -52,6 +55,8 @@ struct _EosAppListModel
   GAppInfoMonitor *app_monitor;
 
   GHashTable *apps;
+
+  gint64 monotonic_update_id;
 
   guint applications_changed_id;
   guint changed_guard_id;
@@ -85,8 +90,10 @@ download_file_from_uri (SoupSession     *session,
                         const char      *source_uri,
                         const char      *target_file,
                         char           **buffer,
+                        gboolean         use_cache,
                         GCancellable    *cancellable,
                         GError         **error);
+
 static void
 set_app_installation_error (const char *desktop_id,
                             const char *internal_message,
@@ -302,39 +309,193 @@ on_shell_applications_changed (GDBusConnection *connection,
   eos_app_list_model_emit_changed (self);
 }
 
+static gint64
+get_local_updates_monotonic_id (void)
+{
+  char *url = eos_get_updates_meta_record_uri ();
+  char *target = eos_get_updates_meta_record_file ();
+  char *data = NULL;
+
+  GError *error = NULL;
+
+  gint64 monotonic_id = -1;
+
+  if (!g_file_get_contents (target, &data, NULL, &error))
+    {
+      eos_app_log_error_message ("Unable to load updates meta record: %s: %s!",
+                                 target,
+                                 error->message);
+
+      goto out;
+    }
+
+  if (!eos_app_load_updates_meta_record (&monotonic_id, data, NULL, &error))
+    {
+      eos_app_log_error_message ("Unable to parse updates meta record: %s: %s! "
+                                 "Removing file from system",
+                                 target,
+                                 error->message);
+
+      /* If we have parsing issues with the file, we want it removed from the
+       * system regardless of the reasons */
+      g_unlink (target);
+
+      goto out;
+    }
+
+out:
+  g_free (url);
+  g_free (target);
+  g_free (data);
+
+  g_clear_error (&error);
+
+  return monotonic_id;
+}
+
 static gboolean
-load_manager_available_apps (EosAppListModel *self,
-                             GCancellable *cancellable,
-                             GError **error_out)
+check_is_app_list_current (EosAppListModel *self,
+                           GCancellable *cancellable)
+{
+  char *url = eos_get_updates_meta_record_uri ();
+  char *target = eos_get_updates_meta_record_file ();
+  char *data = NULL;
+
+  gint64 monotonic_id = 0;
+  gboolean updates_current = FALSE;
+
+  GError *error = NULL;
+
+  eos_app_log_info_message ("Checking if app list update is needed");
+
+  eos_app_log_info_message ("Downloading updates meta record from: %s", url);
+  if (!download_file_from_uri (self->soup_session, "application/json", url,
+                               target,
+                               &data,
+                               TRUE, /* Use cached copy if we have it */
+                               cancellable,
+                               &error))
+    {
+      eos_app_log_error_message ("Unable to get updates meta record!");
+      goto out;
+    }
+
+  if (!eos_app_load_updates_meta_record (&monotonic_id, data, cancellable,
+                                         &error))
+    {
+      eos_app_log_error_message ("Unable to parse updates meta record! "
+                                 "Removing cached file.");
+
+      /* If we have parsing issues with the file, we want it removed from the
+       * system regardless of the reasons */
+      g_unlink (target);
+
+      goto out;
+    }
+
+  eos_app_log_info_message ("Comparing monotonic update ID."
+                            " Old: %" G_GINT64_FORMAT ","
+                            " New: %" G_GINT64_FORMAT ".",
+                            self->monotonic_update_id,
+                            monotonic_id);
+
+  /* If monotonic IDs don't match, we need to update our app list */
+  if (monotonic_id == self->monotonic_update_id)
+    updates_current = TRUE;
+
+out:
+  eos_app_log_info_message ("App list updates are %scurrent",
+                            updates_current ? "" : "not ");
+
+  /* Clean up */
+  g_free (url);
+  g_free (target);
+  g_free (data);
+
+  if (error)
+    {
+      eos_app_log_error_message ("Failed checkng if update is needed!: %s. "
+                                 "Ignoring and assuming that update is needed",
+                                 error->message);
+
+      /* We eat the errors since we assume that it just means that
+       * we'll re-download the updates */
+      g_clear_error (&error);
+    }
+
+  return updates_current;
+}
+
+static gboolean
+load_available_apps (EosAppListModel *self,
+                     GCancellable *cancellable,
+                     GError **error_out)
 {
   eos_app_log_info_message ("Trying to get available apps");
 
-  GError *error = NULL;
-  char *url = eos_get_all_updates_uri ();
   char *target = eos_get_updates_file ();
   char *data = NULL;
+  gboolean updates_current;
 
-  eos_app_log_info_message ("Downloading list of available apps from: %s", url);
+  GError *error = NULL;
 
-  if (!download_file_from_uri (self->soup_session, "application/json", url, target, &data, cancellable, &error))
+  updates_current = check_is_app_list_current (self, cancellable);
+
+  /* Try a manual load of the data */
+  if (updates_current)
     {
-      g_free (url);
-      g_free (target);
-      g_propagate_error (error_out, error);
-      return FALSE;
+      eos_app_log_info_message ("Loading cached updates.json");
+      if (!g_file_get_contents (target, &data, NULL, &error))
+        {
+          eos_app_log_error_message ("Loading cached updates.json failed. "
+                                     "Need to re-download it");
+
+          /* We clear the error because we want to force a re-download */
+          g_clear_error (&error);
+        }
     }
 
-  g_free (url);
-  g_free (target);
+  /* If update needed or we couldn't load cached file, get it again */
+  if (!data)
+    {
+      char *url = eos_get_all_updates_uri ();
+      gboolean updates_download_success;
+
+      eos_app_log_info_message ("Downloading list of available apps from: %s", url);
+      updates_download_success = download_file_from_uri (self->soup_session,
+                                                         "application/json",
+                                                         url,
+                                                         target,
+                                                         &data,
+                                                         FALSE, /* Don't use a cache if we have it */
+                                                         cancellable,
+                                                         &error);
+
+      g_free (url);
+
+      if (!updates_download_success)
+        {
+          eos_app_log_error_message ("Download of all updates failed!");
+
+          g_free (target);
+          g_propagate_error (error_out, error);
+
+          return FALSE;
+        }
+    }
 
   if (!eos_app_load_available_apps (self->apps, data, cancellable, &error))
     {
+      eos_app_log_error_message ("Parsing of all updates failed!");
+
       g_free (data);
       g_propagate_error (error_out, error);
+
       return FALSE;
     }
 
   g_free (data);
+  g_free (target);
 
   return TRUE;
 }
@@ -394,7 +555,7 @@ load_user_capabilities (EosAppListModel *self,
 }
 
 static gboolean
-load_manager_installed_apps (EosAppListModel *self,
+load_installed_apps (EosAppListModel *self,
                              GCancellable *cancellable,
                              GError **error)
 {
@@ -481,11 +642,11 @@ reload_model (EosAppListModel *self,
   eos_app_load_gio_apps (self->apps);
 
   eos_app_log_debug_message ("Loading installed apps from manager");
-  if (!load_manager_installed_apps (self, cancellable, error))
+  if (!load_installed_apps (self, cancellable, error))
     eos_app_log_error_message ("Unable to load installed apps");
 
   eos_app_log_debug_message ("Loading available apps from manager");
-  if (!load_manager_available_apps (self, cancellable, error))
+  if (!load_available_apps (self, cancellable, error))
     eos_app_log_error_message ("Unable to load available apps");
 
   /* Load apps with launcher from the shell */
@@ -647,6 +808,8 @@ eos_app_list_model_init (EosAppListModel *self)
   eos_app_log_error_message ("Creating new soup session");
 
   self->soup_session = soup_session_new ();
+
+  self->monotonic_update_id = get_local_updates_monotonic_id ();
 }
 
 EosAppListModel *
@@ -1176,8 +1339,6 @@ download_file_chunk_func (GByteArray *chunk,
   g_byte_array_append (all_content, buffer, chunk_len);
 }
 
-#define ONE_HOUR  (60 * 60)
-
 static gboolean
 check_cached_file (const char *target_file,
                    char      **buffer)
@@ -1189,42 +1350,56 @@ check_cached_file (const char *target_file,
   GNetworkMonitor *monitor = g_network_monitor_get_default ();
   gboolean network_available = g_network_monitor_get_network_available (monitor);
 
+  GError *internal_error = NULL;
+
   time_t now = time (NULL);
 
   eos_app_log_debug_message ("Checking if the cached file is still good (now: %ld, mtime: %ld, diff: %ld)",
                              now, buf.st_mtime, (now - buf.st_mtime));
 
-  /* We want the cached file if we're not online (and can't get an updated
-   * version anyway), or if the cached file is new enough
+  /* We don't want to use cache if we have the network and the cached
+   * file is stale.
    */
-  if (!network_available ||
-      (buf.st_mtime > now || (now - buf.st_mtime < ONE_HOUR)))
+  if (network_available && (now - buf.st_mtime > DOWNLOADED_FILE_STALE_THRESHOLD))
     {
-      if (network_available)
-        eos_app_log_info_message ("Requested file '%s' is within cache allowance.", target_file);
-      else
-        eos_app_log_info_message ("No network available, using cached file");
-
-      if (buffer != NULL)
-        {
-          GError *internal_error = NULL;
-
-          g_file_get_contents (target_file, buffer, NULL, &internal_error);
-
-          if (internal_error != NULL)
-            {
-              eos_app_log_error_message ("Cached file '%s': %s",
-                                         target_file,
-                                         internal_error->message);
-              g_clear_error (&internal_error);
-              return FALSE;
-            }
-        }
-
-      return TRUE;
+      eos_app_log_info_message ("Stale file and we have network. "
+                                "Not using cached version");
+      return FALSE;
     }
 
-  return FALSE;
+  /* If we have a future date set on the file, something is really
+   * wrong and if we have the network, don't use it.
+   */
+  if (network_available && (now - buf.st_mtime < 0))
+    {
+      eos_app_log_error_message ("File has future date set. "
+                                 "We can't use the cached version");
+      return FALSE;
+    }
+
+  if (network_available)
+    eos_app_log_info_message ("Requested file '%s' is within cache allowance.",
+                              target_file);
+  else
+    eos_app_log_info_message ("No network available, using cached file");
+
+  if (buffer == NULL)
+    {
+      eos_app_log_error_message ("Trying to read a file into an empty pointer!");
+      return FALSE;
+    }
+
+  if (!g_file_get_contents (target_file, buffer, NULL, &internal_error))
+    {
+      /* Fall through, and re-download the file */
+      eos_app_log_error_message ("Could not read cached file '%s': %s",
+                                 target_file,
+                                 internal_error->message);
+      g_clear_error (&internal_error);
+      return FALSE;
+    }
+
+  return TRUE;
 }
 
 static gboolean
@@ -1233,10 +1408,16 @@ download_file_from_uri (SoupSession     *session,
                         const char      *source_uri,
                         const char      *target_file,
                         char           **buffer,
+                        gboolean         use_cache,
                         GCancellable    *cancellable,
                         GError         **error)
 {
-  if (check_cached_file (target_file, buffer))
+  eos_app_log_debug_message ("Downloading file from %s to %s. Cache: %s",
+                             source_uri,
+                             target_file,
+                             use_cache ? "true" : "false");
+
+  if (use_cache && check_cached_file (target_file, buffer))
     return TRUE;
 
   gboolean retval = FALSE;

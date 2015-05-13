@@ -20,6 +20,8 @@
 #define BUNDLE_DIR_TEMPLATE     LOCALSTATEDIR "/tmp/eos-app-store.XXXXXX"
 #define APP_DIR_DEFAULT         "/endless"
 
+G_DEFINE_QUARK (eos-app-utils-error-quark, eos_app_utils_error)
+
 const char *
 eos_get_bundle_download_dir (void)
 {
@@ -747,6 +749,21 @@ eos_get_all_updates_uri (void)
                       NULL);
 }
 
+char *
+eos_get_updates_meta_record_file (void)
+{
+  return g_build_filename (eos_get_cache_dir (), "updates_meta.json", NULL);
+}
+
+char *
+eos_get_updates_meta_record_uri (void)
+{
+  return g_strconcat (eos_get_app_server_url (),
+                      "/api/v1/meta_records",
+                      "?type=updates",
+                      NULL);
+}
+
 static gboolean
 is_app_id (const char *appid)
 {
@@ -842,6 +859,90 @@ eos_app_load_installed_apps (GHashTable *app_info,
   eos_app_log_debug_message ("Bundle loading: %d bundles, %.3f msecs",
                              n_bundles,
                              (double) (g_get_monotonic_time () - start_time) / 1000);
+
+  return TRUE;
+}
+
+gboolean
+eos_app_load_updates_meta_record (gint64 *monotonic_update_id,
+                                  const char *data,
+                                  GCancellable *cancellable,
+                                  GError **error)
+{
+  eos_app_log_debug_message ("Parsing updates meta record");
+
+  if (g_cancellable_is_cancelled (cancellable))
+    {
+      g_set_error_literal (error, G_IO_ERROR, G_IO_ERROR_CANCELLED,
+                           _("Operation cancelled"));
+
+      eos_app_log_error_message ("Operation cancelled");
+
+      return FALSE;
+    }
+
+  JsonParser *parser = json_parser_new ();
+
+  if (!json_parser_load_from_data (parser, data, -1, error))
+    {
+      eos_app_log_error_message ("Updates meta record wasn't able to be parsed");
+
+      g_object_unref (parser);
+      return FALSE;
+    }
+
+  JsonNode *root = json_parser_get_root (parser);
+  if (!JSON_NODE_HOLDS_OBJECT (root))
+    {
+      g_set_error_literal (error, EOS_APP_UTILS_ERROR,
+                           EOS_APP_UTILS_ERROR_JSON_UNEXPECTED_STRUCTURE,
+                           _("Updates meta record did not contain "
+                             "expected structure"));
+
+      eos_app_log_error_message ("Updates meta record did not contain "
+                                 "expected structure");
+
+      g_object_unref (parser);
+      return FALSE;
+    }
+
+  JsonObject *obj = json_node_get_object (root);
+  if (!json_object_has_member (obj, "monotonic_id"))
+    {
+      g_set_error_literal (error, EOS_APP_UTILS_ERROR,
+                           EOS_APP_UTILS_ERROR_JSON_MISSING_ATTRIBUTE,
+                           _("Updates meta record did not contain "
+                             "expected attributes"));
+
+      eos_app_log_error_message ("Updates meta record did not contain "
+                                 "expected attributes");
+
+      g_object_unref (parser);
+      return FALSE;
+    }
+
+  eos_app_log_debug_message ("Loading JSON update meta record monotonic id");
+
+  if (json_object_get_null_member (obj, "monotonic_id"))
+    {
+      g_set_error_literal (error, EOS_APP_UTILS_ERROR,
+                           EOS_APP_UTILS_ERROR_JSON_UNEXPECTED_VALUE,
+                           _("Updates meta record did not contain "
+                             "valid monotonic_id attribute value"));
+
+      eos_app_log_error_message ("Updates meta record did not contain "
+                                 "valid monotonic_id attribute value");
+
+      g_object_unref (parser);
+      return FALSE;
+    }
+
+  *monotonic_update_id = json_object_get_int_member (obj, "monotonic_id");
+
+  eos_app_log_debug_message ("Update meta record monotonic id: %" G_GINT64_FORMAT,
+                             *monotonic_update_id);
+
+  g_object_unref (parser);
 
   return TRUE;
 }
