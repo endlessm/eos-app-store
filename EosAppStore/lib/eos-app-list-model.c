@@ -355,8 +355,7 @@ out:
 
 static gboolean
 check_is_app_list_current (EosAppListModel *self,
-                           GCancellable *cancellable,
-                           GError **error_out)
+                           GCancellable *cancellable)
 {
   char *url = eos_get_updates_meta_record_uri ();
   char *target = eos_get_updates_meta_record_file ();
@@ -413,9 +412,16 @@ out:
   g_free (target);
   g_free (data);
 
-  /* Propagate error if there's any */
   if (error)
-    g_propagate_error (error_out, error);
+    {
+      eos_app_log_error_message ("Failed checkng if update is needed!: %s. "
+                                 "Ignoring and assuming that update is needed",
+                                 error->message);
+
+      /* We eat the errors since we assume that it just means that
+       * we'll re-download the updates */
+      g_clear_error (&error);
+    }
 
   return updates_current;
 }
@@ -433,17 +439,7 @@ load_available_apps (EosAppListModel *self,
 
   GError *error = NULL;
 
-  updates_current = check_is_app_list_current (self, cancellable,
-                                               &error);
-
-  if (!updates_current && error) {
-      eos_app_log_error_message ("Failed checkng if update is needed!: %s. "
-                                 "Ignoring and assuming that update is needed",
-                                 error->message);
-
-      /* Assume that we can just get a new version downlaoded */
-      g_clear_error (&error);
-  }
+  updates_current = check_is_app_list_current (self, cancellable);
 
   /* Try a manual load of the data */
   if (updates_current)

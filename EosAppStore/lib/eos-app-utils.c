@@ -873,13 +873,12 @@ eos_app_load_updates_meta_record (gint64 *monotonic_update_id,
 
   if (g_cancellable_is_cancelled (cancellable))
     {
-      g_set_error_literal (error, EOS_APP_UTILS_ERROR,
-                           EOS_APP_UTILS_ERROR_OPERATION_CANCELLED,
+      g_set_error_literal (error, G_IO_ERROR, G_IO_ERROR_CANCELLED,
                            _("Operation cancelled"));
 
       eos_app_log_error_message ("Operation cancelled");
 
-      return TRUE;
+      return FALSE;
     }
 
   JsonParser *parser = json_parser_new ();
@@ -929,10 +928,10 @@ eos_app_load_updates_meta_record (gint64 *monotonic_update_id,
       g_set_error_literal (error, EOS_APP_UTILS_ERROR,
                            EOS_APP_UTILS_ERROR_JSON_UNEXPECTED_VALUE,
                            _("Updates meta record did not contain "
-                             "valid metadata_id attribute value"));
+                             "valid monotonic_id attribute value"));
 
       eos_app_log_error_message ("Updates meta record did not contain "
-                                 "valid metadata_id attribute value");
+                                 "valid monotonic_id attribute value");
 
       g_object_unref (parser);
       return FALSE;
