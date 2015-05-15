@@ -78,6 +78,7 @@
 
     color: @app_store_button_fg;
     text-shadow: 0 1px alpha(black, 0.5);
+    icon-shadow: 0 1px alpha(black, 0.5);
 }
 
 .category-button:active,
@@ -160,6 +161,7 @@
 
     color: @app_store_button_fg;
     icon-shadow: 0 1px black;
+    box-shadow: none;
 }
 
 .close-button:dir(rtl) {
@@ -495,6 +497,7 @@
     background-repeat: no-repeat;
     background-position: center;
     border: 0px;
+    box-shadow: none;
 }
 
 .new-site-frame .alert-highlight #back {
@@ -518,6 +521,7 @@
     background-image: url("btn_add-website_normal.png");
     background-size: 49px;
     border: 1px;
+    box-shadow: none;
 }
 
 .new-site-frame .add-button:active,
@@ -586,6 +590,7 @@
     background-image: url("btn_add-website_disabled.png");
     background-size: 49px;
     border: 1px;
+    box-shadow: none;
 }
 
 .weblink-listbox .list-row .state-button:hover {
