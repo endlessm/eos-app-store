@@ -23,8 +23,10 @@ class DeltaUpdatesTool(object):
     def trim_newer_full_updates(self, unfiltered_updates):
         return unfiltered_updates
 
-    def save_json(self, location, data):
-        pass
+    def save_json(self, location, updates):
+        with open(location, 'wt') as json_file:
+            json.dump(updates, json_file, sort_keys = True, indent = 2,
+                      separators=(',', ': '))
 
     def trim(self):
         location = './updates.json'
