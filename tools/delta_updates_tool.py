@@ -20,7 +20,54 @@ class DeltaUpdatesTool(object):
 
         return data
 
+    def _build_app_bucket_name(self, update):
+        app_id = update['appId']
+        arch = update['arch']
+        min_os_version = ".".join([str(update['minOsVersionObj']['major']),
+                                   str(update['minOsVersionObj']['minor']),
+                                   str(update['minOsVersionObj']['patch'])])
+
+        locale = None
+        try:
+            locale = update['locale']
+        except:
+            pass
+
+        personality = None
+        try:
+            personality = update['personality']
+        except:
+            pass
+
+        # print(app_id, arch, min_os_version, personality, locale)
+
+        bucket_name = "_".join([app_id, arch, min_os_version, personality or 'None',
+                                locale or 'None'])
+
+        return bucket_name
+
     def trim_newer_full_updates(self, unfiltered_updates):
+        buckets = {}
+        for update in unfiltered_updates:
+            bucket_name = self._build_app_bucket_name(update)
+            # print(bucket_name)
+
+            if bucket_name not in buckets:
+                buckets[bucket_name] = []
+
+            buckets[bucket_name].append(update)
+
+        print("Assembled %s buckets of updates" % len(buckets.keys()))
+
+        for bucket_name, updates in buckets.items():
+            print(bucket_name)
+            for update in updates:
+                if update['isDiff']:
+                    print(" ", "%s -> %s" % (update['fromVersion'], update['codeVersion']))
+                else:
+                    print(" ", update['codeVersion'])
+
+
         return unfiltered_updates
 
     def save_json(self, location, updates):
