@@ -3,6 +3,7 @@
 import json
 
 from os import path
+from subprocess import call
 
 class DeltaUpdatesTool(object):
     def parse_updates_json(self, location):
@@ -46,6 +47,34 @@ class DeltaUpdatesTool(object):
 
         return bucket_name
 
+    def _compare_versions(self, a, b, cmp_func):
+        return call('dpkg --compare-versions %s %s %s' % (a['codeVersion'],
+                                                          cmp_func,
+                                                          b['codeVersion']),
+                    shell = True)
+
+    def _sort_by_versions(self, updates):
+        def cmp_to_key(mycmp):
+            'Convert cmp= function to key= function'
+            class KeyComparator(object):
+                def __init__(self, obj, *args):
+                    self.obj = obj
+                def __lt__(self, other):
+                    return mycmp(self.obj, other.obj, 'lt')
+                def __gt__(self, other):
+                    return mycmp(self.obj, other.obj, 'gt')
+                def __eq__(self, other):
+                    return mycmp(self.obj, other.obj, 'eq')
+                def __le__(self, other):
+                    return mycmp(self.obj, other.obj, 'lte')
+                def __ge__(self, other):
+                    return mycmp(self.obj, other.obj, 'gte')
+                def __ne__(self, other):
+                    return mycmp(self.obj, other.obj, 'ne')
+            return KeyComparator
+
+        return sorted(updates, key=cmp_to_key(self._compare_versions))
+
     def trim_newer_full_updates(self, unfiltered_updates):
         buckets = {}
         for update in unfiltered_updates:
@@ -60,13 +89,15 @@ class DeltaUpdatesTool(object):
         print("Assembled %s buckets of updates" % len(buckets.keys()))
 
         for bucket_name, updates in buckets.items():
-            print(bucket_name)
-            for update in updates:
+            print(bucket_name, len(updates))
+
+            sorted_updates = self._sort_by_versions(updates)
+
+            for update in sorted_updates:
                 if update['isDiff']:
                     print(" ", "%s -> %s" % (update['fromVersion'], update['codeVersion']))
                 else:
                     print(" ", update['codeVersion'])
-
 
         return unfiltered_updates
 
