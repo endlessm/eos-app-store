@@ -81,8 +81,8 @@
     icon-shadow: 0 1px alpha(black, 0.5);
 }
 
-.category-button:active,
-.sidebar-frame .button:active {
+.category-button:checked,
+.sidebar-frame .button:checked {
     font-weight: bold;
 }
 
@@ -91,9 +91,9 @@
     color: @app_store_button_hover_fg;
 }
 
-.category-button:active,
+.category-button:checked,
 .category-button:hover:active,
-.sidebar-frame .button:active,
+.sidebar-frame .button:checked,
 .sidebar-frame .button:hover:active {
     color: white;
 }
@@ -102,7 +102,7 @@
     padding: 6px 0;
 }
 
-.category-button:active {
+.category-button:checked {
     background-image: linear-gradient(to top, white, white 3px, transparent 3px);
 }
 
@@ -275,6 +275,7 @@
     font-weight: 600; /* semibold */
     color: alpha(white, 0.9);
     text-shadow: 0 1px alpha(black, 0.3);
+    box-shadow: none;
 }
 
 .app-frame .state-button:hover {
@@ -703,7 +704,7 @@
     background-image: url("btn_add-folder_hover.png");
 }
 
-.folder-bubble .button:active {
+.folder-bubble .button:checked {
     background-image: url("btn_add-folder_pressed.png");
 }
 
