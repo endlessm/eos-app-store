@@ -3,6 +3,7 @@
 import json
 
 from os import path
+from shutil import move
 from subprocess import call
 
 class DeltaUpdatesTool(object):
@@ -195,9 +196,24 @@ class DeltaUpdatesTool(object):
         return filtered_updates
 
     def save_json(self, location, updates):
+        # Backup old version
+        backup_filename = None
+        for next_index in range(0, 100):
+            path_to_try = "%s.json.%d.old" % (path.splitext(location)[0],
+                                              next_index)
+            if not path.exists(path_to_try):
+                backup_filename = path_to_try
+                break
+
+        if not backup_filename:
+            raise RuntimeError("Could not find a file to save the backup to!")
+
+        move(location, backup_filename)
+
+        # Save the new file
         with open(location, 'wt') as json_file:
             json.dump(updates, json_file, sort_keys = True, indent = 2,
-                      separators=(',', ': '))
+                      separators = (',', ': '))
 
     def trim(self):
         location = './updates.json'
