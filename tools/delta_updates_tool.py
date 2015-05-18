@@ -81,14 +81,29 @@ class DeltaUpdatesTool(object):
     def _sort_by_code_versions(self, updates):
         return sorted(updates, key=self.cmp_to_key(self._compare_code_versions))
 
-    def _split_newer_updates(self, deltas):
+    def _split_newer_updates(self, deltas, updates):
         sorted_deltas = sorted(deltas, key=self.cmp_to_key(self._compare_from_versions))
-        print("Sorted: ", len(sorted_deltas))
+        print("Sorted:", len(sorted_deltas))
+
+        # Find the farthest delta that has an actuall full install candidate
+        last_chainable_diff = None
+        for sorted_update in reversed(sorted_deltas):
+            if last_chainable_diff:
+                break
+
+            for candidate_update in updates:
+                if candidate_update['isDiff'] == False and \
+                   sorted_update['fromVersion'] == candidate_update['codeVersion']:
+                    last_chainable_diff = sorted_update
+                    break
+
+        if last_chainable_diff:
+            sorted_deltas.remove(last_chainable_diff)
 
         if len(sorted_deltas) == 1:
-            return [], sorted_deltas[-1]
+            return [], last_chainable_diff
 
-        return sorted_deltas[:-2], sorted_deltas[-1]
+        return sorted_deltas, last_chainable_diff
 
     def trim_newer_full_updates(self, unfiltered_updates):
         filtered_updates = []
@@ -114,17 +129,23 @@ class DeltaUpdatesTool(object):
             sorted_updates = self._sort_by_code_versions(updates)
 
             latest_version = sorted_updates[0]['codeVersion']
-            # print('Latest: %s' % latest_version)
+            print('Latest: %s' % latest_version)
 
             latest_version_updates = [u for u in sorted_updates if u['codeVersion'] == latest_version]
             latest_version_diffs = [u for u in latest_version_updates if u['isDiff'] == True]
 
             if len(latest_version_diffs) > 0:
                 # Split out the deltas to the newest version from others and remove them
-                updates_to_delete, oldest_diff = self._split_newer_updates(latest_version_diffs)
+                updates_to_delete, oldest_diff = self._split_newer_updates(latest_version_diffs, sorted_updates)
                 for update_to_delete in updates_to_delete:
-                    print("Deleting delta %s version" % update_to_delete['fromVersion'])
+                    # Used for debugging
+                    # print("Deleting delta %s -> %s" % (update_to_delete['fromVersion'],
+                    #                                    update_to_delete['codeVersion']))
                     sorted_updates.remove(update_to_delete)
+
+                # If we don't have a good chain from update to diff, ignore this bucket
+                if not oldest_diff:
+                    continue
 
                 updates_to_delete = []
                 for update in sorted_updates:
@@ -143,6 +164,12 @@ class DeltaUpdatesTool(object):
                         updates_to_delete.append(update)
 
                 for deletable_update in updates_to_delete:
+                    # Used for debugging
+                    # if deletable_update['isDiff']:
+                    #     print("D ", "%s -> %s" % (deletable_update['fromVersion'], deletable_update['codeVersion']))
+                    # else:
+                    #     print("D ", deletable_update['codeVersion'])
+
                     # We may have duplicates so we need this check here
                     if deletable_update in sorted_updates:
                         sorted_updates.remove(deletable_update)
@@ -151,16 +178,10 @@ class DeltaUpdatesTool(object):
                 # bucket, then we don't need that bucket at all
                 sorted_updates = []
 
-            for update in sorted_updates:
-                if update['isDiff']:
-                    print(" ", "%s -> %s" % (update['fromVersion'], update['codeVersion']))
-                else:
-                    print(" ", update['codeVersion'])
-
             # Sanity check
-            # assert len(sorted_updates) == 0 or len(sorted_updates) == 2, \
-            #        "Resulting bucket results should always have either 0 or 2 results " \
-            #        "(got: %s)" % len(sorted_updates)
+            assert len(sorted_updates) == 0 or len(sorted_updates) == 2, \
+                   "Resulting bucket results should always have either 0 or 2 results " \
+                   "(got: %s)" % len(sorted_updates)
 
             for update in sorted_updates:
                 if update['isDiff']:
