@@ -1,12 +1,26 @@
 #!/usr/bin/env python3
+# set expandtab ts=4 sw=4 ai
 
 import json
+import argparse
 
 from os import path
 from shutil import move
 from subprocess import call
 
 class DeltaUpdatesTool(object):
+    VERSION = '0.0.1'
+
+    def __init__(self, debug = False, verbose = False):
+        self.debug = debug
+        self.verbose = verbose
+
+        if self.debug:
+            print("Debug:", self.debug)
+
+        if self.verbose:
+            print("Verbose:", self.verbose)
+
     def parse_updates_json(self, location):
         if not path.exists(location):
             raise RuntimeError("File does not exist at %s" % location)
@@ -41,7 +55,8 @@ class DeltaUpdatesTool(object):
         except:
             pass
 
-        # print(app_id, arch, min_os_version, personality, locale)
+        if self.verbose:
+            print(app_id, arch, min_os_version, personality, locale)
 
         bucket_name = "_".join([app_id, arch, min_os_version, personality or 'None',
                                 locale or 'None'])
@@ -61,7 +76,7 @@ class DeltaUpdatesTool(object):
                     shell = True)
 
     def cmp_to_key(self, comparator):
-        'Convert cmp= function to key= function'
+        # Convert cmp= function to key= function
         class KeyComparator(object):
             def __init__(self, obj, *args):
                 self.obj = obj
@@ -84,7 +99,8 @@ class DeltaUpdatesTool(object):
 
     def _split_newer_updates(self, deltas, updates):
         sorted_deltas = sorted(deltas, key=self.cmp_to_key(self._compare_from_versions))
-        print("Sorted:", len(sorted_deltas))
+        if self.debug:
+            print("Sorted:", len(sorted_deltas))
 
         # Find the farthest delta that has an actuall full install candidate
         last_chainable_diff = None
@@ -114,23 +130,27 @@ class DeltaUpdatesTool(object):
         buckets = {}
         for update in unfiltered_updates:
             bucket_name = self._build_app_bucket_name(update)
-            # print(bucket_name)
+            if self.verbose:
+                print(bucket_name)
 
             if bucket_name not in buckets:
                 buckets[bucket_name] = []
 
             buckets[bucket_name].append(update)
 
-        print("Assembled %s buckets of updates" % len(buckets.keys()))
+        if self.debug:
+            print("Assembled %s buckets of updates" % len(buckets.keys()))
 
         # Filter each bucketted update group
         for bucket_name, updates in buckets.items():
-            print(bucket_name, len(updates))
+            if self.debug:
+                print(bucket_name, len(updates))
 
             sorted_updates = self._sort_by_code_versions(updates)
 
             latest_version = sorted_updates[0]['codeVersion']
-            print('Latest: %s' % latest_version)
+            if self.debug:
+                print('Latest: %s' % latest_version)
 
             latest_version_updates = [u for u in sorted_updates if u['codeVersion'] == latest_version]
             latest_version_diffs = [u for u in latest_version_updates if u['isDiff'] == True]
@@ -139,9 +159,9 @@ class DeltaUpdatesTool(object):
                 # Split out the deltas to the newest version from others and remove them
                 updates_to_delete, oldest_diff = self._split_newer_updates(latest_version_diffs, sorted_updates)
                 for update_to_delete in updates_to_delete:
-                    # Used for debugging
-                    # print("Deleting delta %s -> %s" % (update_to_delete['fromVersion'],
-                    #                                    update_to_delete['codeVersion']))
+                    if self.verbose:
+                        print("Deleting delta %s -> %s" % (update_to_delete['fromVersion'],
+                                                           update_to_delete['codeVersion']))
                     sorted_updates.remove(update_to_delete)
 
                 # If we don't have a good chain from update to diff, ignore this bucket
@@ -165,11 +185,12 @@ class DeltaUpdatesTool(object):
                         updates_to_delete.append(update)
 
                 for deletable_update in updates_to_delete:
-                    # Used for debugging
-                    # if deletable_update['isDiff']:
-                    #     print("D ", "%s -> %s" % (deletable_update['fromVersion'], deletable_update['codeVersion']))
-                    # else:
-                    #     print("D ", deletable_update['codeVersion'])
+                    if self.verbose:
+                        if deletable_update['isDiff']:
+                             print("D ", "%s -> %s" % (deletable_update['fromVersion'],
+                                                       deletable_update['codeVersion']))
+                        else:
+                             print("D ", deletable_update['codeVersion'])
 
                     # We may have duplicates so we need this check here
                     if deletable_update in sorted_updates:
@@ -184,11 +205,13 @@ class DeltaUpdatesTool(object):
                    "Resulting bucket results should always have either 0 or 2 results " \
                    "(got: %s)" % len(sorted_updates)
 
-            for update in sorted_updates:
-                if update['isDiff']:
-                    print(" ", "%s -> %s" % (update['fromVersion'], update['codeVersion']))
-                else:
-                    print(" ", update['codeVersion'])
+            if self.debug:
+                for update in sorted_updates:
+                    if update['isDiff']:
+                        print(" ", "%s -> %s" % (update['fromVersion'],
+                                                 update['codeVersion']))
+                    else:
+                        print(" ", update['codeVersion'])
 
             # Tack on the current filtered bucket to the output list
             filtered_updates += sorted_updates
@@ -197,18 +220,20 @@ class DeltaUpdatesTool(object):
 
     def save_json(self, location, updates):
         # Backup old version
-        backup_filename = None
-        for next_index in range(0, 100):
-            path_to_try = "%s.json.%d.old" % (path.splitext(location)[0],
-                                              next_index)
-            if not path.exists(path_to_try):
-                backup_filename = path_to_try
-                break
+        if path.exists(location):
+            backup_filename = None
+            for next_index in range(0, 100):
+                path_to_try = "%s.json.%d.old" % (path.splitext(location)[0],
+                                                  next_index)
+                if not path.exists(path_to_try):
+                    backup_filename = path_to_try
+                    break
 
-        if not backup_filename:
-            raise RuntimeError("Could not find a file to save the backup to!")
+            if not backup_filename:
+                raise RuntimeError("Could not find a file to save the backup to!")
 
-        move(location, backup_filename)
+            print("Backing up old file to %s" % backup_filename)
+            move(location, backup_filename)
 
         # Save the new file
         with open(location, 'wt') as json_file:
@@ -220,8 +245,31 @@ class DeltaUpdatesTool(object):
         output_location = './updates.new.json'
 
         actual_updates = self.parse_updates_json(location)
+
         filtered_updates = self.trim_newer_full_updates(actual_updates)
+        print("Filtered records:", len(filtered_updates))
+
         self.save_json(output_location, filtered_updates)
 
 if __name__ == '__main__':
-    DeltaUpdatesTool().trim()
+    parser = argparse.ArgumentParser(description='Strips updates.json to bare minimum to test update finctionality')
+
+    parser.add_argument('--debug',
+            help = 'Enable debugging output',
+            action = 'store_true')
+
+    parser.add_argument('--verbose',
+            help = 'Enable extremely verbose debugging output',
+            action = 'store_true')
+
+    parser.add_argument('--version',
+            action = 'version',
+            version = '%(prog)s v' + DeltaUpdatesTool.VERSION)
+
+    args = parser.parse_args()
+
+    if 'help' in args and args.help:
+        parser.print_help()
+    else:
+        DeltaUpdatesTool(args.debug,
+                         args.verbose).trim()
