@@ -4,19 +4,26 @@
 import json
 import argparse
 
-from os import path
+from os import path, utime
 from shutil import move
 from subprocess import call
 
 class DeltaUpdatesTool(object):
     VERSION = '0.0.1'
 
-    DEFAULT_LOCATION = '~/.cache/com.endlessm.AppStore/updates.json'
+    CACHE_PREFIX = '~/.cache/com.endlessm.AppStore/'
+    DEFAULT_LOCATION = '%supdates.json' % CACHE_PREFIX
+    META_RECORD_LOCATION = '%supdates_meta.json' % CACHE_PREFIX
 
-    def __init__(self, target, debug = False, verbose = False):
+    def __init__(self, target, no_meta_touch = False, debug = False,
+                 verbose = False):
         self.debug = debug
         self.verbose = verbose
         self.target = path.expanduser(target)
+
+        # Reversed the boolean since from the code standpoint we want
+        # to know in the positive when to update the mtime
+        self.touch_meta = not no_meta_touch
 
         if self.debug:
             print("Debug:", self.debug)
@@ -245,6 +252,13 @@ class DeltaUpdatesTool(object):
             json.dump(updates, json_file, sort_keys = True, indent = 2,
                       separators = (',', ': '))
 
+    def touch_meta_record(self, meta_record_location):
+        location = path.expanduser(meta_record_location)
+        if path.exists(location):
+            utime(location, None)
+        else:
+            print("WARNING! Could not update time on the meta record!")
+
     def trim(self):
         if not path.exists(self.target):
             raise RuntimeError("File %s does not exists!" % self.target)
@@ -256,14 +270,23 @@ class DeltaUpdatesTool(object):
 
         self.save_json(self.target, filtered_updates)
 
+        if self.touch_meta:
+            self.touch_meta_record(self.META_RECORD_LOCATION)
+
 if __name__ == '__main__':
-    parser = argparse.ArgumentParser(description='Strips updates.json to bare minimum to test update finctionality')
+    parser = argparse.ArgumentParser(description = 'Strips updates.json to bare minimum'
+                                                   'to test update finctionality')
 
     parser.add_argument('target',
                         help = 'Use the following file as the target (default: %s)' % \
                                DeltaUpdatesTool.DEFAULT_LOCATION,
                         default = DeltaUpdatesTool.DEFAULT_LOCATION,
                         nargs = '?')
+
+    parser.add_argument('--no-meta-touch',
+            help = 'Don\'t try to update mtime of %s' % \
+                   DeltaUpdatesTool.META_RECORD_LOCATION,
+            action = 'store_true')
 
     parser.add_argument('--debug',
             help = 'Enable debugging output',
@@ -283,5 +306,6 @@ if __name__ == '__main__':
         parser.print_help()
     else:
         DeltaUpdatesTool(args.target,
+                         args.no_meta_touch,
                          args.debug,
                          args.verbose).trim()
