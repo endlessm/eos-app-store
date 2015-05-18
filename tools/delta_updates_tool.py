@@ -11,15 +11,20 @@ from subprocess import call
 class DeltaUpdatesTool(object):
     VERSION = '0.0.1'
 
-    def __init__(self, debug = False, verbose = False):
+    DEFAULT_LOCATION = '~/.cache/com.endlessm.AppStore/updates.json'
+
+    def __init__(self, target, debug = False, verbose = False):
         self.debug = debug
         self.verbose = verbose
+        self.target = path.expanduser(target)
 
         if self.debug:
             print("Debug:", self.debug)
 
         if self.verbose:
             print("Verbose:", self.verbose)
+
+        print("Target:", self.target)
 
     def parse_updates_json(self, location):
         if not path.exists(location):
@@ -95,14 +100,14 @@ class DeltaUpdatesTool(object):
         return KeyComparator
 
     def _sort_by_code_versions(self, updates):
-        return sorted(updates, key=self.cmp_to_key(self._compare_code_versions))
+        return sorted(updates, key = self.cmp_to_key(self._compare_code_versions))
 
     def _split_newer_updates(self, deltas, updates):
-        sorted_deltas = sorted(deltas, key=self.cmp_to_key(self._compare_from_versions))
+        sorted_deltas = sorted(deltas, key = self.cmp_to_key(self._compare_from_versions))
         if self.debug:
             print("Sorted:", len(sorted_deltas))
 
-        # Find the farthest delta that has an actuall full install candidate
+        # Find the farthest delta that has an actual full install candidate
         last_chainable_diff = None
         for sorted_update in reversed(sorted_deltas):
             if last_chainable_diff:
@@ -241,18 +246,24 @@ class DeltaUpdatesTool(object):
                       separators = (',', ': '))
 
     def trim(self):
-        location = './updates.json'
-        output_location = './updates.new.json'
+        if not path.exists(self.target):
+            raise RuntimeError("File %s does not exists!" % self.target)
 
-        actual_updates = self.parse_updates_json(location)
+        actual_updates = self.parse_updates_json(self.target)
 
         filtered_updates = self.trim_newer_full_updates(actual_updates)
         print("Filtered records:", len(filtered_updates))
 
-        self.save_json(output_location, filtered_updates)
+        self.save_json(self.target, filtered_updates)
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Strips updates.json to bare minimum to test update finctionality')
+
+    parser.add_argument('target',
+                        help = 'Use the following file as the target (default: %s)' % \
+                               DeltaUpdatesTool.DEFAULT_LOCATION,
+                        default = DeltaUpdatesTool.DEFAULT_LOCATION,
+                        nargs = '?')
 
     parser.add_argument('--debug',
             help = 'Enable debugging output',
@@ -271,5 +282,6 @@ if __name__ == '__main__':
     if 'help' in args and args.help:
         parser.print_help()
     else:
-        DeltaUpdatesTool(args.debug,
+        DeltaUpdatesTool(args.target,
+                         args.debug,
                          args.verbose).trim()
