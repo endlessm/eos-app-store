@@ -592,6 +592,31 @@ out:
 }
 
 /*< private >*/
+const int
+eos_app_info_compare_versions (JsonNode   *root,
+                               const EosAppInfo *info)
+{
+  if (!info->version)
+    return 1;
+
+  if (!JSON_NODE_HOLDS_OBJECT (root))
+    {
+      eos_app_log_error_message ("Application data for '%s' is malformed.",
+                                 eos_app_info_get_application_id (info));
+      return FALSE;
+    }
+
+  JsonObject *obj = json_node_get_object (root);
+
+  JsonNode *node = json_object_get_member (obj, JSON_KEYS[CODE_VERSION]);
+  if (node == NULL)
+    return -1;
+
+  const char *version = json_node_get_string (node);
+  return eos_compare_versions (info->version, version);
+}
+
+/*< private >*/
 gboolean
 eos_app_info_update_from_server (EosAppInfo *info,
                                  JsonNode *root)
