@@ -61,7 +61,7 @@ gint64          eos_app_info_get_installation_time      (const EosAppInfo *info)
 /* private */
 G_GNUC_INTERNAL
 gboolean        eos_app_info_update_from_content        (EosAppInfo *info,
-							 JsonNode   *node);
+                                                         JsonNode   *node);
 G_GNUC_INTERNAL
 gboolean        eos_app_info_update_from_server         (EosAppInfo *info,
                                                          JsonNode   *node);
@@ -70,13 +70,13 @@ gboolean        eos_app_info_update_from_installed      (EosAppInfo *info,
                                                          const char *filename);
 G_GNUC_INTERNAL
 void            eos_app_info_update_from_gio            (EosAppInfo *info,
-							 GDesktopAppInfo *desktop_info);
+                                                         GDesktopAppInfo *desktop_info);
 G_GNUC_INTERNAL
 void            eos_app_info_set_has_launcher           (EosAppInfo *info,
-							 gboolean    has_launcher);
+                                                         gboolean    has_launcher);
 G_GNUC_INTERNAL
 void            eos_app_info_set_is_installed           (EosAppInfo *info,
-							 gboolean    is_installed);
+                                                         gboolean    is_installed);
 
 #endif
 
