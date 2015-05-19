@@ -959,6 +959,8 @@ eos_app_load_available_apps (GHashTable *app_info,
 
   if (!json_parser_load_from_data (parser, data, -1, error))
     {
+      eos_app_log_error_message ("Update records weren't able to be parsed");
+
       g_object_unref (parser);
       return FALSE;
     }
@@ -966,6 +968,14 @@ eos_app_load_available_apps (GHashTable *app_info,
   JsonNode *root = json_parser_get_root (parser);
   if (!JSON_NODE_HOLDS_ARRAY (root))
     {
+      g_set_error_literal (error, EOS_APP_UTILS_ERROR,
+                           EOS_APP_UTILS_ERROR_JSON_UNEXPECTED_STRUCTURE,
+                           _("Update records did not contain "
+                             "expected structure"));
+
+      eos_app_log_error_message ("Update records did not contain "
+                                 "expected structure");
+
       g_object_unref (parser);
       return FALSE;
     }
@@ -977,17 +987,27 @@ eos_app_load_available_apps (GHashTable *app_info,
     {
       JsonNode *element;
 
-      if (g_cancellable_is_cancelled (cancellable))
+      if (g_cancellable_is_cancelled (cancellable)) {
+        eos_app_log_info_message ("Reading of update list canceled");
         break;
+      }
 
       element = json_array_get_element (array, i);
 
-      if (!JSON_NODE_HOLDS_OBJECT (element))
+      if (!JSON_NODE_HOLDS_OBJECT (element)) {
+        eos_app_log_error_message ("JSON element contains unknown type of data! "
+                                   "Ignoring!");
+
         continue;
+      }
 
       JsonObject *obj = json_node_get_object (element);
-      if (!json_object_has_member (obj, "appId"))
+      if (!json_object_has_member (obj, "appId")) {
+        eos_app_log_error_message ("JSON element doesn't contain an appId! "
+                                   "Ignoring!");
+
         continue;
+      }
 
       const char *appid = json_object_get_string_member (obj, "appId");
       eos_app_log_info_message ("Loading JSON server info for '%s'", appid);
