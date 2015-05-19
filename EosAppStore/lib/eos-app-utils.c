@@ -997,7 +997,6 @@ eos_app_load_available_apps (GHashTable *app_info,
       if (!JSON_NODE_HOLDS_OBJECT (element)) {
         eos_app_log_error_message ("JSON element contains unknown type of data! "
                                    "Ignoring!");
-
         continue;
       }
 
@@ -1005,14 +1004,24 @@ eos_app_load_available_apps (GHashTable *app_info,
       if (!json_object_has_member (obj, "appId")) {
         eos_app_log_error_message ("JSON element doesn't contain an appId! "
                                    "Ignoring!");
-
         continue;
       }
 
-      const char *appid = json_object_get_string_member (obj, "appId");
-      eos_app_log_info_message ("Loading JSON server info for '%s'", appid);
+      if (!json_object_has_member (obj, "isDiff")) {
+        eos_app_log_error_message ("JSON element doesn't contain isDiff attribute! "
+                                   "Ignoring!");
+        continue;
+      }
 
-      char *desktop_id = g_strconcat (appid, ".desktop", NULL);
+
+      const char *app_id = json_object_get_string_member (obj, "appId");
+      const gboolean is_diff = json_object_get_boolean_member (obj, "isDiff");
+
+      eos_app_log_info_message ("Loading JSON server info for '%s (diff: %s)'",
+                                app_id,
+                                is_diff ? "true" : "false");
+
+      char *desktop_id = g_strconcat (app_id, ".desktop", NULL);
       EosAppInfo *info = g_hash_table_lookup (app_info, desktop_id);
       g_free (desktop_id);
 
