@@ -2051,7 +2051,6 @@ update_app_from_manager (EosAppListModel *self,
   gboolean use_deltas = eos_use_delta_updates ();
   const char *desktop_id = eos_app_info_get_desktop_id (info);
 
-  /* First try to do an xdelta upgrade */
   eos_app_log_info_message ("Attempting to update '%s' (using deltas: %s)",
                             desktop_id, use_deltas ? "true" : "false");
 
@@ -2062,34 +2061,17 @@ update_app_from_manager (EosAppListModel *self,
                                        cancellable,
                                        &error);
 
-  /* Incremental update worked. Nothing else is needed */
-  if (retval)
-    return TRUE;
-
-  eos_app_log_info_message ("Update of '%s' (using deltas: %s) failed: %s",
-                            desktop_id, use_deltas ? "true" : "false",
-                            error->message);
-
-  /* There's no point in testing full updates if xdelta was disabled */
-  if (!use_deltas)
+  /* Incremental update failed */
+  if (!retval)
     {
+      eos_app_log_info_message ("Update of '%s' (using deltas: %s) failed: %s",
+                                desktop_id, use_deltas ? "true" : "false",
+                                error->message);
       g_propagate_error (error_out, error);
       return FALSE;
     }
 
-  /* We don't care what the problem was (at this time) */
-  g_clear_error (&error);
-
-  eos_app_log_info_message ("Trying full update of %s",
-                            desktop_id);
-
-  /* Incremental update failed so we try the full update now */
-  return install_latest_app_version (self,
-                                     info,
-                                     TRUE, /* Is update? */
-                                     FALSE, /* Allow deltas */
-                                     cancellable,
-                                     error_out);
+  return TRUE;
 }
 
 static gboolean
