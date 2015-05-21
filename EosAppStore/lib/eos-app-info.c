@@ -120,6 +120,87 @@ eos_app_info_new (const char *application_id)
 }
 
 EosAppInfo *
+eos_app_info_new_from_json (JsonNode *root)
+{
+  gboolean is_diff = FALSE;
+
+  if (!JSON_NODE_HOLDS_OBJECT (root))
+    {
+      eos_app_log_error_message ("Application data malformed.");
+      return NULL;
+    }
+
+  JsonObject *obj = json_node_get_object (root);
+
+  JsonNode *node;
+
+  EosAppInfo *info = NULL;
+
+  node = json_object_get_member (obj, JSON_KEYS[APP_ID]);
+  if (node)
+    {
+      char *app_id = json_node_dup_string (node);
+      info = eos_app_info_new (app_id);
+    }
+  else
+    {
+      eos_app_log_error_message ("Application data is missing the "
+                                 "required '%s' field.",
+                                 JSON_KEYS[APP_ID]);
+
+      return NULL;
+    }
+
+
+  node = json_object_get_member (obj, JSON_KEYS[CODE_VERSION]);
+  if (node)
+    info->version = g_strdup (json_node_get_string (node));
+  else
+    {
+      eos_app_log_error_message ("Application data for '%s' is missing the "
+                                 "required '%s' field.",
+                                 eos_app_info_get_application_id (info),
+                                 JSON_KEYS[CODE_VERSION]);
+
+      eos_app_info_unref (info);
+      return NULL;
+    }
+
+  // TODO: Handle meta-fields (i.e info->update_available,info->is_available)
+
+  // TODO: Loop this instead of checking each item
+  node = json_object_get_member (obj, JSON_KEYS[IS_DIFF]);
+  if (node)
+    is_diff = json_node_get_boolean (node);
+
+  node = json_object_get_member (obj, JSON_KEYS[LOCALE]);
+  if (node)
+    info->locale = json_node_dup_string (node);
+
+  node = json_object_get_member (obj, JSON_KEYS[INSTALLED_SIZE]);
+  if (node)
+    info->installed_size = json_node_get_int (node);
+
+  node = json_object_get_member (obj, JSON_KEYS[SECONDARY_STORAGE]);
+  if (node)
+    info->on_secondary_storage = json_node_get_boolean (node);
+
+  node = json_object_get_member (obj, JSON_KEYS[DOWNLOAD_LINK]);
+  if (node)
+    info->bundle_uri = json_node_dup_string (node);
+
+  node = json_object_get_member (obj, JSON_KEYS[SIGNATURE_LINK]);
+  if (node)
+    info->signature_uri = json_node_dup_string (node);
+
+  node = json_object_get_member (obj, JSON_KEYS[SHA_HASH]);
+  if (node)
+    info->bundle_hash = json_node_dup_string (node);
+
+  return info;
+}
+
+EosAppInfo *
 eos_app_info_ref (EosAppInfo *info)
 {
   g_atomic_int_inc (&(info->ref_count));
