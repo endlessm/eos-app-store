@@ -947,6 +947,32 @@ eos_app_load_updates_meta_record (gint64 *monotonic_update_id,
   return TRUE;
 }
 
+static JsonNode *
+get_matching_delta (GSList *deltas,
+                    EosAppInfo *info)
+{
+  eos_app_log_debug_message ("Looking for matching delta version: %s",
+                             eos_app_info_get_version (info));
+
+  /* Remove older (not relevant) deltas from temp array */
+  for (GSList *iterator = deltas; iterator; iterator = iterator->next)
+      if (eos_app_info_compare_versions (iterator->data, info) == 0)
+        return iterator->data;
+
+  return NULL;
+}
+
+static void
+remove_records_version_lte (GSList *deltas,
+                            EosAppInfo *info)
+{
+ /* TODO: Remove older/current info from array
+          g_slist_remove (deltas_for_app_id, delta);
+          need to do it outside loop (concurrent change) */
+
+  eos_app_log_debug_message ("Removing old/current deltas from our temp list");
+}
+
 gboolean
 eos_app_load_available_apps (GHashTable *app_info,
                              const char *data,
@@ -1063,24 +1089,20 @@ eos_app_load_available_apps (GHashTable *app_info,
               info = eos_app_info_new_from_server_json (element);
               g_hash_table_replace (app_info, g_strdup (app_id), info);
 
-              /* Remove older (not relevant) delta_updates from temp array */
               GSList  *deltas_for_app_id = g_hash_table_lookup (newer_deltas,
                                                                 desktop_id);
-              for (GSList *iterator = deltas_for_app_id; iterator;
-                   iterator = iterator->next)
+              JsonNode *delta_node = get_matching_delta (deltas_for_app_id,
+                                                         info);
+
+              if (delta_node)
                 {
-                  if (eos_app_info_compare_versions (iterator->data, info) == 0)
-                    {
-                       eos_app_log_debug_message ("Found matching delta for version: %s",
-                                                  eos_app_info_get_version (info));
+                   eos_app_log_debug_message ("Found matching delta for version: %s",
+                                              eos_app_info_get_version (info));
 
-                       /* Update delta fields */
-                       eos_app_info_update_from_server (info, iterator->data);
+                   /* Update delta fields */
+                   eos_app_info_update_from_server (info, delta_node);
 
-                       /* TODO: Remove older/current info from array
-                          g_slist_remove (deltas_for_app_id, delta);
-                          need to do it outside loop (concurrent change) */
-                    }
+                   remove_records_version_lte (deltas_for_app_id, info);
                 }
             }
           else if (version_cmp < 0)
