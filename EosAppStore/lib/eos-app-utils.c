@@ -1051,6 +1051,7 @@ eos_app_load_available_apps (GHashTable *app_info,
 
       int version_cmp = eos_app_info_compare_versions (element, info);
 
+      /* TODO: modularize, if possible */
       if (!is_diff) /* Full version */
         {
           if (version_cmp > 0)
@@ -1088,8 +1089,42 @@ eos_app_load_available_apps (GHashTable *app_info,
           else
             eos_app_log_debug_message ("Same version as current record. Ignoring.");
         }
+      else  // This is a diff update
+        {
+          if (eos_app_info_is_installable (info)) /* We have a full update */
+            {
+              if (version_cmp > 0)
+                {
+                  /* TODO: Add record to newer_deltas array */
+                }
+              else if (version_cmp == 0)
+                {
+                  eos_app_log_debug_message ("Found matching delta for version: %s",
+                                             eos_app_info_get_version (info));
+                  eos_app_info_update_from_server (info, element);
+                }
+              else
+                {
+                  eos_app_log_debug_message ("Delta is lower version: %s. "
+                                             "Ignoring.",
+                                             eos_app_info_get_version (info));
+                  continue;
+                }
+            }
+          else /* We only have the delta in info */
+            /* TODO: Figure out what to do with initially added deltas that
+                     don't get to this point on first run */
+            {
+              eos_app_log_debug_message ("Preserving delta of version: %s",
+                                         eos_app_info_get_version (info));
+              /* TODO: Actually save the delta into the array */
+            }
+        }
     }
 
+  /* TODO: n_available calculation */
+
+  eos_app_log_debug_message ("Cleaning up temporary data structures");
   g_hash_table_unref (newer_deltas);
 
   g_object_unref (parser);
