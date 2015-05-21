@@ -17,6 +17,49 @@
 
 G_DEFINE_BOXED_TYPE (EosAppInfo, eos_app_info, eos_app_info_ref, eos_app_info_unref)
 
+/* installed keyfile keys */
+static const gchar *FILE_KEYS[] = {
+  "app_id",
+  "app_name",
+  "version",
+  "locale",
+  "installed_size",
+  "secondary_storage",
+  NULL,
+  NULL,
+  NULL,
+};
+
+/* JSON fields from app server */
+static const gchar *JSON_KEYS[] = {
+  "appId",
+  "appName",
+  "codeVersion",
+  "Locale",
+  "installedSize",
+  "secondaryStorage",
+  "downloadLink",
+  "signatureLink",
+  "shaHash",
+  "isDiff",
+};
+
+/* Keep the key ids in sync with the names above */
+enum {
+  APP_ID,
+  APP_NAME,
+  CODE_VERSION,
+  LOCALE,
+  INSTALLED_SIZE,
+  SECONDARY_STORAGE,
+  DOWNLOAD_LINK,
+  SIGNATURE_LINK,
+  SHA_HASH,
+  IS_DIFF,
+
+  N_KEYS
+};
+
 static gboolean
 language_is_valid (const char *id)
 {
@@ -449,49 +492,6 @@ eos_app_info_get_has_sufficient_install_space (const EosAppInfo *info)
 
   return FALSE;
 }
-
-/* installed keyfile keys */
-static const gchar *FILE_KEYS[] = {
-  "app_id",
-  "app_name",
-  "version",
-  "locale",
-  "installed_size",
-  "secondary_storage",
-  NULL,
-  NULL,
-  NULL,
-};
-
-/* JSON fields from app server */
-static const gchar *JSON_KEYS[] = {
-  "appId",
-  "appName",
-  "codeVersion",
-  "Locale",
-  "installedSize",
-  "secondaryStorage",
-  "downloadLink",
-  "signatureLink",
-  "shaHash",
-  "isDiff",
-};
-
-/* Keep the key ids in sync with the names above */
-enum {
-  APP_ID,
-  APP_NAME,
-  CODE_VERSION,
-  LOCALE,
-  INSTALLED_SIZE,
-  SECONDARY_STORAGE,
-  DOWNLOAD_LINK,
-  SIGNATURE_LINK,
-  SHA_HASH,
-  IS_DIFF,
-
-  N_KEYS
-};
 
 /* Keep this list updated with the locations we use for
  * installing app bundles
