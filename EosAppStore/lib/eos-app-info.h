@@ -16,7 +16,7 @@ typedef struct _EosAppInfo      EosAppInfo;
 GType eos_app_info_get_type (void);
 
 EosAppInfo *    eos_app_info_new                        (const char *application_id);
-EosAppInfo *    eos_app_info_new_from_json              (JsonNode   *node);
+EosAppInfo *    eos_app_info_new_from_server_json       (JsonNode   *node);
 EosAppInfo *    eos_app_info_ref                        (EosAppInfo *info);
 void            eos_app_info_unref                      (EosAppInfo *info);
 

@@ -1037,7 +1037,7 @@ eos_app_load_available_apps (GHashTable *app_info,
           eos_app_log_debug_message (" - First time encountering app. "
                                      "Creating new record");
 
-          info = eos_app_info_new_from_json (element);
+          info = eos_app_info_new_from_server_json (element);
           g_hash_table_replace (app_info, g_strdup (app_id), info);
 
           /* New record that we haven't seen before - so no need to
@@ -1055,10 +1055,11 @@ eos_app_load_available_apps (GHashTable *app_info,
         {
           if (version_cmp > 0)
             {
-              /* Replace/clean record in table
-                 Redundant but creates clearer logic */
+              /* Replace/clean record in table. Redundant but creates
+                 clearer logic. We might need to opt for clearing of data
+                 instead depending on if we are discarding relevant fields */
               eos_app_info_unref (info);
-              info = eos_app_info_new_from_json (element);
+              info = eos_app_info_new_from_server_json (element);
               g_hash_table_replace (app_info, g_strdup (app_id), info);
 
               /* Remove older (not relevant) delta_updates from temp array */

@@ -120,7 +120,7 @@ eos_app_info_new (const char *application_id)
 }
 
 EosAppInfo *
-eos_app_info_new_from_json (JsonNode *root)
+eos_app_info_new_from_server_json (JsonNode *root)
 {
   gboolean is_diff = FALSE;
 
