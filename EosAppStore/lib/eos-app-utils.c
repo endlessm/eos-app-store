@@ -980,44 +980,51 @@ eos_app_load_available_apps (GHashTable *app_info,
       return FALSE;
     }
 
+  /* TODO: Memory leak if we don't clear the app info
+           (GDestroyNotify) eos_app_info_unref); */
+  GHashTable *newer_deltas = g_hash_table_new_full (g_str_hash, g_str_equal,
+                                                    NULL,
+                                                    NULL);
+
+  eos_app_log_debug_message ("Iterating over the update list");
   int n_available = 0;
   JsonArray *array = json_node_get_array (root);
   guint i, len = json_array_get_length (array);
   for (i = 0; i < len; i++)
     {
+      eos_app_log_debug_message ("Grabbing next update item");
       JsonNode *element;
 
       if (g_cancellable_is_cancelled (cancellable)) {
-        eos_app_log_info_message ("Reading of update list canceled");
+        eos_app_log_info_message (" - Reading of update list canceled");
         break;
       }
 
       element = json_array_get_element (array, i);
 
       if (!JSON_NODE_HOLDS_OBJECT (element)) {
-        eos_app_log_error_message ("JSON element contains unknown type of data! "
+        eos_app_log_error_message (" - JSON element contains unknown type of data! "
                                    "Ignoring!");
         continue;
       }
 
       JsonObject *obj = json_node_get_object (element);
       if (!json_object_has_member (obj, "appId")) {
-        eos_app_log_error_message ("JSON element doesn't contain an appId! "
+        eos_app_log_error_message (" - JSON element doesn't contain an appId! "
                                    "Ignoring!");
         continue;
       }
 
       if (!json_object_has_member (obj, "isDiff")) {
-        eos_app_log_error_message ("JSON element doesn't contain isDiff attribute! "
+        eos_app_log_error_message (" - JSON element doesn't contain isDiff attribute! "
                                    "Ignoring!");
         continue;
       }
 
-
       const char *app_id = json_object_get_string_member (obj, "appId");
       const gboolean is_diff = json_object_get_boolean_member (obj, "isDiff");
 
-      eos_app_log_info_message ("Loading JSON server info for '%s (diff: %s)'",
+      eos_app_log_info_message (" - Loading JSON server info for '%s (diff: %s)'",
                                 app_id,
                                 is_diff ? "true" : "false");
 
@@ -1026,23 +1033,63 @@ eos_app_load_available_apps (GHashTable *app_info,
       g_free (desktop_id);
 
       if (info == NULL)
-        info = eos_app_info_new (appid);
-      else
-        eos_app_info_ref (info);
+        {
+          eos_app_log_debug_message (" - First time encountering app. "
+                                     "Creating new record");
 
-      if (eos_app_info_update_from_server (info, element))
-        {
-          g_hash_table_replace (app_info,
-                                g_strdup (eos_app_info_get_desktop_id (info)),
-                                info);
-          n_available += 1;
+          info = eos_app_info_new_from_json (element);
+          g_hash_table_replace (app_info, g_strdup (app_id), info);
+
+          /* New record that we haven't seen before - so no need to
+             try figuring out the rest of the code below */
+          continue;
         }
-      else
+
+      eos_app_log_debug_message (" - Seen appId before. Reusing reference.");
+
+      eos_app_info_ref (info);
+
+      int version_cmp = eos_app_info_compare_versions (element, info);
+
+      if (!is_diff) /* Full version */
         {
-          eos_app_log_debug_message ("App '%s' does not have updates", appid);
-          eos_app_info_unref (info);
+          if (version_cmp > 0)
+            {
+              /* Replace/clean record in table
+                 Redundant but creates clearer logic */
+              eos_app_info_unref (info);
+              info = eos_app_info_new_from_json (element);
+              g_hash_table_replace (app_info, g_strdup (app_id), info);
+
+              /* Remove older (not relevant) delta_updates from temp array */
+              GSList  *deltas_for_app_id = g_hash_table_lookup (newer_deltas,
+                                                                desktop_id);
+              for (GSList *iterator = deltas_for_app_id; iterator;
+                   iterator = iterator->next)
+                {
+                  if (eos_app_info_compare_versions (iterator->data, info) == 0)
+                    {
+                       eos_app_log_debug_message ("Found matching delta for version: %s",
+                                                  eos_app_info_get_version (info));
+
+                       /* Update delta fields */
+                       eos_app_info_update_from_server (info, iterator->data);
+
+                       /* TODO: Remove older/current info from array
+                          g_slist_remove (deltas_for_app_id, delta);
+                          need to do it outside loop (concurrent change) */
+                    }
+                }
+            }
+          else if (version_cmp < 0)
+            eos_app_log_debug_message ("Full bundle is not a newer version. "
+                                       "Skipping");
+          else
+            eos_app_log_debug_message ("Same version as current record. Ignoring.");
         }
     }
+
+  g_hash_table_unref (newer_deltas);
 
   g_object_unref (parser);
 
