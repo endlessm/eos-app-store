@@ -671,6 +671,19 @@ eos_app_info_compare_versions (JsonNode   *root,
   return eos_compare_versions (info->version, version);
 }
 
+static void
+replace_string_field_from_json (JsonObject *obj,
+                                int key_enum_index,
+                                char **field)
+{
+  JsonNode *node = json_object_get_member (obj, JSON_KEYS[key_enum_index]);
+  if (node != NULL)
+    {
+      g_free (*field);
+      *field = json_node_dup_string (node);
+    }
+}
+
 /*< private >*/
 void
 eos_app_info_clear_server_update_attributes (EosAppInfo *info)
@@ -740,13 +753,6 @@ eos_app_info_update_from_server (EosAppInfo *info,
       return FALSE;
     }
 
-  node = json_object_get_member (obj, JSON_KEYS[LOCALE]);
-  if (node != NULL)
-    {
-      g_free (info->locale);
-      info->locale = json_node_dup_string (node);
-    }
-
   node = json_object_get_member (obj, JSON_KEYS[INSTALLED_SIZE]);
   if (node != NULL)
     info->installed_size = json_node_get_int (node);
@@ -755,52 +761,23 @@ eos_app_info_update_from_server (EosAppInfo *info,
   if (node)
     info->on_secondary_storage = json_node_get_boolean (node);
 
+  replace_string_field_from_json (obj, LOCALE, &info->locale);
+
   /* TODO: Make this cleaner */
   if (!is_diff)
     {
-      node = json_object_get_member (obj, JSON_KEYS[DOWNLOAD_LINK]);
-      if (node != NULL)
-        {
-          g_free (info->bundle_uri);
-          info->bundle_uri = json_node_dup_string (node);
-        }
-
-      node = json_object_get_member (obj, JSON_KEYS[SIGNATURE_LINK]);
-      if (node != NULL)
-        {
-          g_free (info->signature_uri);
-          info->signature_uri = json_node_dup_string (node);
-        }
-
-      node = json_object_get_member (obj, JSON_KEYS[SHA_HASH]);
-      if (node != NULL)
-        {
-          g_free (info->bundle_hash);
-          info->bundle_hash = json_node_dup_string (node);
-        }
+      replace_string_field_from_json (obj, DOWNLOAD_LINK, &info->bundle_uri);
+      replace_string_field_from_json (obj, SIGNATURE_LINK, &info->signature_uri);
+      replace_string_field_from_json (obj, SHA_HASH, &info->bundle_hash);
     }
   else
     {
-      node = json_object_get_member (obj, JSON_KEYS[DOWNLOAD_LINK]);
-      if (node != NULL)
-        {
-          g_free (info->delta_bundle_uri);
-          info->delta_bundle_uri = json_node_dup_string (node);
-        }
-
-      node = json_object_get_member (obj, JSON_KEYS[SIGNATURE_LINK]);
-      if (node != NULL)
-        {
-          g_free (info->delta_signature_uri);
-          info->delta_signature_uri = json_node_dup_string (node);
-        }
-
-      node = json_object_get_member (obj, JSON_KEYS[SHA_HASH]);
-      if (node != NULL)
-        {
-          g_free (info->delta_bundle_hash);
-          info->delta_bundle_hash = json_node_dup_string (node);
-        }
+      replace_string_field_from_json (obj, DOWNLOAD_LINK,
+                                      &info->delta_bundle_uri);
+      replace_string_field_from_json (obj, SIGNATURE_LINK,
+                                      &info->delta_signature_uri);
+      replace_string_field_from_json (obj, SHA_HASH,
+                                      &info->delta_bundle_hash);
     }
 
   return TRUE;
