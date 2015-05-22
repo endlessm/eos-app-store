@@ -166,14 +166,14 @@ eos_app_info_new_from_server_json (JsonNode *root)
       return NULL;
     }
 
-  // TODO: Handle meta-fields (i.e info->update_available,info->is_available)
-
   // TODO: Loop this instead of checking each item
   node = json_object_get_member (obj, JSON_KEYS[IS_DIFF]);
   if (node)
     is_diff = json_node_get_boolean (node);
 
-  info->is_available = TRUE;
+  /* Based on teh type of update, we ensure that the flags are correct */
+  info->is_available = !is_diff;
+  info->update_available = is_diff;
 
   node = json_object_get_member (obj, JSON_KEYS[LOCALE]);
   if (node)
