@@ -325,20 +325,29 @@ eos_app_info_get_locale (const EosAppInfo *info)
 }
 
 const char *
-eos_app_info_get_bundle_uri (const EosAppInfo *info)
+eos_app_info_get_bundle_uri (const EosAppInfo *info, gboolean use_delta)
 {
+  if (use_delta)
+    return info->delta_bundle_uri;
+
   return info->bundle_uri;
 }
 
 const char *
-eos_app_info_get_signature_uri (const EosAppInfo *info)
+eos_app_info_get_signature_uri (const EosAppInfo *info, gboolean use_delta)
 {
+  if (use_delta)
+    return info->delta_signature_uri;
+
   return info->signature_uri;
 }
 
 const char *
-eos_app_info_get_bundle_hash (const EosAppInfo *info)
+eos_app_info_get_bundle_hash (const EosAppInfo *info, gboolean use_delta)
 {
+  if (use_delta)
+    return info->delta_bundle_hash;
+
   return info->bundle_hash;
 }
 

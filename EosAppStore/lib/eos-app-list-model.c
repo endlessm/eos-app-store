@@ -1648,12 +1648,13 @@ download_app_file_from_uri_with_retry (SoupSession     *session,
 static char *
 create_sha256sum (EosAppListModel *self,
                   EosAppInfo *info,
+                  gboolean use_delta,
                   const char *bundle_path,
                   GCancellable *cancellable,
                   GError **error_out)
 {
   GError *error = NULL;
-  const char *bundle_hash = eos_app_info_get_bundle_hash (info);
+  const char *bundle_hash = eos_app_info_get_bundle_hash (info, use_delta);
   const char *app_id = eos_app_info_get_application_id (info);
 
   if (bundle_hash == NULL || *bundle_hash == '\0')
@@ -1681,11 +1682,12 @@ create_sha256sum (EosAppListModel *self,
 static char *
 download_signature (EosAppListModel *self,
                     EosAppInfo *info,
+                    gboolean use_delta,
                     GCancellable *cancellable,
                     GError **error_out)
 {
   GError *error = NULL;
-  const char *signature_uri = eos_app_info_get_signature_uri (info);
+  const char *signature_uri = eos_app_info_get_signature_uri (info, use_delta);
   const char *app_id = eos_app_info_get_application_id (info);
 
   if (signature_uri == NULL || *signature_uri == '\0')
@@ -1715,11 +1717,12 @@ download_signature (EosAppListModel *self,
 static char *
 download_bundle (EosAppListModel *self,
                  EosAppInfo *info,
+                 gboolean use_delta,
                  GCancellable *cancellable,
                  GError **error_out)
 {
   GError *error = NULL;
-  const char *bundle_uri = eos_app_info_get_bundle_uri (info);
+  const char *bundle_uri = eos_app_info_get_bundle_uri (info, use_delta);
   const char *app_id = eos_app_info_get_application_id (info);
 
   eos_app_log_info_message ("Downloading - app id: %s, bundle URI: %s", app_id, bundle_uri);
@@ -1758,6 +1761,7 @@ static gboolean
 get_bundle_artifacts (EosAppListModel *self,
                       EosAppInfo *info,
                       char *transaction_path,
+                      gboolean use_delta,
                       GCancellable *cancellable,
                       GError **error_out)
 {
@@ -1785,8 +1789,9 @@ get_bundle_artifacts (EosAppListModel *self,
       goto out;
     }
 
-  eos_app_log_info_message ("Downloading bundle");
-  bundle_path = download_bundle (self, info, cancellable, &error);
+  eos_app_log_info_message ("Downloading bundle (use_delta: %s)",
+                            use_delta ? "true" : "false");
+  bundle_path = download_bundle (self, info, use_delta, cancellable, &error);
   if (error != NULL)
     {
       eos_app_log_info_message ("Download of bundle failed");
@@ -1794,15 +1799,18 @@ get_bundle_artifacts (EosAppListModel *self,
     }
 
   eos_app_log_info_message ("Downloading signature");
-  signature_path = download_signature (self, info, cancellable, &error);
+  signature_path = download_signature (self, info, use_delta, cancellable,
+                                       &error);
   if (error != NULL)
     {
       eos_app_log_error_message ("Signature download failed");
       goto out;
     }
 
-  eos_app_log_info_message ("Downloading hash");
-  sha256_path = create_sha256sum (self, info, bundle_path, cancellable, &error);
+  eos_app_log_info_message ("Persisting hash");
+  sha256_path = create_sha256sum (self, info, use_delta, bundle_path,
+                                  cancellable,
+                                  &error);
   if (error != NULL)
     {
       eos_app_log_error_message ("Hash download failed");
@@ -1997,7 +2005,10 @@ install_latest_app_version (EosAppListModel *self,
 
   eos_app_log_info_message ("Got transaction path: %s", transaction_path);
 
-  retval = get_bundle_artifacts (self, info, transaction_path, cancellable, &error);
+  gboolean use_delta = allow_deltas && is_upgrade;
+
+  retval = get_bundle_artifacts (self, info, transaction_path, use_delta,
+                                 cancellable, &error);
 
   if (error != NULL)
     {
