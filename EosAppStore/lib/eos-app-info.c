@@ -381,7 +381,7 @@ eos_app_info_is_installable (const EosAppInfo *info)
 gboolean
 eos_app_info_is_updatable (const EosAppInfo *info)
 {
-  return info->update_available;
+  return info->is_installed && info->update_available;
 }
 
 gboolean
