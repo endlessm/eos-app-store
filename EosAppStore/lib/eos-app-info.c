@@ -715,44 +715,23 @@ eos_app_info_update_from_server (EosAppInfo *info,
 
   JsonNode *node;
 
+  gboolean is_diff = FALSE;
   node = json_object_get_member (obj, JSON_KEYS[IS_DIFF]);
   if (node != NULL)
     {
-      if (json_node_get_boolean (node) && !eos_use_delta_updates ())
-        {
-          eos_app_log_info_message ("Application data is for a delta "
-                                    "update of '%s', and delta updates "
-                                    "are disabled.",
-                                    eos_app_info_get_application_id (info));
-          return FALSE;
-        }
+      is_diff = json_node_get_boolean (node);
+      if (is_diff)
+        info->update_available = TRUE;
+
+      if (!is_diff)
+        info->is_available = TRUE;
     }
 
   node = json_object_get_member (obj, JSON_KEYS[CODE_VERSION]);
   if (node != NULL)
     {
-      const char *version = json_node_get_string (node);
-      int version_cmp = eos_compare_versions (info->version, version);
-
-      /* If the server returns a newer version, we update the related fields;
-       * otherwise, we keep what we have
-       */
-      if (version_cmp > 0)
-        {
-          eos_app_log_info_message ("Application data for is for an "
-                                    "earlier version of '%s'",
-                                    eos_app_info_get_application_id (info));
-          return FALSE;
-        }
-
-      if (version_cmp < 0)
-        {
-          g_free (info->version);
-          info->version = g_strdup (version);
-
-          /* Newer version means we have an update */
-          info->update_available = TRUE;
-        }
+      g_free (info->version);
+      info->version = g_strdup (json_node_get_string (node));
     }
   else
     {
@@ -762,9 +741,6 @@ eos_app_info_update_from_server (EosAppInfo *info,
                                  JSON_KEYS[CODE_VERSION]);
       return FALSE;
     }
-
-  /* If we found it here, then it's available */
-  info->is_available = TRUE;
 
   node = json_object_get_member (obj, JSON_KEYS[LOCALE]);
   if (node != NULL)
