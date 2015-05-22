@@ -618,7 +618,9 @@ load_content_apps (EosAppListModel *self,
       EosAppInfo *info = eos_app_list_model_get_app_info (self, desktop_id);
       g_free (desktop_id);
 
-      eos_app_log_info_message ("Updating content info for %s", info ? eos_app_info_get_desktop_id (info) : "null");
+      eos_app_log_info_message ("Updating content info for %s (%s)",
+                                app_id ? app_id : "null",
+                                info ? eos_app_info_get_desktop_id (info) : "null");
 
       if (info == NULL)
         continue;

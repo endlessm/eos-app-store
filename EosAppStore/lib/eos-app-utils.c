@@ -1126,12 +1126,8 @@ eos_app_load_available_apps (GHashTable *app_info,
         {
           if (version_cmp > 0)
             {
-              /* Replace/clean record in table. Redundant but creates
-                 clearer logic. We might need to opt for clearing of data
-                 instead depending on if we are discarding relevant fields */
-              eos_app_info_unref (info);
-              info = eos_app_info_new_from_server_json (element);
-              g_hash_table_replace (app_info, g_strdup (desktop_id), info);
+              eos_app_info_clear_server_update_attributes (info);
+              eos_app_info_update_from_server (info, element);
 
               JsonNode *delta_node = get_matching_version_delta (deltas_for_app_id,
                                                                  eos_app_info_get_version (info));

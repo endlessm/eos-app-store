@@ -645,6 +645,7 @@ out:
   return retval;
 }
 
+/* TODO: Remove or fix to handle json update from server */
 /*< private >*/
 const int
 eos_app_info_compare_versions (JsonNode   *root,
@@ -668,6 +669,31 @@ eos_app_info_compare_versions (JsonNode   *root,
 
   const char *version = json_node_get_string (node);
   return eos_compare_versions (info->version, version);
+}
+
+/*< private >*/
+void
+eos_app_info_clear_server_update_attributes (EosAppInfo *info)
+{
+  g_free (info->application_id);
+  g_free (info->title);
+  g_free (info->subtitle);
+  g_free (info->description);
+  g_free (info->locale);
+
+  /* TODO: Only do this if version is higher */
+  g_free (info->version);
+
+  g_free (info->bundle_uri);
+  g_free (info->signature_uri);
+  g_free (info->bundle_hash);
+
+  g_free (info->delta_bundle_uri);
+  g_free (info->delta_signature_uri);
+  g_free (info->delta_bundle_hash);
+
+  info->update_available = FALSE;
+  info->is_available = FALSE;
 }
 
 /*< private >*/

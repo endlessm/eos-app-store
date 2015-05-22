@@ -84,6 +84,8 @@ void            eos_app_info_set_has_launcher           (EosAppInfo *info,
 G_GNUC_INTERNAL
 void            eos_app_info_set_is_installed           (EosAppInfo *info,
                                                          gboolean    is_installed);
+G_GNUC_INTERNAL
+void            eos_app_info_clear_server_update_attributes (EosAppInfo *info);
 
 #endif
 
