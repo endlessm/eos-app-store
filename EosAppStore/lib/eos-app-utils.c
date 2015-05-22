@@ -1027,10 +1027,14 @@ eos_app_load_available_apps (GHashTable *app_info,
                                                     NULL);
 
   eos_app_log_debug_message ("Iterating over the update list");
-  int n_available = 0;
   JsonArray *array = json_node_get_array (root);
-  guint i, len = json_array_get_length (array);
-  for (i = 0; i < len; i++)
+
+  guint array_length = json_array_get_length (array);
+
+  /* TODO: Calculate this correctly */
+  int n_available = array_length;
+
+  for (guint index = 0; index < array_length; index++)
     {
       eos_app_log_debug_message ("Grabbing next update item");
       JsonNode *element;
@@ -1040,7 +1044,7 @@ eos_app_load_available_apps (GHashTable *app_info,
         break;
       }
 
-      element = json_array_get_element (array, i);
+      element = json_array_get_element (array, index);
 
       if (!JSON_NODE_HOLDS_OBJECT (element)) {
         eos_app_log_error_message (" - JSON element contains unknown type of data! "
@@ -1196,8 +1200,6 @@ eos_app_load_available_apps (GHashTable *app_info,
             }
         }
     }
-
-  /* TODO: n_available calculation */
 
   eos_app_log_debug_message ("Cleaning up temporary data structures");
   g_hash_table_unref (newer_deltas);
