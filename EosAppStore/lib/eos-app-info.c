@@ -122,8 +122,6 @@ eos_app_info_new (const char *application_id)
 EosAppInfo *
 eos_app_info_new_from_server_json (JsonNode *root)
 {
-  gboolean is_diff = FALSE;
-
   if (!JSON_NODE_HOLDS_OBJECT (root))
     {
       eos_app_log_error_message ("Application data malformed.");
@@ -151,71 +149,12 @@ eos_app_info_new_from_server_json (JsonNode *root)
       return NULL;
     }
 
-
-  node = json_object_get_member (obj, JSON_KEYS[CODE_VERSION]);
-  if (node)
-    info->version = g_strdup (json_node_get_string (node));
-  else
+  if (!eos_app_info_update_from_server (info, root))
     {
-      eos_app_log_error_message ("Application data for '%s' is missing the "
-                                 "required '%s' field.",
-                                 eos_app_info_get_application_id (info),
-                                 JSON_KEYS[CODE_VERSION]);
-
       eos_app_info_unref (info);
       return NULL;
     }
 
-  // TODO: Loop this instead of checking each item
-  node = json_object_get_member (obj, JSON_KEYS[IS_DIFF]);
-  if (node)
-    is_diff = json_node_get_boolean (node);
-
-  /* Based on teh type of update, we ensure that the flags are correct */
-  info->is_available = !is_diff;
-  info->update_available = is_diff;
-
-  node = json_object_get_member (obj, JSON_KEYS[LOCALE]);
-  if (node)
-    info->locale = json_node_dup_string (node);
-
-  node = json_object_get_member (obj, JSON_KEYS[INSTALLED_SIZE]);
-  if (node)
-    info->installed_size = json_node_get_int (node);
-
-  node = json_object_get_member (obj, JSON_KEYS[SECONDARY_STORAGE]);
-  if (node)
-    info->on_secondary_storage = json_node_get_boolean (node);
-
-  /* TODO: Make this cleaner */
-  if (!is_diff)
-    {
-      node = json_object_get_member (obj, JSON_KEYS[DOWNLOAD_LINK]);
-      if (node)
-        info->bundle_uri = json_node_dup_string (node);
-
-      node = json_object_get_member (obj, JSON_KEYS[SIGNATURE_LINK]);
-      if (node)
-        info->signature_uri = json_node_dup_string (node);
-
-      node = json_object_get_member (obj, JSON_KEYS[SHA_HASH]);
-      if (node)
-        info->bundle_hash = json_node_dup_string (node);
-    }
-  else
-    {
-      node = json_object_get_member (obj, JSON_KEYS[DOWNLOAD_LINK]);
-      if (node)
-        info->delta_bundle_uri = json_node_dup_string (node);
-
-      node = json_object_get_member (obj, JSON_KEYS[SIGNATURE_LINK]);
-      if (node)
-        info->delta_signature_uri = json_node_dup_string (node);
-
-      node = json_object_get_member (obj, JSON_KEYS[SHA_HASH]);
-      if (node)
-        info->delta_bundle_hash = json_node_dup_string (node);
-    }
   return info;
 }
 
