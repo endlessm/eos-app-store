@@ -173,6 +173,8 @@ eos_app_info_new_from_server_json (JsonNode *root)
   if (node)
     is_diff = json_node_get_boolean (node);
 
+  info->is_available = TRUE;
+
   node = json_object_get_member (obj, JSON_KEYS[LOCALE]);
   if (node)
     info->locale = json_node_dup_string (node);
