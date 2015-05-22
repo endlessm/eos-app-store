@@ -948,11 +948,14 @@ eos_app_load_updates_meta_record (gint64 *monotonic_update_id,
 }
 
 static JsonNode *
-get_matching_delta (GList *deltas,
-                    EosAppInfo *info)
+get_matching_version_delta (GList *deltas,
+                            EosAppInfo *info)
 {
   eos_app_log_debug_message ("Looking for matching delta version: %s",
                              eos_app_info_get_version (info));
+
+  if (!deltas)
+    return NULL;
 
   /* Remove older (not relevant) deltas from temp array */
   for (GList *iterator = deltas; iterator; iterator = iterator->next)
@@ -968,6 +971,9 @@ remove_records_version_lte (GList *deltas,
 {
   eos_app_log_debug_message ("Removing old/current/irrelevant deltas "
                              "from our temp list");
+
+  if (!deltas)
+    return;
 
   GList *next = NULL;
   for (GList *iterator = deltas; iterator; iterator = next)
@@ -1017,7 +1023,7 @@ eos_app_load_available_apps (GHashTable *app_info,
   /* TODO: Memory leak if we don't clear the app info
            (GDestroyNotify) eos_app_info_unref); */
   GHashTable *newer_deltas = g_hash_table_new_full (g_str_hash, g_str_equal,
-                                                    NULL,
+                                                    NULL, /* Not supposed to free these */
                                                     NULL);
 
   eos_app_log_debug_message ("Iterating over the update list");
@@ -1085,6 +1091,9 @@ eos_app_load_available_apps (GHashTable *app_info,
 
       int version_cmp = eos_app_info_compare_versions (element, info);
 
+      GList  *deltas_for_app_id = g_hash_table_lookup (newer_deltas,
+                                                       desktop_id);
+
       /* TODO: modularize, if possible */
       if (!is_diff) /* Full version */
         {
@@ -1097,10 +1106,8 @@ eos_app_load_available_apps (GHashTable *app_info,
               info = eos_app_info_new_from_server_json (element);
               g_hash_table_replace (app_info, g_strdup (app_id), info);
 
-              GList  *deltas_for_app_id = g_hash_table_lookup (newer_deltas,
-                                                                desktop_id);
-              JsonNode *delta_node = get_matching_delta (deltas_for_app_id,
-                                                         info);
+              JsonNode *delta_node = get_matching_version_delta (deltas_for_app_id,
+                                                                 info);
 
               if (delta_node)
                 {
@@ -1152,7 +1159,8 @@ eos_app_load_available_apps (GHashTable *app_info,
               eos_app_log_debug_message ("Preserving delta of version: %s",
                                          eos_app_info_get_version (delta));
 
-              g_list_append (newer_deltas, delta);
+              GList *new_delta_list = g_list_append (deltas_for_app_id, delta);
+              g_hash_table_replace (newer_deltas, g_strdup (app_id), new_delta_list);
             }
         }
     }
