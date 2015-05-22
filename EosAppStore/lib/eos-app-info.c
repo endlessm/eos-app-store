@@ -187,18 +187,35 @@ eos_app_info_new_from_server_json (JsonNode *root)
   if (node)
     info->on_secondary_storage = json_node_get_boolean (node);
 
-  node = json_object_get_member (obj, JSON_KEYS[DOWNLOAD_LINK]);
-  if (node)
-    info->bundle_uri = json_node_dup_string (node);
+  /* TODO: Make this cleaner */
+  if (!is_diff)
+    {
+      node = json_object_get_member (obj, JSON_KEYS[DOWNLOAD_LINK]);
+      if (node)
+        info->bundle_uri = json_node_dup_string (node);
 
-  node = json_object_get_member (obj, JSON_KEYS[SIGNATURE_LINK]);
-  if (node)
-    info->signature_uri = json_node_dup_string (node);
+      node = json_object_get_member (obj, JSON_KEYS[SIGNATURE_LINK]);
+      if (node)
+        info->signature_uri = json_node_dup_string (node);
 
-  node = json_object_get_member (obj, JSON_KEYS[SHA_HASH]);
-  if (node)
-    info->bundle_hash = json_node_dup_string (node);
+      node = json_object_get_member (obj, JSON_KEYS[SHA_HASH]);
+      if (node)
+        info->bundle_hash = json_node_dup_string (node);
+    }
+  else
+    {
+      node = json_object_get_member (obj, JSON_KEYS[DOWNLOAD_LINK]);
+      if (node)
+        info->delta_bundle_uri = json_node_dup_string (node);
 
+      node = json_object_get_member (obj, JSON_KEYS[SIGNATURE_LINK]);
+      if (node)
+        info->delta_signature_uri = json_node_dup_string (node);
+
+      node = json_object_get_member (obj, JSON_KEYS[SHA_HASH]);
+      if (node)
+        info->delta_bundle_hash = json_node_dup_string (node);
+    }
   return info;
 }
 
@@ -225,9 +242,15 @@ eos_app_info_unref (EosAppInfo *info)
       g_free (info->featured_img);
       g_free (info->version);
       g_free (info->locale);
+
       g_free (info->bundle_uri);
       g_free (info->signature_uri);
       g_free (info->bundle_hash);
+
+      g_free (info->delta_bundle_uri);
+      g_free (info->delta_signature_uri);
+      g_free (info->delta_bundle_hash);
+
       g_free (info->icon_name);
       g_strfreev (info->screenshots);
 
@@ -757,25 +780,52 @@ eos_app_info_update_from_server (EosAppInfo *info,
   if (node)
     info->on_secondary_storage = json_node_get_boolean (node);
 
-  node = json_object_get_member (obj, JSON_KEYS[DOWNLOAD_LINK]);
-  if (node != NULL)
+  /* TODO: Make this cleaner */
+  if (!is_diff)
     {
-      g_free (info->bundle_uri);
-      info->bundle_uri = json_node_dup_string (node);
-    }
+      node = json_object_get_member (obj, JSON_KEYS[DOWNLOAD_LINK]);
+      if (node != NULL)
+        {
+          g_free (info->bundle_uri);
+          info->bundle_uri = json_node_dup_string (node);
+        }
 
-  node = json_object_get_member (obj, JSON_KEYS[SIGNATURE_LINK]);
-  if (node != NULL)
-    {
-      g_free (info->signature_uri);
-      info->signature_uri = json_node_dup_string (node);
-    }
+      node = json_object_get_member (obj, JSON_KEYS[SIGNATURE_LINK]);
+      if (node != NULL)
+        {
+          g_free (info->signature_uri);
+          info->signature_uri = json_node_dup_string (node);
+        }
 
-  node = json_object_get_member (obj, JSON_KEYS[SHA_HASH]);
-  if (node != NULL)
+      node = json_object_get_member (obj, JSON_KEYS[SHA_HASH]);
+      if (node != NULL)
+        {
+          g_free (info->bundle_hash);
+          info->bundle_hash = json_node_dup_string (node);
+        }
+    }
+  else
     {
-      g_free (info->bundle_hash);
-      info->bundle_hash = json_node_dup_string (node);
+      node = json_object_get_member (obj, JSON_KEYS[DOWNLOAD_LINK]);
+      if (node != NULL)
+        {
+          g_free (info->delta_bundle_uri);
+          info->delta_bundle_uri = json_node_dup_string (node);
+        }
+
+      node = json_object_get_member (obj, JSON_KEYS[SIGNATURE_LINK]);
+      if (node != NULL)
+        {
+          g_free (info->delta_signature_uri);
+          info->delta_signature_uri = json_node_dup_string (node);
+        }
+
+      node = json_object_get_member (obj, JSON_KEYS[SHA_HASH]);
+      if (node != NULL)
+        {
+          g_free (info->delta_bundle_hash);
+          info->delta_bundle_hash = json_node_dup_string (node);
+        }
     }
 
   return TRUE;

@@ -27,6 +27,10 @@ struct _EosAppInfo
   char *signature_uri;
   char *bundle_hash;
 
+  char *delta_bundle_uri;
+  char *delta_signature_uri;
+  char *delta_bundle_hash;
+
   gint64 installed_size;
 
   char *square_img;
