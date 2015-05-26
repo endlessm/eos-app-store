@@ -951,7 +951,7 @@ static JsonNode *
 get_matching_version_delta (GList *deltas,
                             const char *version)
 {
-  eos_app_log_debug_message ("Looking for matching delta version: %s",
+  eos_app_log_debug_message (" - Looking for matching delta version: %s",
                              version);
 
   if (!deltas)
@@ -969,7 +969,7 @@ static void
 remove_records_version_lte (GList *deltas,
                             const char *version)
 {
-  eos_app_log_debug_message ("Removing old/current/irrelevant deltas "
+  eos_app_log_debug_message (" - Removing old/current/irrelevant deltas "
                              "from our temp list");
 
   if (!deltas)
@@ -1041,7 +1041,6 @@ eos_app_load_available_apps (GHashTable *app_info,
 
   for (guint index = 0; index < array_length; index++)
     {
-      eos_app_log_debug_message ("Grabbing next update item");
       JsonNode *element;
 
       if (g_cancellable_is_cancelled (cancellable))
@@ -1088,16 +1087,17 @@ eos_app_load_available_apps (GHashTable *app_info,
       /* Short-circuit if it's a diff and they're disabled */
       if (is_diff && !eos_use_delta_updates())
         {
-          eos_app_log_debug_message (" -> Deltas disabled. Ignoring '%s (diff: %s)'",
+          eos_app_log_debug_message ("Deltas disabled. Ignoring '%s (diff: %s)'",
                                      app_id,
                                      is_diff ? "true" : "false");
 
           continue;
         }
 
-      eos_app_log_debug_message (" - Loading JSON server info for '%s (diff: %s)'",
+      eos_app_log_debug_message ("Loading: '%s (diff: %s) %s'",
                                 app_id,
-                                is_diff ? "true" : "false");
+                                is_diff ? "true" : "false",
+                                code_version);
 
       char *desktop_id = g_strconcat (app_id, ".desktop", NULL);
       EosAppInfo *info = g_hash_table_lookup (app_info, desktop_id);
@@ -1116,15 +1116,12 @@ eos_app_load_available_apps (GHashTable *app_info,
           continue;
         }
 
-      eos_app_log_debug_message (" - Seen appId before. Reusing reference.");
-
       eos_app_info_ref (info);
 
       int version_cmp = eos_compare_versions (code_version,
                                               eos_app_info_get_version (info));
 
-      eos_app_log_debug_message (" - Version comparison: %d (%s -> %s).",
-                                 version_cmp,
+      eos_app_log_debug_message (" - Version comparison: [new: %s, have: %s].",
                                  code_version,
                                  eos_app_info_get_version (info));
 
@@ -1136,6 +1133,9 @@ eos_app_load_available_apps (GHashTable *app_info,
         {
           if (version_cmp > 0)
             {
+              eos_app_log_debug_message (" -> Full version newer than in our records. "
+                                         "Updating record.");
+
               eos_app_info_clear_server_update_attributes (info);
               eos_app_info_update_from_server (info, element);
 
@@ -1145,7 +1145,7 @@ eos_app_load_available_apps (GHashTable *app_info,
               if (delta_node)
                 {
                   eos_app_log_debug_message (" -> Found matching delta for version: %s"
-                                             "Updating record.",
+                                             "Updating delta record.",
                                              eos_app_info_get_version (info));
 
                   /* Update delta fields */
@@ -1168,6 +1168,8 @@ eos_app_load_available_apps (GHashTable *app_info,
               if (version_cmp > 0)
                 {
                   /* TODO: Combine all additions to the delta list in one spot */
+                  /* TODO: Only save the delta if we have a valid path from currently
+                           installed version */
                   EosAppInfo *delta = eos_app_info_new_from_server_json (element);
                   eos_app_log_debug_message (" -> Preserving delta of version: %s",
                                              eos_app_info_get_version (delta));
@@ -1208,14 +1210,14 @@ eos_app_load_available_apps (GHashTable *app_info,
       eos_app_info_unref (info);
     }
 
-  eos_app_log_debug_message ("Cleaning up temporary data structures");
+  eos_app_log_info_message ("Cleaning up temporary data structures");
   g_hash_table_unref (newer_deltas);
 
   g_object_unref (parser);
 
-  eos_app_log_debug_message ("Available bundles: %d bundles, %.3f msecs",
-                             n_available,
-                             (double) (g_get_monotonic_time () - start_time) / 1000);
+  eos_app_log_info_message ("Available bundles: %d bundles, %.3f msecs",
+                            n_available,
+                            (double) (g_get_monotonic_time () - start_time) / 1000);
 
   return TRUE;
 }
