@@ -1186,7 +1186,6 @@ eos_app_load_available_apps (GHashTable *app_info,
                                              "Ignoring.",
                                              code_version,
                                              eos_app_info_get_version (info));
-                  continue;
                 }
             }
           else /* We only have the delta in info */
@@ -1204,6 +1203,8 @@ eos_app_load_available_apps (GHashTable *app_info,
               g_hash_table_replace (newer_deltas, g_strdup (app_id), new_delta_list);
             }
         }
+
+      eos_app_info_unref (info);
     }
 
   eos_app_log_debug_message ("Cleaning up temporary data structures");
