@@ -1044,10 +1044,11 @@ eos_app_load_available_apps (GHashTable *app_info,
       eos_app_log_debug_message ("Grabbing next update item");
       JsonNode *element;
 
-      if (g_cancellable_is_cancelled (cancellable)) {
-        eos_app_log_info_message (" - Reading of update list canceled");
-        break;
-      }
+      if (g_cancellable_is_cancelled (cancellable))
+        {
+          eos_app_log_info_message (" - Reading of update list canceled");
+          break;
+        }
 
       element = json_array_get_element (array, index);
 
