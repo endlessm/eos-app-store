@@ -375,6 +375,9 @@ eos_app_info_get_icon_name (const EosAppInfo *info)
 EosAppState
 eos_app_info_get_state (const EosAppInfo *info)
 {
+  if (!info)
+    return EOS_APP_STATE_UNKNOWN;
+
   EosAppState retval = EOS_APP_STATE_UNKNOWN;
   gboolean is_installed, is_installable, is_updatable;
 
@@ -382,7 +385,15 @@ eos_app_info_get_state (const EosAppInfo *info)
   is_updatable = eos_app_info_is_updatable (info);
   is_installable = eos_app_info_is_installable (info);
 
-  if (is_installed && is_updatable)
+  eos_app_log_debug_message ("%s (%p)"
+                             "(installed: %s, updatable: %s, installable: %s",
+                             eos_app_info_get_application_id (info),
+                             info,
+                             is_installed ? "true" : "false",
+                             is_updatable ? "true" : "false",
+                             is_installable ? "true" : "false");
+
+  if (is_updatable)
     retval = EOS_APP_STATE_UPDATABLE;
   else if (is_installed)
     retval = EOS_APP_STATE_INSTALLED;
@@ -642,6 +653,8 @@ eos_app_info_update_from_installed (EosAppInfo *info,
     info->on_secondary_storage = g_key_file_get_boolean (keyfile, GROUP, FILE_KEYS[SECONDARY_STORAGE], NULL);
 
   /* If we found it here, then it's installed */
+  eos_app_log_debug_message ("Setting app '%s' as installed",
+                             info->application_id);
   info->is_installed = TRUE;
 
   retval = TRUE;
@@ -806,6 +819,9 @@ void
 eos_app_info_set_is_installed (EosAppInfo *info,
                                gboolean is_installed)
 {
+  eos_app_log_debug_message ("Setting app '%s' as %sinstalled",
+                             info->application_id,
+                             is_installed ? "" : "not ");
   info->is_installed = is_installed;
 }
 

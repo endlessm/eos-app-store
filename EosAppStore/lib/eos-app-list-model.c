@@ -647,7 +647,7 @@ reload_model (EosAppListModel *self,
   if (!load_installed_apps (self, cancellable, error))
     eos_app_log_error_message ("Unable to load installed apps");
 
-  eos_app_log_debug_message ("Loading available apps from manager");
+  eos_app_log_debug_message ("Loading available apps");
   if (!load_available_apps (self, cancellable, error))
     eos_app_log_error_message ("Unable to load available apps");
 
@@ -709,6 +709,8 @@ invalidate_app_info (EosAppListModel *self,
   /* Remove this info from the apps hash table, and let the code below
    * take care of resetting the proper state.
    */
+  eos_app_log_debug_message ("Removing '%s' from apps hash table",
+                             eos_app_info_get_application_id (info));
   g_hash_table_remove (self->apps, eos_app_info_get_desktop_id (info));
 
   GError *error = NULL;
@@ -2444,11 +2446,18 @@ remove_app_thread_func (GTask *task,
 
   invalidate_app_info (model, info, cancellable);
 
+  eos_app_log_debug_message ("Removing app from shell");
+
   if (!remove_app_from_shell (model, info, cancellable, &error))
     {
+      eos_app_log_error_message ("Unable to remove app '%s' from shell!",
+                                 eos_app_info_get_application_id (info));
       g_task_return_error (task, error);
       return;
     }
+
+  eos_app_log_debug_message ("Removed app '%s' from shell",
+                             eos_app_info_get_application_id (info));
 
   g_task_return_boolean (task, TRUE);
 }
