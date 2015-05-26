@@ -677,21 +677,16 @@ replace_string_field_from_json (JsonObject *obj,
                                 char **field)
 {
   JsonNode *node = json_object_get_member (obj, JSON_KEYS[key_enum_index]);
-  if (node != NULL)
+  if (node)
     {
       g_free (*field);
       *field = json_node_dup_string (node);
     }
 }
 
-/*< private >*/
 void
 eos_app_info_clear_server_update_attributes (EosAppInfo *info)
 {
-  g_free (info->application_id);
-  g_free (info->title);
-  g_free (info->subtitle);
-  g_free (info->description);
   g_free (info->locale);
 
   /* TODO: Only do this if version is higher */
@@ -705,6 +700,19 @@ eos_app_info_clear_server_update_attributes (EosAppInfo *info)
   g_free (info->delta_signature_uri);
   g_free (info->delta_bundle_hash);
 
+  info->locale = NULL;
+
+  info->version = NULL;
+
+  info->bundle_uri = NULL;
+  info->signature_uri = NULL;
+  info->bundle_hash = NULL;
+
+  info->delta_bundle_uri = NULL;
+  info->delta_signature_uri = NULL;
+  info->delta_bundle_hash = NULL;
+
+  /* Meta fields that need clearing */
   info->update_available = FALSE;
   info->is_available = FALSE;
 }
@@ -742,7 +750,7 @@ eos_app_info_update_from_server (EosAppInfo *info,
   if (node != NULL)
     {
       g_free (info->version);
-      info->version = g_strdup (json_node_get_string (node));
+      info->version = json_node_dup_string (node);
     }
   else
     {

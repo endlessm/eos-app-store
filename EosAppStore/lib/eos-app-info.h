@@ -63,6 +63,8 @@ gboolean        eos_app_info_get_has_sufficient_install_space (const EosAppInfo 
 
 gint64          eos_app_info_get_installation_time      (const EosAppInfo *info);
 
+void            eos_app_info_clear_server_update_attributes (EosAppInfo *info);
+
 #ifndef __GI_SCANNER__
 
 /* private */
@@ -84,8 +86,6 @@ void            eos_app_info_set_has_launcher           (EosAppInfo *info,
 G_GNUC_INTERNAL
 void            eos_app_info_set_is_installed           (EosAppInfo *info,
                                                          gboolean    is_installed);
-G_GNUC_INTERNAL
-void            eos_app_info_clear_server_update_attributes (EosAppInfo *info);
 
 #endif
 
