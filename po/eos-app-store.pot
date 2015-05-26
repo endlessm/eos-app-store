@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-05-19 01:22+0000\n"
+"POT-Creation-Date: 2015-05-26 01:25+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -235,7 +235,7 @@ msgstr ""
 #: ../EosAppStore/lib/eos-app-list-model.c:519
 #: ../EosAppStore/lib/eos-app-list-model.c:1908
 #: ../EosAppStore/lib/eos-app-list-model.c:1990
-#: ../EosAppStore/lib/eos-app-list-model.c:2145
+#: ../EosAppStore/lib/eos-app-list-model.c:2127
 msgid ""
 "The app store has detected a fatal error and cannot continue with the "
 "installation. Please, restart your system. If the problem persists, please "
@@ -328,43 +328,43 @@ msgstr ""
 msgid "You must be an administrator to install applications"
 msgstr ""
 
-#: ../EosAppStore/lib/eos-app-list-model.c:2171
+#: ../EosAppStore/lib/eos-app-list-model.c:2153
 msgid "You must be an administrator to remove applications"
 msgstr ""
 
-#: ../EosAppStore/lib/eos-app-list-model.c:2180
+#: ../EosAppStore/lib/eos-app-list-model.c:2162
 #, c-format
 msgid "Application '%s' could not be uninstalled. %s"
 msgstr ""
 
-#: ../EosAppStore/lib/eos-app-list-model.c:2188
+#: ../EosAppStore/lib/eos-app-list-model.c:2170
 #, c-format
 msgid "Application '%s' could not be uninstalled"
 msgstr ""
 
-#: ../EosAppStore/lib/eos-app-list-model.c:2200
+#: ../EosAppStore/lib/eos-app-list-model.c:2182
 #, c-format
 msgid "Application '%s' could not be removed"
 msgstr ""
 
-#: ../EosAppStore/lib/eos-app-list-model.c:2319
-#: ../EosAppStore/lib/eos-app-list-model.c:2387
+#: ../EosAppStore/lib/eos-app-list-model.c:2301
+#: ../EosAppStore/lib/eos-app-list-model.c:2369
 #, c-format
 msgid "App %s not installable"
 msgstr ""
 
-#: ../EosAppStore/lib/eos-app-list-model.c:2331
+#: ../EosAppStore/lib/eos-app-list-model.c:2313
 #, c-format
 msgid "App %s already installed"
 msgstr ""
 
-#: ../EosAppStore/lib/eos-app-list-model.c:2398
+#: ../EosAppStore/lib/eos-app-list-model.c:2380
 #, c-format
 msgid "App %s is up to date"
 msgstr ""
 
-#: ../EosAppStore/lib/eos-app-list-model.c:2464
-#: ../EosAppStore/lib/eos-app-list-model.c:2496
+#: ../EosAppStore/lib/eos-app-list-model.c:2446
+#: ../EosAppStore/lib/eos-app-list-model.c:2478
 #, c-format
 msgid "App %s is not installed"
 msgstr ""
