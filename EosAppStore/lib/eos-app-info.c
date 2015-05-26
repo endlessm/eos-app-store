@@ -35,6 +35,7 @@ static const gchar *JSON_KEYS[] = {
   "appId",
   "appName",
   "codeVersion",
+  "fromVersion",
   "Locale",
   "installedSize",
   "secondaryStorage",
@@ -49,6 +50,7 @@ enum {
   APP_ID,
   APP_NAME,
   CODE_VERSION,
+  FROM_VERSION,
   LOCALE,
   INSTALLED_SIZE,
   SECONDARY_STORAGE,
@@ -179,8 +181,10 @@ eos_app_info_unref (EosAppInfo *info)
       g_free (info->description);
       g_free (info->square_img);
       g_free (info->featured_img);
-      g_free (info->version);
       g_free (info->locale);
+
+      g_free (info->installed_version);
+      g_free (info->available_version);
 
       g_free (info->bundle_uri);
       g_free (info->signature_uri);
@@ -252,9 +256,15 @@ eos_app_info_get_description (const EosAppInfo *info)
 }
 
 const char *
-eos_app_info_get_version (const EosAppInfo *info)
+eos_app_info_get_installed_version (const EosAppInfo *info)
 {
-  return info->version;
+  return info->installed_version;
+}
+
+const char *
+eos_app_info_get_available_version (const EosAppInfo *info)
+{
+  return info->available_version;
 }
 
 const char *
@@ -638,8 +648,10 @@ eos_app_info_update_from_installed (EosAppInfo *info,
   if (!g_key_file_has_group (keyfile, GROUP))
     goto out;
 
-  g_free (info->version);
-  info->version = g_key_file_get_string (keyfile, GROUP, FILE_KEYS[CODE_VERSION], NULL);
+  g_free (info->installed_version);
+  info->installed_version = g_key_file_get_string (keyfile, GROUP,
+                                                   FILE_KEYS[CODE_VERSION],
+                                                   NULL);
 
   g_free (info->locale);
   info->locale = g_key_file_get_string (keyfile, GROUP, FILE_KEYS[LOCALE], NULL);
@@ -685,8 +697,7 @@ eos_app_info_clear_server_update_attributes (EosAppInfo *info)
 {
   g_free (info->locale);
 
-  /* TODO: Only do this if version is higher */
-  g_free (info->version);
+  g_free (info->available_version);
 
   g_free (info->bundle_uri);
   g_free (info->signature_uri);
@@ -699,7 +710,7 @@ eos_app_info_clear_server_update_attributes (EosAppInfo *info)
   /* Explicit clearing since we use NULL as a check in some logic */
   info->locale = NULL;
 
-  info->version = NULL;
+  info->available_version = NULL;
 
   info->bundle_uri = NULL;
   info->signature_uri = NULL;
@@ -746,8 +757,8 @@ eos_app_info_update_from_server (EosAppInfo *info,
   node = json_object_get_member (obj, JSON_KEYS[CODE_VERSION]);
   if (node != NULL)
     {
-      g_free (info->version);
-      info->version = json_node_dup_string (node);
+      g_free (info->available_version);
+      info->available_version = json_node_dup_string (node);
     }
   else
     {
