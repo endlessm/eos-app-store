@@ -987,6 +987,13 @@ remove_records_version_lte (GList *deltas,
     }
 }
 
+/* Functions to clear our newer_deltas hashtable */
+static void
+free_app_info_glist (gpointer data)
+{
+  g_list_free_full (data, (GDestroyNotify) eos_app_info_unref);
+}
+
 gboolean
 eos_app_load_available_apps (GHashTable *app_info,
                              const char *data,
@@ -1020,11 +1027,9 @@ eos_app_load_available_apps (GHashTable *app_info,
       return FALSE;
     }
 
-  /* TODO: Memory leak if we don't clear the app info
-           (GDestroyNotify) eos_app_info_unref); */
   GHashTable *newer_deltas = g_hash_table_new_full (g_str_hash, g_str_equal,
                                                     NULL, /* Not supposed to free these */
-                                                    NULL);
+                                                    free_app_info_glist);
 
   eos_app_log_debug_message ("Iterating over the update list");
   JsonArray *array = json_node_get_array (root);
