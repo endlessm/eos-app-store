@@ -264,30 +264,39 @@ eos_app_info_get_locale (const EosAppInfo *info)
 }
 
 const char *
-eos_app_info_get_bundle_uri (const EosAppInfo *info, gboolean use_delta)
+eos_app_info_get_bundle_uri (const EosAppInfo *info)
 {
-  if (use_delta)
-    return info->delta_bundle_uri;
-
   return info->bundle_uri;
 }
 
 const char *
-eos_app_info_get_signature_uri (const EosAppInfo *info, gboolean use_delta)
+eos_app_info_get_signature_uri (const EosAppInfo *info)
 {
-  if (use_delta)
-    return info->delta_signature_uri;
-
   return info->signature_uri;
 }
 
 const char *
-eos_app_info_get_bundle_hash (const EosAppInfo *info, gboolean use_delta)
+eos_app_info_get_bundle_hash (const EosAppInfo *info)
 {
-  if (use_delta)
-    return info->delta_bundle_hash;
-
   return info->bundle_hash;
+}
+
+const char *
+eos_app_info_get_delta_bundle_uri (const EosAppInfo *info)
+{
+  return info->delta_bundle_uri;
+}
+
+const char *
+eos_app_info_get_delta_signature_uri (const EosAppInfo *info)
+{
+  return info->delta_signature_uri;
+}
+
+const char *
+eos_app_info_get_delta_bundle_hash (const EosAppInfo *info)
+{
+  return info->delta_bundle_hash;
 }
 
 gboolean
@@ -674,6 +683,7 @@ eos_app_info_clear_server_update_attributes (EosAppInfo *info)
   g_free (info->delta_signature_uri);
   g_free (info->delta_bundle_hash);
 
+  /* Explicit clearing since we use NULL as a check in some logic */
   info->locale = NULL;
 
   info->version = NULL;

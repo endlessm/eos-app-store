@@ -39,12 +39,13 @@ char *          eos_app_info_get_square_img             (const EosAppInfo *info)
 char *          eos_app_info_get_featured_img           (const EosAppInfo *info);
 char *          eos_app_info_get_icon_name              (const EosAppInfo *info);
 
-const char *    eos_app_info_get_bundle_uri             (const EosAppInfo *info,
-                                                         const gboolean use_delta);
-const char *    eos_app_info_get_signature_uri          (const EosAppInfo *info,
-                                                         const gboolean use_delta);
-const char *    eos_app_info_get_bundle_hash            (const EosAppInfo *info,
-                                                         const gboolean use_delta);
+const char *    eos_app_info_get_bundle_uri             (const EosAppInfo *info);
+const char *    eos_app_info_get_signature_uri          (const EosAppInfo *info);
+const char *    eos_app_info_get_bundle_hash            (const EosAppInfo *info);
+
+const char *    eos_app_info_get_delta_bundle_uri       (const EosAppInfo *info);
+const char *    eos_app_info_get_delta_signature_uri    (const EosAppInfo *info);
+const char *    eos_app_info_get_delta_bundle_hash      (const EosAppInfo *info);
 
 guint           eos_app_info_get_n_screenshots          (const EosAppInfo *info);
 char **         eos_app_info_get_screenshots            (const EosAppInfo *info);
