@@ -30,9 +30,6 @@ const char *    eos_app_info_get_version                (const EosAppInfo *info)
 gint64          eos_app_info_get_installed_size         (const EosAppInfo *info);
 const char *    eos_app_info_get_locale                 (const EosAppInfo *info);
 
-const int       eos_app_info_compare_versions           (JsonNode   *node,
-                                                         const EosAppInfo *info);
-
 gboolean        eos_app_info_is_featured                (const EosAppInfo *info);
 gboolean        eos_app_info_is_offline                 (const EosAppInfo *info);
 gboolean        eos_app_info_is_on_secondary_storage    (const EosAppInfo *info);

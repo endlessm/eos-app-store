@@ -645,32 +645,6 @@ out:
   return retval;
 }
 
-/* TODO: Remove or fix to handle json update from server */
-/*< private >*/
-const int
-eos_app_info_compare_versions (JsonNode   *root,
-                               const EosAppInfo *info)
-{
-  if (!info->version)
-    return 1;
-
-  if (!JSON_NODE_HOLDS_OBJECT (root))
-    {
-      eos_app_log_error_message ("Application data for '%s' is malformed.",
-                                 eos_app_info_get_application_id (info));
-      return FALSE;
-    }
-
-  JsonObject *obj = json_node_get_object (root);
-
-  JsonNode *node = json_object_get_member (obj, JSON_KEYS[CODE_VERSION]);
-  if (node == NULL)
-    return -1;
-
-  const char *version = json_node_get_string (node);
-  return eos_compare_versions (info->version, version);
-}
-
 static void
 replace_string_field_from_json (JsonObject *obj,
                                 int key_enum_index,
