@@ -1094,6 +1094,17 @@ eos_app_load_available_apps (GHashTable *app_info,
           continue;
         }
 
+      /* Grab fromVersion field for deltas */
+      const char *from_version = NULL;
+      if (is_diff && !json_object_has_member (obj, "fromVersion"))
+        {
+          eos_app_log_error_message (" - JSON element doesn't contain fromVersion "
+                                     "attribute! Ignoring!");
+          continue;
+        }
+      else
+        from_version = json_object_get_string_member (obj, "fromVersion");
+
       eos_app_log_debug_message ("Loading: '%s (diff: %s) %s'",
                                 app_id,
                                 is_diff ? "true" : "false",
@@ -1163,13 +1174,25 @@ eos_app_load_available_apps (GHashTable *app_info,
         }
       else  // This is a diff update
         {
+          /* TODO: Deal with first record being an invalid delta (won't get to
+                   this code) */
+          if (eos_compare_versions (from_version,
+                                    eos_app_info_get_installed_version (info)) != 0)
+            {
+              eos_app_log_debug_message (" -> Delta from_version (%s) does not match "
+                                         "installed version (%s). Ignoring.",
+                                         from_version,
+                                         eos_app_info_get_installed_version (info));
+
+              eos_app_info_unref (info);
+              continue;
+            }
+
           if (eos_app_info_is_installable (info)) /* We have a full update */
             {
               if (version_cmp > 0)
                 {
                   /* TODO: Combine all additions to the delta list in one spot */
-                  /* TODO: Only save the delta if we have a valid path from currently
-                           installed version */
                   EosAppInfo *delta = eos_app_info_new_from_server_json (element);
                   eos_app_log_debug_message (" -> Preserving delta of version: %s",
                                              eos_app_info_get_available_version (delta));
@@ -1181,6 +1204,7 @@ eos_app_load_available_apps (GHashTable *app_info,
                 {
                   eos_app_log_debug_message (" -> Found matching delta for version: %s",
                                              eos_app_info_get_available_version (info));
+
                   eos_app_info_update_from_server (info, element);
                 }
               else
