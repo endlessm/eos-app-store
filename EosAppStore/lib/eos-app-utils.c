@@ -1051,30 +1051,34 @@ eos_app_load_available_apps (GHashTable *app_info,
 
       element = json_array_get_element (array, index);
 
-      if (!JSON_NODE_HOLDS_OBJECT (element)) {
-        eos_app_log_error_message (" - JSON element contains unknown type of data! "
-                                   "Ignoring!");
-        continue;
-      }
+      if (!JSON_NODE_HOLDS_OBJECT (element))
+        {
+          eos_app_log_error_message (" - JSON element contains unknown type of data! "
+                                     "Ignoring!");
+          continue;
+        }
 
       JsonObject *obj = json_node_get_object (element);
-      if (!json_object_has_member (obj, "appId")) {
-        eos_app_log_error_message (" - JSON element doesn't contain an appId! "
-                                   "Ignoring!");
-        continue;
-      }
+      if (!json_object_has_member (obj, "appId"))
+        {
+          eos_app_log_error_message (" - JSON element doesn't contain an appId! "
+                                     "Ignoring!");
+          continue;
+        }
 
-      if (!json_object_has_member (obj, "isDiff")) {
-        eos_app_log_error_message (" - JSON element doesn't contain isDiff attribute! "
-                                   "Ignoring!");
-        continue;
-      }
+      if (!json_object_has_member (obj, "isDiff"))
+        {
+          eos_app_log_error_message (" - JSON element doesn't contain isDiff attribute! "
+                                     "Ignoring!");
+          continue;
+        }
 
-      if (!json_object_has_member (obj, "codeVersion")) {
-        eos_app_log_error_message (" - JSON element doesn't contain codeVersion attribute! "
-                                   "Ignoring!");
-        continue;
-      }
+      if (!json_object_has_member (obj, "codeVersion"))
+        {
+          eos_app_log_error_message (" - JSON element doesn't contain codeVersion attribute! "
+                                     "Ignoring!");
+          continue;
+        }
 
       const char *app_id = json_object_get_string_member (obj, "appId");
       const gboolean is_diff = json_object_get_boolean_member (obj, "isDiff");
