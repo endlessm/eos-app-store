@@ -1122,9 +1122,9 @@ eos_app_load_available_apps (GHashTable *app_info,
           info = eos_app_info_new_from_server_json (element);
           g_hash_table_replace (app_info, g_strdup (desktop_id), info);
 
-          /* New record that we haven't seen before - so no need to
-             try figuring out the rest of the code below */
-          continue;
+          /* We can only short-circuit initial full updates */
+          if (!is_diff)
+            continue;
         }
 
       eos_app_info_ref (info);
@@ -1174,8 +1174,6 @@ eos_app_load_available_apps (GHashTable *app_info,
         }
       else  // This is a diff update
         {
-          /* TODO: Deal with first record being an invalid delta (won't get to
-                   this code) */
           if (eos_compare_versions (from_version,
                                     eos_app_info_get_installed_version (info)) != 0)
             {
@@ -1217,9 +1215,6 @@ eos_app_load_available_apps (GHashTable *app_info,
             }
           else /* We only have the delta in info */
             {
-              /* TODO: Figure out what to do with initially added deltas that
-                       don't get to this point on first run */
-
               /* We save all deltas until we get a full update record since
                  we won't know what is a good delta version to keep */
               EosAppInfo *delta = eos_app_info_new_from_server_json (element);
