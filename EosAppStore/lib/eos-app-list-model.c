@@ -1661,10 +1661,10 @@ create_sha256sum (EosAppListModel *self,
   const char *bundle_hash = NULL;
   const char *app_id = eos_app_info_get_application_id (info);
 
-  if (!use_delta)
-    bundle_hash = eos_app_info_get_bundle_hash (info);
-  else
+  if (use_delta)
     bundle_hash = eos_app_info_get_delta_bundle_hash (info);
+  else
+    bundle_hash = eos_app_info_get_bundle_hash (info);
 
   if (bundle_hash == NULL || *bundle_hash == '\0')
     {
@@ -1699,10 +1699,10 @@ download_signature (EosAppListModel *self,
   const char *signature_uri = NULL;
   const char *app_id = eos_app_info_get_application_id (info);
 
-  if (!use_delta)
-    signature_uri = eos_app_info_get_signature_uri (info);
-  else
+  if (use_delta)
     signature_uri = eos_app_info_get_delta_signature_uri (info);
+  else
+    signature_uri = eos_app_info_get_signature_uri (info);
 
   if (signature_uri == NULL || *signature_uri == '\0')
     {
@@ -1739,10 +1739,10 @@ download_bundle (EosAppListModel *self,
   const char *bundle_uri = NULL;
   const char *app_id = eos_app_info_get_application_id (info);
 
-  if (!use_delta)
-    bundle_uri = eos_app_info_get_bundle_uri (info);
-  else
+  if (use_delta)
     bundle_uri = eos_app_info_get_delta_bundle_uri (info);
+  else
+    bundle_uri = eos_app_info_get_bundle_uri (info);
 
   eos_app_log_info_message ("Downloading - app id: %s, bundle URI: %s", app_id, bundle_uri);
 

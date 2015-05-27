@@ -954,12 +954,9 @@ get_matching_version_delta (GList *deltas,
   eos_app_log_debug_message (" - Looking for matching delta version: %s",
                              version);
 
-  if (!deltas)
-    return NULL;
-
   /* Remove older (not relevant) deltas from temp array */
   for (GList *iterator = deltas; iterator; iterator = iterator->next)
-    if (eos_compare_versions(iterator->data, version) == 0)
+    if (eos_compare_versions (iterator->data, version) == 0)
       return iterator->data;
 
   return NULL;
@@ -972,17 +969,17 @@ remove_records_version_lte (GList *deltas,
   eos_app_log_debug_message (" - Removing old/current/irrelevant deltas "
                              "from our temp list");
 
-  if (!deltas)
-    return;
-
   GList *next = NULL;
   for (GList *iterator = deltas; iterator; iterator = next)
     {
       next = iterator->next;
       if (eos_compare_versions (iterator->data, version) <= 0)
-        if (!g_list_delete_link (deltas, iterator)) {
-          eos_app_log_debug_message ("Removing %p from list failed!",
-                                     iterator->data);
+        {
+          if (!g_list_delete_link (deltas, iterator))
+            {
+              eos_app_log_debug_message ("Removing %p from list failed!",
+                                         iterator->data);
+            }
         }
     }
 }
@@ -1017,8 +1014,7 @@ eos_app_load_available_apps (GHashTable *app_info,
     {
       g_set_error_literal (error, EOS_APP_UTILS_ERROR,
                            EOS_APP_UTILS_ERROR_JSON_UNEXPECTED_STRUCTURE,
-                           _("Update records did not contain "
-                             "expected structure"));
+                           "Update records did not contain expected structure");
 
       eos_app_log_error_message ("Update records did not contain "
                                  "expected structure");
@@ -1028,7 +1024,7 @@ eos_app_load_available_apps (GHashTable *app_info,
     }
 
   GHashTable *newer_deltas = g_hash_table_new_full (g_str_hash, g_str_equal,
-                                                    NULL, /* Not supposed to free these */
+                                                    g_free,
                                                     free_app_info_glist);
 
   eos_app_log_debug_message ("Iterating over the update list");
@@ -1050,7 +1046,6 @@ eos_app_load_available_apps (GHashTable *app_info,
         }
 
       element = json_array_get_element (array, index);
-
       if (!JSON_NODE_HOLDS_OBJECT (element))
         {
           eos_app_log_error_message (" - JSON element contains unknown type of data! "
@@ -1175,7 +1170,7 @@ eos_app_load_available_apps (GHashTable *app_info,
           else
             eos_app_log_debug_message (" -> Same version as current record. Ignoring.");
         }
-      else  // This is a diff update
+      else /* We have a diff here */
         {
           if (eos_compare_versions (from_version,
                                     eos_app_info_get_installed_version (info)) != 0)

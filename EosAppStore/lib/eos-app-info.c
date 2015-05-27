@@ -139,7 +139,7 @@ eos_app_info_new_from_server_json (JsonNode *root)
   node = json_object_get_member (obj, JSON_KEYS[APP_ID]);
   if (node)
     {
-      char *app_id = json_node_dup_string (node);
+      const char *app_id = json_node_get_string (node);
       info = eos_app_info_new (app_id);
     }
   else
@@ -398,9 +398,6 @@ eos_app_info_get_icon_name (const EosAppInfo *info)
 EosAppState
 eos_app_info_get_state (const EosAppInfo *info)
 {
-  if (!info)
-    return EOS_APP_STATE_UNKNOWN;
-
   EosAppState retval = EOS_APP_STATE_UNKNOWN;
   gboolean is_installed, is_installable, is_updatable;
 
@@ -698,7 +695,7 @@ replace_string_field_from_json (JsonObject *obj,
                                 char **field)
 {
   JsonNode *node = json_object_get_member (obj, JSON_KEYS[key_enum_index]);
-  if (node)
+  if (node != NULL)
     {
       g_free (*field);
       *field = json_node_dup_string (node);
@@ -729,8 +726,7 @@ eos_app_info_update_from_server (EosAppInfo *info,
       is_diff = json_node_get_boolean (node);
       if (is_diff)
         info->update_available = TRUE;
-
-      if (!is_diff)
+      else
         info->is_available = TRUE;
     }
 
@@ -759,7 +755,6 @@ eos_app_info_update_from_server (EosAppInfo *info,
 
   replace_string_field_from_json (obj, LOCALE, &info->locale);
 
-  /* TODO: Make this cleaner */
   if (!is_diff)
     {
       replace_string_field_from_json (obj, DOWNLOAD_LINK, &info->bundle_uri);
@@ -768,12 +763,9 @@ eos_app_info_update_from_server (EosAppInfo *info,
     }
   else
     {
-      replace_string_field_from_json (obj, DOWNLOAD_LINK,
-                                      &info->delta_bundle_uri);
-      replace_string_field_from_json (obj, SIGNATURE_LINK,
-                                      &info->delta_signature_uri);
-      replace_string_field_from_json (obj, SHA_HASH,
-                                      &info->delta_bundle_hash);
+      replace_string_field_from_json (obj, DOWNLOAD_LINK, &info->delta_bundle_uri);
+      replace_string_field_from_json (obj, SIGNATURE_LINK, &info->delta_signature_uri);
+      replace_string_field_from_json (obj, SHA_HASH, &info->delta_bundle_hash);
     }
 
   return TRUE;
