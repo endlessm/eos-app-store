@@ -169,6 +169,26 @@ eos_app_info_ref (EosAppInfo *info)
 }
 
 void
+eos_app_info_clear_server_update_attributes (EosAppInfo *info)
+{
+  g_clear_pointer (&info->locale, g_free);
+
+  g_clear_pointer (&info->available_version, g_free);
+
+  g_clear_pointer (&info->bundle_uri, g_free);
+  g_clear_pointer (&info->signature_uri, g_free);
+  g_clear_pointer (&info->bundle_hash, g_free);
+
+  g_clear_pointer (&info->delta_bundle_uri, g_free);
+  g_clear_pointer (&info->delta_signature_uri, g_free);
+  g_clear_pointer (&info->delta_bundle_hash, g_free);
+
+  /* Meta fields that need clearing */
+  info->update_available = FALSE;
+  info->is_available = FALSE;
+}
+
+void
 eos_app_info_unref (EosAppInfo *info)
 {
   if (g_atomic_int_dec_and_test (&(info->ref_count)))
@@ -184,15 +204,8 @@ eos_app_info_unref (EosAppInfo *info)
       g_free (info->locale);
 
       g_free (info->installed_version);
-      g_free (info->available_version);
 
-      g_free (info->bundle_uri);
-      g_free (info->signature_uri);
-      g_free (info->bundle_hash);
-
-      g_free (info->delta_bundle_uri);
-      g_free (info->delta_signature_uri);
-      g_free (info->delta_bundle_hash);
+      eos_app_info_clear_server_update_attributes (info);
 
       g_free (info->icon_name);
       g_strfreev (info->screenshots);
@@ -690,39 +703,6 @@ replace_string_field_from_json (JsonObject *obj,
       g_free (*field);
       *field = json_node_dup_string (node);
     }
-}
-
-void
-eos_app_info_clear_server_update_attributes (EosAppInfo *info)
-{
-  g_free (info->locale);
-
-  g_free (info->available_version);
-
-  g_free (info->bundle_uri);
-  g_free (info->signature_uri);
-  g_free (info->bundle_hash);
-
-  g_free (info->delta_bundle_uri);
-  g_free (info->delta_signature_uri);
-  g_free (info->delta_bundle_hash);
-
-  /* Explicit clearing since we use NULL as a check in some logic */
-  info->locale = NULL;
-
-  info->available_version = NULL;
-
-  info->bundle_uri = NULL;
-  info->signature_uri = NULL;
-  info->bundle_hash = NULL;
-
-  info->delta_bundle_uri = NULL;
-  info->delta_signature_uri = NULL;
-  info->delta_bundle_hash = NULL;
-
-  /* Meta fields that need clearing */
-  info->update_available = FALSE;
-  info->is_available = FALSE;
 }
 
 /*< private >*/
