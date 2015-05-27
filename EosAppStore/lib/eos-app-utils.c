@@ -1096,14 +1096,17 @@ eos_app_load_available_apps (GHashTable *app_info,
 
       /* Grab fromVersion field for deltas */
       const char *from_version = NULL;
-      if (is_diff && !json_object_has_member (obj, "fromVersion"))
+      if (is_diff)
         {
-          eos_app_log_error_message (" - JSON element doesn't contain fromVersion "
-                                     "attribute! Ignoring!");
-          continue;
+          if (!json_object_has_member (obj, "fromVersion"))
+            {
+              eos_app_log_error_message (" - JSON element doesn't contain fromVersion "
+                                         "attribute! Ignoring!");
+              continue;
+            }
+          else
+            from_version = json_object_get_string_member (obj, "fromVersion");
         }
-      else
-        from_version = json_object_get_string_member (obj, "fromVersion");
 
       eos_app_log_debug_message ("Loading: '%s (diff: %s) %s'",
                                 app_id,
