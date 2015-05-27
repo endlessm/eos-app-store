@@ -1132,17 +1132,17 @@ eos_app_load_available_apps (GHashTable *app_info,
 
       eos_app_info_ref (info);
 
-      int version_cmp = eos_compare_versions (code_version,
-                                              eos_app_info_get_available_version (info));
+      const char *stored_code_version = eos_app_info_get_available_version (info);
+      const int version_cmp = eos_compare_versions (code_version, stored_code_version);
 
       eos_app_log_debug_message (" - Version comparison: [new: %s, have: %s].",
                                  code_version,
-                                 eos_app_info_get_available_version (info));
+                                 stored_code_version);
 
       GList  *deltas_for_app_id = g_hash_table_lookup (newer_deltas,
                                                        desktop_id);
 
-      /* TODO: modularize, if possible */
+      /* TODO: Modularize, if possible */
       if (!is_diff) /* Full version */
         {
           if (version_cmp > 0)
@@ -1204,7 +1204,7 @@ eos_app_load_available_apps (GHashTable *app_info,
               else if (version_cmp == 0)
                 {
                   eos_app_log_debug_message (" -> Found matching delta for version: %s",
-                                             eos_app_info_get_available_version (info));
+                                             stored_code_version);
 
                   eos_app_info_update_from_server (info, element);
                 }
@@ -1213,7 +1213,7 @@ eos_app_load_available_apps (GHashTable *app_info,
                   eos_app_log_debug_message (" -> Delta (%s) is lower version than %s. "
                                              "Ignoring.",
                                              code_version,
-                                             eos_app_info_get_available_version (info));
+                                             stored_code_version);
                 }
             }
           else /* We only have the delta in info */
