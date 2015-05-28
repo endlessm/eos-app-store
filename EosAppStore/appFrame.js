@@ -220,11 +220,17 @@ const AppListBoxRow = new Lang.Class({
         this._screenshotPreviewBox.hide();
         this._screenshotImage.hide();
 
+        this._screenshotPreviewBox.foreach(Lang.bind(this, function (smallScreenshot) {
+            smallScreenshot.destroy();
+        }));
+
         for (let i in screenshots) {
             let path = screenshots[i];
 
             if (i == 0) {
-                EosAppStorePrivate.app_load_screenshot(this._screenshotImage, path, this._screenshotLarge);
+                EosAppStorePrivate.app_load_screenshot(this._screenshotImage,
+                                                       path,
+                                                       this._screenshotLarge);
             }
 
             let previewBox = new AppPreview(path, this._screenshotSmall);
@@ -779,7 +785,9 @@ const AppCategoryFrame = new Lang.Class({
     },
 
     _showGrid: function() {
-        let curPage = this._stack.get_visible_child();
+        let currentPage = this._stack.get_visible_child();
+        let currentPageName = this._stack.visible_child_name;
+
         this._mainWindow.clearHeaderState();
 
         if (this._backClickedId > 0) {
@@ -794,10 +802,9 @@ const AppCategoryFrame = new Lang.Class({
 
         // application pages are recreated each time, unless there's
         // a transaction in progress
-        let curPageName = this._stack.visible_child_name;
-        if (!(curPageName == 'app-frame' || curPageName == 'spinner') &&
-            !curPage.hasTransactionInProgress) {
-            curPage.destroy();
+        if (!(currentPageName == 'app-frame' || currentPageName == 'spinner') &&
+            !currentPage.hasTransactionInProgress) {
+            currentPage.destroy();
         }
     },
 
