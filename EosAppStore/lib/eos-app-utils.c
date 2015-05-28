@@ -1127,8 +1127,6 @@ eos_app_load_available_apps (GHashTable *app_info,
             continue;
         }
 
-      eos_app_info_ref (info);
-
       const char *stored_code_version = eos_app_info_get_available_version (info);
       const int version_cmp = eos_compare_versions (code_version, stored_code_version);
 
@@ -1150,7 +1148,6 @@ eos_app_load_available_apps (GHashTable *app_info,
                                          from_version,
                                          eos_app_info_get_installed_version (info));
 
-              eos_app_info_unref (info);
               continue;
             }
 
@@ -1226,8 +1223,6 @@ eos_app_load_available_apps (GHashTable *app_info,
                                          version_cmp);
             }
         }
-
-      eos_app_info_unref (info);
     }
 
   g_hash_table_unref (newer_deltas);
