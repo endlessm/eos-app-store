@@ -838,12 +838,6 @@ const AppBroker = new Lang.Class({
             category.widget = new AppCategoryFrame(category, this._model, mainWindow);
             category.widget.spinning = true;
         }));
-
-        let content_dir = EosAppStorePrivate.app_get_content_dir();
-        let content_path = GLib.build_filenamev([content_dir, 'content.json']);
-        let content_file = Gio.File.new_for_path(content_path);
-        this._contentMonitor = content_file.monitor_file(Gio.FileMonitorFlags.NONE, null);
-        this._contentMonitor.connect('changed', Lang.bind(this, this._onContentChanged));
     },
 
     _onModelRefresh: function(model, error) {
@@ -861,10 +855,6 @@ const AppBroker = new Lang.Class({
             return;
         }
 
-        this._populateAllCategories();
-    },
-
-    _onContentChanged: function(monitor, file, other_file, event_type) {
         this._populateAllCategories();
     },
 
