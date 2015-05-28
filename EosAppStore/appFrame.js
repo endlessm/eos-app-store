@@ -463,6 +463,8 @@ const AppListBoxRow = new Lang.Class({
                     appWindow.hide();
                 }
 
+                this.emit('transaction-completed');
+
                 return false;
             }));
         }));
@@ -484,7 +486,8 @@ const AppListBoxRow = new Lang.Class({
                 this._maybeNotify(_("We could not update '%s'").format(this.appTitle), error);
             }
             else {
-                    this._maybeNotify(_("'%s' was updated successfully").format(this.appTitle));
+                this._maybeNotify(_("'%s' was updated successfully").format(this.appTitle));
+                this.emit('transaction-completed');
             }
         }));
     },
@@ -574,9 +577,9 @@ const AppListBoxRow = new Lang.Class({
                 }
                 else {
                     this._maybeNotify(_("'%s' was removed successfully").format(this.appTitle));
+                    this.emit('transaction-completed');
                 }
 
-                this._updateState();
             }));
         }
     },
@@ -629,6 +632,7 @@ const AppListBoxRow = new Lang.Class({
     },
 });
 Builder.bindTemplateChildren(AppListBoxRow.prototype);
+Signals.addSignalMethods(AppListBoxRow.prototype);
 
 const AppCategoryFrame = new Lang.Class({
     Name: 'AppCategoryFrame',
@@ -767,6 +771,11 @@ const AppCategoryFrame = new Lang.Class({
     _onCellActivated: function(grid, cell) {
         if (!this._stack.get_child_by_name(cell.desktop_id)) {
             let appBox = new AppListBoxRow(this._model, cell.app_info);
+
+            this._transactionCompletedId = appBox.connect('transaction-completed',
+                                                          Lang.bind(this,
+                                                                    this._showGrid));
+
             appBox.show();
 
             this._stack.add_named(appBox, cell.desktop_id);
@@ -804,6 +813,11 @@ const AppCategoryFrame = new Lang.Class({
         // a transaction in progress
         if (!(currentPageName == 'app-frame' || currentPageName == 'spinner') &&
             !currentPage.hasTransactionInProgress) {
+            if (this._transactionCompletedId) {
+                currentPage.disconnect(this._transactionCompletedId);
+                this._transactionCompletedId = 0;
+            }
+
             currentPage.destroy();
         }
     },
