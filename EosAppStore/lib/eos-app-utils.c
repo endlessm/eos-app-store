@@ -1093,15 +1093,12 @@ eos_app_load_available_apps (GHashTable *app_info,
       const char *from_version = NULL;
       if (is_diff)
         {
-          if (!json_object_has_member (obj, "fromVersion"))
+          from_version = json_object_get_string_member (obj, "fromVersion");
+          if (from_version == NULL)
             {
               eos_app_log_error_message (" - JSON element doesn't contain fromVersion "
                                          "attribute! Ignoring!");
               continue;
-            }
-          else
-            {
-              from_version = json_object_get_string_member (obj, "fromVersion");
             }
         }
 
