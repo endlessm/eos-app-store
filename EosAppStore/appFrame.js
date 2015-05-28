@@ -614,12 +614,11 @@ const AppListBoxRow = new Lang.Class({
 
         // we only show the error dialog if the error is set
         if (error) {
-            let dialog = new Gtk.MessageDialog();
-            dialog.set_transient_for(app.mainWindow);
-            dialog.modal = true;
-            dialog.destroy_with_parent = true;
-            dialog.text = message;
-            dialog.secondary_text = error.message;
+            let dialog = new Gtk.MessageDialog({ transient_for: app.mainWindow,
+                                                 modal: true,
+                                                 destroy_with_parent: true,
+                                                 text: message,
+                                                 secondary_text: error.message });
             dialog.add_button(_("Dismiss"), Gtk.ResponseType.OK);
             dialog.show_all();
             this._errorDialog = dialog;
@@ -842,12 +841,11 @@ const AppBroker = new Lang.Class({
 
     _onModelRefresh: function(model, error) {
         if (error) {
-            let dialog = new Gtk.MessageDialog();
-            dialog.set_transient_for(app.mainWindow);
-            dialog.modal = true;
-            dialog.destroy_with_parent = true;
-            dialog.text = _("Update failed");
-            dialog.secondary_text = error.message;
+            let dialog = new Gtk.MessageDialog({ transient_for: app.mainWindow,
+                                                 modal: true,
+                                                 destroy_with_parent: true,
+                                                 text: _("Update failed"),
+                                                 secondary_text: error.message });
             dialog.add_button(_("Dismiss"), Gtk.ResponseType.OK);
             dialog.show_all();
             dialog.run();
