@@ -196,6 +196,10 @@ const AppList = new Lang.Class({
         return this._model.launch_app(id, timestamp);
     },
 
+    getApp: function(id) {
+        return this._model.get_app(id);
+    },
+
     _onNetworkChanged: function() {
         // As a first approximation, we simply check if the network is available
         this._networkAvailable = this._netMonitor.get_network_available();

@@ -2239,6 +2239,13 @@ eos_app_list_model_get_apps_for_category (EosAppListModel *model,
   return g_list_reverse (apps);
 }
 
+EosAppInfo *
+eos_app_list_model_get_app (EosAppListModel *model,
+                            const char *desktop_id)
+{
+  return eos_app_list_model_get_app_info (model, desktop_id);
+}
+
 gboolean
 eos_app_list_model_get_app_has_launcher (EosAppListModel *model,
                                          const char *desktop_id)

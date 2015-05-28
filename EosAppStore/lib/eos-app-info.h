@@ -6,6 +6,7 @@
 #include <json-glib/json-glib.h>
 #include <gio/gdesktopappinfo.h>
 #include "eos-app-enums.h"
+#include "eos-app-info.h"
 
 G_BEGIN_DECLS
 

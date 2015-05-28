@@ -579,7 +579,6 @@ const AppListBoxRow = new Lang.Class({
                     this._maybeNotify(_("'%s' was removed successfully").format(this.appTitle));
                     this.emit('transaction-completed');
                 }
-
             }));
         }
     },
@@ -662,7 +661,7 @@ const AppCategoryFrame = new Lang.Class({
                                 vexpand: true });
         this._stack.add_named(box, 'spinner');
         box.show();
-        
+
         box.add(new Separator.FrameSeparator());
 
         this._spinner = new Gtk.Spinner({ halign: Gtk.Align.CENTER,
