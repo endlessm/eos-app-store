@@ -220,11 +220,17 @@ const AppListBoxRow = new Lang.Class({
         this._screenshotPreviewBox.hide();
         this._screenshotImage.hide();
 
+        this._screenshotPreviewBox.foreach(Lang.bind(this, function (smallScreenshot) {
+            smallScreenshot.destroy();
+        }));
+
         for (let i in screenshots) {
             let path = screenshots[i];
 
             if (i == 0) {
-                EosAppStorePrivate.app_load_screenshot(this._screenshotImage, path, this._screenshotLarge);
+                EosAppStorePrivate.app_load_screenshot(this._screenshotImage,
+                                                       path,
+                                                       this._screenshotLarge);
             }
 
             let previewBox = new AppPreview(path, this._screenshotSmall);
