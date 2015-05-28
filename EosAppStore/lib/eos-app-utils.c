@@ -1100,7 +1100,9 @@ eos_app_load_available_apps (GHashTable *app_info,
               continue;
             }
           else
-            from_version = json_object_get_string_member (obj, "fromVersion");
+            {
+              from_version = json_object_get_string_member (obj, "fromVersion");
+            }
         }
 
       eos_app_log_debug_message ("Loading: '%s (diff: %s) %s'",
@@ -1134,8 +1136,8 @@ eos_app_load_available_apps (GHashTable *app_info,
                                  code_version,
                                  stored_code_version);
 
-      GList  *deltas_for_app_id = g_hash_table_lookup (newer_deltas,
-                                                       desktop_id);
+      GList *deltas_for_app_id = g_hash_table_lookup (newer_deltas,
+                                                      app_id);
 
       /* TODO: Modularize, if possible */
       if (is_diff)
@@ -1159,9 +1161,9 @@ eos_app_load_available_apps (GHashTable *app_info,
                   /* TODO: Combine all additions to the delta list in one spot */
                   EosAppInfo *delta = eos_app_info_new_from_server_json (element);
                   eos_app_log_debug_message (" -> Preserving delta of version: %s",
-                                             eos_app_info_get_available_version (delta));
+                                             code_version);
 
-                  GList *new_delta_list = g_list_append (deltas_for_app_id, delta);
+                  GList *new_delta_list = g_list_prepend (deltas_for_app_id, delta);
                   g_hash_table_replace (newer_deltas, g_strdup (app_id), new_delta_list);
                 }
               else if (version_cmp == 0)
@@ -1185,7 +1187,7 @@ eos_app_load_available_apps (GHashTable *app_info,
                  we won't know what is a good delta version to keep */
               EosAppInfo *delta = eos_app_info_new_from_server_json (element);
               eos_app_log_debug_message (" -> Preserving delta of version: %s",
-                                         eos_app_info_get_available_version (delta));
+                                         code_version);
 
               GList *new_delta_list = g_list_append (deltas_for_app_id, delta);
               g_hash_table_replace (newer_deltas, g_strdup (app_id), new_delta_list);
@@ -1202,34 +1204,33 @@ eos_app_load_available_apps (GHashTable *app_info,
               eos_app_info_update_from_server (info, element);
 
               JsonNode *delta_node = get_matching_version_delta (deltas_for_app_id,
-                                                                 eos_app_info_get_available_version (info));
+                                                                 code_version);
 
               if (delta_node)
                 {
                   eos_app_log_debug_message (" -> Found matching delta for version: %s"
                                              "Updating delta record.",
-                                             eos_app_info_get_available_version (info));
+                                             code_version);
 
                   /* Update delta fields */
                   eos_app_info_update_from_server (info, delta_node);
 
                   remove_records_version_lte (deltas_for_app_id,
-                                              eos_app_info_get_available_version (info));
+                                              code_version);
                 }
             }
-          else if (version_cmp < 0)
-            eos_app_log_debug_message (" -> Full bundle is not a newer version. "
-                                       "Skipping");
           else
-            eos_app_log_debug_message (" -> Same version as current record. Ignoring.");
+            {
+              eos_app_log_debug_message (" -> Full bundle is not a newer version. (%d)"
+                                         "Skipping",
+                                         version_cmp);
+            }
         }
 
       eos_app_info_unref (info);
     }
 
-  eos_app_log_info_message ("Cleaning up temporary data structures");
   g_hash_table_unref (newer_deltas);
-
   g_object_unref (parser);
 
   eos_app_log_info_message ("Available bundles: %d bundles, %.3f msecs",
