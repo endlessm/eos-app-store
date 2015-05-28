@@ -1138,39 +1138,7 @@ eos_app_load_available_apps (GHashTable *app_info,
                                                        desktop_id);
 
       /* TODO: Modularize, if possible */
-      if (!is_diff) /* Full version */
-        {
-          if (version_cmp > 0)
-            {
-              eos_app_log_debug_message (" -> Full version newer than in our records. "
-                                         "Updating record.");
-
-              eos_app_info_clear_server_update_attributes (info);
-              eos_app_info_update_from_server (info, element);
-
-              JsonNode *delta_node = get_matching_version_delta (deltas_for_app_id,
-                                                                 eos_app_info_get_available_version (info));
-
-              if (delta_node)
-                {
-                  eos_app_log_debug_message (" -> Found matching delta for version: %s"
-                                             "Updating delta record.",
-                                             eos_app_info_get_available_version (info));
-
-                  /* Update delta fields */
-                  eos_app_info_update_from_server (info, delta_node);
-
-                  remove_records_version_lte (deltas_for_app_id,
-                                              eos_app_info_get_available_version (info));
-                }
-            }
-          else if (version_cmp < 0)
-            eos_app_log_debug_message (" -> Full bundle is not a newer version. "
-                                       "Skipping");
-          else
-            eos_app_log_debug_message (" -> Same version as current record. Ignoring.");
-        }
-      else /* We have a diff here */
+      if (is_diff)
         {
           if (eos_compare_versions (from_version,
                                     eos_app_info_get_installed_version (info)) != 0)
@@ -1222,6 +1190,38 @@ eos_app_load_available_apps (GHashTable *app_info,
               GList *new_delta_list = g_list_append (deltas_for_app_id, delta);
               g_hash_table_replace (newer_deltas, g_strdup (app_id), new_delta_list);
             }
+        }
+      else /* Full version */
+        {
+          if (version_cmp > 0)
+            {
+              eos_app_log_debug_message (" -> Full version newer than in our records. "
+                                         "Updating record.");
+
+              eos_app_info_clear_server_update_attributes (info);
+              eos_app_info_update_from_server (info, element);
+
+              JsonNode *delta_node = get_matching_version_delta (deltas_for_app_id,
+                                                                 eos_app_info_get_available_version (info));
+
+              if (delta_node)
+                {
+                  eos_app_log_debug_message (" -> Found matching delta for version: %s"
+                                             "Updating delta record.",
+                                             eos_app_info_get_available_version (info));
+
+                  /* Update delta fields */
+                  eos_app_info_update_from_server (info, delta_node);
+
+                  remove_records_version_lte (deltas_for_app_id,
+                                              eos_app_info_get_available_version (info));
+                }
+            }
+          else if (version_cmp < 0)
+            eos_app_log_debug_message (" -> Full bundle is not a newer version. "
+                                       "Skipping");
+          else
+            eos_app_log_debug_message (" -> Same version as current record. Ignoring.");
         }
 
       eos_app_info_unref (info);
