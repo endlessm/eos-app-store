@@ -981,6 +981,17 @@ remove_records_version_lte (GList *deltas,
   return new_list;
 }
 
+static void
+add_delta_to_temp_records (GHashTable *temp_delta_map, const char *app_id,
+                           JsonNode *element)
+{
+  GList *deltas = g_hash_table_lookup (temp_delta_map, app_id);
+  EosAppInfo *delta = eos_app_info_new_from_server_json (element);
+  GList *new_delta_list = g_list_prepend (deltas, delta);
+
+  g_hash_table_replace (temp_delta_map, g_strdup (app_id), new_delta_list);
+}
+
 /* Functions to clear our newer_deltas hashtable */
 static void
 free_app_info_glist (gpointer data)
@@ -1149,13 +1160,9 @@ eos_app_load_available_apps (GHashTable *app_info,
             {
               if (version_cmp > 0)
                 {
-                  /* TODO: Combine all additions to the delta list in one spot */
-                  EosAppInfo *delta = eos_app_info_new_from_server_json (element);
                   eos_app_log_debug_message (" -> Preserving delta of version: %s",
                                              code_version);
-
-                  GList *new_delta_list = g_list_prepend (deltas_for_app_id, delta);
-                  g_hash_table_replace (newer_deltas, g_strdup (app_id), new_delta_list);
+                  add_delta_to_temp_records (newer_deltas, app_id, element);
                 }
               else if (version_cmp == 0)
                 {
@@ -1176,12 +1183,9 @@ eos_app_load_available_apps (GHashTable *app_info,
             {
               /* We save all deltas until we get a full update record since
                  we won't know what is a good delta version to keep */
-              EosAppInfo *delta = eos_app_info_new_from_server_json (element);
               eos_app_log_debug_message (" -> Preserving delta of version: %s",
                                          code_version);
-
-              GList *new_delta_list = g_list_append (deltas_for_app_id, delta);
-              g_hash_table_replace (newer_deltas, g_strdup (app_id), new_delta_list);
+              add_delta_to_temp_records (newer_deltas, app_id, element);
             }
         }
       else /* Full version */
