@@ -652,19 +652,19 @@ const AppCategoryFrame = new Lang.Class({
         this._lastCellSelected = null;
         this._gridBox = null;
 
-        let box = new Gtk.Box({ orientation: Gtk.Orientation.VERTICAL,
-                                hexpand: true,
-                                vexpand: true });
-        this._stack.add_named(box, 'spinner');
-        box.show();
-        
-        box.add(new Separator.FrameSeparator());
+        this._spinnerBox = new Gtk.Box({ orientation: Gtk.Orientation.VERTICAL,
+                                         hexpand: true,
+                                         vexpand: true });
+        this._stack.add_named(this._spinnerBox, 'spinner');
+        this._spinnerBox.show();
+
+        this._spinnerBox.add(new Separator.FrameSeparator());
 
         this._spinner = new Gtk.Spinner({ halign: Gtk.Align.CENTER,
                                           valign: Gtk.Align.CENTER,
                                           hexpand: true,
                                           vexpand: true });
-        box.add(this._spinner);
+        this._spinnerBox.add(this._spinner);
 
         this.show_all();
     },
@@ -684,10 +684,13 @@ const AppCategoryFrame = new Lang.Class({
     },
 
     invalidate: function() {
-        if (this._gridBox) {
-            this._gridBox.destroy();
-            this._gridBox = null;
-        }
+        this._stack.foreach(Lang.bind(this, function(child) {
+            if (child != this._spinnerBox) {
+                child.destroy();
+            }
+        }));
+
+        this._gridBox = null;
     },
 
     populate: function() {
