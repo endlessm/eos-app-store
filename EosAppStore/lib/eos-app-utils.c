@@ -962,7 +962,7 @@ get_matching_version_delta (GList *deltas,
   return NULL;
 }
 
-static void
+static GList *
 remove_records_version_lte (GList *deltas,
                             const char *version)
 {
@@ -970,18 +970,15 @@ remove_records_version_lte (GList *deltas,
                              "from our temp list");
 
   GList *next = NULL;
+  GList *new_list = deltas;
   for (GList *iterator = deltas; iterator; iterator = next)
     {
       next = iterator->next;
       if (eos_compare_versions (iterator->data, version) <= 0)
-        {
-          if (!g_list_delete_link (deltas, iterator))
-            {
-              eos_app_log_debug_message ("Removing %p from list failed!",
-                                         iterator->data);
-            }
-        }
+        new_list = g_list_delete_link (deltas, iterator);
     }
+
+  return new_list;
 }
 
 /* Functions to clear our newer_deltas hashtable */
@@ -1209,8 +1206,10 @@ eos_app_load_available_apps (GHashTable *app_info,
                   /* Update delta fields */
                   eos_app_info_update_from_server (info, delta_node);
 
-                  remove_records_version_lte (deltas_for_app_id,
-                                              code_version);
+                  /* Remove any older deltas that we held onto */
+                  GList *new_delta_list = remove_records_version_lte (deltas_for_app_id,
+                                                                      code_version);
+                  g_hash_table_replace (newer_deltas, g_strdup (app_id), new_delta_list);
                 }
             }
           else
