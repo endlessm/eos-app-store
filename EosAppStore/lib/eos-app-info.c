@@ -721,14 +721,7 @@ eos_app_info_update_from_server (EosAppInfo *info,
   gboolean is_diff = FALSE;
   node = json_object_get_member (obj, JSON_KEYS[IS_DIFF]);
   if (node != NULL)
-    {
-      /* TODO: This needs checks to compare against local version */
-      is_diff = json_node_get_boolean (node);
-      if (is_diff)
-        info->update_available = TRUE;
-      else
-        info->is_available = TRUE;
-    }
+    is_diff = json_node_get_boolean (node);
 
   node = json_object_get_member (obj, JSON_KEYS[CODE_VERSION]);
   if (node != NULL)
@@ -744,6 +737,13 @@ eos_app_info_update_from_server (EosAppInfo *info,
                                  JSON_KEYS[CODE_VERSION]);
       return FALSE;
     }
+
+  gboolean is_newer_version = eos_compare_versions (info->available_version,
+                                                    info->installed_version) > 0;
+  if (is_diff)
+    info->update_available = is_newer_version;
+  else
+    info->is_available = is_newer_version;
 
   node = json_object_get_member (obj, JSON_KEYS[INSTALLED_SIZE]);
   if (node != NULL)
