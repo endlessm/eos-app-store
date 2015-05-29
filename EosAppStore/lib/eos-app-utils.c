@@ -982,11 +982,13 @@ remove_records_version_lte (GList *deltas,
 }
 
 static void
-add_delta_to_temp_records (GHashTable *temp_delta_map, const char *app_id,
+add_delta_to_temp_records (GHashTable *temp_delta_map,
+                           const char *app_id,
                            JsonNode *element)
 {
   GList *deltas = g_hash_table_lookup (temp_delta_map, app_id);
-  EosAppInfo *delta = eos_app_info_new_from_server_json (element);
+  EosAppInfo *delta = eos_app_info_new (app_id);
+  eos_app_info_update_from_server (delta, element);
   GList *new_delta_list = g_list_prepend (deltas, delta);
 
   g_hash_table_replace (temp_delta_map, g_strdup (app_id), new_delta_list);
@@ -1117,20 +1119,25 @@ eos_app_load_available_apps (GHashTable *app_info,
 
       char *desktop_id = g_strconcat (app_id, ".desktop", NULL);
       EosAppInfo *info = g_hash_table_lookup (app_info, desktop_id);
-      g_free (desktop_id);
 
       if (info == NULL)
         {
           eos_app_log_debug_message (" -> First time encountering app. "
                                      "Creating new record");
 
-          info = eos_app_info_new_from_server_json (element);
+          info = eos_app_info_new (app_id);
+          eos_app_info_update_from_server (info, element);
           g_hash_table_replace (app_info, g_strdup (desktop_id), info);
 
           /* We can only short-circuit initial full updates */
           if (!is_diff)
-            continue;
+            {
+              g_free (desktop_id);
+              continue;
+            }
         }
+
+      g_free (desktop_id);
 
       const char *stored_code_version = eos_app_info_get_available_version (info);
 
@@ -1143,8 +1150,7 @@ eos_app_load_available_apps (GHashTable *app_info,
                                  code_version,
                                  stored_code_version);
 
-      GList *deltas_for_app_id = g_hash_table_lookup (newer_deltas,
-                                                      app_id);
+      GList *deltas_for_app_id = g_hash_table_lookup (newer_deltas, app_id);
 
       /* TODO: Modularize, if possible */
       if (is_diff)

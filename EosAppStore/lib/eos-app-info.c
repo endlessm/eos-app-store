@@ -122,45 +122,6 @@ eos_app_info_new (const char *application_id)
 }
 
 EosAppInfo *
-eos_app_info_new_from_server_json (JsonNode *root)
-{
-  if (!JSON_NODE_HOLDS_OBJECT (root))
-    {
-      eos_app_log_error_message ("Application data malformed.");
-      return NULL;
-    }
-
-  JsonObject *obj = json_node_get_object (root);
-
-  JsonNode *node;
-
-  EosAppInfo *info = NULL;
-
-  node = json_object_get_member (obj, JSON_KEYS[APP_ID]);
-  if (node)
-    {
-      const char *app_id = json_node_get_string (node);
-      info = eos_app_info_new (app_id);
-    }
-  else
-    {
-      eos_app_log_error_message ("Application data is missing the "
-                                 "required '%s' field.",
-                                 JSON_KEYS[APP_ID]);
-
-      return NULL;
-    }
-
-  if (!eos_app_info_update_from_server (info, root))
-    {
-      eos_app_info_unref (info);
-      return NULL;
-    }
-
-  return info;
-}
-
-EosAppInfo *
 eos_app_info_ref (EosAppInfo *info)
 {
   g_atomic_int_inc (&(info->ref_count));
@@ -171,8 +132,6 @@ eos_app_info_ref (EosAppInfo *info)
 void
 eos_app_info_clear_server_update_attributes (EosAppInfo *info)
 {
-  g_clear_pointer (&info->locale, g_free);
-
   g_clear_pointer (&info->available_version, g_free);
 
   g_clear_pointer (&info->bundle_uri, g_free);
@@ -755,17 +714,17 @@ eos_app_info_update_from_server (EosAppInfo *info,
 
   replace_string_field_from_json (obj, LOCALE, &info->locale);
 
-  if (!is_diff)
-    {
-      replace_string_field_from_json (obj, DOWNLOAD_LINK, &info->bundle_uri);
-      replace_string_field_from_json (obj, SIGNATURE_LINK, &info->signature_uri);
-      replace_string_field_from_json (obj, SHA_HASH, &info->bundle_hash);
-    }
-  else
+  if (is_diff)
     {
       replace_string_field_from_json (obj, DOWNLOAD_LINK, &info->delta_bundle_uri);
       replace_string_field_from_json (obj, SIGNATURE_LINK, &info->delta_signature_uri);
       replace_string_field_from_json (obj, SHA_HASH, &info->delta_bundle_hash);
+    }
+  else
+    {
+      replace_string_field_from_json (obj, DOWNLOAD_LINK, &info->bundle_uri);
+      replace_string_field_from_json (obj, SIGNATURE_LINK, &info->signature_uri);
+      replace_string_field_from_json (obj, SHA_HASH, &info->bundle_hash);
     }
 
   return TRUE;
