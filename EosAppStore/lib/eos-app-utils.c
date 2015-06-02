@@ -1118,30 +1118,48 @@ eos_app_load_available_apps (GHashTable *app_info,
                                 is_diff ? "true" : "false",
                                 code_version);
 
+      const char *stored_code_version = NULL;
       char *desktop_id = g_strconcat (app_id, ".desktop", NULL);
       EosAppInfo *info = g_hash_table_lookup (app_info, desktop_id);
 
       if (info == NULL)
         {
-          eos_app_log_debug_message (" -> First time encountering app. "
-                                     "Creating new record");
-
-          info = eos_app_info_new (app_id);
-          eos_app_info_update_from_server (info, element);
-
-          g_hash_table_insert (app_info, g_strdup (desktop_id), info);
-
-          /* We can only short-circuit initial full updates */
-          if (!is_diff)
+          if (is_diff)
             {
+              /* This logic saves any deltas into our temp structure until we
+                 get a matching full update and doesn't change the app_info
+                 so that we can install apps that have higher deltas. Sadly
+                 this does prevent upgrades to a newer version with a delta if
+                 there is no matching full update since at that point we would
+                 need to retain different available versions (1 full, 1 delta)
+                 but at this point, that situation should never occur. */
+              eos_app_log_debug_message (" -> First time encountering app. "
+                                         "Saving delta as possible upgrade path.");
+
+              add_delta_to_temp_records (newer_deltas, app_id, element);
+
               g_free (desktop_id);
               continue;
             }
+          else
+            {
+              /* New record. Save but continue the logic since we may have
+                 some deltas waiting to be assigned to the app_info */
+              eos_app_log_debug_message (" -> First time encountering app. "
+                                         "Creating new record.");
+
+              info = eos_app_info_new (app_id);
+              eos_app_info_update_from_server (info, element);
+
+              g_hash_table_insert (app_info, g_strdup (desktop_id), info);
+            }
+        }
+      else
+        {
+          stored_code_version = eos_app_info_get_available_version (info);
         }
 
       g_free (desktop_id);
-
-      const char *stored_code_version = eos_app_info_get_available_version (info);
 
       /* If we have no availability version, just use the installed version */
       if (stored_code_version == NULL || *stored_code_version == '\0')

@@ -1744,7 +1744,10 @@ download_bundle (EosAppListModel *self,
   else
     bundle_uri = eos_app_info_get_bundle_uri (info);
 
-  eos_app_log_info_message ("Downloading - app id: %s, bundle URI: %s", app_id, bundle_uri);
+  eos_app_log_info_message ("Downloading - app id: %s (%s), bundle URI: %s",
+                            app_id,
+                            eos_app_info_get_available_version (info),
+                            bundle_uri);
 
   if (bundle_uri == NULL || *bundle_uri == '\0')
     {
