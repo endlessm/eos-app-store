@@ -11,14 +11,28 @@ eos_app_log_messagev (int level,
                       const char *fmt,
                       va_list args)
 {
-  static const char *eos_app_testing;
+  static char eos_app_testing = '\0';
+  static char eos_app_journal_debugging = '\0';
 
-  if (eos_app_testing == NULL) {
+  if (eos_app_testing == '\0') {
     const char *env = g_getenv ("EAS_TESTING");
     if (env != NULL && *env == '1')
-      eos_app_testing = "1";
+      eos_app_testing = '1';
     else
-      eos_app_testing = "0";
+      eos_app_testing = '0';
+  }
+
+  if (eos_app_journal_debugging == '\0') {
+    const char *env = g_getenv ("EAS_DEBUG_JOURNAL");
+    if (env != NULL && *env == '1')
+      eos_app_journal_debugging = '1';
+    else
+      eos_app_journal_debugging = '0';
+  }
+
+  if (eos_app_journal_debugging == '1') {
+    sd_journal_printv (level, fmt, args);
+    return;
   }
 
   switch (level) {
@@ -34,11 +48,11 @@ eos_app_log_messagev (int level,
       /* if we're not under a test environment, then we send
        * errors to the journal
        */
-      if (*eos_app_testing == '0') {
-	sd_journal_printv (level, fmt, args);
+      if (eos_app_testing == '0') {
+        sd_journal_printv (level, fmt, args);
       } else {
-	vfprintf (stderr, fmt, args);
-	fputc ('\n', stderr);
+        vfprintf (stderr, fmt, args);
+        fputc ('\n', stderr);
       }
       return;
 
