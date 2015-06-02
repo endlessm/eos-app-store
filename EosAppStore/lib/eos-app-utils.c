@@ -991,7 +991,8 @@ add_delta_to_temp_records (GHashTable *temp_delta_map,
   eos_app_info_update_from_server (delta, element);
   GList *new_delta_list = g_list_prepend (deltas, delta);
 
-  g_hash_table_replace (temp_delta_map, g_strdup (app_id), new_delta_list);
+  g_hash_table_steal (temp_delta_map, app_id);
+  g_hash_table_insert (temp_delta_map, g_strdup (app_id), new_delta_list);
 }
 
 /* Functions to clear our newer_deltas hashtable */
@@ -1127,7 +1128,8 @@ eos_app_load_available_apps (GHashTable *app_info,
 
           info = eos_app_info_new (app_id);
           eos_app_info_update_from_server (info, element);
-          g_hash_table_replace (app_info, g_strdup (desktop_id), info);
+
+          g_hash_table_insert (app_info, g_strdup (desktop_id), info);
 
           /* We can only short-circuit initial full updates */
           if (!is_diff)
@@ -1223,7 +1225,9 @@ eos_app_load_available_apps (GHashTable *app_info,
                   /* Remove any older deltas that we held onto */
                   GList *new_delta_list = remove_records_version_lte (deltas_for_app_id,
                                                                       code_version);
-                  g_hash_table_replace (newer_deltas, g_strdup (app_id), new_delta_list);
+
+                  g_hash_table_steal (newer_deltas, app_id);
+                  g_hash_table_insert (newer_deltas, g_strdup (app_id), new_delta_list);
                 }
             }
           else
