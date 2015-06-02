@@ -626,12 +626,6 @@ const WeblinkFrame = new Lang.Class({
         this._populateCategoryHeaders();
         this.setModelConnected(true);
 
-        let content_dir = EosAppStorePrivate.link_get_content_dir();
-        let content_path = GLib.build_filenamev([content_dir, 'content.json']);
-        let content_file = Gio.File.new_for_path(content_path);
-        this._contentMonitor = content_file.monitor_file(Gio.FileMonitorFlags.NONE, null);
-        this._contentMonitor.connect('changed', Lang.bind(this, this._repopulate));
-
         // We want all the links to recover their original state (screenshot and description)
         // after hiding the store, regardless they have been recently installed or not.
         mainWindow.connect('hide', Lang.bind(this, this._repopulate));

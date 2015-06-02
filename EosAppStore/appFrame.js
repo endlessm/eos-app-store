@@ -614,12 +614,11 @@ const AppListBoxRow = new Lang.Class({
 
         // we only show the error dialog if the error is set
         if (error) {
-            let dialog = new Gtk.MessageDialog();
-            dialog.set_transient_for(app.mainWindow);
-            dialog.modal = true;
-            dialog.destroy_with_parent = true;
-            dialog.text = message;
-            dialog.secondary_text = error.message;
+            let dialog = new Gtk.MessageDialog({ transient_for: app.mainWindow,
+                                                 modal: true,
+                                                 destroy_with_parent: true,
+                                                 text: message,
+                                                 secondary_text: error.message });
             dialog.add_button(_("Dismiss"), Gtk.ResponseType.OK);
             dialog.show_all();
             this._errorDialog = dialog;
@@ -653,19 +652,19 @@ const AppCategoryFrame = new Lang.Class({
         this._lastCellSelected = null;
         this._gridBox = null;
 
-        let box = new Gtk.Box({ orientation: Gtk.Orientation.VERTICAL,
-                                hexpand: true,
-                                vexpand: true });
-        this._stack.add_named(box, 'spinner');
-        box.show();
-        
-        box.add(new Separator.FrameSeparator());
+        this._spinnerBox = new Gtk.Box({ orientation: Gtk.Orientation.VERTICAL,
+                                         hexpand: true,
+                                         vexpand: true });
+        this._stack.add_named(this._spinnerBox, 'spinner');
+        this._spinnerBox.show();
+
+        this._spinnerBox.add(new Separator.FrameSeparator());
 
         this._spinner = new Gtk.Spinner({ halign: Gtk.Align.CENTER,
                                           valign: Gtk.Align.CENTER,
                                           hexpand: true,
                                           vexpand: true });
-        box.add(this._spinner);
+        this._spinnerBox.add(this._spinner);
 
         this.show_all();
     },
@@ -685,10 +684,13 @@ const AppCategoryFrame = new Lang.Class({
     },
 
     invalidate: function() {
-        if (this._gridBox) {
-            this._gridBox.destroy();
-            this._gridBox = null;
-        }
+        this._stack.foreach(Lang.bind(this, function(child) {
+            if (child != this._spinnerBox) {
+                child.destroy();
+            }
+        }));
+
+        this._gridBox = null;
     },
 
     populate: function() {
@@ -838,22 +840,15 @@ const AppBroker = new Lang.Class({
             category.widget = new AppCategoryFrame(category, this._model, mainWindow);
             category.widget.spinning = true;
         }));
-
-        let content_dir = EosAppStorePrivate.app_get_content_dir();
-        let content_path = GLib.build_filenamev([content_dir, 'content.json']);
-        let content_file = Gio.File.new_for_path(content_path);
-        this._contentMonitor = content_file.monitor_file(Gio.FileMonitorFlags.NONE, null);
-        this._contentMonitor.connect('changed', Lang.bind(this, this._onContentChanged));
     },
 
     _onModelRefresh: function(model, error) {
         if (error) {
-            let dialog = new Gtk.MessageDialog();
-            dialog.set_transient_for(app.mainWindow);
-            dialog.modal = true;
-            dialog.destroy_with_parent = true;
-            dialog.text = _("Update failed");
-            dialog.secondary_text = error.message;
+            let dialog = new Gtk.MessageDialog({ transient_for: app.mainWindow,
+                                                 modal: true,
+                                                 destroy_with_parent: true,
+                                                 text: _("Update failed"),
+                                                 secondary_text: error.message });
             dialog.add_button(_("Dismiss"), Gtk.ResponseType.OK);
             dialog.show_all();
             dialog.run();
@@ -861,10 +856,6 @@ const AppBroker = new Lang.Class({
             return;
         }
 
-        this._populateAllCategories();
-    },
-
-    _onContentChanged: function(monitor, file, other_file, event_type) {
         this._populateAllCategories();
     },
 
