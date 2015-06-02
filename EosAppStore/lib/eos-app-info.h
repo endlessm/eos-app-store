@@ -52,6 +52,7 @@ char **         eos_app_info_get_screenshots            (const EosAppInfo *info)
 
 gboolean        eos_app_info_is_installable             (const EosAppInfo *info);
 gboolean        eos_app_info_is_installed               (const EosAppInfo *info);
+gboolean        eos_app_info_is_available               (const EosAppInfo *info);
 gboolean        eos_app_info_is_updatable               (const EosAppInfo *info);
 gboolean        eos_app_info_is_removable               (const EosAppInfo *info);
 

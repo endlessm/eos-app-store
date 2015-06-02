@@ -1166,9 +1166,10 @@ eos_app_load_available_apps (GHashTable *app_info,
         stored_code_version = eos_app_info_get_installed_version (info);
 
       const int version_cmp = eos_compare_versions (code_version, stored_code_version);
-      eos_app_log_debug_message (" - Version comparison: [new: %s, have: %s].",
+      eos_app_log_debug_message (" - Version comparison: [new: %s, have: %s, diff: %d].",
                                  code_version,
-                                 stored_code_version);
+                                 stored_code_version,
+                                 version_cmp);
 
       GList *deltas_for_app_id = g_hash_table_lookup (newer_deltas, app_id);
 
@@ -1186,12 +1187,13 @@ eos_app_load_available_apps (GHashTable *app_info,
               continue;
             }
 
-          if (eos_app_info_is_installable (info)) /* We have a full update */
+          if (eos_app_info_is_available (info)) /* We have a full update */
             {
               if (version_cmp > 0)
                 {
-                  eos_app_log_debug_message (" -> Preserving delta of version: %s",
-                                             code_version);
+                  eos_app_log_debug_message (" -> Preserving delta of version: %s (%d)",
+                                             code_version,
+                                             version_cmp);
                   add_delta_to_temp_records (newer_deltas, app_id, element);
                 }
               else if (version_cmp == 0)
