@@ -810,7 +810,9 @@ const AppBroker = new Lang.Class({
         this._mainWindow = mainWindow;
 
         // initialize the applications model
-        this._model = new AppListModel.AppList();
+        let application = Gio.Application.get_default();
+        this._model = application.appList;
+
         this._model.refresh(Lang.bind(this, this._onModelRefresh));
 
         this._categories = Categories.get_app_categories();

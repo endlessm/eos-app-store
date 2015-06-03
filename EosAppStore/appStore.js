@@ -11,6 +11,7 @@ const Mainloop = imports.mainloop;
 const Signals = imports.signals;
 const _ = imports.gettext.gettext;
 
+const AppListModel = imports.appListModel;
 const AppStoreWindow = imports.appStoreWindow;
 const AppStoreDBusService = imports.appStoreDBusService;
 const Categories = imports.categories;
@@ -59,13 +60,16 @@ const AppStore = new Lang.Class({
         Gtk.StyleContext.add_provider_for_screen(Gdk.Screen.get_default(), provider,
                                                  Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION);
 
-        // the app store shell proxy
+        // The app store shell proxy
         this._shellProxy = new ShellAppStore.ShellAppStore();
 
-        // the backing app list model
+        // The backing app list model
         this._appModel = new EosAppStorePrivate.AppListModel();
 
-        // no window by default
+        // Main list model
+        this._appList = new AppListModel.AppList();
+
+        // No window by default
         this._mainWindow = null;
     },
 
@@ -93,6 +97,10 @@ const AppStore = new Lang.Class({
 
     get appModel() {
         return this._appModel;
+    },
+
+    get appList() {
+        return this._appList;
     },
 
     get shellProxy() {
