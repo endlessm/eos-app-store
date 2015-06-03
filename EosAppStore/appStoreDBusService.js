@@ -86,9 +86,12 @@ const AppStoreDBusService = new Lang.Class({
         return [];
     },
 
-    Refresh: function() {
-        print("Stub!");
-        return true;
+    RefreshAsync: function(params, invocation) {
+        log("Refreshing apps");
+        this._app.appList.refresh(Lang.bind(this, function(error) {
+            let success = (error == null);
+            invocation.return_value(GLib.Variant.new('(b)', [success]));
+        }));
     },
 
     Install: function(appId) {
