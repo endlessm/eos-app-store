@@ -31,6 +31,17 @@ const AppStoreDBusIface = '<node><interface name="com.endlessm.AppStore">' +
   '<method name="ListAvailable">' +
     '<arg type="a(s)" direction="out" name="applications"/>' +
   '</method>' +
+  '<method name="Refresh">' +
+    '<arg type="b" direction="out" name="success"/>' +
+  '</method>' +
+  '<method name="Install">' +
+    '<arg type="s" direction="in" name="app_id"/>' +
+    '<arg type="b" direction="out" name="success"/>' +
+  '</method>' +
+  '<method name="Uninstall">' +
+    '<arg type="s" direction="in" name="app_id"/>' +
+    '<arg type="b" direction="out" name="success"/>' +
+  '</method>' +
   '<property name="Visible" type="b" access="read"/>' +
 '</interface></node>';
 
@@ -73,6 +84,21 @@ const AppStoreDBusService = new Lang.Class({
     ListAvailable: function() {
         print("Stub!");
         return [];
+    },
+
+    Refresh: function() {
+        print("Stub!");
+        return true;
+    },
+
+    Install: function(appId) {
+        print("Stub! -", appId);
+        return true;
+    },
+
+    Uninstall: function(appId) {
+        print("Stub! -", appId);
+        return true;
     },
 
     visibilityChanged: function(is_visible) {
