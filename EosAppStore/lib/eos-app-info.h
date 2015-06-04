@@ -72,7 +72,7 @@ gboolean        eos_app_info_update_from_content        (EosAppInfo *info,
                                                          JsonNode   *node);
 G_GNUC_INTERNAL
 gboolean        eos_app_info_update_from_server         (EosAppInfo *info,
-                                                         JsonNode   *node);
+                                                         JsonObject *obj);
 G_GNUC_INTERNAL
 gboolean        eos_app_info_update_from_installed      (EosAppInfo *info,
                                                          const char *filename);

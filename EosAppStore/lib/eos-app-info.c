@@ -672,17 +672,8 @@ replace_string_field_from_json (JsonObject *obj,
 /*< private >*/
 gboolean
 eos_app_info_update_from_server (EosAppInfo *info,
-                                 JsonNode *root)
+                                 JsonObject *obj)
 {
-  if (!JSON_NODE_HOLDS_OBJECT (root))
-    {
-      eos_app_log_error_message ("Application data for '%s' is malformed.",
-                                 eos_app_info_get_application_id (info));
-      return FALSE;
-    }
-
-  JsonObject *obj = json_node_get_object (root);
-
   if (!replace_string_field_from_json (obj, CODE_VERSION, &info->available_version))
     {
       eos_app_log_error_message ("Application data for '%s' is missing the "

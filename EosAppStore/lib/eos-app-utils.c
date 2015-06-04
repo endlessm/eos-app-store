@@ -947,7 +947,7 @@ eos_app_load_updates_meta_record (gint64 *monotonic_update_id,
   return TRUE;
 }
 
-static JsonNode *
+static JsonObject *
 get_matching_version_delta (GList *deltas,
                             const char *version)
 {
@@ -956,8 +956,13 @@ get_matching_version_delta (GList *deltas,
 
   /* Remove older (not relevant) deltas from temp array */
   for (GList *iterator = deltas; iterator; iterator = iterator->next)
-    if (eos_compare_versions (iterator->data, version) == 0)
-      return iterator->data;
+    {
+      JsonObject *obj = iterator->data;
+      const char *code_version = json_object_get_string_member (obj, "codeVersion");
+
+      if (eos_compare_versions (code_version, version) == 0)
+        return iterator->data;
+    }
 
   return NULL;
 }
@@ -973,8 +978,11 @@ remove_records_version_lte (GList *deltas,
   GList *new_list = deltas;
   for (GList *iterator = deltas; iterator; iterator = next)
     {
+      JsonObject *obj = iterator->data;
+      const char *code_version = json_object_get_string_member (obj, "codeVersion");
       next = iterator->next;
-      if (eos_compare_versions (iterator->data, version) <= 0)
+
+      if (eos_compare_versions (code_version, version) <= 0)
         new_list = g_list_delete_link (deltas, iterator);
     }
 
@@ -984,12 +992,10 @@ remove_records_version_lte (GList *deltas,
 static void
 add_delta_to_temp_records (GHashTable *temp_delta_map,
                            const char *app_id,
-                           JsonNode *element)
+                           JsonObject *obj)
 {
   GList *deltas = g_hash_table_lookup (temp_delta_map, app_id);
-  EosAppInfo *delta = eos_app_info_new (app_id);
-  eos_app_info_update_from_server (delta, element);
-  GList *new_delta_list = g_list_prepend (deltas, delta);
+  GList *new_delta_list = g_list_prepend (deltas, json_object_ref (obj));
 
   g_hash_table_steal (temp_delta_map, app_id);
   g_hash_table_insert (temp_delta_map, g_strdup (app_id), new_delta_list);
@@ -997,9 +1003,9 @@ add_delta_to_temp_records (GHashTable *temp_delta_map,
 
 /* Functions to clear our newer_deltas hashtable */
 static void
-free_app_info_glist (gpointer data)
+free_json_object_glist (gpointer data)
 {
-  g_list_free_full (data, (GDestroyNotify) eos_app_info_unref);
+  g_list_free_full (data, (GDestroyNotify) json_object_unref);
 }
 
 gboolean
@@ -1013,7 +1019,7 @@ eos_app_load_available_apps (GHashTable *app_info,
   gint64 start_time = g_get_monotonic_time ();
   GHashTable *newer_deltas = g_hash_table_new_full (g_str_hash, g_str_equal,
                                                     g_free,
-                                                    free_app_info_glist);
+                                                    free_json_object_glist);
 
   if (!json_parser_load_from_data (parser, data, -1, error))
     {
@@ -1132,7 +1138,7 @@ eos_app_load_available_apps (GHashTable *app_info,
               eos_app_log_debug_message (" -> First time encountering app. "
                                          "Saving delta as possible upgrade path.");
 
-              add_delta_to_temp_records (newer_deltas, app_id, element);
+              add_delta_to_temp_records (newer_deltas, app_id, obj);
 
               g_free (desktop_id);
               continue;
@@ -1145,7 +1151,7 @@ eos_app_load_available_apps (GHashTable *app_info,
                                          "Creating new record.");
 
               info = eos_app_info_new (app_id);
-              eos_app_info_update_from_server (info, element);
+              eos_app_info_update_from_server (info, obj);
 
               g_hash_table_insert (app_info, g_strdup (desktop_id), info);
             }
@@ -1190,14 +1196,14 @@ eos_app_load_available_apps (GHashTable *app_info,
                   eos_app_log_debug_message (" -> Preserving delta of version: %s (%d)",
                                              code_version,
                                              version_cmp);
-                  add_delta_to_temp_records (newer_deltas, app_id, element);
+                  add_delta_to_temp_records (newer_deltas, app_id, obj);
                 }
               else if (version_cmp == 0)
                 {
                   eos_app_log_debug_message (" -> Found matching delta for version: %s",
                                              stored_code_version);
 
-                  eos_app_info_update_from_server (info, element);
+                  eos_app_info_update_from_server (info, obj);
                 }
               else
                 {
@@ -1213,7 +1219,7 @@ eos_app_load_available_apps (GHashTable *app_info,
                  we won't know what is a good delta version to keep */
               eos_app_log_debug_message (" -> Preserving delta of version: %s",
                                          code_version);
-              add_delta_to_temp_records (newer_deltas, app_id, element);
+              add_delta_to_temp_records (newer_deltas, app_id, obj);
             }
         }
       else /* Full version */
@@ -1224,19 +1230,19 @@ eos_app_load_available_apps (GHashTable *app_info,
                                          "Updating record.");
 
               eos_app_info_clear_server_update_attributes (info);
-              eos_app_info_update_from_server (info, element);
+              eos_app_info_update_from_server (info, obj);
 
-              JsonNode *delta_node = get_matching_version_delta (deltas_for_app_id,
-                                                                 code_version);
+              JsonObject *delta_object = get_matching_version_delta (deltas_for_app_id,
+                                                                     code_version);
 
-              if (delta_node)
+              if (delta_object)
                 {
                   eos_app_log_debug_message (" -> Found matching delta for version: %s"
                                              "Updating delta record.",
                                              code_version);
 
                   /* Update delta fields */
-                  eos_app_info_update_from_server (info, delta_node);
+                  eos_app_info_update_from_server (info, delta_object);
 
                   /* Remove any older deltas that we held onto */
                   GList *new_delta_list = remove_records_version_lte (deltas_for_app_id,
