@@ -74,12 +74,19 @@ const AppStoreDBusService = new Lang.Class({
             let success = (error == null);
             log("Refresh finished. Loading installed apps");
 
+            /* TODO: Handle refresh errors better */
+            if (!success)
+                invocation.return_value(GLib.Variant.new('(as)', [[]]));
+
             let appInfos = this._app.appList.loadCategory(EosAppStorePrivate.AppCategory
                                                           .INSTALLED);
 
             let appIds = [];
             for (let index in appInfos) {
-                appIds.push(appInfos[index].get_application_id());
+                let appInfo = appInfos[index];
+
+                if (appInfo.is_installed())
+                    appIds.push(appInfo.get_application_id());
             }
 
             log("Returning " + appIds.length + " installed apps");
@@ -92,6 +99,10 @@ const AppStoreDBusService = new Lang.Class({
         this._app.appList.refresh(Lang.bind(this, function(error) {
             let success = (error == null);
             log("Refresh finished. Loading updatable apps");
+
+            /* TODO: Handle refresh errors better */
+            if (!success)
+                invocation.return_value(GLib.Variant.new('(as)', [[]]));
 
             let appInfos = this._app.appList.loadCategory(EosAppStorePrivate.AppCategory
                                                           .INSTALLED);
@@ -108,9 +119,31 @@ const AppStoreDBusService = new Lang.Class({
         }));
     },
 
-    ListUninstallable: function() {
-        print("Stub!");
-        return [];
+    ListUninstallableAsync: function(params, invocation) {
+        log("Listing uninstallable apps");
+        this._app.appList.refresh(Lang.bind(this, function(error) {
+            let success = (error == null);
+
+            /* TODO: Handle refresh errors better */
+            if (!success)
+                invocation.return_value(GLib.Variant.new('(as)', [[]]));
+
+            log("Refresh finished. Loading uninstallable apps");
+
+            let appInfos = this._app.appList.loadCategory(EosAppStorePrivate.AppCategory
+                                                          .INSTALLED);
+
+            let appIds = [];
+            for (let index in appInfos) {
+                let appInfo = appInfos[index];
+                if (appInfo.is_installed() && appInfo.is_removable() &&
+                    !appInfo.get_has_launcher())
+                    appIds.push(appInfo.get_application_id());
+            }
+
+            log("Returning " + appIds.length + " uninstallable apps");
+            invocation.return_value(GLib.Variant.new('(as)', [appIds]));
+        }));
     },
 
     ListAvailable: function() {
