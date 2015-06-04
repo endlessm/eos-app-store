@@ -90,18 +90,31 @@ const AppStoreDBusService = new Lang.Class({
         log("Refreshing apps");
         this._app.appList.refresh(Lang.bind(this, function(error) {
             let success = (error == null);
+            log("Refresh finished. Success: " + success);
             invocation.return_value(GLib.Variant.new('(b)', [success]));
         }));
     },
 
-    Install: function(appId) {
-        print("Stub! -", appId);
-        return true;
+    InstallAsync: function(params, invocation) {
+        let [appId] = params;
+        log("Installing: " + appId);
+
+        this._app.appList.install(appId + ".desktop", Lang.bind(this, function(error) {
+            let success = (error == null);
+            log("Install finished. Success: " + success);
+            invocation.return_value(GLib.Variant.new('(b)', [success]));
+        }));
     },
 
-    Uninstall: function(appId) {
-        print("Stub! -", appId);
-        return true;
+    UninstallAsync: function(params, invocation) {
+        let [appId] = params;
+        log("Uninstalling: " + appId);
+
+        this._app.appList.uninstall(appId + ".desktop", Lang.bind(this, function(error) {
+            let success = (error == null);
+            log("Uninstall finished. Success: " + success);
+            invocation.return_value(GLib.Variant.new('(b)', [success]));
+        }));
     },
 
     visibilityChanged: function(is_visible) {
