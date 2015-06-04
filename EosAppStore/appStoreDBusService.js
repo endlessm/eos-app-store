@@ -4,6 +4,8 @@ const GLib = imports.gi.GLib;
 
 const Lang = imports.lang;
 
+const EosAppStorePrivate = imports.gi.EosAppStorePrivate;
+
 const APP_STORE_PATH = '/com/endlessm/AppStore';
 const APP_STORE_IFACE = 'com.endlessm.AppStore';
 
@@ -20,16 +22,16 @@ const AppStoreDBusIface = '<node><interface name="com.endlessm.AppStore">' +
     '<arg type="s" direction="in" name="page"/>' +
   '</method>' +
   '<method name="ListInstalled">' +
-    '<arg type="a(s)" direction="out" name="applications"/>' +
+    '<arg type="as" direction="out" name="applications"/>' +
   '</method>' +
   '<method name="ListUpdatable">' +
-    '<arg type="a(s)" direction="out" name="applications"/>' +
+    '<arg type="as" direction="out" name="applications"/>' +
   '</method>' +
   '<method name="ListUninstallable">' +
-    '<arg type="a(s)" direction="out" name="applications"/>' +
+    '<arg type="as" direction="out" name="applications"/>' +
   '</method>' +
   '<method name="ListAvailable">' +
-    '<arg type="a(s)" direction="out" name="applications"/>' +
+    '<arg type="as" direction="out" name="applications"/>' +
   '</method>' +
   '<method name="Refresh">' +
     '<arg type="b" direction="out" name="success"/>' +
@@ -66,9 +68,23 @@ const AppStoreDBusService = new Lang.Class({
         this._app.showPage(timestamp, page);
     },
 
-    ListInstalled: function() {
-        print("Stub!");
-        return [];
+    ListInstalledAsync: function(params, invocation) {
+        log("Listing installed apps");
+        this._app.appList.refresh(Lang.bind(this, function(error) {
+            let success = (error == null);
+            log("Refresh finished. Loading installed apps");
+
+            let appInfos = this._app.appList.loadCategory(EosAppStorePrivate.AppCategory
+                                                          .INSTALLED);
+
+            let appIds = [];
+            for (let index in appInfos) {
+                appIds.push(appInfos[index].get_application_id());
+            }
+
+            log("Returning " + appIds.length + " installed apps");
+            invocation.return_value(GLib.Variant.new('(as)', [appIds]));
+        }));
     },
 
     ListUpdatable: function() {
