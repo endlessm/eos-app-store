@@ -10,46 +10,6 @@ from gi.repository import Gio, GLib
 MAIN_DEST = 'com.endlessm.AppStore'
 MAIN_PATH = '/com/endlessm/AppStore'
 
-INTROSPECTABLE_INTERFACE = 'org.freedesktop.DBus.Introspectable'
-
-introspect_method = { "dest": MAIN_DEST,
-                      "path": MAIN_PATH,
-                      "interface": INTROSPECTABLE_INTERFACE,
-                      "name": "Introspect",
-                      "args": None,
-                      "reply_format": GLib.VariantType.new ('(s)') }
-
-# Most calls share some of these values
-base_method = { "dest": MAIN_DEST,
-                "path": MAIN_PATH,
-                "interface": MAIN_DEST,
-                "args": None,
-                "reply_format": GLib.VariantType.new ('(b)') }
-
-# Installed
-installed_method_prototype = { "name": "ListInstalled",
-                               "reply_format": GLib.VariantType.new ('(as)') }
-installed_method = base_method.copy()
-installed_method.update(installed_method_prototype)
-
-# Updatable
-updatable_method_prototype = { "name": "ListUpdatable",
-                               "reply_format": GLib.VariantType.new ('(as)') }
-updatable_method = base_method.copy()
-updatable_method.update(updatable_method_prototype)
-
-# Removable
-uninstallable_method_prototype = { "name": "ListUninstallable",
-                                   "reply_format": GLib.VariantType.new ('(as)') }
-uninstallable_method = base_method.copy()
-uninstallable_method.update(uninstallable_method_prototype)
-
-# List available
-available_method_prototype = { "name": "ListAvailable",
-                               "reply_format": GLib.VariantType.new ('(as)') }
-available_method = base_method.copy()
-available_method.update(available_method_prototype)
-
 def available_method_param_post_handler(response, params):
     if len(params) != 1:
         return response
@@ -62,15 +22,6 @@ def available_method_param_post_handler(response, params):
             matching_packages.append(package)
 
     return matching_packages
-available_method['arg_post_handler'] = available_method_param_post_handler
-
-METHOD_MAP = {
-    "available": available_method,
-    "installed": installed_method,
-    "updatable": updatable_method,
-    "uninstallable": uninstallable_method,
-    "introspect": introspect_method,
-}
 
 class GenericEasDbusMethod(object):
     def __init__(self, name, method_name, params):
@@ -101,6 +52,24 @@ class GenericEasDbusMethod(object):
     def define_action_arguments(parser):
         pass
 
+class IntrospectEasDbusMethod(GenericEasDbusMethod):
+    INTROSPECTABLE_INTERFACE = 'org.freedesktop.DBus.Introspectable'
+
+    def __init__(self, params):
+        super().__init__("introspect", "Introspect", params);
+
+        self.interface = self.INTROSPECTABLE_INTERFACE
+        self.reply_format = GLib.VariantType.new('(s)')
+
+    def arg_post_handler(self, response):
+        strr = ""
+        object_iterator = iter(response)
+        for list_item in object_iterator:
+            strr = strr + list_item
+
+        print(strr)
+        return ""
+
 class RefreshEasDbusMethod(GenericEasDbusMethod):
     def __init__(self, params):
         super().__init__("refresh", "Refresh", params);
@@ -110,7 +79,7 @@ class UninstallEasDbusMethod(GenericEasDbusMethod):
         super().__init__("uninstall", "Uninstall", params);
 
     def _arg_handler(self, args):
-        print('Package: %s' % args.app_id)
+        print('App ID: %s' % args.app_id)
         self.args = GLib.Variant('(s)', (args.app_id,))
 
     def define_action_arguments(parser):
@@ -122,7 +91,7 @@ class InstallEasDbusMethod(GenericEasDbusMethod):
         super().__init__("install", "Install", params);
 
     def _arg_handler(self, args):
-        print('Package: %s' % args.app_id)
+        print('App ID: %s' % args.app_id)
         self.args = GLib.Variant('(s)', (args.app_id,))
 
     def define_action_arguments(parser):
@@ -134,12 +103,36 @@ class UpdateEasDbusMethod(GenericEasDbusMethod):
         super().__init__("update", "Update", params);
 
     def _arg_handler(self, args):
-        print('Package: %s' % args.app_id)
+        print('App ID: %s' % args.app_id)
         self.args = GLib.Variant('(s)', (args.app_id,))
 
     def define_action_arguments(parser):
         parser.add_argument('app_id',
                             help='App ID to update')
+
+class InstalledEasDbusMethod(GenericEasDbusMethod):
+    def __init__(self, params):
+        super().__init__("installed", "ListInstalled", params);
+
+        self.reply_format = GLib.VariantType.new ('(as)')
+
+class UpdatableEasDbusMethod(GenericEasDbusMethod):
+    def __init__(self, params):
+        super().__init__("updatable", "ListUpdatable", params);
+
+        self.reply_format = GLib.VariantType.new ('(as)')
+
+class UninstallableEasDbusMethod(GenericEasDbusMethod):
+    def __init__(self, params):
+        super().__init__("uninstallable", "ListUninstallable", params);
+
+        self.reply_format = GLib.VariantType.new ('(as)')
+
+class AvailableEasDbusMethod(GenericEasDbusMethod):
+    def __init__(self, params):
+        super().__init__("available", "ListAvailable", params);
+
+        self.reply_format = GLib.VariantType.new ('(as)')
 
 class EasDbusTool(object):
     VERSION = '0.1'
@@ -167,22 +160,38 @@ class EasDbusTool(object):
     def __init__(self, debug = False, verbose = False):
         pass
 
+    def output_response(self, method, reply):
+        unpacked_reply = reply.unpack()
+        print('Return arguments: %s' % len(unpacked_reply))
+
+        for reply in unpacked_reply:
+            print('-' * 40)
+            response = method.arg_post_handler(reply)
+
+            try:
+                object_iterator = iter(response)
+                for list_item in object_iterator:
+                    print(list_item)
+            except TypeError:
+                print(response)
+            pass
+
     def invoke(self, method_name, params):
-        method_class = self.__class__.class_from_method(method_name)
-        if not method_class:
+        action_class = self.__class__.class_from_method(method_name)
+        if not action_class:
             print("Error! No method specified!")
             exit(1)
 
-        method = method_class(params)
-        print(method.name)
+        action = action_class(params)
+        print("Invoking DBus method:", action.method_name)
 
         bus   = Gio.bus_get_sync(Gio.BusType.SESSION, None)
-        reply = bus.call_sync(method.destination,
-                              method.path,
-                              method.interface,
-                              method.method_name,
-                              method.args,
-                              method.reply_format,
+        reply = bus.call_sync(action.destination,
+                              action.path,
+                              action.interface,
+                              action.method_name,
+                              action.args,
+                              action.reply_format,
                               Gio.DBusCallFlags.NONE,
                               -1,    # Timeout
                               None)  # Cancellable
@@ -193,22 +202,7 @@ class EasDbusTool(object):
             print("**ERROR. No return value!")
             exit(1)
 
-        unpacked_reply = reply.unpack()
-        print('Return arguments: %s' % len(unpacked_reply))
-
-        for reply in unpacked_reply:
-            print('-' * 40)
-            response = reply
-
-            response = method.arg_post_handler(response)
-
-            try:
-                object_iterator = iter(response)
-                for list_item in object_iterator:
-                    print(list_item)
-            except TypeError:
-                print(response)
-            pass
+        self.output_response(action, reply)
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description = 'App store DBus test tool')
