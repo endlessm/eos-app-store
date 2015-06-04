@@ -57,14 +57,17 @@ const AppStoreDBusService = new Lang.Class({
     },
 
     show: function(timestamp, reset) {
+        log("App store show requested");
         this._app.show(reset, timestamp);
     },
 
     hide: function(timestamp) {
+        log("App store hide requested");
         this._app.hide();
     },
 
     showPage: function(timestamp, page) {
+        log("App store's " + page + " page requested");
         this._app.showPage(timestamp, page);
     },
 

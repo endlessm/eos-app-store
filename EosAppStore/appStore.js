@@ -47,7 +47,6 @@ const AppStore = new Lang.Class({
         this._runningOperations = 0;
 
         this._dbusService = new AppStoreDBusService.AppStoreDBusService(this);
-
         this._dbusService.visibilityChanged(false);
     },
 
