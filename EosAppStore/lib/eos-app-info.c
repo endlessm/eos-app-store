@@ -142,6 +142,8 @@ eos_app_info_clear_server_update_attributes (EosAppInfo *info)
   g_clear_pointer (&info->delta_signature_uri, g_free);
   g_clear_pointer (&info->delta_bundle_hash, g_free);
 
+  g_clear_pointer (&info->locale, g_free);
+
   /* Meta fields that need clearing */
   info->update_available = FALSE;
   info->is_available = FALSE;
@@ -160,7 +162,6 @@ eos_app_info_unref (EosAppInfo *info)
       g_free (info->description);
       g_free (info->square_img);
       g_free (info->featured_img);
-      g_free (info->locale);
 
       g_free (info->installed_version);
 
