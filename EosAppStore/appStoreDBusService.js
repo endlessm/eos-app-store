@@ -146,9 +146,30 @@ const AppStoreDBusService = new Lang.Class({
         }));
     },
 
-    ListAvailable: function() {
-        print("Stub!");
-        return [];
+    ListAvailableAsync: function(params, invocation) {
+        log("Listing available apps");
+        this._app.appList.refresh(Lang.bind(this, function(error) {
+            let success = (error == null);
+
+            /* TODO: Handle refresh errors better */
+            if (!success)
+                invocation.return_value(GLib.Variant.new('(as)', [[]]));
+
+            log("Refresh finished. Loading available apps");
+
+            let appInfos = this._app.appList.loadCategory(EosAppStorePrivate.AppCategory
+                                                          .ALL);
+
+            let appIds = [];
+            for (let index in appInfos) {
+                let appInfo = appInfos[index];
+                if (appInfo.get_state() == EosAppStorePrivate.AppState.AVAILABLE)
+                    appIds.push(appInfo.get_application_id());
+            }
+
+            log("Returning " + appIds.length + " available apps");
+            invocation.return_value(GLib.Variant.new('(as)', [appIds]));
+        }));
     },
 
     RefreshAsync: function(params, invocation) {
