@@ -961,7 +961,7 @@ get_matching_version_delta (GList *deltas,
       const char *code_version = json_object_get_string_member (obj, "codeVersion");
 
       if (eos_compare_versions (code_version, version) == 0)
-        return iterator->data;
+        return obj;
     }
 
   return NULL;
