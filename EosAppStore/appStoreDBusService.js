@@ -68,107 +68,79 @@ const AppStoreDBusService = new Lang.Class({
         this._app.showPage(timestamp, page);
     },
 
+    _genericListing: function(invocation, error, category, test_func) {
+        let success = (error == null);
+        log("Refresh finished. Loading apps");
+
+        /* TODO: Handle refresh errors better */
+        if (!success)
+            invocation.return_value(GLib.Variant.new('(as)', [[]]));
+
+        let appInfos = this._app.appList.loadCategory(category);
+
+        let appIds = [];
+        for (let index in appInfos) {
+            let appInfo = appInfos[index];
+
+            if (test_func(appInfo))
+                appIds.push(appInfo.get_application_id());
+        }
+
+        log("Returning " + appIds.length + " apps matching criteria");
+        invocation.return_value(GLib.Variant.new('(as)', [appIds]));
+    },
+
     ListInstalledAsync: function(params, invocation) {
         log("Listing installed apps");
+
         this._app.appList.refresh(Lang.bind(this, function(error) {
-            let success = (error == null);
-            log("Refresh finished. Loading installed apps");
-
-            /* TODO: Handle refresh errors better */
-            if (!success)
-                invocation.return_value(GLib.Variant.new('(as)', [[]]));
-
-            let appInfos = this._app.appList.loadCategory(EosAppStorePrivate.AppCategory
-                                                          .INSTALLED);
-
-            let appIds = [];
-            for (let index in appInfos) {
-                let appInfo = appInfos[index];
-
-                if (appInfo.is_installed())
-                    appIds.push(appInfo.get_application_id());
-            }
-
-            log("Returning " + appIds.length + " installed apps");
-            invocation.return_value(GLib.Variant.new('(as)', [appIds]));
+            this._genericListing(invocation,
+                                 error,
+                                 EosAppStorePrivate.AppCategory.INSTALLED,
+                                 function (appInfo) {
+                                     return appInfo.is_installed();
+                                 });
         }));
     },
 
     ListUpdatableAsync: function(params, invocation) {
         log("Listing updatable apps");
+
         this._app.appList.refresh(Lang.bind(this, function(error) {
-            let success = (error == null);
-            log("Refresh finished. Loading updatable apps");
-
-            /* TODO: Handle refresh errors better */
-            if (!success)
-                invocation.return_value(GLib.Variant.new('(as)', [[]]));
-
-            let appInfos = this._app.appList.loadCategory(EosAppStorePrivate.AppCategory
-                                                          .INSTALLED);
-
-            let appIds = [];
-            for (let index in appInfos) {
-                let appInfo = appInfos[index];
-                if (appInfo.is_installed() && appInfo.is_updatable())
-                    appIds.push(appInfo.get_application_id());
-            }
-
-            log("Returning " + appIds.length + " updatable apps");
-            invocation.return_value(GLib.Variant.new('(as)', [appIds]));
+            this._genericListing(invocation,
+                                 error,
+                                 EosAppStorePrivate.AppCategory.INSTALLED,
+                                 function (appInfo) {
+                                     return appInfo.is_installed() &&
+                                            appInfo.is_updatable();
+                                 });
         }));
     },
 
     ListUninstallableAsync: function(params, invocation) {
         log("Listing uninstallable apps");
         this._app.appList.refresh(Lang.bind(this, function(error) {
-            let success = (error == null);
-
-            /* TODO: Handle refresh errors better */
-            if (!success)
-                invocation.return_value(GLib.Variant.new('(as)', [[]]));
-
-            log("Refresh finished. Loading uninstallable apps");
-
-            let appInfos = this._app.appList.loadCategory(EosAppStorePrivate.AppCategory
-                                                          .INSTALLED);
-
-            let appIds = [];
-            for (let index in appInfos) {
-                let appInfo = appInfos[index];
-                if (appInfo.is_installed() && appInfo.is_removable() &&
-                    !appInfo.get_has_launcher())
-                    appIds.push(appInfo.get_application_id());
-            }
-
-            log("Returning " + appIds.length + " uninstallable apps");
-            invocation.return_value(GLib.Variant.new('(as)', [appIds]));
+            this._genericListing(invocation,
+                                 error,
+                                 EosAppStorePrivate.AppCategory.INSTALLED,
+                                 function (appInfo) {
+                                     return appInfo.is_installed() &&
+                                            appInfo.is_removable() &&
+                                            !appInfo.get_has_launcher();
+                                 });
         }));
     },
 
     ListAvailableAsync: function(params, invocation) {
         log("Listing available apps");
         this._app.appList.refresh(Lang.bind(this, function(error) {
-            let success = (error == null);
-
-            /* TODO: Handle refresh errors better */
-            if (!success)
-                invocation.return_value(GLib.Variant.new('(as)', [[]]));
-
-            log("Refresh finished. Loading available apps");
-
-            let appInfos = this._app.appList.loadCategory(EosAppStorePrivate.AppCategory
-                                                          .ALL);
-
-            let appIds = [];
-            for (let index in appInfos) {
-                let appInfo = appInfos[index];
-                if (appInfo.get_state() == EosAppStorePrivate.AppState.AVAILABLE)
-                    appIds.push(appInfo.get_application_id());
-            }
-
-            log("Returning " + appIds.length + " available apps");
-            invocation.return_value(GLib.Variant.new('(as)', [appIds]));
+            this._genericListing(invocation,
+                                 error,
+                                 EosAppStorePrivate.AppCategory.ALL,
+                                 function (appInfo) {
+                                     return appInfo.get_state() ==
+                                            EosAppStorePrivate.AppState.AVAILABLE;
+                                 });
         }));
     },
 
