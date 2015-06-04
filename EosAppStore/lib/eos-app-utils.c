@@ -1009,15 +1009,16 @@ eos_app_load_available_apps (GHashTable *app_info,
                              GError **error)
 {
   JsonParser *parser = json_parser_new ();
-
+  gboolean retval = FALSE;
   gint64 start_time = g_get_monotonic_time ();
+  GHashTable *newer_deltas = g_hash_table_new_full (g_str_hash, g_str_equal,
+                                                    g_free,
+                                                    free_app_info_glist);
 
   if (!json_parser_load_from_data (parser, data, -1, error))
     {
       eos_app_log_error_message ("Update records weren't able to be parsed");
-
-      g_object_unref (parser);
-      return FALSE;
+      goto out;
     }
 
   JsonNode *root = json_parser_get_root (parser);
@@ -1029,14 +1030,8 @@ eos_app_load_available_apps (GHashTable *app_info,
 
       eos_app_log_error_message ("Update records did not contain "
                                  "expected structure");
-
-      g_object_unref (parser);
-      return FALSE;
+      goto out;
     }
-
-  GHashTable *newer_deltas = g_hash_table_new_full (g_str_hash, g_str_equal,
-                                                    g_free,
-                                                    free_app_info_glist);
 
   eos_app_log_debug_message ("Iterating over the update list");
   JsonArray *array = json_node_get_array (root);
@@ -1048,15 +1043,16 @@ eos_app_load_available_apps (GHashTable *app_info,
 
   for (guint index = 0; index < array_length; index++)
     {
-      JsonNode *element;
-
       if (g_cancellable_is_cancelled (cancellable))
         {
+          g_set_error_literal (error, G_IO_ERROR,
+                               G_IO_ERROR_CANCELLED,
+                               "Operation was cancelled");
           eos_app_log_info_message (" - Reading of update list canceled");
-          break;
+          goto out;
         }
 
-      element = json_array_get_element (array, index);
+      JsonNode *element = json_array_get_element (array, index);
       if (!JSON_NODE_HOLDS_OBJECT (element))
         {
           eos_app_log_error_message (" - JSON element contains unknown type of data! "
@@ -1259,14 +1255,16 @@ eos_app_load_available_apps (GHashTable *app_info,
         }
     }
 
-  g_hash_table_unref (newer_deltas);
-  g_object_unref (parser);
-
+  retval = TRUE;
   eos_app_log_info_message ("Available bundles: %d bundles, %.3f msecs",
                             n_available,
                             (double) (g_get_monotonic_time () - start_time) / 1000);
 
-  return TRUE;
+ out:
+  g_hash_table_unref (newer_deltas);
+  g_object_unref (parser);
+
+  return retval;
 }
 
 static gchar *
