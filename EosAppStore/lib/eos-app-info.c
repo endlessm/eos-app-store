@@ -655,7 +655,7 @@ out:
   return retval;
 }
 
-static void
+static gboolean
 replace_string_field_from_json (JsonObject *obj,
                                 int key_enum_index,
                                 char **field)
@@ -665,7 +665,10 @@ replace_string_field_from_json (JsonObject *obj,
     {
       g_free (*field);
       *field = json_node_dup_string (node);
+      return TRUE;
     }
+
+  return FALSE;
 }
 
 /*< private >*/
@@ -682,20 +685,7 @@ eos_app_info_update_from_server (EosAppInfo *info,
 
   JsonObject *obj = json_node_get_object (root);
 
-  JsonNode *node;
-
-  gboolean is_diff = FALSE;
-  node = json_object_get_member (obj, JSON_KEYS[IS_DIFF]);
-  if (node != NULL)
-    is_diff = json_node_get_boolean (node);
-
-  node = json_object_get_member (obj, JSON_KEYS[CODE_VERSION]);
-  if (node != NULL)
-    {
-      g_free (info->available_version);
-      info->available_version = json_node_dup_string (node);
-    }
-  else
+  if (!replace_string_field_from_json (obj, CODE_VERSION, &info->available_version))
     {
       eos_app_log_error_message ("Application data for '%s' is missing the "
                                  "required '%s' field.",
@@ -703,6 +693,11 @@ eos_app_info_update_from_server (EosAppInfo *info,
                                  JSON_KEYS[CODE_VERSION]);
       return FALSE;
     }
+
+  gboolean is_diff = FALSE;
+  JsonNode *node = json_object_get_member (obj, JSON_KEYS[IS_DIFF]);
+  if (node != NULL)
+    is_diff = json_node_get_boolean (node);
 
   gboolean is_newer_version = eos_compare_versions (info->available_version,
                                                     info->installed_version) > 0;
