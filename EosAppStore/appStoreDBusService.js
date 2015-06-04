@@ -87,9 +87,25 @@ const AppStoreDBusService = new Lang.Class({
         }));
     },
 
-    ListUpdatable: function() {
-        print("Stub!");
-        return [];
+    ListUpdatableAsync: function(params, invocation) {
+        log("Listing updatable apps");
+        this._app.appList.refresh(Lang.bind(this, function(error) {
+            let success = (error == null);
+            log("Refresh finished. Loading updatable apps");
+
+            let appInfos = this._app.appList.loadCategory(EosAppStorePrivate.AppCategory
+                                                          .INSTALLED);
+
+            let appIds = [];
+            for (let index in appInfos) {
+                let appInfo = appInfos[index];
+                if (appInfo.is_installed() && appInfo.is_updatable())
+                    appIds.push(appInfo.get_application_id());
+            }
+
+            log("Returning " + appIds.length + " updatable apps");
+            invocation.return_value(GLib.Variant.new('(as)', [appIds]));
+        }));
     },
 
     ListUninstallable: function() {
