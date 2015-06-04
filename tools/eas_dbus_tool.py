@@ -7,30 +7,18 @@ import argparse
 import gi.repository
 from gi.repository import Gio, GLib
 
-MAIN_DEST = 'com.endlessm.AppStore'
-MAIN_PATH = '/com/endlessm/AppStore'
-
-def available_method_param_post_handler(response, params):
-    if len(params) != 1:
-        return response
-
-    print('Package grep: %s' % params[0])
-
-    matching_packages = []
-    for package in response:
-        if re.search('.*%s.*' % params[0], package[0]):
-            matching_packages.append(package)
-
-    return matching_packages
-
+# ---------------------- METHOD IMPLEMENTATIOS ----------------------
 class GenericEasDbusMethod(object):
+    MAIN_DEST = 'com.endlessm.AppStore'
+    MAIN_PATH = '/com/endlessm/AppStore'
+
     def __init__(self, name, method_name, params):
         self.name = name
         self.method_name = method_name
 
-        self.destination = MAIN_DEST
-        self.path = MAIN_PATH
-        self.interface = MAIN_DEST
+        self.destination = self.MAIN_DEST
+        self.path = self.MAIN_PATH
+        self.interface = self.MAIN_DEST
 
         self.args = None
         self.reply_format = GLib.VariantType.new ('(b)')
@@ -134,6 +122,22 @@ class AvailableEasDbusMethod(GenericEasDbusMethod):
 
         self.reply_format = GLib.VariantType.new ('(as)')
 
+    # TODO: Handle regex matching on response
+    # def available_method_param_post_handler(response, params):
+    #     if len(params) != 1:
+    #         return response
+    #
+    #     print('Package grep: %s' % params[0])
+    #
+    #     matching_packages = []
+    #     for package in response:
+    #         if re.search('.*%s.*' % params[0], package[0]):
+    #             matching_packages.append(package)
+    #
+    #     return matching_packages
+
+# ---------------------- MAIN INVOCATION CLASS ----------------------
+
 class EasDbusTool(object):
     VERSION = '0.1'
 
@@ -204,6 +208,7 @@ class EasDbusTool(object):
 
         self.output_response(action, reply)
 
+# ---------------------- CLI LOGIC ENTRY ----------------------
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description = 'App store DBus test tool')
 
