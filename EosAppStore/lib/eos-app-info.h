@@ -69,7 +69,7 @@ void            eos_app_info_clear_server_update_attributes (EosAppInfo *info);
 /* private */
 G_GNUC_INTERNAL
 gboolean        eos_app_info_update_from_content        (EosAppInfo *info,
-                                                         JsonNode   *node);
+                                                         JsonObject *obj);
 G_GNUC_INTERNAL
 gboolean        eos_app_info_update_from_server         (EosAppInfo *info,
                                                          JsonObject *obj);

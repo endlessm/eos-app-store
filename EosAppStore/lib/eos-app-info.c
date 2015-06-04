@@ -761,13 +761,8 @@ eos_app_info_set_is_installed (EosAppInfo *info,
 /*< private >*/
 gboolean
 eos_app_info_update_from_content (EosAppInfo *info,
-                                  JsonNode *node)
+                                  JsonObject *obj)
 {
-  if (!JSON_NODE_HOLDS_OBJECT (node))
-    return FALSE;
-
-  JsonObject *obj = json_node_get_object (node);
-
   if (json_object_has_member (obj, "title"))
     info->title = json_node_dup_string (json_object_get_member (obj, "title"));
   else

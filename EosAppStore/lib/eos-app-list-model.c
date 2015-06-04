@@ -625,7 +625,7 @@ load_content_apps (EosAppListModel *self,
       if (info == NULL)
         continue;
 
-      eos_app_info_update_from_content (info, element);
+      eos_app_info_update_from_content (info, obj);
     }
 
   json_array_unref (array);
