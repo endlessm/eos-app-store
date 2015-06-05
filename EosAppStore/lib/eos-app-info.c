@@ -17,6 +17,49 @@
 
 G_DEFINE_BOXED_TYPE (EosAppInfo, eos_app_info, eos_app_info_ref, eos_app_info_unref)
 
+/* installed keyfile keys */
+static const gchar *FILE_KEYS[] = {
+  "app_id",
+  "app_name",
+  "version",
+  "locale",
+  "installed_size",
+  "secondary_storage",
+  NULL,
+  NULL,
+  NULL,
+};
+
+/* JSON fields from app server */
+static const gchar *JSON_KEYS[] = {
+  "appId",
+  "appName",
+  "codeVersion",
+  "Locale",
+  "installedSize",
+  "secondaryStorage",
+  "downloadLink",
+  "signatureLink",
+  "shaHash",
+  "isDiff",
+};
+
+/* Keep the key ids in sync with the names above */
+enum {
+  APP_ID,
+  APP_NAME,
+  CODE_VERSION,
+  LOCALE,
+  INSTALLED_SIZE,
+  SECONDARY_STORAGE,
+  DOWNLOAD_LINK,
+  SIGNATURE_LINK,
+  SHA_HASH,
+  IS_DIFF,
+
+  N_KEYS
+};
+
 static gboolean
 language_is_valid (const char *id)
 {
@@ -85,6 +128,26 @@ eos_app_info_ref (EosAppInfo *info)
 }
 
 void
+eos_app_info_clear_server_update_attributes (EosAppInfo *info)
+{
+  g_clear_pointer (&info->available_version, g_free);
+
+  g_clear_pointer (&info->bundle_uri, g_free);
+  g_clear_pointer (&info->signature_uri, g_free);
+  g_clear_pointer (&info->bundle_hash, g_free);
+
+  g_clear_pointer (&info->delta_bundle_uri, g_free);
+  g_clear_pointer (&info->delta_signature_uri, g_free);
+  g_clear_pointer (&info->delta_bundle_hash, g_free);
+
+  g_clear_pointer (&info->locale, g_free);
+
+  /* Meta fields that need clearing */
+  info->update_available = FALSE;
+  info->is_available = FALSE;
+}
+
+void
 eos_app_info_unref (EosAppInfo *info)
 {
   if (g_atomic_int_dec_and_test (&(info->ref_count)))
@@ -97,11 +160,11 @@ eos_app_info_unref (EosAppInfo *info)
       g_free (info->description);
       g_free (info->square_img);
       g_free (info->featured_img);
-      g_free (info->version);
-      g_free (info->locale);
-      g_free (info->bundle_uri);
-      g_free (info->signature_uri);
-      g_free (info->bundle_hash);
+
+      g_free (info->installed_version);
+
+      eos_app_info_clear_server_update_attributes (info);
+
       g_free (info->icon_name);
       g_strfreev (info->screenshots);
 
@@ -164,9 +227,15 @@ eos_app_info_get_description (const EosAppInfo *info)
 }
 
 const char *
-eos_app_info_get_version (const EosAppInfo *info)
+eos_app_info_get_installed_version (const EosAppInfo *info)
 {
-  return info->version;
+  return info->installed_version;
+}
+
+const char *
+eos_app_info_get_available_version (const EosAppInfo *info)
+{
+  return info->available_version;
 }
 
 const char *
@@ -191,6 +260,24 @@ const char *
 eos_app_info_get_bundle_hash (const EosAppInfo *info)
 {
   return info->bundle_hash;
+}
+
+const char *
+eos_app_info_get_delta_bundle_uri (const EosAppInfo *info)
+{
+  return info->delta_bundle_uri;
+}
+
+const char *
+eos_app_info_get_delta_signature_uri (const EosAppInfo *info)
+{
+  return info->delta_signature_uri;
+}
+
+const char *
+eos_app_info_get_delta_bundle_hash (const EosAppInfo *info)
+{
+  return info->delta_bundle_hash;
 }
 
 gboolean
@@ -230,9 +317,15 @@ eos_app_info_is_installable (const EosAppInfo *info)
 }
 
 gboolean
+eos_app_info_is_available (const EosAppInfo *info)
+{
+  return info->is_available;
+}
+
+gboolean
 eos_app_info_is_updatable (const EosAppInfo *info)
 {
-  return info->update_available;
+  return info->is_installed && info->update_available;
 }
 
 gboolean
@@ -276,7 +369,15 @@ eos_app_info_get_state (const EosAppInfo *info)
   is_updatable = eos_app_info_is_updatable (info);
   is_installable = eos_app_info_is_installable (info);
 
-  if (is_installed && is_updatable)
+  eos_app_log_debug_message ("%s (%p)"
+                             "(installed: %s, updatable: %s, installable: %s",
+                             eos_app_info_get_application_id (info),
+                             info,
+                             is_installed ? "true" : "false",
+                             is_updatable ? "true" : "false",
+                             is_installable ? "true" : "false");
+
+  if (is_updatable)
     retval = EOS_APP_STATE_UPDATABLE;
   else if (is_installed)
     retval = EOS_APP_STATE_INSTALLED;
@@ -450,49 +551,6 @@ eos_app_info_get_has_sufficient_install_space (const EosAppInfo *info)
   return FALSE;
 }
 
-/* installed keyfile keys */
-static const gchar *FILE_KEYS[] = {
-  "app_id",
-  "app_name",
-  "version",
-  "locale",
-  "installed_size",
-  "secondary_storage",
-  NULL,
-  NULL,
-  NULL,
-};
-
-/* JSON fields from app server */
-static const gchar *JSON_KEYS[] = {
-  "appId",
-  "appName",
-  "codeVersion",
-  "Locale",
-  "installedSize",
-  "secondaryStorage",
-  "downloadLink",
-  "signatureLink",
-  "shaHash",
-  "isDiff",
-};
-
-/* Keep the key ids in sync with the names above */
-enum {
-  APP_ID,
-  APP_NAME,
-  CODE_VERSION,
-  LOCALE,
-  INSTALLED_SIZE,
-  SECONDARY_STORAGE,
-  DOWNLOAD_LINK,
-  SIGNATURE_LINK,
-  SHA_HASH,
-  IS_DIFF,
-
-  N_KEYS
-};
-
 /* Keep this list updated with the locations we use for
  * installing app bundles
  */
@@ -564,8 +622,10 @@ eos_app_info_update_from_installed (EosAppInfo *info,
   if (!g_key_file_has_group (keyfile, GROUP))
     goto out;
 
-  g_free (info->version);
-  info->version = g_key_file_get_string (keyfile, GROUP, FILE_KEYS[CODE_VERSION], NULL);
+  g_free (info->installed_version);
+  info->installed_version = g_key_file_get_string (keyfile, GROUP,
+                                                   FILE_KEYS[CODE_VERSION],
+                                                   NULL);
 
   g_free (info->locale);
   info->locale = g_key_file_get_string (keyfile, GROUP, FILE_KEYS[LOCALE], NULL);
@@ -579,6 +639,8 @@ eos_app_info_update_from_installed (EosAppInfo *info,
     info->on_secondary_storage = g_key_file_get_boolean (keyfile, GROUP, FILE_KEYS[SECONDARY_STORAGE], NULL);
 
   /* If we found it here, then it's installed */
+  eos_app_log_debug_message ("Setting app '%s' as installed",
+                             info->application_id);
   info->is_installed = TRUE;
 
   retval = TRUE;
@@ -591,62 +653,28 @@ out:
   return retval;
 }
 
+static gboolean
+replace_string_field_from_json (JsonObject *obj,
+                                int key_enum_index,
+                                char **field)
+{
+  JsonNode *node = json_object_get_member (obj, JSON_KEYS[key_enum_index]);
+  if (node != NULL)
+    {
+      g_free (*field);
+      *field = json_node_dup_string (node);
+      return TRUE;
+    }
+
+  return FALSE;
+}
+
 /*< private >*/
 gboolean
 eos_app_info_update_from_server (EosAppInfo *info,
-                                 JsonNode *root)
+                                 JsonObject *obj)
 {
-  if (!JSON_NODE_HOLDS_OBJECT (root))
-    {
-      eos_app_log_error_message ("Application data for '%s' is malformed.",
-                                 eos_app_info_get_application_id (info));
-      return FALSE;
-    }
-
-  JsonObject *obj = json_node_get_object (root);
-
-  JsonNode *node;
-
-  node = json_object_get_member (obj, JSON_KEYS[IS_DIFF]);
-  if (node != NULL)
-    {
-      if (json_node_get_boolean (node) && !eos_use_delta_updates ())
-        {
-          eos_app_log_info_message ("Application data is for a delta "
-                                    "update of '%s', and delta updates "
-                                    "are disabled.",
-                                    eos_app_info_get_application_id (info));
-          return FALSE;
-        }
-    }
-
-  node = json_object_get_member (obj, JSON_KEYS[CODE_VERSION]);
-  if (node != NULL)
-    {
-      const char *version = json_node_get_string (node);
-      int version_cmp = eos_compare_versions (info->version, version);
-
-      /* If the server returns a newer version, we update the related fields;
-       * otherwise, we keep what we have
-       */
-      if (version_cmp > 0)
-        {
-          eos_app_log_info_message ("Application data for is for an "
-                                    "earlier version of '%s'",
-                                    eos_app_info_get_application_id (info));
-          return FALSE;
-        }
-
-      if (version_cmp < 0)
-        {
-          g_free (info->version);
-          info->version = g_strdup (version);
-
-          /* Newer version means we have an update */
-          info->update_available = TRUE;
-        }
-    }
-  else
+  if (!replace_string_field_from_json (obj, CODE_VERSION, &info->available_version))
     {
       eos_app_log_error_message ("Application data for '%s' is missing the "
                                  "required '%s' field.",
@@ -655,15 +683,17 @@ eos_app_info_update_from_server (EosAppInfo *info,
       return FALSE;
     }
 
-  /* If we found it here, then it's available */
-  info->is_available = TRUE;
-
-  node = json_object_get_member (obj, JSON_KEYS[LOCALE]);
+  gboolean is_diff = FALSE;
+  JsonNode *node = json_object_get_member (obj, JSON_KEYS[IS_DIFF]);
   if (node != NULL)
-    {
-      g_free (info->locale);
-      info->locale = json_node_dup_string (node);
-    }
+    is_diff = json_node_get_boolean (node);
+
+  gboolean is_newer_version = eos_compare_versions (info->available_version,
+                                                    info->installed_version) > 0;
+  if (is_diff)
+    info->update_available = is_newer_version;
+  else
+    info->is_available = is_newer_version;
 
   node = json_object_get_member (obj, JSON_KEYS[INSTALLED_SIZE]);
   if (node != NULL)
@@ -673,25 +703,19 @@ eos_app_info_update_from_server (EosAppInfo *info,
   if (node)
     info->on_secondary_storage = json_node_get_boolean (node);
 
-  node = json_object_get_member (obj, JSON_KEYS[DOWNLOAD_LINK]);
-  if (node != NULL)
-    {
-      g_free (info->bundle_uri);
-      info->bundle_uri = json_node_dup_string (node);
-    }
+  replace_string_field_from_json (obj, LOCALE, &info->locale);
 
-  node = json_object_get_member (obj, JSON_KEYS[SIGNATURE_LINK]);
-  if (node != NULL)
+  if (is_diff)
     {
-      g_free (info->signature_uri);
-      info->signature_uri = json_node_dup_string (node);
+      replace_string_field_from_json (obj, DOWNLOAD_LINK, &info->delta_bundle_uri);
+      replace_string_field_from_json (obj, SIGNATURE_LINK, &info->delta_signature_uri);
+      replace_string_field_from_json (obj, SHA_HASH, &info->delta_bundle_hash);
     }
-
-  node = json_object_get_member (obj, JSON_KEYS[SHA_HASH]);
-  if (node != NULL)
+  else
     {
-      g_free (info->bundle_hash);
-      info->bundle_hash = json_node_dup_string (node);
+      replace_string_field_from_json (obj, DOWNLOAD_LINK, &info->bundle_uri);
+      replace_string_field_from_json (obj, SIGNATURE_LINK, &info->signature_uri);
+      replace_string_field_from_json (obj, SHA_HASH, &info->bundle_hash);
     }
 
   return TRUE;
@@ -728,19 +752,17 @@ void
 eos_app_info_set_is_installed (EosAppInfo *info,
                                gboolean is_installed)
 {
+  eos_app_log_debug_message ("Setting app '%s' as %sinstalled",
+                             info->application_id,
+                             is_installed ? "" : "not ");
   info->is_installed = is_installed;
 }
 
 /*< private >*/
 gboolean
 eos_app_info_update_from_content (EosAppInfo *info,
-                                  JsonNode *node)
+                                  JsonObject *obj)
 {
-  if (!JSON_NODE_HOLDS_OBJECT (node))
-    return FALSE;
-
-  JsonObject *obj = json_node_get_object (node);
-
   if (json_object_has_member (obj, "title"))
     info->title = json_node_dup_string (json_object_get_member (obj, "title"));
   else

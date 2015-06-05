@@ -618,12 +618,14 @@ load_content_apps (EosAppListModel *self,
       EosAppInfo *info = eos_app_list_model_get_app_info (self, desktop_id);
       g_free (desktop_id);
 
-      eos_app_log_info_message ("Updating content info for %s", info ? eos_app_info_get_desktop_id (info) : "null");
+      eos_app_log_info_message ("Updating content info for %s (%s)",
+                                app_id ? app_id : "null",
+                                info ? eos_app_info_get_desktop_id (info) : "null");
 
       if (info == NULL)
         continue;
 
-      eos_app_info_update_from_content (info, element);
+      eos_app_info_update_from_content (info, obj);
     }
 
   json_array_unref (array);
@@ -645,7 +647,7 @@ reload_model (EosAppListModel *self,
   if (!load_installed_apps (self, cancellable, error))
     eos_app_log_error_message ("Unable to load installed apps");
 
-  eos_app_log_debug_message ("Loading available apps from manager");
+  eos_app_log_debug_message ("Loading available apps");
   if (!load_available_apps (self, cancellable, error))
     eos_app_log_error_message ("Unable to load available apps");
 
@@ -707,6 +709,8 @@ invalidate_app_info (EosAppListModel *self,
   /* Remove this info from the apps hash table, and let the code below
    * take care of resetting the proper state.
    */
+  eos_app_log_debug_message ("Removing '%s' from apps hash table",
+                             eos_app_info_get_application_id (info));
   g_hash_table_remove (self->apps, eos_app_info_get_desktop_id (info));
 
   GError *error = NULL;
@@ -1648,13 +1652,19 @@ download_app_file_from_uri_with_retry (SoupSession     *session,
 static char *
 create_sha256sum (EosAppListModel *self,
                   EosAppInfo *info,
+                  gboolean use_delta,
                   const char *bundle_path,
                   GCancellable *cancellable,
                   GError **error_out)
 {
   GError *error = NULL;
-  const char *bundle_hash = eos_app_info_get_bundle_hash (info);
+  const char *bundle_hash = NULL;
   const char *app_id = eos_app_info_get_application_id (info);
+
+  if (use_delta)
+    bundle_hash = eos_app_info_get_delta_bundle_hash (info);
+  else
+    bundle_hash = eos_app_info_get_bundle_hash (info);
 
   if (bundle_hash == NULL || *bundle_hash == '\0')
     {
@@ -1681,12 +1691,18 @@ create_sha256sum (EosAppListModel *self,
 static char *
 download_signature (EosAppListModel *self,
                     EosAppInfo *info,
+                    gboolean use_delta,
                     GCancellable *cancellable,
                     GError **error_out)
 {
   GError *error = NULL;
-  const char *signature_uri = eos_app_info_get_signature_uri (info);
+  const char *signature_uri = NULL;
   const char *app_id = eos_app_info_get_application_id (info);
+
+  if (use_delta)
+    signature_uri = eos_app_info_get_delta_signature_uri (info);
+  else
+    signature_uri = eos_app_info_get_signature_uri (info);
 
   if (signature_uri == NULL || *signature_uri == '\0')
     {
@@ -1715,14 +1731,23 @@ download_signature (EosAppListModel *self,
 static char *
 download_bundle (EosAppListModel *self,
                  EosAppInfo *info,
+                 gboolean use_delta,
                  GCancellable *cancellable,
                  GError **error_out)
 {
   GError *error = NULL;
-  const char *bundle_uri = eos_app_info_get_bundle_uri (info);
+  const char *bundle_uri = NULL;
   const char *app_id = eos_app_info_get_application_id (info);
 
-  eos_app_log_info_message ("Downloading - app id: %s, bundle URI: %s", app_id, bundle_uri);
+  if (use_delta)
+    bundle_uri = eos_app_info_get_delta_bundle_uri (info);
+  else
+    bundle_uri = eos_app_info_get_bundle_uri (info);
+
+  eos_app_log_info_message ("Downloading - app id: %s (%s), bundle URI: %s",
+                            app_id,
+                            eos_app_info_get_available_version (info),
+                            bundle_uri);
 
   if (bundle_uri == NULL || *bundle_uri == '\0')
     {
@@ -1758,6 +1783,7 @@ static gboolean
 get_bundle_artifacts (EosAppListModel *self,
                       EosAppInfo *info,
                       char *transaction_path,
+                      gboolean use_delta,
                       GCancellable *cancellable,
                       GError **error_out)
 {
@@ -1785,8 +1811,9 @@ get_bundle_artifacts (EosAppListModel *self,
       goto out;
     }
 
-  eos_app_log_info_message ("Downloading bundle");
-  bundle_path = download_bundle (self, info, cancellable, &error);
+  eos_app_log_info_message ("Downloading bundle (use_delta: %s)",
+                            use_delta ? "true" : "false");
+  bundle_path = download_bundle (self, info, use_delta, cancellable, &error);
   if (error != NULL)
     {
       eos_app_log_info_message ("Download of bundle failed");
@@ -1794,15 +1821,18 @@ get_bundle_artifacts (EosAppListModel *self,
     }
 
   eos_app_log_info_message ("Downloading signature");
-  signature_path = download_signature (self, info, cancellable, &error);
+  signature_path = download_signature (self, info, use_delta, cancellable,
+                                       &error);
   if (error != NULL)
     {
       eos_app_log_error_message ("Signature download failed");
       goto out;
     }
 
-  eos_app_log_info_message ("Downloading hash");
-  sha256_path = create_sha256sum (self, info, bundle_path, cancellable, &error);
+  eos_app_log_info_message ("Persisting hash");
+  sha256_path = create_sha256sum (self, info, use_delta, bundle_path,
+                                  cancellable,
+                                  &error);
   if (error != NULL)
     {
       eos_app_log_error_message ("Hash download failed");
@@ -1997,7 +2027,10 @@ install_latest_app_version (EosAppListModel *self,
 
   eos_app_log_info_message ("Got transaction path: %s", transaction_path);
 
-  retval = get_bundle_artifacts (self, info, transaction_path, cancellable, &error);
+  gboolean use_delta = allow_deltas && is_upgrade;
+
+  retval = get_bundle_artifacts (self, info, transaction_path, use_delta,
+                                 cancellable, &error);
 
   if (error != NULL)
     {
@@ -2416,11 +2449,18 @@ remove_app_thread_func (GTask *task,
 
   invalidate_app_info (model, info, cancellable);
 
+  eos_app_log_debug_message ("Removing app from shell");
+
   if (!remove_app_from_shell (model, info, cancellable, &error))
     {
+      eos_app_log_error_message ("Unable to remove app '%s' from shell!",
+                                 eos_app_info_get_application_id (info));
       g_task_return_error (task, error);
       return;
     }
+
+  eos_app_log_debug_message ("Removed app '%s' from shell",
+                             eos_app_info_get_application_id (info));
 
   g_task_return_boolean (task, TRUE);
 }

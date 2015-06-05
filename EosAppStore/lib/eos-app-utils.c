@@ -947,6 +947,67 @@ eos_app_load_updates_meta_record (gint64 *monotonic_update_id,
   return TRUE;
 }
 
+static JsonObject *
+get_matching_version_delta (GList *deltas,
+                            const char *version)
+{
+  eos_app_log_debug_message (" - Looking for matching delta version: %s",
+                             version);
+
+  /* Remove older (not relevant) deltas from temp array */
+  for (GList *iterator = deltas; iterator; iterator = iterator->next)
+    {
+      JsonObject *obj = iterator->data;
+      const char *code_version = json_object_get_string_member (obj, "codeVersion");
+
+      if (eos_compare_versions (code_version, version) == 0)
+        return obj;
+    }
+
+  return NULL;
+}
+
+static GList *
+remove_records_version_lte (GList *deltas,
+                            const char *version)
+{
+  eos_app_log_debug_message (" - Removing old/current/irrelevant deltas "
+                             "from our temp list");
+
+  GList *next = NULL;
+  GList *new_list = deltas;
+  for (GList *iterator = deltas; iterator; iterator = next)
+    {
+      JsonObject *obj = iterator->data;
+      const char *code_version = json_object_get_string_member (obj, "codeVersion");
+      next = iterator->next;
+
+      if (eos_compare_versions (code_version, version) <= 0)
+        new_list = g_list_delete_link (deltas, iterator);
+    }
+
+  return new_list;
+}
+
+static void
+add_delta_to_temp_records (GHashTable *temp_delta_map,
+                           const char *app_id,
+                           JsonObject *obj)
+{
+  GList *deltas = g_hash_table_lookup (temp_delta_map, app_id);
+  GList *new_delta_list = g_list_prepend (deltas, json_object_ref (obj));
+
+  g_hash_table_steal (temp_delta_map, app_id);
+  g_hash_table_insert (temp_delta_map, g_strdup (app_id), new_delta_list);
+}
+
+/* Functions to clear our newer_deltas hashtable */
+static void
+free_json_object_glist (gpointer data)
+{
+  g_list_free_full (data, (GDestroyNotify) json_object_unref);
+}
+
 gboolean
 eos_app_load_available_apps (GHashTable *app_info,
                              const char *data,
@@ -954,74 +1015,262 @@ eos_app_load_available_apps (GHashTable *app_info,
                              GError **error)
 {
   JsonParser *parser = json_parser_new ();
-
+  gboolean retval = FALSE;
   gint64 start_time = g_get_monotonic_time ();
+  GHashTable *newer_deltas = g_hash_table_new_full (g_str_hash, g_str_equal,
+                                                    g_free,
+                                                    free_json_object_glist);
 
   if (!json_parser_load_from_data (parser, data, -1, error))
     {
-      g_object_unref (parser);
-      return FALSE;
+      eos_app_log_error_message ("Update records weren't able to be parsed");
+      goto out;
     }
 
   JsonNode *root = json_parser_get_root (parser);
   if (!JSON_NODE_HOLDS_ARRAY (root))
     {
-      g_object_unref (parser);
-      return FALSE;
+      g_set_error_literal (error, EOS_APP_UTILS_ERROR,
+                           EOS_APP_UTILS_ERROR_JSON_UNEXPECTED_STRUCTURE,
+                           "Update records did not contain expected structure");
+
+      eos_app_log_error_message ("Update records did not contain "
+                                 "expected structure");
+      goto out;
     }
 
-  int n_available = 0;
+  eos_app_log_debug_message ("Iterating over the update list");
   JsonArray *array = json_node_get_array (root);
-  guint i, len = json_array_get_length (array);
-  for (i = 0; i < len; i++)
+
+  guint array_length = json_array_get_length (array);
+
+  /* TODO: Calculate this correctly */
+  int n_available = array_length;
+
+  for (guint index = 0; index < array_length; index++)
     {
-      JsonNode *element;
-
       if (g_cancellable_is_cancelled (cancellable))
-        break;
+        {
+          g_set_error_literal (error, G_IO_ERROR,
+                               G_IO_ERROR_CANCELLED,
+                               "Operation was cancelled");
+          eos_app_log_info_message (" - Reading of update list canceled");
+          goto out;
+        }
 
-      element = json_array_get_element (array, i);
-
+      JsonNode *element = json_array_get_element (array, index);
       if (!JSON_NODE_HOLDS_OBJECT (element))
-        continue;
+        {
+          eos_app_log_error_message (" - JSON element contains unknown type of data! "
+                                     "Ignoring!");
+          continue;
+        }
 
       JsonObject *obj = json_node_get_object (element);
       if (!json_object_has_member (obj, "appId"))
-        continue;
+        {
+          eos_app_log_error_message (" - JSON element doesn't contain an appId! "
+                                     "Ignoring!");
+          continue;
+        }
 
-      const char *appid = json_object_get_string_member (obj, "appId");
-      eos_app_log_info_message ("Loading JSON server info for '%s'", appid);
+      if (!json_object_has_member (obj, "isDiff"))
+        {
+          eos_app_log_error_message (" - JSON element doesn't contain isDiff attribute! "
+                                     "Ignoring!");
+          continue;
+        }
 
-      char *desktop_id = g_strconcat (appid, ".desktop", NULL);
+      if (!json_object_has_member (obj, "codeVersion"))
+        {
+          eos_app_log_error_message (" - JSON element doesn't contain codeVersion attribute! "
+                                     "Ignoring!");
+          continue;
+        }
+
+      const char *app_id = json_object_get_string_member (obj, "appId");
+      const gboolean is_diff = json_object_get_boolean_member (obj, "isDiff");
+      const char *code_version = json_object_get_string_member (obj, "codeVersion");
+
+      /* Short-circuit if it's a diff and they're disabled */
+      if (is_diff && !eos_use_delta_updates())
+        {
+          eos_app_log_debug_message ("Deltas disabled. Ignoring '%s (diff: %s)'",
+                                     app_id,
+                                     is_diff ? "true" : "false");
+
+          continue;
+        }
+
+      /* Grab fromVersion field for deltas */
+      const char *from_version = NULL;
+      if (is_diff)
+        {
+          from_version = json_object_get_string_member (obj, "fromVersion");
+          if (from_version == NULL)
+            {
+              eos_app_log_error_message (" - JSON element doesn't contain fromVersion "
+                                         "attribute! Ignoring!");
+              continue;
+            }
+        }
+
+      eos_app_log_debug_message ("Loading: '%s (diff: %s) %s'",
+                                app_id,
+                                is_diff ? "true" : "false",
+                                code_version);
+
+      const char *stored_code_version = NULL;
+      char *desktop_id = g_strconcat (app_id, ".desktop", NULL);
       EosAppInfo *info = g_hash_table_lookup (app_info, desktop_id);
-      g_free (desktop_id);
 
       if (info == NULL)
-        info = eos_app_info_new (appid);
-      else
-        eos_app_info_ref (info);
-
-      if (eos_app_info_update_from_server (info, element))
         {
-          g_hash_table_replace (app_info,
-                                g_strdup (eos_app_info_get_desktop_id (info)),
-                                info);
-          n_available += 1;
+          if (is_diff)
+            {
+              /* This logic saves any deltas into our temp structure until we
+                 get a matching full update and doesn't change the app_info
+                 so that we can install apps that have higher deltas. Sadly
+                 this does prevent upgrades to a newer version with a delta if
+                 there is no matching full update since at that point we would
+                 need to retain different available versions (1 full, 1 delta)
+                 but at this point, that situation should never occur. */
+              eos_app_log_debug_message (" -> First time encountering app. "
+                                         "Saving delta as possible upgrade path.");
+
+              add_delta_to_temp_records (newer_deltas, app_id, obj);
+
+              g_free (desktop_id);
+              continue;
+            }
+          else
+            {
+              /* New record. Save but continue the logic since we may have
+                 some deltas waiting to be assigned to the app_info */
+              eos_app_log_debug_message (" -> First time encountering app. "
+                                         "Creating new record.");
+
+              info = eos_app_info_new (app_id);
+              eos_app_info_update_from_server (info, obj);
+
+              g_hash_table_insert (app_info, g_strdup (desktop_id), info);
+            }
         }
       else
         {
-          eos_app_log_debug_message ("App '%s' does not have updates", appid);
-          eos_app_info_unref (info);
+          stored_code_version = eos_app_info_get_available_version (info);
+        }
+
+      g_free (desktop_id);
+
+      /* If we have no availability version, just use the installed version */
+      if (stored_code_version == NULL || *stored_code_version == '\0')
+        stored_code_version = eos_app_info_get_installed_version (info);
+
+      const int version_cmp = eos_compare_versions (code_version, stored_code_version);
+      eos_app_log_debug_message (" - Version comparison: [new: %s, have: %s, diff: %d].",
+                                 code_version,
+                                 stored_code_version,
+                                 version_cmp);
+
+      GList *deltas_for_app_id = g_hash_table_lookup (newer_deltas, app_id);
+
+      /* TODO: Modularize, if possible */
+      if (is_diff)
+        {
+          if (eos_compare_versions (from_version,
+                                    eos_app_info_get_installed_version (info)) != 0)
+            {
+              eos_app_log_debug_message (" -> Delta from_version (%s) does not match "
+                                         "installed version (%s). Ignoring.",
+                                         from_version,
+                                         eos_app_info_get_installed_version (info));
+
+              continue;
+            }
+
+          if (eos_app_info_is_available (info)) /* We have a full update */
+            {
+              if (version_cmp > 0)
+                {
+                  eos_app_log_debug_message (" -> Preserving delta of version: %s (%d)",
+                                             code_version,
+                                             version_cmp);
+                  add_delta_to_temp_records (newer_deltas, app_id, obj);
+                }
+              else if (version_cmp == 0)
+                {
+                  eos_app_log_debug_message (" -> Found matching delta for version: %s",
+                                             stored_code_version);
+
+                  eos_app_info_update_from_server (info, obj);
+                }
+              else
+                {
+                  eos_app_log_debug_message (" -> Delta (%s) is lower version than %s. "
+                                             "Ignoring.",
+                                             code_version,
+                                             stored_code_version);
+                }
+            }
+          else /* We only have the delta in info */
+            {
+              /* We save all deltas until we get a full update record since
+                 we won't know what is a good delta version to keep */
+              eos_app_log_debug_message (" -> Preserving delta of version: %s",
+                                         code_version);
+              add_delta_to_temp_records (newer_deltas, app_id, obj);
+            }
+        }
+      else /* Full version */
+        {
+          if (version_cmp > 0)
+            {
+              eos_app_log_debug_message (" -> Full version newer than in our records. "
+                                         "Updating record.");
+
+              eos_app_info_clear_server_update_attributes (info);
+              eos_app_info_update_from_server (info, obj);
+
+              JsonObject *delta_object = get_matching_version_delta (deltas_for_app_id,
+                                                                     code_version);
+
+              if (delta_object)
+                {
+                  eos_app_log_debug_message (" -> Found matching delta for version: %s"
+                                             "Updating delta record.",
+                                             code_version);
+
+                  /* Update delta fields */
+                  eos_app_info_update_from_server (info, delta_object);
+
+                  /* Remove any older deltas that we held onto */
+                  GList *new_delta_list = remove_records_version_lte (deltas_for_app_id,
+                                                                      code_version);
+
+                  g_hash_table_steal (newer_deltas, app_id);
+                  g_hash_table_insert (newer_deltas, g_strdup (app_id), new_delta_list);
+                }
+            }
+          else
+            {
+              eos_app_log_debug_message (" -> Full bundle is not a newer version. (%d)"
+                                         "Skipping",
+                                         version_cmp);
+            }
         }
     }
 
+  retval = TRUE;
+  eos_app_log_info_message ("Available bundles: %d bundles, %.3f msecs",
+                            n_available,
+                            (double) (g_get_monotonic_time () - start_time) / 1000);
+
+ out:
+  g_hash_table_unref (newer_deltas);
   g_object_unref (parser);
 
-  eos_app_log_debug_message ("Available bundles: %d bundles, %.3f msecs",
-                             n_available,
-                             (double) (g_get_monotonic_time () - start_time) / 1000);
-
-  return TRUE;
+  return retval;
 }
 
 static gchar *

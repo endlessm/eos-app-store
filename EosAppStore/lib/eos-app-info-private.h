@@ -21,11 +21,16 @@ struct _EosAppInfo
   char *description;
   char *locale;
 
-  char *version;
+  char *installed_version;
+  char *available_version;
 
   char *bundle_uri;
   char *signature_uri;
   char *bundle_hash;
+
+  char *delta_bundle_uri;
+  char *delta_signature_uri;
+  char *delta_bundle_hash;
 
   gint64 installed_size;
 

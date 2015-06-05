@@ -25,7 +25,8 @@ const char *    eos_app_info_get_content_id             (const EosAppInfo *info)
 const char *    eos_app_info_get_title                  (const EosAppInfo *info);
 const char *    eos_app_info_get_subtitle               (const EosAppInfo *info);
 const char *    eos_app_info_get_description            (const EosAppInfo *info);
-const char *    eos_app_info_get_version                (const EosAppInfo *info);
+const char *    eos_app_info_get_installed_version      (const EosAppInfo *info);
+const char *    eos_app_info_get_available_version      (const EosAppInfo *info);
 gint64          eos_app_info_get_installed_size         (const EosAppInfo *info);
 const char *    eos_app_info_get_locale                 (const EosAppInfo *info);
 
@@ -42,11 +43,16 @@ const char *    eos_app_info_get_bundle_uri             (const EosAppInfo *info)
 const char *    eos_app_info_get_signature_uri          (const EosAppInfo *info);
 const char *    eos_app_info_get_bundle_hash            (const EosAppInfo *info);
 
+const char *    eos_app_info_get_delta_bundle_uri       (const EosAppInfo *info);
+const char *    eos_app_info_get_delta_signature_uri    (const EosAppInfo *info);
+const char *    eos_app_info_get_delta_bundle_hash      (const EosAppInfo *info);
+
 guint           eos_app_info_get_n_screenshots          (const EosAppInfo *info);
 char **         eos_app_info_get_screenshots            (const EosAppInfo *info);
 
 gboolean        eos_app_info_is_installable             (const EosAppInfo *info);
 gboolean        eos_app_info_is_installed               (const EosAppInfo *info);
+gboolean        eos_app_info_is_available               (const EosAppInfo *info);
 gboolean        eos_app_info_is_updatable               (const EosAppInfo *info);
 gboolean        eos_app_info_is_removable               (const EosAppInfo *info);
 
@@ -56,27 +62,29 @@ gboolean        eos_app_info_get_has_sufficient_install_space (const EosAppInfo 
 
 gint64          eos_app_info_get_installation_time      (const EosAppInfo *info);
 
+void            eos_app_info_clear_server_update_attributes (EosAppInfo *info);
+
 #ifndef __GI_SCANNER__
 
 /* private */
 G_GNUC_INTERNAL
 gboolean        eos_app_info_update_from_content        (EosAppInfo *info,
-							 JsonNode   *node);
+                                                         JsonObject *obj);
 G_GNUC_INTERNAL
 gboolean        eos_app_info_update_from_server         (EosAppInfo *info,
-                                                         JsonNode   *node);
+                                                         JsonObject *obj);
 G_GNUC_INTERNAL
 gboolean        eos_app_info_update_from_installed      (EosAppInfo *info,
                                                          const char *filename);
 G_GNUC_INTERNAL
 void            eos_app_info_update_from_gio            (EosAppInfo *info,
-							 GDesktopAppInfo *desktop_info);
+                                                         GDesktopAppInfo *desktop_info);
 G_GNUC_INTERNAL
 void            eos_app_info_set_has_launcher           (EosAppInfo *info,
-							 gboolean    has_launcher);
+                                                         gboolean    has_launcher);
 G_GNUC_INTERNAL
 void            eos_app_info_set_is_installed           (EosAppInfo *info,
-							 gboolean    is_installed);
+                                                         gboolean    is_installed);
 
 #endif
 
