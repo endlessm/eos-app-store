@@ -949,9 +949,11 @@ eos_app_load_updates_meta_record (gint64 *monotonic_update_id,
 
 static JsonObject *
 get_matching_version_delta (GList *deltas,
-                            const char *version)
+                            const char *version,
+                            const char *installed_version)
 {
-  eos_app_log_debug_message (" - Looking for matching delta version: %s",
+  eos_app_log_debug_message (" - Looking for matching delta version: %s -> %s",
+                             installed_version,
                              version);
 
   /* Remove older (not relevant) deltas from temp array */
@@ -959,9 +961,14 @@ get_matching_version_delta (GList *deltas,
     {
       JsonObject *obj = iterator->data;
       const char *code_version = json_object_get_string_member (obj, "codeVersion");
+      const char *from_version = json_object_get_string_member (obj, "fromVersion");
 
-      if (eos_compare_versions (code_version, version) == 0)
-        return obj;
+      if (eos_compare_versions (code_version, version) == 0 &&
+          eos_compare_versions (installed_version, from_version) == 0)
+        {
+          eos_app_log_debug_message (" - Found matching delta");
+          return obj;
+        }
     }
 
   return NULL;
@@ -980,10 +987,17 @@ remove_records_version_lte (GList *deltas,
     {
       JsonObject *obj = iterator->data;
       const char *code_version = json_object_get_string_member (obj, "codeVersion");
+      const char *from_version = json_object_get_string_member (obj, "fromVersion");
+
       next = iterator->next;
 
       if (eos_compare_versions (code_version, version) <= 0)
-        new_list = g_list_delete_link (deltas, iterator);
+        {
+          eos_app_log_debug_message (" - Deleting delta %s -> %s", from_version,
+                                     code_version);
+          new_list = g_list_delete_link (deltas, iterator);
+          json_object_unref (obj);
+        }
     }
 
   return new_list;
@@ -1115,9 +1129,10 @@ eos_app_load_available_apps (GHashTable *app_info,
             }
         }
 
-      eos_app_log_debug_message ("Loading: '%s (diff: %s) %s'",
+      eos_app_log_debug_message ("Loading: '%s (diff: %s) %s -> %s'",
                                 app_id,
                                 is_diff ? "true" : "false",
+                                from_version == NULL ? "None" : from_version,
                                 code_version);
 
       const char *stored_code_version = NULL;
@@ -1233,11 +1248,12 @@ eos_app_load_available_apps (GHashTable *app_info,
               eos_app_info_update_from_server (info, obj);
 
               JsonObject *delta_object = get_matching_version_delta (deltas_for_app_id,
-                                                                     code_version);
+                                                                     code_version,
+                                                                     eos_app_info_get_installed_version (info));
 
               if (delta_object)
                 {
-                  eos_app_log_debug_message (" -> Found matching delta for version: %s"
+                  eos_app_log_debug_message (" -> Found matching delta for version: %s. "
                                              "Updating delta record.",
                                              code_version);
 
@@ -1250,6 +1266,11 @@ eos_app_load_available_apps (GHashTable *app_info,
 
                   g_hash_table_steal (newer_deltas, app_id);
                   g_hash_table_insert (newer_deltas, g_strdup (app_id), new_delta_list);
+                }
+              else
+                {
+                  eos_app_log_debug_message (" -> No matching delta for version: %s",
+                                             code_version);
                 }
             }
           else
