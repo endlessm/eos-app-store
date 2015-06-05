@@ -771,6 +771,8 @@ const AppCategoryFrame = new Lang.Class({
             let appBox = new AppListBoxRow(this._model, cell.app_info);
             appBox.show();
 
+            appBox.connect('destroy', Lang.bind(this, this._showGrid));
+
             this._stack.add_named(appBox, cell.desktop_id);
         }
 
