@@ -58,6 +58,43 @@ class IntrospectEasDbusMethod(GenericEasDbusMethod):
         print(strr)
         return ""
 
+class ShowUiEasDbusMethod(GenericEasDbusMethod):
+    def __init__(self, params):
+        super().__init__("show", "show", params);
+
+        self.reply_format = GLib.VariantType.new ('()')
+
+    def _arg_handler(self, args):
+        print('Reset: %s' % args.reset)
+        self.args = GLib.Variant('(ub)', (0, args.reset == 'true',))
+
+    def define_action_arguments(parser):
+        parser.add_argument('reset',
+                            help='Reset the store during showing')
+
+class ShowPageEasDbusMethod(GenericEasDbusMethod):
+    def __init__(self, params):
+        super().__init__("page", "showPage", params);
+
+        self.reply_format = GLib.VariantType.new ('()')
+
+    def _arg_handler(self, args):
+        print('Page: %s' % args.page)
+        self.args = GLib.Variant('(us)', (0, args.page,))
+
+    def define_action_arguments(parser):
+        parser.add_argument('page',
+                            help='Open the app store to this page')
+
+class HideUiEasDbusMethod(GenericEasDbusMethod):
+    def __init__(self, params):
+        super().__init__("hide", "hide", params);
+
+        self.reply_format = GLib.VariantType.new ('()')
+
+    def _arg_handler(self, args):
+        self.args = GLib.Variant('(u)', (0,))
+
 class RefreshEasDbusMethod(GenericEasDbusMethod):
     def __init__(self, params):
         super().__init__("refresh", "Refresh", params);
