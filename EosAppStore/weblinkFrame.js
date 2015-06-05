@@ -38,11 +38,11 @@ function getAvailableFilename(path, prefix, name, suffix) {
     // Append a number until we find a free slot
     let availableFilename = filename + suffix;
     let availablePath = GLib.build_filenamev([path, availableFilename]);
-    let i = 0;
+    let index = 0;
 
     while (GLib.file_test(availablePath, GLib.FileTest.EXISTS)) {
-        i++;
-        availableFilename = filename + '-' + i + suffix;
+        index++;
+        availableFilename = filename + '-' + index + suffix;
         availablePath = GLib.build_filenamev([path, availableFilename]);
     }
 
@@ -75,7 +75,7 @@ function createWeblink(url, title, icon) {
 
     let path = GLib.build_filenamev([GLib.get_user_data_dir(), 'applications']);
     GLib.mkdir_with_parents(path, parseInt('0755', 8));
-    
+
     let [availableFilename, availablePath] = getAvailableFilename(path, 'eos-link-user-', filename, '.desktop');
 
     desktop.set_string(GLib.KEY_FILE_DESKTOP_GROUP, GLib.KEY_FILE_DESKTOP_KEY_VERSION, '1.0');
@@ -506,11 +506,7 @@ const WeblinkListBoxRow = new Lang.Class({
     },
 
     _setSensitiveState: function(isSensitive) {
-        if (isSensitive) {
-            this._stateButton.sensitive = true;
-        } else {
-            this._stateButton.sensitive = false;
-        }
+        this._stateButton.sensitive = isSensitive;
     },
 
     // This 'just installed' state should go away after closing the store and
@@ -623,6 +619,7 @@ const WeblinkFrame = new Lang.Class({
 
         this._buttonGroup = null;
         this._modelConnectionId = null;
+        this._initializeLinks();
         this._populateCategoryHeaders();
         this.setModelConnected(true);
 
@@ -653,9 +650,21 @@ const WeblinkFrame = new Lang.Class({
         }
     },
 
+    _initializeLinks: function() {
+        for (let c in this._categories) {
+            let category = this._categories[c];
+
+            category.links = EosAppStorePrivate.link_load_content(category.id);
+        }
+    },
+
     _populateCategoryHeaders: function() {
         for (let c in this._categories) {
             let category = this._categories[c];
+
+            // We omit empty categories
+            if (category.links.length == 0)
+                continue;
 
             if (!category.button) {
                 category.button = new CategoryButton.CategoryButton({ label: category.label,
@@ -710,10 +719,9 @@ const WeblinkFrame = new Lang.Class({
             weblinksBox.add(weblinksColumnBoxes[i]);
         }
 
-        let cells = EosAppStorePrivate.link_load_content(category.id);
         let index = 0;
-        for (let i in cells) {
-            let info = cells[i];
+        for (let link_index in category.links) {
+            let info = category.links[link_index];
             let row = info.create_row();
             let rowContent = new WeblinkListBoxRow(this, this._weblinkListModel, row);
             row.add(rowContent);
@@ -724,9 +732,9 @@ const WeblinkFrame = new Lang.Class({
     },
 
     _populateAllCategories: function() {
-        for (let c in this._categories) {
-            this._resetCategory(c);
-            this._populateCategory(c);
+        for (let category in this._categories) {
+            this._resetCategory(category);
+            this._populateCategory(category);
         }
     },
 

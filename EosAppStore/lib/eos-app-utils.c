@@ -537,7 +537,7 @@ eos_link_load_content (EosLinkCategory category)
 
   if (i >= n_elements)
     {
-      g_critical ("Unable to find category '%s'", category_name);
+      eos_app_log_info_message ("Unable to find category '%s'", category_name);
       goto out;
     }
 
