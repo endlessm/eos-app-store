@@ -1842,7 +1842,7 @@ get_bundle_artifacts (EosAppListModel *self,
   eos_app_log_info_message ("Completing transaction with eam");
 
   eos_app_manager_transaction_call_complete_transaction_sync (transaction,
-                                                              bundle_path,
+                                                              eos_get_bundle_download_dir (),
                                                               &retval,
                                                               cancellable,
                                                               &error);
