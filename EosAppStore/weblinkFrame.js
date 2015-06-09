@@ -416,9 +416,8 @@ const NewSiteBox = new Lang.Class({
 
     _onSiteAdd: function() {
         let title = this._urlLabel.get_label();
-
         let desktopId = this._webHelper.save(title);
-        this._weblinkListModel.install(desktopId, function() {});
+        this._weblinkListModel.installUserWeblink(desktopId);
 
         this._setState(NewSiteBoxState.INSTALLED);
 
