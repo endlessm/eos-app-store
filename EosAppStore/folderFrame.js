@@ -152,6 +152,7 @@ const FolderIconButton = new Lang.Class({
             relief: Gtk.ReliefStyle.NONE,
             hexpand: false,
             vexpand: false,
+            halign: Gtk.Align.CENTER,
             image: new Gtk.Image({
                 icon_name: iconName,
                 pixel_size: _FOLDER_BUTTON_IMAGE_SIZE }) });
@@ -163,7 +164,7 @@ const FolderIconButton = new Lang.Class({
 
 const FolderIconGrid = new Lang.Class({
     Name: 'FolderIconGrid',
-    Extends: Gtk.Grid,
+    Extends: Gtk.FlowBox,
 
     _on_button_toggled: function(toggleButton) {
         if (toggleButton.get_active()) {
@@ -199,37 +200,14 @@ const FolderIconGrid = new Lang.Class({
         }
     },
 
-    _populate: function(allocatedWidth) {
-        let columns = Math.max(1, Math.floor(allocatedWidth / (_FOLDER_BUTTON_SIZE + _FOLDER_GRID_SPACING)));
-
+    _populate: function() {
         for (let i = 0; i < this._iconList.length; i++) {
             let button = new FolderIconButton(this._iconList[i]);
 
             button.connect('toggled', Lang.bind(this, this._on_button_toggled));
-            this.attach(button, i % columns, Math.floor(i/columns), 1, 1);
+            this.add(button);
         }
         this.show_all();
-    },
-
-    _get_icons: function() {
-        this._iconList = this._folderModel.getIconList();
-
-        // TODO better solution needed here
-        // wait for allocation to know how many columns the grid should have
-        if (this.get_realized()) {
-            // the widget has been allocated already
-            GLib.idle_add(GLib.PRIORITY_HIGH_IDLE,
-                          Lang.bind(this, this._populate),
-                          this.get_allocated_width());
-        }
-        else {
-            // we will populate it when it is allocated
-            let handler = this.connect('size-allocate',
-                                       Lang.bind(this, function (widget, allocation) {
-                                           this.disconnect(handler);
-                                           this._populate(allocation.width);
-                                       }));
-        }
     },
 
     _init: function(folderModel) {
@@ -239,7 +217,8 @@ const FolderIconGrid = new Lang.Class({
             border_width: _FOLDER_GRID_BORDER });
 
         this._folderModel = folderModel;
-        this._get_icons();
+        this._iconList = this._folderModel.getIconList();
+        this._populate();
         this._activeToggle = null;
 
         this.get_style_context().add_class('folder-icon-grid');
