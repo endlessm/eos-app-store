@@ -421,6 +421,10 @@ const NewSiteBox = new Lang.Class({
         this._weblinkListModel.install(desktopId, function() {});
 
         this._setState(NewSiteBoxState.INSTALLED);
+
+        // UX here is pretty bad if we leave the app store on top
+        let application = Gio.Application.get_default();
+        application.hide();
     },
 
     _onUrlEntryChanged: function() {
