@@ -633,6 +633,8 @@
     border: none;
     background: none;
     color: #e8e8e8;
+    box-shadow: none;
+    transition: none;
 
     -GtkWidget-focus-line-width: 0;
     -GtkWidget-focus-line-padding: 0;
