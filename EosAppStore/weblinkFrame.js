@@ -88,13 +88,14 @@ function createWeblink(url, title, icon) {
     let [data, length] = desktop.to_data();
     GLib.file_set_contents(availablePath, data, length);
 
-    return [availableFilename, availablePath, desktop];
+    return [availablePath, desktop];
 };
 
 const NewSiteHelper = new Lang.Class({
     Name: 'NewSiteHelper',
 
-    _init: function(url) {
+    _init: function(model, url) {
+        this._model = model;
         this._url = url;
         this._title = null;
 
@@ -190,11 +191,11 @@ const NewSiteHelper = new Lang.Class({
             icon = this._faviconPath;
         }
 
-        let [desktopId, keyfilePath, keyfile] = createWeblink(this._url, title, icon);
+        let [keyfilePath, keyfile] = createWeblink(this._url, title, icon);
         this._savedKeyfile = keyfile;
         this._savedKeyfilePath = keyfilePath;
 
-        return desktopId;
+        return this._model.createLink(this._savedKeyfilePath);
     }
 });
 Signals.addSignalMethods(NewSiteHelper.prototype);
@@ -417,8 +418,8 @@ const NewSiteBox = new Lang.Class({
     _onSiteAdd: function() {
         let title = this._urlLabel.get_label();
 
-        let desktopId = this._webHelper.save(title);
-        this._weblinkListModel.install(desktopId, function() {});
+        let appInfo = this._webHelper.save(title);
+        this._weblinkListModel.install(appInfo.get_desktop_id(), function() {});
 
         this._setState(NewSiteBoxState.INSTALLED);
 
@@ -439,7 +440,7 @@ const NewSiteBox = new Lang.Class({
 
     _onUrlEntryActivated: function() {
         let url = this._urlEntry.get_text();
-        this._webHelper = new NewSiteHelper(url);
+        this._webHelper = new NewSiteHelper(this._weblinkListModel, url);
 
         this._webHelper.connect('favicon-loaded', Lang.bind(this, this._onFaviconLoaded));
         this._webHelper.connect('website-loaded', Lang.bind(this, this._onWebsiteLoaded));
