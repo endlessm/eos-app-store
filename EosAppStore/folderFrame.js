@@ -200,8 +200,6 @@ const FolderIconGrid = new Lang.Class({
     },
 
     _populate: function(allocatedWidth) {
-        this._toggleButtons = [];
-
         let base = this._path + '/';
         let columns = Math.max(1, Math.floor(allocatedWidth / (_FOLDER_BUTTON_SIZE + _FOLDER_GRID_SPACING)));
 
@@ -209,9 +207,7 @@ const FolderIconGrid = new Lang.Class({
             let button = new FolderIconButton(this._iconList[i]);
 
             button.connect('toggled', Lang.bind(this, this._on_button_toggled));
-
             this.attach(button, i % columns, Math.floor(i/columns), 1, 1);
-            this._toggleButtons.push(button);
         }
         this.show_all();
     },
