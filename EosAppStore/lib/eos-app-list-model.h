@@ -6,7 +6,9 @@
 #include <gio/gio.h>
 #include <gio/gdesktopappinfo.h>
 #include <gdk-pixbuf/gdk-pixbuf.h>
+
 #include "eos-app-enums.h"
+#include "eos-app-info.h"
 
 G_BEGIN_DECLS
 
@@ -32,6 +34,9 @@ gboolean eos_app_list_model_refresh_finish          (EosAppListModel *model,
 
 GList * eos_app_list_model_get_apps_for_category    (EosAppListModel *model,
                                                      EosAppCategory category);
+
+EosAppInfo * eos_app_list_model_create_from_filename (EosAppListModel *model,
+                                                      const char *filename);
 
 gboolean eos_app_list_model_get_app_has_launcher    (EosAppListModel *model,
                                                      const char *desktop_id);

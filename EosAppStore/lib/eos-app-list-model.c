@@ -2522,3 +2522,40 @@ eos_app_list_model_launch_app (EosAppListModel *model,
 
   return launch_app (model, info, timestamp, NULL, error);
 }
+
+/**
+ * eos_app_list_model_create_from_filename:
+ * @model:
+ * @filename:
+ *
+ * Returns: (transfer none):
+ */
+EosAppInfo *
+eos_app_list_model_create_from_filename (EosAppListModel *model,
+                                         const char *filename)
+{
+  EosAppInfo *info;
+  GDesktopAppInfo *desktop_info;
+  const char *desktop_id;
+  char *app_id;
+
+  desktop_info = g_desktop_app_info_new_from_filename (filename);
+  if (desktop_info == NULL)
+    return NULL;
+
+  desktop_id = g_app_info_get_id (G_APP_INFO (desktop_info));
+  info = eos_app_list_model_get_app_info (model, desktop_id);
+  if (info == NULL)
+    {
+      app_id = app_id_from_desktop_id (desktop_id);
+      info = eos_app_info_new (app_id);
+      g_free (app_id);
+
+      g_hash_table_replace (model->apps, g_strdup (desktop_id), info);
+    }
+
+  eos_app_info_update_from_gio (info, desktop_info);
+  g_object_unref (desktop_info);
+
+  return info;
+}
