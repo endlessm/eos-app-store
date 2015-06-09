@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: eos-app-store\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-05-26 01:25+0000\n"
+"POT-Creation-Date: 2015-06-02 01:22+0000\n"
 "PO-Revision-Date: 2015-05-19 01:22+0000\n"
 "Last-Translator: endlessmobile_build <philip@endlessm.com>\n"
 "Language-Team: Arabic (http://www.transifex.com/projects/p/eos-app-store/language/ar/)\n"
@@ -22,11 +22,11 @@ msgstr ""
 msgid "Create your own folder to organize your apps. First, choose an icon."
 msgstr "قم بإنشاء مجلد خاص بك لتنظيم تطبيقاتك. اختر رمزا أولا."
 
-#: ../data/eos-app-store-list-row.ui.h:1 ../EosAppStore/appFrame.js:323
+#: ../data/eos-app-store-list-row.ui.h:1 ../EosAppStore/appFrame.js:329
 msgid "Install app"
 msgstr "تثبيت التطبيق"
 
-#: ../data/eos-app-store-list-row.ui.h:2 ../EosAppStore/appFrame.js:553
+#: ../data/eos-app-store-list-row.ui.h:2 ../EosAppStore/appFrame.js:559
 msgid "Cancel"
 msgstr "إلغاء"
 
@@ -46,95 +46,95 @@ msgstr "احذف من الجهاز"
 msgid "e.g.: http://www.globoesporte.com"
 msgstr "مثال: http://www.globoesporte.com"
 
-#: ../EosAppStore/appFrame.js:189 ../EosAppStore/appFrame.js:466
+#: ../EosAppStore/appFrame.js:189 ../EosAppStore/appFrame.js:472
 msgid "Downloading…"
 msgstr "جاري التنزيل..."
 
-#: ../EosAppStore/appFrame.js:195 ../EosAppStore/appFrame.js:500
+#: ../EosAppStore/appFrame.js:195 ../EosAppStore/appFrame.js:506
 msgid "Installing…"
 msgstr "جاري التثبيت…"
 
-#: ../EosAppStore/appFrame.js:324
+#: ../EosAppStore/appFrame.js:330
 msgid "Update app"
 msgstr "تحديث التطبيق"
 
-#: ../EosAppStore/appFrame.js:325
+#: ../EosAppStore/appFrame.js:331
 msgid "Open app"
 msgstr "فتح التطبيق"
 
-#: ../EosAppStore/appFrame.js:326
+#: ../EosAppStore/appFrame.js:332
 msgid "Add to the desktop"
 msgstr "إضافة إلى سطح المكتب "
 
-#: ../EosAppStore/appFrame.js:327
+#: ../EosAppStore/appFrame.js:333
 msgid "No network connection is available"
 msgstr ""
 
-#: ../EosAppStore/appFrame.js:328
+#: ../EosAppStore/appFrame.js:334
 msgid "Insufficient space to install the app"
 msgstr "مساحة غير كافية لتثبيت التطبيق"
 
-#: ../EosAppStore/appFrame.js:442
+#: ../EosAppStore/appFrame.js:448
 #, javascript-format
 msgid "We could not install '%s'"
 msgstr "لم نتمكن من تثبيت '%s'"
 
-#: ../EosAppStore/appFrame.js:447
+#: ../EosAppStore/appFrame.js:453
 #, javascript-format
 msgid "'%s' was installed successfully"
 msgstr "تم تثبيت '%s' بنجاح"
 
-#: ../EosAppStore/appFrame.js:471
+#: ../EosAppStore/appFrame.js:477
 msgid "Updating…"
 msgstr "جاري التحديث…"
 
-#: ../EosAppStore/appFrame.js:478
+#: ../EosAppStore/appFrame.js:484
 #, javascript-format
 msgid "We could not update '%s'"
 msgstr "لم نتمكن من تحديث '%s'"
 
-#: ../EosAppStore/appFrame.js:481
+#: ../EosAppStore/appFrame.js:487
 #, javascript-format
 msgid "'%s' was updated successfully"
 msgstr "تم تحديث '%s' بنجاح"
 
-#: ../EosAppStore/appFrame.js:549
+#: ../EosAppStore/appFrame.js:555
 msgid "Deleting app"
 msgstr "جاري حذف التطبيق"
 
-#: ../EosAppStore/appFrame.js:550
+#: ../EosAppStore/appFrame.js:556
 msgid ""
 "Deleting this app will remove it from the device for all users. You will "
 "need to download it from the internet in order to reinstall it."
 msgstr "سيقوم حذف هذا التطبيق بإزالته من الجهاز لجميع المستخدمين. سوف تحتاج إلى تحميله من الإنترنت من أجل إعادة تثبيته."
 
-#: ../EosAppStore/appFrame.js:551
+#: ../EosAppStore/appFrame.js:557
 msgid "Delete app"
 msgstr "احذف التطبيق"
 
-#: ../EosAppStore/appFrame.js:561
+#: ../EosAppStore/appFrame.js:567
 msgid "Removing…"
 msgstr "جاري الحذف"
 
-#: ../EosAppStore/appFrame.js:567
+#: ../EosAppStore/appFrame.js:573
 #, javascript-format
 msgid "We could not remove '%s'"
 msgstr "لم نتمكن من إزالة '%s'"
 
-#: ../EosAppStore/appFrame.js:570
+#: ../EosAppStore/appFrame.js:576
 #, javascript-format
 msgid "'%s' was removed successfully"
 msgstr "تمت إزالة '%s' بنجاح"
 
-#: ../EosAppStore/appFrame.js:617 ../EosAppStore/appFrame.js:850
+#: ../EosAppStore/appFrame.js:623 ../EosAppStore/appFrame.js:857
 msgid "Dismiss"
 msgstr "استبعاد"
 
-#: ../EosAppStore/appFrame.js:814
+#: ../EosAppStore/appFrame.js:821
 msgid "Install apps"
 msgstr "تثبيت التطبيقات"
 
-#: ../EosAppStore/appFrame.js:848
+#: ../EosAppStore/appFrame.js:855
 msgid "Update failed"
 msgstr ""
 

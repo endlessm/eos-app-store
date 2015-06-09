@@ -23,7 +23,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: eos-app-store\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-05-26 01:25+0000\n"
+"POT-Creation-Date: 2015-06-02 01:22+0000\n"
 "PO-Revision-Date: 2015-05-19 01:22+0000\n"
 "Last-Translator: endlessmobile_build <philip@endlessm.com>\n"
 "Language-Team: Spanish (http://www.transifex.com/projects/p/eos-app-store/language/es/)\n"
@@ -37,11 +37,11 @@ msgstr ""
 msgid "Create your own folder to organize your apps. First, choose an icon."
 msgstr "Crea tu propia carpeta para organizar tus programas. Primero, escoge un icono."
 
-#: ../data/eos-app-store-list-row.ui.h:1 ../EosAppStore/appFrame.js:323
+#: ../data/eos-app-store-list-row.ui.h:1 ../EosAppStore/appFrame.js:329
 msgid "Install app"
 msgstr "Instalar programa"
 
-#: ../data/eos-app-store-list-row.ui.h:2 ../EosAppStore/appFrame.js:553
+#: ../data/eos-app-store-list-row.ui.h:2 ../EosAppStore/appFrame.js:559
 msgid "Cancel"
 msgstr "Cancelar"
 
@@ -61,95 +61,95 @@ msgstr "Eliminar del sistema"
 msgid "e.g.: http://www.globoesporte.com"
 msgstr "ej.: http://www.globoesporte.com"
 
-#: ../EosAppStore/appFrame.js:189 ../EosAppStore/appFrame.js:466
+#: ../EosAppStore/appFrame.js:189 ../EosAppStore/appFrame.js:472
 msgid "Downloading…"
 msgstr "Descargando…"
 
-#: ../EosAppStore/appFrame.js:195 ../EosAppStore/appFrame.js:500
+#: ../EosAppStore/appFrame.js:195 ../EosAppStore/appFrame.js:506
 msgid "Installing…"
 msgstr "Instalando…"
 
-#: ../EosAppStore/appFrame.js:324
+#: ../EosAppStore/appFrame.js:330
 msgid "Update app"
 msgstr "Actualizar programa"
 
-#: ../EosAppStore/appFrame.js:325
+#: ../EosAppStore/appFrame.js:331
 msgid "Open app"
 msgstr "Abrir programa"
 
-#: ../EosAppStore/appFrame.js:326
+#: ../EosAppStore/appFrame.js:332
 msgid "Add to the desktop"
 msgstr "Agregar al escritorio"
 
-#: ../EosAppStore/appFrame.js:327
+#: ../EosAppStore/appFrame.js:333
 msgid "No network connection is available"
 msgstr ""
 
-#: ../EosAppStore/appFrame.js:328
+#: ../EosAppStore/appFrame.js:334
 msgid "Insufficient space to install the app"
 msgstr "No hay suficiente espacio para instalar el programa"
 
-#: ../EosAppStore/appFrame.js:442
+#: ../EosAppStore/appFrame.js:448
 #, javascript-format
 msgid "We could not install '%s'"
 msgstr "No pudimos instalar '%s'"
 
-#: ../EosAppStore/appFrame.js:447
+#: ../EosAppStore/appFrame.js:453
 #, javascript-format
 msgid "'%s' was installed successfully"
 msgstr "'%s' fue instalado con éxito"
 
-#: ../EosAppStore/appFrame.js:471
+#: ../EosAppStore/appFrame.js:477
 msgid "Updating…"
 msgstr "Actualizando…"
 
-#: ../EosAppStore/appFrame.js:478
+#: ../EosAppStore/appFrame.js:484
 #, javascript-format
 msgid "We could not update '%s'"
 msgstr "No pudimos actualizar '%s'"
 
-#: ../EosAppStore/appFrame.js:481
+#: ../EosAppStore/appFrame.js:487
 #, javascript-format
 msgid "'%s' was updated successfully"
 msgstr "'%s' fue actualizado con éxito"
 
-#: ../EosAppStore/appFrame.js:549
+#: ../EosAppStore/appFrame.js:555
 msgid "Deleting app"
 msgstr "Eliminando el programa"
 
-#: ../EosAppStore/appFrame.js:550
+#: ../EosAppStore/appFrame.js:556
 msgid ""
 "Deleting this app will remove it from the device for all users. You will "
 "need to download it from the internet in order to reinstall it."
 msgstr "Si borras este programa será eliminado del sistema, y el cambio será actualizado para todos los usuarios de esta computadora. Para reinstalar el programa, tendrás que descargarlo del internet e instalarlo de nuevo."
 
-#: ../EosAppStore/appFrame.js:551
+#: ../EosAppStore/appFrame.js:557
 msgid "Delete app"
 msgstr "Eliminar programa"
 
-#: ../EosAppStore/appFrame.js:561
+#: ../EosAppStore/appFrame.js:567
 msgid "Removing…"
 msgstr "Eliminando…"
 
-#: ../EosAppStore/appFrame.js:567
+#: ../EosAppStore/appFrame.js:573
 #, javascript-format
 msgid "We could not remove '%s'"
 msgstr "No pudimos quitar '%s'"
 
-#: ../EosAppStore/appFrame.js:570
+#: ../EosAppStore/appFrame.js:576
 #, javascript-format
 msgid "'%s' was removed successfully"
 msgstr "'%s' fue quitado con éxito"
 
-#: ../EosAppStore/appFrame.js:617 ../EosAppStore/appFrame.js:850
+#: ../EosAppStore/appFrame.js:623 ../EosAppStore/appFrame.js:857
 msgid "Dismiss"
 msgstr "Cerrar"
 
-#: ../EosAppStore/appFrame.js:814
+#: ../EosAppStore/appFrame.js:821
 msgid "Install apps"
 msgstr "Instalar programas"
 
-#: ../EosAppStore/appFrame.js:848
+#: ../EosAppStore/appFrame.js:855
 msgid "Update failed"
 msgstr ""
 
