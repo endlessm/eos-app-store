@@ -233,4 +233,8 @@ const AppList = new Lang.Class({
 const WeblinkList = new Lang.Class({
     Name: 'WeblinkList',
     Extends: BaseList,
+
+    createLink: function(filename) {
+        return this._model.create_from_filename(filename);
+    }
 });
