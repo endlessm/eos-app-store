@@ -233,9 +233,4 @@ const AppList = new Lang.Class({
 const WeblinkList = new Lang.Class({
     Name: 'WeblinkList',
     Extends: BaseList,
-
-    installUserWeblink: function(id) {
-        let application = Gio.Application.get_default();
-        application.shellProxy.proxy.AddApplicationSync(id);
-    }
 });
