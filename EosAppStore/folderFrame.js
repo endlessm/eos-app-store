@@ -200,7 +200,6 @@ const FolderIconGrid = new Lang.Class({
     },
 
     _populate: function(allocatedWidth) {
-        let base = this._path + '/';
         let columns = Math.max(1, Math.floor(allocatedWidth / (_FOLDER_BUTTON_SIZE + _FOLDER_GRID_SPACING)));
 
         for (let i = 0; i < this._iconList.length; i++) {
