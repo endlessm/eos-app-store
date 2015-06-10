@@ -161,7 +161,6 @@ download_file_chunk_func (GByteArray *chunk,
 static gboolean
 download_file_chunks (GInputStream   *in_stream,
                       GOutputStream  *out_stream,
-                      EosAppInfo     *info,
                       gsize          *bytes_read,
                       EosChunkFunc    chunk_func,
                       gpointer        chunk_func_user_data,
@@ -205,14 +204,9 @@ download_file_chunks (GInputStream   *in_stream,
     {
       char *error_message;
 
-      eos_app_log_info_message ("Canceled download");
+      eos_app_log_info_message ("Download cancelled");
 
-      if (info != NULL)
-        error_message = g_strdup_printf (_("Download of app '%s' cancelled by the user."),
-                                         eos_app_info_get_application_id (info));
-      else
-        error_message = g_strdup (_("Refresh of available apps cancelled by the user."));
-
+      error_message = g_strdup (_("Download cancelled"));
       g_set_error_literal (error, EOS_NET_UTILS_ERROR,
                            EOS_NET_UTILS_ERROR_CANCELLED,
                            error_message);
@@ -325,7 +319,6 @@ prepare_soup_request (SoupSession  *session,
 
 static GOutputStream *
 prepare_out_stream (const char    *target_file,
-                    EosAppInfo    *info,
                     GCancellable  *cancellable,
                     GError       **error)
 {
@@ -340,12 +333,7 @@ prepare_out_stream (const char    *target_file,
 
       eos_app_log_error_message ("Create file failed - canceling download");
 
-      if (info != NULL)
-        error_message = g_strdup_printf (_("Unable to create the file for downloading '%s': %s"),
-                                         eos_app_info_get_application_id (info),
-                                         internal_error->message);
-      else
-        error_message = g_strdup_printf (_("Unable to update the list of available applications: %s"),
+      error_message = g_strdup_printf (_("Create file failed - canceling download (%s)"),
                                          internal_error->message);
 
       g_set_error_literal (error, EOS_NET_UTILS_ERROR,
@@ -406,7 +394,7 @@ download_from_uri (SoupSession          *session,
   if (in_stream == NULL)
     goto out;
 
-  out_stream = prepare_out_stream (target_file, info, cancellable, error);
+  out_stream = prepare_out_stream (target_file, cancellable, error);
   if (out_stream == NULL)
     goto out;
 
@@ -422,7 +410,7 @@ download_from_uri (SoupSession          *session,
   clos->info = info;
   clos->total_len = total;
 
-  retval = download_file_chunks (in_stream, out_stream, info, &bytes_read,
+  retval = download_file_chunks (in_stream, out_stream, &bytes_read,
                                  download_chunk_func,
                                  clos, cancellable, error);
 
@@ -572,11 +560,11 @@ eos_net_utils_download_file_from_uri (SoupSession     *session,
   if (in_stream == NULL)
     goto out;
 
-  out_stream = prepare_out_stream (target_file, NULL, cancellable, error);
+  out_stream = prepare_out_stream (target_file, cancellable, error);
   if (out_stream == NULL)
     goto out;
 
-  if (!download_file_chunks (in_stream, out_stream, NULL, &bytes_read,
+  if (!download_file_chunks (in_stream, out_stream, &bytes_read,
                              download_file_chunk_func, all_content,
                              cancellable, error))
     goto out;
