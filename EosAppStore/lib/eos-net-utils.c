@@ -366,10 +366,10 @@ prepare_out_stream (const char    *target_file,
 }
 
 static void
-download_app_file_chunk_func (GByteArray *chunk,
-                              gsize       chunk_len,
-                              gsize       bytes_read,
-                              gpointer    chunk_func_user_data)
+download_chunk_func (GByteArray *chunk,
+                     gsize       chunk_len,
+                     gsize       bytes_read,
+                     gpointer    chunk_func_user_data)
 {
   EosDownloadAppFileClosure *clos = chunk_func_user_data;
 
@@ -380,15 +380,15 @@ download_app_file_chunk_func (GByteArray *chunk,
 }
 
 static gboolean
-download_app_file_from_uri (SoupSession          *session,
-                            EosAppInfo           *info,
-                            const char           *source_uri,
-                            const char           *target_file,
-                            EosProgressReportFunc progress_func,
-                            gpointer              progress_func_user_data,
-                            gboolean             *reset_error_counter,
-                            GCancellable         *cancellable,
-                            GError              **error)
+download_from_uri (SoupSession          *session,
+                   EosAppInfo           *info,
+                   const char           *source_uri,
+                   const char           *target_file,
+                   EosProgressReportFunc progress_func,
+                   gpointer              progress_func_user_data,
+                   gboolean             *reset_error_counter,
+                   GCancellable         *cancellable,
+                   GError              **error)
 {
   gboolean retval = FALSE;
 
@@ -428,7 +428,7 @@ download_app_file_from_uri (SoupSession          *session,
   clos->total_len = total;
 
   retval = download_file_chunks (in_stream, out_stream, info, &bytes_read,
-                                 download_app_file_chunk_func,
+                                 download_chunk_func,
                                  clos, cancellable, error);
 
   g_slice_free (EosDownloadAppFileClosure, clos);
@@ -480,13 +480,13 @@ eos_net_utils_download_file_with_retry (SoupSession          *session,
      */
     while (TRUE)
       {
-        download_success = download_app_file_from_uri (session, info, source_uri,
-                                                       target_file,
-                                                       progress_func,
-                                                       progress_func_user_data,
-                                                       &reset_error_counter,
-                                                       cancellable,
-                                                       &error);
+        download_success = download_from_uri (session, info, source_uri,
+                                              target_file,
+                                              progress_func,
+                                              progress_func_user_data,
+                                              &reset_error_counter,
+                                              cancellable,
+                                              &error);
 
         /* We're done if we get the file */
         if (download_success)
