@@ -55,7 +55,18 @@ gboolean  eos_net_utils_download_file_with_retry (SoupSession          *session,
                                                   EosProgressReportFunc progress_func,
                                                   gpointer              progress_func_user_data,
                                                   GCancellable         *cancellable,
-                                                  GError              **error_out);
+                                                  GError              **error);
+
+#define EOS_NET_UTILS_ERROR        (eos_net_utils_error_quark ())
+
+GQuark eos_net_utils_error_quark (void);
+
+typedef enum {
+  EOS_NET_UTILS_ERROR_INVALID_URL,
+  EOS_NET_UTILS_ERROR_FAILED,
+  EOS_NET_UTILS_ERROR_BAD_CERTIFICATE,
+  EOS_NET_UTILS_ERROR_CANCELLED
+} EosNetUtilsError;
 
 G_END_DECLS
 

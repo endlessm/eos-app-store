@@ -959,7 +959,7 @@ create_sha256sum (EosAppListModel *self,
   if (bundle_hash == NULL || *bundle_hash == '\0')
     {
       g_set_error (error_out, EOS_APP_LIST_MODEL_ERROR,
-                   EOS_APP_LIST_MODEL_ERROR_INVALID_URL,
+                   EOS_APP_LIST_MODEL_ERROR_CHECKSUM_MISSING,
                    _("No verification available for app '%s'"),
                    app_id);
       return NULL;
@@ -997,7 +997,7 @@ download_signature (EosAppListModel *self,
   if (signature_uri == NULL || *signature_uri == '\0')
     {
       g_set_error (error_out, EOS_APP_LIST_MODEL_ERROR,
-                   EOS_APP_LIST_MODEL_ERROR_INVALID_URL,
+                   EOS_APP_LIST_MODEL_ERROR_SIGNATURE_MISSING,
                    _("No signature available for app '%s'"),
                    app_id);
       return NULL;

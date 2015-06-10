@@ -26,6 +26,8 @@
 
 #define GET_DATA_BLOCK_SIZE     64 * 1024
 
+G_DEFINE_QUARK (eos-net-utils-error-quark, eos_net_utils_error)
+
 void
 eos_net_utils_progress_closure_free (gpointer _data)
 {
@@ -211,8 +213,8 @@ download_file_chunks (GInputStream   *in_stream,
       else
         error_message = g_strdup (_("Refresh of available apps cancelled by the user."));
 
-      g_set_error_literal (error, EOS_APP_LIST_MODEL_ERROR,
-                           EOS_APP_LIST_MODEL_ERROR_CANCELLED,
+      g_set_error_literal (error, EOS_NET_UTILS_ERROR,
+                           EOS_NET_UTILS_ERROR_CANCELLED,
                            error_message);
       g_free (error_message);
 
@@ -244,7 +246,6 @@ static SoupRequest *
 prepare_soup_request (SoupSession  *session,
                       const char   *source_uri,
                       const char   *content_type,
-                      EosAppInfo   *info,
                       GError      **error)
 {
   GError *internal_error = NULL;
@@ -256,14 +257,9 @@ prepare_soup_request (SoupSession  *session,
 
       eos_app_log_error_message ("Soap URI is NULL - canceling download");
 
-      if (info != NULL)
-        error_message = g_strdup_printf (_("No available bundle for '%s'"),
-                                         eos_app_info_get_application_id (info));
-      else
-        error_message = g_strdup (_("No available data on the server"));
-
-      g_set_error_literal (error, EOS_APP_LIST_MODEL_ERROR,
-                           EOS_APP_LIST_MODEL_ERROR_INVALID_URL,
+      error_message = g_strdup (_("Soap URI is NULL - canceling download"));
+      g_set_error_literal (error, EOS_NET_UTILS_ERROR,
+                           EOS_NET_UTILS_ERROR_INVALID_URL,
                            error_message);
       g_free (error_message);
 
@@ -293,18 +289,18 @@ prepare_soup_request (SoupSession  *session,
           const char *msg;
 
           if ((cert_flags & G_TLS_CERTIFICATE_EXPIRED) != 0)
-            msg = _("The certificate of the app store is expired");
+            msg = _("The certificate of the target server is expired");
           else if ((cert_flags & G_TLS_CERTIFICATE_REVOKED) != 0)
-            msg = _("The certificate of the app store has been revoked");
+            msg = _("The certificate of the target server has been revoked");
           else if ((cert_flags & G_TLS_CERTIFICATE_BAD_IDENTITY) != 0)
-            msg = _("The certificate of the app store has a bad identity");
+            msg = _("The certificate of the target server has a bad identity");
           else if ((cert_flags & G_TLS_CERTIFICATE_UNKNOWN_CA) != 0)
-            msg = _("The certificate of the app store is from an unknown authority");
+            msg = _("The certificate of the target server is from an unknown authority");
           else
-            msg = _("The certificate of the app store is bad or invalid");
+            msg = _("The certificate of the target server is bad or invalid");
 
-          g_set_error_literal (error, EOS_APP_LIST_MODEL_ERROR,
-                               EOS_APP_LIST_MODEL_ERROR_BAD_CERTIFICATE,
+          g_set_error_literal (error, EOS_NET_UTILS_ERROR,
+                               EOS_NET_UTILS_ERROR_BAD_CERTIFICATE,
                                msg);
           g_error_free (internal_error);
         }
@@ -352,8 +348,8 @@ prepare_out_stream (const char    *target_file,
         error_message = g_strdup_printf (_("Unable to update the list of available applications: %s"),
                                          internal_error->message);
 
-      g_set_error_literal (error, EOS_APP_LIST_MODEL_ERROR,
-                           EOS_APP_LIST_MODEL_ERROR_FAILED,
+      g_set_error_literal (error, EOS_NET_UTILS_ERROR,
+                           EOS_NET_UTILS_ERROR_FAILED,
                            error_message);
 
       g_error_free (internal_error);
@@ -398,8 +394,7 @@ download_from_uri (SoupSession          *session,
   gsize bytes_read = 0;
   GInputStream *in_stream = NULL;
   GOutputStream *out_stream = NULL;
-  SoupRequest *request = prepare_soup_request (session, source_uri, NULL, info,
-                                               error);
+  SoupRequest *request = prepare_soup_request (session, source_uri, NULL, error);
   if (request == NULL)
     goto out;
 
@@ -493,8 +488,8 @@ eos_net_utils_download_file_with_retry (SoupSession          *session,
             break;
 
         /* If we got canceled, also bail */
-        if (g_error_matches (error, EOS_APP_LIST_MODEL_ERROR,
-                             EOS_APP_LIST_MODEL_ERROR_CANCELLED))
+        if (g_error_matches (error, EOS_NET_UTILS_ERROR,
+                             EOS_NET_UTILS_ERROR_CANCELLED))
           {
             eos_app_log_error_message ("Download cancelled. Breaking out of retry loop.");
             g_propagate_error (error_out, error);
@@ -561,9 +556,7 @@ eos_net_utils_download_file_from_uri (SoupSession     *session,
   GInputStream *in_stream = NULL;
   GOutputStream *out_stream = NULL;
   GByteArray *all_content = g_byte_array_new ();
-  SoupRequest *request = prepare_soup_request (session, source_uri, content_type,
-                                               NULL,
-                                               error);
+  SoupRequest *request = prepare_soup_request (session, source_uri, content_type, error);
   if (request == NULL)
     goto out;
 
