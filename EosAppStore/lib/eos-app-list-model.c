@@ -3,6 +3,10 @@
 
 #include "config.h"
 
+// TODO: Move this to bottom of imports (we leave it here to find out all
+//       missing imports
+#include "eos-net-utils.h"
+
 #include "eos-app-log.h"
 #include "eos-app-list-model.h"
 #include "eos-app-manager-service.h"
@@ -914,7 +918,7 @@ progress_closure_free (gpointer _data)
 static gboolean
 emit_download_progress (gpointer _data)
 {
-  ProgressClosure *data = _data;
+  EosProgressClosure *data = _data;
 
   g_signal_emit (data->model, eos_app_list_model_signals[DOWNLOAD_PROGRESS], 0,
                  eos_app_info_get_content_id (data->info),
@@ -931,7 +935,7 @@ queue_download_progress (EosAppInfo *info,
                          gpointer    user_data)
 {
   EosAppListModel *self = user_data;
-  ProgressClosure *clos = g_slice_new (ProgressClosure);
+  EosProgressClosure *clos = g_slice_new (EosProgressClosure);
 
   clos->model = g_object_ref (self);
   clos->info = g_object_ref (info);
@@ -942,7 +946,7 @@ queue_download_progress (EosAppInfo *info,
   g_main_context_invoke_full (NULL, G_PRIORITY_DEFAULT,
                               emit_download_progress,
                               clos,
-                              progress_closure_free);
+                              eos_net_utils_progress_closure_free);
 }
 
 static gboolean
@@ -1425,10 +1429,10 @@ out:
 }
 
 typedef struct {
-  ProgressReportFunc  progress_func;
-  gpointer            progress_func_user_data;
-  EosAppInfo         *info;
-  gsize               total_len;
+  EosProgressReportFunc  progress_func;
+  gpointer               progress_func_user_data;
+  EosAppInfo            *info;
+  gsize                  total_len;
 } DownloadAppFileClosure;
 
 static void
@@ -1446,11 +1450,11 @@ download_app_file_chunk_func (GByteArray *chunk,
 }
 
 static gboolean
-download_app_file_from_uri (SoupSession     *session,
-                            EosAppInfo      *info,
-                            const char      *source_uri,
-                            const char      *target_file,
-                            ProgressReportFunc progress_func,
+download_app_file_from_uri (SoupSession          *session,
+                            EosAppInfo           *info,
+                            const char           *source_uri,
+                            const char           *target_file,
+                            EosProgressReportFunc progress_func,
                             gpointer         progress_func_user_data,
                             gboolean        *reset_error_counter,
                             GCancellable    *cancellable,
@@ -1519,14 +1523,14 @@ out:
 }
 
 static gboolean
-download_app_file_from_uri_with_retry (SoupSession     *session,
-                                       EosAppInfo      *info,
-                                       const char      *source_uri,
-                                       const char      *target_file,
-                                       ProgressReportFunc progress_func,
-                                       gpointer         progress_func_user_data,
-                                       GCancellable    *cancellable,
-                                       GError         **error_out)
+download_app_file_from_uri_with_retry (SoupSession          *session,
+                                       EosAppInfo           *info,
+                                       const char           *source_uri,
+                                       const char           *target_file,
+                                       EosProgressReportFunc progress_func,
+                                       gpointer              progress_func_user_data,
+                                       GCancellable         *cancellable,
+                                       GError              **error_out)
 {
     gboolean download_success = FALSE;
     gboolean reset_error_counter = FALSE;
