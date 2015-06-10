@@ -6,6 +6,7 @@
 
 #include <glib.h>
 #include <glib-object.h>
+#include <libsoup/soup.h>
 
 #include "eos-app-info.h"
 #include "eos-app-list-model.h"
@@ -31,7 +32,12 @@ typedef struct {
   gsize                  total_len;
 } EosDownloadAppFileClosure;
 
-void   eos_net_utils_progress_closure_free   (gpointer data);
+void           eos_net_utils_progress_closure_free         (gpointer data);
+
+GInputStream * eos_net_utils_set_up_download_from_request  (SoupRequest   *request,
+                                                            const char    *target_file,
+                                                            GCancellable  *cancellable,
+                                                            GError       **error);
 
 G_END_DECLS
 

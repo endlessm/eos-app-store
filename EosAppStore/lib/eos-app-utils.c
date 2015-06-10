@@ -1685,3 +1685,52 @@ eos_compare_versions (const char *a,
 
   return res;
 }
+
+gboolean
+eos_check_available_space (GFile         *path,
+                           goffset        min_size,
+                           GCancellable  *cancellable,
+                           GError       **error)
+{
+  GFileInfo *info;
+  gboolean retval = TRUE;
+
+  if (path == NULL)
+    eos_app_log_error_message ("File doesn't exist");
+
+  eos_app_log_info_message ("Trying to get filesystem info from %s",
+                            g_file_get_path(path));
+
+  info = g_file_query_filesystem_info (path, G_FILE_ATTRIBUTE_FILESYSTEM_FREE,
+                                       cancellable,
+                                       error);
+  if (info == NULL)
+    {
+      eos_app_log_error_message ("Can't get filesystem info to calculate"
+                                 "the available space");
+      return FALSE;
+    }
+
+  guint64 free_space = g_file_info_get_attribute_uint64 (info, G_FILE_ATTRIBUTE_FILESYSTEM_FREE);
+
+  /* we try to be conservative, and reserve twice the requested size, like
+   * eos-app-manager does.
+   */
+  guint64 req_space = min_size * 2;
+
+  eos_app_log_info_message ("Space left on FS: %lld", (long long) req_space);
+
+  if (free_space < req_space)
+    {
+      eos_app_log_error_message ("Not enough space on device for downloading app");
+
+      g_set_error (error, EOS_APP_UTILS_ERROR,
+                   EOS_APP_UTILS_ERROR_DISK_FULL,
+                   _("Not enough space on device for downloading app"));
+      retval = FALSE;
+    }
+
+  g_object_unref (info);
+
+  return retval;
+}

@@ -949,55 +949,6 @@ queue_download_progress (EosAppInfo *info,
                               eos_net_utils_progress_closure_free);
 }
 
-static gboolean
-check_available_space (GFile         *path,
-                       goffset        min_size,
-                       GCancellable  *cancellable,
-                       GError       **error)
-{
-  GFileInfo *info;
-  gboolean retval = TRUE;
-
-  if (path == NULL)
-    eos_app_log_error_message ("File doesn't exist");
-
-  eos_app_log_info_message ("Trying to get filesystem info from %s",
-                            g_file_get_path(path));
-
-  info = g_file_query_filesystem_info (path, G_FILE_ATTRIBUTE_FILESYSTEM_FREE,
-                                       cancellable,
-                                       error);
-  if (info == NULL)
-    {
-      eos_app_log_error_message ("Can't get filesystem info to calculate"
-                                 "the available space");
-      return FALSE;
-    }
-
-  guint64 free_space = g_file_info_get_attribute_uint64 (info, G_FILE_ATTRIBUTE_FILESYSTEM_FREE);
-
-  /* we try to be conservative, and reserve twice the requested size, like
-   * eos-app-manager does.
-   */
-  guint64 req_space = min_size * 2;
-
-  eos_app_log_info_message ("Space left on FS: %lld", (long long) req_space);
-
-  if (free_space < req_space)
-    {
-      eos_app_log_error_message ("Not enough space on device for downloading app");
-
-      g_set_error (error, EOS_APP_LIST_MODEL_ERROR,
-                   EOS_APP_LIST_MODEL_ERROR_DISK_FULL,
-                   _("Not enough space on device for downloading app"));
-      retval = FALSE;
-    }
-
-  g_object_unref (info);
-
-  return retval;
-}
-
 static SoupRequest *
 prepare_soup_request (SoupSession  *session,
                       const char   *source_uri,
@@ -1111,49 +1062,6 @@ set_up_target_dir (const char *target_file,
   g_object_unref (file);
 
   return res;
-}
-
-static GInputStream *
-set_up_download_from_request (SoupRequest   *request,
-                              const char    *target_file,
-                              GCancellable  *cancellable,
-                              GError       **error)
-{
-  GError *internal_error = NULL;
-  GInputStream *in_stream = soup_request_send (request, cancellable, &internal_error);
-
-  if (internal_error != NULL)
-    {
-      eos_app_log_error_message ("Soup request sending had an internal error");
-
-      g_propagate_error (error, internal_error);
-      return NULL;
-    }
-
-  goffset total = soup_request_get_content_length (request);
-  GFile *file = g_file_new_for_path (target_file);
-  GFile *parent = g_file_get_parent (file);
-
-  if (!check_available_space (parent, total, cancellable, &internal_error))
-    {
-      eos_app_log_error_message ("Not enough space on FS - canceling download");
-
-      g_propagate_error (error, internal_error);
-      g_clear_object (&in_stream);
-      goto out;
-    }
-
-  /* we don't use GFile API because the error handling is weird,
-   * and we also know that the target is a local file, so there
-   * is no point in going through the abstraction
-   */
-  g_unlink (target_file);
-
- out:
-  g_object_unref (parent);
-  g_object_unref (file);
-
-  return in_stream;
 }
 
 static GOutputStream *
@@ -1393,12 +1301,13 @@ download_file_from_uri (SoupSession     *session,
   /* For non-bundle artifacts files we cannot rely on the target directory
    * to exist, so we always try and create it. If the directory already
    * exists, this is a no-op.
-   */ 
+   */
   if (!set_up_target_dir (target_file, error))
     goto out;
 
-  in_stream = set_up_download_from_request (request, target_file,
-                                            cancellable, error);
+  in_stream = eos_net_utils_set_up_download_from_request (request, target_file,
+                                                          cancellable,
+                                                          error);
   if (in_stream == NULL)
     goto out;
 
@@ -1470,8 +1379,9 @@ download_app_file_from_uri (SoupSession          *session,
   /* For app bundles artifacts we are guaranteed that the download directory
    * exists and has been successfully created by eos_get_bundle_download_dir().
    */
-  in_stream = set_up_download_from_request (request, target_file,
-                                            cancellable, error);
+  in_stream = eos_net_utils_set_up_download_from_request (request, target_file,
+                                                          cancellable,
+                                                          error);
   if (in_stream == NULL)
     goto out;
 

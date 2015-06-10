@@ -60,6 +60,11 @@ gboolean eos_app_load_updates_meta_record (gint64        *monotonic_update_id,
                                            GCancellable  *cancellable,
                                            GError       **error);
 
+gboolean eos_check_available_space        (GFile         *path,
+                                           goffset        min_size,
+                                           GCancellable  *cancellable,
+                                           GError       **error);
+
 void eos_app_load_gio_apps   (GHashTable *app_info);
 void eos_app_load_shell_apps (GHashTable *app_info,
                               GVariant *shell_apps);
@@ -76,7 +81,8 @@ GQuark eos_app_utils_error_quark (void);
 typedef enum {
   EOS_APP_UTILS_ERROR_JSON_UNEXPECTED_STRUCTURE,
   EOS_APP_UTILS_ERROR_JSON_MISSING_ATTRIBUTE,
-  EOS_APP_UTILS_ERROR_JSON_UNEXPECTED_VALUE
+  EOS_APP_UTILS_ERROR_JSON_UNEXPECTED_VALUE,
+  EOS_APP_UTILS_ERROR_DISK_FULL
 } EosAppUtilsError;
 
 G_END_DECLS
