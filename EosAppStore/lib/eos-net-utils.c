@@ -28,17 +28,6 @@
 
 G_DEFINE_QUARK (eos-net-utils-error-quark, eos_net_utils_error)
 
-void
-eos_net_utils_progress_closure_free (gpointer _data)
-{
-  EosProgressClosure *data = _data;
-
-  g_clear_object (&data->model);
-  g_object_unref (data->info);
-
-  g_slice_free (EosProgressClosure, data);
-}
-
 static GInputStream *
 set_up_download_from_request (SoupRequest   *request,
                               const char    *target_file,
@@ -364,7 +353,6 @@ download_chunk_func (GByteArray *chunk,
 
 static gboolean
 download_from_uri (SoupSession          *session,
-                   EosAppInfo           *info,
                    const char           *source_uri,
                    const char           *target_file,
                    EosProgressReportFunc progress_func,
@@ -406,7 +394,6 @@ download_from_uri (SoupSession          *session,
   EosDownloadAppFileClosure *clos = g_slice_new0 (EosDownloadAppFileClosure);
   clos->progress_func = progress_func;
   clos->progress_func_user_data = progress_func_user_data;
-  clos->info = info;
   clos->total_len = total;
 
   retval = download_file_chunks (in_stream, out_stream, &bytes_read,
@@ -461,8 +448,7 @@ eos_net_utils_download_file_with_retry (SoupSession          *session,
      */
     while (TRUE)
       {
-        download_success = download_from_uri (session, NULL, source_uri,
-                                              target_file,
+        download_success = download_from_uri (session, source_uri, target_file,
                                               progress_func,
                                               progress_func_user_data,
                                               &reset_error_counter,

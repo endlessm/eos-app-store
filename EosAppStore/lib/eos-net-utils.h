@@ -23,10 +23,9 @@ typedef void (* EosChunkFunc)          (GByteArray *chunk,
                                         gpointer    chunk_func_user_data);
 
 typedef struct {
-  EosAppListModel *model;
-  EosAppInfo *info;
   goffset current;
   goffset total;
+  gpointer user_data;
 } EosProgressClosure;
 
 typedef struct {

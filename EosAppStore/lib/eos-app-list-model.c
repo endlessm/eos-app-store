@@ -82,6 +82,15 @@ typedef struct
 } DownloadProgressCallbackData;
 
 static void
+download_progress_callback_data_free (DownloadProgressCallbackData *data)
+{
+  g_object_unref (data->model);
+  g_object_unref (data->info);
+
+  g_slice_free (DownloadProgressCallbackData, data);
+}
+
+static void
 set_app_installation_error (const char *desktop_id,
                             const char *internal_message,
                             const char *external_message,
@@ -900,28 +909,29 @@ typedef struct {
   goffset total;
 } ProgressClosure;
 
-static void
-progress_closure_free (gpointer _data)
-{
-  ProgressClosure *data = _data;
-
-  g_clear_object (&data->model);
-  g_clear_object (&data->info);
-
-  g_slice_free (ProgressClosure, data);
-}
-
 static gboolean
 emit_download_progress (gpointer _data)
 {
-  EosProgressClosure *data = _data;
+  EosProgressClosure *clos = _data;
+  DownloadProgressCallbackData *user_data = clos->user_data;
 
-  g_signal_emit (data->model, eos_app_list_model_signals[DOWNLOAD_PROGRESS], 0,
-                 eos_app_info_get_content_id (data->info),
-                 data->current,
-                 data->total);
+  /* If we're downloading a signature, we won't have the info object */
+  if (user_data->info)
+      g_signal_emit (user_data->model,
+                     eos_app_list_model_signals[DOWNLOAD_PROGRESS], 0,
+                     eos_app_info_get_content_id (user_data->info),
+                     clos->current,
+                     clos->total);
 
   return G_SOURCE_REMOVE;
+}
+
+static void
+progress_closure_free (gpointer _data)
+{
+  eos_app_log_info_message("Freeing closure");
+  EosProgressClosure *clos = _data;
+  g_slice_free (EosProgressClosure, clos);
 }
 
 static void
@@ -929,23 +939,16 @@ queue_download_progress (goffset     current,
                          goffset     total,
                          gpointer    user_data)
 {
-  DownloadProgressCallbackData *callback_data = user_data;
-
-  EosAppListModel *self = callback_data->model;
-  EosAppInfo *info = callback_data->info;
-
   EosProgressClosure *clos = g_slice_new (EosProgressClosure);
-
-  clos->model = g_object_ref (self);
-  clos->info = g_object_ref (info);
   clos->current = current;
   clos->total = total;
+  clos->user_data = user_data;
 
   /* we need to invoke this into the main context */
   g_main_context_invoke_full (NULL, G_PRIORITY_DEFAULT,
                               emit_download_progress,
                               clos,
-                              eos_net_utils_progress_closure_free);
+                              progress_closure_free);
 }
 
 static char *
@@ -1027,15 +1030,6 @@ download_signature (EosAppListModel *self,
   return signature_path;
 }
 
-static void
-download_progress_callback_data_free (DownloadProgressCallbackData *data)
-{
-  g_object_unref (data->model);
- eos_app_info_unref (data->info);
-
-  g_slice_free (DownloadProgressCallbackData, data);
-}
-
 static char *
 download_bundle (EosAppListModel *self,
                  EosAppInfo *info,
@@ -1076,7 +1070,7 @@ download_bundle (EosAppListModel *self,
 
   DownloadProgressCallbackData *data = g_slice_new (DownloadProgressCallbackData);
   data->model = g_object_ref (self);
-  data->info = eos_app_info_ref (info);
+  data->info = g_object_ref (info);
 
   if (!eos_net_utils_download_file_with_retry (self->soup_session, bundle_uri,
                                                bundle_path,
@@ -1084,7 +1078,6 @@ download_bundle (EosAppListModel *self,
                                                cancellable, &error))
     {
       eos_app_log_error_message ("Download of bundle failed");
-
 
       g_propagate_error (error_out, error);
     }
