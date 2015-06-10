@@ -1734,3 +1734,31 @@ eos_check_available_space (GFile         *path,
 
   return retval;
 }
+
+gboolean
+eos_set_up_target_dir (const char *target_file,
+                       GError    **error)
+{
+  GFile *file = g_file_new_for_path (target_file);
+  GFile *parent = g_file_get_parent (file);
+  gboolean res = TRUE;
+
+  char *parent_path = g_file_get_path (parent);
+  if (g_mkdir_with_parents (parent_path, 0755) == -1)
+    {
+      int saved_errno = errno;
+
+      g_set_error (error, EOS_APP_UTILS_ERROR,
+                   EOS_APP_UTILS_ERROR_FAILED_TO_CREATE_DIR,
+                   "Unable to create directory: %s",
+                   g_strerror (saved_errno));
+      res = FALSE;
+    }
+
+  g_free (parent_path);
+
+  g_object_unref (parent);
+  g_object_unref (file);
+
+  return res;
+}

@@ -26,16 +26,8 @@
 #include <glib/gi18n-lib.h>
 #include <libsoup/soup.h>
 
-/* Amount of seconds that we should keep retrying to download the file after
- * first interruption
- */
-#define MAX_DOWNLOAD_RETRY_PERIOD 20
-
-/* Amount of seconds that we should wait before retrying a failed download */
-#define DOWNLOAD_RETRY_PERIOD 4
-
-/* Amount of seconds before a downloaded file is considered stale */
-#define DOWNLOADED_FILE_STALE_THRESHOLD 3600
+/* The delay for the EosAppListModel::changed signal, in milliseconds */
+#define CHANGED_DELAY   500
 
 /* HACK: This will be revisited for the next release,
  * but for now we have a limited number of app language ids,
@@ -83,15 +75,11 @@ enum {
 
 static guint eos_app_list_model_signals[LAST_SIGNAL] = { 0, };
 
-static gboolean
-download_file_from_uri (SoupSession     *session,
-                        const char      *content_type,
-                        const char      *source_uri,
-                        const char      *target_file,
-                        char           **buffer,
-                        gboolean         use_cache,
-                        GCancellable    *cancellable,
-                        GError         **error);
+static void
+set_app_installation_error (const char *desktop_id,
+                            const char *internal_message,
+                            const char *external_message,
+                            GError **error_out);
 
 G_DEFINE_TYPE (EosAppListModel, eos_app_list_model, G_TYPE_OBJECT)
 G_DEFINE_QUARK (eos-app-list-model-error-quark, eos_app_list_model_error)
@@ -364,12 +352,14 @@ check_is_app_list_current (EosAppListModel *self,
   eos_app_log_info_message ("Checking if app list update is needed");
 
   eos_app_log_info_message ("Downloading updates meta record from: %s", url);
-  if (!download_file_from_uri (self->soup_session, "application/json", url,
-                               target,
-                               &data,
-                               TRUE, /* Use cached copy if we have it */
-                               cancellable,
-                               &error))
+  if (!eos_net_utils_download_file_from_uri (self->soup_session,
+                                             "application/json",
+                                             url,
+                                             target,
+                                             &data,
+                                             TRUE, /* Use cached copy if we have it */
+                                             cancellable,
+                                             &error))
     {
       eos_app_log_error_message ("Unable to get updates meta record!");
       goto out;
@@ -455,21 +445,21 @@ load_available_apps (EosAppListModel *self,
   if (!data)
     {
       char *url = eos_get_all_updates_uri ();
-      gboolean updates_download_success;
+      gboolean updates_dl_success;
 
       eos_app_log_info_message ("Downloading list of available apps from: %s", url);
-      updates_download_success = download_file_from_uri (self->soup_session,
-                                                         "application/json",
-                                                         url,
-                                                         target,
-                                                         &data,
-                                                         FALSE, /* Don't use a cache if we have it */
-                                                         cancellable,
-                                                         &error);
+      updates_dl_success = eos_net_utils_download_file_from_uri (self->soup_session,
+                                                                 "application/json",
+                                                                 url,
+                                                                 target,
+                                                                 &data,
+                                                                 FALSE, /* Don't use a cache if we have it */
+                                                                 cancellable,
+                                                                 &error);
 
       g_free (url);
 
-      if (!updates_download_success)
+      if (!updates_dl_success)
         {
           eos_app_log_error_message ("Download of all updates failed!");
 
@@ -949,564 +939,6 @@ queue_download_progress (EosAppInfo *info,
                               eos_net_utils_progress_closure_free);
 }
 
-static SoupRequest *
-prepare_soup_request (SoupSession  *session,
-                      const char   *source_uri,
-                      const char   *content_type,
-                      EosAppInfo   *info,
-                      GError      **error)
-{
-  GError *internal_error = NULL;
-  SoupURI *uri = soup_uri_new (source_uri);
-
-  if (uri == NULL)
-    {
-      char *error_message;
-
-      eos_app_log_error_message ("Soap URI is NULL - canceling download");
-
-      if (info != NULL)
-        error_message = g_strdup_printf (_("No available bundle for '%s'"),
-                                         eos_app_info_get_application_id (info));
-      else
-        error_message = g_strdup (_("No available data on the server"));
-
-      g_set_error_literal (error, EOS_APP_LIST_MODEL_ERROR,
-                           EOS_APP_LIST_MODEL_ERROR_INVALID_URL,
-                           error_message);
-      g_free (error_message);
-
-      return NULL;
-    }
-
-  SoupRequest *request = soup_session_request_uri (session, uri, &internal_error);
-
-  soup_uri_free (uri);
-
-  if (internal_error != NULL)
-    {
-      eos_app_log_error_message ("Soup request had an internal error: %s",
-                                 internal_error->message);
-
-      if (g_type_is_a (G_OBJECT_TYPE (request), SOUP_TYPE_REQUEST_HTTP) &&
-          g_error_matches (internal_error, G_TLS_ERROR, G_TLS_ERROR_BAD_CERTIFICATE))
-        {
-          SoupMessage *message;
-
-          message = soup_request_http_get_message (SOUP_REQUEST_HTTP (request));
-
-          GTlsCertificateFlags cert_flags = 0;
-
-          g_object_get (message, "tls-errors", &cert_flags, NULL);
-
-          const char *msg;
-
-          if ((cert_flags & G_TLS_CERTIFICATE_EXPIRED) != 0)
-            msg = _("The certificate of the app store is expired");
-          else if ((cert_flags & G_TLS_CERTIFICATE_REVOKED) != 0)
-            msg = _("The certificate of the app store has been revoked");
-          else if ((cert_flags & G_TLS_CERTIFICATE_BAD_IDENTITY) != 0)
-            msg = _("The certificate of the app store has a bad identity");
-          else if ((cert_flags & G_TLS_CERTIFICATE_UNKNOWN_CA) != 0)
-            msg = _("The certificate of the app store is from an unknown authority");
-          else
-            msg = _("The certificate of the app store is bad or invalid");
-
-          g_set_error_literal (error, EOS_APP_LIST_MODEL_ERROR,
-                               EOS_APP_LIST_MODEL_ERROR_BAD_CERTIFICATE,
-                               msg);
-          g_error_free (internal_error);
-        }
-      else
-        g_propagate_error (error, internal_error);
-
-      return NULL;
-    }
-
-  if (content_type != NULL)
-    {
-      SoupMessage *message = soup_request_http_get_message (SOUP_REQUEST_HTTP (request));
-      if (message != NULL)
-        {
-          soup_message_headers_append (message->request_headers, "Accept", content_type);
-          g_object_unref (message);
-        }
-    }
-
-  return request;
-}
-
-static gboolean
-set_up_target_dir (const char *target_file,
-                   GError    **error)
-{
-  GFile *file = g_file_new_for_path (target_file);
-  GFile *parent = g_file_get_parent (file);
-  gboolean res = TRUE;
-
-  char *parent_path = g_file_get_path (parent);
-  if (g_mkdir_with_parents (parent_path, 0755) == -1)
-    {
-      int saved_errno = errno;
-
-      g_set_error (error, EOS_APP_LIST_MODEL_ERROR,
-                   EOS_APP_LIST_MODEL_ERROR_FAILED,
-                   "Unable to create directory: %s",
-                   g_strerror (saved_errno));
-      res = FALSE;
-    }
-
-  g_free (parent_path);
-
-  g_object_unref (parent);
-  g_object_unref (file);
-
-  return res;
-}
-
-static GOutputStream *
-prepare_out_stream (const char    *target_file,
-                    EosAppInfo    *info,
-                    GCancellable  *cancellable,
-                    GError       **error)
-{
-  GError *internal_error = NULL;
-  GFileOutputStream *out_stream = NULL;
-  GFile *file = g_file_new_for_path (target_file);
-
-  out_stream = g_file_create (file, G_FILE_CREATE_NONE, cancellable, &internal_error);
-  if (internal_error != NULL)
-    {
-      char *error_message;
-
-      eos_app_log_error_message ("Create file failed - canceling download");
-
-      if (info != NULL)
-        error_message = g_strdup_printf (_("Unable to create the file for downloading '%s': %s"),
-                                         eos_app_info_get_application_id (info),
-                                         internal_error->message);
-      else
-        error_message = g_strdup_printf (_("Unable to update the list of available applications: %s"),
-                                         internal_error->message);
-
-      g_set_error_literal (error, EOS_APP_LIST_MODEL_ERROR,
-                           EOS_APP_LIST_MODEL_ERROR_FAILED,
-                           error_message);
-
-      g_error_free (internal_error);
-      g_free (error_message);
-    }
-
-  g_object_unref (file);
-
-  return G_OUTPUT_STREAM (out_stream);
-}
-
-typedef void (* ChunkFunc) (GByteArray *chunk,
-                            gsize       chunk_len,
-                            gsize       bytes_read,
-                            gpointer    chunk_func_user_data);
-
-static gboolean
-download_file_chunks (GInputStream   *in_stream,
-                      GOutputStream  *out_stream,
-                      EosAppInfo     *info,
-                      gsize          *bytes_read,
-                      ChunkFunc       chunk_func,
-                      gpointer        chunk_func_user_data,
-                      GCancellable   *cancellable,
-                      GError        **error)
-{
-#define GET_DATA_BLOCK_SIZE     64 * 1024
-
-  gboolean retval = FALSE;
-  GError *internal_error = NULL;
-  gssize res = 0;
-  gsize pos = 0;
-  GByteArray *content = g_byte_array_sized_new (GET_DATA_BLOCK_SIZE);
-
-  eos_app_log_info_message ("Downloading file chunks start");
-
-  /* we don't use splice() because the data is coming from a network
-   * request, so it won't have a file descriptor we can use splice()
-   * on.
-   */
-  while (!g_cancellable_is_cancelled (cancellable) &&
-         (res = g_input_stream_read (in_stream, content->data,
-                                     GET_DATA_BLOCK_SIZE,
-                                     cancellable, &internal_error)) > 0)
-    {
-      g_output_stream_write (G_OUTPUT_STREAM (out_stream), content->data, res,
-                             cancellable,
-                             &internal_error);
-      if (internal_error != NULL)
-        {
-          eos_app_log_error_message ("Downloading file failed during piecewise transfer");
-          g_propagate_error (error, internal_error);
-          goto out;
-        }
-
-      pos += res;
-
-      if (chunk_func != NULL)
-        chunk_func (content, res, pos, chunk_func_user_data);
-    }
-
-  if (g_cancellable_is_cancelled (cancellable))
-    {
-      char *error_message;
-
-      eos_app_log_info_message ("Canceled download");
-
-      if (info != NULL)
-        error_message = g_strdup_printf (_("Download of app '%s' cancelled by the user."),
-                                         eos_app_info_get_application_id (info));
-      else
-        error_message = g_strdup (_("Refresh of available apps cancelled by the user."));
-
-      g_set_error_literal (error, EOS_APP_LIST_MODEL_ERROR,
-                           EOS_APP_LIST_MODEL_ERROR_CANCELLED,
-                           error_message);
-      g_free (error_message);
-
-      goto out;
-    }
-
-  if (res < 0)
-    {
-      g_propagate_error (error, internal_error);
-      goto out;
-    }
-
-  retval = TRUE;
-
-  eos_app_log_info_message ("Exiting download method normally");
-
-out:
-  g_clear_pointer (&content, g_byte_array_unref);
-
-  if (bytes_read != NULL)
-    *bytes_read = pos;
-
-#undef GET_DATA_BLOCK_SIZE
-
-  return retval;
-}
-
-static void
-download_file_chunk_func (GByteArray *chunk,
-                          gsize       chunk_len,
-                          gsize       bytes_read,
-                          gpointer    chunk_func_user_data)
-{
-  GByteArray *all_content = chunk_func_user_data;
-  guint8 *buffer;
-
-  buffer = (guint8 *) g_strndup ((const char *) chunk->data, chunk_len);
-  g_byte_array_append (all_content, buffer, chunk_len);
-}
-
-static gboolean
-check_cached_file (const char *target_file,
-                   char      **buffer)
-{
-  struct stat buf;
-  if (stat (target_file, &buf) != 0)
-    return FALSE;
-
-  GNetworkMonitor *monitor = g_network_monitor_get_default ();
-  gboolean network_available = g_network_monitor_get_network_available (monitor);
-
-  GError *internal_error = NULL;
-
-  time_t now = time (NULL);
-
-  eos_app_log_debug_message ("Checking if the cached file is still good (now: %ld, mtime: %ld, diff: %ld)",
-                             now, buf.st_mtime, (now - buf.st_mtime));
-
-  /* We don't want to use cache if we have the network and the cached
-   * file is stale.
-   */
-  if (network_available && (now - buf.st_mtime > DOWNLOADED_FILE_STALE_THRESHOLD))
-    {
-      eos_app_log_info_message ("Stale file and we have network. "
-                                "Not using cached version");
-      return FALSE;
-    }
-
-  /* If we have a future date set on the file, something is really
-   * wrong and if we have the network, don't use it.
-   */
-  if (network_available && (now - buf.st_mtime < 0))
-    {
-      eos_app_log_error_message ("File has future date set. "
-                                 "We can't use the cached version");
-      return FALSE;
-    }
-
-  if (network_available)
-    eos_app_log_info_message ("Requested file '%s' is within cache allowance.",
-                              target_file);
-  else
-    eos_app_log_info_message ("No network available, using cached file");
-
-  if (buffer == NULL)
-    {
-      eos_app_log_error_message ("Trying to read a file into an empty pointer!");
-      return FALSE;
-    }
-
-  if (!g_file_get_contents (target_file, buffer, NULL, &internal_error))
-    {
-      /* Fall through, and re-download the file */
-      eos_app_log_error_message ("Could not read cached file '%s': %s",
-                                 target_file,
-                                 internal_error->message);
-      g_clear_error (&internal_error);
-      return FALSE;
-    }
-
-  return TRUE;
-}
-
-static gboolean
-download_file_from_uri (SoupSession     *session,
-                        const char      *content_type,
-                        const char      *source_uri,
-                        const char      *target_file,
-                        char           **buffer,
-                        gboolean         use_cache,
-                        GCancellable    *cancellable,
-                        GError         **error)
-{
-  eos_app_log_debug_message ("Downloading file from %s to %s. Cache: %s",
-                             source_uri,
-                             target_file,
-                             use_cache ? "true" : "false");
-
-  if (use_cache && check_cached_file (target_file, buffer))
-    return TRUE;
-
-  gboolean retval = FALSE;
-  gsize bytes_read = 0;
-  GInputStream *in_stream = NULL;
-  GOutputStream *out_stream = NULL;
-  GByteArray *all_content = g_byte_array_new ();
-  SoupRequest *request = prepare_soup_request (session, source_uri,
-                                               content_type, NULL,
-                                               error);
-  if (request == NULL)
-    goto out;
-
-  /* For non-bundle artifacts files we cannot rely on the target directory
-   * to exist, so we always try and create it. If the directory already
-   * exists, this is a no-op.
-   */
-  if (!set_up_target_dir (target_file, error))
-    goto out;
-
-  in_stream = eos_net_utils_set_up_download_from_request (request, target_file,
-                                                          cancellable,
-                                                          error);
-  if (in_stream == NULL)
-    goto out;
-
-  out_stream = prepare_out_stream (target_file, NULL,
-                                   cancellable, error);
-  if (out_stream == NULL)
-    goto out;
-
-  if (!download_file_chunks (in_stream, out_stream,
-                             NULL, &bytes_read,
-                             download_file_chunk_func, all_content,
-                             cancellable, error))
-    goto out;
-
-  /* NUL-terminate the content */
-  all_content->data[bytes_read] = 0;
-  *buffer = (char *) g_byte_array_free (all_content, FALSE);
-
-  retval = TRUE;
-
-out:
-  g_byte_array_unref (all_content);
-  g_clear_object (&in_stream);
-  g_clear_object (&out_stream);
-  g_clear_object (&request);
-
-  return retval;
-}
-
-static void
-download_app_file_chunk_func (GByteArray *chunk,
-                              gsize       chunk_len,
-                              gsize       bytes_read,
-                              gpointer    chunk_func_user_data)
-{
-  EosDownloadAppFileClosure *clos = chunk_func_user_data;
-
-  if (clos->progress_func != NULL)
-    clos->progress_func (clos->info,
-                         bytes_read, clos->total_len,
-                         clos->progress_func_user_data);
-}
-
-static gboolean
-download_app_file_from_uri (SoupSession          *session,
-                            EosAppInfo           *info,
-                            const char           *source_uri,
-                            const char           *target_file,
-                            EosProgressReportFunc progress_func,
-                            gpointer         progress_func_user_data,
-                            gboolean        *reset_error_counter,
-                            GCancellable    *cancellable,
-                            GError         **error)
-{
-  gboolean retval = FALSE;
-
-  /* We assume that we won't get any data from the endpoint */
-  *reset_error_counter = FALSE;
-
-  gsize bytes_read = 0;
-  GInputStream *in_stream = NULL;
-  GOutputStream *out_stream = NULL;
-  SoupRequest *request = prepare_soup_request (session, source_uri,
-                                               NULL, info,
-                                               error);
-  if (request == NULL)
-    goto out;
-
-  /* For app bundles artifacts we are guaranteed that the download directory
-   * exists and has been successfully created by eos_get_bundle_download_dir().
-   */
-  in_stream = eos_net_utils_set_up_download_from_request (request, target_file,
-                                                          cancellable,
-                                                          error);
-  if (in_stream == NULL)
-    goto out;
-
-  out_stream = prepare_out_stream (target_file, info,
-                                   cancellable, error);
-  if (out_stream == NULL)
-    goto out;
-
-  goffset total = soup_request_get_content_length (request);
-
-  /* ensure we emit a progress notification at the beginning */
-  if (progress_func != NULL)
-    progress_func (info, 0, total, progress_func_user_data);
-
-  EosDownloadAppFileClosure *clos = g_slice_new0 (EosDownloadAppFileClosure);
-  clos->progress_func = progress_func;
-  clos->progress_func_user_data = progress_func_user_data;
-  clos->info = info;
-  clos->total_len = total;
-
-  retval = download_file_chunks (in_stream, out_stream,
-                                 info, &bytes_read,
-                                 download_app_file_chunk_func, clos,
-                                 cancellable, error);
-
-  g_slice_free (EosDownloadAppFileClosure, clos);
-
-  /* Since we got some data, we can assume that network is back online */
-  if (bytes_read > 0)
-    *reset_error_counter = TRUE;
-
-  /* emit a progress notification for the whole file, in any case */
-  if (progress_func != NULL)
-    progress_func (info, total, total, progress_func_user_data);
-
-out:
-  g_clear_object (&in_stream);
-  g_clear_object (&out_stream);
-  g_clear_object (&request);
-
-  return retval;
-}
-
-static gboolean
-download_app_file_from_uri_with_retry (SoupSession          *session,
-                                       EosAppInfo           *info,
-                                       const char           *source_uri,
-                                       const char           *target_file,
-                                       EosProgressReportFunc progress_func,
-                                       gpointer              progress_func_user_data,
-                                       GCancellable         *cancellable,
-                                       GError              **error_out)
-{
-    gboolean download_success = FALSE;
-    gboolean reset_error_counter = FALSE;
-
-    GError *error = NULL;
-
-    gint64 retry_time_limit = MAX_DOWNLOAD_RETRY_PERIOD * G_USEC_PER_SEC;
-
-    gint64 error_retry_cutoff = 0;
-
-    /* Keep trying to download unless we finish successfully or we reach
-     * the retry timeout
-     */
-    while (TRUE)
-      {
-        download_success = download_app_file_from_uri (session, info, source_uri,
-                                                       target_file,
-                                                       progress_func,
-                                                       progress_func_user_data,
-                                                       &reset_error_counter,
-                                                       cancellable,
-                                                       &error);
-
-        /* We're done if we get the file */
-        if (download_success)
-            break;
-
-        /* If we got canceled, also bail */
-        if (g_error_matches (error, EOS_APP_LIST_MODEL_ERROR,
-                             EOS_APP_LIST_MODEL_ERROR_CANCELLED))
-          {
-            eos_app_log_error_message ("Download cancelled. Breaking out of retry loop.");
-            g_propagate_error (error_out, error);
-            break;
-          }
-
-        eos_app_log_error_message ("Error downloading. Checking if retries are needed");
-
-        if (reset_error_counter)
-          {
-            eos_app_log_info_message ("Some data retrieved during download failure. "
-                                      "Resetting retry timeouts.");
-            error_retry_cutoff = 0;
-          }
-
-        /* If this is our first retry, record the start time */
-        if (error_retry_cutoff == 0)
-            error_retry_cutoff = g_get_monotonic_time () + retry_time_limit;
-
-        /* If we reached our limit of retry time, exit */
-        if (g_get_monotonic_time () >= error_retry_cutoff)
-          {
-            eos_app_log_error_message ("Retry limit reached. Exiting with failure");
-
-            g_propagate_error (error_out, error);
-
-            break;
-          }
-
-        /* Ignore the error if we need to run again */
-        g_clear_error (&error);
-
-        eos_app_log_error_message ("Retrying to download the file after a short break");
-
-        /* Sleep for n seconds and try again */
-        g_usleep (DOWNLOAD_RETRY_PERIOD * G_USEC_PER_SEC);
-
-        eos_app_log_error_message ("Continuing download loop...");
-      }
-
-    return download_success;
-}
-
 static char *
 create_sha256sum (EosAppListModel *self,
                   EosAppInfo *info,
@@ -1575,10 +1007,10 @@ download_signature (EosAppListModel *self,
   char *signature_path = g_build_filename (eos_get_bundle_download_dir (), signature_name, NULL);
   g_free (signature_name);
 
-  if (!download_app_file_from_uri_with_retry (self->soup_session, info,
-                                              signature_uri, signature_path,
-                                              NULL, NULL,
-                                              cancellable, &error))
+  if (!eos_net_utils_download_file_with_retry (self->soup_session, info,
+                                               signature_uri, signature_path,
+                                               NULL, NULL,
+                                               cancellable, &error))
     {
       g_propagate_error (error_out, error);
     }
@@ -1624,10 +1056,10 @@ download_bundle (EosAppListModel *self,
 
   eos_app_log_info_message ("Bundle save path is %s", bundle_path);
 
-  if (!download_app_file_from_uri_with_retry (self->soup_session, info,
-                                              bundle_uri, bundle_path,
-                                              queue_download_progress, self,
-                                              cancellable, &error))
+  if (!eos_net_utils_download_file_with_retry (self->soup_session, info,
+                                               bundle_uri, bundle_path,
+                                               queue_download_progress, self,
+                                               cancellable, &error))
     {
       eos_app_log_error_message ("Download of bundle failed");
 

@@ -65,6 +65,9 @@ gboolean eos_check_available_space        (GFile         *path,
                                            GCancellable  *cancellable,
                                            GError       **error);
 
+gboolean eos_set_up_target_dir            (const char *target_file,
+                                           GError    **error);
+
 void eos_app_load_gio_apps   (GHashTable *app_info);
 void eos_app_load_shell_apps (GHashTable *app_info,
                               GVariant *shell_apps);
@@ -79,10 +82,11 @@ EosAppCategory  eos_app_category_from_id (const char *p);
 GQuark eos_app_utils_error_quark (void);
 
 typedef enum {
+  EOS_APP_UTILS_ERROR_DISK_FULL,
+  EOS_APP_UTILS_ERROR_FAILED_TO_CREATE_DIR,
   EOS_APP_UTILS_ERROR_JSON_UNEXPECTED_STRUCTURE,
   EOS_APP_UTILS_ERROR_JSON_MISSING_ATTRIBUTE,
-  EOS_APP_UTILS_ERROR_JSON_UNEXPECTED_VALUE,
-  EOS_APP_UTILS_ERROR_DISK_FULL
+  EOS_APP_UTILS_ERROR_JSON_UNEXPECTED_VALUE
 } EosAppUtilsError;
 
 G_END_DECLS

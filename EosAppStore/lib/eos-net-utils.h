@@ -18,6 +18,11 @@ typedef void (* EosProgressReportFunc) (EosAppInfo *info,
                                         goffset total,
                                         gpointer user_data);
 
+typedef void (* EosChunkFunc)          (GByteArray *chunk,
+                                        gsize       chunk_len,
+                                        gsize       bytes_read,
+                                        gpointer    chunk_func_user_data);
+
 typedef struct {
   EosAppListModel *model;
   EosAppInfo *info;
@@ -32,12 +37,25 @@ typedef struct {
   gsize                  total_len;
 } EosDownloadAppFileClosure;
 
-void           eos_net_utils_progress_closure_free         (gpointer data);
+void      eos_net_utils_progress_closure_free    (gpointer data);
 
-GInputStream * eos_net_utils_set_up_download_from_request  (SoupRequest   *request,
-                                                            const char    *target_file,
-                                                            GCancellable  *cancellable,
-                                                            GError       **error);
+gboolean  eos_net_utils_download_file_from_uri   (SoupSession   *session,
+                                                  const char    *content_type,
+                                                  const char    *source_uri,
+                                                  const char    *target_file,
+                                                  char         **buffer,
+                                                  gboolean       use_cache,
+                                                  GCancellable  *cancellable,
+                                                  GError       **error);
+
+gboolean  eos_net_utils_download_file_with_retry (SoupSession          *session,
+                                                  EosAppInfo           *info,
+                                                  const char           *source_uri,
+                                                  const char           *target_file,
+                                                  EosProgressReportFunc progress_func,
+                                                  gpointer              progress_func_user_data,
+                                                  GCancellable         *cancellable,
+                                                  GError              **error_out);
 
 G_END_DECLS
 
