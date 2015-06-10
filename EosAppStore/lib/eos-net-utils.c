@@ -506,14 +506,14 @@ eos_net_utils_download_file_with_retry (SoupSession          *session,
 }
 
 gboolean
-eos_net_utils_download_file_from_uri (SoupSession     *session,
-                                      const char      *content_type,
-                                      const char      *source_uri,
-                                      const char      *target_file,
-                                      char           **buffer,
-                                      gboolean         use_cache,
-                                      GCancellable    *cancellable,
-                                      GError         **error)
+eos_net_utils_download_file (SoupSession     *session,
+                             const char      *content_type,
+                             const char      *source_uri,
+                             const char      *target_file,
+                             char           **buffer,
+                             gboolean         use_cache,
+                             GCancellable    *cancellable,
+                             GError         **error)
 {
   eos_app_log_debug_message ("Downloading file from %s to %s. Cache: %s",
                              source_uri,

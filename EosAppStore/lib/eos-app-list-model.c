@@ -367,14 +367,14 @@ check_is_app_list_current (EosAppListModel *self,
   eos_app_log_info_message ("Checking if app list update is needed");
 
   eos_app_log_info_message ("Downloading updates meta record from: %s", url);
-  if (!eos_net_utils_download_file_from_uri (self->soup_session,
-                                             "application/json",
-                                             url,
-                                             target,
-                                             &data,
-                                             TRUE, /* Use cached copy if we have it */
-                                             cancellable,
-                                             &error))
+  if (!eos_net_utils_download_file (self->soup_session,
+                                    "application/json",
+                                    url,
+                                    target,
+                                    &data,
+                                    TRUE, /* Use cached copy if we have it */
+                                    cancellable,
+                                    &error))
     {
       eos_app_log_error_message ("Unable to get updates meta record!");
       goto out;
@@ -463,14 +463,14 @@ load_available_apps (EosAppListModel *self,
       gboolean updates_dl_success;
 
       eos_app_log_info_message ("Downloading list of available apps from: %s", url);
-      updates_dl_success = eos_net_utils_download_file_from_uri (self->soup_session,
-                                                                 "application/json",
-                                                                 url,
-                                                                 target,
-                                                                 &data,
-                                                                 FALSE, /* Don't use a cache if we have it */
-                                                                 cancellable,
-                                                                 &error);
+      updates_dl_success = eos_net_utils_download_file (self->soup_session,
+                                                        "application/json",
+                                                        url,
+                                                        target,
+                                                        &data,
+                                                        FALSE, /* Don't use a cache if we have it */
+                                                        cancellable,
+                                                        &error);
 
       g_free (url);
 

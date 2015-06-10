@@ -37,14 +37,14 @@ typedef struct {
 
 void      eos_net_utils_progress_closure_free    (gpointer data);
 
-gboolean  eos_net_utils_download_file_from_uri   (SoupSession   *session,
-                                                  const char    *content_type,
-                                                  const char    *source_uri,
-                                                  const char    *target_file,
-                                                  char         **buffer,
-                                                  gboolean       use_cache,
-                                                  GCancellable  *cancellable,
-                                                  GError       **error);
+gboolean  eos_net_utils_download_file (SoupSession   *session,
+                                       const char    *content_type,
+                                       const char    *source_uri,
+                                       const char    *target_file,
+                                       char         **buffer,
+                                       gboolean       use_cache,
+                                       GCancellable  *cancellable,
+                                       GError       **error);
 
 gboolean  eos_net_utils_download_file_with_retry (SoupSession          *session,
                                                   const char           *source_uri,
