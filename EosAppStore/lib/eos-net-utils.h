@@ -13,8 +13,7 @@
 
 G_BEGIN_DECLS
 
-typedef void (* EosProgressReportFunc) (EosAppInfo *info,
-                                        goffset current,
+typedef void (* EosProgressReportFunc) (goffset current,
                                         goffset total,
                                         gpointer user_data);
 
@@ -49,7 +48,6 @@ gboolean  eos_net_utils_download_file_from_uri   (SoupSession   *session,
                                                   GError       **error);
 
 gboolean  eos_net_utils_download_file_with_retry (SoupSession          *session,
-                                                  EosAppInfo           *info,
                                                   const char           *source_uri,
                                                   const char           *target_file,
                                                   EosProgressReportFunc progress_func,

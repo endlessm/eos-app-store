@@ -358,8 +358,7 @@ download_chunk_func (GByteArray *chunk,
   EosDownloadAppFileClosure *clos = chunk_func_user_data;
 
   if (clos->progress_func != NULL)
-    clos->progress_func (clos->info,
-                         bytes_read, clos->total_len,
+    clos->progress_func (bytes_read, clos->total_len,
                          clos->progress_func_user_data);
 }
 
@@ -402,7 +401,7 @@ download_from_uri (SoupSession          *session,
 
   /* ensure we emit a progress notification at the beginning */
   if (progress_func != NULL)
-    progress_func (info, 0, total, progress_func_user_data);
+    progress_func (0, total, progress_func_user_data);
 
   EosDownloadAppFileClosure *clos = g_slice_new0 (EosDownloadAppFileClosure);
   clos->progress_func = progress_func;
@@ -422,7 +421,7 @@ download_from_uri (SoupSession          *session,
 
   /* emit a progress notification for the whole file, in any case */
   if (progress_func != NULL)
-    progress_func (info, total, total, progress_func_user_data);
+    progress_func (total, total, progress_func_user_data);
 
 out:
   g_clear_object (&in_stream);
@@ -441,7 +440,6 @@ out:
  */
 gboolean
 eos_net_utils_download_file_with_retry (SoupSession          *session,
-                                        EosAppInfo           *info,
                                         const char           *source_uri,
                                         const char           *target_file,
                                         EosProgressReportFunc progress_func,
@@ -463,7 +461,7 @@ eos_net_utils_download_file_with_retry (SoupSession          *session,
      */
     while (TRUE)
       {
-        download_success = download_from_uri (session, info, source_uri,
+        download_success = download_from_uri (session, NULL, source_uri,
                                               target_file,
                                               progress_func,
                                               progress_func_user_data,

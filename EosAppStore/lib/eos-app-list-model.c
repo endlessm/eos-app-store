@@ -75,6 +75,12 @@ enum {
 
 static guint eos_app_list_model_signals[LAST_SIGNAL] = { 0, };
 
+typedef struct
+{
+  EosAppListModel *model;
+  EosAppInfo *info;
+} DownloadProgressCallbackData;
+
 static void
 set_app_installation_error (const char *desktop_id,
                             const char *internal_message,
@@ -919,12 +925,15 @@ emit_download_progress (gpointer _data)
 }
 
 static void
-queue_download_progress (EosAppInfo *info,
-                         goffset     current,
+queue_download_progress (goffset     current,
                          goffset     total,
                          gpointer    user_data)
 {
-  EosAppListModel *self = user_data;
+  DownloadProgressCallbackData *callback_data = user_data;
+
+  EosAppListModel *self = callback_data->model;
+  EosAppInfo *info = callback_data->info;
+
   EosProgressClosure *clos = g_slice_new (EosProgressClosure);
 
   clos->model = g_object_ref (self);
@@ -1007,7 +1016,7 @@ download_signature (EosAppListModel *self,
   char *signature_path = g_build_filename (eos_get_bundle_download_dir (), signature_name, NULL);
   g_free (signature_name);
 
-  if (!eos_net_utils_download_file_with_retry (self->soup_session, info,
+  if (!eos_net_utils_download_file_with_retry (self->soup_session,
                                                signature_uri, signature_path,
                                                NULL, NULL,
                                                cancellable, &error))
@@ -1016,6 +1025,15 @@ download_signature (EosAppListModel *self,
     }
 
   return signature_path;
+}
+
+static void
+download_progress_callback_data_free (DownloadProgressCallbackData *data)
+{
+  g_object_unref (data->model);
+ eos_app_info_unref (data->info);
+
+  g_slice_free (DownloadProgressCallbackData, data);
 }
 
 static char *
@@ -1056,15 +1074,22 @@ download_bundle (EosAppListModel *self,
 
   eos_app_log_info_message ("Bundle save path is %s", bundle_path);
 
-  if (!eos_net_utils_download_file_with_retry (self->soup_session, info,
-                                               bundle_uri, bundle_path,
-                                               queue_download_progress, self,
+  DownloadProgressCallbackData *data = g_slice_new (DownloadProgressCallbackData);
+  data->model = g_object_ref (self);
+  data->info = eos_app_info_ref (info);
+
+  if (!eos_net_utils_download_file_with_retry (self->soup_session, bundle_uri,
+                                               bundle_path,
+                                               queue_download_progress, data,
                                                cancellable, &error))
     {
       eos_app_log_error_message ("Download of bundle failed");
 
+
       g_propagate_error (error_out, error);
     }
+
+  download_progress_callback_data_free (data);
 
   return bundle_path;
 }
