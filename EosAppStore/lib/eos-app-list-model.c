@@ -1428,20 +1428,13 @@ out:
   return retval;
 }
 
-typedef struct {
-  EosProgressReportFunc  progress_func;
-  gpointer               progress_func_user_data;
-  EosAppInfo            *info;
-  gsize                  total_len;
-} DownloadAppFileClosure;
-
 static void
 download_app_file_chunk_func (GByteArray *chunk,
                               gsize       chunk_len,
                               gsize       bytes_read,
                               gpointer    chunk_func_user_data)
 {
-  DownloadAppFileClosure *clos = chunk_func_user_data;
+  EosDownloadAppFileClosure *clos = chunk_func_user_data;
 
   if (clos->progress_func != NULL)
     clos->progress_func (clos->info,
@@ -1493,7 +1486,7 @@ download_app_file_from_uri (SoupSession          *session,
   if (progress_func != NULL)
     progress_func (info, 0, total, progress_func_user_data);
 
-  DownloadAppFileClosure *clos = g_slice_new0 (DownloadAppFileClosure);
+  EosDownloadAppFileClosure *clos = g_slice_new0 (EosDownloadAppFileClosure);
   clos->progress_func = progress_func;
   clos->progress_func_user_data = progress_func_user_data;
   clos->info = info;
@@ -1504,7 +1497,7 @@ download_app_file_from_uri (SoupSession          *session,
                                  download_app_file_chunk_func, clos,
                                  cancellable, error);
 
-  g_slice_free (DownloadAppFileClosure, clos);
+  g_slice_free (EosDownloadAppFileClosure, clos);
 
   /* Since we got some data, we can assume that network is back online */
   if (bytes_read > 0)

@@ -24,6 +24,12 @@ typedef struct {
   goffset total;
 } EosProgressClosure;
 
+typedef struct {
+  EosProgressReportFunc  progress_func;
+  gpointer               progress_func_user_data;
+  EosAppInfo            *info;
+  gsize                  total_len;
+} EosDownloadAppFileClosure;
 
 void   eos_net_utils_progress_closure_free   (gpointer data);
 
