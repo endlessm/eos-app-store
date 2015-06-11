@@ -339,6 +339,17 @@ prepare_out_stream (const char    *target_file,
 }
 
 static void
+prepare_soup_request_resume (const SoupRequest *request,
+                             const char *source_uri,
+                             const char *target_file,
+                             GCancellable *cancellable,
+                             GError **error)
+{
+  // TODO: Finish this
+}
+
+
+static void
 download_chunk_func (GByteArray *chunk,
                      gsize       chunk_len,
                      gsize       bytes_read,
@@ -355,6 +366,7 @@ static gboolean
 download_from_uri (SoupSession          *session,
                    const char           *source_uri,
                    const char           *target_file,
+                   const gboolean        allow_resume,
                    EosProgressReportFunc progress_func,
                    gpointer              progress_func_user_data,
                    gboolean             *reset_error_counter,
@@ -372,6 +384,19 @@ download_from_uri (SoupSession          *session,
   SoupRequest *request = prepare_soup_request (session, source_uri, NULL, error);
   if (request == NULL)
     goto out;
+
+  if (allow_resume)
+    {
+      eos_app_log_debug_message ("Resume allowed. "
+                                 "Figuring out what range to request.");
+      prepare_soup_request_resume (request, source_uri, target_file,
+                                   cancellable,
+                                   error);
+    }
+  else
+    {
+      eos_app_log_debug_message ("Resume disabled. Creating new file.");
+    }
 
   /* For app bundles artifacts we are guaranteed that the download directory
    * exists and has been successfully created by eos_get_bundle_download_dir().
@@ -449,6 +474,7 @@ eos_net_utils_download_file_with_retry (SoupSession          *session,
     while (TRUE)
       {
         download_success = download_from_uri (session, source_uri, target_file,
+                                              TRUE, /* Allow resume */
                                               progress_func,
                                               progress_func_user_data,
                                               &reset_error_counter,

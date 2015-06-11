@@ -929,7 +929,6 @@ emit_download_progress (gpointer _data)
 static void
 progress_closure_free (gpointer _data)
 {
-  eos_app_log_info_message("Freeing closure");
   EosProgressClosure *clos = _data;
   g_slice_free (EosProgressClosure, clos);
 }
