@@ -342,10 +342,51 @@ static void
 prepare_soup_request_resume (const SoupRequest *request,
                              const char *source_uri,
                              const char *target_file,
-                             GCancellable *cancellable,
-                             GError **error)
+                             GCancellable *cancellable)
 {
-  // TODO: Finish this
+  GFile *file = NULL;
+  GFileInfo *info = NULL;
+  GError *error = NULL;
+
+  eos_app_log_debug_message ("Getting local file length");
+
+  file = g_file_new_for_path (target_file);
+  info = g_file_query_info (file, G_FILE_ATTRIBUTE_STANDARD_SIZE,
+                            G_FILE_QUERY_INFO_NOFOLLOW_SYMLINKS,
+                            cancellable,
+                            &error);
+  if (error)
+    {
+      eos_app_log_error_message ("Cannot resume - unable to get "
+                                 "local file's size (%s: %s).",
+                                 target_file,
+                                 error->message);
+      goto out;
+    }
+
+  guint64 size = g_file_info_get_attribute_uint64 (info,
+                                                   G_FILE_ATTRIBUTE_STANDARD_SIZE);
+  g_clear_object (&info);
+
+  eos_app_log_info_message ("Resume size of %s is %" G_GUINT64_FORMAT, target_file,
+                             size);
+
+  /* No file or nothing downloaded - just get the whole file */
+  if (size == 0)
+    goto out;
+
+  eos_app_log_debug_message ("Attaching resume offset header");
+  SoupMessage *message = soup_request_http_get_message (SOUP_REQUEST_HTTP (request));
+  if (message != NULL)
+    {
+      soup_message_headers_set_range (message->request_headers, size, 0);
+      g_object_unref (message);
+    }
+out:
+  g_error_free (error);
+
+  g_clear_object (&file);
+  g_clear_object (&info);
 }
 
 
@@ -390,12 +431,7 @@ download_from_uri (SoupSession          *session,
       eos_app_log_debug_message ("Resume allowed. "
                                  "Figuring out what range to request.");
       prepare_soup_request_resume (request, source_uri, target_file,
-                                   cancellable,
-                                   error);
-    }
-  else
-    {
-      eos_app_log_debug_message ("Resume disabled. Creating new file.");
+                                   cancellable);
     }
 
   /* For app bundles artifacts we are guaranteed that the download directory
