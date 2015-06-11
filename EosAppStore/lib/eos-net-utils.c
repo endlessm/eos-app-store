@@ -58,12 +58,6 @@ set_up_download_from_request (SoupRequest   *request,
       goto out;
     }
 
-  /* we don't use GFile API because the error handling is weird,
-   * and we also know that the target is a local file, so there
-   * is no point in going through the abstraction
-   */
-  g_unlink (target_file);
-
  out:
   g_object_unref (parent);
   g_object_unref (file);
@@ -308,12 +302,23 @@ prepare_soup_request (SoupSession  *session,
 
 static GOutputStream *
 prepare_out_stream (const char    *target_file,
+                    const gboolean is_resumed,
                     GCancellable  *cancellable,
                     GError       **error)
 {
   GError *internal_error = NULL;
   GFileOutputStream *out_stream = NULL;
   GFile *file = g_file_new_for_path (target_file);
+
+  /* We only remove the file if we are not resuming */
+  if (!is_resumed)
+    {
+      /* we don't use GFile API because the error handling is weird,
+       * and we also know that the target is a local file, so there
+       * is no point in going through the abstraction
+       */
+      g_unlink (target_file);
+    }
 
   out_stream = g_file_create (file, G_FILE_CREATE_NONE, cancellable, &internal_error);
   if (internal_error != NULL)
@@ -338,7 +343,7 @@ prepare_out_stream (const char    *target_file,
   return G_OUTPUT_STREAM (out_stream);
 }
 
-static void
+static gboolean
 prepare_soup_request_resume (const SoupRequest *request,
                              const char *source_uri,
                              const char *target_file,
@@ -347,6 +352,8 @@ prepare_soup_request_resume (const SoupRequest *request,
   GFile *file = NULL;
   GFileInfo *info = NULL;
   GError *error = NULL;
+
+  gboolean using_resume = FALSE;
 
   eos_app_log_debug_message ("Getting local file length");
 
@@ -382,11 +389,15 @@ prepare_soup_request_resume (const SoupRequest *request,
       soup_message_headers_set_range (message->request_headers, size, 0);
       g_object_unref (message);
     }
+
+  using_resume = TRUE;
 out:
   g_error_free (error);
 
   g_clear_object (&file);
   g_clear_object (&info);
+
+  return using_resume;
 }
 
 
@@ -426,12 +437,13 @@ download_from_uri (SoupSession          *session,
   if (request == NULL)
     goto out;
 
+  gboolean is_resumed = FALSE;
   if (allow_resume)
     {
       eos_app_log_debug_message ("Resume allowed. "
                                  "Figuring out what range to request.");
-      prepare_soup_request_resume (request, source_uri, target_file,
-                                   cancellable);
+      is_resumed = prepare_soup_request_resume (request, source_uri, target_file,
+                                                      cancellable);
     }
 
   /* For app bundles artifacts we are guaranteed that the download directory
@@ -442,7 +454,7 @@ download_from_uri (SoupSession          *session,
   if (in_stream == NULL)
     goto out;
 
-  out_stream = prepare_out_stream (target_file, cancellable, error);
+  out_stream = prepare_out_stream (target_file, is_resumed, cancellable, error);
   if (out_stream == NULL)
     goto out;
 
@@ -606,7 +618,10 @@ eos_net_utils_download_file (SoupSession     *session,
   if (in_stream == NULL)
     goto out;
 
-  out_stream = prepare_out_stream (target_file, cancellable, error);
+  out_stream = prepare_out_stream (target_file,
+                                   FALSE, /* No resuming for these right now */
+                                   cancellable,
+                                   error);
   if (out_stream == NULL)
     goto out;
 
