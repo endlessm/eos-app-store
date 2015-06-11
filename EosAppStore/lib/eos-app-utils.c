@@ -1718,7 +1718,7 @@ eos_check_available_space (GFile         *path,
    */
   guint64 req_space = min_size * 2;
 
-  eos_app_log_info_message ("Space left on FS: %lld", (long long) req_space);
+  eos_app_log_info_message ("Space left on FS: %lldKB", (long long) (req_space/1024));
 
   if (free_space < req_space)
     {
