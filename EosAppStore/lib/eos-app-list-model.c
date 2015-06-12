@@ -1951,22 +1951,22 @@ install_latest_app_version (EosAppListModel *self,
 
   const char *app_id = eos_app_info_get_application_id (info);
   const char *desktop_id = eos_app_info_get_desktop_id (info);
+  const char *internal_message = NULL;
+  const char *external_message = NULL;
 
+  /* We do a double check here, to catch the case where the app manager
+   * proxy was successfully created, but the app bundles directory was
+   * removed afterwards
+   */
   EosAppManager *proxy = get_eam_dbus_proxy (self);
-  if (proxy == NULL)
+  if (proxy == NULL ||
+      !g_file_test (eos_get_bundles_dir (), G_FILE_TEST_EXISTS))
     {
-      /* The app manager will fail to start if various conditions are not
-       * met: missing configuration; broken file system layout; or a broken
-       * installation.
-       */
-      set_app_installation_error (desktop_id,
-                                  "Could not get DBus proxy object - canceling",
-                                  _("The app store has detected a fatal error and "
-                                    "cannot continue with the installation. Please, "
-                                    "restart your system. If the problem persists, "
-                                    "please contact support."),
-                                  error_out);
-      return FALSE;
+      external_message = _("The app store has detected a fatal error and "
+                           "cannot continue. Please, "
+                           "restart your system. If the problem persists, "
+                           "please contact support.");
+      goto out;
     }
 
   char *transaction_path = NULL;
@@ -1993,62 +1993,25 @@ install_latest_app_version (EosAppListModel *self,
 
   if (error != NULL)
     {
-      /* errors coming out of DBus are generally obscure and not
-       * useful for users; we log them on the session log and journal
-       * but report a generic error to the UI
-       */
-
-      eos_app_log_error_message ("Got an error getting the transaction");
-
-      g_warning ("Unable to install '%s': %s", desktop_id, error->message);
-
       /* the app manager may send us specific errors */
-      char *message = NULL;
       if (g_dbus_error_is_remote_error (error))
         {
           char *code = g_dbus_error_get_remote_error (error);
 
           if (g_strcmp0 (code, "com.endlessm.AppManager.Error.NotAuthorized") == 0)
-            message = _("You must be an administrator to install applications");
+            external_message = _("You must be an administrator to install applications");
 
           g_free (code);
         }
 
-      set_app_installation_error (desktop_id,
-                                  "Installation of app failed",
-                                  message,
-                                  error_out);
-
-      g_error_free (error);
-
-      return FALSE;
+      internal_message = error->message;
+      goto out;
     }
 
   if (transaction_path == NULL || *transaction_path == '\0')
     {
-      set_app_installation_error (desktop_id,
-                                  "Transaction path is empty - canceling",
-                                  NULL, /* External message */
-                                  error_out);
-
-      return FALSE;
-    }
-
-  /* This check covers the case in which we managed to start the
-   * app manager with a consistent file system, and then something
-   * deleted the applications directory
-   */
-  if (!g_file_test (eos_get_bundles_dir (), G_FILE_TEST_EXISTS))
-    {
-      g_free (transaction_path);
-      set_app_installation_error (desktop_id,
-                                  "Applications directory is missing",
-                                  _("The app store has detected a fatal error and "
-                                    "cannot continue with the installation. Please, "
-                                    "restart your system. If the problem persists, "
-                                    "please contact support."),
-                                  error_out);
-      return FALSE;
+      internal_message = "Transaction path is empty - canceling";
+      goto out;
     }
 
   eos_app_log_info_message ("Got transaction path: %s", transaction_path);
@@ -2060,26 +2023,28 @@ install_latest_app_version (EosAppListModel *self,
 
   if (error != NULL)
     {
-      eos_app_log_error_message ("Transaction %s failed", transaction_path);
-
+      /* propagate only the errors we generate as they are... */
       if (error->domain == EOS_APP_LIST_MODEL_ERROR)
-        {
-          /* propagate only the errors we generate as they are... */
-          g_propagate_error (error_out, error);
-        }
-      else
-        set_app_installation_error (desktop_id,
-                                    error->message,
-                                    NULL, /* External message */
-                                    error_out);
+        external_message = error->message;
 
-      retval = FALSE;
-    }
-  else
-    {
-      invalidate_app_info (self, info, cancellable);
+      internal_message = error->message;
+      goto out;
     }
 
+  eos_app_log_debug_message ("Re-loading available apps after install");
+  invalidate_app_info (self, info, cancellable);
+
+ out:
+  if (!retval && !internal_message)
+    internal_message = "Install transaction failed";
+
+  if (!retval)
+    set_app_installation_error (desktop_id,
+                                internal_message,
+                                external_message,
+                                error_out);
+
+  g_clear_error (&error);
   g_free (transaction_path);
 
   return retval;
