@@ -283,6 +283,7 @@ on_app_monitor_changed (GAppInfoMonitor *monitor,
                         EosAppListModel *self)
 {
   eos_app_load_gio_apps (self->apps);
+  eos_app_load_installed_apps (self->apps, NULL, NULL);
 
   eos_app_list_model_emit_changed (self);
 }
@@ -2027,8 +2028,8 @@ install_latest_app_version (EosAppListModel *self,
       goto out;
     }
 
-  eos_app_log_debug_message ("Re-loading available apps after install");
-  invalidate_app_info (self, info, cancellable);
+  if (is_upgrade)
+    invalidate_app_info (self, info, cancellable);
 
  out:
   if (!retval && !internal_message)
