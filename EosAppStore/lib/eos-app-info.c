@@ -696,9 +696,8 @@ eos_app_info_update_from_server (EosAppInfo *info,
 
   gboolean is_newer_version = eos_compare_versions (info->available_version,
                                                     info->installed_version) > 0;
-  if (is_diff)
-    info->update_available = is_newer_version;
-  else
+  info->update_available = is_newer_version;
+  if (!is_diff)
     info->is_available = is_newer_version;
 
   node = json_object_get_member (obj, JSON_KEYS[INSTALLED_SIZE]);
