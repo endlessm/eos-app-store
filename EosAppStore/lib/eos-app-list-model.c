@@ -426,7 +426,7 @@ load_available_apps (EosAppListModel *self,
                      GCancellable *cancellable,
                      GError **error_out)
 {
-  eos_app_log_info_message ("Trying to get available apps");
+  eos_app_log_debug_message ("Reloading available apps");
 
   char *target = eos_get_updates_file ();
   char *data = NULL;
@@ -554,6 +554,7 @@ load_shell_apps (EosAppListModel *self,
                  GCancellable *cancellable)
 {
   GError *error = NULL;
+  eos_app_log_debug_message ("Reloading shell launchers");
 
   GVariant *applications =
     g_dbus_connection_call_sync (self->session_bus,
@@ -583,6 +584,8 @@ static gboolean
 load_content_apps (EosAppListModel *self,
                    GCancellable *cancellable)
 {
+  eos_app_log_debug_message ("Reloading content apps");
+
   JsonArray *array = eos_app_parse_resource_content ("apps", "content", NULL);
 
   if (array == NULL)
@@ -625,26 +628,20 @@ reload_model (EosAppListModel *self,
 {
   gboolean retval = FALSE;
 
-  eos_app_log_debug_message ("Loading GIO apps");
   eos_app_load_gio_apps (self->apps);
 
-  eos_app_log_debug_message ("Loading installed apps from manager");
   if (!eos_app_load_installed_apps (self->apps, cancellable, error))
     eos_app_log_error_message ("Unable to load installed apps");
 
-  eos_app_log_debug_message ("Loading available apps");
   if (!load_available_apps (self, cancellable, error))
     eos_app_log_error_message ("Unable to load available apps");
 
-  /* Load apps with launcher from the shell */
-  eos_app_log_debug_message ("Loading apps with launcher from the shell");
   if (!load_shell_apps (self, cancellable))
     {
       eos_app_log_error_message ("Unable to load shell apps");
       goto out;
     }
 
-  eos_app_log_debug_message ("Loading apps from content");
   if (!load_content_apps (self, cancellable))
     {
       eos_app_log_error_message ("Unable to load content apps");

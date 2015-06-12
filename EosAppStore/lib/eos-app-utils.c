@@ -802,7 +802,7 @@ eos_app_load_installed_apps (GHashTable *app_info,
                              GError **error)
 {
   const char *appdir = eos_get_bundles_dir ();
-  eos_app_log_info_message ("Trying to load installed apps");
+  eos_app_log_info_message ("Reloading installed apps");
 
   GError *internal_error = NULL;
   GDir *dir = g_dir_open (appdir, 0, &internal_error);
@@ -1353,6 +1353,7 @@ eos_app_load_gio_apps (GHashTable *app_info)
   const char *desktop_id;
   EosAppInfo *info;
 
+  eos_app_log_debug_message ("Reloading GIO apps");
   apps = load_apps_from_gio ();
   gio_apps = g_hash_table_get_values (apps);
 
