@@ -2187,9 +2187,6 @@ remove_app_from_manager (EosAppListModel *self,
       goto out;
     }
 
-  eos_app_log_debug_message ("Re-loading available apps after uninstall");
-  invalidate_app_info (self, info, cancellable);
-
  out:
   if (!retval && !internal_message)
     internal_message = "Uninstall transaction failed";

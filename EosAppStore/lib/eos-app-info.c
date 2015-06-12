@@ -762,6 +762,9 @@ eos_app_info_set_is_installed (EosAppInfo *info,
                              info->application_id,
                              is_installed ? "" : "not ");
   info->is_installed = is_installed;
+
+  if (!is_installed)
+    eos_app_info_clear_installed_attributes (info);
 }
 
 /*< private >*/
