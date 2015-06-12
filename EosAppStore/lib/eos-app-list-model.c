@@ -1954,6 +1954,12 @@ install_latest_app_version (EosAppListModel *self,
   const char *internal_message = NULL;
   const char *external_message = NULL;
 
+  if (!self->can_install)
+    {
+      external_message = _("You must be an administrator to install applications");
+      goto out;
+    }
+
   /* We do a double check here, to catch the case where the app manager
    * proxy was successfully created, but the app bundles directory was
    * removed afterwards
@@ -2271,7 +2277,6 @@ add_app_thread_func (GTask *task,
   if (!eos_app_info_is_installed (info))
     {
       if (!desktop_id_is_web_link (eos_app_info_get_desktop_id (info)) &&
-          model->can_install &&
           !add_app_from_manager (model, info, cancellable, &error))
         {
           g_task_return_error (task, error);
