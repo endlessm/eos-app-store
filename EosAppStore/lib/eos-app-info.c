@@ -143,7 +143,6 @@ eos_app_info_clear_server_update_attributes (EosAppInfo *info)
   g_clear_pointer (&info->server_locale, g_free);
 
   /* Meta fields that need clearing */
-  info->update_available = FALSE;
   info->is_available = FALSE;
 }
 
@@ -344,7 +343,9 @@ eos_app_info_is_available (const EosAppInfo *info)
 gboolean
 eos_app_info_is_updatable (const EosAppInfo *info)
 {
-  return info->is_installed && info->update_available;
+  return info->is_installed &&
+    (eos_compare_versions (info->available_version,
+                           info->installed_version) > 0);
 }
 
 gboolean
@@ -696,7 +697,6 @@ eos_app_info_update_from_server (EosAppInfo *info,
 
   gboolean is_newer_version = eos_compare_versions (info->available_version,
                                                     info->installed_version) > 0;
-  info->update_available = is_newer_version;
   if (!is_diff)
     info->is_available = is_newer_version;
 

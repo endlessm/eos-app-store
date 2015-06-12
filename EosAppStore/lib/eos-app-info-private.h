@@ -55,7 +55,6 @@ struct _EosAppInfo
   guint server_on_secondary_storage : 1;
   guint is_available : 1;
   guint is_installed : 1;
-  guint update_available : 1;
   guint has_launcher : 1;
   guint has_override : 1;
 };
