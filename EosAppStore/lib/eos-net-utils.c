@@ -389,7 +389,11 @@ prepare_soup_request_resume (const SoupRequest *request,
   SoupMessage *message = soup_request_http_get_message (SOUP_REQUEST_HTTP (request));
   if (message != NULL)
     {
-      soup_message_headers_set_range (message->request_headers, size, 0);
+      /* -1 for end range is to make sure that libsoup doesn't include the
+       * end number or the server will reject the message range and return
+       * a 206. See github.com/endlessm/eos-shell/issues/4596#issuecomment-111574913
+       * for more info */
+      soup_message_headers_set_range (message->request_headers, size, -1);
       g_object_unref (message);
     }
 
