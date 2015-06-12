@@ -2175,6 +2175,12 @@ remove_app_from_manager (EosAppListModel *self,
   const char *internal_message = NULL;
   const char *external_message = NULL;
 
+  if (!self->can_uninstall)
+    {
+      external_message = _("You must be an administrator to remove applications");
+      goto out;
+    }
+
   /* We do a double check here, to catch the case where the app manager
    * proxy was successfully created, but the app bundles directory was
    * removed afterwards
@@ -2443,7 +2449,7 @@ remove_app_thread_func (GTask *task,
   EosAppListModel *model = source_object;
   EosAppInfo *info = task_data;
 
-  if (model->can_uninstall && !remove_app_from_manager (model, info, cancellable, &error))
+  if (!remove_app_from_manager (model, info, cancellable, &error))
     {
       g_task_return_error (task, error);
       return;
