@@ -638,11 +638,6 @@ eos_app_info_update_from_installed (EosAppInfo *info,
   if (g_key_file_has_key (keyfile, GROUP, FILE_KEYS[SECONDARY_STORAGE], NULL))
     info->on_secondary_storage = g_key_file_get_boolean (keyfile, GROUP, FILE_KEYS[SECONDARY_STORAGE], NULL);
 
-  /* If we found it here, then it's installed */
-  eos_app_log_debug_message ("Setting app '%s' as installed",
-                             info->application_id);
-  info->is_installed = TRUE;
-
   retval = TRUE;
 
 #undef GROUP
