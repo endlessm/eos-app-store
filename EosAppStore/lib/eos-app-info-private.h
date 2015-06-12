@@ -19,7 +19,8 @@ struct _EosAppInfo
   char *title;
   char *subtitle;
   char *description;
-  char *locale;
+  char *server_locale;
+  char *installed_locale;
 
   char *installed_version;
   char *available_version;

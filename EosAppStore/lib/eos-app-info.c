@@ -140,7 +140,7 @@ eos_app_info_clear_server_update_attributes (EosAppInfo *info)
   g_clear_pointer (&info->delta_signature_uri, g_free);
   g_clear_pointer (&info->delta_bundle_hash, g_free);
 
-  g_clear_pointer (&info->locale, g_free);
+  g_clear_pointer (&info->server_locale, g_free);
 
   /* Meta fields that need clearing */
   info->update_available = FALSE;
@@ -160,7 +160,7 @@ eos_app_info_unref (EosAppInfo *info)
       g_free (info->description);
       g_free (info->square_img);
       g_free (info->featured_img);
-
+      g_free (info->installed_locale);
       g_free (info->installed_version);
 
       eos_app_info_clear_server_update_attributes (info);
@@ -241,7 +241,10 @@ eos_app_info_get_available_version (const EosAppInfo *info)
 const char *
 eos_app_info_get_locale (const EosAppInfo *info)
 {
-  return info->locale;
+  if (info->installed_locale)
+    return info->installed_locale;
+
+  return info->server_locale;
 }
 
 const char *
@@ -627,8 +630,8 @@ eos_app_info_update_from_installed (EosAppInfo *info,
                                                    FILE_KEYS[CODE_VERSION],
                                                    NULL);
 
-  g_free (info->locale);
-  info->locale = g_key_file_get_string (keyfile, GROUP, FILE_KEYS[LOCALE], NULL);
+  g_free (info->installed_locale);
+  info->installed_locale = g_key_file_get_string (keyfile, GROUP, FILE_KEYS[LOCALE], NULL);
 
   info->installed_size = g_key_file_get_int64 (keyfile, GROUP, FILE_KEYS[INSTALLED_SIZE], NULL);
 
@@ -698,7 +701,7 @@ eos_app_info_update_from_server (EosAppInfo *info,
   if (node)
     info->on_secondary_storage = json_node_get_boolean (node);
 
-  replace_string_field_from_json (obj, LOCALE, &info->locale);
+  replace_string_field_from_json (obj, LOCALE, &info->server_locale);
 
   if (is_diff)
     {
