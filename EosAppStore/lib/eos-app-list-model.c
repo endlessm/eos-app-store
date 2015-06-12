@@ -56,8 +56,6 @@ struct _EosAppListModel
 
   GHashTable *apps;
 
-  gint64 monotonic_update_id;
-
   guint applications_changed_id;
   guint changed_guard_id;
 
@@ -356,6 +354,7 @@ check_is_app_list_current (EosAppListModel *self,
   char *target = eos_get_updates_meta_record_file ();
   char *data = NULL;
 
+  gint64 old_monotonic_id = 0;
   gint64 monotonic_id = 0;
   gboolean updates_current = FALSE;
 
@@ -388,14 +387,15 @@ check_is_app_list_current (EosAppListModel *self,
       goto out;
     }
 
+  old_monotonic_id = get_local_updates_monotonic_id ();
   eos_app_log_info_message ("Comparing monotonic update ID."
                             " Old: %" G_GINT64_FORMAT ","
                             " New: %" G_GINT64_FORMAT ".",
-                            self->monotonic_update_id,
+                            old_monotonic_id,
                             monotonic_id);
 
   /* If monotonic IDs don't match, we need to update our app list */
-  if (monotonic_id == self->monotonic_update_id)
+  if (monotonic_id == old_monotonic_id)
     updates_current = TRUE;
 
 out:
@@ -768,8 +768,6 @@ eos_app_list_model_init (EosAppListModel *self)
   eos_app_log_error_message ("Creating new soup session");
 
   self->soup_session = soup_session_new ();
-
-  self->monotonic_update_id = get_local_updates_monotonic_id ();
 }
 
 EosAppListModel *
