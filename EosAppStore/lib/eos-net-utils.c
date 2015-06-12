@@ -320,15 +320,18 @@ prepare_out_stream (const char    *target_file,
       g_unlink (target_file);
     }
 
-  out_stream = g_file_create (file, G_FILE_CREATE_NONE, cancellable, &internal_error);
+  out_stream = g_file_append_to (file, G_FILE_CREATE_NONE, cancellable,
+                                 &internal_error);
   if (internal_error != NULL)
     {
       char *error_message;
 
-      eos_app_log_error_message ("Create file failed - canceling download");
+      eos_app_log_error_message ("Opening output file failed - canceling download");
 
-      error_message = g_strdup_printf (_("Create file failed - canceling download (%s)"),
-                                         internal_error->message);
+      error_message = g_strdup_printf (_("Opening output file %s failed - "
+                                         "canceling download (%s)"),
+                                       target_file,
+                                       internal_error->message);
 
       g_set_error_literal (error, EOS_NET_UTILS_ERROR,
                            EOS_NET_UTILS_ERROR_FAILED,
