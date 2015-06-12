@@ -298,7 +298,10 @@ eos_app_info_is_offline (const EosAppInfo *info)
 gboolean
 eos_app_info_is_on_secondary_storage (const EosAppInfo *info)
 {
-  return info->on_secondary_storage;
+  if (info->is_installed)
+    return info->installed_on_secondary_storage;
+
+  return info->server_on_secondary_storage;
 }
 
 gint64
@@ -337,7 +340,7 @@ eos_app_info_is_updatable (const EosAppInfo *info)
 gboolean
 eos_app_info_is_removable (const EosAppInfo *info)
 {
-  return !info->on_secondary_storage;
+  return !eos_app_info_is_on_secondary_storage (info);
 }
 
 EosAppCategory
@@ -576,7 +579,7 @@ check_info_storage (EosAppInfo *info,
                     const char *filename)
 {
   /* Default values */
-  info->on_secondary_storage = FALSE;
+  info->installed_on_secondary_storage = FALSE;
   info->installation_time = -1;
 
   /* we check if the file resides on a volume mounted using overlayfs.
@@ -606,7 +609,7 @@ check_info_storage (EosAppInfo *info,
 
       if (file_stdev == statbuf.st_dev)
         {
-          info->on_secondary_storage = TRUE;
+          info->installed_on_secondary_storage = TRUE;
           break;
         }
     }
@@ -642,7 +645,7 @@ eos_app_info_update_from_installed (EosAppInfo *info,
 
   /* Data coming from the keyfile takes precedence */
   if (g_key_file_has_key (keyfile, GROUP, FILE_KEYS[SECONDARY_STORAGE], NULL))
-    info->on_secondary_storage = g_key_file_get_boolean (keyfile, GROUP, FILE_KEYS[SECONDARY_STORAGE], NULL);
+    info->installed_on_secondary_storage = g_key_file_get_boolean (keyfile, GROUP, FILE_KEYS[SECONDARY_STORAGE], NULL);
 
   retval = TRUE;
 
@@ -702,7 +705,7 @@ eos_app_info_update_from_server (EosAppInfo *info,
 
   node = json_object_get_member (obj, JSON_KEYS[SECONDARY_STORAGE]);
   if (node)
-    info->on_secondary_storage = json_node_get_boolean (node);
+    info->server_on_secondary_storage = json_node_get_boolean (node);
 
   replace_string_field_from_json (obj, LOCALE, &info->server_locale);
 
