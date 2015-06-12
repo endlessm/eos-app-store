@@ -392,7 +392,8 @@ prepare_soup_request_resume (const SoupRequest *request,
 
   using_resume = TRUE;
 out:
-  g_error_free (error);
+  if (error)
+      g_error_free (error);
 
   g_clear_object (&file);
   g_clear_object (&info);
