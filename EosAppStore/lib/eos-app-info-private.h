@@ -25,6 +25,8 @@ struct _EosAppInfo
   char *installed_version;
   char *available_version;
 
+  char *info_filename;
+
   char *bundle_uri;
   char *signature_uri;
   char *bundle_hash;

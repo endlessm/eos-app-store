@@ -175,6 +175,7 @@ eos_app_info_unref (EosAppInfo *info)
       eos_app_info_clear_server_update_attributes (info);
 
       g_free (info->icon_name);
+      g_free (info->info_filename);
       g_strfreev (info->screenshots);
 
       g_slice_free (EosAppInfo, info);
@@ -586,8 +587,7 @@ static const char *known_mount_points[] = {
  * Updates file system related fields of @info.
  */
 static void
-check_info_storage (EosAppInfo *info,
-                    const char *filename)
+check_info_storage (EosAppInfo *info)
 {
   /* we check if the file resides on a volume mounted using overlayfs.
    * this is a bit more convoluted; in theory, we could check if the
@@ -596,7 +596,7 @@ check_info_storage (EosAppInfo *info,
    * have to do assume that the overlayfs magic bit never changes.
    */
   struct stat statbuf;
-  if (stat (filename, &statbuf) < 0)
+  if (stat (info->info_filename, &statbuf) < 0)
     return;
 
   /* We use second resolution for the installation time, because
@@ -624,13 +624,14 @@ check_info_storage (EosAppInfo *info,
 
 /*< private >*/
 gboolean
-eos_app_info_update_from_installed (EosAppInfo *info,
-                                    const char *filename)
+eos_app_info_installed_changed (EosAppInfo *info)
 {
   GKeyFile *keyfile = g_key_file_new ();
   gboolean retval = FALSE;
 
-  if (!g_key_file_load_from_file (keyfile, filename, 0, NULL))
+  g_assert (info->info_filename != NULL);
+
+  if (!g_key_file_load_from_file (keyfile, info->info_filename, 0, NULL))
     goto out;
 
 #define GROUP   "Bundle"
@@ -644,7 +645,7 @@ eos_app_info_update_from_installed (EosAppInfo *info,
   info->installed_locale = g_key_file_get_string (keyfile, GROUP, FILE_KEYS[LOCALE], NULL);
   info->installed_size = g_key_file_get_int64 (keyfile, GROUP, FILE_KEYS[INSTALLED_SIZE], NULL);
 
-  check_info_storage (info, filename);
+  check_info_storage (info);
 
   /* Data coming from the keyfile takes precedence */
   if (g_key_file_has_key (keyfile, GROUP, FILE_KEYS[SECONDARY_STORAGE], NULL))
@@ -658,6 +659,17 @@ out:
   g_key_file_unref (keyfile);
 
   return retval;
+}
+
+/*< private >*/
+gboolean
+eos_app_info_update_from_installed (EosAppInfo *info,
+                                    const char *filename)
+{
+  g_clear_pointer (&info->info_filename, g_free);
+  info->info_filename = g_strdup (filename);
+
+  return eos_app_info_installed_changed (info);
 }
 
 static gboolean
@@ -763,7 +775,10 @@ eos_app_info_set_is_installed (EosAppInfo *info,
   info->is_installed = is_installed;
 
   if (!is_installed)
-    eos_app_info_clear_installed_attributes (info);
+    {
+      eos_app_info_clear_installed_attributes (info);
+      g_clear_pointer (&info->info_filename, g_free);
+    }
 }
 
 /*< private >*/

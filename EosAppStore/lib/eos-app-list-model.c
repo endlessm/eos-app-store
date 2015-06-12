@@ -687,32 +687,6 @@ load_all_apps (EosAppListModel *self,
 }
 
 static void
-invalidate_app_info (EosAppListModel *self,
-                     EosAppInfo *info,
-                     GCancellable *cancellable)
-{
-  /* Remove this info from the apps hash table, and let the code below
-   * take care of resetting the proper state.
-   */
-  eos_app_log_debug_message ("Removing '%s' from apps hash table",
-                             eos_app_info_get_application_id (info));
-  g_hash_table_remove (self->apps, eos_app_info_get_desktop_id (info));
-
-  GError *error = NULL;
-  if (!reload_model (self, cancellable, &error))
-    {
-      eos_app_log_error_message ("Unable to reload the model after "
-                                 "invalidating app info for '%s': %s",
-                                 eos_app_info_get_application_id (info),
-                                 error != NULL ? error->message : "internal error");
-      if (error != NULL)
-        g_error_free (error);
-    }
-
-  eos_app_list_model_emit_changed (self);
-}
-
-static void
 eos_app_list_model_finalize (GObject *gobject)
 {
   EosAppListModel *self = EOS_APP_LIST_MODEL (gobject);
@@ -2029,7 +2003,10 @@ install_latest_app_version (EosAppListModel *self,
     }
 
   if (is_upgrade)
-    invalidate_app_info (self, info, cancellable);
+    {
+      eos_app_info_installed_changed (info);
+      eos_app_list_model_emit_changed (self);
+    }
 
  out:
   if (!retval && !internal_message)
