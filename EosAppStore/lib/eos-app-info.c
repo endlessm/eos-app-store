@@ -304,7 +304,10 @@ eos_app_info_is_on_secondary_storage (const EosAppInfo *info)
 gint64
 eos_app_info_get_installed_size (const EosAppInfo *info)
 {
-  return info->installed_size;
+  if (info->is_installed)
+    return info->installed_size;
+
+  return info->server_installed_size;
 }
 
 gboolean
@@ -695,7 +698,7 @@ eos_app_info_update_from_server (EosAppInfo *info,
 
   node = json_object_get_member (obj, JSON_KEYS[INSTALLED_SIZE]);
   if (node != NULL)
-    info->installed_size = json_node_get_int (node);
+    info->server_installed_size = json_node_get_int (node);
 
   node = json_object_get_member (obj, JSON_KEYS[SECONDARY_STORAGE]);
   if (node)

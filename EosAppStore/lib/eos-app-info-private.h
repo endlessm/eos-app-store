@@ -34,6 +34,7 @@ struct _EosAppInfo
   char *delta_bundle_hash;
 
   gint64 installed_size;
+  gint64 server_installed_size;
 
   char *square_img;
   char *featured_img;
