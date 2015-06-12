@@ -47,7 +47,6 @@ const char *eos_get_app_server_url (void);
 gboolean eos_use_delta_updates (void);
 
 gboolean eos_app_load_installed_apps      (GHashTable    *app_info,
-                                           const char    *appdir,
                                            GCancellable  *cancellable,
                                            GError       **error);
 

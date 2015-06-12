@@ -549,16 +549,6 @@ load_user_capabilities (EosAppListModel *self,
 }
 
 static gboolean
-load_installed_apps (EosAppListModel *self,
-                             GCancellable *cancellable,
-                             GError **error)
-{
-  eos_app_log_info_message ("Trying to get installed apps");
-
-  return eos_app_load_installed_apps (self->apps, eos_get_bundles_dir (), cancellable, error);
-}
-
-static gboolean
 load_shell_apps (EosAppListModel *self,
                  GCancellable *cancellable)
 {
@@ -638,7 +628,7 @@ reload_model (EosAppListModel *self,
   eos_app_load_gio_apps (self->apps);
 
   eos_app_log_debug_message ("Loading installed apps from manager");
-  if (!load_installed_apps (self, cancellable, error))
+  if (!eos_app_load_installed_apps (self->apps, cancellable, error))
     eos_app_log_error_message ("Unable to load installed apps");
 
   eos_app_log_debug_message ("Loading available apps");

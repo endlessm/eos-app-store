@@ -798,10 +798,12 @@ is_app_id (const char *appid)
 
 gboolean
 eos_app_load_installed_apps (GHashTable *app_info,
-                             const char *appdir,
                              GCancellable *cancellable,
                              GError **error)
 {
+  const char *appdir = eos_get_bundles_dir ();
+  eos_app_log_info_message ("Trying to load installed apps");
+
   GError *internal_error = NULL;
   GDir *dir = g_dir_open (appdir, 0, &internal_error);
   if (dir == NULL)
