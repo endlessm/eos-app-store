@@ -147,6 +147,17 @@ eos_app_info_clear_server_update_attributes (EosAppInfo *info)
   info->is_available = FALSE;
 }
 
+static void
+eos_app_info_clear_installed_attributes (EosAppInfo *info)
+{
+  g_clear_pointer (&info->installed_version, g_free);
+  g_clear_pointer (&info->installed_locale, g_free);
+
+  info->installed_size = 0;
+  info->installation_time = -1;
+  info->installed_on_secondary_storage = FALSE;
+}
+
 void
 eos_app_info_unref (EosAppInfo *info)
 {
@@ -160,9 +171,8 @@ eos_app_info_unref (EosAppInfo *info)
       g_free (info->description);
       g_free (info->square_img);
       g_free (info->featured_img);
-      g_free (info->installed_locale);
-      g_free (info->installed_version);
 
+      eos_app_info_clear_installed_attributes (info);
       eos_app_info_clear_server_update_attributes (info);
 
       g_free (info->icon_name);
@@ -578,10 +588,6 @@ static void
 check_info_storage (EosAppInfo *info,
                     const char *filename)
 {
-  /* Default values */
-  info->installed_on_secondary_storage = FALSE;
-  info->installation_time = -1;
-
   /* we check if the file resides on a volume mounted using overlayfs.
    * this is a bit more convoluted; in theory, we could check if the
    * directory in which @filename is located has the overlayfs magic
@@ -631,14 +637,10 @@ eos_app_info_update_from_installed (EosAppInfo *info,
   if (!g_key_file_has_group (keyfile, GROUP))
     goto out;
 
-  g_free (info->installed_version);
-  info->installed_version = g_key_file_get_string (keyfile, GROUP,
-                                                   FILE_KEYS[CODE_VERSION],
-                                                   NULL);
+  eos_app_info_clear_installed_attributes (info);
 
-  g_free (info->installed_locale);
+  info->installed_version = g_key_file_get_string (keyfile, GROUP, FILE_KEYS[CODE_VERSION], NULL);
   info->installed_locale = g_key_file_get_string (keyfile, GROUP, FILE_KEYS[LOCALE], NULL);
-
   info->installed_size = g_key_file_get_int64 (keyfile, GROUP, FILE_KEYS[INSTALLED_SIZE], NULL);
 
   check_info_storage (info, filename);
