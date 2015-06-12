@@ -2187,6 +2187,9 @@ remove_app_from_manager (EosAppListModel *self,
       goto out;
     }
 
+  eos_app_log_debug_message ("Re-loading available apps after uninstall");
+  invalidate_app_info (self, info, cancellable);
+
  out:
   if (!retval && !internal_message)
     internal_message = "Uninstall transaction failed";
@@ -2424,10 +2427,6 @@ remove_app_thread_func (GTask *task,
       g_task_return_error (task, error);
       return;
     }
-
-  eos_app_log_debug_message ("Re-loading available apps after uninstall");
-
-  invalidate_app_info (model, info, cancellable);
 
   eos_app_log_debug_message ("Removing app from shell");
 
