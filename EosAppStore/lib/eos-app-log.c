@@ -99,3 +99,19 @@ eos_app_log_info_message (const char *fmt,
 
   va_end (args);
 }
+
+gboolean
+eos_app_log_soup_debug_enabled (void)
+{
+  static char eos_app_soup_debug = '\0';
+
+  if (eos_app_soup_debug == '\0') {
+    const char *env = g_getenv ("EAS_DEBUG_LIBSOUP");
+    if (env != NULL && *env == '1')
+      eos_app_soup_debug = '1';
+    else
+      eos_app_soup_debug = '0';
+  }
+
+  return eos_app_soup_debug == '1';
+}

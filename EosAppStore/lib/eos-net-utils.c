@@ -414,6 +414,24 @@ download_chunk_func (GByteArray *chunk,
                          clos->progress_func_user_data);
 }
 
+static void
+soup_log_printer (SoupLogger *logger,
+                  SoupLoggerLogLevel level,
+                  char direction,
+                  const char *data,
+                  gpointer user_data)
+{
+  eos_app_log_error_message ("%s", data);
+}
+
+static void
+add_soup_logger (SoupSession *session)
+{
+  SoupLogger *logger = soup_logger_new (SOUP_LOGGER_LOG_HEADERS, -1);
+  soup_session_add_feature (session, (SoupSessionFeature *) logger);
+  soup_logger_set_printer (logger, soup_log_printer, NULL, NULL);
+}
+
 static gboolean
 download_from_uri (SoupSession          *session,
                    const char           *source_uri,
@@ -433,6 +451,10 @@ download_from_uri (SoupSession          *session,
   gsize bytes_read = 0;
   GInputStream *in_stream = NULL;
   GOutputStream *out_stream = NULL;
+
+  if (eos_app_log_soup_debug_enabled())
+      add_soup_logger (session);
+
   SoupRequest *request = prepare_soup_request (session, source_uri, NULL, error);
   if (request == NULL)
     goto out;
@@ -443,11 +465,13 @@ download_from_uri (SoupSession          *session,
       eos_app_log_debug_message ("Resume allowed. "
                                  "Figuring out what range to request.");
       is_resumed = prepare_soup_request_resume (request, source_uri, target_file,
-                                                      cancellable);
+                                                cancellable);
     }
 
   /* For app bundles artifacts we are guaranteed that the download directory
    * exists and has been successfully created by eos_get_bundle_download_dir().
+   * Here we also return the resuming status since the server could reject our
+   * request.
    */
   in_stream = set_up_download_from_request (request, target_file, cancellable,
                                             error);
