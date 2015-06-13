@@ -12,12 +12,11 @@ G_BEGIN_DECLS
 #define EOS_TYPE_APP_INFO       (eos_app_info_get_type ())
 
 typedef struct _EosAppInfo      EosAppInfo;
+typedef struct _EosAppInfoClass EosAppInfoClass;
 
 GType eos_app_info_get_type (void);
 
 EosAppInfo *    eos_app_info_new                        (const char *application_id);
-EosAppInfo *    eos_app_info_ref                        (EosAppInfo *info);
-void            eos_app_info_unref                      (EosAppInfo *info);
 
 const char *    eos_app_info_get_application_id         (const EosAppInfo *info);
 const char *    eos_app_info_get_desktop_id             (const EosAppInfo *info);

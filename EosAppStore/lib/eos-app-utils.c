@@ -838,7 +838,7 @@ eos_app_load_installed_apps (GHashTable *app_info,
       if (info == NULL)
         info = eos_app_info_new (appid);
       else
-        eos_app_info_ref (info);
+        g_object_ref (info);
 
       if (eos_app_info_update_from_installed (info, info_path))
         {
@@ -850,7 +850,7 @@ eos_app_load_installed_apps (GHashTable *app_info,
       else
         {
           eos_app_log_error_message ("App '%s' failed to update from installed info", appid);
-          eos_app_info_unref (info);
+          g_object_unref (info);
         }
 
       g_free (info_path);

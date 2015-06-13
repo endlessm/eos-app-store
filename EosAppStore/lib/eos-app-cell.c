@@ -173,7 +173,7 @@ eos_app_cell_get_property (GObject    *gobject,
       break;
 
     case PROP_APP_INFO:
-      g_value_set_boxed (value, self->info);
+      g_value_set_object (value, self->info);
       break;
 
     case PROP_SELECTED:
@@ -215,7 +215,7 @@ eos_app_cell_set_property (GObject      *gobject,
 
     case PROP_APP_INFO:
       g_assert (self->info == NULL);
-      self->info = eos_app_info_ref (g_value_get_boxed (value));
+      self->info = g_value_dup_object (value);
       g_assert (self->info != NULL);
       break;
 
@@ -262,7 +262,7 @@ eos_app_cell_finalize (GObject *gobject)
   g_clear_pointer (&self->image, (GDestroyNotify) cairo_surface_destroy);
   g_free (self->desktop_id);
   g_free (self->icon_name);
-  eos_app_info_unref (self->info);
+  g_clear_object (&self->info);
 
   G_OBJECT_CLASS (eos_app_cell_parent_class)->finalize (gobject);
 }
@@ -386,11 +386,11 @@ eos_app_cell_class_init (EosAppCellClass *klass)
                          G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS);
 
   eos_app_cell_props[PROP_APP_INFO] =
-    g_param_spec_boxed ("app-info",
-                        "App Info",
-                        "Application Info",
-                        EOS_TYPE_APP_INFO,
-                        G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS | G_PARAM_CONSTRUCT_ONLY);
+    g_param_spec_object ("app-info",
+                         "App Info",
+                         "Application Info",
+                         EOS_TYPE_APP_INFO,
+                         G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS | G_PARAM_CONSTRUCT_ONLY);
 
   eos_app_cell_props[PROP_SELECTED] =
     g_param_spec_boolean ("selected",

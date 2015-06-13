@@ -760,7 +760,7 @@ eos_app_list_model_init (EosAppListModel *self)
 
   self->apps = g_hash_table_new_full (g_str_hash, g_str_equal,
                                       g_free,
-                                      (GDestroyNotify) eos_app_info_unref);
+                                      (GDestroyNotify) g_object_unref);
 
   eos_app_log_error_message ("Creating new soup session");
 
@@ -906,7 +906,7 @@ progress_closure_free (gpointer _data)
   ProgressClosure *data = _data;
 
   g_clear_object (&data->model);
-  eos_app_info_unref (data->info);
+  g_clear_object (&data->info);
 
   g_slice_free (ProgressClosure, data);
 }
@@ -934,7 +934,7 @@ queue_download_progress (EosAppInfo *info,
   ProgressClosure *clos = g_slice_new (ProgressClosure);
 
   clos->model = g_object_ref (self);
-  clos->info = eos_app_info_ref (info);
+  clos->info = g_object_ref (info);
   clos->current = current;
   clos->total = total;
 
@@ -2289,7 +2289,7 @@ eos_app_list_model_install_app_async (EosAppListModel *model,
       return;
     }
 
-  g_task_set_task_data (task, eos_app_info_ref (info), (GDestroyNotify) eos_app_info_unref);
+  g_task_set_task_data (task, g_object_ref (info), g_object_unref);
   g_task_run_in_thread (task, add_app_thread_func);
   g_object_unref (task);
 }
@@ -2356,7 +2356,7 @@ eos_app_list_model_update_app_async (EosAppListModel *model,
       return;
     }
 
-  g_task_set_task_data (task, eos_app_info_ref (info), (GDestroyNotify) eos_app_info_unref);
+  g_task_set_task_data (task, g_object_ref (info), g_object_unref);
   g_task_run_in_thread (task, update_app_thread_func);
   g_object_unref (task);
 }
@@ -2425,7 +2425,7 @@ eos_app_list_model_uninstall_app_async (EosAppListModel *model,
       return;
     }
 
-  g_task_set_task_data (task, eos_app_info_ref (info), (GDestroyNotify) eos_app_info_unref);
+  g_task_set_task_data (task, g_object_ref (info), g_object_unref);
   g_task_run_in_thread (task, remove_app_thread_func);
   g_object_unref (task);
 }

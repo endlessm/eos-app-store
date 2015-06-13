@@ -15,7 +15,15 @@
 #include <locale.h>
 #include <glib/gi18n.h>
 
-G_DEFINE_BOXED_TYPE (EosAppInfo, eos_app_info, eos_app_info_ref, eos_app_info_unref)
+G_DEFINE_TYPE (EosAppInfo, eos_app_info, G_TYPE_OBJECT)
+
+enum {
+  PROP_0,
+  PROP_APPLICATION_ID,
+  NUM_PROPS,
+};
+
+static GParamSpec *properties[NUM_PROPS] = { NULL, };
 
 /* installed keyfile keys */
 static const gchar *FILE_KEYS[] = {
@@ -102,29 +110,49 @@ content_id_from_application_id (const char *application_id)
   return g_strdup (application_id);
 }
 
-EosAppInfo *
-eos_app_info_new (const char *application_id)
+static void
+eos_app_info_set_application_id (EosAppInfo *info,
+                                 const char *application_id)
 {
-  EosAppInfo *info = g_slice_new0 (EosAppInfo);
-
-  info->shape = EOS_FLEXY_SHAPE_SMALL;
-  info->ref_count = 1;
-
   info->application_id = g_strdup (application_id);
   info->content_id = content_id_from_application_id (application_id);
-  info->desktop_id = g_strdup_printf ("%s.desktop", info->application_id);
-
-  info->installation_time = -1;
-
-  return info;
+  info->desktop_id = g_strdup_printf ("%s.desktop", application_id);
 }
 
-EosAppInfo *
-eos_app_info_ref (EosAppInfo *info)
+static void
+eos_app_info_get_property (GObject    *gobject,
+                           guint       prop_id,
+                           GValue     *value,
+                           GParamSpec *pspec)
 {
-  g_atomic_int_inc (&(info->ref_count));
+  EosAppInfo *info = (EosAppInfo *) gobject;
 
-  return info;
+  switch (prop_id)
+    {
+    case PROP_APPLICATION_ID:
+      g_value_set_string (value, eos_app_info_get_application_id (info));
+      break;
+    default:
+      G_OBJECT_WARN_INVALID_PROPERTY_ID (gobject, prop_id, pspec);
+    }
+}
+
+static void
+eos_app_info_set_property (GObject      *gobject,
+                           guint         prop_id,
+                           const GValue *value,
+                           GParamSpec   *pspec)
+{
+  EosAppInfo *info = (EosAppInfo *) gobject;
+
+  switch (prop_id)
+    {
+    case PROP_APPLICATION_ID:
+      eos_app_info_set_application_id (info, g_value_get_string (value));
+      break;
+    default:
+      G_OBJECT_WARN_INVALID_PROPERTY_ID (gobject, prop_id, pspec);
+    }
 }
 
 void
@@ -157,29 +185,62 @@ eos_app_info_clear_installed_attributes (EosAppInfo *info)
   info->installed_on_secondary_storage = FALSE;
 }
 
-void
-eos_app_info_unref (EosAppInfo *info)
+static void
+eos_app_info_finalize (GObject *gobject)
 {
-  if (g_atomic_int_dec_and_test (&(info->ref_count)))
-    {
-      g_free (info->application_id);
-      g_free (info->desktop_id);
-      g_free (info->content_id);
-      g_free (info->title);
-      g_free (info->subtitle);
-      g_free (info->description);
-      g_free (info->square_img);
-      g_free (info->featured_img);
+  EosAppInfo *info = (EosAppInfo *) gobject;
 
-      eos_app_info_clear_installed_attributes (info);
-      eos_app_info_clear_server_update_attributes (info);
+  g_free (info->application_id);
+  g_free (info->desktop_id);
+  g_free (info->content_id);
+  g_free (info->title);
+  g_free (info->subtitle);
+  g_free (info->description);
+  g_free (info->square_img);
+  g_free (info->featured_img);
 
-      g_free (info->icon_name);
-      g_free (info->info_filename);
-      g_strfreev (info->screenshots);
+  eos_app_info_clear_installed_attributes (info);
+  eos_app_info_clear_server_update_attributes (info);
 
-      g_slice_free (EosAppInfo, info);
-    }
+  g_free (info->icon_name);
+  g_free (info->info_filename);
+  g_strfreev (info->screenshots);
+
+  G_OBJECT_CLASS (eos_app_info_parent_class)->finalize (gobject);
+}
+
+static void
+eos_app_info_init (EosAppInfo *info)
+{
+  info->shape = EOS_FLEXY_SHAPE_SMALL;
+  info->installation_time = -1;
+}
+
+static void
+eos_app_info_class_init (EosAppInfoClass *klass)
+{
+  GObjectClass *oclass = G_OBJECT_CLASS (klass);
+
+  oclass->get_property = eos_app_info_get_property;
+  oclass->set_property = eos_app_info_set_property;
+  oclass->finalize = eos_app_info_finalize;
+
+  properties[PROP_APPLICATION_ID] =
+    g_param_spec_string ("application-id",
+                         "Application ID",
+                         "The application ID",
+                         "",
+                         G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS | G_PARAM_CONSTRUCT_ONLY);
+
+  g_object_class_install_properties (oclass, NUM_PROPS, properties);
+}
+
+EosAppInfo *
+eos_app_info_new (const char *application_id)
+{
+  return g_object_new (EOS_TYPE_APP_INFO,
+                       "application-id", application_id,
+                       NULL);
 }
 
 const char *
