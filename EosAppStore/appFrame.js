@@ -101,7 +101,7 @@ const AppListBoxRow = new Lang.Class({
         this._appId = appInfo.get_desktop_id();
 
         this._model = model;
-        this._changedId = this._model.connect('changed', Lang.bind(this, this._updateState));
+        this._stateChangedId = this.appInfo.connect('notify::state', Lang.bind(this, this._updateState));
         this._progressId = this._model.connect('download-progress', Lang.bind(this, this._downloadProgress));
 
         this._removeDialog = null;
@@ -160,9 +160,9 @@ const AppListBoxRow = new Lang.Class({
             this._windowHideId = 0;
         }
 
-        if (this._changedId != 0) {
-            this._model.disconnect(this._changedId);
-            this._changedId = 0;
+        if (this._stateChangedId != 0) {
+            this.appInfo.disconnect(this._stateChangedId);
+            this._stateChangedId = 0;
         }
 
         if (this._progressId != 0) {
@@ -478,7 +478,6 @@ const AppListBoxRow = new Lang.Class({
 
         this._model.updateApp(this._appId, Lang.bind(this, function(error) {
             this._popTransaction();
-            this._updateState();
 
             if (error) {
                 this._maybeNotify(_("We could not update '%s'").format(this.appTitle), error);
@@ -575,8 +574,6 @@ const AppListBoxRow = new Lang.Class({
                 else {
                     this._maybeNotify(_("'%s' was removed successfully").format(this.appTitle));
                 }
-
-                this._updateState();
             }));
         }
     },

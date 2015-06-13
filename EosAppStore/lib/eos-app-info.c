@@ -20,6 +20,7 @@ G_DEFINE_TYPE (EosAppInfo, eos_app_info, G_TYPE_OBJECT)
 enum {
   PROP_0,
   PROP_APPLICATION_ID,
+  PROP_STATE,
   NUM_PROPS,
 };
 
@@ -132,6 +133,9 @@ eos_app_info_get_property (GObject    *gobject,
     case PROP_APPLICATION_ID:
       g_value_set_string (value, eos_app_info_get_application_id (info));
       break;
+    case PROP_STATE:
+      g_value_set_enum (value, eos_app_info_get_state (info));
+      break;
     default:
       G_OBJECT_WARN_INVALID_PROPERTY_ID (gobject, prop_id, pspec);
     }
@@ -231,6 +235,13 @@ eos_app_info_class_init (EosAppInfoClass *klass)
                          "The application ID",
                          "",
                          G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS | G_PARAM_CONSTRUCT_ONLY);
+  properties[PROP_STATE] =
+    g_param_spec_enum ("state",
+                       "Application state",
+                       "The application state",
+                       EOS_TYPE_APP_STATE,
+                       EOS_APP_STATE_UNKNOWN,
+                       G_PARAM_READABLE | G_PARAM_STATIC_STRINGS);
 
   g_object_class_install_properties (oclass, NUM_PROPS, properties);
 }
@@ -713,6 +724,7 @@ eos_app_info_installed_changed (EosAppInfo *info)
     info->installed_on_secondary_storage = g_key_file_get_boolean (keyfile, GROUP, FILE_KEYS[SECONDARY_STORAGE], NULL);
 
   retval = TRUE;
+  g_object_notify_by_pspec (G_OBJECT (info), properties[PROP_STATE]);
 
 #undef GROUP
 
@@ -796,6 +808,8 @@ eos_app_info_update_from_server (EosAppInfo *info,
       replace_string_field_from_json (obj, SHA_HASH, &info->bundle_hash);
     }
 
+  g_object_notify_by_pspec (G_OBJECT (info), properties[PROP_STATE]);
+
   return TRUE;
 }
 
@@ -823,6 +837,7 @@ eos_app_info_set_has_launcher (EosAppInfo *info,
                                gboolean has_launcher)
 {
   info->has_launcher = has_launcher;
+  g_object_notify_by_pspec (G_OBJECT (info), properties[PROP_STATE]);
 }
 
 /*< private >*/
@@ -840,6 +855,8 @@ eos_app_info_set_is_installed (EosAppInfo *info,
       eos_app_info_clear_installed_attributes (info);
       g_clear_pointer (&info->info_filename, g_free);
     }
+
+  g_object_notify_by_pspec (G_OBJECT (info), properties[PROP_STATE]);
 }
 
 /*< private >*/
