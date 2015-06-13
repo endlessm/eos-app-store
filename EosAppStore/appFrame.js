@@ -680,16 +680,6 @@ const AppCategoryFrame = new Lang.Class({
         return (this._stack.visible_child_name == 'spinner');
     },
 
-    invalidate: function() {
-        this._stack.foreach(Lang.bind(this, function(child) {
-            if (child != this._spinnerBox) {
-                child.destroy();
-            }
-        }));
-
-        this._gridBox = null;
-    },
-
     populate: function() {
         if (this._gridBox) {
             return;
@@ -786,9 +776,6 @@ const AppCategoryFrame = new Lang.Class({
     },
 
     _showGrid: function() {
-        let currentPage = this._stack.get_visible_child();
-        let currentPageName = this._stack.visible_child_name;
-
         this._mainWindow.clearHeaderState();
 
         if (this._backClickedId > 0) {
@@ -796,17 +783,9 @@ const AppCategoryFrame = new Lang.Class({
             this._backClickedId = 0;
         }
 
-        if (this._gridBox) {
-            this._stack.transition_type = Gtk.StackTransitionType.SLIDE_RIGHT;
-            this._stack.set_visible_child(this._gridBox);
-        }
-
-        // application pages are recreated each time, unless there's
-        // a transaction in progress
-        if (!(currentPageName == 'app-frame' || currentPageName == 'spinner') &&
-            !currentPage.hasTransactionInProgress) {
-            currentPage.destroy();
-        }
+        this.populate();
+        this._stack.transition_type = Gtk.StackTransitionType.SLIDE_RIGHT;
+        this._stack.set_visible_child(this._gridBox);
     },
 
     reset: function() {
@@ -814,8 +793,9 @@ const AppCategoryFrame = new Lang.Class({
             return;
         }
 
+        this._gridBox.destroy();
+        this._gridBox = null;
         this._showGrid();
-        this.populate();
     },
 
     get title() {
@@ -832,7 +812,6 @@ const AppBroker = new Lang.Class({
         // initialize the applications model
         this._model = new AppListModel.AppList();
         this._model.refresh(Lang.bind(this, this._onModelRefresh));
-        this._model.connect('changed', Lang.bind(this, this._populateAllCategories));
 
         this._categories = Categories.get_app_categories();
         this._categories.forEach(Lang.bind(this, function(category) {
@@ -860,7 +839,6 @@ const AppBroker = new Lang.Class({
 
     _populateAllCategories: function() {
         this._categories.forEach(Lang.bind(this, function(c) {
-            c.widget.invalidate();
             c.widget.populate();
         }));
     },
