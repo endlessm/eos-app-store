@@ -702,6 +702,8 @@ eos_app_info_installed_changed (EosAppInfo *info)
   gboolean retval = FALSE;
 
   g_assert (info->info_filename != NULL);
+  eos_app_log_debug_message ("Loading installed information for '%s' from '%s'",
+                             info->application_id, info->info_filename);
 
   if (!g_key_file_load_from_file (keyfile, info->info_filename, 0, NULL))
     goto out;
