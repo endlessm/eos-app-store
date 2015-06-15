@@ -3,15 +3,12 @@
 
 #include "config.h"
 
-// TODO: Move this to bottom of imports (we leave it here to find out all
-//       missing imports
-#include "eos-net-utils.h"
-
 #include "eos-app-log.h"
 #include "eos-app-list-model.h"
 #include "eos-app-manager-service.h"
 #include "eos-app-manager-transaction.h"
 #include "eos-app-utils.h"
+#include "eos-net-utils.h"
 
 #include <time.h>
 #include <sys/types.h>
