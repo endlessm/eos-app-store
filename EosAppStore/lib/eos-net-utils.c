@@ -312,7 +312,10 @@ prepare_out_stream (const char    *target_file,
   GFileOutputStream *out_stream = NULL;
   GFile *file = g_file_new_for_path (target_file);
 
-  /* We only remove the file if we are not resuming */
+  /* If we are not allowed resuming, the resume file is not there, or
+   * the server returned a strange status code, we need to start from
+   * scratch to ensure that we don't leave junk around
+   */
   if (!is_resumed)
     {
       /* we don't use GFile API because the error handling is weird,
@@ -373,7 +376,8 @@ prepare_soup_resume_request (const SoupRequest *request,
     {
       /* TODO Turn this into something less frightening when we have a
        *      good idea on which conditions we will not have the local
-       *      file available */
+       *      file available
+       */
       eos_app_log_error_message ("Cannot resume - unable to get "
                                  "local file's size (%s: %s).",
                                  target_file,
@@ -399,7 +403,8 @@ prepare_soup_resume_request (const SoupRequest *request,
       /* -1 for end range is to make sure that libsoup doesn't include the
        * end number or the server will reject the message range and return
        * a 206. See github.com/endlessm/eos-shell/issues/4596#issuecomment-111574913
-       * for more info */
+       * for more info
+       */
       soup_message_headers_set_range (message->request_headers, size, -1);
 
       *resume_offset = size;
