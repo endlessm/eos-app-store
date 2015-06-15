@@ -22,9 +22,6 @@
 #include <glib/gi18n-lib.h>
 #include <libsoup/soup.h>
 
-/* The delay for the EosAppListModel::changed signal, in milliseconds */
-#define CHANGED_DELAY   500
-
 /* Amount of seconds that we should keep retrying to download the file after
  * first interruption
  */
@@ -55,8 +52,6 @@ struct _EosAppListModel
   GAppInfoMonitor *app_monitor;
 
   GHashTable *apps;
-
-  gint64 monotonic_update_id;
 
   guint applications_changed_id;
   guint changed_guard_id;
@@ -93,12 +88,6 @@ download_file_from_uri (SoupSession     *session,
                         gboolean         use_cache,
                         GCancellable    *cancellable,
                         GError         **error);
-
-static void
-set_app_installation_error (const char *desktop_id,
-                            const char *internal_message,
-                            const char *external_message,
-                            GError **error_out);
 
 G_DEFINE_TYPE (EosAppListModel, eos_app_list_model, G_TYPE_OBJECT)
 G_DEFINE_QUARK (eos-app-list-model-error-quark, eos_app_list_model_error)
@@ -147,7 +136,7 @@ static void
 eos_app_list_model_emit_changed (EosAppListModel *self)
 {
   if (self->changed_guard_id == 0)
-    self->changed_guard_id = g_timeout_add (CHANGED_DELAY, emit_queued_changed, self);
+    self->changed_guard_id = g_idle_add (emit_queued_changed, self);
 }
 
 #define WEB_LINK_ID_PREFIX "eos-link-"
@@ -289,6 +278,7 @@ on_app_monitor_changed (GAppInfoMonitor *monitor,
                         EosAppListModel *self)
 {
   eos_app_load_gio_apps (self->apps);
+  eos_app_load_installed_apps (self->apps, NULL, NULL);
 
   eos_app_list_model_emit_changed (self);
 }
@@ -361,6 +351,7 @@ check_is_app_list_current (EosAppListModel *self,
   char *target = eos_get_updates_meta_record_file ();
   char *data = NULL;
 
+  gint64 old_monotonic_id = 0;
   gint64 monotonic_id = 0;
   gboolean updates_current = FALSE;
 
@@ -393,14 +384,15 @@ check_is_app_list_current (EosAppListModel *self,
       goto out;
     }
 
+  old_monotonic_id = get_local_updates_monotonic_id ();
   eos_app_log_info_message ("Comparing monotonic update ID."
                             " Old: %" G_GINT64_FORMAT ","
                             " New: %" G_GINT64_FORMAT ".",
-                            self->monotonic_update_id,
+                            old_monotonic_id,
                             monotonic_id);
 
   /* If monotonic IDs don't match, we need to update our app list */
-  if (monotonic_id == self->monotonic_update_id)
+  if (monotonic_id == old_monotonic_id)
     updates_current = TRUE;
 
 out:
@@ -431,7 +423,7 @@ load_available_apps (EosAppListModel *self,
                      GCancellable *cancellable,
                      GError **error_out)
 {
-  eos_app_log_info_message ("Trying to get available apps");
+  eos_app_log_debug_message ("Reloading available apps");
 
   char *target = eos_get_updates_file ();
   char *data = NULL;
@@ -555,20 +547,11 @@ load_user_capabilities (EosAppListModel *self,
 }
 
 static gboolean
-load_installed_apps (EosAppListModel *self,
-                             GCancellable *cancellable,
-                             GError **error)
-{
-  eos_app_log_info_message ("Trying to get installed apps");
-
-  return eos_app_load_installed_apps (self->apps, eos_get_bundles_dir (), cancellable, error);
-}
-
-static gboolean
 load_shell_apps (EosAppListModel *self,
                  GCancellable *cancellable)
 {
   GError *error = NULL;
+  eos_app_log_debug_message ("Reloading shell launchers");
 
   GVariant *applications =
     g_dbus_connection_call_sync (self->session_bus,
@@ -598,6 +581,8 @@ static gboolean
 load_content_apps (EosAppListModel *self,
                    GCancellable *cancellable)
 {
+  eos_app_log_debug_message ("Reloading content apps");
+
   JsonArray *array = eos_app_parse_resource_content ("apps", "content", NULL);
 
   if (array == NULL)
@@ -640,26 +625,20 @@ reload_model (EosAppListModel *self,
 {
   gboolean retval = FALSE;
 
-  eos_app_log_debug_message ("Loading GIO apps");
   eos_app_load_gio_apps (self->apps);
 
-  eos_app_log_debug_message ("Loading installed apps from manager");
-  if (!load_installed_apps (self, cancellable, error))
+  if (!eos_app_load_installed_apps (self->apps, cancellable, error))
     eos_app_log_error_message ("Unable to load installed apps");
 
-  eos_app_log_debug_message ("Loading available apps");
   if (!load_available_apps (self, cancellable, error))
     eos_app_log_error_message ("Unable to load available apps");
 
-  /* Load apps with launcher from the shell */
-  eos_app_log_debug_message ("Loading apps with launcher from the shell");
   if (!load_shell_apps (self, cancellable))
     {
       eos_app_log_error_message ("Unable to load shell apps");
       goto out;
     }
 
-  eos_app_log_debug_message ("Loading apps from content");
   if (!load_content_apps (self, cancellable))
     {
       eos_app_log_error_message ("Unable to load content apps");
@@ -699,32 +678,6 @@ load_all_apps (EosAppListModel *self,
     }
 
   return retval;
-}
-
-static void
-invalidate_app_info (EosAppListModel *self,
-                     EosAppInfo *info,
-                     GCancellable *cancellable)
-{
-  /* Remove this info from the apps hash table, and let the code below
-   * take care of resetting the proper state.
-   */
-  eos_app_log_debug_message ("Removing '%s' from apps hash table",
-                             eos_app_info_get_application_id (info));
-  g_hash_table_remove (self->apps, eos_app_info_get_desktop_id (info));
-
-  GError *error = NULL;
-  if (!reload_model (self, cancellable, &error))
-    {
-      eos_app_log_error_message ("Unable to reload the model after "
-                                 "invalidating app info for '%s': %s",
-                                 eos_app_info_get_application_id (info),
-                                 error != NULL ? error->message : "internal error");
-      if (error != NULL)
-        g_error_free (error);
-    }
-
-  eos_app_list_model_emit_changed (self);
 }
 
 static void
@@ -807,13 +760,11 @@ eos_app_list_model_init (EosAppListModel *self)
 
   self->apps = g_hash_table_new_full (g_str_hash, g_str_equal,
                                       g_free,
-                                      (GDestroyNotify) eos_app_info_unref);
+                                      (GDestroyNotify) g_object_unref);
 
   eos_app_log_error_message ("Creating new soup session");
 
   self->soup_session = soup_session_new ();
-
-  self->monotonic_update_id = get_local_updates_monotonic_id ();
 }
 
 EosAppListModel *
@@ -955,7 +906,7 @@ progress_closure_free (gpointer _data)
   ProgressClosure *data = _data;
 
   g_clear_object (&data->model);
-  eos_app_info_unref (data->info);
+  g_clear_object (&data->info);
 
   g_slice_free (ProgressClosure, data);
 }
@@ -983,7 +934,7 @@ queue_download_progress (EosAppInfo *info,
   ProgressClosure *clos = g_slice_new (ProgressClosure);
 
   clos->model = g_object_ref (self);
-  clos->info = eos_app_info_ref (info);
+  clos->info = g_object_ref (info);
   clos->current = current;
   clos->total = total;
 
@@ -1912,6 +1863,38 @@ set_app_installation_error (const char *desktop_id,
     }
 }
 
+static void
+set_app_uninstall_error (const char *desktop_id,
+                         const char *internal_message,
+                         const char *external_message,
+                         GError **error_out)
+{
+  /* Show errors in journal */
+  eos_app_log_error_message ("Error: %s", internal_message);
+  eos_app_log_error_message ("Error (user-visible): %s", external_message);
+
+  /* Show errors in session log */
+  g_warning ("Error: %s", internal_message);
+  g_warning ("Error (user-visible): %s", external_message);
+
+  /* Set user-visible error */
+  if (external_message == NULL)
+    {
+      g_set_error (error_out, EOS_APP_LIST_MODEL_ERROR,
+                   EOS_APP_LIST_MODEL_ERROR_UNINSTALL_FAILED,
+                   _("Application '%s' could not be removed"),
+                   desktop_id);
+    }
+  else
+    {
+      g_set_error (error_out, EOS_APP_LIST_MODEL_ERROR,
+                   EOS_APP_LIST_MODEL_ERROR_UNINSTALL_FAILED,
+                   _("Application '%s' could not be removed. %s"),
+                   desktop_id,
+                   external_message);
+    }
+}
+
 static gboolean
 install_latest_app_version (EosAppListModel *self,
                             EosAppInfo *info,
@@ -1925,22 +1908,28 @@ install_latest_app_version (EosAppListModel *self,
 
   const char *app_id = eos_app_info_get_application_id (info);
   const char *desktop_id = eos_app_info_get_desktop_id (info);
+  const char *internal_message = NULL;
+  const char *external_message = NULL;
 
-  EosAppManager *proxy = get_eam_dbus_proxy (self);
-  if (proxy == NULL)
+  if (!self->can_install)
     {
-      /* The app manager will fail to start if various conditions are not
-       * met: missing configuration; broken file system layout; or a broken
-       * installation.
-       */
-      set_app_installation_error (desktop_id,
-                                  "Could not get DBus proxy object - canceling",
-                                  _("The app store has detected a fatal error and "
-                                    "cannot continue with the installation. Please, "
-                                    "restart your system. If the problem persists, "
-                                    "please contact support."),
-                                  error_out);
-      return FALSE;
+      external_message = _("You must be an administrator to install applications");
+      goto out;
+    }
+
+  /* We do a double check here, to catch the case where the app manager
+   * proxy was successfully created, but the app bundles directory was
+   * removed afterwards
+   */
+  EosAppManager *proxy = get_eam_dbus_proxy (self);
+  if (proxy == NULL ||
+      !g_file_test (eos_get_bundles_dir (), G_FILE_TEST_EXISTS))
+    {
+      external_message = _("The app store has detected a fatal error and "
+                           "cannot continue. Please, "
+                           "restart your system. If the problem persists, "
+                           "please contact support.");
+      goto out;
     }
 
   char *transaction_path = NULL;
@@ -1967,62 +1956,25 @@ install_latest_app_version (EosAppListModel *self,
 
   if (error != NULL)
     {
-      /* errors coming out of DBus are generally obscure and not
-       * useful for users; we log them on the session log and journal
-       * but report a generic error to the UI
-       */
-
-      eos_app_log_error_message ("Got an error getting the transaction");
-
-      g_warning ("Unable to install '%s': %s", desktop_id, error->message);
-
       /* the app manager may send us specific errors */
-      char *message = NULL;
       if (g_dbus_error_is_remote_error (error))
         {
           char *code = g_dbus_error_get_remote_error (error);
 
           if (g_strcmp0 (code, "com.endlessm.AppManager.Error.NotAuthorized") == 0)
-            message = _("You must be an administrator to install applications");
+            external_message = _("You must be an administrator to install applications");
 
           g_free (code);
         }
 
-      set_app_installation_error (desktop_id,
-                                  "Installation of app failed",
-                                  message,
-                                  error_out);
-
-      g_error_free (error);
-
-      return FALSE;
+      internal_message = error->message;
+      goto out;
     }
 
   if (transaction_path == NULL || *transaction_path == '\0')
     {
-      set_app_installation_error (desktop_id,
-                                  "Transaction path is empty - canceling",
-                                  NULL, /* External message */
-                                  error_out);
-
-      return FALSE;
-    }
-
-  /* This check covers the case in which we managed to start the
-   * app manager with a consistent file system, and then something
-   * deleted the applications directory
-   */
-  if (!g_file_test (eos_get_bundles_dir (), G_FILE_TEST_EXISTS))
-    {
-      g_free (transaction_path);
-      set_app_installation_error (desktop_id,
-                                  "Applications directory is missing",
-                                  _("The app store has detected a fatal error and "
-                                    "cannot continue with the installation. Please, "
-                                    "restart your system. If the problem persists, "
-                                    "please contact support."),
-                                  error_out);
-      return FALSE;
+      internal_message = "Transaction path is empty - canceling";
+      goto out;
     }
 
   eos_app_log_info_message ("Got transaction path: %s", transaction_path);
@@ -2034,26 +1986,31 @@ install_latest_app_version (EosAppListModel *self,
 
   if (error != NULL)
     {
-      eos_app_log_error_message ("Transaction %s failed", transaction_path);
-
+      /* propagate only the errors we generate as they are... */
       if (error->domain == EOS_APP_LIST_MODEL_ERROR)
-        {
-          /* propagate only the errors we generate as they are... */
-          g_propagate_error (error_out, error);
-        }
-      else
-        set_app_installation_error (desktop_id,
-                                    error->message,
-                                    NULL, /* External message */
-                                    error_out);
+        external_message = error->message;
 
-      retval = FALSE;
+      internal_message = error->message;
+      goto out;
     }
-  else
+
+  if (is_upgrade)
     {
-      invalidate_app_info (self, info, cancellable);
+      eos_app_info_installed_changed (info);
+      eos_app_list_model_emit_changed (self);
     }
 
+ out:
+  if (!retval && !internal_message)
+    internal_message = "Install transaction failed";
+
+  if (!retval)
+    set_app_installation_error (desktop_id,
+                                internal_message,
+                                external_message,
+                                error_out);
+
+  g_clear_error (&error);
   g_free (transaction_path);
 
   return retval;
@@ -2146,6 +2103,14 @@ remove_app_from_manager (EosAppListModel *self,
 
   const char *app_id = eos_app_info_get_application_id (info);
   const char *desktop_id = eos_app_info_get_desktop_id (info);
+  const char *internal_message = NULL;
+  const char *external_message = NULL;
+
+  if (!self->can_uninstall)
+    {
+      external_message = _("You must be an administrator to remove applications");
+      goto out;
+    }
 
   /* We do a double check here, to catch the case where the app manager
    * proxy was successfully created, but the app bundles directory was
@@ -2155,69 +2120,45 @@ remove_app_from_manager (EosAppListModel *self,
   if (proxy == NULL ||
       !g_file_test (eos_get_bundles_dir (), G_FILE_TEST_EXISTS))
     {
-      set_app_installation_error (desktop_id,
-                                  "Could not get DBus proxy object - canceling",
-                                  _("The app store has detected a fatal error and "
-                                    "cannot continue with the installation. Please, "
-                                    "restart your system. If the problem persists, "
-                                    "please contact support."),
-                                  error_out);
-      return FALSE;
+      external_message = _("The app store has detected a fatal error and "
+                           "cannot continue. Please, "
+                           "restart your system. If the problem persists, "
+                           "please contact support.");
+      goto out;
     }
 
   eos_app_log_info_message ("Trying to uninstall %s", app_id);
-
   eos_app_manager_call_uninstall_sync (proxy, app_id, &retval, NULL, &error);
 
   if (error != NULL)
     {
-      eos_app_log_error_message ("Unable to uninstall application '%s': %s",
-                                 desktop_id, error->message);
-      g_warning ("Unable to uninstall application '%s': %s",
-                 desktop_id, error->message);
-
       /* the app manager may send us specific errors */
-      char *message = NULL;
       if (g_dbus_error_is_remote_error (error))
         {
           char *code = g_dbus_error_get_remote_error (error);
 
           if (g_strcmp0 (code, "com.endlessm.AppManager.Error.NotAuthorized") == 0)
-            message = _("You must be an administrator to remove applications");
+            external_message = _("You must be an administrator to remove applications");
 
           g_free (code);
         }
 
-      if (message != NULL)
-        {
-          g_set_error (error_out, EOS_APP_LIST_MODEL_ERROR,
-                       EOS_APP_LIST_MODEL_ERROR_UNINSTALL_FAILED,
-                       _("Application '%s' could not be uninstalled. %s"),
-                       desktop_id,
-                       message);
-        }
-      else
-        {
-          g_set_error (error_out, EOS_APP_LIST_MODEL_ERROR,
-                       EOS_APP_LIST_MODEL_ERROR_UNINSTALL_FAILED,
-                       _("Application '%s' could not be uninstalled"),
-                       desktop_id);
-        }
-
-      g_error_free (error);
-
-      return FALSE;
+      internal_message = error->message;
+      goto out;
     }
 
-  if (!retval)
-    g_set_error (error_out, EOS_APP_LIST_MODEL_ERROR,
-                 EOS_APP_LIST_MODEL_ERROR_UNINSTALL_FAILED,
-                 _("Application '%s' could not be removed"),
-                 desktop_id);
+ out:
+  if (!retval && !internal_message)
+    internal_message = "Uninstall transaction failed";
 
-
-  eos_app_log_info_message ("Uninstall return value from eam: %s",
-                            retval ? "OK" : "Fail");
+  if (retval)
+    eos_app_log_info_message ("Uninstall transaction succeeded");
+  else
+    set_app_uninstall_error (desktop_id,
+                             internal_message,
+                             external_message,
+                             error_out);
+  g_clear_error (&error);
 
   return retval;
 }
@@ -2296,7 +2237,6 @@ add_app_thread_func (GTask *task,
   if (!eos_app_info_is_installed (info))
     {
       if (!desktop_id_is_web_link (eos_app_info_get_desktop_id (info)) &&
-          model->can_install &&
           !add_app_from_manager (model, info, cancellable, &error))
         {
           g_task_return_error (task, error);
@@ -2349,7 +2289,7 @@ eos_app_list_model_install_app_async (EosAppListModel *model,
       return;
     }
 
-  g_task_set_task_data (task, eos_app_info_ref (info), (GDestroyNotify) eos_app_info_unref);
+  g_task_set_task_data (task, g_object_ref (info), g_object_unref);
   g_task_run_in_thread (task, add_app_thread_func);
   g_object_unref (task);
 }
@@ -2416,7 +2356,7 @@ eos_app_list_model_update_app_async (EosAppListModel *model,
       return;
     }
 
-  g_task_set_task_data (task, eos_app_info_ref (info), (GDestroyNotify) eos_app_info_unref);
+  g_task_set_task_data (task, g_object_ref (info), g_object_unref);
   g_task_run_in_thread (task, update_app_thread_func);
   g_object_unref (task);
 }
@@ -2439,15 +2379,11 @@ remove_app_thread_func (GTask *task,
   EosAppListModel *model = source_object;
   EosAppInfo *info = task_data;
 
-  if (model->can_uninstall && !remove_app_from_manager (model, info, cancellable, &error))
+  if (!remove_app_from_manager (model, info, cancellable, &error))
     {
       g_task_return_error (task, error);
       return;
     }
-
-  eos_app_log_debug_message ("Re-loading available apps after uninstall");
-
-  invalidate_app_info (model, info, cancellable);
 
   eos_app_log_debug_message ("Removing app from shell");
 
@@ -2489,7 +2425,7 @@ eos_app_list_model_uninstall_app_async (EosAppListModel *model,
       return;
     }
 
-  g_task_set_task_data (task, eos_app_info_ref (info), (GDestroyNotify) eos_app_info_unref);
+  g_task_set_task_data (task, g_object_ref (info), g_object_unref);
   g_task_run_in_thread (task, remove_app_thread_func);
   g_object_unref (task);
 }

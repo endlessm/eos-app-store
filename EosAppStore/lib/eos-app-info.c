@@ -15,7 +15,16 @@
 #include <locale.h>
 #include <glib/gi18n.h>
 
-G_DEFINE_BOXED_TYPE (EosAppInfo, eos_app_info, eos_app_info_ref, eos_app_info_unref)
+G_DEFINE_TYPE (EosAppInfo, eos_app_info, G_TYPE_OBJECT)
+
+enum {
+  PROP_0,
+  PROP_APPLICATION_ID,
+  PROP_STATE,
+  NUM_PROPS,
+};
+
+static GParamSpec *properties[NUM_PROPS] = { NULL, };
 
 /* installed keyfile keys */
 static const gchar *FILE_KEYS[] = {
@@ -102,29 +111,52 @@ content_id_from_application_id (const char *application_id)
   return g_strdup (application_id);
 }
 
-EosAppInfo *
-eos_app_info_new (const char *application_id)
+static void
+eos_app_info_set_application_id (EosAppInfo *info,
+                                 const char *application_id)
 {
-  EosAppInfo *info = g_slice_new0 (EosAppInfo);
-
-  info->shape = EOS_FLEXY_SHAPE_SMALL;
-  info->ref_count = 1;
-
   info->application_id = g_strdup (application_id);
   info->content_id = content_id_from_application_id (application_id);
-  info->desktop_id = g_strdup_printf ("%s.desktop", info->application_id);
-
-  info->installation_time = -1;
-
-  return info;
+  info->desktop_id = g_strdup_printf ("%s.desktop", application_id);
 }
 
-EosAppInfo *
-eos_app_info_ref (EosAppInfo *info)
+static void
+eos_app_info_get_property (GObject    *gobject,
+                           guint       prop_id,
+                           GValue     *value,
+                           GParamSpec *pspec)
 {
-  g_atomic_int_inc (&(info->ref_count));
+  EosAppInfo *info = (EosAppInfo *) gobject;
 
-  return info;
+  switch (prop_id)
+    {
+    case PROP_APPLICATION_ID:
+      g_value_set_string (value, eos_app_info_get_application_id (info));
+      break;
+    case PROP_STATE:
+      g_value_set_enum (value, eos_app_info_get_state (info));
+      break;
+    default:
+      G_OBJECT_WARN_INVALID_PROPERTY_ID (gobject, prop_id, pspec);
+    }
+}
+
+static void
+eos_app_info_set_property (GObject      *gobject,
+                           guint         prop_id,
+                           const GValue *value,
+                           GParamSpec   *pspec)
+{
+  EosAppInfo *info = (EosAppInfo *) gobject;
+
+  switch (prop_id)
+    {
+    case PROP_APPLICATION_ID:
+      eos_app_info_set_application_id (info, g_value_get_string (value));
+      break;
+    default:
+      G_OBJECT_WARN_INVALID_PROPERTY_ID (gobject, prop_id, pspec);
+    }
 }
 
 void
@@ -140,36 +172,86 @@ eos_app_info_clear_server_update_attributes (EosAppInfo *info)
   g_clear_pointer (&info->delta_signature_uri, g_free);
   g_clear_pointer (&info->delta_bundle_hash, g_free);
 
-  g_clear_pointer (&info->locale, g_free);
+  g_clear_pointer (&info->server_locale, g_free);
 
   /* Meta fields that need clearing */
-  info->update_available = FALSE;
   info->is_available = FALSE;
 }
 
-void
-eos_app_info_unref (EosAppInfo *info)
+static void
+eos_app_info_clear_installed_attributes (EosAppInfo *info)
 {
-  if (g_atomic_int_dec_and_test (&(info->ref_count)))
-    {
-      g_free (info->application_id);
-      g_free (info->desktop_id);
-      g_free (info->content_id);
-      g_free (info->title);
-      g_free (info->subtitle);
-      g_free (info->description);
-      g_free (info->square_img);
-      g_free (info->featured_img);
+  g_clear_pointer (&info->installed_version, g_free);
+  g_clear_pointer (&info->installed_locale, g_free);
 
-      g_free (info->installed_version);
+  info->installed_size = 0;
+  info->installation_time = -1;
+  info->installed_on_secondary_storage = FALSE;
+}
 
-      eos_app_info_clear_server_update_attributes (info);
+static void
+eos_app_info_finalize (GObject *gobject)
+{
+  EosAppInfo *info = (EosAppInfo *) gobject;
 
-      g_free (info->icon_name);
-      g_strfreev (info->screenshots);
+  g_free (info->application_id);
+  g_free (info->desktop_id);
+  g_free (info->content_id);
+  g_free (info->title);
+  g_free (info->subtitle);
+  g_free (info->description);
+  g_free (info->square_img);
+  g_free (info->featured_img);
 
-      g_slice_free (EosAppInfo, info);
-    }
+  eos_app_info_clear_installed_attributes (info);
+  eos_app_info_clear_server_update_attributes (info);
+
+  g_free (info->icon_name);
+  g_free (info->info_filename);
+  g_strfreev (info->screenshots);
+
+  G_OBJECT_CLASS (eos_app_info_parent_class)->finalize (gobject);
+}
+
+static void
+eos_app_info_init (EosAppInfo *info)
+{
+  info->shape = EOS_FLEXY_SHAPE_SMALL;
+  info->installation_time = -1;
+}
+
+static void
+eos_app_info_class_init (EosAppInfoClass *klass)
+{
+  GObjectClass *oclass = G_OBJECT_CLASS (klass);
+
+  oclass->get_property = eos_app_info_get_property;
+  oclass->set_property = eos_app_info_set_property;
+  oclass->finalize = eos_app_info_finalize;
+
+  properties[PROP_APPLICATION_ID] =
+    g_param_spec_string ("application-id",
+                         "Application ID",
+                         "The application ID",
+                         "",
+                         G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS | G_PARAM_CONSTRUCT_ONLY);
+  properties[PROP_STATE] =
+    g_param_spec_enum ("state",
+                       "Application state",
+                       "The application state",
+                       EOS_TYPE_APP_STATE,
+                       EOS_APP_STATE_UNKNOWN,
+                       G_PARAM_READABLE | G_PARAM_STATIC_STRINGS);
+
+  g_object_class_install_properties (oclass, NUM_PROPS, properties);
+}
+
+EosAppInfo *
+eos_app_info_new (const char *application_id)
+{
+  return g_object_new (EOS_TYPE_APP_INFO,
+                       "application-id", application_id,
+                       NULL);
 }
 
 const char *
@@ -241,7 +323,10 @@ eos_app_info_get_available_version (const EosAppInfo *info)
 const char *
 eos_app_info_get_locale (const EosAppInfo *info)
 {
-  return info->locale;
+  if (info->installed_locale)
+    return info->installed_locale;
+
+  return info->server_locale;
 }
 
 const char *
@@ -295,13 +380,19 @@ eos_app_info_is_offline (const EosAppInfo *info)
 gboolean
 eos_app_info_is_on_secondary_storage (const EosAppInfo *info)
 {
-  return info->on_secondary_storage;
+  if (info->is_installed)
+    return info->installed_on_secondary_storage;
+
+  return info->for_secondary_storage;
 }
 
 gint64
 eos_app_info_get_installed_size (const EosAppInfo *info)
 {
-  return info->installed_size;
+  if (info->is_installed)
+    return info->installed_size;
+
+  return info->server_installed_size;
 }
 
 gboolean
@@ -325,13 +416,15 @@ eos_app_info_is_available (const EosAppInfo *info)
 gboolean
 eos_app_info_is_updatable (const EosAppInfo *info)
 {
-  return info->is_installed && info->update_available;
+  return info->is_installed &&
+    (eos_compare_versions (info->available_version,
+                           info->installed_version) > 0);
 }
 
 gboolean
 eos_app_info_is_removable (const EosAppInfo *info)
 {
-  return !info->on_secondary_storage;
+  return !eos_app_info_is_on_secondary_storage (info);
 }
 
 EosAppCategory
@@ -566,13 +659,8 @@ static const char *known_mount_points[] = {
  * Updates file system related fields of @info.
  */
 static void
-check_info_storage (EosAppInfo *info,
-                    const char *filename)
+check_info_storage (EosAppInfo *info)
 {
-  /* Default values */
-  info->on_secondary_storage = FALSE;
-  info->installation_time = -1;
-
   /* we check if the file resides on a volume mounted using overlayfs.
    * this is a bit more convoluted; in theory, we could check if the
    * directory in which @filename is located has the overlayfs magic
@@ -580,7 +668,7 @@ check_info_storage (EosAppInfo *info,
    * have to do assume that the overlayfs magic bit never changes.
    */
   struct stat statbuf;
-  if (stat (filename, &statbuf) < 0)
+  if (stat (info->info_filename, &statbuf) < 0)
     return;
 
   /* We use second resolution for the installation time, because
@@ -600,7 +688,7 @@ check_info_storage (EosAppInfo *info,
 
       if (file_stdev == statbuf.st_dev)
         {
-          info->on_secondary_storage = TRUE;
+          info->installed_on_secondary_storage = TRUE;
           break;
         }
     }
@@ -608,13 +696,16 @@ check_info_storage (EosAppInfo *info,
 
 /*< private >*/
 gboolean
-eos_app_info_update_from_installed (EosAppInfo *info,
-                                    const char *filename)
+eos_app_info_installed_changed (EosAppInfo *info)
 {
   GKeyFile *keyfile = g_key_file_new ();
   gboolean retval = FALSE;
 
-  if (!g_key_file_load_from_file (keyfile, filename, 0, NULL))
+  g_assert (info->info_filename != NULL);
+  eos_app_log_debug_message ("Loading installed information for '%s' from '%s'",
+                             info->application_id, info->info_filename);
+
+  if (!g_key_file_load_from_file (keyfile, info->info_filename, 0, NULL))
     goto out;
 
 #define GROUP   "Bundle"
@@ -622,28 +713,20 @@ eos_app_info_update_from_installed (EosAppInfo *info,
   if (!g_key_file_has_group (keyfile, GROUP))
     goto out;
 
-  g_free (info->installed_version);
-  info->installed_version = g_key_file_get_string (keyfile, GROUP,
-                                                   FILE_KEYS[CODE_VERSION],
-                                                   NULL);
+  eos_app_info_clear_installed_attributes (info);
 
-  g_free (info->locale);
-  info->locale = g_key_file_get_string (keyfile, GROUP, FILE_KEYS[LOCALE], NULL);
-
+  info->installed_version = g_key_file_get_string (keyfile, GROUP, FILE_KEYS[CODE_VERSION], NULL);
+  info->installed_locale = g_key_file_get_string (keyfile, GROUP, FILE_KEYS[LOCALE], NULL);
   info->installed_size = g_key_file_get_int64 (keyfile, GROUP, FILE_KEYS[INSTALLED_SIZE], NULL);
 
-  check_info_storage (info, filename);
+  check_info_storage (info);
 
   /* Data coming from the keyfile takes precedence */
   if (g_key_file_has_key (keyfile, GROUP, FILE_KEYS[SECONDARY_STORAGE], NULL))
-    info->on_secondary_storage = g_key_file_get_boolean (keyfile, GROUP, FILE_KEYS[SECONDARY_STORAGE], NULL);
-
-  /* If we found it here, then it's installed */
-  eos_app_log_debug_message ("Setting app '%s' as installed",
-                             info->application_id);
-  info->is_installed = TRUE;
+    info->installed_on_secondary_storage = g_key_file_get_boolean (keyfile, GROUP, FILE_KEYS[SECONDARY_STORAGE], NULL);
 
   retval = TRUE;
+  g_object_notify_by_pspec (G_OBJECT (info), properties[PROP_STATE]);
 
 #undef GROUP
 
@@ -651,6 +734,17 @@ out:
   g_key_file_unref (keyfile);
 
   return retval;
+}
+
+/*< private >*/
+gboolean
+eos_app_info_update_from_installed (EosAppInfo *info,
+                                    const char *filename)
+{
+  g_clear_pointer (&info->info_filename, g_free);
+  info->info_filename = g_strdup (filename);
+
+  return eos_app_info_installed_changed (info);
 }
 
 static gboolean
@@ -688,22 +782,18 @@ eos_app_info_update_from_server (EosAppInfo *info,
   if (node != NULL)
     is_diff = json_node_get_boolean (node);
 
-  gboolean is_newer_version = eos_compare_versions (info->available_version,
-                                                    info->installed_version) > 0;
-  if (is_diff)
-    info->update_available = is_newer_version;
-  else
-    info->is_available = is_newer_version;
+  if (!is_diff)
+    info->is_available = TRUE;
 
   node = json_object_get_member (obj, JSON_KEYS[INSTALLED_SIZE]);
   if (node != NULL)
-    info->installed_size = json_node_get_int (node);
+    info->server_installed_size = json_node_get_int (node);
 
   node = json_object_get_member (obj, JSON_KEYS[SECONDARY_STORAGE]);
   if (node)
-    info->on_secondary_storage = json_node_get_boolean (node);
+    info->for_secondary_storage = json_node_get_boolean (node);
 
-  replace_string_field_from_json (obj, LOCALE, &info->locale);
+  replace_string_field_from_json (obj, LOCALE, &info->server_locale);
 
   if (is_diff)
     {
@@ -717,6 +807,8 @@ eos_app_info_update_from_server (EosAppInfo *info,
       replace_string_field_from_json (obj, SIGNATURE_LINK, &info->signature_uri);
       replace_string_field_from_json (obj, SHA_HASH, &info->bundle_hash);
     }
+
+  g_object_notify_by_pspec (G_OBJECT (info), properties[PROP_STATE]);
 
   return TRUE;
 }
@@ -745,6 +837,7 @@ eos_app_info_set_has_launcher (EosAppInfo *info,
                                gboolean has_launcher)
 {
   info->has_launcher = has_launcher;
+  g_object_notify_by_pspec (G_OBJECT (info), properties[PROP_STATE]);
 }
 
 /*< private >*/
@@ -756,6 +849,14 @@ eos_app_info_set_is_installed (EosAppInfo *info,
                              info->application_id,
                              is_installed ? "" : "not ");
   info->is_installed = is_installed;
+
+  if (!is_installed)
+    {
+      eos_app_info_clear_installed_attributes (info);
+      g_clear_pointer (&info->info_filename, g_free);
+    }
+
+  g_object_notify_by_pspec (G_OBJECT (info), properties[PROP_STATE]);
 }
 
 /*< private >*/

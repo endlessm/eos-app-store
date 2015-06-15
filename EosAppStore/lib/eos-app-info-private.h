@@ -10,7 +10,7 @@ G_BEGIN_DECLS
  */
 struct _EosAppInfo
 {
-  volatile int ref_count;
+  GObject parent;
 
   char *application_id;
   char *desktop_id;
@@ -19,10 +19,13 @@ struct _EosAppInfo
   char *title;
   char *subtitle;
   char *description;
-  char *locale;
+  char *server_locale;
+  char *installed_locale;
 
   char *installed_version;
   char *available_version;
+
+  char *info_filename;
 
   char *bundle_uri;
   char *signature_uri;
@@ -33,6 +36,7 @@ struct _EosAppInfo
   char *delta_bundle_hash;
 
   gint64 installed_size;
+  gint64 server_installed_size;
 
   char *square_img;
   char *featured_img;
@@ -49,12 +53,16 @@ struct _EosAppInfo
 
   guint is_featured : 1;
   guint is_offline : 1;
-  guint on_secondary_storage : 1;
+  guint installed_on_secondary_storage : 1;
+  guint for_secondary_storage : 1;
   guint is_available : 1;
   guint is_installed : 1;
-  guint update_available : 1;
   guint has_launcher : 1;
   guint has_override : 1;
+};
+
+struct _EosAppInfoClass {
+  GObjectClass parent_class;
 };
 
 G_END_DECLS
