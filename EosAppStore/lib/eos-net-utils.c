@@ -144,6 +144,7 @@ download_file_chunk_func (GByteArray *chunk,
 static gboolean
 download_file_chunks (GInputStream   *in_stream,
                       GOutputStream  *out_stream,
+                      gsize           offset,
                       gsize          *bytes_read,
                       EosChunkFunc    chunk_func,
                       gpointer        chunk_func_user_data,
@@ -172,7 +173,8 @@ download_file_chunks (GInputStream   *in_stream,
                              &internal_error);
       if (internal_error != NULL)
         {
-          eos_app_log_error_message ("Downloading file failed during piecewise transfer");
+          eos_app_log_error_message ("Downloading file failed. %s",
+                                     internal_error->message);
           g_propagate_error (error, internal_error);
           goto out;
         }
@@ -180,7 +182,7 @@ download_file_chunks (GInputStream   *in_stream,
       pos += res;
 
       if (chunk_func != NULL)
-        chunk_func (content, res, pos, chunk_func_user_data);
+        chunk_func (content, res, offset + pos, chunk_func_user_data);
     }
 
   if (g_cancellable_is_cancelled (cancellable))
@@ -348,15 +350,17 @@ prepare_out_stream (const char    *target_file,
 
 static gboolean
 prepare_soup_request_resume (const SoupRequest *request,
-                             const char *source_uri,
-                             const char *target_file,
-                             GCancellable *cancellable)
+                             const char        *source_uri,
+                             const char        *target_file,
+                             gsize             *resume_offset,
+                             GCancellable      *cancellable)
 {
   GFile *file = NULL;
   GFileInfo *info = NULL;
   GError *error = NULL;
 
   gboolean using_resume = FALSE;
+  *resume_offset = 0;
 
   eos_app_log_debug_message ("Getting local file length");
 
@@ -367,6 +371,9 @@ prepare_soup_request_resume (const SoupRequest *request,
                             &error);
   if (error)
     {
+      /* TODO Turn this into something less frightening when we have a
+       *      good idea on which conditions we will not have the local
+       *      file available */
       eos_app_log_error_message ("Cannot resume - unable to get "
                                  "local file's size (%s: %s).",
                                  target_file,
@@ -378,14 +385,14 @@ prepare_soup_request_resume (const SoupRequest *request,
                                                    G_FILE_ATTRIBUTE_STANDARD_SIZE);
   g_clear_object (&info);
 
-  eos_app_log_info_message ("Resume size of %s is %" G_GUINT64_FORMAT, target_file,
-                             size);
-
   /* No file or nothing downloaded - just get the whole file */
   if (size == 0)
     goto out;
 
-  eos_app_log_debug_message ("Attaching resume offset header");
+  eos_app_log_info_message ("Resuming %s from offset %" G_GUINT64_FORMAT,
+                            target_file,
+                            size);
+
   SoupMessage *message = soup_request_http_get_message (SOUP_REQUEST_HTTP (request));
   if (message != NULL)
     {
@@ -394,6 +401,9 @@ prepare_soup_request_resume (const SoupRequest *request,
        * a 206. See github.com/endlessm/eos-shell/issues/4596#issuecomment-111574913
        * for more info */
       soup_message_headers_set_range (message->request_headers, size, -1);
+
+      *resume_offset = size;
+
       g_object_unref (message);
     }
 
@@ -407,7 +417,6 @@ out:
 
   return using_resume;
 }
-
 
 static void
 download_chunk_func (GByteArray *chunk,
@@ -441,6 +450,32 @@ add_soup_logger (SoupSession *session)
 }
 
 static gboolean
+is_response_partial_content (SoupRequest *request)
+{
+  gboolean is_partial_content = FALSE;
+  SoupMessage *message = soup_request_http_get_message (SOUP_REQUEST_HTTP (request));
+  if (message != NULL)
+    {
+      eos_app_log_debug_message ("Status code: %d",  message->status_code);
+
+      if (message->status_code == SOUP_STATUS_PARTIAL_CONTENT)
+        {
+          eos_app_log_debug_message ("Server supports resuming. "
+                                     "Continuing download");
+          is_partial_content = TRUE;
+        }
+      else
+        {
+          eos_app_log_error_message ("Server does not support our resume request!");
+        }
+
+      g_object_unref (message);
+    }
+
+  return is_partial_content;
+}
+
+static gboolean
 download_from_uri (SoupSession          *session,
                    const char           *source_uri,
                    const char           *target_file,
@@ -456,9 +491,12 @@ download_from_uri (SoupSession          *session,
   /* We assume that we won't get any data from the endpoint */
   *reset_error_counter = FALSE;
 
-  gsize bytes_read = 0;
   GInputStream *in_stream = NULL;
   GOutputStream *out_stream = NULL;
+
+  gsize bytes_read = 0;
+  gsize start_offset = 0;
+  gboolean is_resumed = FALSE;
 
   if (eos_app_log_soup_debug_enabled())
       add_soup_logger (session);
@@ -467,12 +505,12 @@ download_from_uri (SoupSession          *session,
   if (request == NULL)
     goto out;
 
-  gboolean is_resumed = FALSE;
   if (allow_resume)
     {
       eos_app_log_debug_message ("Resume allowed. "
                                  "Figuring out what range to request.");
       is_resumed = prepare_soup_request_resume (request, source_uri, target_file,
+                                                &start_offset,
                                                 cancellable);
     }
 
@@ -486,23 +524,27 @@ download_from_uri (SoupSession          *session,
   if (in_stream == NULL)
     goto out;
 
+  /* Check that the server supports our resume request */
+  if (is_resumed)
+    is_resumed &= is_response_partial_content (request);
+
   out_stream = prepare_out_stream (target_file, is_resumed, cancellable, error);
   if (out_stream == NULL)
     goto out;
 
-  goffset total = soup_request_get_content_length (request);
+  goffset total = start_offset + soup_request_get_content_length (request);
 
   /* ensure we emit a progress notification at the beginning */
   if (progress_func != NULL)
-    progress_func (0, total, progress_func_user_data);
+    progress_func (start_offset, total, progress_func_user_data);
 
   EosDownloadAppFileClosure *clos = g_slice_new0 (EosDownloadAppFileClosure);
   clos->progress_func = progress_func;
   clos->progress_func_user_data = progress_func_user_data;
   clos->total_len = total;
 
-  retval = download_file_chunks (in_stream, out_stream, &bytes_read,
-                                 download_chunk_func,
+  retval = download_file_chunks (in_stream, out_stream, start_offset,
+                                 &bytes_read, download_chunk_func,
                                  clos, cancellable, error);
 
   g_slice_free (EosDownloadAppFileClosure, clos);
@@ -657,7 +699,7 @@ eos_net_utils_download_file (SoupSession     *session,
   if (out_stream == NULL)
     goto out;
 
-  if (!download_file_chunks (in_stream, out_stream, &bytes_read,
+  if (!download_file_chunks (in_stream, out_stream, 0, &bytes_read,
                              download_file_chunk_func, all_content,
                              cancellable, error))
     goto out;
