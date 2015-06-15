@@ -383,7 +383,7 @@ eos_app_info_is_on_secondary_storage (const EosAppInfo *info)
   if (info->is_installed)
     return info->installed_on_secondary_storage;
 
-  return info->server_on_secondary_storage;
+  return info->for_secondary_storage;
 }
 
 gint64
@@ -789,7 +789,7 @@ eos_app_info_update_from_server (EosAppInfo *info,
 
   node = json_object_get_member (obj, JSON_KEYS[SECONDARY_STORAGE]);
   if (node)
-    info->server_on_secondary_storage = json_node_get_boolean (node);
+    info->for_secondary_storage = json_node_get_boolean (node);
 
   replace_string_field_from_json (obj, LOCALE, &info->server_locale);
 
