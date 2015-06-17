@@ -1275,6 +1275,20 @@ eos_app_load_available_apps (GHashTable *app_info,
                                              code_version);
                 }
             }
+          else if (version_cmp == 0)
+            {
+              if (eos_compare_versions (code_version,
+                                        eos_app_info_get_installed_version (info)) != 0)
+                {
+                   eos_app_log_error_message (" -> Full bundle has an override. "
+                                              "Ignoring");
+                   continue;
+                }
+
+              eos_app_log_debug_message (" -> Full bundle matches installed version. "
+                                         "Updating record");
+              eos_app_info_update_from_server (info, obj);
+            }
           else
             {
               eos_app_log_debug_message (" -> Full bundle is not a newer version. (%d)"

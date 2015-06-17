@@ -456,19 +456,22 @@ EosAppState
 eos_app_info_get_state (const EosAppInfo *info)
 {
   EosAppState retval = EOS_APP_STATE_UNKNOWN;
-  gboolean is_installed, is_installable, is_updatable;
+  gboolean is_installed, is_installable, is_updatable, is_available;
 
   is_installed = eos_app_info_is_installed (info);
   is_updatable = eos_app_info_is_updatable (info);
   is_installable = eos_app_info_is_installable (info);
+  is_available = eos_app_info_is_available (info);
 
-  eos_app_log_debug_message ("%s (%p)"
-                             "(installed: %s, updatable: %s, installable: %s",
+  eos_app_log_debug_message ("%s (%p) "
+                             "(installed: %s, updatable: %s,"
+                             " installable: %s, available: %s)",
                              eos_app_info_get_application_id (info),
                              info,
                              is_installed ? "true" : "false",
                              is_updatable ? "true" : "false",
-                             is_installable ? "true" : "false");
+                             is_installable ? "true" : "false",
+                             is_available ? "true" : "false");
 
   if (is_updatable)
     retval = EOS_APP_STATE_UPDATABLE;
