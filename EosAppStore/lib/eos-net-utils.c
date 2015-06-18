@@ -28,6 +28,13 @@
 
 G_DEFINE_QUARK (eos-net-utils-error-quark, eos_net_utils_error)
 
+typedef struct {
+  GFileProgressCallback  progress_func;
+  gpointer               progress_func_user_data;
+  EosAppInfo            *info;
+  gsize                  total_len;
+} EosDownloadAppFileClosure;
+
 static GInputStream *
 set_up_download_from_request (SoupRequest   *request,
                               const char    *target_file,

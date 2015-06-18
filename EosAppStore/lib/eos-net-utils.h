@@ -24,13 +24,6 @@ typedef struct {
   gpointer user_data;
 } EosProgressClosure;
 
-typedef struct {
-  GFileProgressCallback  progress_func;
-  gpointer               progress_func_user_data;
-  EosAppInfo            *info;
-  gsize                  total_len;
-} EosDownloadAppFileClosure;
-
 void      eos_net_utils_progress_closure_free    (gpointer data);
 
 gboolean  eos_net_utils_download_file (SoupSession   *session,
