@@ -38,6 +38,11 @@ gboolean  eos_net_utils_download_file_with_retry (SoupSession          *session,
                                                   GCancellable         *cancellable,
                                                   GError              **error);
 
+SoupLogger * eos_net_utils_add_soup_logger          (SoupSession *session);
+
+void         eos_net_utils_remove_soup_logger       (SoupSession *session,
+                                                     SoupLogger *logger);
+
 #define EOS_NET_UTILS_ERROR        (eos_net_utils_error_quark ())
 
 GQuark eos_net_utils_error_quark (void);

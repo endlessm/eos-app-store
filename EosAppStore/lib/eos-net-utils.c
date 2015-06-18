@@ -443,12 +443,20 @@ soup_log_printer (SoupLogger *logger,
   eos_app_log_error_message ("%s", data);
 }
 
-static void
-add_soup_logger (SoupSession *session)
+SoupLogger *
+eos_net_utils_add_soup_logger (SoupSession *session)
 {
   SoupLogger *logger = soup_logger_new (SOUP_LOGGER_LOG_HEADERS, -1);
   soup_session_add_feature (session, (SoupSessionFeature *) logger);
   soup_logger_set_printer (logger, soup_log_printer, NULL, NULL);
+
+  return logger;
+}
+
+void
+eos_net_utils_remove_soup_logger (SoupSession *session, SoupLogger *logger)
+{
+  soup_session_remove_feature (session, (SoupSessionFeature *) logger);
 }
 
 static gboolean
@@ -499,9 +507,6 @@ download_from_uri (SoupSession          *session,
   gsize bytes_read = 0;
   gsize start_offset = 0;
   gboolean is_resumed = FALSE;
-
-  if (eos_app_log_soup_debug_enabled())
-      add_soup_logger (session);
 
   SoupRequest *request = prepare_soup_request (session, source_uri, NULL, error);
   if (request == NULL)

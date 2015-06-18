@@ -54,6 +54,7 @@ struct _EosAppListModel
   gboolean caps_loaded;
 
   SoupSession *soup_session;
+  SoupLogger *soup_logger;
 
   EosAppManager *proxy;
 };
@@ -700,7 +701,11 @@ eos_app_list_model_finalize (GObject *gobject)
 
   g_object_unref (&self->proxy);
 
+  eos_net_utils_remove_soup_logger (self->soup_session, self->soup_logger);
+  g_clear_object (&self->soup_logger);
+
   g_clear_object (&self->soup_session);
+
   g_clear_object (&self->app_monitor);
   g_clear_object (&self->session_bus);
   g_clear_object (&self->system_bus);
@@ -765,6 +770,10 @@ eos_app_list_model_init (EosAppListModel *self)
   eos_app_log_error_message ("Creating new soup session");
 
   self->soup_session = soup_session_new ();
+
+  self->soup_logger = NULL;
+  if (eos_app_log_soup_debug_enabled())
+      self->soup_logger = eos_net_utils_add_soup_logger (self->soup_session);
 }
 
 EosAppListModel *
