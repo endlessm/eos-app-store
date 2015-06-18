@@ -570,13 +570,6 @@ out:
   return retval;
 }
 
-/**
- * eos_net_utils_download_file_with_retry:
- * @progress_func: (closure) (scope async): Callback function to
- *                 invoke for every progress event
- *
- * Returns:
- */
 gboolean
 eos_net_utils_download_file_with_retry (SoupSession          *session,
                                         const char           *source_uri,
