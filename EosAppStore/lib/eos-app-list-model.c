@@ -87,12 +87,6 @@ download_progress_callback_data_free (DownloadProgressCallbackData *data)
   g_slice_free (DownloadProgressCallbackData, data);
 }
 
-static void
-set_app_installation_error (const char *desktop_id,
-                            const char *internal_message,
-                            const char *external_message,
-                            GError **error_out);
-
 G_DEFINE_TYPE (EosAppListModel, eos_app_list_model, G_TYPE_OBJECT)
 G_DEFINE_QUARK (eos-app-list-model-error-quark, eos_app_list_model_error)
 
