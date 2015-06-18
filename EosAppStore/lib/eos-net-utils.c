@@ -81,6 +81,12 @@ static gboolean
 check_cached_file (const char *target_file,
                    char      **buffer)
 {
+  if (buffer == NULL)
+    {
+      eos_app_log_error_message ("Trying to read a file into an empty pointer!");
+      return FALSE;
+    }
+
   struct stat buf;
   if (stat (target_file, &buf) != 0)
     return FALSE;
@@ -120,12 +126,6 @@ check_cached_file (const char *target_file,
                               target_file);
   else
     eos_app_log_info_message ("No network available, using cached file");
-
-  if (buffer == NULL)
-    {
-      eos_app_log_error_message ("Trying to read a file into an empty pointer!");
-      return FALSE;
-    }
 
   if (!g_file_get_contents (target_file, buffer, NULL, &internal_error))
     {
