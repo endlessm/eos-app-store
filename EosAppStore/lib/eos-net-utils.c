@@ -361,7 +361,6 @@ prepare_soup_resume_request (const SoupRequest *request,
   GError *error = NULL;
 
   gboolean using_resume = FALSE;
-  *resume_offset = 0;
 
   eos_app_log_debug_message ("Getting local file length");
 
