@@ -1687,7 +1687,7 @@ eos_compare_versions (const char *a,
 }
 
 gboolean
-eos_check_available_space (GFile         *path,
+eos_check_available_space (GFile         *file,
                            goffset        min_size,
                            GCancellable  *cancellable,
                            GError       **error)
@@ -1695,13 +1695,13 @@ eos_check_available_space (GFile         *path,
   GFileInfo *info;
   gboolean retval = TRUE;
 
-  if (path == NULL)
+  if (file == NULL)
     eos_app_log_error_message ("File doesn't exist");
 
   eos_app_log_info_message ("Trying to get filesystem info from %s",
-                            g_file_get_path(path));
+                            g_file_get_path(file));
 
-  info = g_file_query_filesystem_info (path, G_FILE_ATTRIBUTE_FILESYSTEM_FREE,
+  info = g_file_query_filesystem_info (file, G_FILE_ATTRIBUTE_FILESYSTEM_FREE,
                                        cancellable,
                                        error);
   if (info == NULL)

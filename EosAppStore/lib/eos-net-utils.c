@@ -199,15 +199,11 @@ download_file_chunks (GInputStream   *in_stream,
 
   if (g_cancellable_is_cancelled (cancellable))
     {
-      char *error_message;
-
       eos_app_log_info_message ("Download cancelled");
 
-      error_message = g_strdup (_("Download cancelled"));
       g_set_error_literal (error, EOS_NET_UTILS_ERROR,
                            EOS_NET_UTILS_ERROR_CANCELLED,
-                           error_message);
-      g_free (error_message);
+                           "Download cancelled");
 
       goto out;
     }
@@ -244,15 +240,11 @@ prepare_soup_request (SoupSession  *session,
 
   if (uri == NULL)
     {
-      char *error_message;
+      eos_app_log_error_message ("Soup URI is NULL - canceling download");
 
-      eos_app_log_error_message ("Soap URI is NULL - canceling download");
-
-      error_message = g_strdup (_("Soap URI is NULL - canceling download"));
       g_set_error_literal (error, EOS_NET_UTILS_ERROR,
                            EOS_NET_UTILS_ERROR_INVALID_URL,
-                           error_message);
-      g_free (error_message);
+                           "No URI provided - cancelling download");
 
       return NULL;
     }
@@ -341,21 +333,15 @@ prepare_out_stream (const char    *target_file,
                                  &internal_error);
   if (internal_error != NULL)
     {
-      char *error_message;
-
       eos_app_log_error_message ("Opening output file failed - canceling download");
 
-      error_message = g_strdup_printf (_("Opening output file %s failed - "
-                                         "canceling download (%s)"),
-                                       target_file,
-                                       internal_error->message);
-
-      g_set_error_literal (error, EOS_NET_UTILS_ERROR,
-                           EOS_NET_UTILS_ERROR_FAILED,
-                           error_message);
+      g_set_error (error, EOS_NET_UTILS_ERROR,
+                   EOS_NET_UTILS_ERROR_FAILED,
+                   _("Could not save bundle file - "
+                     "canceling download (%s)"),
+                   internal_error->message);
 
       g_error_free (internal_error);
-      g_free (error_message);
     }
 
   g_object_unref (file);
@@ -399,7 +385,6 @@ prepare_soup_resume_request (const SoupRequest *request,
 
   guint64 size = g_file_info_get_attribute_uint64 (info,
                                                    G_FILE_ATTRIBUTE_STANDARD_SIZE);
-  g_clear_object (&info);
 
   /* No file or nothing downloaded - just get the whole file */
   if (size == 0)
@@ -425,9 +410,9 @@ prepare_soup_resume_request (const SoupRequest *request,
     }
 
   using_resume = TRUE;
+
 out:
-  if (error)
-      g_error_free (error);
+  g_clear_error (&error);
 
   g_clear_object (&file);
   g_clear_object (&info);
