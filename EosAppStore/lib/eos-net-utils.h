@@ -13,10 +13,6 @@
 
 G_BEGIN_DECLS
 
-typedef void (* EosProgressReportFunc) (goffset current,
-                                        goffset total,
-                                        gpointer user_data);
-
 typedef void (* EosChunkFunc)          (GByteArray *chunk,
                                         gsize       chunk_len,
                                         gsize       bytes_read,
@@ -29,7 +25,7 @@ typedef struct {
 } EosProgressClosure;
 
 typedef struct {
-  EosProgressReportFunc  progress_func;
+  GFileProgressCallback  progress_func;
   gpointer               progress_func_user_data;
   EosAppInfo            *info;
   gsize                  total_len;
@@ -49,7 +45,7 @@ gboolean  eos_net_utils_download_file (SoupSession   *session,
 gboolean  eos_net_utils_download_file_with_retry (SoupSession          *session,
                                                   const char           *source_uri,
                                                   const char           *target_file,
-                                                  EosProgressReportFunc progress_func,
+                                                  GFileProgressCallback progress_func,
                                                   gpointer              progress_func_user_data,
                                                   GCancellable         *cancellable,
                                                   GError              **error);
