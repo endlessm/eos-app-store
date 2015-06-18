@@ -28,6 +28,11 @@
 
 G_DEFINE_QUARK (eos-net-utils-error-quark, eos_net_utils_error)
 
+typedef void (* EosChunkFunc)          (GByteArray *chunk,
+                                        gsize       chunk_len,
+                                        gsize       bytes_read,
+                                        gpointer    chunk_func_user_data);
+
 typedef struct {
   GFileProgressCallback  progress_func;
   gpointer               progress_func_user_data;

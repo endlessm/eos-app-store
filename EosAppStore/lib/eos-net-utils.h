@@ -13,11 +13,6 @@
 
 G_BEGIN_DECLS
 
-typedef void (* EosChunkFunc)          (GByteArray *chunk,
-                                        gsize       chunk_len,
-                                        gsize       bytes_read,
-                                        gpointer    chunk_func_user_data);
-
 typedef struct {
   goffset current;
   goffset total;
