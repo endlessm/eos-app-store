@@ -909,6 +909,7 @@ typedef struct {
   goffset total;
 } ProgressClosure;
 
+/* Needs to be invoked on main context */
 static gboolean
 emit_download_progress (gpointer _data)
 {
@@ -924,30 +925,6 @@ emit_download_progress (gpointer _data)
                      clos->total);
 
   return G_SOURCE_REMOVE;
-}
-
-static void
-progress_closure_free (gpointer _data)
-{
-  EosProgressClosure *clos = _data;
-  g_slice_free (EosProgressClosure, clos);
-}
-
-static void
-queue_download_progress (goffset     current,
-                         goffset     total,
-                         gpointer    user_data)
-{
-  EosProgressClosure *clos = g_slice_new (EosProgressClosure);
-  clos->current = current;
-  clos->total = total;
-  clos->user_data = user_data;
-
-  /* we need to invoke this into the main context */
-  g_main_context_invoke_full (NULL, G_PRIORITY_DEFAULT,
-                              emit_download_progress,
-                              clos,
-                              progress_closure_free);
 }
 
 static char *
@@ -1073,7 +1050,7 @@ download_bundle (EosAppListModel *self,
 
   if (!eos_net_utils_download_file_with_retry (self->soup_session, bundle_uri,
                                                bundle_path,
-                                               queue_download_progress, data,
+                                               emit_download_progress, data,
                                                cancellable, &error))
     {
       eos_app_log_error_message ("Download of bundle failed");

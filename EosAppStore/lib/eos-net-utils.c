@@ -34,10 +34,10 @@ typedef void (* EosChunkFunc)          (GByteArray *chunk,
                                         gpointer    chunk_func_user_data);
 
 typedef struct {
-  GFileProgressCallback  progress_func;
-  gpointer               progress_func_user_data;
-  EosAppInfo            *info;
-  gsize                  total_len;
+  GSourceFunc  progress_func;
+  gpointer     progress_func_user_data;
+  EosAppInfo  *info;
+  gsize        total_len;
 } EosDownloadAppFileClosure;
 
 static GInputStream *
@@ -420,6 +420,31 @@ out:
 }
 
 static void
+progress_closure_free (gpointer _data)
+{
+  EosProgressClosure *clos = _data;
+  g_slice_free (EosProgressClosure, clos);
+}
+
+static void
+send_progress_to_main_context (GSourceFunc  progress_func,
+                               gsize        bytes_read,
+                               gsize        total_len,
+                               gpointer     user_data)
+{
+  EosProgressClosure *clos = g_slice_new (EosProgressClosure);
+  clos->current = bytes_read;
+  clos->total = total_len;
+  clos->user_data = user_data;
+
+  /* we need to invoke this into the main context */
+  g_main_context_invoke_full (NULL, G_PRIORITY_DEFAULT,
+                              progress_func,
+                              clos,
+                              progress_closure_free);
+}
+
+static void
 download_chunk_func (GByteArray *chunk,
                      gsize       chunk_len,
                      gsize       bytes_read,
@@ -428,8 +453,9 @@ download_chunk_func (GByteArray *chunk,
   EosDownloadAppFileClosure *clos = chunk_func_user_data;
 
   if (clos->progress_func != NULL)
-    clos->progress_func (bytes_read, clos->total_len,
-                         clos->progress_func_user_data);
+    /* we need to invoke this into the main context */
+    send_progress_to_main_context (clos->progress_func, bytes_read, clos->total_len,
+                                   clos->progress_func_user_data);
 }
 
 static void
@@ -485,15 +511,15 @@ is_response_partial_content (SoupRequest *request)
 }
 
 static gboolean
-download_from_uri (SoupSession          *session,
-                   const char           *source_uri,
-                   const char           *target_file,
-                   const gboolean        allow_resume,
-                   GFileProgressCallback progress_func,
-                   gpointer              progress_func_user_data,
-                   gboolean             *reset_error_counter,
-                   GCancellable         *cancellable,
-                   GError              **error)
+download_from_uri (SoupSession     *session,
+                   const char      *source_uri,
+                   const char      *target_file,
+                   const gboolean   allow_resume,
+                   GSourceFunc      progress_func,
+                   gpointer         progress_func_user_data,
+                   gboolean        *reset_error_counter,
+                   GCancellable    *cancellable,
+                   GError         **error)
 {
   gboolean retval = FALSE;
 
@@ -541,8 +567,10 @@ download_from_uri (SoupSession          *session,
   goffset total = start_offset + soup_request_get_content_length (request);
 
   /* ensure we emit a progress notification at the beginning */
+  /* we need to invoke this into the main context */
   if (progress_func != NULL)
-    progress_func (start_offset, total, progress_func_user_data);
+    send_progress_to_main_context (progress_func, start_offset, total,
+                                   progress_func_user_data);
 
   EosDownloadAppFileClosure *clos = g_slice_new0 (EosDownloadAppFileClosure);
   clos->progress_func = progress_func;
@@ -561,7 +589,8 @@ download_from_uri (SoupSession          *session,
 
   /* emit a progress notification for the whole file, in any case */
   if (progress_func != NULL)
-    progress_func (total, total, progress_func_user_data);
+    send_progress_to_main_context (progress_func, total, total,
+                                   progress_func_user_data);
 
 out:
   g_clear_object (&in_stream);
@@ -572,13 +601,13 @@ out:
 }
 
 gboolean
-eos_net_utils_download_file_with_retry (SoupSession          *session,
-                                        const char           *source_uri,
-                                        const char           *target_file,
-                                        GFileProgressCallback progress_func,
-                                        gpointer              progress_func_user_data,
-                                        GCancellable         *cancellable,
-                                        GError              **error_out)
+eos_net_utils_download_file_with_retry (SoupSession   *session,
+                                        const char    *source_uri,
+                                        const char    *target_file,
+                                        GSourceFunc    progress_func,
+                                        gpointer       progress_func_user_data,
+                                        GCancellable  *cancellable,
+                                        GError       **error_out)
 {
     gboolean download_success = FALSE;
     gboolean reset_error_counter = FALSE;
