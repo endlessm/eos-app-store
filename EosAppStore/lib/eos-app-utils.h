@@ -65,7 +65,7 @@ gboolean eos_check_available_space        (GFile         *path,
                                            GCancellable  *cancellable,
                                            GError       **error);
 
-gboolean eos_set_up_target_dir            (const char *target_file,
+gboolean eos_mkdir_for_artifact           (const char *target_file,
                                            GError    **error);
 
 void eos_app_load_gio_apps   (GHashTable *app_info);

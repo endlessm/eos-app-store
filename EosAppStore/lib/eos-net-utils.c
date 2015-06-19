@@ -683,7 +683,7 @@ eos_net_utils_download_file (SoupSession     *session,
    * to exist, so we always try and create it. If the directory already
    * exists, this is a no-op.
    */
-  if (!eos_set_up_target_dir (target_file, error))
+  if (!eos_mkdir_for_artifact (target_file, error))
     goto out;
 
   in_stream = set_up_download_from_request (request, target_file, cancellable,

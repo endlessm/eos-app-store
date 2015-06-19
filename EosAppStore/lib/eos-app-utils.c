@@ -1736,8 +1736,8 @@ eos_check_available_space (GFile         *file,
 }
 
 gboolean
-eos_set_up_target_dir (const char *target_file,
-                       GError    **error)
+eos_mkdir_for_artifact (const char *target_file,
+                        GError    **error)
 {
   GFile *file = g_file_new_for_path (target_file);
   GFile *parent = g_file_get_parent (file);
