@@ -78,6 +78,7 @@ const AppStoreDBusService = new Lang.Class({
         /* TODO: Handle refresh errors better */
         if (!success)
             invocation.return_value(GLib.Variant.new('(as)', [[]]));
+            return;
 
         let appInfos = this._app.appList.loadCategory(category);
 
