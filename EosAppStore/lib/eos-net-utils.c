@@ -627,7 +627,6 @@ eos_net_utils_download_file_with_retry (SoupSession            *session,
     GError *error = NULL;
 
     gint64 retry_time_limit = MAX_DOWNLOAD_RETRY_PERIOD * G_USEC_PER_SEC;
-
     gint64 error_retry_cutoff = 0;
 
     /* Keep trying to download unless we finish successfully or we reach

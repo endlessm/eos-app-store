@@ -1696,7 +1696,16 @@ eos_check_available_space (GFile         *file,
   gboolean retval = TRUE;
 
   if (file == NULL)
-    eos_app_log_error_message ("File doesn't exist");
+    {
+      eos_app_log_error_message ("File doesn't exist. "
+                                 "Unable to query available disk space");
+
+      g_set_error (error, EOS_APP_UTILS_ERROR,
+                   EOS_APP_UTILS_ERROR_UNABLE_TO_CHECK_SPACE,
+                   "Unable to query available disk space");
+
+      return FALSE;
+    }
 
   eos_app_log_info_message ("Trying to get filesystem info from %s",
                             g_file_get_path(file));
@@ -1718,7 +1727,10 @@ eos_check_available_space (GFile         *file,
    */
   guint64 req_space = min_size * 2;
 
-  eos_app_log_info_message ("Space left on FS: %lldKB", (long long) (req_space/1024));
+  eos_app_log_info_message ("Space required: %lld KB",
+                            (long long) (req_space / 1024));
+  eos_app_log_info_message ("Space left on FS: %lld KB",
+                            (long long) (free_space / 1024));
 
   if (free_space < req_space)
     {
