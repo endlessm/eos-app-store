@@ -60,6 +60,14 @@ gboolean eos_app_load_updates_meta_record (gint64        *monotonic_update_id,
                                            GCancellable  *cancellable,
                                            GError       **error);
 
+gboolean eos_check_available_space        (const char    *path,
+                                           goffset        min_size,
+                                           GCancellable  *cancellable,
+                                           GError       **error);
+
+gboolean eos_mkdir_for_artifact           (const char *target_file,
+                                           GError    **error);
+
 void eos_app_load_gio_apps   (GHashTable *app_info);
 void eos_app_load_shell_apps (GHashTable *app_info,
                               GVariant *shell_apps);

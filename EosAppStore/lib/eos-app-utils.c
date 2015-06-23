@@ -1685,3 +1685,90 @@ eos_compare_versions (const char *a,
 
   return res;
 }
+
+gboolean
+eos_check_available_space (const char    *path,
+                           goffset        min_size,
+                           GCancellable  *cancellable,
+                           GError       **error)
+{
+  GFile *file;
+  GFileInfo *info;
+  gboolean retval = TRUE;
+
+  file = g_file_new_for_path (path);
+  eos_app_log_info_message ("Trying to get filesystem info from %s", path);
+
+  info = g_file_query_filesystem_info (file, G_FILE_ATTRIBUTE_FILESYSTEM_FREE,
+                                       cancellable,
+                                       error);
+  g_object_unref (file);
+
+  if (info == NULL)
+    {
+      eos_app_log_error_message ("Can't get filesystem info to calculate"
+                                 "the available space");
+      return FALSE;
+    }
+
+  guint64 free_space = g_file_info_get_attribute_uint64 (info, G_FILE_ATTRIBUTE_FILESYSTEM_FREE);
+
+  /* we try to be conservative, and reserve twice the requested size, like
+   * eos-app-manager does.
+   */
+  guint64 req_space = min_size * 2;
+
+  eos_app_log_info_message ("Space required: %lld KB",
+                            (long long) (req_space / 1024));
+  eos_app_log_info_message ("Space left on FS: %lld KB",
+                            (long long) (free_space / 1024));
+
+  if (free_space < req_space)
+    {
+      eos_app_log_error_message ("Not enough space on device for downloading app");
+
+      g_set_error (error, G_IO_ERROR,
+                   G_IO_ERROR_NO_SPACE,
+                   _("Not enough space on device for downloading app"));
+      retval = FALSE;
+    }
+
+  g_object_unref (info);
+
+  return retval;
+}
+
+gboolean
+eos_mkdir_for_artifact (const char *target_file,
+                        GError    **error)
+{
+  GFile *file = g_file_new_for_path (target_file);
+  GFile *parent = g_file_get_parent (file);
+
+  char *parent_path = NULL;
+
+  gboolean retval = FALSE;
+
+  parent_path = g_file_get_path (parent);
+  if (g_mkdir_with_parents (parent_path, 0755) == -1)
+    {
+      int saved_errno = errno;
+
+      g_set_error (error, G_IO_ERROR,
+                   g_io_error_from_errno (saved_errno),
+                   "Unable to create directory: %s",
+                   g_strerror (saved_errno));
+
+      goto out;
+    }
+
+  retval = TRUE;
+
+out:
+  g_free (parent_path);
+
+  g_object_unref (parent);
+  g_object_unref (file);
+
+  return retval;
+}

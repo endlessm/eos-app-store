@@ -21,6 +21,7 @@ eaprivate_source_h = \
 	lib/eos-flexy-grid-private.h \
 	lib/eos-flexy-grid.h \
 	lib/eos-link-info.h \
+	lib/eos-net-utils-private.h \
 	lib/eos-vertical-stack-switcher.h
 
 eaprivate_source_c = \
@@ -33,6 +34,7 @@ eaprivate_source_c = \
 	lib/eos-flexy-grid-cell.c \
 	lib/eos-flexy-grid.c \
 	lib/eos-link-info.c \
+	lib/eos-net-utils.c \
 	lib/eos-vertical-stack-switcher.c
 
 eaprivate_built_source = \
