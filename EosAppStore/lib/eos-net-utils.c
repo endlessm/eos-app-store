@@ -230,8 +230,6 @@ out:
   if (bytes_read != NULL)
     *bytes_read = pos;
 
-#undef GET_DATA_BLOCK_SIZE
-
   return retval;
 }
 
