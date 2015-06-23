@@ -60,7 +60,7 @@ gboolean eos_app_load_updates_meta_record (gint64        *monotonic_update_id,
                                            GCancellable  *cancellable,
                                            GError       **error);
 
-gboolean eos_check_available_space        (GFile         *path,
+gboolean eos_check_available_space        (const char    *path,
                                            goffset        min_size,
                                            GCancellable  *cancellable,
                                            GError       **error);
@@ -84,7 +84,6 @@ GQuark eos_app_utils_error_quark (void);
 typedef enum {
   EOS_APP_UTILS_ERROR_DISK_FULL,
   EOS_APP_UTILS_ERROR_FAILED_TO_CREATE_DIR,
-  EOS_APP_UTILS_ERROR_UNABLE_TO_CHECK_SPACE,
   EOS_APP_UTILS_ERROR_JSON_UNEXPECTED_STRUCTURE,
   EOS_APP_UTILS_ERROR_JSON_MISSING_ATTRIBUTE,
   EOS_APP_UTILS_ERROR_JSON_UNEXPECTED_VALUE

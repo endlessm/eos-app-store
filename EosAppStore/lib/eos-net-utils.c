@@ -64,19 +64,14 @@ set_up_download_from_request (SoupRequest   *request,
     }
 
   goffset total = soup_request_get_content_length (request);
-  GFile *file = g_file_new_for_path (target_file);
-  GFile *parent = g_file_get_parent (file);
 
-  if (!eos_check_available_space (parent, total, cancellable, &internal_error))
+  if (!eos_check_available_space (target_file, total, cancellable, &internal_error))
     {
       eos_app_log_error_message ("Not enough space on FS - canceling download");
 
       g_propagate_error (error, internal_error);
       g_clear_object (&in_stream);
     }
-
-  g_object_unref (parent);
-  g_object_unref (file);
 
   return in_stream;
 }

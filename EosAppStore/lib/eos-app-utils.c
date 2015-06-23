@@ -1687,32 +1687,23 @@ eos_compare_versions (const char *a,
 }
 
 gboolean
-eos_check_available_space (GFile         *file,
+eos_check_available_space (const char    *path,
                            goffset        min_size,
                            GCancellable  *cancellable,
                            GError       **error)
 {
+  GFile *file;
   GFileInfo *info;
   gboolean retval = TRUE;
 
-  if (file == NULL)
-    {
-      eos_app_log_error_message ("File doesn't exist. "
-                                 "Unable to query available disk space");
-
-      g_set_error (error, EOS_APP_UTILS_ERROR,
-                   EOS_APP_UTILS_ERROR_UNABLE_TO_CHECK_SPACE,
-                   "Unable to query available disk space");
-
-      return FALSE;
-    }
-
-  eos_app_log_info_message ("Trying to get filesystem info from %s",
-                            g_file_get_path(file));
+  file = g_file_new_for_path (path);
+  eos_app_log_info_message ("Trying to get filesystem info from %s", path);
 
   info = g_file_query_filesystem_info (file, G_FILE_ATTRIBUTE_FILESYSTEM_FREE,
                                        cancellable,
                                        error);
+  g_object_unref (file);
+
   if (info == NULL)
     {
       eos_app_log_error_message ("Can't get filesystem info to calculate"
