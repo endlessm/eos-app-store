@@ -1749,15 +1749,6 @@ eos_mkdir_for_artifact (const char *target_file,
 
   gboolean retval = FALSE;
 
-  if (parent == NULL)
-    {
-      g_set_error (error, EOS_APP_UTILS_ERROR,
-                   EOS_APP_UTILS_ERROR_FAILED_TO_CREATE_DIR,
-                   "Unable to create directory.");
-
-      goto out;
-    }
-
   parent_path = g_file_get_path (parent);
   if (g_mkdir_with_parents (parent_path, 0755) == -1)
     {
