@@ -156,10 +156,7 @@ app_id_from_desktop_id (const gchar *desktop_id)
 
   /* We check to make sure the string is actually a .desktop file */
   /* The 8 here is the length of ".desktop" */
-  if (len <= 8) {
-    eos_app_log_error_message ("Desktop ID is too short! Value: %s", desktop_id);
-    return g_strdup (desktop_id);
-  }
+  g_assert_false (len <= 8);
 
   return g_strndup (desktop_id, len - 8);
 }
