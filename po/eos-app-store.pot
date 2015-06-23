@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-06-16 01:22+0000\n"
+"POT-Creation-Date: 2015-06-23 01:22+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -146,19 +146,19 @@ msgid "Folders"
 msgstr ""
 
 #. Translators: use the same string used to install the app store content JSON
-#: ../EosAppStore/categories.js:12 ../EosAppStore/lib/eos-app-utils.c:1438
+#: ../EosAppStore/categories.js:12 ../EosAppStore/lib/eos-app-utils.c:1452
 msgid "Education"
 msgstr ""
 
-#: ../EosAppStore/categories.js:19 ../EosAppStore/lib/eos-app-utils.c:1439
+#: ../EosAppStore/categories.js:19 ../EosAppStore/lib/eos-app-utils.c:1453
 msgid "Games"
 msgstr ""
 
-#: ../EosAppStore/categories.js:26 ../EosAppStore/lib/eos-app-utils.c:1440
+#: ../EosAppStore/categories.js:26 ../EosAppStore/lib/eos-app-utils.c:1454
 msgid "Resources"
 msgstr ""
 
-#: ../EosAppStore/categories.js:33 ../EosAppStore/lib/eos-app-utils.c:1441
+#: ../EosAppStore/categories.js:33 ../EosAppStore/lib/eos-app-utils.c:1455
 msgid "Utilities"
 msgstr ""
 
