@@ -488,20 +488,12 @@ soup_log_printer (SoupLogger *logger,
   eos_app_log_error_message ("%s", data);
 }
 
-SoupLogger *
+void
 eos_net_utils_add_soup_logger (SoupSession *session)
 {
   SoupLogger *logger = soup_logger_new (SOUP_LOGGER_LOG_HEADERS, -1);
   soup_session_add_feature (session, (SoupSessionFeature *) logger);
   soup_logger_set_printer (logger, soup_log_printer, NULL, NULL);
-
-  return logger;
-}
-
-void
-eos_net_utils_remove_soup_logger (SoupSession *session, SoupLogger *logger)
-{
-  soup_session_remove_feature (session, (SoupSessionFeature *) logger);
 }
 
 static gboolean

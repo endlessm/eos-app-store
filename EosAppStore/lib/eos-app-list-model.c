@@ -54,7 +54,6 @@ struct _EosAppListModel
   gboolean caps_loaded;
 
   SoupSession *soup_session;
-  SoupLogger *soup_logger;
 
   EosAppManager *proxy;
 };
@@ -701,9 +700,6 @@ eos_app_list_model_finalize (GObject *gobject)
 
   g_object_unref (&self->proxy);
 
-  eos_net_utils_remove_soup_logger (self->soup_session, self->soup_logger);
-  g_clear_object (&self->soup_logger);
-
   g_clear_object (&self->soup_session);
 
   g_clear_object (&self->app_monitor);
@@ -771,9 +767,9 @@ eos_app_list_model_init (EosAppListModel *self)
 
   self->soup_session = soup_session_new ();
 
-  self->soup_logger = NULL;
+  /* Add soup logger to session if needed */
   if (eos_app_log_soup_debug_enabled())
-      self->soup_logger = eos_net_utils_add_soup_logger (self->soup_session);
+      eos_net_utils_add_soup_logger (self->soup_session);
 }
 
 EosAppListModel *
