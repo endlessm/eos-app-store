@@ -909,22 +909,18 @@ typedef struct {
   goffset total;
 } ProgressClosure;
 
-/* Needs to be invoked on main context */
-static gboolean
-emit_download_progress (gpointer _data)
+static void
+emit_download_progress (goffset current, goffset total, gpointer _data)
 {
-  EosProgressClosure *clos = _data;
-  DownloadProgressCallbackData *user_data = clos->user_data;
+  DownloadProgressCallbackData *user_data = _data;
 
   /* If we're downloading a signature, we won't have the info object */
   if (user_data->info)
       g_signal_emit (user_data->model,
                      eos_app_list_model_signals[DOWNLOAD_PROGRESS], 0,
                      eos_app_info_get_content_id (user_data->info),
-                     clos->current,
-                     clos->total);
-
-  return G_SOURCE_REMOVE;
+                     current,
+                     total);
 }
 
 static char *

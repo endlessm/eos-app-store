@@ -13,12 +13,6 @@
 
 G_BEGIN_DECLS
 
-typedef struct {
-  goffset current;
-  goffset total;
-  gpointer user_data;
-} EosProgressClosure;
-
 void      eos_net_utils_progress_closure_free    (gpointer data);
 
 gboolean  eos_net_utils_download_file (SoupSession   *session,
@@ -30,13 +24,13 @@ gboolean  eos_net_utils_download_file (SoupSession   *session,
                                        GCancellable  *cancellable,
                                        GError       **error);
 
-gboolean  eos_net_utils_download_file_with_retry (SoupSession    *session,
-                                                  const char     *source_uri,
-                                                  const char     *target_file,
-                                                  GSourceFunc     progress_func,
-                                                  gpointer        progress_func_user_data,
-                                                  GCancellable   *cancellable,
-                                                  GError        **error);
+gboolean  eos_net_utils_download_file_with_retry (SoupSession           *session,
+                                                  const char            *source_uri,
+                                                  const char            *target_file,
+                                                  GFileProgressCallback  progress_func,
+                                                  gpointer               progress_func_user_data,
+                                                  GCancellable          *cancellable,
+                                                  GError               **error);
 
 SoupLogger * eos_net_utils_add_soup_logger          (SoupSession *session);
 
