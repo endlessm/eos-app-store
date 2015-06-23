@@ -400,20 +400,24 @@ prepare_soup_resume_request (const SoupRequest *request,
                             size);
 
   SoupMessage *message = soup_request_http_get_message (SOUP_REQUEST_HTTP (request));
-  if (message != NULL)
+
+  if (message == NULL)
     {
-      /* -1 for end range is to make sure that libsoup doesn't include the
-       * end number or the server will reject the message range and return
-       * a 206. See github.com/endlessm/eos-shell/issues/4596#issuecomment-111574913
-       * for more info
-       */
-      soup_message_headers_set_range (message->request_headers, size, -1);
-
-      *resume_offset = size;
-
-      g_object_unref (message);
+      eos_app_log_error_message ("Could not apply header to SOUP message");
+      goto out;
     }
 
+  /* -1 for end range is to make sure that libsoup doesn't include the
+   * end number or the server will reject the message range and return
+   * a 206. See github.com/endlessm/eos-shell/issues/4596#issuecomment-111574913
+   * for more info
+   */
+  soup_message_headers_set_range (message->request_headers, size, -1);
+  g_object_unref (message);
+
+  *resume_offset = size;
+
+  /* If we get to here, we're set on using the partial download */
   using_resume = TRUE;
 
 out:
