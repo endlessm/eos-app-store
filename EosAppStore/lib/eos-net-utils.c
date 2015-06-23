@@ -85,11 +85,7 @@ static gboolean
 check_cached_file (const char *target_file,
                    char      **buffer)
 {
-  if (buffer == NULL)
-    {
-      eos_app_log_error_message ("Trying to read a file into an empty pointer!");
-      return FALSE;
-    }
+  g_assert_nonnull (buffer);
 
   struct stat buf;
   if (stat (target_file, &buf) != 0)
@@ -440,7 +436,7 @@ send_progress_to_caller (gpointer _data)
 {
   EosProgressClosure *clos = _data;
 
-  g_assert (clos->progress_func != NULL);
+  g_assert_nonnull (clos->progress_func);
 
   clos->progress_func (clos->current, clos->total, clos->user_data);
 
