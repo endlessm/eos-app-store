@@ -82,7 +82,6 @@ EosAppCategory  eos_app_category_from_id (const char *p);
 GQuark eos_app_utils_error_quark (void);
 
 typedef enum {
-  EOS_APP_UTILS_ERROR_DISK_FULL,
   EOS_APP_UTILS_ERROR_JSON_UNEXPECTED_STRUCTURE,
   EOS_APP_UTILS_ERROR_JSON_MISSING_ATTRIBUTE,
   EOS_APP_UTILS_ERROR_JSON_UNEXPECTED_VALUE
