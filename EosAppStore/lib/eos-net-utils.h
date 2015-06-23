@@ -13,8 +13,6 @@
 
 G_BEGIN_DECLS
 
-void      eos_net_utils_progress_closure_free    (gpointer data);
-
 gboolean  eos_net_utils_download_file (SoupSession   *session,
                                        const char    *content_type,
                                        const char    *source_uri,
