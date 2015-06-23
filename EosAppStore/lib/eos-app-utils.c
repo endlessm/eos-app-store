@@ -1754,8 +1754,8 @@ eos_mkdir_for_artifact (const char *target_file,
     {
       int saved_errno = errno;
 
-      g_set_error (error, EOS_APP_UTILS_ERROR,
-                   EOS_APP_UTILS_ERROR_FAILED_TO_CREATE_DIR,
+      g_set_error (error, G_IO_ERROR,
+                   g_io_error_from_errno (saved_errno),
                    "Unable to create directory: %s",
                    g_strerror (saved_errno));
 
