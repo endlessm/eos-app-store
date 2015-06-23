@@ -73,10 +73,8 @@ set_up_download_from_request (SoupRequest   *request,
 
       g_propagate_error (error, internal_error);
       g_clear_object (&in_stream);
-      goto out;
     }
 
- out:
   g_object_unref (parent);
   g_object_unref (file);
 
