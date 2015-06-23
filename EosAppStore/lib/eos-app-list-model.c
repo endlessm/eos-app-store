@@ -8,7 +8,7 @@
 #include "eos-app-manager-service.h"
 #include "eos-app-manager-transaction.h"
 #include "eos-app-utils.h"
-#include "eos-net-utils.h"
+#include "eos-net-utils-private.h"
 
 #include <time.h>
 #include <sys/types.h>

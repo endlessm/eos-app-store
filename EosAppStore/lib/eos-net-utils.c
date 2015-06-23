@@ -11,7 +11,7 @@
 
 #include "eos-app-log.h"
 #include "eos-app-utils.h"
-#include "eos-net-utils.h"
+#include "eos-net-utils-private.h"
 
 /* Amount of seconds before a downloaded file is considered stale */
 #define DOWNLOADED_FILE_STALE_THRESHOLD 3600
