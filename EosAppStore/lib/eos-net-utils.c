@@ -192,14 +192,11 @@ download_file_chunks (GInputStream   *in_stream,
         chunk_func (content, res, offset + pos, chunk_func_user_data);
     }
 
-  /* Check for errors */
-  if (res < 0)
-    {
-      g_propagate_error (error, internal_error);
-      goto out;
-    }
-
   /* Check for cancellations */
+  /* XXX: Since we pass the same cancellable to reading/writing fuctions
+   *      we need to check the cancellable status before checking the retval
+   *      from reads.
+   */
   if (g_cancellable_is_cancelled (cancellable))
     {
       eos_app_log_info_message ("Download cancelled");
@@ -211,6 +208,12 @@ download_file_chunks (GInputStream   *in_stream,
       goto out;
     }
 
+  /* Check for errors */
+  if (res < 0)
+    {
+      g_propagate_error (error, internal_error);
+      goto out;
+    }
   retval = TRUE;
 
   eos_app_log_info_message ("Exiting download method normally");
