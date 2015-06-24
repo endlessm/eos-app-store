@@ -1693,16 +1693,28 @@ eos_check_available_space (const char    *path,
                            GError       **error)
 {
   GFile *file;
+  GFile *parent;
   GFileInfo *info;
   gboolean retval = TRUE;
 
   file = g_file_new_for_path (path);
+  parent = g_file_get_parent (file);
+  g_object_unref (file);
+
   eos_app_log_info_message ("Trying to get filesystem info from %s", path);
 
-  info = g_file_query_filesystem_info (file, G_FILE_ATTRIBUTE_FILESYSTEM_FREE,
+  if (parent == NULL)
+    {
+      eos_app_log_error_message ("Can't get parent GFile for %s", path);
+
+      return FALSE;
+    }
+
+  info = g_file_query_filesystem_info (parent,
+                                       G_FILE_ATTRIBUTE_FILESYSTEM_FREE,
                                        cancellable,
                                        error);
-  g_object_unref (file);
+  g_object_unref (parent);
 
   if (info == NULL)
     {
