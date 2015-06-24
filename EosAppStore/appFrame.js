@@ -366,6 +366,9 @@ const AppListBoxRow = new Lang.Class({
                     this._installButton.set_sensitive(false);
                     this._installButton.set_tooltip_text(BUTTON_TOOLTIP_NO_SPACE);
                 }
+                else {
+                    this._installButton.set_sensitive(true);
+                }
 
                 this._installButton.show();
 
@@ -373,10 +376,9 @@ const AppListBoxRow = new Lang.Class({
 
             case EosAppStorePrivate.AppState.UPDATABLE:
                 if (this.appInfo.get_has_launcher()) {
-                    if (!this._networkAvailable) {
-                        this._installButton.set_sensitive(false);
+                    this._installButton.set_sensitive(this._networkAvailable);
+                    if (!this._networkAvailable)
                         this._installButton.set_tooltip_text(BUTTON_TOOLTIP_NO_NETWORK);
-                    }
 
                     this._installButtonLabel.set_text(BUTTON_LABEL_UPDATE);
                 }
