@@ -119,7 +119,7 @@
                                 <child>
                                   <object class="GtkImage" id="header-icon">
                                     <property name="can_focus">False</property>
-                                    <property name="stock">gtk-missing-image</property>
+                                    <property name="icon-name">missing-image</property>
                                     <style>
                                       <class name="header-icon"/>
                                     </style>
