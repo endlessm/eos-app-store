@@ -201,10 +201,6 @@ download_file_chunks (GInputStream   *in_stream,
     {
       eos_app_log_info_message ("Download cancelled");
 
-      g_set_error_literal (error, EOS_NET_UTILS_ERROR,
-                           EOS_NET_UTILS_ERROR_CANCELLED,
-                           "Download cancelled");
-
       goto out;
     }
 
@@ -643,11 +639,13 @@ eos_net_utils_download_file_with_retry (SoupSession            *session,
             break;
 
         /* If we got canceled, also bail */
-        if (g_error_matches (error, EOS_NET_UTILS_ERROR,
-                             EOS_NET_UTILS_ERROR_CANCELLED))
+        if (g_cancellable_is_cancelled (cancellable))
           {
+             g_set_error_literal (error_out, EOS_NET_UTILS_ERROR,
+                                  EOS_NET_UTILS_ERROR_CANCELLED,
+                                  "Download cancelled");
+
             eos_app_log_error_message ("Download cancelled. Breaking out of retry loop.");
-            g_propagate_error (error_out, error);
             break;
           }
 
