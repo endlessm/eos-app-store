@@ -435,8 +435,8 @@ send_progress_to_caller (gpointer _data)
 
 static void
 send_progress_to_main_context (GFileProgressCallback  progress_func,
-                               gsize                  bytes_read,
-                               gsize                  total_len,
+                               goffset                bytes_read,
+                               goffset                total_len,
                                gpointer               user_data)
 {
   EosProgressClosure *clos = g_slice_new (EosProgressClosure);
