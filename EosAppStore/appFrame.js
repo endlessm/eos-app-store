@@ -181,6 +181,13 @@ const AppListBoxRow = new Lang.Class({
         this.appState = this.appInfo.get_state();
     },
 
+    _showInstallSpinner: function() {
+        this._installProgressLabel.set_text(_("Installing…"));
+        this._installProgressSpinner.show();
+        this._installProgressSpinner.start();
+        this._installProgressBar.hide();
+    },
+
     _downloadProgress: function(model, contentId, progress, current, total) {
         if (this.appInfo.get_content_id() != contentId) {
             return;
@@ -193,8 +200,7 @@ const AppListBoxRow = new Lang.Class({
         }
 
         if (current == total) {
-            this._installProgressLabel.set_text(_("Installing…"));
-            this._installProgressBar.fraction = 1.0;
+            this._showInstallSpinner();
             return;
         }
 
@@ -424,9 +430,11 @@ const AppListBoxRow = new Lang.Class({
             this._installProgressBar.fraction = 0.0;
             this._installProgressBar.show();
             this._installProgressCancel.show();
+            this._installProgressSpinner.hide();
         }
         else {
             this._installProgressBar.hide();
+            this._installProgressSpinner.hide();
             this._installProgressCancel.hide();
         }
 
