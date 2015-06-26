@@ -100,10 +100,9 @@ get_eam_dbus_proxy (EosAppListModel *self)
     return self->proxy;
 
   /* Otherwise create it */
-  GError *error = NULL;
-
   eos_app_log_debug_message ("No dbus proxy object yet - creating it");
 
+  g_autoptr(GError) error = NULL;
   self->proxy = eos_app_manager_proxy_new_for_bus_sync (G_BUS_TYPE_SYSTEM,
                                                         G_DBUS_PROXY_FLAGS_NONE,
                                                         "com.endlessm.AppManager",
@@ -113,7 +112,7 @@ get_eam_dbus_proxy (EosAppListModel *self)
   g_dbus_proxy_set_default_timeout (G_DBUS_PROXY (self->proxy), G_MAXINT);
 
   if (error != NULL)
-    eos_app_log_error_message ("Unable to create dbus proxy");
+    eos_app_log_error_message ("Unable to create dbus proxy: %s", error->message);
 
   return self->proxy;
 }
@@ -159,7 +158,6 @@ get_language_ids (void)
 {
   const gchar * const * locales;
   const gchar *locale_name;
-  gchar **variants;
   GPtrArray *lang_ids;
   gint idx;
 
@@ -171,7 +169,7 @@ get_language_ids (void)
    * for the current locale, except those that specify an encoding,
    * since our language IDs all assume UTF-8.
    */
-  variants = g_get_locale_variants (locale_name);
+  g_auto(GStrv) variants = g_get_locale_variants (locale_name);
   for (idx = 0; variants[idx] != NULL; idx++)
     {
       /* Variants with encoding are identified with a dot */
@@ -182,7 +180,6 @@ get_language_ids (void)
     }
 
   g_ptr_array_add (lang_ids, NULL);
-  g_strfreev (variants);
 
   return (gchar **) g_ptr_array_free (lang_ids, FALSE);
 }
@@ -191,15 +188,9 @@ static gchar *
 localized_id_from_desktop_id (const gchar *desktop_id,
                               const gchar *lang_id)
 {
-  gchar *localized_id;
-  gchar *app_id;
+  g_autofree char *app_id = app_id_from_desktop_id (desktop_id);
 
-  app_id = app_id_from_desktop_id (desktop_id);
-  localized_id = g_strdup_printf ("%s%s.desktop", app_id, lang_id);
-
-  g_free (app_id);
-
-  return localized_id;
+  return g_strdup_printf ("%s%s.desktop", app_id, lang_id);
 }
 
 static EosAppInfo *
@@ -208,27 +199,18 @@ get_localized_app_info (EosAppListModel *model,
                         gboolean language_fallback)
 {
   EosAppInfo *info;
-  gchar *localized_id;
-  gchar **lang_ids;
-  gint idx;
 
-  lang_ids = get_language_ids ();
+  g_auto(GStrv) lang_ids = get_language_ids ();
 
-  for (idx = 0; lang_ids[idx] != NULL; idx++)
+  for (int idx = 0; lang_ids[idx] != NULL; idx++)
     {
-      localized_id = localized_id_from_desktop_id (desktop_id, lang_ids[idx]);
+      g_autofree char *localized_id =
+        localized_id_from_desktop_id (desktop_id, lang_ids[idx]);
 
       info = g_hash_table_lookup (model->apps, localized_id);
-      g_free (localized_id);
-
-      if (info)
-        {
-          g_strfreev (lang_ids);
-          return info;
-        }
+      if (info != NULL)
+        return info;
     }
-
-  g_strfreev (lang_ids);
 
   if (!language_fallback)
     return NULL;
@@ -236,14 +218,14 @@ get_localized_app_info (EosAppListModel *model,
   /* If app is not installed in the user's current language,
    * consider all other supported languages, starting with English.
    */
-  for (idx = 0; app_lang_ids[idx] != NULL; idx++)
+  for (int idx = 0; app_lang_ids[idx] != NULL; idx++)
     {
-      const char *suffix = app_lang_ids[idx];
-      localized_id = localized_id_from_desktop_id (desktop_id, suffix);
-      info = g_hash_table_lookup (model->apps, localized_id);
-      g_free (localized_id);
+      g_autofree char *localized_id =
+        localized_id_from_desktop_id (desktop_id, app_lang_ids[idx]);
 
-      if (info)
+      info = g_hash_table_lookup (model->apps, localized_id);
+
+      if (info != NULL)
         return info;
     }
 
@@ -300,23 +282,19 @@ on_shell_applications_changed (GDBusConnection *connection,
 static gint64
 get_local_updates_monotonic_id (void)
 {
-  char *url = eos_get_updates_meta_record_uri ();
-  char *target = eos_get_updates_meta_record_file ();
-  char *data = NULL;
-
-  GError *error = NULL;
-
-  gint64 monotonic_id = -1;
+  g_autofree char *target = eos_get_updates_meta_record_file ();
+  g_autofree char *data = NULL;
+  g_autoptr(GError) error = NULL;
 
   if (!g_file_get_contents (target, &data, NULL, &error))
     {
       eos_app_log_error_message ("Unable to load updates meta record: %s: %s!",
                                  target,
                                  error->message);
-
-      goto out;
+      return -1;
     }
 
+  gint64 monotonic_id = -1;
   if (!eos_app_load_updates_meta_record (&monotonic_id, data, NULL, &error))
     {
       eos_app_log_error_message ("Unable to parse updates meta record: %s: %s! "
@@ -327,16 +305,8 @@ get_local_updates_monotonic_id (void)
       /* If we have parsing issues with the file, we want it removed from the
        * system regardless of the reasons */
       g_unlink (target);
-
-      goto out;
+      return -1;
     }
-
-out:
-  g_free (url);
-  g_free (target);
-  g_free (data);
-
-  g_clear_error (&error);
 
   return monotonic_id;
 }
@@ -345,19 +315,17 @@ static gboolean
 check_is_app_list_current (EosAppListModel *self,
                            GCancellable *cancellable)
 {
-  char *url = eos_get_updates_meta_record_uri ();
-  char *target = eos_get_updates_meta_record_file ();
-  char *data = NULL;
+  g_autofree char *url = eos_get_updates_meta_record_uri ();
+  g_autofree char *target = eos_get_updates_meta_record_file ();
+  g_autofree char *data = NULL;
 
   gint64 old_monotonic_id = 0;
   gint64 monotonic_id = 0;
   gboolean updates_current = FALSE;
 
-  GError *error = NULL;
-
-  eos_app_log_info_message ("Checking if app list update is needed");
-
   eos_app_log_info_message ("Downloading updates meta record from: %s", url);
+
+  g_autoptr(GError) error = NULL;
   if (!eos_net_utils_download_file (self->soup_session,
                                     "application/json",
                                     url,
@@ -368,20 +336,18 @@ check_is_app_list_current (EosAppListModel *self,
                                     &error))
     {
       eos_app_log_error_message ("Unable to get updates meta record!");
-      goto out;
+      return FALSE;
     }
 
   if (!eos_app_load_updates_meta_record (&monotonic_id, data, cancellable,
                                          &error))
     {
-      eos_app_log_error_message ("Unable to parse updates meta record! "
-                                 "Removing cached file.");
+      eos_app_log_error_message ("Unable to parse updates meta record! Removing cached file.");
 
       /* If we have parsing issues with the file, we want it removed from the
        * system regardless of the reasons */
       g_unlink (target);
-
-      goto out;
+      return FALSE;
     }
 
   old_monotonic_id = get_local_updates_monotonic_id ();
@@ -395,25 +361,8 @@ check_is_app_list_current (EosAppListModel *self,
   if (monotonic_id == old_monotonic_id)
     updates_current = TRUE;
 
-out:
   eos_app_log_info_message ("App list updates are %scurrent",
                             updates_current ? "" : "not ");
-
-  /* Clean up */
-  g_free (url);
-  g_free (target);
-  g_free (data);
-
-  if (error)
-    {
-      eos_app_log_error_message ("Failed checkng if update is needed!: %s. "
-                                 "Ignoring and assuming that update is needed",
-                                 error->message);
-
-      /* We eat the errors since we assume that it just means that
-       * we'll re-download the updates */
-      g_clear_error (&error);
-    }
 
   return updates_current;
 }
@@ -425,8 +374,8 @@ load_available_apps (EosAppListModel *self,
 {
   eos_app_log_debug_message ("Reloading available apps");
 
-  char *target = eos_get_updates_file ();
-  char *data = NULL;
+  g_autofree char *target = eos_get_updates_file ();
+  g_autofree char *data = NULL;
   gboolean updates_current;
 
   GError *error = NULL;
@@ -448,9 +397,9 @@ load_available_apps (EosAppListModel *self,
     }
 
   /* If update needed or we couldn't load cached file, get it again */
-  if (!data)
+  if (data == NULL)
     {
-      char *url = eos_get_all_updates_uri ();
+      g_autofree char *url = eos_get_all_updates_uri ();
       gboolean updates_dl_success;
 
       eos_app_log_info_message ("Downloading list of available apps from: %s", url);
@@ -463,13 +412,9 @@ load_available_apps (EosAppListModel *self,
                                                         cancellable,
                                                         &error);
 
-      g_free (url);
-
       if (!updates_dl_success)
         {
           eos_app_log_error_message ("Download of all updates failed!");
-
-          g_free (target);
           g_propagate_error (error_out, error);
 
           return FALSE;
@@ -479,15 +424,10 @@ load_available_apps (EosAppListModel *self,
   if (!eos_app_load_available_apps (self->apps, data, cancellable, &error))
     {
       eos_app_log_error_message ("Parsing of all updates failed!");
-
-      g_free (data);
       g_propagate_error (error_out, error);
 
       return FALSE;
     }
-
-  g_free (data);
-  g_free (target);
 
   return TRUE;
 }
@@ -538,10 +478,8 @@ load_user_capabilities (EosAppListModel *self,
 
   self->caps_loaded = TRUE;
 
-  eos_app_log_debug_message ("CanInstall: %s",
-                             self->can_install ? "Yes" : "No");
-  eos_app_log_debug_message ("CanUninstall: %s",
-                             self->can_uninstall ? "Yes" : "No");
+  eos_app_log_debug_message ("CanInstall: %s", self->can_install ? "Yes" : "No");
+  eos_app_log_debug_message ("CanUninstall: %s", self->can_uninstall ? "Yes" : "No");
 
   return TRUE;
 }
@@ -588,8 +526,8 @@ load_content_apps (EosAppListModel *self,
   if (array == NULL)
     return FALSE;
 
-  guint i, n_elements = json_array_get_length (array);
-  for (i = 0; i < n_elements; i++)
+  guint n_elements = json_array_get_length (array);
+  for (guint i = 0; i < n_elements; i++)
     {
       JsonNode *element = json_array_get_element (array, i);
 
@@ -598,10 +536,8 @@ load_content_apps (EosAppListModel *self,
         continue;
 
       const char *app_id = json_object_get_string_member (obj, "application-id");
-      char *desktop_id = g_strconcat (app_id, ".desktop", NULL);
-
+      g_autofree char *desktop_id = g_strconcat (app_id, ".desktop", NULL);
       EosAppInfo *info = eos_app_list_model_get_app_info (self, desktop_id);
-      g_free (desktop_id);
 
       eos_app_log_info_message ("Updating content info for %s (%s)",
                                 app_id ? app_id : "null",
@@ -769,7 +705,7 @@ eos_app_list_model_init (EosAppListModel *self)
 
   /* Add soup logger to session if needed */
   if (eos_app_log_soup_debug_enabled())
-      eos_net_utils_add_soup_logger (self->soup_session);
+    eos_net_utils_add_soup_logger (self->soup_session);
 }
 
 EosAppListModel *
@@ -808,9 +744,9 @@ eos_app_list_model_refresh_async (EosAppListModel *model,
                                   GAsyncReadyCallback callback,
                                   gpointer user_data)
 {
-  GTask *task = g_task_new (model, cancellable, callback, user_data);
+  g_autoptr(GTask) task = g_task_new (model, cancellable, callback, user_data);
+
   g_task_run_in_thread (task, refresh_thread_func);
-  g_object_unref (task);
 }
 
 gboolean
@@ -945,9 +881,8 @@ create_sha256sum (EosAppListModel *self,
       return NULL;
     }
 
-  char *sha256_name = g_strconcat (app_id, ".sha256", NULL);
+  g_autofree char *sha256_name = g_strconcat (app_id, ".sha256", NULL);
   char *sha256_path = g_build_filename (eos_get_bundle_download_dir (), sha256_name, NULL);
-  g_free (sha256_name);
 
   gchar *contents = g_strconcat (bundle_hash, "\t", bundle_path, "\n", NULL);
   if (!g_file_set_contents (sha256_path, contents, -1, &error))
@@ -983,9 +918,8 @@ download_signature (EosAppListModel *self,
       return NULL;
     }
 
-  char *signature_name = g_strconcat (app_id, ".asc", NULL);
+  g_autofree char *signature_name = g_strconcat (app_id, ".asc", NULL);
   char *signature_path = g_build_filename (eos_get_bundle_download_dir (), signature_name, NULL);
-  g_free (signature_name);
 
   if (!eos_net_utils_download_file_with_retry (self->soup_session,
                                                signature_uri, signature_path,
@@ -1030,9 +964,8 @@ download_bundle (EosAppListModel *self,
       return NULL;
     }
 
-  char *bundle_name = g_strconcat (app_id, ".bundle", NULL);
+  g_autofree char *bundle_name = g_strconcat (app_id, ".bundle", NULL);
   char *bundle_path = g_build_filename (eos_get_bundle_download_dir (), bundle_name, NULL);
-  g_free (bundle_name);
 
   eos_app_log_info_message ("Bundle save path is %s", bundle_path);
 
@@ -1066,9 +999,9 @@ get_bundle_artifacts (EosAppListModel *self,
   GError *error = NULL;
   gboolean retval = FALSE;
 
-  char *bundle_path = NULL;
-  char *signature_path = NULL;
-  char *sha256_path = NULL;
+  g_autofree char *bundle_path = NULL;
+  g_autofree char *signature_path = NULL;
+  g_autofree char *sha256_path = NULL;
 
   eos_app_log_info_message ("Accessing dbus transaction");
 
@@ -1149,9 +1082,6 @@ out:
 
   /* We're done with the transaction now that we've called CompleteTransaction() */
   g_clear_object (&transaction);
-  g_free (bundle_path);
-  g_free (signature_path);
-  g_free (sha256_path);
 
   return retval;
 }
@@ -1228,7 +1158,6 @@ install_latest_app_version (EosAppListModel *self,
                             GCancellable *cancellable,
                             GError **error_out)
 {
-  GError *error = NULL;
   gboolean retval = FALSE;
 
   const char *app_id = eos_app_info_get_application_id (info);
@@ -1257,7 +1186,8 @@ install_latest_app_version (EosAppListModel *self,
       goto out;
     }
 
-  char *transaction_path = NULL;
+  g_autofree char *transaction_path = NULL;
+  g_autoptr(GError) error = NULL;
 
   /* We use different DBus targets but everything else is same */
   if (is_upgrade)
@@ -1284,12 +1214,10 @@ install_latest_app_version (EosAppListModel *self,
       /* the app manager may send us specific errors */
       if (g_dbus_error_is_remote_error (error))
         {
-          char *code = g_dbus_error_get_remote_error (error);
+          g_autofree char *code = g_dbus_error_get_remote_error (error);
 
           if (g_strcmp0 (code, "com.endlessm.AppManager.Error.NotAuthorized") == 0)
             external_message = _("You must be an administrator to install applications");
-
-          g_free (code);
         }
 
       internal_message = error->message;
@@ -1334,9 +1262,6 @@ install_latest_app_version (EosAppListModel *self,
                                 internal_message,
                                 external_message,
                                 error_out);
-
-  g_clear_error (&error);
-  g_free (transaction_path);
 
   return retval;
 }
@@ -1499,14 +1424,13 @@ GList *
 eos_app_list_model_get_apps_for_category (EosAppListModel *model,
                                           EosAppCategory category)
 {
-  GList *apps = NULL;
   JsonArray *array = eos_app_parse_resource_content ("apps", "content", NULL);
-
   if (array == NULL)
     return NULL;
 
-  guint i, n_elements = json_array_get_length (array);
-  for (i = 0; i < n_elements; i++)
+  GList *apps = NULL;
+  guint n_elements = json_array_get_length (array);
+  for (guint i = 0; i < n_elements; i++)
     {
       JsonNode *element = json_array_get_element (array, i);
 
@@ -1519,14 +1443,12 @@ eos_app_list_model_get_apps_for_category (EosAppListModel *model,
           category == EOS_APP_CATEGORY_ALL)
         {
           const char *app_id = json_object_get_string_member (obj, "application-id");
-          char *desktop_id = g_strconcat (app_id, ".desktop", NULL);
+          g_autofree char *desktop_id = g_strconcat (app_id, ".desktop", NULL);
 
           EosAppInfo *info = g_hash_table_lookup (model->apps, desktop_id);
 
           if (info == NULL)
             info = get_localized_app_info (model, desktop_id, FALSE);
-
-          g_free (desktop_id);
 
           if (info != NULL)
             apps = g_list_prepend (apps, info);
@@ -1585,11 +1507,8 @@ eos_app_list_model_install_app_async (EosAppListModel *model,
                                       GAsyncReadyCallback callback,
                                       gpointer user_data)
 {
-  GTask *task;
-  EosAppInfo *info;
-
-  task = g_task_new (model, cancellable, callback, user_data);
-  info = eos_app_list_model_get_app_info (model, desktop_id);
+  g_autoptr(GTask) task = g_task_new (model, cancellable, callback, user_data);
+  EosAppInfo *info = eos_app_list_model_get_app_info (model, desktop_id);
 
   if (info == NULL)
     {
@@ -1598,7 +1517,6 @@ eos_app_list_model_install_app_async (EosAppListModel *model,
                                EOS_APP_LIST_MODEL_ERROR_FAILED,
                                _("App %s not installable"),
                                desktop_id);
-      g_object_unref (task);
       return;
     }
 
@@ -1610,13 +1528,11 @@ eos_app_list_model_install_app_async (EosAppListModel *model,
                                EOS_APP_LIST_MODEL_ERROR_INSTALLED,
                                _("App %s already installed"),
                                desktop_id);
-      g_object_unref (task);
       return;
     }
 
   g_task_set_task_data (task, g_object_ref (info), g_object_unref);
   g_task_run_in_thread (task, add_app_thread_func);
-  g_object_unref (task);
 }
 
 gboolean
@@ -1653,11 +1569,8 @@ eos_app_list_model_update_app_async (EosAppListModel *model,
                                      GAsyncReadyCallback callback,
                                      gpointer user_data)
 {
-  GTask *task;
-  EosAppInfo *info;
-
-  task = g_task_new (model, cancellable, callback, user_data);
-  info = eos_app_list_model_get_app_info (model, desktop_id);
+  g_autoptr(GTask) task = g_task_new (model, cancellable, callback, user_data);
+  EosAppInfo *info = eos_app_list_model_get_app_info (model, desktop_id);
 
   if (info == NULL)
     {
@@ -1666,7 +1579,6 @@ eos_app_list_model_update_app_async (EosAppListModel *model,
                                EOS_APP_LIST_MODEL_ERROR_FAILED,
                                _("App %s not installable"),
                                desktop_id);
-      g_object_unref (task);
       return;
     }
 
@@ -1677,13 +1589,11 @@ eos_app_list_model_update_app_async (EosAppListModel *model,
                                EOS_APP_LIST_MODEL_ERROR_NO_UPDATE_AVAILABLE,
                                _("App %s is up to date"),
                                desktop_id);
-      g_object_unref (task);
       return;
     }
 
   g_task_set_task_data (task, g_object_ref (info), g_object_unref);
   g_task_run_in_thread (task, update_app_thread_func);
-  g_object_unref (task);
 }
 
 gboolean
@@ -1733,11 +1643,8 @@ eos_app_list_model_uninstall_app_async (EosAppListModel *model,
                                         GAsyncReadyCallback callback,
                                         gpointer user_data)
 {
-  GTask *task;
-  EosAppInfo *info;
-
-  task = g_task_new (model, cancellable, callback, user_data);
-  info = eos_app_list_model_get_app_info (model, desktop_id);
+  g_autoptr(GTask) task = g_task_new (model, cancellable, callback, user_data);
+  EosAppInfo *info = eos_app_list_model_get_app_info (model, desktop_id);
 
   if (info == NULL || !eos_app_info_is_installed (info))
     {
@@ -1746,13 +1653,11 @@ eos_app_list_model_uninstall_app_async (EosAppListModel *model,
                                EOS_APP_LIST_MODEL_ERROR_NOT_INSTALLED,
                                _("App %s is not installed"),
                                desktop_id);
-      g_object_unref (task);
       return;
     }
 
   g_task_set_task_data (task, g_object_ref (info), g_object_unref);
   g_task_run_in_thread (task, remove_app_thread_func);
-  g_object_unref (task);
 }
 
 gboolean
@@ -1795,28 +1700,24 @@ EosAppInfo *
 eos_app_list_model_create_from_filename (EosAppListModel *model,
                                          const char *filename)
 {
-  EosAppInfo *info;
-  GDesktopAppInfo *desktop_info;
   const char *desktop_id;
-  char *app_id;
+  EosAppInfo *info;
 
   desktop_info = g_desktop_app_info_new_from_filename (filename);
   if (desktop_info == NULL)
     return NULL;
 
-  desktop_id = g_app_info_get_id (G_APP_INFO (desktop_info));
+  g_autoptr(GDesktopAppInfo) desktop_id = g_app_info_get_id (G_APP_INFO (desktop_info));
   info = eos_app_list_model_get_app_info (model, desktop_id);
   if (info == NULL)
     {
-      app_id = app_id_from_desktop_id (desktop_id);
+      g_autofree char *app_id = app_id_from_desktop_id (desktop_id);
       info = eos_app_info_new (app_id);
-      g_free (app_id);
 
       g_hash_table_replace (model->apps, g_strdup (desktop_id), info);
     }
 
   eos_app_info_update_from_gio (info, desktop_info);
-  g_object_unref (desktop_info);
 
   return info;
 }

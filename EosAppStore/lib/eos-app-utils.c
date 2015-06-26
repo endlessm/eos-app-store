@@ -51,55 +51,45 @@ eos_get_bundle_download_dir (void)
 void
 eos_clear_bundle_download_dir (void)
 {
-  GFile *dir = g_file_new_for_path (eos_get_bundle_download_dir ());
-
-  GError *error = NULL;
-  GFileEnumerator *enumerator = g_file_enumerate_children (dir, G_FILE_ATTRIBUTE_STANDARD_NAME,
-                                                           G_FILE_QUERY_INFO_NOFOLLOW_SYMLINKS,
-                                                           NULL,
-                                                           &error);
+  g_autoptr(GFile) dir = g_file_new_for_path (eos_get_bundle_download_dir ());
+  g_autoptr(GError) error = NULL;
+  g_autoptr(GFileEnumerator) enumerator = g_file_enumerate_children (dir, G_FILE_ATTRIBUTE_STANDARD_NAME,
+                                                                     G_FILE_QUERY_INFO_NOFOLLOW_SYMLINKS,
+                                                                     NULL,
+                                                                     &error);
   if (error != NULL)
     {
       eos_app_log_error_message ("Unable to enumerate bundle dir '%s': %s",
                                  eos_get_bundle_download_dir (),
                                  error->message);
-      g_error_free (error);
-      g_object_unref (dir);
       return;
     }
 
-  GFileInfo *child_info = NULL;
-  while ((child_info = g_file_enumerator_next_file (enumerator, NULL, &error)) != NULL)
+  while (TRUE)
     {
-      GFile *child = g_file_get_child (dir, g_file_info_get_name (child_info));
+      GFileInfo *child_info;
+      GFile *child;
+
+      if (!g_file_enumerator_iterate (enumerator, &child_info, &child, NULL, &error))
+        {
+          eos_app_log_error_message ("Unable to enumerate: %s", error->message);
+          return;
+        }
+
+      if (child_info == NULL)
+        break;
 
       g_file_delete (child, NULL, &error);
       if (error != NULL)
         {
           eos_app_log_error_message ("Unable to delete file: %s", error->message);
-          g_clear_error (&error);
+          return;
         }
-
-      g_clear_object (&child_info);
-      g_object_unref (child);
     }
-
-  if (error != NULL)
-    {
-      eos_app_log_error_message ("Enumeration failed: %s", error->message);
-      g_clear_error (&error);
-    }
-
-  g_object_unref (enumerator);
 
   g_file_delete (dir, NULL, &error);
   if (error != NULL)
-    {
-      eos_app_log_error_message ("Unable to delete download dir: %s", error->message);
-      g_clear_error (&error);
-    }
-
-  g_object_unref (dir);
+    eos_app_log_error_message ("Unable to delete download dir: %s", error->message);
 }
 
 static const char *
@@ -286,19 +276,16 @@ static gboolean
 parse_os_release_file (gchar  **version_id,
                        GError **error)
 {
-  char *contents = NULL;
-  char **lines;
-  gint idx;
+  g_autofree char *contents = NULL;
 
   if (!g_file_get_contents (SYSCONFDIR "/os-release", &contents, NULL, error))
     return FALSE;
 
-  lines = g_strsplit (contents, "\n", -1);
-  g_free (contents);
+  g_auto(GStrv) lines = g_strsplit (contents, "\n", -1);
 
   gboolean ret = FALSE;
 
-  for (idx = 0; lines[idx] != NULL; idx++)
+  for (int idx = 0; lines[idx] != NULL; idx++)
     {
       char *line = lines[idx];
 
@@ -326,13 +313,11 @@ parse_os_release_file (gchar  **version_id,
         p++;
 
       *version_id = g_strndup (start, p - start);
-      ret = TRUE;
-      break;
+
+      return TRUE;
     }
 
-  g_strfreev (lines);
-
-  return ret;
+  return FALSE;
 }
 
 static const char *
@@ -423,13 +408,12 @@ eos_app_parse_resource_content (const char *content_type,
                                 GError **error_out)
 {
   gint64 start_time = g_get_monotonic_time ();
-  JsonArray *content_array = NULL;
+
+  g_autofree char *content_file =
+    g_strdup_printf ("/com/endlessm/appstore-content/%s/%s.json",
+                     content_type, content_name);
+
   GError *error = NULL;
-  JsonParser *parser = json_parser_new ();
-
-  char *content_file = g_strdup_printf ("/com/endlessm/appstore-content/%s/%s.json",
-                                        content_type, content_name);
-
   GBytes *data = g_resources_lookup_data (content_file, 0, &error);
   if (error != NULL)
     {
@@ -438,6 +422,7 @@ eos_app_parse_resource_content (const char *content_type,
       goto out_error;
     }
 
+  JsonParser *parser = json_parser_new ();
   json_parser_load_from_data (parser,
                               g_bytes_get_data (data, NULL),
                               g_bytes_get_size (data),
@@ -447,7 +432,8 @@ eos_app_parse_resource_content (const char *content_type,
     {
       g_critical ("Unable to load content from '%s': %s", content_file, error->message);
       g_propagate_error (error_out, error);
-      goto out_error;
+      g_object_unref (parser);
+      return NULL;
     }
 
   JsonNode *node = json_parser_get_root (parser);
@@ -457,20 +443,15 @@ eos_app_parse_resource_content (const char *content_type,
                    JSON_READER_ERROR,
                    JSON_READER_ERROR_NO_ARRAY,
                    "Expected array content");
-      goto out_error;
+      g_object_unref (parser);
+      return NULL;
     }
-
-  content_array = json_node_dup_array (node);
 
   eos_app_log_debug_message ("Content type '%s' loading: %.3f msecs",
                              content_type,
                              (double) (g_get_monotonic_time () - start_time) / 1000);
 
- out_error:
-  g_object_unref (parser);
-  g_free (content_file);
-
-  return content_array;
+  return json_node_dup_array (node);
 }
 
 /**
@@ -571,22 +552,21 @@ eos_app_load_screenshot (GtkWidget  *image,
                          const char *path,
                          int         width)
 {
-  GError *error = NULL;
+  g_autoptr(GError) error = NULL;
   GdkPixbuf *pixbuf =
     gdk_pixbuf_new_from_file_at_size (path, width, width, &error);
 
   if (error != NULL)
     {
-      g_warning ("Cannot load image at path '%s': %s", path, error->message);
-      g_error_free (error);
+      eos_app_log_error_message ("Cannot load image at path '%s': %s", path, error->message);
       gtk_widget_hide (image);
       return;
     }
 
   gtk_image_set_from_pixbuf (GTK_IMAGE (image), pixbuf);
-  gtk_widget_show (image);
-
   g_object_unref (pixbuf);
+
+  gtk_widget_show (image);
 }
 
 /**
@@ -599,15 +579,13 @@ eos_app_load_screenshot (GtkWidget  *image,
 GdkPixbuf *
 eos_link_get_favicon (WebKitWebView *webview)
 {
-  GdkPixbuf *dest;
   cairo_surface_t *icon_surface = webkit_web_view_get_favicon (webview);
-
   if (icon_surface == NULL)
     return NULL;
 
   gint favicon_width = cairo_image_surface_get_width (icon_surface);
   gint favicon_height = cairo_image_surface_get_height (icon_surface);
-  gint biggest =  MAX (favicon_width, favicon_height);
+  gint biggest = MAX (favicon_width, favicon_height);
   gdouble scale = 1.0;
   gdouble offset_x = 0.0;
   gdouble offset_y = 0.0;
@@ -710,7 +688,7 @@ eos_link_get_favicon (WebKitWebView *webview)
       cairo_paint (cr);
     }
 
-  dest = gdk_pixbuf_get_from_surface (dest_surface, 0, 0, 64, 64);
+  GdkPixbuf *dest = gdk_pixbuf_get_from_surface (dest_surface, 0, 0, 64, 64);
   cairo_surface_destroy (dest_surface);
   cairo_pattern_destroy (icon_pattern);
   cairo_destroy (cr);
@@ -805,7 +783,7 @@ eos_app_load_installed_apps (GHashTable *app_info,
   eos_app_log_info_message ("Reloading installed apps");
 
   GError *internal_error = NULL;
-  GDir *dir = g_dir_open (appdir, 0, &internal_error);
+  g_autoptr(GDir) dir = g_dir_open (appdir, 0, &internal_error);
   if (dir == NULL)
     {
       eos_app_log_error_message ("Unable to open '%s': %s", appdir, internal_error->message);
@@ -828,12 +806,11 @@ eos_app_load_installed_apps (GHashTable *app_info,
           continue;
         }
 
-      char *info_path = g_build_filename (appdir, appid, ".info", NULL);
+      g_autofree char *info_path = g_build_filename (appdir, appid, ".info", NULL);
       eos_app_log_info_message ("Loading bundle info for '%s' from '%s'...", appid, info_path);
 
-      char *desktop_id = g_strconcat (appid, ".desktop", NULL);
+      g_autofree char *desktop_id = g_strconcat (appid, ".desktop", NULL);
       EosAppInfo *info = g_hash_table_lookup (app_info, desktop_id);
-      g_free (desktop_id);
 
       if (info == NULL)
         info = eos_app_info_new (appid);
@@ -852,11 +829,7 @@ eos_app_load_installed_apps (GHashTable *app_info,
           eos_app_log_error_message ("App '%s' failed to update from installed info", appid);
           g_object_unref (info);
         }
-
-      g_free (info_path);
     }
-
-  g_dir_close (dir);
 
   eos_app_log_debug_message ("Bundle loading: %d bundles, %.3f msecs",
                              n_bundles,
@@ -1030,17 +1003,19 @@ eos_app_load_available_apps (GHashTable *app_info,
                              GCancellable *cancellable,
                              GError **error)
 {
-  JsonParser *parser = json_parser_new ();
   gboolean retval = FALSE;
   gint64 start_time = g_get_monotonic_time ();
-  GHashTable *newer_deltas = g_hash_table_new_full (g_str_hash, g_str_equal,
-                                                    g_free,
-                                                    free_json_object_glist);
 
+  g_autoptr(GHashTable) newer_deltas = g_hash_table_new_full (g_str_hash, g_str_equal,
+                                                              g_free,
+                                                              free_json_object_glist);
+
+  JsonParser *parser = json_parser_new ();
   if (!json_parser_load_from_data (parser, data, -1, error))
     {
       eos_app_log_error_message ("Update records weren't able to be parsed");
-      goto out;
+      g_object_unref (parser);
+      return FALSE;
     }
 
   JsonNode *root = json_parser_get_root (parser);
@@ -1052,7 +1027,8 @@ eos_app_load_available_apps (GHashTable *app_info,
 
       eos_app_log_error_message ("Update records did not contain "
                                  "expected structure");
-      goto out;
+      g_object_unref (parser);
+      return FALSE;
     }
 
   eos_app_log_debug_message ("Iterating over the update list");
@@ -1071,7 +1047,8 @@ eos_app_load_available_apps (GHashTable *app_info,
                                G_IO_ERROR_CANCELLED,
                                "Operation was cancelled");
           eos_app_log_info_message (" - Reading of update list canceled");
-          goto out;
+          g_object_unref (parser);
+          return FALSE;
         }
 
       JsonNode *element = json_array_get_element (array, index);
@@ -1138,7 +1115,7 @@ eos_app_load_available_apps (GHashTable *app_info,
                                 code_version);
 
       const char *stored_code_version = NULL;
-      char *desktop_id = g_strconcat (app_id, ".desktop", NULL);
+      g_autofree char *desktop_id = g_strconcat (app_id, ".desktop", NULL);
       EosAppInfo *info = g_hash_table_lookup (app_info, desktop_id);
 
       if (info == NULL)
@@ -1156,8 +1133,6 @@ eos_app_load_available_apps (GHashTable *app_info,
                                          "Saving delta as possible upgrade path.");
 
               add_delta_to_temp_records (newer_deltas, app_id, obj);
-
-              g_free (desktop_id);
               continue;
             }
           else
@@ -1177,8 +1152,6 @@ eos_app_load_available_apps (GHashTable *app_info,
         {
           stored_code_version = eos_app_info_get_available_version (info);
         }
-
-      g_free (desktop_id);
 
       /* If we have no availability version, just use the installed version */
       if (stored_code_version == NULL || *stored_code_version == '\0')
@@ -1298,23 +1271,20 @@ eos_app_load_available_apps (GHashTable *app_info,
         }
     }
 
-  retval = TRUE;
   eos_app_log_info_message ("Available bundles: %d bundles, %.3f msecs",
                             n_available,
                             (double) (g_get_monotonic_time () - start_time) / 1000);
 
- out:
-  g_hash_table_unref (newer_deltas);
   g_object_unref (parser);
 
-  return retval;
+  return TRUE;
 }
 
 static gchar *
 app_id_from_gio_desktop_id (const gchar *desktop_id)
 {
-  gint len;
   const char *ptr = desktop_id;
+  gint len;
 
   if (g_str_has_prefix (ptr, "eos-app-"))
     ptr += 8; /* the 8 here is the length of "eos-app-" */
@@ -1362,7 +1332,7 @@ void
 eos_app_load_gio_apps (GHashTable *app_info)
 {
   GList *l, *gio_apps;
-  GHashTable *apps;
+  g_autoptr(GHashTable) apps;
   GHashTableIter iter;
   const char *desktop_id;
   EosAppInfo *info;
@@ -1377,8 +1347,8 @@ eos_app_load_gio_apps (GHashTable *app_info)
 
       desktop_id = g_app_info_get_id (G_APP_INFO (desktop_info));
 
-      char *app_id = app_id_from_gio_desktop_id (desktop_id);
-      char *sanitized_desktop_id = g_strconcat (app_id, ".desktop", NULL);
+      g_autofree char *app_id = app_id_from_gio_desktop_id (desktop_id);
+      g_autofree char *sanitized_desktop_id = g_strconcat (app_id, ".desktop", NULL);
 
       info = g_hash_table_lookup (app_info, sanitized_desktop_id);
 
@@ -1388,9 +1358,6 @@ eos_app_load_gio_apps (GHashTable *app_info)
           g_hash_table_replace (app_info, g_strdup (sanitized_desktop_id), info);
         }
 
-      g_free (app_id);
-      g_free (sanitized_desktop_id);
-
       eos_app_info_update_from_gio (info, desktop_info);
     }
 
@@ -1398,10 +1365,7 @@ eos_app_load_gio_apps (GHashTable *app_info)
 
   g_hash_table_iter_init (&iter, app_info);
   while (g_hash_table_iter_next (&iter, (gpointer *) &desktop_id, (gpointer *) &info))
-    eos_app_info_set_is_installed (info,
-                                   g_hash_table_contains (apps, desktop_id));
-
-  g_hash_table_unref (apps);
+    eos_app_info_set_is_installed (info, g_hash_table_contains (apps, desktop_id));
 }
 
 static GHashTable *
@@ -1428,19 +1392,16 @@ void
 eos_app_load_shell_apps (GHashTable *app_info,
                          GVariant *shell_apps)
 {
-  GHashTable *apps;
   GHashTableIter iter;
   char *desktop_id;
   EosAppInfo *info;
 
-  apps = load_shell_apps_from_gvariant (shell_apps);
+  g_autoptr(GHashTable) apps = load_shell_apps_from_gvariant (shell_apps);
 
   g_hash_table_iter_init (&iter, app_info);
   while (g_hash_table_iter_next (&iter, (gpointer *) &desktop_id, (gpointer *) &info))
     eos_app_info_set_has_launcher (info,
                                    g_hash_table_contains (apps, desktop_id));
-
-  g_hash_table_unref (apps);
 }
 
 /* Keep in the same order as the EosAppCategory enumeration */
@@ -1692,18 +1653,12 @@ eos_check_available_space (const char    *path,
                            GCancellable  *cancellable,
                            GError       **error)
 {
-  GFile *file;
-  GFileInfo *info;
-  gboolean retval = TRUE;
-
-  file = g_file_new_for_path (path);
   eos_app_log_info_message ("Trying to get filesystem info from %s", path);
 
-  info = g_file_query_filesystem_info (file, G_FILE_ATTRIBUTE_FILESYSTEM_FREE,
-                                       cancellable,
-                                       error);
-  g_object_unref (file);
-
+  g_autoptr(GFile) file = g_file_new_for_path (path);
+  g_autoptr(GFileInfo) info = g_file_query_filesystem_info (file, G_FILE_ATTRIBUTE_FILESYSTEM_FREE,
+                                                            cancellable,
+                                                            error);
   if (info == NULL)
     {
       eos_app_log_error_message ("Can't get filesystem info to calculate"
@@ -1718,10 +1673,8 @@ eos_check_available_space (const char    *path,
    */
   guint64 req_space = min_size * 2;
 
-  eos_app_log_info_message ("Space required: %lld KB",
-                            (long long) (req_space / 1024));
-  eos_app_log_info_message ("Space left on FS: %lld KB",
-                            (long long) (free_space / 1024));
+  eos_app_log_info_message ("Space required: %lld KB", (long long) (req_space / 1024));
+  eos_app_log_info_message ("Space left on FS: %lld KB", (long long) (free_space / 1024));
 
   if (free_space < req_space)
     {
@@ -1730,26 +1683,20 @@ eos_check_available_space (const char    *path,
       g_set_error (error, G_IO_ERROR,
                    G_IO_ERROR_NO_SPACE,
                    _("Not enough space on device for downloading app"));
-      retval = FALSE;
+      return FALSE;
     }
 
-  g_object_unref (info);
-
-  return retval;
+  return TRUE;
 }
 
 gboolean
 eos_mkdir_for_artifact (const char *target_file,
                         GError    **error)
 {
-  GFile *file = g_file_new_for_path (target_file);
-  GFile *parent = g_file_get_parent (file);
+  g_autoptr(GFile) file = g_file_new_for_path (target_file);
+  g_autoptr(GFile) parent = g_file_get_parent (file);
 
-  char *parent_path = NULL;
-
-  gboolean retval = FALSE;
-
-  parent_path = g_file_get_path (parent);
+  g_autofree char *parent_path = g_file_get_path (parent);
   if (g_mkdir_with_parents (parent_path, 0755) == -1)
     {
       int saved_errno = errno;
@@ -1759,16 +1706,8 @@ eos_mkdir_for_artifact (const char *target_file,
                    "Unable to create directory: %s",
                    g_strerror (saved_errno));
 
-      goto out;
+      return FALSE;
     }
 
-  retval = TRUE;
-
-out:
-  g_free (parent_path);
-
-  g_object_unref (parent);
-  g_object_unref (file);
-
-  return retval;
+  return TRUE;
 }

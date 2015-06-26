@@ -66,16 +66,12 @@ G_DEFINE_TYPE (EosAppCell, eos_app_cell, EOS_TYPE_FLEXY_GRID_CELL)
 static GtkStyleContext *
 eos_app_info_get_cell_style_context (void)
 {
-  GtkStyleContext *style_context;
-  GtkWidgetPath *widget_path;
-
-  widget_path = gtk_widget_path_new ();
+  g_autoptr(GtkWidgetPath) widget_path = gtk_widget_path_new ();
   gtk_widget_path_append_type (widget_path, eos_app_cell_get_type ());
 
-  style_context = gtk_style_context_new ();
+  GtkStyleContext *style_context = gtk_style_context_new ();
   gtk_style_context_set_path (style_context, widget_path);
   gtk_style_context_add_class (style_context, "app-cell-image");
-  gtk_widget_path_free (widget_path);
 
   return style_context;
 }
@@ -114,38 +110,26 @@ prepare_surface_from_file (EosAppCell *self,
                            gint image_height,
                            GError **error)
 {
-  cairo_surface_t *surface;
   cairo_t *cr;
-  GtkCssProvider *provider;
-  gchar *provider_data;
 
-  provider_data = g_strdup_printf (PROVIDER_DATA_FORMAT, path);
-  provider = gtk_css_provider_new ();
+  g_autofree char *provider_data = g_strdup_printf (PROVIDER_DATA_FORMAT, path);
+  g_autoptr(GtkCssProvider) provider = gtk_css_provider_new ();
 
   if (!gtk_css_provider_load_from_data (provider, provider_data, -1, error))
-    {
-      g_free (provider_data);
-      g_object_unref (provider);
-
-      return NULL;
-    }
+    return NULL;
 
   gtk_style_context_add_provider (self->image_context,
                                   GTK_STYLE_PROVIDER (provider),
                                   GTK_STYLE_PROVIDER_PRIORITY_APPLICATION);
 
-  surface = cairo_image_surface_create (CAIRO_FORMAT_ARGB32,
-                                        image_width, image_height);
-  cr = cairo_create (surface);
+  cairo_surface_t *surface = cairo_image_surface_create (CAIRO_FORMAT_ARGB32,
+                                                         image_width, image_height);
+  cairo_t *cr = cairo_create (surface);
   gtk_render_background (self->image_context, cr,
                          0, 0, image_width, image_height);
-
   cairo_destroy (cr);
-  gtk_style_context_remove_provider (self->image_context,
-                                     GTK_STYLE_PROVIDER (provider));
 
-  g_free (provider_data);
-  g_object_unref (provider);
+  gtk_style_context_remove_provider (self->image_context, GTK_STYLE_PROVIDER (provider));
 
   return surface;
 }
@@ -273,8 +257,6 @@ eos_app_cell_draw_normal (EosAppCell *self,
                           gint width,
                           gint height)
 {
-  gchar *path;
-  GError *error;
   gint image_width, image_height;
   GtkBorder image_margin;
   EosFlexyShape shape;
@@ -282,9 +264,9 @@ eos_app_cell_draw_normal (EosAppCell *self,
   if (self->image != NULL)
     goto out;
 
-  path = NULL;
   shape = eos_flexy_grid_cell_get_shape (EOS_FLEXY_GRID_CELL (self));
 
+  g_autofree char *path = NULL;
   if (shape != EOS_FLEXY_SHAPE_SMALL)
     path = eos_app_info_get_featured_img (self->info);
 
@@ -301,20 +283,13 @@ eos_app_cell_draw_normal (EosAppCell *self,
       goto out;
     }
 
-  error = NULL;
+  g_autoptr(GError) error = NULL;
   image_width = width - self->cell_margin;
   image_height = height - self->cell_margin;
-
   self->image = prepare_surface_from_file (self, path, image_width, image_height, &error);
 
   if (error != NULL)
-    {
-      g_warning ("Unable to load image at path '%s': %s",
-                 path, error->message);
-      g_error_free (error);
-    }
-
-  g_free (path);
+    g_warning ("Unable to load image at path '%s': %s", path, error->message);
 
 out:
   if (self->image != NULL)
@@ -414,7 +389,13 @@ configure_style_for_subtitle_label (GtkLabel *label)
 {
   gtk_style_context_add_class (gtk_widget_get_style_context (GTK_WIDGET (label)),
                                "app-cell-subtitle");
+
+#if GTK_CHECK_VERSION (3, 16, 0)
+  gtk_label_set_xalign (GTK_LABEL (label), 0);
+  gtk_label_set_yalign (GTK_LABEL (label), 0);
+#else
   gtk_misc_set_alignment (GTK_MISC (label), 0.0, 0.0);
+#endif
 
   gtk_label_set_line_wrap (GTK_LABEL (label), TRUE);
   gtk_label_set_max_width_chars (GTK_LABEL (label), 50);
@@ -541,14 +522,9 @@ eos_app_cell_init (EosAppCell *self)
 gint
 eos_app_info_get_cell_margin (void)
 {
-  GtkStyleContext *context;
-  gint retval;
+  g_autoptr(GtkStyleContext) context = eos_app_info_get_cell_style_context ();
 
-  context = eos_app_info_get_cell_style_context ();
-  retval = eos_app_info_get_cell_margin_for_context (context);
-  g_object_unref (context);
-
-  return retval;
+  return eos_app_info_get_cell_margin_for_context (context);
 }
 
 static EosFlexyShape

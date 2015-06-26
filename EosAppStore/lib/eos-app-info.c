@@ -596,26 +596,22 @@ get_screenshots (JsonArray *array,
 static guint64
 get_fs_available_space (void)
 {
-  GFile *current_directory = NULL;
   GFileInfo *filesystem_info = NULL;
   GError *error = NULL;
 
   /* Whatever FS we're on, check the space */
-  current_directory = g_file_new_for_path (".");
-
-  filesystem_info = g_file_query_filesystem_info (current_directory,
-                                                  G_FILE_ATTRIBUTE_FILESYSTEM_FREE,
-                                                  NULL, /* Cancellable */
-                                                  &error);
-
-  g_object_unref (current_directory);
+  g_autoptr(GFile) current_directory = g_file_new_for_path (".");
+  g_autoptr(GError) error = NULL;
+  g_autoptr(GFileInfo) filesystem_info =
+    g_file_query_filesystem_info (current_directory,
+                                  G_FILE_ATTRIBUTE_FILESYSTEM_FREE,
+                                  NULL, /* Cancellable */
+                                  &error);
 
   if (error != NULL)
     {
       eos_app_log_error_message ("Could not retrieve available space: %s",
                                  error->message);
-      g_error_free (error);
-
       /* Assume we have the space */
       return G_MAXUINT64;
     }
@@ -624,8 +620,6 @@ get_fs_available_space (void)
                                                               G_FILE_ATTRIBUTE_FILESYSTEM_FREE);
 
   eos_app_log_debug_message ("Available space: %" G_GUINT64_FORMAT, available_space);
-
-  g_object_unref (filesystem_info);
 
   return available_space;
 }
@@ -701,20 +695,18 @@ check_info_storage (EosAppInfo *info)
 gboolean
 eos_app_info_installed_changed (EosAppInfo *info)
 {
-  GKeyFile *keyfile = g_key_file_new ();
-  gboolean retval = FALSE;
-
   g_assert (info->info_filename != NULL);
   eos_app_log_debug_message ("Loading installed information for '%s' from '%s'",
                              info->application_id, info->info_filename);
 
+  g_autoptr(GKeyFile) keyfile = g_key_file_new ();
   if (!g_key_file_load_from_file (keyfile, info->info_filename, 0, NULL))
     goto out;
 
 #define GROUP   "Bundle"
 
   if (!g_key_file_has_group (keyfile, GROUP))
-    goto out;
+    return FALSE;
 
   eos_app_info_clear_installed_attributes (info);
 
@@ -728,15 +720,11 @@ eos_app_info_installed_changed (EosAppInfo *info)
   if (g_key_file_has_key (keyfile, GROUP, FILE_KEYS[SECONDARY_STORAGE], NULL))
     info->installed_on_secondary_storage = g_key_file_get_boolean (keyfile, GROUP, FILE_KEYS[SECONDARY_STORAGE], NULL);
 
-  retval = TRUE;
   g_object_notify_by_pspec (G_OBJECT (info), properties[PROP_STATE]);
 
 #undef GROUP
 
-out:
-  g_key_file_unref (keyfile);
-
-  return retval;
+  return TRUE;
 }
 
 /*< private >*/
@@ -932,19 +920,17 @@ eos_app_info_update_from_content (EosAppInfo *info,
         {
           JsonObject *screenshots = json_node_get_object (node);
           const gchar * const * my_languages = g_get_language_names ();
-          gchar *language = NULL;
+          g_autofree char *language = NULL;
 
           for (gint i = 0; my_languages[i] != NULL; i++)
             {
-              gchar *my_language = g_ascii_strdown (my_languages[i], -1);
+              g_autofree char *my_language = g_ascii_strdown (my_languages[i], -1);
 
               if (json_object_has_member (screenshots, my_language))
                 {
-                  language = my_language;
+                  language = g_strdup (my_language);
                   break;
                 }
-
-              g_free (my_language);
             }
 
           if (!language)
@@ -953,7 +939,6 @@ eos_app_info_update_from_content (EosAppInfo *info,
           JsonNode *array = json_object_get_member (screenshots, language);
           if (array != NULL)
             get_screenshots (json_node_get_array (array), language, info);
-          g_free (language);
         }
     }
   else

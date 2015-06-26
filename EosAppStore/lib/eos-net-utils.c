@@ -53,24 +53,21 @@ set_up_download_from_request (SoupRequest   *request,
                               GError       **error)
 {
   GError *internal_error = NULL;
-  GInputStream *in_stream = soup_request_send (request, cancellable, &internal_error);
+  g_autoptr(GInputStream) in_stream = soup_request_send (request, cancellable, &internal_error);
 
   if (internal_error != NULL)
     {
       eos_app_log_error_message ("Soup request sending had an internal error");
-
       g_propagate_error (error, internal_error);
       return NULL;
     }
 
   goffset total = soup_request_get_content_length (request);
-
   if (!eos_check_available_space (target_file, total, cancellable, &internal_error))
     {
       eos_app_log_error_message ("Not enough space on FS - canceling download");
-
       g_propagate_error (error, internal_error);
-      g_clear_object (&in_stream);
+      return NULL;
     }
 
   return in_stream;
@@ -88,9 +85,7 @@ check_cached_file (const char *target_file,
 
   GNetworkMonitor *monitor = g_network_monitor_get_default ();
   gboolean network_available = g_network_monitor_get_network_available (monitor);
-
-  GError *internal_error = NULL;
-
+  g_autoptr(GError) internal_error = NULL;
   time_t now = time (NULL);
 
   eos_app_log_debug_message ("Checking if the cached file is still good (now: %ld, mtime: %ld, diff: %ld)",
@@ -117,18 +112,15 @@ check_cached_file (const char *target_file,
     }
 
   if (network_available)
-    eos_app_log_info_message ("Requested file '%s' is within cache allowance.",
-                              target_file);
+    eos_app_log_info_message ("Requested file '%s' is within cache allowance.", target_file);
   else
     eos_app_log_info_message ("No network available, using cached file");
 
   if (!g_file_get_contents (target_file, buffer, NULL, &internal_error))
     {
-      /* Fall through, and re-download the file */
       eos_app_log_error_message ("Could not read cached file '%s': %s",
                                  target_file,
                                  internal_error->message);
-      g_clear_error (&internal_error);
       return FALSE;
     }
 
@@ -230,7 +222,6 @@ prepare_soup_request (SoupSession  *session,
                       const char   *content_type,
                       GError      **error)
 {
-  GError *internal_error = NULL;
   SoupURI *uri = soup_uri_new (source_uri);
 
   if (uri == NULL)
@@ -244,8 +235,8 @@ prepare_soup_request (SoupSession  *session,
       return NULL;
     }
 
+  GError *internal_error = NULL;
   SoupRequest *request = soup_session_request_uri (session, uri, &internal_error);
-
   soup_uri_free (uri);
 
   if (internal_error != NULL)
@@ -307,9 +298,7 @@ prepare_out_stream (const char    *target_file,
                     GCancellable  *cancellable,
                     GError       **error)
 {
-  GError *internal_error = NULL;
-  GFileOutputStream *out_stream = NULL;
-  GFile *file = g_file_new_for_path (target_file);
+  g_autoptr(GFile) file = g_file_new_for_path (target_file);
 
   /* If we are not allowed resuming, the resume file is not there, or
    * the server returned a strange status code, we need to start from
@@ -324,8 +313,10 @@ prepare_out_stream (const char    *target_file,
       g_unlink (target_file);
     }
 
-  out_stream = g_file_append_to (file, G_FILE_CREATE_NONE, cancellable,
-                                 &internal_error);
+  GError *internal_error = NULL;
+  GFileOutputStream *out_stream =
+    g_file_append_to (file, G_FILE_CREATE_NONE, cancellable, &internal_error);
+
   if (internal_error != NULL)
     {
       eos_app_log_error_message ("Opening output file failed - canceling download");
@@ -336,10 +327,8 @@ prepare_out_stream (const char    *target_file,
                      "canceling download (%s)"),
                    internal_error->message);
 
-      g_error_free (internal_error);
+      return NULL;
     }
-
-  g_object_unref (file);
 
   return G_OUTPUT_STREAM (out_stream);
 }
@@ -351,19 +340,16 @@ prepare_soup_resume_request (const SoupRequest *request,
                              gsize             *resume_offset,
                              GCancellable      *cancellable)
 {
-  GFile *file = NULL;
-  GFileInfo *info = NULL;
-  GError *error = NULL;
-
   gboolean using_resume = FALSE;
 
   eos_app_log_debug_message ("Getting local file length");
 
-  file = g_file_new_for_path (target_file);
-  info = g_file_query_info (file, G_FILE_ATTRIBUTE_STANDARD_SIZE,
-                            G_FILE_QUERY_INFO_NOFOLLOW_SYMLINKS,
-                            cancellable,
-                            &error);
+  g_autoptr(GError) error = NULL;
+  g_autoptr(GFile) file = g_file_new_for_path (target_file);
+  g_autoptr(GFileInfo) info = g_file_query_info (file, G_FILE_ATTRIBUTE_STANDARD_SIZE,
+                                                 G_FILE_QUERY_INFO_NOFOLLOW_SYMLINKS,
+                                                 cancellable,
+                                                 &error);
   if (error)
     {
       /* TODO Turn this into something less frightening when we have a
@@ -374,26 +360,24 @@ prepare_soup_resume_request (const SoupRequest *request,
                                  "local file's size (%s: %s).",
                                  target_file,
                                  error->message);
-      goto out;
+      return FALSE;
     }
 
-  guint64 size = g_file_info_get_attribute_uint64 (info,
-                                                   G_FILE_ATTRIBUTE_STANDARD_SIZE);
+  guint64 size = g_file_info_get_attribute_uint64 (info, G_FILE_ATTRIBUTE_STANDARD_SIZE);
 
   /* No file or nothing downloaded - just get the whole file */
   if (size == 0)
-    goto out;
+    return FALSE;
 
   eos_app_log_info_message ("Resuming %s from offset %" G_GUINT64_FORMAT,
                             target_file,
                             size);
 
   SoupMessage *message = soup_request_http_get_message (SOUP_REQUEST_HTTP (request));
-
   if (message == NULL)
     {
       eos_app_log_error_message ("Could not apply header to SOUP message");
-      goto out;
+      return FALSE;
     }
 
   /* -1 for end range is to make sure that libsoup doesn't include the
@@ -407,22 +391,13 @@ prepare_soup_resume_request (const SoupRequest *request,
   *resume_offset = size;
 
   /* If we get to here, we're set on using the partial download */
-  using_resume = TRUE;
-
-out:
-  g_clear_error (&error);
-
-  g_clear_object (&file);
-  g_clear_object (&info);
-
-  return using_resume;
+  return TRUE;
 }
 
 static void
-progress_closure_free (gpointer _data)
+progress_closure_free (gpointer data)
 {
-  EosProgressClosure *clos = _data;
-  g_slice_free (EosProgressClosure, clos);
+  g_slice_free (EosProgressClosure, data);
 }
 
 /* Needs to be invoked within main context */
@@ -466,9 +441,11 @@ download_chunk_func (GByteArray *chunk,
   EosDownloadFileClosure *clos = chunk_func_user_data;
 
   if (clos->progress_func != NULL)
-    /* we need to invoke this into the main context */
-    send_progress_to_main_context (clos->progress_func, bytes_read, clos->total_len,
-                                   clos->user_data);
+    {
+      /* we need to invoke this into the main context */
+      send_progress_to_main_context (clos->progress_func, bytes_read, clos->total_len,
+                                     clos->user_data);
+    }
 }
 
 static void
@@ -526,13 +503,8 @@ download_from_uri (SoupSession            *session,
                    GCancellable           *cancellable,
                    GError                **error)
 {
-  gboolean retval = FALSE;
-
   /* We assume that we won't get any data from the endpoint */
   *reset_error_counter = FALSE;
-
-  GInputStream *in_stream = NULL;
-  GOutputStream *out_stream = NULL;
 
   gsize bytes_read = 0;
   gsize start_offset = 0;
@@ -540,12 +512,11 @@ download_from_uri (SoupSession            *session,
 
   SoupRequest *request = prepare_soup_request (session, source_uri, NULL, error);
   if (request == NULL)
-    goto out;
+    return FALSE;
 
   if (allow_resume)
     {
-      eos_app_log_debug_message ("Resume allowed. "
-                                 "Figuring out what range to request.");
+      eos_app_log_debug_message ("Resume allowed. Figuring out what range to request.");
       is_resumed = prepare_soup_resume_request (request, source_uri, target_file,
                                                 &start_offset,
                                                 cancellable);
@@ -556,26 +527,30 @@ download_from_uri (SoupSession            *session,
    * Here we also return the resuming status since the server could reject our
    * request.
    */
-  in_stream = set_up_download_from_request (request, target_file, cancellable,
-                                            error);
+  g_autoptr(GInputStream) in_stream = set_up_download_from_request (request, target_file, cancellable, error);
   if (in_stream == NULL)
-    goto out;
+    {
+      g_object_unref (request);
+      return FALSE;
+    }
 
   /* Check that the server supports our resume request */
   if (is_resumed)
     is_resumed &= is_response_partial_content (request);
 
-  out_stream = prepare_out_stream (target_file, is_resumed, cancellable, error);
+  g_autoptr(GOutputStream) out_stream = prepare_out_stream (target_file, is_resumed, cancellable, error);
   if (out_stream == NULL)
-    goto out;
+    {
+      g_object_unref (request);
+      return FALSE;
+    }
 
   goffset total = start_offset + soup_request_get_content_length (request);
 
   /* ensure we emit a progress notification at the beginning */
   /* we need to invoke this into the main context */
   if (progress_func != NULL)
-    send_progress_to_main_context (progress_func, start_offset, total,
-                                   user_data);
+    send_progress_to_main_context (progress_func, start_offset, total, user_data);
 
   EosDownloadFileClosure *clos = g_slice_new0 (EosDownloadFileClosure);
   clos->progress_func = progress_func;
@@ -594,15 +569,9 @@ download_from_uri (SoupSession            *session,
 
   /* emit a progress notification for the whole file, in any case */
   if (progress_func != NULL)
-    send_progress_to_main_context (progress_func, total, total,
-                                   user_data);
+    send_progress_to_main_context (progress_func, total, total, user_data);
 
-out:
-  g_clear_object (&in_stream);
-  g_clear_object (&out_stream);
-  g_clear_object (&request);
-
-  return retval;
+  return TRUE;
 }
 
 gboolean
@@ -614,75 +583,73 @@ eos_net_utils_download_file_with_retry (SoupSession            *session,
                                         GCancellable           *cancellable,
                                         GError                **error_out)
 {
-    gboolean download_success = FALSE;
-    gboolean reset_error_counter = FALSE;
+  gboolean download_success = FALSE;
+  gboolean reset_error_counter = FALSE;
 
-    GError *error = NULL;
+  GError *error = NULL;
 
-    gint64 retry_time_limit = MAX_DOWNLOAD_RETRY_PERIOD * G_USEC_PER_SEC;
-    gint64 error_retry_cutoff = 0;
+  gint64 retry_time_limit = MAX_DOWNLOAD_RETRY_PERIOD * G_USEC_PER_SEC;
+  gint64 error_retry_cutoff = 0;
 
-    /* Keep trying to download unless we finish successfully or we reach
-     * the retry timeout
-     */
-    while (TRUE)
-      {
-        download_success = download_from_uri (session, source_uri, target_file,
-                                              TRUE, /* Allow resume */
-                                              progress_func,
-                                              user_data,
-                                              &reset_error_counter,
-                                              cancellable,
-                                              &error);
+  /* Keep trying to download unless we finish successfully or we reach
+   * the retry timeout
+   */
+  while (TRUE)
+    {
+      download_success = download_from_uri (session, source_uri, target_file,
+                                            TRUE, /* Allow resume */
+                                            progress_func,
+                                            user_data,
+                                            &reset_error_counter,
+                                            cancellable,
+                                            &error);
 
-        /* We're done if we get the file */
-        if (download_success)
-            break;
+      /* We're done if we get the file */
+      if (download_success)
+        break;
 
-        /* If we got canceled, also bail */
-        if (g_error_matches (error, EOS_NET_UTILS_ERROR,
-                             EOS_NET_UTILS_ERROR_CANCELLED))
-          {
-            eos_app_log_error_message ("Download cancelled. Breaking out of retry loop.");
-            g_propagate_error (error_out, error);
-            break;
-          }
+      /* If we got canceled, also bail */
+      if (g_error_matches (error, EOS_NET_UTILS_ERROR, EOS_NET_UTILS_ERROR_CANCELLED))
+        {
+          eos_app_log_error_message ("Download cancelled. Breaking out of retry loop.");
+          g_propagate_error (error_out, error);
+          break;
+        }
 
-        eos_app_log_error_message ("Error downloading. Checking if retries are needed");
+      eos_app_log_error_message ("Error downloading. Checking if retries are needed");
 
-        if (reset_error_counter)
-          {
-            eos_app_log_info_message ("Some data retrieved during download failure. "
-                                      "Resetting retry timeouts.");
-            error_retry_cutoff = 0;
-          }
+      if (reset_error_counter)
+        {
+          eos_app_log_info_message ("Some data retrieved during download failure. "
+                                    "Resetting retry timeouts.");
+          error_retry_cutoff = 0;
+        }
 
-        /* If this is our first retry, record the start time */
-        if (error_retry_cutoff == 0)
-            error_retry_cutoff = g_get_monotonic_time () + retry_time_limit;
+      /* If this is our first retry, record the start time */
+      if (error_retry_cutoff == 0)
+        error_retry_cutoff = g_get_monotonic_time () + retry_time_limit;
 
-        /* If we reached our limit of retry time, exit */
-        if (g_get_monotonic_time () >= error_retry_cutoff)
-          {
-            eos_app_log_error_message ("Retry limit reached. Exiting with failure");
+      /* If we reached our limit of retry time, exit */
+      if (g_get_monotonic_time () >= error_retry_cutoff)
+        {
+          eos_app_log_error_message ("Retry limit reached. Exiting with failure");
+          g_propagate_error (error_out, error);
 
-            g_propagate_error (error_out, error);
+          break;
+        }
 
-            break;
-          }
+      /* Ignore the error if we need to run again */
+      g_clear_error (&error);
 
-        /* Ignore the error if we need to run again */
-        g_clear_error (&error);
+      eos_app_log_error_message ("Retrying to download the file after a short break");
 
-        eos_app_log_error_message ("Retrying to download the file after a short break");
+      /* Sleep for n seconds and try again */
+      g_usleep (DOWNLOAD_RETRY_PERIOD * G_USEC_PER_SEC);
 
-        /* Sleep for n seconds and try again */
-        g_usleep (DOWNLOAD_RETRY_PERIOD * G_USEC_PER_SEC);
+      eos_app_log_error_message ("Continuing download loop...");
+    }
 
-        eos_app_log_error_message ("Continuing download loop...");
-      }
-
-    return download_success;
+  return download_success;
 }
 
 gboolean
@@ -705,12 +672,9 @@ eos_net_utils_download_file (SoupSession     *session,
 
   gboolean retval = FALSE;
   gsize bytes_read = 0;
-  GInputStream *in_stream = NULL;
-  GOutputStream *out_stream = NULL;
-  GByteArray *all_content = g_byte_array_new ();
   SoupRequest *request = prepare_soup_request (session, source_uri, content_type, error);
   if (request == NULL)
-    goto out;
+    return FALSE;
 
   /* For non-bundle artifacts files we cannot rely on the target directory
    * to exist, so we always try and create it. If the directory already
@@ -719,34 +683,41 @@ eos_net_utils_download_file (SoupSession     *session,
   if (!eos_mkdir_for_artifact (target_file, error))
     goto out;
 
-  in_stream = set_up_download_from_request (request, target_file, cancellable,
-                                            error);
+  g_autoptr(GInputStream) in_stream =
+    set_up_download_from_request (request, target_file, cancellable, error);
   if (in_stream == NULL)
-    goto out;
+    {
+      g_object_unref (request);
+      return FALSE;
+    }
 
-  out_stream = prepare_out_stream (target_file,
-                                   FALSE, /* No resuming for these right now */
-                                   cancellable,
-                                   error);
+  g_autoptr(GOutputStream) out_stream =
+    prepare_out_stream (target_file,
+                        FALSE, /* No resuming for these right now */
+                        cancellable,
+                        error);
   if (out_stream == NULL)
-    goto out;
+    {
+      g_object_unref (request);
+      return FALSE;
+    }
+
+  GByteArray *all_content = g_byte_array_new ();
 
   if (!download_file_chunks (in_stream, out_stream, 0, &bytes_read,
                              download_file_chunk_func, all_content,
                              cancellable, error))
-    goto out;
+    {
+      g_byte_array_unref (all_content);
+      g_object_unref (request);
+      return FALSE;
+    }
 
   /* NUL-terminate the content */
   all_content->data[bytes_read] = 0;
   *buffer = (char *) g_byte_array_free (all_content, FALSE);
 
-  retval = TRUE;
+  g_object_unref (request);
 
-out:
-  g_byte_array_unref (all_content);
-  g_clear_object (&in_stream);
-  g_clear_object (&out_stream);
-  g_clear_object (&request);
-
-  return retval;
+  return TRUE;
 }
