@@ -679,11 +679,23 @@ load_all_apps (EosAppListModel *self,
 
   if (!retval)
     {
-      if (internal_error == NULL || internal_error->domain != EOS_APP_LIST_MODEL_ERROR)
+      eos_app_log_debug_message ("Model reload error. "
+                                 "Deciding if we need to ignore the error");
+
+      if (internal_error != NULL &&
+          internal_error->domain == EOS_APP_LIST_MODEL_ERROR)
         {
+          eos_app_log_debug_message ("Propagating reload error to caller");
+
+          g_propagate_error (error, internal_error);
+          return retval;
+        }
+      else
+        {
+          /* Debug purposes only since we eat the message anyways */
           if (internal_error != NULL)
             {
-              eos_app_log_error_message ("%s", internal_error->message);
+              eos_app_log_error_message ("Error: %s", internal_error->message);
               g_error_free (internal_error);
             }
 
@@ -691,8 +703,6 @@ load_all_apps (EosAppListModel *self,
                                EOS_APP_LIST_MODEL_ERROR_NO_UPDATE_AVAILABLE,
                                _("We were unable to update the list of applications"));
         }
-      else
-        g_propagate_error (error, internal_error);
     }
 
   return retval;
@@ -813,6 +823,9 @@ refresh_thread_func (GTask *task,
 
   if (!load_all_apps (model, cancellable, &error))
     {
+      eos_app_log_info_message ("Failed to load apps. "
+                                "Returning error to dbus invoker");
+
       g_task_return_error (task, error);
       return;
     }
