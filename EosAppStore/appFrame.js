@@ -64,6 +64,7 @@ const AppListBoxRow = new Lang.Class({
         '_installProgress',
         '_installProgressLabel',
         '_installProgressBar',
+        '_installProgressSpinner',
         '_installProgressCancel',
         '_installedMessage',
         '_removeButton',
