@@ -824,9 +824,10 @@ const AppBroker = new Lang.Class({
         }));
     },
 
-    _onModelRefresh: function(model, error) {
+    _onModelRefresh: function(error) {
         if (error) {
-            let dialog = new Gtk.MessageDialog({ transient_for: app.mainWindow,
+            // Show the error dialog
+            let dialog = new Gtk.MessageDialog({ transient_for: this._mainWindow,
                                                  modal: true,
                                                  destroy_with_parent: true,
                                                  text: _("Update failed"),
@@ -835,9 +836,10 @@ const AppBroker = new Lang.Class({
             dialog.show_all();
             dialog.run();
             dialog.destroy();
-            return;
         }
 
+        // We try to populate even with errors as we have multiple data sources
+        // and some might have had some app data
         this._populateAllCategories();
     },
 
