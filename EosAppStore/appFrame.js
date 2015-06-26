@@ -451,36 +451,39 @@ const AppListBoxRow = new Lang.Class({
         app.popRunningOperation();
     },
 
-    _installOrAddToDesktop: function() {
-        this._model.install(this._appId, Lang.bind(this, function(error) {
-            this._popTransaction();
+    _installFinishedCallback: function(error) {
+        this._popTransaction();
 
-            if (error) {
-                this._maybeNotify(_("We could not install '%s'").format(this.appTitle), error);
-                this._updateState();
-                return;
+        if (error) {
+            this._maybeNotify(_("We could not install '%s'").format(this.appTitle), error);
+            this._updateState();
+            return;
+        }
+
+        this._maybeNotify(_("'%s' was installed successfully").format(this.appTitle));
+
+        this._installedMessage.show();
+        Mainloop.timeout_add_seconds(SHOW_DESKTOP_ICON_DELAY,
+                                     Lang.bind(this, function() {
+            this._installedMessage.hide();
+            this._updateState();
+
+            let appWindow = Gio.Application.get_default().mainWindow;
+            if (appWindow && appWindow.is_visible()) {
+                appWindow.hide();
             }
 
-            this._maybeNotify(_("'%s' was installed successfully").format(this.appTitle));
-
-            this._installedMessage.show();
-            Mainloop.timeout_add_seconds(SHOW_DESKTOP_ICON_DELAY,
-                                         Lang.bind(this, function() {
-                this._installedMessage.hide();
-                this._updateState();
-
-                let appWindow = Gio.Application.get_default().mainWindow;
-                if (appWindow && appWindow.is_visible()) {
-                    appWindow.hide();
-                }
-
-                return false;
-            }));
+            return false;
         }));
     },
 
+    _installOrAddToDesktop: function() {
+        this._model.install(this._appId,
+                            Lang.bind(this, this._installFinishedCallback));
+    },
+
     _installApp: function() {
-        this._pushTransaction(_("Downloading…"), true);
+        this._pushTransaction(_("Downloading…", true));
         this._installOrAddToDesktop();
     },
 
