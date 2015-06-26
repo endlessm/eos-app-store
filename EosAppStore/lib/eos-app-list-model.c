@@ -628,31 +628,44 @@ reload_model (EosAppListModel *self,
               GCancellable *cancellable,
               GError **error)
 {
-  gboolean retval = FALSE;
+  /* Since each step can fail independently, we assume a success result
+   * unless any of the loading steps explicitly flips the flag
+   */
+  gboolean retval = TRUE;
 
   eos_app_load_gio_apps (self->apps);
 
   if (!eos_app_load_installed_apps (self->apps, cancellable, error))
-    eos_app_log_error_message ("Unable to load installed apps");
+    {
+      eos_app_log_error_message ("Unable to load installed apps");
+      retval = FALSE;
+    }
 
+  /* XXX: Legacy code could have error value set twice here - not really
+   *      sure what the proper way to handle this would be if we want
+   *      robustness. Also this rises a question of which one of the errors
+   *      we pass to the caller since we don't exit early but this can be
+   *      left for another issue as it's outside of the scope of current work.
+   */
   if (!load_available_apps (self, cancellable, error))
-    eos_app_log_error_message ("Unable to load available apps");
+    {
+      eos_app_log_error_message ("Unable to load available apps: %s",
+                                 (*error)->message);
+      retval = FALSE;
+    }
 
   if (!load_shell_apps (self, cancellable))
     {
       eos_app_log_error_message ("Unable to load shell apps");
-      goto out;
+      retval = FALSE;
     }
 
   if (!load_content_apps (self, cancellable))
     {
       eos_app_log_error_message ("Unable to load content apps");
-      goto out;
+      retval = FALSE;
     }
 
-  retval = TRUE;
-
-out:
   return retval;
 }
 
