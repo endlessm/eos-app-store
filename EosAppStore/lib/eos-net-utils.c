@@ -365,14 +365,10 @@ prepare_soup_resume_request (const SoupRequest *request,
                             &error);
   if (error)
     {
-      /* TODO Turn this into something less frightening when we have a
-       *      good idea on which conditions we will not have the local
-       *      file available
-       */
-      eos_app_log_error_message ("Cannot resume - unable to get "
-                                 "local file's size (%s: %s).",
-                                 target_file,
-                                 error->message);
+      eos_app_log_info_message ("Cannot resume - unable to get "
+                                "local file's size (%s: %s).",
+                                target_file,
+                                error->message);
       goto out;
     }
 

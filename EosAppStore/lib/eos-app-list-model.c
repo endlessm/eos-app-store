@@ -908,15 +908,18 @@ typedef struct {
 static void
 emit_download_progress (goffset current, goffset total, gpointer _data)
 {
+
   DownloadProgressCallbackData *user_data = _data;
 
-  /* If we're downloading a signature, we won't have the info object */
-  if (user_data->info)
-      g_signal_emit (user_data->model,
-                     eos_app_list_model_signals[DOWNLOAD_PROGRESS], 0,
-                     eos_app_info_get_content_id (user_data->info),
-                     current,
-                     total);
+  eos_app_log_debug_message ("Emitting download progress signal");
+
+  g_assert_nonnull (user_data->info);
+
+  g_signal_emit (user_data->model,
+                 eos_app_list_model_signals[DOWNLOAD_PROGRESS], 0,
+                 eos_app_info_get_content_id (user_data->info),
+                 current,
+                 total);
 }
 
 static char *
