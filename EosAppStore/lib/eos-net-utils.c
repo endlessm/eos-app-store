@@ -28,6 +28,12 @@
 
 G_DEFINE_QUARK (eos-net-utils-error-quark, eos_net_utils_error)
 
+/* XXX: We need to remove these if Soup starts shipping auto cleanup symbols */
+G_DEFINE_AUTOPTR_CLEANUP_FUNC (SoupLogger, g_object_unref)
+G_DEFINE_AUTOPTR_CLEANUP_FUNC (SoupMessage, g_object_unref)
+G_DEFINE_AUTOPTR_CLEANUP_FUNC (SoupRequest, g_object_unref)
+G_DEFINE_AUTOPTR_CLEANUP_FUNC (SoupURI, soup_uri_free)
+
 typedef void (* EosChunkFunc)          (GByteArray *chunk,
                                         gsize       chunk_len,
                                         gsize       bytes_read,
@@ -222,11 +228,11 @@ prepare_soup_request (SoupSession  *session,
                       const char   *content_type,
                       GError      **error)
 {
-  SoupURI *uri = soup_uri_new (source_uri);
+  g_autoptr(SoupURI) uri = soup_uri_new (source_uri);
 
   if (uri == NULL)
     {
-      eos_app_log_error_message ("Soup URI is NULL - canceling download");
+      eos_app_log_error_message ("Invalid URL '%s' - cancelling download", source_uri);
 
       g_set_error_literal (error, EOS_NET_UTILS_ERROR,
                            EOS_NET_UTILS_ERROR_INVALID_URL,
@@ -237,7 +243,6 @@ prepare_soup_request (SoupSession  *session,
 
   GError *internal_error = NULL;
   SoupRequest *request = soup_session_request_uri (session, uri, &internal_error);
-  soup_uri_free (uri);
 
   if (internal_error != NULL)
     {
@@ -247,9 +252,8 @@ prepare_soup_request (SoupSession  *session,
       if (g_type_is_a (G_OBJECT_TYPE (request), SOUP_TYPE_REQUEST_HTTP) &&
           g_error_matches (internal_error, G_TLS_ERROR, G_TLS_ERROR_BAD_CERTIFICATE))
         {
-          SoupMessage *message;
-
-          message = soup_request_http_get_message (SOUP_REQUEST_HTTP (request));
+          g_autoptr(SoupMessage) message =
+            soup_request_http_get_message (SOUP_REQUEST_HTTP (request));
 
           GTlsCertificateFlags cert_flags = 0;
 
@@ -281,12 +285,11 @@ prepare_soup_request (SoupSession  *session,
 
   if (content_type != NULL)
     {
-      SoupMessage *message = soup_request_http_get_message (SOUP_REQUEST_HTTP (request));
+      g_autoptr(SoupMessage) message =
+        soup_request_http_get_message (SOUP_REQUEST_HTTP (request));
+
       if (message != NULL)
-        {
-          soup_message_headers_append (message->request_headers, "Accept", content_type);
-          g_object_unref (message);
-        }
+        soup_message_headers_append (message->request_headers, "Accept", content_type);
     }
 
   return request;
@@ -313,7 +316,7 @@ prepare_out_stream (const char    *target_file,
       g_unlink (target_file);
     }
 
-  GError *internal_error = NULL;
+  g_autoptr(GError) internal_error = NULL;
   GFileOutputStream *out_stream =
     g_file_append_to (file, G_FILE_CREATE_NONE, cancellable, &internal_error);
 
@@ -334,11 +337,11 @@ prepare_out_stream (const char    *target_file,
 }
 
 static gboolean
-prepare_soup_resume_request (const SoupRequest *request,
-                             const char        *source_uri,
-                             const char        *target_file,
-                             gsize             *resume_offset,
-                             GCancellable      *cancellable)
+prepare_soup_resume_request (SoupRequest  *request,
+                             const char   *source_uri,
+                             const char   *target_file,
+                             gsize        *resume_offset,
+                             GCancellable *cancellable)
 {
   gboolean using_resume = FALSE;
 
@@ -373,7 +376,7 @@ prepare_soup_resume_request (const SoupRequest *request,
                             target_file,
                             size);
 
-  SoupMessage *message = soup_request_http_get_message (SOUP_REQUEST_HTTP (request));
+  g_autoptr(SoupMessage) message = soup_request_http_get_message (SOUP_REQUEST_HTTP (request));
   if (message == NULL)
     {
       eos_app_log_error_message ("Could not apply header to SOUP message");
@@ -386,7 +389,6 @@ prepare_soup_resume_request (const SoupRequest *request,
    * for more info
    */
   soup_message_headers_set_range (message->request_headers, size, -1);
-  g_object_unref (message);
 
   *resume_offset = size;
 
@@ -455,15 +457,16 @@ soup_log_printer (SoupLogger *logger,
                   const char *data,
                   gpointer user_data)
 {
-  eos_app_log_error_message ("%s", data);
+  eos_app_log_error_message ("*** %s ***", data);
 }
 
 void
 eos_net_utils_add_soup_logger (SoupSession *session)
 {
-  SoupLogger *logger = soup_logger_new (SOUP_LOGGER_LOG_HEADERS, -1);
-  soup_session_add_feature (session, (SoupSessionFeature *) logger);
+  g_autoptr(SoupLogger) logger = soup_logger_new (SOUP_LOGGER_LOG_HEADERS, -1);
+
   soup_logger_set_printer (logger, soup_log_printer, NULL, NULL);
+  soup_session_add_feature (session, (SoupSessionFeature *) logger);
 }
 
 static gboolean
@@ -471,25 +474,19 @@ is_response_partial_content (SoupRequest *request)
 {
   gboolean is_partial_content = FALSE;
   SoupMessage *message = soup_request_http_get_message (SOUP_REQUEST_HTTP (request));
-  if (message != NULL)
+  if (message == NULL)
+    return FALSE;
+
+  if (message->status_code == SOUP_STATUS_PARTIAL_CONTENT)
     {
-      eos_app_log_debug_message ("Status code: %d",  message->status_code);
-
-      if (message->status_code == SOUP_STATUS_PARTIAL_CONTENT)
-        {
-          eos_app_log_debug_message ("Server supports resuming. "
-                                     "Continuing download");
-          is_partial_content = TRUE;
-        }
-      else
-        {
-          eos_app_log_error_message ("Server does not support our resume request!");
-        }
-
-      g_object_unref (message);
+      eos_app_log_debug_message ("Server supports resuming. Continuing download");
+      return TRUE;
     }
 
-  return is_partial_content;
+  eos_app_log_error_message ("Server does not support our resume request (code:%d)",
+                             message->status_code);
+
+  return FALSE;
 }
 
 static gboolean
@@ -510,7 +507,7 @@ download_from_uri (SoupSession            *session,
   gsize start_offset = 0;
   gboolean is_resumed = FALSE;
 
-  SoupRequest *request = prepare_soup_request (session, source_uri, NULL, error);
+  g_autoptr(SoupRequest) request = prepare_soup_request (session, source_uri, NULL, error);
   if (request == NULL)
     return FALSE;
 
@@ -529,10 +526,7 @@ download_from_uri (SoupSession            *session,
    */
   g_autoptr(GInputStream) in_stream = set_up_download_from_request (request, target_file, cancellable, error);
   if (in_stream == NULL)
-    {
-      g_object_unref (request);
-      return FALSE;
-    }
+    return FALSE;
 
   /* Check that the server supports our resume request */
   if (is_resumed)
@@ -540,10 +534,7 @@ download_from_uri (SoupSession            *session,
 
   g_autoptr(GOutputStream) out_stream = prepare_out_stream (target_file, is_resumed, cancellable, error);
   if (out_stream == NULL)
-    {
-      g_object_unref (request);
-      return FALSE;
-    }
+    return FALSE;
 
   goffset total = start_offset + soup_request_get_content_length (request);
 
@@ -672,7 +663,7 @@ eos_net_utils_download_file (SoupSession     *session,
 
   gboolean retval = FALSE;
   gsize bytes_read = 0;
-  SoupRequest *request = prepare_soup_request (session, source_uri, content_type, error);
+  g_autoptr(SoupRequest) request = prepare_soup_request (session, source_uri, content_type, error);
   if (request == NULL)
     return FALSE;
 
@@ -685,11 +676,9 @@ eos_net_utils_download_file (SoupSession     *session,
 
   g_autoptr(GInputStream) in_stream =
     set_up_download_from_request (request, target_file, cancellable, error);
+
   if (in_stream == NULL)
-    {
-      g_object_unref (request);
-      return FALSE;
-    }
+    return FALSE;
 
   g_autoptr(GOutputStream) out_stream =
     prepare_out_stream (target_file,
@@ -697,10 +686,7 @@ eos_net_utils_download_file (SoupSession     *session,
                         cancellable,
                         error);
   if (out_stream == NULL)
-    {
-      g_object_unref (request);
-      return FALSE;
-    }
+    return FALSE;
 
   GByteArray *all_content = g_byte_array_new ();
 
@@ -709,15 +695,12 @@ eos_net_utils_download_file (SoupSession     *session,
                              cancellable, error))
     {
       g_byte_array_unref (all_content);
-      g_object_unref (request);
       return FALSE;
     }
 
   /* NUL-terminate the content */
   all_content->data[bytes_read] = 0;
   *buffer = (char *) g_byte_array_free (all_content, FALSE);
-
-  g_object_unref (request);
 
   return TRUE;
 }
