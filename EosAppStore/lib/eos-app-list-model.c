@@ -1531,8 +1531,14 @@ remove_app_from_manager (EosAppListModel *self,
       goto out;
     }
 
+  const char *prefix;
+  if (eos_app_info_is_on_secondary_storage (info))
+    prefix = eos_get_secondary_storage ();
+  else
+    prefix = eos_get_primary_storage ();
+
   eos_app_log_info_message ("Trying to uninstall %s", app_id);
-  eos_app_manager_call_uninstall_sync (proxy, app_id, &retval, NULL, &error);
+  eos_app_manager_call_uninstall_sync (proxy, app_id, prefix, &retval, NULL, &error);
 
   if (error != NULL)
     {
