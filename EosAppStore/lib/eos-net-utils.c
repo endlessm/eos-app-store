@@ -595,14 +595,19 @@ download_from_uri (SoupSession            *session,
 
   /* Since we got some data, we can assume that network is back online */
   if (bytes_read > 0)
-    *reset_error_counter = TRUE;
+      *reset_error_counter = TRUE;
 
   /* Emit a progress notification for the whole file if we successfully
-   * downloaded it
+   * downloaded it otherwise we want to free the caller's user data later
+   * (if failures) due to retries in the caller.
    */
-  if (retval && progress_func != NULL)
-    send_progress_to_main_context (progress_func, total, total, user_data,
-                                   free_func);
+  if (retval) {
+      if (progress_func != NULL)
+          send_progress_to_main_context (progress_func, total, total, user_data,
+                                         free_func);
+      else if (free_func != NULL)
+          free_func (user_data);
+    }
 
 out:
   g_clear_object (&in_stream);
@@ -692,6 +697,10 @@ eos_net_utils_download_file_with_retry (SoupSession            *session,
 
         eos_app_log_error_message ("Continuing download loop...");
       }
+
+    /* On failures we didn't free the caller's data yet */
+    if (!download_success && free_func)
+      free_func (user_data);
 
     return download_success;
 }
