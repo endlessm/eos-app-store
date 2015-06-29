@@ -79,8 +79,11 @@ typedef struct
 } DownloadProgressCallbackData;
 
 static void
-download_progress_callback_data_free (DownloadProgressCallbackData *data)
+download_progress_callback_data_free (gpointer _data)
+
 {
+  DownloadProgressCallbackData *data = _data;
+
   g_object_unref (data->model);
   g_object_unref (data->info);
 
@@ -953,10 +956,13 @@ typedef struct {
 static void
 emit_download_progress (goffset current, goffset total, gpointer _data)
 {
-
   DownloadProgressCallbackData *user_data = _data;
 
-  eos_app_log_debug_message ("Emitting download progress signal");
+  eos_app_log_debug_message ("Emitting download progress signal "
+                             "(%" G_GOFFSET_FORMAT " "
+                             "of %" G_GOFFSET_FORMAT ")",
+                             current,
+                             total);
 
   g_assert_nonnull (user_data->info);
 
@@ -1037,7 +1043,7 @@ download_signature (EosAppListModel *self,
 
   if (!eos_net_utils_download_file_with_retry (self->soup_session,
                                                signature_uri, signature_path,
-                                               NULL, NULL,
+                                               NULL, NULL, NULL,
                                                cancellable, &error))
     {
       g_propagate_error (error_out, error);
@@ -1090,15 +1096,15 @@ download_bundle (EosAppListModel *self,
 
   if (!eos_net_utils_download_file_with_retry (self->soup_session, bundle_uri,
                                                bundle_path,
-                                               emit_download_progress, data,
+                                               emit_download_progress,
+                                               download_progress_callback_data_free,
+                                               data,
                                                cancellable, &error))
     {
       eos_app_log_error_message ("Download of bundle failed");
 
       g_propagate_error (error_out, error);
     }
-
-  download_progress_callback_data_free (data);
 
   return bundle_path;
 }

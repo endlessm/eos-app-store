@@ -26,7 +26,8 @@ gboolean  eos_net_utils_download_file_with_retry (SoupSession           *session
                                                   const char            *source_uri,
                                                   const char            *target_file,
                                                   GFileProgressCallback  progress_func,
-                                                  gpointer               progress_func_user_data,
+                                                  GDestroyNotify         free_func,
+                                                  gpointer               user_data,
                                                   GCancellable          *cancellable,
                                                   GError               **error);
 
