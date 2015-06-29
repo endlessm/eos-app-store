@@ -427,10 +427,10 @@ const AppListBoxRow = new Lang.Class({
 
         // conditionally show the progress bar and cancel button
         if (showProgressBar) {
+            this._installProgressSpinner.hide();
             this._installProgressBar.fraction = 0.0;
             this._installProgressBar.show();
             this._installProgressCancel.show();
-            this._installProgressSpinner.hide();
         }
         else {
             this._installProgressBar.hide();
@@ -483,7 +483,7 @@ const AppListBoxRow = new Lang.Class({
     },
 
     _installApp: function() {
-        this._pushTransaction(_("Downloading…", true));
+        this._pushTransaction(_("Downloading…"), true);
         this._installOrAddToDesktop();
     },
 
