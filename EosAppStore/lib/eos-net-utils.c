@@ -597,8 +597,10 @@ download_from_uri (SoupSession            *session,
   if (bytes_read > 0)
     *reset_error_counter = TRUE;
 
-  /* emit a progress notification for the whole file, in any case */
-  if (progress_func != NULL)
+  /* Emit a progress notification for the whole file if we successfully
+   * downloaded it
+   */
+  if (retval && progress_func != NULL)
     send_progress_to_main_context (progress_func, total, total, user_data,
                                    free_func);
 
