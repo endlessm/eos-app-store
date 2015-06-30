@@ -23,7 +23,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: eos-app-store\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-06-16 01:22+0000\n"
+"POT-Creation-Date: 2015-06-23 01:22+0000\n"
 "PO-Revision-Date: 2015-06-16 01:22+0000\n"
 "Last-Translator: endlessmobile_build <philip@endlessm.com>\n"
 "Language-Team: Spanish (http://www.transifex.com/projects/p/eos-app-store/language/es/)\n"
@@ -162,19 +162,19 @@ msgid "Folders"
 msgstr "Carpetas"
 
 #. Translators: use the same string used to install the app store content JSON
-#: ../EosAppStore/categories.js:12 ../EosAppStore/lib/eos-app-utils.c:1438
+#: ../EosAppStore/categories.js:12 ../EosAppStore/lib/eos-app-utils.c:1452
 msgid "Education"
 msgstr "Educación"
 
-#: ../EosAppStore/categories.js:19 ../EosAppStore/lib/eos-app-utils.c:1439
+#: ../EosAppStore/categories.js:19 ../EosAppStore/lib/eos-app-utils.c:1453
 msgid "Games"
 msgstr "Juegos"
 
-#: ../EosAppStore/categories.js:26 ../EosAppStore/lib/eos-app-utils.c:1440
+#: ../EosAppStore/categories.js:26 ../EosAppStore/lib/eos-app-utils.c:1454
 msgid "Resources"
 msgstr "Recursos"
 
-#: ../EosAppStore/categories.js:33 ../EosAppStore/lib/eos-app-utils.c:1441
+#: ../EosAppStore/categories.js:33 ../EosAppStore/lib/eos-app-utils.c:1455
 msgid "Utilities"
 msgstr "Herramientas"
 

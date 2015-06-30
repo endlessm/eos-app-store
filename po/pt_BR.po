@@ -3,6 +3,7 @@
 # This file is distributed under the same license as the PACKAGE package.
 # 
 # Translators:
+# Ivan G. Gonçalves <i@endlessm.com>, 2015
 # Joel Gil Leon <joel@endlessm.com>, 2013
 # Nuritzi Sanchez <ns@endlessm.com>, 2013
 # Philip Chimento <philip.chimento@gmail.com>, 2014
@@ -14,9 +15,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: eos-app-store\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-06-16 01:22+0000\n"
-"PO-Revision-Date: 2015-06-16 01:22+0000\n"
-"Last-Translator: endlessmobile_build <philip@endlessm.com>\n"
+"POT-Creation-Date: 2015-06-23 01:22+0000\n"
+"PO-Revision-Date: 2015-06-26 10:47+0000\n"
+"Last-Translator: Ivan G. Gonçalves <i@endlessm.com>\n"
 "Language-Team: Portuguese (Brazil) (http://www.transifex.com/projects/p/eos-app-store/language/pt_BR/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -74,7 +75,7 @@ msgstr "Adicionar à área de trabalho"
 
 #: ../EosAppStore/appFrame.js:333
 msgid "No network connection is available"
-msgstr ""
+msgstr "Nenhuma conexão de rede disponível"
 
 #: ../EosAppStore/appFrame.js:334
 msgid "Insufficient space to install the app"
@@ -142,7 +143,7 @@ msgstr "Instalar programas"
 
 #: ../EosAppStore/appFrame.js:828
 msgid "Update failed"
-msgstr ""
+msgstr "A atualização falhou"
 
 #: ../EosAppStore/appStoreWindow.js:229
 msgid "Websites"
@@ -153,19 +154,19 @@ msgid "Folders"
 msgstr "Pastas"
 
 #. Translators: use the same string used to install the app store content JSON
-#: ../EosAppStore/categories.js:12 ../EosAppStore/lib/eos-app-utils.c:1438
+#: ../EosAppStore/categories.js:12 ../EosAppStore/lib/eos-app-utils.c:1452
 msgid "Education"
 msgstr "Educação"
 
-#: ../EosAppStore/categories.js:19 ../EosAppStore/lib/eos-app-utils.c:1439
+#: ../EosAppStore/categories.js:19 ../EosAppStore/lib/eos-app-utils.c:1453
 msgid "Games"
 msgstr "Jogos"
 
-#: ../EosAppStore/categories.js:26 ../EosAppStore/lib/eos-app-utils.c:1440
+#: ../EosAppStore/categories.js:26 ../EosAppStore/lib/eos-app-utils.c:1454
 msgid "Resources"
 msgstr "Recursos"
 
-#: ../EosAppStore/categories.js:33 ../EosAppStore/lib/eos-app-utils.c:1441
+#: ../EosAppStore/categories.js:33 ../EosAppStore/lib/eos-app-utils.c:1455
 msgid "Utilities"
 msgstr "Utilidades"
 
@@ -244,7 +245,7 @@ msgid ""
 "The app store has detected a fatal error and cannot continue with the "
 "installation. Please, restart your system. If the problem persists, please "
 "contact support."
-msgstr ""
+msgstr "Mais programas detectou um erro fatal e não pode continuar. Por favor, reinicie o sistema. Se o problema persistir, por favor entre em contato com o suporte."
 
 #: ../EosAppStore/lib/eos-app-list-model.c:674
 msgid "We were unable to update the list of applications"
@@ -336,7 +337,7 @@ msgstr "Programa '%s' não pôde ser removido"
 #: ../EosAppStore/lib/eos-app-list-model.c:1892
 #, c-format
 msgid "Application '%s' could not be removed. %s"
-msgstr ""
+msgstr "O programa '%s' não pode ser desentalado. %s "
 
 #: ../EosAppStore/lib/eos-app-list-model.c:1916
 #: ../EosAppStore/lib/eos-app-list-model.c:1965
@@ -348,7 +349,7 @@ msgstr "Você deve ser um administrador para instalar programas"
 msgid ""
 "The app store has detected a fatal error and cannot continue. Please, "
 "restart your system. If the problem persists, please contact support."
-msgstr ""
+msgstr "Mais programas detectou um erro fatal e não pode continuar. Por favor, reinicie o sistema. Se o problema persistir, por favor entre em contato com o suporte."
 
 #: ../EosAppStore/lib/eos-app-list-model.c:2111
 #: ../EosAppStore/lib/eos-app-list-model.c:2141
@@ -379,16 +380,16 @@ msgstr " O programa %s não está instalado"
 
 #: ../EosAppStore/lib/eos-app-utils.c:879
 msgid "Operation cancelled"
-msgstr ""
+msgstr "Operação cancelada"
 
 #: ../EosAppStore/lib/eos-app-utils.c:901
 msgid "Updates meta record did not contain expected structure"
-msgstr ""
+msgstr "O arquivo de atualização não contém a estrutura esperada"
 
 #: ../EosAppStore/lib/eos-app-utils.c:916
 msgid "Updates meta record did not contain expected attributes"
-msgstr ""
+msgstr "O arquivo de atualização não contém os atributos esperados"
 
 #: ../EosAppStore/lib/eos-app-utils.c:932
 msgid "Updates meta record did not contain valid monotonic_id attribute value"
-msgstr ""
+msgstr "O arquivo de atualização não contem um atributo monotonic_id válido."
