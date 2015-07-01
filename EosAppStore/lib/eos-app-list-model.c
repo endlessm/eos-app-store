@@ -151,7 +151,12 @@ app_id_from_desktop_id (const gchar *desktop_id)
   gint len;
 
   len = strlen (desktop_id);
-  return g_strndup (desktop_id, len - 8); /* the 8 here is the length of ".desktop" */
+
+  /* We check to make sure the string is actually a .desktop file */
+  /* The 8 here is the length of ".desktop" */
+  g_assert_false (len <= 8);
+
+  return g_strndup (desktop_id, len - 8);
 }
 
 static gchar **
@@ -1735,6 +1740,8 @@ eos_app_list_model_uninstall_app_async (EosAppListModel *model,
 {
   GTask *task;
   EosAppInfo *info;
+
+  eos_app_log_info_message ("Attempting to uninstall: %s", desktop_id);
 
   task = g_task_new (model, cancellable, callback, user_data);
   info = eos_app_list_model_get_app_info (model, desktop_id);
