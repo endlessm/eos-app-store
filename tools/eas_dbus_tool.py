@@ -20,6 +20,8 @@ class GenericEasDbusMethod(object):
         self.path = self.MAIN_PATH
         self.interface = self.MAIN_DEST
 
+        self.timeout = -1;
+
         self.args = None
         self.reply_format = GLib.VariantType.new ('(b)')
 
@@ -114,6 +116,9 @@ class UninstallEasDbusMethod(GenericEasDbusMethod):
 class InstallEasDbusMethod(GenericEasDbusMethod):
     def __init__(self, params):
         super().__init__("install", "Install", params);
+
+        # Install is a much longer operation
+        self.timeout = 20 * 60 * 1000;
 
     def _arg_handler(self, args):
         print('App ID: %s' % args.app_id)
@@ -234,8 +239,8 @@ class EasDbusTool(object):
                               action.args,
                               action.reply_format,
                               Gio.DBusCallFlags.NONE,
-                              -1,    # Timeout
-                              None)  # Cancellable
+                              action.timeout,    # Timeout
+                              None)              # Cancellable
 
         print()
 
