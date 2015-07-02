@@ -158,25 +158,41 @@ const AppStoreDBusService = new Lang.Class({
         }));
     },
 
+    _refresh: function(callback) {
+        this._app.appList.refresh(callback);
+    },
+
     InstallAsync: function(params, invocation) {
         let [appId] = params;
-        log("Installing: " + appId);
 
-        this._app.appList.install(appId + ".desktop", Lang.bind(this, function(error) {
-            let success = (error == null);
-            log("Install finished. Success: " + success);
-            invocation.return_value(GLib.Variant.new('(b)', [success]));
+        this._refresh(Lang.bind(this, function(error) {
+            log("Refreshing before install");
+            if (error != null)
+                invocation.return_value(GLib.Variant.new('(b)', [False]));
+
+            log("Installing: " + appId);
+            this._app.appList.install(appId + ".desktop", Lang.bind(this, function(error) {
+                let success = (error == null);
+                log("Install finished. Success: " + success);
+                invocation.return_value(GLib.Variant.new('(b)', [success]));
+            }));
         }));
     },
 
     UninstallAsync: function(params, invocation) {
         let [appId] = params;
-        log("Uninstalling: " + appId);
 
-        this._app.appList.uninstall(appId + ".desktop", Lang.bind(this, function(error) {
-            let success = (error == null);
-            log("Uninstall finished. Success: " + success);
-            invocation.return_value(GLib.Variant.new('(b)', [success]));
+        this._refresh(Lang.bind(this, function(error) {
+            log("Refreshing before install");
+            if (error != null)
+                invocation.return_value(GLib.Variant.new('(b)', [False]));
+
+            log("Uninstalling: " + appId);
+            this._app.appList.uninstall(appId + ".desktop", Lang.bind(this, function(error) {
+                let success = (error == null);
+                log("Uninstall finished. Success: " + success);
+                invocation.return_value(GLib.Variant.new('(b)', [success]));
+            }));
         }));
     },
 
