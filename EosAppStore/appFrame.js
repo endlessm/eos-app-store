@@ -830,15 +830,22 @@ const AppBroker = new Lang.Class({
             let dialog = new Gtk.MessageDialog({ transient_for: this._mainWindow,
                                                  modal: true,
                                                  destroy_with_parent: true,
-                                                 text: _("Update failed"),
+                                                 text: _("Refresh failed"),
                                                  secondary_text: error.message });
             dialog.add_button(_("Dismiss"), Gtk.ResponseType.OK);
             dialog.show_all();
             dialog.run();
             dialog.destroy();
+
+            if (error.code !=
+                EosAppStorePrivate.AppListModelError.APP_REFRESH_PARTIAL_FAILURE) {
+                // On critical failures we don't try to partially populate
+                // categories
+                return;
+            }
         }
 
-        // We try to populate even with errors as we have multiple data sources
+        // We try to populate regardless of errors as we have multiple data sources
         // and some might have had some app data
         this._populateAllCategories();
     },
