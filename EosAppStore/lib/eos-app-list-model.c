@@ -759,7 +759,7 @@ eos_app_list_model_finalize (GObject *gobject)
       self->changed_guard_id = 0;
     }
 
-  g_object_unref (&self->proxy);
+  g_clear_object (&self->proxy);
 
   g_clear_object (&self->soup_session);
 
