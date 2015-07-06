@@ -623,6 +623,32 @@ load_content_apps (EosAppListModel *self,
   return TRUE;
 }
 
+static void
+set_reload_error (GError **error,
+                  gboolean is_critical,
+                  char *message)
+{
+  eos_app_log_error_message ("Reload error: %s", message);
+
+  if (*error == NULL || is_critical)
+    {
+      int error_type = EOS_APP_LIST_MODEL_ERROR_APP_REFRESH_PARTIAL_FAILURE;
+
+      if (is_critical)
+        {
+          g_clear_error (error);
+
+          error_type = EOS_APP_LIST_MODEL_ERROR_APP_REFRESH_FAILURE;
+        }
+
+      if (!message)
+        message = _("Unable to load app list");
+
+      g_set_error_literal (error, EOS_APP_LIST_MODEL_ERROR, error_type,
+                           message);
+    }
+}
+
 static gboolean
 reload_model (EosAppListModel *self,
               GCancellable *cancellable,
@@ -633,36 +659,43 @@ reload_model (EosAppListModel *self,
    */
   gboolean retval = TRUE;
 
+  GError *internal_error = NULL;
+
   eos_app_load_gio_apps (self->apps);
 
-  if (!eos_app_load_installed_apps (self->apps, cancellable, error))
+  if (!eos_app_load_installed_apps (self->apps, cancellable, &internal_error))
     {
-      eos_app_log_error_message ("Unable to load installed apps");
+      /* We eat the message */
+      if (internal_error != NULL)
+          g_error_free (internal_error);
+
+      set_reload_error (error, FALSE, _("Unable to load installed apps"));
+
       retval = FALSE;
     }
 
-  /* XXX: Legacy code could have error value set twice here - not really
-   *      sure what the proper way to handle this would be if we want
-   *      robustness. Also this rises a question of which one of the errors
-   *      we pass to the caller since we don't exit early but this can be
-   *      left for another issue as it's outside of the scope of current work.
-   */
-  if (!load_available_apps (self, cancellable, error))
+  if (!load_available_apps (self, cancellable, &internal_error))
     {
-      eos_app_log_error_message ("Unable to load available apps: %s",
-                                 (*error)->message);
+      /* We eat the message */
+      if (internal_error)
+          g_error_free (internal_error);
+
+      set_reload_error (error, FALSE, _("Unable to load available apps"));
+
       retval = FALSE;
     }
 
   if (!load_shell_apps (self, cancellable))
     {
-      eos_app_log_error_message ("Unable to load shell apps");
+      set_reload_error (error, TRUE, _("Unable to load shell apps"));
+
       retval = FALSE;
     }
 
   if (!load_content_apps (self, cancellable))
     {
-      eos_app_log_error_message ("Unable to load content apps");
+      set_reload_error (error, TRUE, _("Unable to load content apps"));
+
       retval = FALSE;
     }
 
