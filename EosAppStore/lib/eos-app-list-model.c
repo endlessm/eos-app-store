@@ -641,9 +641,6 @@ set_reload_error (GError **error,
           error_type = EOS_APP_LIST_MODEL_ERROR_APP_REFRESH_FAILURE;
         }
 
-      if (!message)
-        message = _("Unable to load app list");
-
       g_set_error_literal (error, EOS_APP_LIST_MODEL_ERROR, error_type,
                            message);
     }
@@ -666,8 +663,7 @@ reload_model (EosAppListModel *self,
   if (!eos_app_load_installed_apps (self->apps, cancellable, &internal_error))
     {
       /* We eat the message */
-      if (internal_error != NULL)
-          g_error_free (internal_error);
+      g_error_free (internal_error);
 
       set_reload_error (error, FALSE, _("Unable to load installed apps"));
 
@@ -677,8 +673,7 @@ reload_model (EosAppListModel *self,
   if (!load_available_apps (self, cancellable, &internal_error))
     {
       /* We eat the message */
-      if (internal_error)
-          g_error_free (internal_error);
+      g_error_free (internal_error);
 
       set_reload_error (error, FALSE, _("Unable to load available apps"));
 
@@ -715,22 +710,20 @@ load_all_apps (EosAppListModel *self,
       eos_app_log_debug_message ("Model reload error. "
                                  "Deciding if we need to ignore the error");
 
-      if (internal_error != NULL &&
-          internal_error->domain == EOS_APP_LIST_MODEL_ERROR)
+      /* Sanity check */
+      g_assert_nonnull (internal_error);
+
+      if (internal_error->domain == EOS_APP_LIST_MODEL_ERROR)
         {
           eos_app_log_debug_message ("Propagating reload error to caller");
 
           g_propagate_error (error, internal_error);
-          return retval;
         }
       else
         {
           /* Debug purposes only since we eat the message anyways */
-          if (internal_error != NULL)
-            {
-              eos_app_log_error_message ("Error: %s", internal_error->message);
-              g_error_free (internal_error);
-            }
+          eos_app_log_error_message ("Error: %s", internal_error->message);
+          g_error_free (internal_error);
 
           g_set_error_literal (error, EOS_APP_LIST_MODEL_ERROR,
                                EOS_APP_LIST_MODEL_ERROR_NO_UPDATE_AVAILABLE,
