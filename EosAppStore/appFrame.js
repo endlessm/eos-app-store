@@ -845,8 +845,6 @@ const AppBroker = new Lang.Class({
             }
         }
 
-        // We try to populate regardless of errors as we have multiple data sources
-        // and some might have had some app data
         this._populateAllCategories();
     },
 
