@@ -837,11 +837,13 @@ const AppBroker = new Lang.Class({
             dialog.run();
             dialog.destroy();
 
-            if (error.code !=
-                EosAppStorePrivate.AppListModelError.APP_REFRESH_PARTIAL_FAILURE) {
-                // On critical failures we don't try to partially populate
-                // categories
+            // On critical failures we don't try to partially populate
+            // categories
+            if (error.matches(EosAppStorePrivate.AppListModel.error_quark(),
+                              EosAppStorePrivate.AppListModelError.APP_REFRESH_FAILURE)) {
                 return;
+            } else {
+                log("Loading apps due to non-critical exceptions");
             }
         }
 
