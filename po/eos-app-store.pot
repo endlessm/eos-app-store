@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-06-30 01:22+0000\n"
+"POT-Creation-Date: 2015-07-07 01:23+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -125,7 +125,7 @@ msgstr ""
 msgid "'%s' was removed successfully"
 msgstr ""
 
-#: ../EosAppStore/appFrame.js:621 ../EosAppStore/appFrame.js:832
+#: ../EosAppStore/appFrame.js:621 ../EosAppStore/appFrame.js:834
 msgid "Dismiss"
 msgstr ""
 
@@ -133,7 +133,7 @@ msgstr ""
 msgid "Install apps"
 msgstr ""
 
-#: ../EosAppStore/appFrame.js:830
+#: ../EosAppStore/appFrame.js:832
 msgid "Update failed"
 msgstr ""
 
@@ -232,87 +232,87 @@ msgstr ""
 msgid "Install websites"
 msgstr ""
 
-#: ../EosAppStore/lib/eos-app-list-model.c:511
+#: ../EosAppStore/lib/eos-app-list-model.c:516
 msgid ""
 "The app store has detected a fatal error and cannot continue with the "
 "installation. Please, restart your system. If the problem persists, please "
 "contact support."
 msgstr ""
 
-#: ../EosAppStore/lib/eos-app-list-model.c:674
+#: ../EosAppStore/lib/eos-app-list-model.c:679
 msgid "We were unable to update the list of applications"
 msgstr ""
 
-#: ../EosAppStore/lib/eos-app-list-model.c:943
+#: ../EosAppStore/lib/eos-app-list-model.c:948
 #, c-format
 msgid "No verification available for app '%s'"
 msgstr ""
 
-#: ../EosAppStore/lib/eos-app-list-model.c:981
+#: ../EosAppStore/lib/eos-app-list-model.c:986
 #, c-format
 msgid "No signature available for app '%s'"
 msgstr ""
 
-#: ../EosAppStore/lib/eos-app-list-model.c:1028
+#: ../EosAppStore/lib/eos-app-list-model.c:1033
 #, c-format
 msgid "Application bundle '%s' could not be downloaded"
 msgstr ""
 
-#: ../EosAppStore/lib/eos-app-list-model.c:1178
+#: ../EosAppStore/lib/eos-app-list-model.c:1183
 #, c-format
 msgid "Application '%s' could not be installed"
 msgstr ""
 
-#: ../EosAppStore/lib/eos-app-list-model.c:1185
+#: ../EosAppStore/lib/eos-app-list-model.c:1190
 #, c-format
 msgid "Application '%s' could not be installed. %s"
 msgstr ""
 
-#: ../EosAppStore/lib/eos-app-list-model.c:1210
+#: ../EosAppStore/lib/eos-app-list-model.c:1215
 #, c-format
 msgid "Application '%s' could not be removed"
 msgstr ""
 
-#: ../EosAppStore/lib/eos-app-list-model.c:1217
+#: ../EosAppStore/lib/eos-app-list-model.c:1222
 #, c-format
 msgid "Application '%s' could not be removed. %s"
 msgstr ""
 
-#: ../EosAppStore/lib/eos-app-list-model.c:1241
-#: ../EosAppStore/lib/eos-app-list-model.c:1290
+#: ../EosAppStore/lib/eos-app-list-model.c:1246
+#: ../EosAppStore/lib/eos-app-list-model.c:1295
 msgid "You must be an administrator to install applications"
 msgstr ""
 
-#: ../EosAppStore/lib/eos-app-list-model.c:1253
-#: ../EosAppStore/lib/eos-app-list-model.c:1448
+#: ../EosAppStore/lib/eos-app-list-model.c:1258
+#: ../EosAppStore/lib/eos-app-list-model.c:1453
 msgid ""
 "The app store has detected a fatal error and cannot continue. Please, "
 "restart your system. If the problem persists, please contact support."
 msgstr ""
 
-#: ../EosAppStore/lib/eos-app-list-model.c:1436
-#: ../EosAppStore/lib/eos-app-list-model.c:1466
+#: ../EosAppStore/lib/eos-app-list-model.c:1441
+#: ../EosAppStore/lib/eos-app-list-model.c:1471
 msgid "You must be an administrator to remove applications"
 msgstr ""
 
-#: ../EosAppStore/lib/eos-app-list-model.c:1599
-#: ../EosAppStore/lib/eos-app-list-model.c:1667
+#: ../EosAppStore/lib/eos-app-list-model.c:1604
+#: ../EosAppStore/lib/eos-app-list-model.c:1672
 #, c-format
 msgid "App %s not installable"
 msgstr ""
 
-#: ../EosAppStore/lib/eos-app-list-model.c:1611
+#: ../EosAppStore/lib/eos-app-list-model.c:1616
 #, c-format
 msgid "App %s already installed"
 msgstr ""
 
-#: ../EosAppStore/lib/eos-app-list-model.c:1678
+#: ../EosAppStore/lib/eos-app-list-model.c:1683
 #, c-format
 msgid "App %s is up to date"
 msgstr ""
 
-#: ../EosAppStore/lib/eos-app-list-model.c:1747
-#: ../EosAppStore/lib/eos-app-list-model.c:1779
+#: ../EosAppStore/lib/eos-app-list-model.c:1754
+#: ../EosAppStore/lib/eos-app-list-model.c:1786
 #, c-format
 msgid "App %s is not installed"
 msgstr ""
