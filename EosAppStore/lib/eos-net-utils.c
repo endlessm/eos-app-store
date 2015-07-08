@@ -29,12 +29,12 @@
 G_DEFINE_QUARK (eos-net-utils-error-quark, eos_net_utils_error)
 
 typedef void (* EosChunkFunc)          (GByteArray *chunk,
-                                        gsize       chunk_len,
-                                        gsize       bytes_read,
+                                        goffset     chunk_len,
+                                        goffset     bytes_read,
                                         gpointer    chunk_func_user_data);
 
 typedef struct {
-  gsize                  total_len;
+  goffset                total_len;
   GFileProgressCallback  progress_func;
   gpointer               user_data;
 } EosDownloadFileClosure;
@@ -137,8 +137,8 @@ check_cached_file (const char *target_file,
 
 static void
 download_file_chunk_func (GByteArray *chunk,
-                          gsize       chunk_len,
-                          gsize       bytes_read,
+                          goffset     chunk_len,
+                          goffset     bytes_read,
                           gpointer    chunk_func_user_data)
 {
   GByteArray *all_content = chunk_func_user_data;
@@ -151,8 +151,8 @@ download_file_chunk_func (GByteArray *chunk,
 static gboolean
 download_file_chunks (GInputStream   *in_stream,
                       GOutputStream  *out_stream,
-                      gsize           offset,
-                      gsize          *bytes_read,
+                      goffset         offset,
+                      goffset        *bytes_read,
                       EosChunkFunc    chunk_func,
                       gpointer        chunk_func_user_data,
                       GCancellable   *cancellable,
@@ -161,7 +161,7 @@ download_file_chunks (GInputStream   *in_stream,
   gboolean retval = FALSE;
   GError *internal_error = NULL;
   gssize res = 0;
-  gsize pos = 0;
+  goffset pos = 0;
   GByteArray *content = g_byte_array_sized_new (GET_DATA_BLOCK_SIZE);
 
   eos_app_log_info_message ("Downloading file chunks start");
@@ -347,7 +347,7 @@ static gboolean
 prepare_soup_resume_request (const SoupRequest *request,
                              const char        *source_uri,
                              const char        *target_file,
-                             gsize             *resume_offset,
+                             goffset           *resume_offset,
                              GCancellable      *cancellable)
 {
   GFile *file = NULL;
@@ -439,8 +439,8 @@ send_progress_to_caller (gpointer _data)
 
 static void
 send_progress_to_main_context (GFileProgressCallback  progress_func,
-                               gsize                  bytes_read,
-                               gsize                  total_len,
+                               goffset                bytes_read,
+                               goffset                total_len,
                                gpointer               user_data)
 {
   EosProgressClosure *clos = g_slice_new (EosProgressClosure);
@@ -458,8 +458,8 @@ send_progress_to_main_context (GFileProgressCallback  progress_func,
 
 static void
 download_chunk_func (GByteArray *chunk,
-                     gsize       chunk_len,
-                     gsize       bytes_read,
+                     goffset     chunk_len,
+                     goffset     bytes_read,
                      gpointer    chunk_func_user_data)
 {
   EosDownloadFileClosure *clos = chunk_func_user_data;
@@ -533,8 +533,8 @@ download_from_uri (SoupSession            *session,
   GInputStream *in_stream = NULL;
   GOutputStream *out_stream = NULL;
 
-  gsize bytes_read = 0;
-  gsize start_offset = 0;
+  goffset bytes_read = 0;
+  goffset start_offset = 0;
   gboolean is_resumed = FALSE;
 
   SoupRequest *request = prepare_soup_request (session, source_uri, NULL, error);
@@ -705,7 +705,7 @@ eos_net_utils_download_file (SoupSession     *session,
     return TRUE;
 
   gboolean retval = FALSE;
-  gsize bytes_read = 0;
+  goffset bytes_read = 0;
   GInputStream *in_stream = NULL;
   GOutputStream *out_stream = NULL;
   GByteArray *all_content = g_byte_array_new ();
