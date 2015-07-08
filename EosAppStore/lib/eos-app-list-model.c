@@ -623,36 +623,79 @@ load_content_apps (EosAppListModel *self,
   return TRUE;
 }
 
+static void
+set_reload_error (GError **error,
+                  gboolean is_critical)
+{
+  eos_app_log_error_message ("Reload error during refresh");
+
+  if (*error == NULL || is_critical)
+    {
+      int error_type = EOS_APP_LIST_MODEL_ERROR_APP_REFRESH_PARTIAL_FAILURE;
+      char *error_message = _("We are unable to load the complete list of "
+                              "applications");
+
+      if (is_critical)
+        {
+          g_clear_error (error);
+
+          error_type = EOS_APP_LIST_MODEL_ERROR_APP_REFRESH_FAILURE;
+          error_message = _("We were unable to update the list of applications");
+        }
+
+      g_set_error_literal (error, EOS_APP_LIST_MODEL_ERROR, error_type,
+                           error_message);
+    }
+}
+
 static gboolean
 reload_model (EosAppListModel *self,
               GCancellable *cancellable,
               GError **error)
 {
-  gboolean retval = FALSE;
+  /* Since each step can fail independently, we assume a success result
+   * unless any of the loading steps explicitly flips the flag
+   */
+  gboolean retval = TRUE;
+
+  GError *internal_error = NULL;
 
   eos_app_load_gio_apps (self->apps);
 
-  if (!eos_app_load_installed_apps (self->apps, cancellable, error))
-    eos_app_log_error_message ("Unable to load installed apps");
+  if (!eos_app_load_installed_apps (self->apps, cancellable, &internal_error))
+    {
+      /* We eat the message */
+      g_error_free (internal_error);
 
-  if (!load_available_apps (self, cancellable, error))
-    eos_app_log_error_message ("Unable to load available apps");
+      set_reload_error (error, FALSE);
+
+      retval = FALSE;
+    }
+
+  if (!load_available_apps (self, cancellable, &internal_error))
+    {
+      /* We eat the message */
+      g_error_free (internal_error);
+
+      set_reload_error (error, FALSE);
+
+      retval = FALSE;
+    }
 
   if (!load_shell_apps (self, cancellable))
     {
-      eos_app_log_error_message ("Unable to load shell apps");
-      goto out;
+      set_reload_error (error, TRUE);
+
+      retval = FALSE;
     }
 
   if (!load_content_apps (self, cancellable))
     {
-      eos_app_log_error_message ("Unable to load content apps");
-      goto out;
+      set_reload_error (error, TRUE);
+
+      retval = FALSE;
     }
 
-  retval = TRUE;
-
-out:
   return retval;
 }
 
@@ -666,20 +709,14 @@ load_all_apps (EosAppListModel *self,
 
   if (!retval)
     {
-      if (internal_error == NULL || internal_error->domain != EOS_APP_LIST_MODEL_ERROR)
-        {
-          if (internal_error != NULL)
-            {
-              eos_app_log_error_message ("%s", internal_error->message);
-              g_error_free (internal_error);
-            }
+      eos_app_log_debug_message ("Model reload error. Propagating error up.");
 
-          g_set_error_literal (error, EOS_APP_LIST_MODEL_ERROR,
-                               EOS_APP_LIST_MODEL_ERROR_NO_UPDATE_AVAILABLE,
-                               _("We were unable to update the list of applications"));
-        }
-      else
-        g_propagate_error (error, internal_error);
+      /* Sanity check */
+      g_assert_nonnull (internal_error);
+
+      g_assert_true (internal_error->domain == EOS_APP_LIST_MODEL_ERROR);
+
+      g_propagate_error (error, internal_error);
     }
 
   return retval;
@@ -703,7 +740,7 @@ eos_app_list_model_finalize (GObject *gobject)
       self->changed_guard_id = 0;
     }
 
-  g_object_unref (&self->proxy);
+  g_clear_object (&self->proxy);
 
   g_clear_object (&self->soup_session);
 
@@ -800,6 +837,9 @@ refresh_thread_func (GTask *task,
 
   if (!load_all_apps (model, cancellable, &error))
     {
+      eos_app_log_info_message ("Failed to load apps. "
+                                "Returning error to dbus invoker");
+
       g_task_return_error (task, error);
       return;
     }
