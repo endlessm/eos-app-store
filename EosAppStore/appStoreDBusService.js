@@ -52,13 +52,14 @@ const AppStoreDBusService = new Lang.Class({
 
     _init: function(app) {
         this._app = app;
+        this.Visible = false;
         this._dbusImpl = Gio.DBusExportedObject.wrapJSObject(AppStoreDBusIface, this);
         this._dbusImpl.export(Gio.DBus.session, APP_STORE_PATH);
     },
 
     show: function(timestamp, reset) {
         log("App store show requested");
-        this._app.show(reset, timestamp);
+        this._app.show(timestamp, reset);
     },
 
     hide: function(timestamp) {
@@ -197,10 +198,10 @@ const AppStoreDBusService = new Lang.Class({
     },
 
     visibilityChanged: function(is_visible) {
-        this._visible = is_visible;
+        this.Visible = is_visible;
 
         let propChangedVariant = new GLib.Variant('(sa{sv}as)',
-            [APP_STORE_IFACE, { 'Visible': new GLib.Variant('b', this._visible) }, []]);
+            [APP_STORE_IFACE, { 'Visible': new GLib.Variant('b', this.Visible) }, []]);
 
         Gio.DBus.session.emit_signal(null, APP_STORE_PATH,
                                      'org.freedesktop.DBus.Properties',

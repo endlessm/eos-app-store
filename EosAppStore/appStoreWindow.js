@@ -319,7 +319,7 @@ const AppStoreWindow = new Lang.Class({
         this.parent();
     },
 
-    doShow: function(reset, timestamp) {
+    doShow: function(timestamp, reset) {
         let page = this._stack.get_visible_child();
         if (page && reset) {
             page.reset();

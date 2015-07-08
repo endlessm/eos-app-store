@@ -112,7 +112,7 @@ const AppStore = new Lang.Class({
 
     show: function(timestamp, reset) {
         this._createMainWindow();
-        this._mainWindow.doShow(reset, timestamp);
+        this._mainWindow.doShow(timestamp, reset);
     },
 
     hide: function() {
