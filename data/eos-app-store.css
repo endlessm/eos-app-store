@@ -37,6 +37,7 @@
     -GtkRange-slider-width: 8;
     -GtkRange-stepper-spacing: 15;
     -GtkRange-stepper-size: 0;
+    -GtkRange-trough-border: 0;
     -GtkRange-trough-under-steppers: false;
 
     -GtkScrollbar-min-slider-length: 115;
@@ -49,11 +50,13 @@
     background-repeat: no-repeat;
     background-position: 50%;
 
+    margin: 0;
     border-width: 0;
     box-shadow: inset 0 0 2px 0 alpha(black, 0.25);
 }
 
 .scrollbar.trough {
+    border-width: 0;
     border-radius: 20px;
     background-color: alpha(black, 0.20);
     box-shadow: inset 0 0 2px 0 alpha(black, 0.25);
