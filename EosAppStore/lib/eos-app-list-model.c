@@ -625,24 +625,26 @@ load_content_apps (EosAppListModel *self,
 
 static void
 set_reload_error (GError **error,
-                  gboolean is_critical,
-                  char *message)
+                  gboolean is_critical)
 {
-  eos_app_log_error_message ("Reload error: %s", message);
+  eos_app_log_error_message ("Reload error during refresh");
 
   if (*error == NULL || is_critical)
     {
       int error_type = EOS_APP_LIST_MODEL_ERROR_APP_REFRESH_PARTIAL_FAILURE;
+      char *error_message = _("We are unable to load the complete list of "
+                              "applications");
 
       if (is_critical)
         {
           g_clear_error (error);
 
           error_type = EOS_APP_LIST_MODEL_ERROR_APP_REFRESH_FAILURE;
+          error_message = _("We were unable to update the list of applications");
         }
 
       g_set_error_literal (error, EOS_APP_LIST_MODEL_ERROR, error_type,
-                           message);
+                           error_message);
     }
 }
 
@@ -665,7 +667,7 @@ reload_model (EosAppListModel *self,
       /* We eat the message */
       g_error_free (internal_error);
 
-      set_reload_error (error, FALSE, _("Unable to load installed apps"));
+      set_reload_error (error, FALSE);
 
       retval = FALSE;
     }
@@ -675,21 +677,21 @@ reload_model (EosAppListModel *self,
       /* We eat the message */
       g_error_free (internal_error);
 
-      set_reload_error (error, FALSE, _("Unable to load available apps"));
+      set_reload_error (error, FALSE);
 
       retval = FALSE;
     }
 
   if (!load_shell_apps (self, cancellable))
     {
-      set_reload_error (error, TRUE, _("Unable to load shell apps"));
+      set_reload_error (error, TRUE);
 
       retval = FALSE;
     }
 
   if (!load_content_apps (self, cancellable))
     {
-      set_reload_error (error, TRUE, _("Unable to load content apps"));
+      set_reload_error (error, TRUE);
 
       retval = FALSE;
     }
@@ -707,28 +709,14 @@ load_all_apps (EosAppListModel *self,
 
   if (!retval)
     {
-      eos_app_log_debug_message ("Model reload error. "
-                                 "Deciding if we need to ignore the error");
+      eos_app_log_debug_message ("Model reload error. Propagating error up.");
 
       /* Sanity check */
       g_assert_nonnull (internal_error);
 
-      if (internal_error->domain == EOS_APP_LIST_MODEL_ERROR)
-        {
-          eos_app_log_debug_message ("Propagating reload error to caller");
+      g_assert_true (internal_error->domain == EOS_APP_LIST_MODEL_ERROR);
 
-          g_propagate_error (error, internal_error);
-        }
-      else
-        {
-          /* Debug purposes only since we eat the message anyways */
-          eos_app_log_error_message ("Error: %s", internal_error->message);
-          g_error_free (internal_error);
-
-          g_set_error_literal (error, EOS_APP_LIST_MODEL_ERROR,
-                               EOS_APP_LIST_MODEL_ERROR_NO_UPDATE_AVAILABLE,
-                               _("We were unable to update the list of applications"));
-        }
+      g_propagate_error (error, internal_error);
     }
 
   return retval;
