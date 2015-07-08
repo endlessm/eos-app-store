@@ -1718,7 +1718,7 @@ eos_check_available_space (const char    *path,
 
   if (info == NULL)
     {
-      eos_app_log_error_message ("Can't get filesystem info to calculate"
+      eos_app_log_error_message ("Can't get filesystem info to calculate "
                                  "the available space");
       return FALSE;
     }
