@@ -826,24 +826,24 @@ const AppBroker = new Lang.Class({
 
     _onModelRefresh: function(error) {
         if (error) {
-            // Show the error dialog
-            let dialog = new Gtk.MessageDialog({ transient_for: this._mainWindow,
-                                                 modal: true,
-                                                 destroy_with_parent: true,
-                                                 text: _("Refresh failed"),
-                                                 secondary_text: error.message });
-            dialog.add_button(_("Dismiss"), Gtk.ResponseType.OK);
-            dialog.show_all();
-            dialog.run();
-            dialog.destroy();
-
-            // On critical failures we don't try to partially populate
-            // categories
             if (error.matches(EosAppStorePrivate.AppListModel.error_quark(),
                               EosAppStorePrivate.AppListModelError.APP_REFRESH_FAILURE)) {
+                // Show the error dialog
+                let dialog = new Gtk.MessageDialog({ transient_for: this._mainWindow,
+                                                     modal: true,
+                                                     destroy_with_parent: true,
+                                                     text: _("Refresh failed"),
+                                                     secondary_text: error.message });
+                dialog.add_button(_("Dismiss"), Gtk.ResponseType.OK);
+                dialog.show_all();
+                dialog.run();
+                dialog.destroy();
+
+                // On critical failures we don't try to partially populate
+                // categories
                 return;
             } else {
-                log("Loading apps due to non-critical exceptions");
+                log("Loading apps anyways due to non-critical exceptions");
             }
         }
 
