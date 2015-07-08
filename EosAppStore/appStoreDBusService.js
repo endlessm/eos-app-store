@@ -58,7 +58,7 @@ const AppStoreDBusService = new Lang.Class({
 
     show: function(timestamp, reset) {
         log("App store show requested");
-        this._app.show(reset, timestamp);
+        this._app.show(timestamp, reset);
     },
 
     hide: function(timestamp) {
