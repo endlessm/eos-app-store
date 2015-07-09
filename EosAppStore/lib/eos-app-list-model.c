@@ -1172,12 +1172,10 @@ get_bundle_artifacts (EosAppListModel *self,
   eos_app_log_info_message ("Completing transaction with eam");
 
   GVariantBuilder opts;
-  g_variant_builder_init (&opts, G_VARIANT_TYPE ("(a{sv})"));
-  g_variant_builder_open (&opts, G_VARIANT_TYPE ("a{sv}"));
+  g_variant_builder_init (&opts, G_VARIANT_TYPE ("a{sv}"));
   g_variant_builder_add (&opts, "{sv}", "BundlePath", g_variant_new_string (bundle_path));
   g_variant_builder_add (&opts, "{sv}", "SignaturePath", g_variant_new_string (signature_path));
   g_variant_builder_add (&opts, "{sv}", "ChecksumPath", g_variant_new_string (sha256_path));
-  g_variant_builder_close (&opts);
 
   eos_app_manager_transaction_call_complete_transaction_sync (transaction,
                                                               g_variant_builder_end (&opts),
