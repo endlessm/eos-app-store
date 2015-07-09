@@ -64,6 +64,7 @@ const AppListBoxRow = new Lang.Class({
         '_installProgress',
         '_installProgressLabel',
         '_installProgressBar',
+        '_installProgressSpinner',
         '_installProgressCancel',
         '_installedMessage',
         '_removeButton',
@@ -180,6 +181,13 @@ const AppListBoxRow = new Lang.Class({
         this.appState = this.appInfo.get_state();
     },
 
+    _showInstallSpinner: function() {
+        this._installProgressLabel.set_text(_("Installing…"));
+        this._installProgressSpinner.show();
+        this._installProgressSpinner.start();
+        this._installProgressBar.hide();
+    },
+
     _downloadProgress: function(model, contentId, progress, current, total) {
         if (this.appInfo.get_content_id() != contentId) {
             return;
@@ -192,8 +200,7 @@ const AppListBoxRow = new Lang.Class({
         }
 
         if (current == total) {
-            this._installProgressLabel.set_text(_("Installing…"));
-            this._installProgressBar.fraction = 1.0;
+            this._showInstallSpinner();
             return;
         }
 
@@ -420,12 +427,14 @@ const AppListBoxRow = new Lang.Class({
 
         // conditionally show the progress bar and cancel button
         if (showProgressBar) {
+            this._installProgressSpinner.hide();
             this._installProgressBar.fraction = 0.0;
             this._installProgressBar.show();
             this._installProgressCancel.show();
         }
         else {
             this._installProgressBar.hide();
+            this._installProgressSpinner.hide();
             this._installProgressCancel.hide();
         }
 
@@ -442,32 +451,35 @@ const AppListBoxRow = new Lang.Class({
         app.popRunningOperation();
     },
 
-    _installOrAddToDesktop: function() {
-        this._model.install(this._appId, Lang.bind(this, function(error) {
-            this._popTransaction();
+    _installFinishedCallback: function(error) {
+        this._popTransaction();
 
-            if (error) {
-                this._maybeNotify(_("We could not install '%s'").format(this.appTitle), error);
-                this._updateState();
-                return;
+        if (error) {
+            this._maybeNotify(_("We could not install '%s'").format(this.appTitle), error);
+            this._updateState();
+            return;
+        }
+
+        this._maybeNotify(_("'%s' was installed successfully").format(this.appTitle));
+
+        this._installedMessage.show();
+        Mainloop.timeout_add_seconds(SHOW_DESKTOP_ICON_DELAY,
+                                     Lang.bind(this, function() {
+            this._installedMessage.hide();
+            this._updateState();
+
+            let appWindow = Gio.Application.get_default().mainWindow;
+            if (appWindow && appWindow.is_visible()) {
+                appWindow.hide();
             }
 
-            this._maybeNotify(_("'%s' was installed successfully").format(this.appTitle));
-
-            this._installedMessage.show();
-            Mainloop.timeout_add_seconds(SHOW_DESKTOP_ICON_DELAY,
-                                         Lang.bind(this, function() {
-                this._installedMessage.hide();
-                this._updateState();
-
-                let appWindow = Gio.Application.get_default().mainWindow;
-                if (appWindow && appWindow.is_visible()) {
-                    appWindow.hide();
-                }
-
-                return false;
-            }));
+            return false;
         }));
+    },
+
+    _installOrAddToDesktop: function() {
+        this._model.install(this._appId,
+                            Lang.bind(this, this._installFinishedCallback));
     },
 
     _installApp: function() {
