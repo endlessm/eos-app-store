@@ -366,6 +366,13 @@ eos_app_info_get_delta_bundle_hash (const EosAppInfo *info)
 }
 
 gboolean
+eos_app_info_get_has_delta_update (const EosAppInfo *info)
+{
+  return info->delta_bundle_uri && info->delta_signature_uri &&
+    info->delta_bundle_hash;
+}
+
+gboolean
 eos_app_info_is_featured (const EosAppInfo *info)
 {
   return info->is_featured;

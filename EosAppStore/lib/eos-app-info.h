@@ -45,6 +45,7 @@ const char *    eos_app_info_get_bundle_hash            (const EosAppInfo *info)
 const char *    eos_app_info_get_delta_bundle_uri       (const EosAppInfo *info);
 const char *    eos_app_info_get_delta_signature_uri    (const EosAppInfo *info);
 const char *    eos_app_info_get_delta_bundle_hash      (const EosAppInfo *info);
+gboolean        eos_app_info_get_has_delta_update       (const EosAppInfo *info);
 
 guint           eos_app_info_get_n_screenshots          (const EosAppInfo *info);
 char **         eos_app_info_get_screenshots            (const EosAppInfo *info);

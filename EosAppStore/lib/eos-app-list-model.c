@@ -1363,7 +1363,8 @@ install_latest_app_version (EosAppListModel *self,
 
   eos_app_log_info_message ("Got transaction path: %s", transaction_path);
 
-  gboolean use_delta = allow_deltas && is_upgrade;
+  gboolean use_delta = allow_deltas && is_upgrade &&
+    eos_app_info_get_has_delta_update (info);
 
   retval = get_bundle_artifacts (self, info, transaction_path, use_delta,
                                  cancellable, &error);
