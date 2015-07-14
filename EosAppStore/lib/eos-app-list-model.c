@@ -1084,7 +1084,9 @@ download_bundle (EosAppListModel *self,
       return NULL;
     }
 
-  char *bundle_name = g_strconcat (app_id, ".bundle", NULL);
+  char *extension = use_delta ? ".xdelta": ".bundle";
+  char *bundle_name = g_strconcat (app_id, extension, NULL);
+
   char *bundle_path = g_build_filename (eos_get_bundle_download_dir (), bundle_name, NULL);
   g_free (bundle_name);
 
