@@ -169,7 +169,7 @@ const AppStoreDBusService = new Lang.Class({
         this._refresh(Lang.bind(this, function(error) {
             log("Refreshing before install");
             if (error != null)
-                invocation.return_value(GLib.Variant.new('(b)', [False]));
+                invocation.return_value(GLib.Variant.new('(b)', [false]));
 
             log("Installing: " + appId);
             this._app.appList.install(appId + ".desktop", Lang.bind(this, function(error) {
@@ -186,7 +186,7 @@ const AppStoreDBusService = new Lang.Class({
         this._refresh(Lang.bind(this, function(error) {
             log("Refreshing before install");
             if (error != null)
-                invocation.return_value(GLib.Variant.new('(b)', [False]));
+                invocation.return_value(GLib.Variant.new('(b)', [false]));
 
             log("Uninstalling: " + appId);
             this._app.appList.uninstall(appId + ".desktop", Lang.bind(this, function(error) {
