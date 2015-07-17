@@ -9,6 +9,7 @@
 
 #include <locale.h>
 #include <glib/gi18n.h>
+#include <glib/gstdio.h>
 #include <json-glib/json-glib.h>
 #include <errno.h>
 
@@ -16,8 +17,8 @@
 #define APP_STORE_CONTENT_APPS  "apps"
 #define APP_STORE_CONTENT_LINKS "links"
 
-#define BUNDLE_DIR              LOCALSTATEDIR "/tmp"
-#define BUNDLE_DIR_TEMPLATE     LOCALSTATEDIR "/tmp/eos-app-store.XXXXXX"
+#define BUNDLE_DIR              LOCALSTATEDIR "/tmp/eos-app-store"
+#define BUNDLE_DIR_TEMPLATE     BUNDLE_DIR "/downloadXXXXXX"
 #define APP_DIR_DEFAULT         "/endless"
 
 G_DEFINE_QUARK (eos-app-utils-error-quark, eos_app_utils_error)
@@ -29,7 +30,14 @@ eos_get_bundle_download_dir (void)
 
   if (g_once_init_enter (&bundle_dir))
     {
+      /* g_mkdir* functions do not allow setting of 0777 mode as the o+w
+       * never gets set so we require a separate step to ensure that the
+       * permissions are correct. We also ignore problems here since it
+       * usually means that the folder is already created by us or someone
+       * else
+       */
       g_mkdir_with_parents (BUNDLE_DIR, 0755);
+      g_chmod (BUNDLE_DIR, 01777);
 
       char *tmp = g_strdup (BUNDLE_DIR_TEMPLATE);
       while (g_mkdtemp_full (tmp, 0755) == NULL)

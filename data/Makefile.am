@@ -21,6 +21,9 @@ CLEANFILES += \
 servicedir = $(datadir)/dbus-1/services
 service_DATA = com.endlessm.AppStore.service
 
+tmpfilesdir = $(prefix)/lib/tmpfiles.d
+dist_tmpfiles_DATA = eos-app-store.conf
+
 com.endlessm.AppStore.service: Makefile
 	$(AM_V_GEN) \
 	( echo "[D-BUS Service]" ; \
