@@ -45,6 +45,7 @@ void        eos_clear_bundle_download_dir (void);
 const char *eos_get_app_server_url (void);
 const char *eos_get_primary_storage (void);
 const char *eos_get_secondary_storage (void);
+gboolean    eos_has_secondary_storage (void);
 
 gboolean eos_use_delta_updates (void);
 

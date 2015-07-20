@@ -216,6 +216,30 @@ eos_get_bundles_dir (void)
   return apps_dir;
 }
 
+gboolean
+eos_has_secondary_storage (void)
+{
+  const char *primary_storage, *secondary_storage;
+
+  primary_storage = eos_get_primary_storage ();
+  secondary_storage = eos_get_secondary_storage ();
+
+  /* The secondary storage path does not exist */
+  struct stat secondary_statbuf;
+  if (stat (secondary_storage, &secondary_statbuf) < 0)
+    return FALSE;
+
+  /* The primary storage path does not exist */
+  struct stat primary_statbuf;
+  if (stat (primary_storage, &primary_statbuf) < 0)
+    return TRUE;
+
+  /* We have a valid secondary storage if it's on a different
+   * device than the primary.
+   */
+  return primary_statbuf.st_dev != secondary_statbuf.st_dev;
+}
+
 const char *
 eos_get_primary_storage (void)
 {
