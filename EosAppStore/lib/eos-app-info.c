@@ -663,11 +663,11 @@ eos_app_info_check_install_space (const EosAppInfo *info)
 {
   const char *storage;
 
-  storage = eos_get_primary_storage ();
+  storage = eos_get_secondary_storage ();
   if (eos_app_info_get_has_sufficient_install_space (info, storage))
     return TRUE;
 
-  storage = eos_get_secondary_storage ();
+  storage = eos_get_primary_storage ();
   if (eos_app_info_get_has_sufficient_install_space (info, storage))
     return TRUE;
 
