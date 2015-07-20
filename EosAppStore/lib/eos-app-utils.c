@@ -195,7 +195,7 @@ eos_get_bundles_dir (void)
       GError *error = NULL;
       g_key_file_load_from_file (keyfile, path, G_KEY_FILE_NONE, &error);
       if (error == NULL)
-        tmp = g_key_file_get_string (keyfile, "eam", "appdir", &error);
+        tmp = g_key_file_get_string (keyfile, "Directories", "ApplicationsDir", &error);
 
       if (error != NULL)
         {
@@ -206,6 +206,76 @@ eos_get_bundles_dir (void)
         }
 
       eos_app_log_info_message ("Bundles dir: %s", tmp);
+
+      g_free (path);
+      g_key_file_free (keyfile);
+
+      g_once_init_leave (&apps_dir, tmp);
+    }
+
+  return apps_dir;
+}
+
+const char *
+eos_get_primary_storage (void)
+{
+  static char *apps_dir;
+
+  if (g_once_init_enter (&apps_dir))
+    {
+      char *tmp;
+
+      GKeyFile *keyfile = g_key_file_new ();
+      char *path = g_build_filename (SYSCONFDIR, "eos-app-manager", "eam-default.cfg", NULL);
+      GError *error = NULL;
+      g_key_file_load_from_file (keyfile, path, G_KEY_FILE_NONE, &error);
+      if (error == NULL)
+        tmp = g_key_file_get_string (keyfile, "Directories", "PrimaryStorage", &error);
+
+      if (error != NULL)
+        {
+          eos_app_log_error_message ("Unable to load configuration: %s",
+                                     error->message);
+          g_error_free (error);
+          tmp = g_strdup (APP_DIR_DEFAULT);
+        }
+
+      eos_app_log_info_message ("Primary storage dir: %s", tmp);
+
+      g_free (path);
+      g_key_file_free (keyfile);
+
+      g_once_init_leave (&apps_dir, tmp);
+    }
+
+  return apps_dir;
+}
+
+const char *
+eos_get_secondary_storage (void)
+{
+  static char *apps_dir;
+
+  if (g_once_init_enter (&apps_dir))
+    {
+      char *tmp;
+
+      GKeyFile *keyfile = g_key_file_new ();
+      char *path = g_build_filename (SYSCONFDIR, "eos-app-manager", "eam-default.cfg", NULL);
+      GError *error = NULL;
+      g_key_file_load_from_file (keyfile, path, G_KEY_FILE_NONE, &error);
+      if (error == NULL)
+        tmp = g_key_file_get_string (keyfile, "Directories", "SecondaryStorage", &error);
+
+      if (error != NULL)
+        {
+          eos_app_log_error_message ("Unable to load configuration: %s",
+                                     error->message);
+          g_error_free (error);
+          tmp = g_strdup (APP_DIR_DEFAULT);
+        }
+
+      eos_app_log_info_message ("Secondary storage dir: %s", tmp);
 
       g_free (path);
       g_key_file_free (keyfile);
@@ -231,7 +301,7 @@ eos_use_delta_updates (void)
       GError *error = NULL;
       g_key_file_load_from_file (keyfile, path, G_KEY_FILE_NONE, &error);
       if (error == NULL)
-        val = g_key_file_get_boolean (keyfile, "eam", "deltaupdates", &error);
+        val = g_key_file_get_boolean (keyfile, "Repository", "EnableDeltaUpdates", &error);
 
       if (error != NULL)
         {
@@ -268,7 +338,7 @@ eos_get_app_server_url (void)
       GError *error = NULL;
       g_key_file_load_from_file (keyfile, path, G_KEY_FILE_NONE, &error);
       if (error == NULL)
-        tmp = g_key_file_get_string (keyfile, "eam", "serveraddress", &error);
+        tmp = g_key_file_get_string (keyfile, "Repository", "ServerUrl", &error);
 
       if (error != NULL)
         {
@@ -284,6 +354,38 @@ eos_get_app_server_url (void)
     }
 
   return server_url;
+}
+
+static const char *
+eos_get_app_server_api (void)
+{
+  static char *server_api;
+
+  if (g_once_init_enter (&server_api))
+    {
+      char *tmp;
+
+      GKeyFile *keyfile = g_key_file_new ();
+      char *path = g_build_filename (SYSCONFDIR, "eos-app-manager", "eam-default.cfg", NULL);
+      GError *error = NULL;
+      g_key_file_load_from_file (keyfile, path, G_KEY_FILE_NONE, &error);
+      if (error == NULL)
+        tmp = g_key_file_get_string (keyfile, "Repository", "ApiVersion", &error);
+
+      if (error != NULL)
+        {
+          eos_app_log_error_message ("Unable to load configuration: %s",
+                                     error->message);
+          g_error_free (error);
+          tmp = g_strdup ("v1");
+        }
+
+      eos_app_log_info_message ("Server API version: %s", tmp);
+
+      g_once_init_leave (&server_api, tmp);
+    }
+
+  return server_api;
 }
 
 /*
@@ -750,7 +852,9 @@ char *
 eos_get_all_updates_uri (void)
 {
   return g_strconcat (eos_get_app_server_url (),
-                      "/api/v1/updates/",
+                      "/api/",
+                      eos_get_app_server_api (),
+                      "/updates/",
                       get_os_version (),
                       "?arch=", get_os_arch (),
                       "&personality=", get_os_personality (),

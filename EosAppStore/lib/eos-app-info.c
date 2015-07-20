@@ -601,14 +601,17 @@ get_screenshots (JsonArray *array,
 }
 
 static guint64
-get_fs_available_space (void)
+get_fs_available_space (const char *dir)
 {
   GFile *current_directory = NULL;
   GFileInfo *filesystem_info = NULL;
   GError *error = NULL;
 
   /* Whatever FS we're on, check the space */
-  current_directory = g_file_new_for_path (".");
+  if (dir == NULL)
+    dir = ".";
+
+  current_directory = g_file_new_for_path (dir);
 
   filesystem_info = g_file_query_filesystem_info (current_directory,
                                                   G_FILE_ATTRIBUTE_FILESYSTEM_FREE,
@@ -638,7 +641,8 @@ get_fs_available_space (void)
 }
 
 gboolean
-eos_app_info_get_has_sufficient_install_space (const EosAppInfo *info)
+eos_app_info_get_has_sufficient_install_space (const EosAppInfo *info,
+                                               const char       *dir)
 {
   guint64 installed_size = 0;
 
@@ -648,7 +652,23 @@ eos_app_info_get_has_sufficient_install_space (const EosAppInfo *info)
                              eos_app_info_get_desktop_id (info),
                              installed_size);
 
-  if (installed_size <= get_fs_available_space ())
+  if (installed_size <= get_fs_available_space (dir))
+    return TRUE;
+
+  return FALSE;
+}
+
+gboolean
+eos_app_info_check_install_space (const EosAppInfo *info)
+{
+  const char *storage;
+
+  storage = eos_get_primary_storage ();
+  if (eos_app_info_get_has_sufficient_install_space (info, storage))
+    return TRUE;
+
+  storage = eos_get_secondary_storage ();
+  if (eos_app_info_get_has_sufficient_install_space (info, storage))
     return TRUE;
 
   return FALSE;
