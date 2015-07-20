@@ -1173,8 +1173,25 @@ get_bundle_artifacts (EosAppListModel *self,
 
   eos_app_log_info_message ("Completing transaction with eam");
 
+  const char *storage_type = NULL;
+
+  if (eos_app_info_get_has_sufficient_install_space (info,  eos_get_primary_storage ()))
+    storage_type = "primary";
+  else if (eos_app_info_get_has_sufficient_install_space (info, eos_get_secondary_storage ()))
+    storage_type = "secondary";
+  else
+    {
+      eos_app_log_error_message ("Unable to determine where the bundle should be installed");
+
+      g_set_error_literal (&error, EOS_APP_LIST_MODEL_ERROR,
+                           EOS_APP_LIST_MODEL_ERROR_DISK_FULL,
+                           _("No space available for installing the app"));
+      goto out;
+    }
+
   GVariantBuilder opts;
   g_variant_builder_init (&opts, G_VARIANT_TYPE ("a{sv}"));
+  g_variant_builder_add (&opts, "{sv}", "StorageType", g_variant_new_string (storage_type));
   g_variant_builder_add (&opts, "{sv}", "BundlePath", g_variant_new_string (bundle_path));
   g_variant_builder_add (&opts, "{sv}", "SignaturePath", g_variant_new_string (signature_path));
   g_variant_builder_add (&opts, "{sv}", "ChecksumPath", g_variant_new_string (sha256_path));

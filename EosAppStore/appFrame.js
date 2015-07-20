@@ -369,7 +369,7 @@ const AppListBoxRow = new Lang.Class({
                     this._installButton.set_sensitive(false);
                     this._installButton.set_tooltip_text(BUTTON_TOOLTIP_NO_NETWORK);
                 }
-                else if (!this.appInfo.get_has_sufficient_install_space()) {
+                else if (!this.appInfo.check_install_space()) {
                     this._installButton.set_sensitive(false);
                     this._installButton.set_tooltip_text(BUTTON_TOOLTIP_NO_SPACE);
                 }
