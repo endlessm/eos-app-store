@@ -1175,7 +1175,8 @@ get_bundle_artifacts (EosAppListModel *self,
 
   const char *storage_type = NULL;
 
-  if (eos_app_info_get_has_sufficient_install_space (info, eos_get_secondary_storage ()))
+  if (eos_has_secondary_storage () &&
+      eos_app_info_get_has_sufficient_install_space (info, eos_get_secondary_storage ()))
     storage_type = "secondary";
   else if (eos_app_info_get_has_sufficient_install_space (info,  eos_get_primary_storage ()))
     storage_type = "primary";
