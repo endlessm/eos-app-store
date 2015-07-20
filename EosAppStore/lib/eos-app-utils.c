@@ -216,6 +216,76 @@ eos_get_bundles_dir (void)
   return apps_dir;
 }
 
+const char *
+eos_get_primary_storage (void)
+{
+  static char *apps_dir;
+
+  if (g_once_init_enter (&apps_dir))
+    {
+      char *tmp;
+
+      GKeyFile *keyfile = g_key_file_new ();
+      char *path = g_build_filename (SYSCONFDIR, "eos-app-manager", "eam-default.cfg", NULL);
+      GError *error = NULL;
+      g_key_file_load_from_file (keyfile, path, G_KEY_FILE_NONE, &error);
+      if (error == NULL)
+        tmp = g_key_file_get_string (keyfile, "Directories", "PrimaryStorage", &error);
+
+      if (error != NULL)
+        {
+          eos_app_log_error_message ("Unable to load configuration: %s",
+                                     error->message);
+          g_error_free (error);
+          tmp = g_strdup (APP_DIR_DEFAULT);
+        }
+
+      eos_app_log_info_message ("Primary storage dir: %s", tmp);
+
+      g_free (path);
+      g_key_file_free (keyfile);
+
+      g_once_init_leave (&apps_dir, tmp);
+    }
+
+  return apps_dir;
+}
+
+const char *
+eos_get_secondary_storage (void)
+{
+  static char *apps_dir;
+
+  if (g_once_init_enter (&apps_dir))
+    {
+      char *tmp;
+
+      GKeyFile *keyfile = g_key_file_new ();
+      char *path = g_build_filename (SYSCONFDIR, "eos-app-manager", "eam-default.cfg", NULL);
+      GError *error = NULL;
+      g_key_file_load_from_file (keyfile, path, G_KEY_FILE_NONE, &error);
+      if (error == NULL)
+        tmp = g_key_file_get_string (keyfile, "Directories", "SecondaryStorage", &error);
+
+      if (error != NULL)
+        {
+          eos_app_log_error_message ("Unable to load configuration: %s",
+                                     error->message);
+          g_error_free (error);
+          tmp = g_strdup (APP_DIR_DEFAULT);
+        }
+
+      eos_app_log_info_message ("Secondary storage dir: %s", tmp);
+
+      g_free (path);
+      g_key_file_free (keyfile);
+
+      g_once_init_leave (&apps_dir, tmp);
+    }
+
+  return apps_dir;
+}
+
 gboolean
 eos_use_delta_updates (void)
 {
