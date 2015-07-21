@@ -1443,24 +1443,24 @@ update_app_from_manager (EosAppListModel *self,
 {
   GError *error = NULL;
   gboolean retval = FALSE;
-  gboolean use_deltas = eos_use_delta_updates ();
+  gboolean allow_deltas = eos_use_delta_updates ();
   const char *desktop_id = eos_app_info_get_desktop_id (info);
 
-  eos_app_log_info_message ("Attempting to update '%s' (using deltas: %s)",
-                            desktop_id, use_deltas ? "true" : "false");
+  eos_app_log_info_message ("Attempting to update '%s' (deltas allowed: %s)",
+                            desktop_id, allow_deltas ? "true" : "false");
 
   retval = install_latest_app_version (self,
                                        info,
                                        TRUE, /* Is update? */
-                                       use_deltas,
+                                       allow_deltas,
                                        cancellable,
                                        &error);
 
   /* Incremental update failed */
   if (!retval)
     {
-      eos_app_log_info_message ("Update of '%s' (using deltas: %s) failed: %s",
-                                desktop_id, use_deltas ? "true" : "false",
+      eos_app_log_info_message ("Update of '%s' (deltas allowed: %s) failed: %s",
+                                desktop_id, allow_deltas ? "true" : "false",
                                 error->message);
       g_propagate_error (error_out, error);
       return FALSE;
