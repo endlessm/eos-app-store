@@ -229,10 +229,13 @@ eos_has_secondary_storage (void)
   if (stat (secondary_storage, &secondary_statbuf) < 0)
     return FALSE;
 
-  /* The primary storage path does not exist */
+  /* If the primary storage path does not exist, we're screwed.
+   * Throw an assertion instead of continuing in a corrupted
+   * state.
+   */
   struct stat primary_statbuf;
   if (stat (primary_storage, &primary_statbuf) < 0)
-    return TRUE;
+    g_assert_not_reached ();
 
   /* We have a valid secondary storage if it's on a different
    * device than the primary.
