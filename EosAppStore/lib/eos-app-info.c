@@ -747,10 +747,6 @@ eos_app_info_installed_changed (EosAppInfo *info)
 
   check_info_storage (info);
 
-  /* Data coming from the keyfile takes precedence */
-  if (g_key_file_has_key (keyfile, GROUP, FILE_KEYS[SECONDARY_STORAGE], NULL))
-    info->installed_on_secondary_storage = g_key_file_get_boolean (keyfile, GROUP, FILE_KEYS[SECONDARY_STORAGE], NULL);
-
   retval = TRUE;
   g_object_notify_by_pspec (G_OBJECT (info), properties[PROP_STATE]);
 
