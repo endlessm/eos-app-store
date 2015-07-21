@@ -15,8 +15,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: eos-app-store\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-07-07 01:23+0000\n"
-"PO-Revision-Date: 2015-06-30 01:22+0000\n"
+"POT-Creation-Date: 2015-07-14 01:22+0000\n"
+"PO-Revision-Date: 2015-07-14 01:22+0000\n"
 "Last-Translator: endlessmobile_build <philip@endlessm.com>\n"
 "Language-Team: Portuguese (Brazil) (http://www.transifex.com/p/eos-app-store/language/pt_BR/)\n"
 "MIME-Version: 1.0\n"
@@ -29,11 +29,11 @@ msgstr ""
 msgid "Create your own folder to organize your apps. First, choose an icon."
 msgstr "Crie a sua própria pasta para organizar seus programas. Primeiro, escolha um ícone."
 
-#: ../data/eos-app-store-list-row.ui.h:1 ../EosAppStore/appFrame.js:329
+#: ../data/eos-app-store-list-row.ui.h:1 ../EosAppStore/appFrame.js:336
 msgid "Install app"
 msgstr "Instalar programa"
 
-#: ../data/eos-app-store-list-row.ui.h:2 ../EosAppStore/appFrame.js:560
+#: ../data/eos-app-store-list-row.ui.h:2 ../EosAppStore/appFrame.js:572
 msgid "Cancel"
 msgstr "Cancelar"
 
@@ -53,97 +53,97 @@ msgstr "Apagar do dispositivo"
 msgid "e.g.: http://www.globoesporte.com"
 msgstr "ex.: http://www.globoesporte.com"
 
-#: ../EosAppStore/appFrame.js:189 ../EosAppStore/appFrame.js:474
-msgid "Downloading…"
-msgstr "Baixando... "
-
-#: ../EosAppStore/appFrame.js:195 ../EosAppStore/appFrame.js:507
+#: ../EosAppStore/appFrame.js:185 ../EosAppStore/appFrame.js:519
 msgid "Installing…"
 msgstr "Instalando…"
 
-#: ../EosAppStore/appFrame.js:330
+#: ../EosAppStore/appFrame.js:197 ../EosAppStore/appFrame.js:486
+msgid "Downloading…"
+msgstr "Baixando... "
+
+#: ../EosAppStore/appFrame.js:337
 msgid "Update app"
 msgstr "Atualizar programa"
 
-#: ../EosAppStore/appFrame.js:331
+#: ../EosAppStore/appFrame.js:338
 msgid "Open app"
 msgstr "Abrir programa"
 
-#: ../EosAppStore/appFrame.js:332
+#: ../EosAppStore/appFrame.js:339
 msgid "Add to the desktop"
 msgstr "Adicionar à área de trabalho"
 
-#: ../EosAppStore/appFrame.js:333
+#: ../EosAppStore/appFrame.js:340
 msgid "No network connection is available"
 msgstr "Nenhuma conexão de rede disponível"
 
-#: ../EosAppStore/appFrame.js:334
+#: ../EosAppStore/appFrame.js:341
 msgid "Insufficient space to install the app"
 msgstr "Espaço insuficiente para instalar o programa"
 
-#: ../EosAppStore/appFrame.js:450
+#: ../EosAppStore/appFrame.js:458
 #, javascript-format
 msgid "We could not install '%s'"
 msgstr "Não foi possível instalar '%s'"
 
-#: ../EosAppStore/appFrame.js:455
+#: ../EosAppStore/appFrame.js:463
 #, javascript-format
 msgid "'%s' was installed successfully"
 msgstr "'%s' instalado com sucesso"
 
-#: ../EosAppStore/appFrame.js:479
+#: ../EosAppStore/appFrame.js:491
 msgid "Updating…"
 msgstr "Atualizando…"
 
-#: ../EosAppStore/appFrame.js:485
+#: ../EosAppStore/appFrame.js:497
 #, javascript-format
 msgid "We could not update '%s'"
 msgstr "Não foi possível atualizar '%s'"
 
-#: ../EosAppStore/appFrame.js:488
+#: ../EosAppStore/appFrame.js:500
 #, javascript-format
 msgid "'%s' was updated successfully"
 msgstr "'%s' foi atualizado com sucesso"
 
-#: ../EosAppStore/appFrame.js:556
+#: ../EosAppStore/appFrame.js:568
 msgid "Deleting app"
 msgstr "Excluindo programa"
 
-#: ../EosAppStore/appFrame.js:557
+#: ../EosAppStore/appFrame.js:569
 msgid ""
 "Deleting this app will remove it from the device for all users. You will "
 "need to download it from the internet in order to reinstall it."
 msgstr "Ao excluir este programa você o removerá de todas as contas de usuário desse computador. Caso queira reinstalar será necessário baixar pela internet."
 
-#: ../EosAppStore/appFrame.js:558
+#: ../EosAppStore/appFrame.js:570
 msgid "Delete app"
 msgstr "Excluir programa "
 
-#: ../EosAppStore/appFrame.js:568
+#: ../EosAppStore/appFrame.js:580
 msgid "Removing…"
 msgstr "Removendo…"
 
-#: ../EosAppStore/appFrame.js:574
+#: ../EosAppStore/appFrame.js:586
 #, javascript-format
 msgid "We could not remove '%s'"
 msgstr "Não foi possível excluir '%s'"
 
-#: ../EosAppStore/appFrame.js:577
+#: ../EosAppStore/appFrame.js:589
 #, javascript-format
 msgid "'%s' was removed successfully"
 msgstr " '%s' foi excluído com sucesso"
 
-#: ../EosAppStore/appFrame.js:621 ../EosAppStore/appFrame.js:834
+#: ../EosAppStore/appFrame.js:633 ../EosAppStore/appFrame.js:849
 msgid "Dismiss"
 msgstr "Descartar"
 
-#: ../EosAppStore/appFrame.js:804
+#: ../EosAppStore/appFrame.js:816
 msgid "Install apps"
 msgstr "Instalar programas"
 
-#: ../EosAppStore/appFrame.js:832
-msgid "Update failed"
-msgstr "A atualização falhou"
+#: ../EosAppStore/appFrame.js:847
+msgid "Refresh failed"
+msgstr ""
 
 #: ../EosAppStore/appStoreWindow.js:229
 msgid "Websites"
@@ -240,87 +240,91 @@ msgstr "Adicione seus sites favoritos à sua área de trabalho ou escolha entre 
 msgid "Install websites"
 msgstr "Adicionar atalhos para sites"
 
-#: ../EosAppStore/lib/eos-app-list-model.c:516
+#: ../EosAppStore/lib/eos-app-list-model.c:519
 msgid ""
 "The app store has detected a fatal error and cannot continue with the "
 "installation. Please, restart your system. If the problem persists, please "
 "contact support."
 msgstr "Mais programas detectou um erro fatal e não pode continuar. Por favor, reinicie o sistema. Se o problema persistir, por favor entre em contato com o suporte."
 
-#: ../EosAppStore/lib/eos-app-list-model.c:679
+#: ../EosAppStore/lib/eos-app-list-model.c:638
+msgid "We are unable to load the complete list of applications"
+msgstr ""
+
+#: ../EosAppStore/lib/eos-app-list-model.c:646
 msgid "We were unable to update the list of applications"
 msgstr "Não foi possível atualizar a lista de aplicativos"
 
-#: ../EosAppStore/lib/eos-app-list-model.c:948
+#: ../EosAppStore/lib/eos-app-list-model.c:997
 #, c-format
 msgid "No verification available for app '%s'"
 msgstr "Nenhuma verificação disponível para o programa '%s'"
 
-#: ../EosAppStore/lib/eos-app-list-model.c:986
+#: ../EosAppStore/lib/eos-app-list-model.c:1035
 #, c-format
 msgid "No signature available for app '%s'"
 msgstr "Nenhuma assinatura disponível para o programa '%s'"
 
-#: ../EosAppStore/lib/eos-app-list-model.c:1033
+#: ../EosAppStore/lib/eos-app-list-model.c:1082
 #, c-format
 msgid "Application bundle '%s' could not be downloaded"
 msgstr "Não foi possível baixar o pacote de programas '%s'"
 
-#: ../EosAppStore/lib/eos-app-list-model.c:1183
+#: ../EosAppStore/lib/eos-app-list-model.c:1238
 #, c-format
 msgid "Application '%s' could not be installed"
 msgstr "Programa '%s' não pôde ser instalado "
 
-#: ../EosAppStore/lib/eos-app-list-model.c:1190
+#: ../EosAppStore/lib/eos-app-list-model.c:1245
 #, c-format
 msgid "Application '%s' could not be installed. %s"
 msgstr "O programa '%s' não pôde ser instalado.  %s"
 
-#: ../EosAppStore/lib/eos-app-list-model.c:1215
+#: ../EosAppStore/lib/eos-app-list-model.c:1270
 #, c-format
 msgid "Application '%s' could not be removed"
 msgstr "Programa '%s' não pôde ser removido"
 
-#: ../EosAppStore/lib/eos-app-list-model.c:1222
+#: ../EosAppStore/lib/eos-app-list-model.c:1277
 #, c-format
 msgid "Application '%s' could not be removed. %s"
 msgstr "O programa '%s' não pode ser desentalado. %s "
 
-#: ../EosAppStore/lib/eos-app-list-model.c:1246
-#: ../EosAppStore/lib/eos-app-list-model.c:1295
+#: ../EosAppStore/lib/eos-app-list-model.c:1301
+#: ../EosAppStore/lib/eos-app-list-model.c:1349
 msgid "You must be an administrator to install applications"
 msgstr "Você deve ser um administrador para instalar programas"
 
-#: ../EosAppStore/lib/eos-app-list-model.c:1258
-#: ../EosAppStore/lib/eos-app-list-model.c:1453
+#: ../EosAppStore/lib/eos-app-list-model.c:1313
+#: ../EosAppStore/lib/eos-app-list-model.c:1508
 msgid ""
 "The app store has detected a fatal error and cannot continue. Please, "
 "restart your system. If the problem persists, please contact support."
 msgstr "Mais programas detectou um erro fatal e não pode continuar. Por favor, reinicie o sistema. Se o problema persistir, por favor entre em contato com o suporte."
 
-#: ../EosAppStore/lib/eos-app-list-model.c:1441
-#: ../EosAppStore/lib/eos-app-list-model.c:1471
+#: ../EosAppStore/lib/eos-app-list-model.c:1496
+#: ../EosAppStore/lib/eos-app-list-model.c:1526
 msgid "You must be an administrator to remove applications"
 msgstr "Você deve ser um administrador para remover programas"
 
-#: ../EosAppStore/lib/eos-app-list-model.c:1604
-#: ../EosAppStore/lib/eos-app-list-model.c:1672
+#: ../EosAppStore/lib/eos-app-list-model.c:1659
+#: ../EosAppStore/lib/eos-app-list-model.c:1727
 #, c-format
 msgid "App %s not installable"
 msgstr "Não é possível instalar o programa %s "
 
-#: ../EosAppStore/lib/eos-app-list-model.c:1616
+#: ../EosAppStore/lib/eos-app-list-model.c:1671
 #, c-format
 msgid "App %s already installed"
 msgstr "O programa %s já está instalado"
 
-#: ../EosAppStore/lib/eos-app-list-model.c:1683
+#: ../EosAppStore/lib/eos-app-list-model.c:1738
 #, c-format
 msgid "App %s is up to date"
 msgstr "O programa %s está atualizado"
 
-#: ../EosAppStore/lib/eos-app-list-model.c:1754
-#: ../EosAppStore/lib/eos-app-list-model.c:1786
+#: ../EosAppStore/lib/eos-app-list-model.c:1809
+#: ../EosAppStore/lib/eos-app-list-model.c:1841
 #, c-format
 msgid "App %s is not installed"
 msgstr " O programa %s não está instalado"
@@ -346,27 +350,27 @@ msgstr "O arquivo de atualização não contem um atributo monotonic_id válido.
 msgid "Not enough space on device for downloading app"
 msgstr "O dispositivo não tem espaço suficiente para baixar o programa"
 
-#: ../EosAppStore/lib/eos-net-utils.c:269
+#: ../EosAppStore/lib/eos-net-utils.c:270
 msgid "The certificate of the target server is expired"
 msgstr ""
 
-#: ../EosAppStore/lib/eos-net-utils.c:271
+#: ../EosAppStore/lib/eos-net-utils.c:272
 msgid "The certificate of the target server has been revoked"
 msgstr ""
 
-#: ../EosAppStore/lib/eos-net-utils.c:273
+#: ../EosAppStore/lib/eos-net-utils.c:274
 msgid "The certificate of the target server has a bad identity"
 msgstr ""
 
-#: ../EosAppStore/lib/eos-net-utils.c:275
+#: ../EosAppStore/lib/eos-net-utils.c:276
 msgid "The certificate of the target server is from an unknown authority"
 msgstr ""
 
-#: ../EosAppStore/lib/eos-net-utils.c:277
+#: ../EosAppStore/lib/eos-net-utils.c:278
 msgid "The certificate of the target server is bad or invalid"
 msgstr ""
 
-#: ../EosAppStore/lib/eos-net-utils.c:334
+#: ../EosAppStore/lib/eos-net-utils.c:335
 #, c-format
 msgid "Could not save bundle file - canceling download (%s)"
 msgstr ""
