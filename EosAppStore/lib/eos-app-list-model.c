@@ -1115,7 +1115,8 @@ static gboolean
 get_bundle_artifacts (EosAppListModel *self,
                       EosAppInfo *info,
                       char *transaction_path,
-                      gboolean use_delta,
+                      gboolean is_upgrade,
+                      gboolean allow_deltas,
                       GCancellable *cancellable,
                       GError **error_out)
 {
@@ -1125,6 +1126,9 @@ get_bundle_artifacts (EosAppListModel *self,
   char *bundle_path = NULL;
   char *signature_path = NULL;
   char *sha256_path = NULL;
+
+  gboolean use_delta = allow_deltas && is_upgrade &&
+    eos_app_info_get_has_delta_update (info);
 
   eos_app_log_info_message ("Accessing dbus transaction");
 
@@ -1383,10 +1387,7 @@ install_latest_app_version (EosAppListModel *self,
 
   eos_app_log_info_message ("Got transaction path: %s", transaction_path);
 
-  gboolean use_delta = allow_deltas && is_upgrade &&
-    eos_app_info_get_has_delta_update (info);
-
-  retval = get_bundle_artifacts (self, info, transaction_path, use_delta,
+  retval = get_bundle_artifacts (self, info, transaction_path, is_upgrade, allow_deltas,
                                  cancellable, &error);
 
   if (error != NULL)
