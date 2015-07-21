@@ -285,13 +285,19 @@ eos_app_list_model_get_app_info (EosAppListModel *model,
 }
 
 static void
-on_app_monitor_changed (GAppInfoMonitor *monitor,
-                        EosAppListModel *self)
+eos_app_list_model_refresh_installed (EosAppListModel *self)
 {
   eos_app_load_gio_apps (self->apps);
   eos_app_load_installed_apps (self->apps, NULL);
 
   eos_app_list_model_emit_changed (self);
+}
+
+static void
+on_app_monitor_changed (GAppInfoMonitor *monitor,
+                        EosAppListModel *self)
+{
+  eos_app_list_model_refresh_installed (self);
 }
 
 static void
