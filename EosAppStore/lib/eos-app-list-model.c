@@ -1179,12 +1179,32 @@ get_bundle_artifacts (EosAppListModel *self,
 
   const char *storage_type = NULL;
 
-  if (eos_has_secondary_storage () &&
-      eos_app_info_get_has_sufficient_install_space (info, eos_get_secondary_storage ()))
-    storage_type = "secondary";
-  else if (eos_app_info_get_has_sufficient_install_space (info,  eos_get_primary_storage ()))
-    storage_type = "primary";
+  if (is_upgrade)
+    {
+      /* Update to the location where the app currently is, as if the system
+       * does not have secondary storage, eos_app_info_is_on_secondary_storage() will
+       * return FALSE.
+       * In case we don't have enough space on that location, the app
+       * manager will return a failure.
+       * In the future we probably want to be smarter and move things around
+       * when an update is requested and free space is found on at least
+       * one storage.
+       */
+      if (eos_app_info_is_on_secondary_storage (info))
+        storage_type = "secondary";
+      else
+        storage_type = "primary";
+    }
   else
+    {
+      if (eos_has_secondary_storage () &&
+          eos_app_info_get_has_sufficient_install_space (info, eos_get_secondary_storage ()))
+        storage_type = "secondary";
+      else if (eos_app_info_get_has_sufficient_install_space (info,  eos_get_primary_storage ()))
+        storage_type = "primary";
+    }
+
+  if (storage_type == NULL)
     {
       eos_app_log_error_message ("Unable to determine where the bundle should be installed");
 
