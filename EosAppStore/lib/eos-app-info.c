@@ -687,19 +687,12 @@ static const char *known_mount_points[] = {
 /*< private >
  * check_info_storage:
  * @info: the #EosAppInfo to update
- * @filename: the full path to the bundle info file
  *
  * Updates file system related fields of @info.
  */
 static void
 check_info_storage (EosAppInfo *info)
 {
-  /* we check if the file resides on a volume mounted using overlayfs.
-   * this is a bit more convoluted; in theory, we could check if the
-   * directory in which @filename is located has the overlayfs magic
-   * bit, but that bit is not exposed by the kernel headers, so we would
-   * have to do assume that the overlayfs magic bit never changes.
-   */
   struct stat statbuf;
   if (stat (info->info_filename, &statbuf) < 0)
     return;
@@ -709,22 +702,22 @@ check_info_storage (EosAppInfo *info)
    */
   info->installation_time = statbuf.st_ctim.tv_sec;
 
-  dev_t file_stdev = statbuf.st_dev;
-
-  /* and we compare them with the same fields of a list of known
-   * mount points
+  /* We check if the file resides on a list of location that correspond
+   * to where the extra SD card storage could be mounted.
    */
+  GFile *app_info_file = g_file_new_for_path (info->info_filename);
+
   for (int i = 0; i < G_N_ELEMENTS (known_mount_points); i++)
    {
-      if (stat (known_mount_points[i], &statbuf) < 0)
-        break;
+     GFile *mount_point = g_file_new_for_path (known_mount_points[i]);
+     info->installed_on_secondary_storage = g_file_has_prefix (app_info_file, mount_point);
+     g_object_unref (mount_point);
 
-      if (file_stdev == statbuf.st_dev)
-        {
-          info->installed_on_secondary_storage = TRUE;
-          break;
-        }
+     if (info->installed_on_secondary_storage)
+       break;
     }
+
+  g_object_unref (app_info_file);
 }
 
 /*< private >*/
