@@ -145,7 +145,7 @@ msgstr ""
 msgid "Folders"
 msgstr ""
 
-#. Translators: use the same string used to install the app store content JSON
+#. Translators: use the same string used to install the app center content JSON
 #: ../EosAppStore/categories.js:12 ../EosAppStore/lib/eos-app-utils.c:1564
 msgid "Education"
 msgstr ""
@@ -187,7 +187,7 @@ msgid "Local"
 msgstr ""
 
 #: ../EosAppStore/environment.js:22
-msgid "App Store"
+msgid "App Center"
 msgstr ""
 
 #: ../EosAppStore/folderFrame.js:41
@@ -234,7 +234,7 @@ msgstr ""
 
 #: ../EosAppStore/lib/eos-app-list-model.c:519
 msgid ""
-"The app store has detected a fatal error and cannot continue with the "
+"The app center has detected a fatal error and cannot continue with the "
 "installation. Please, restart your system. If the problem persists, please "
 "contact support."
 msgstr ""
@@ -294,7 +294,7 @@ msgstr ""
 #: ../EosAppStore/lib/eos-app-list-model.c:1332
 #: ../EosAppStore/lib/eos-app-list-model.c:1527
 msgid ""
-"The app store has detected a fatal error and cannot continue. Please, "
+"The app center has detected a fatal error and cannot continue. Please, "
 "restart your system. If the problem persists, please contact support."
 msgstr ""
 

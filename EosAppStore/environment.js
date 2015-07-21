@@ -19,7 +19,7 @@ function init() {
     window.ngettext = Gettext.ngettext;
 
     GLib.set_prgname('eos-app-store');
-    GLib.set_application_name(_("App Store"));
+    GLib.set_application_name(_("App Center"));
 
     GObject.type_ensure(EosAppStorePrivate.VerticalStackSwitcher);
 

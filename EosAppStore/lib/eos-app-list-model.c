@@ -516,7 +516,7 @@ load_user_capabilities (EosAppListModel *self,
     {
       g_set_error_literal (error_out, EOS_APP_LIST_MODEL_ERROR,
                            EOS_APP_LIST_MODEL_ERROR_FAILED,
-                           _("The app store has detected a fatal error and "
+                           _("The app center has detected a fatal error and "
                              "cannot continue with the installation. Please, "
                              "restart your system. If the problem persists, "
                              "please contact support."));
@@ -1329,7 +1329,7 @@ install_latest_app_version (EosAppListModel *self,
   if (proxy == NULL ||
       !g_file_test (eos_get_bundles_dir (), G_FILE_TEST_EXISTS))
     {
-      external_message = _("The app store has detected a fatal error and "
+      external_message = _("The app center has detected a fatal error and "
                            "cannot continue. Please, "
                            "restart your system. If the problem persists, "
                            "please contact support.");
@@ -1524,7 +1524,7 @@ remove_app_from_manager (EosAppListModel *self,
   if (proxy == NULL ||
       !g_file_test (eos_get_bundles_dir (), G_FILE_TEST_EXISTS))
     {
-      external_message = _("The app store has detected a fatal error and "
+      external_message = _("The app center has detected a fatal error and "
                            "cannot continue. Please, "
                            "restart your system. If the problem persists, "
                            "please contact support.");
