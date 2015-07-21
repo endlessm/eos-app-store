@@ -677,13 +677,6 @@ eos_app_info_check_install_space (const EosAppInfo *info)
   return FALSE;
 }
 
-/* Keep this list updated with the locations we use for
- * installing app bundles
- */
-static const char *known_mount_points[] = {
-  "/var/endless-extra",
-};
-
 /*< private >
  * check_info_storage:
  * @info: the #EosAppInfo to update
@@ -693,6 +686,8 @@ static const char *known_mount_points[] = {
 static void
 check_info_storage (EosAppInfo *info)
 {
+  const char *external_storage_path = "/var/endless-extra";
+
   struct stat statbuf;
   if (stat (info->info_filename, &statbuf) < 0)
     return;
@@ -706,17 +701,11 @@ check_info_storage (EosAppInfo *info)
    * to where the extra SD card storage could be mounted.
    */
   GFile *app_info_file = g_file_new_for_path (info->info_filename);
+  GFile *external_storage = g_file_new_for_path (external_storage_path);
 
-  for (int i = 0; i < G_N_ELEMENTS (known_mount_points); i++)
-   {
-     GFile *mount_point = g_file_new_for_path (known_mount_points[i]);
-     info->installed_on_secondary_storage = g_file_has_prefix (app_info_file, mount_point);
-     g_object_unref (mount_point);
+  info->installed_on_secondary_storage = g_file_has_prefix (app_info_file, external_storage);
 
-     if (info->installed_on_secondary_storage)
-       break;
-    }
-
+  g_object_unref (external_storage);
   g_object_unref (app_info_file);
 }
 
