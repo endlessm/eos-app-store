@@ -284,7 +284,7 @@ on_app_monitor_changed (GAppInfoMonitor *monitor,
                         EosAppListModel *self)
 {
   eos_app_load_gio_apps (self->apps);
-  eos_app_load_installed_apps (self->apps, NULL, NULL);
+  eos_app_load_installed_apps (self->apps, NULL);
 
   eos_app_list_model_emit_changed (self);
 }
@@ -665,11 +665,8 @@ reload_model (EosAppListModel *self,
 
   eos_app_load_gio_apps (self->apps);
 
-  if (!eos_app_load_installed_apps (self->apps, cancellable, &internal_error))
+  if (!eos_app_load_installed_apps (self->apps, cancellable))
     {
-      /* We eat the message */
-      g_error_free (internal_error);
-
       set_reload_error (error, FALSE);
 
       retval = FALSE;

@@ -50,8 +50,7 @@ gboolean    eos_has_secondary_storage (void);
 gboolean eos_use_delta_updates (void);
 
 gboolean eos_app_load_installed_apps      (GHashTable    *app_info,
-                                           GCancellable  *cancellable,
-                                           GError       **error);
+                                           GCancellable  *cancellable);
 
 gboolean eos_app_load_available_apps      (GHashTable    *app_info,
                                            const char    *data,
