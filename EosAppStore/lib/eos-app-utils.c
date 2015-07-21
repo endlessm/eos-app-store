@@ -1938,3 +1938,17 @@ out:
 
   return retval;
 }
+
+char *
+eos_storage_type_to_string (EosStorageType storage)
+{
+  GEnumClass *enum_class = g_type_class_ref (EOS_TYPE_STORAGE_TYPE);
+  GEnumValue *enum_value = g_enum_get_value (enum_class, storage);
+
+  g_assert (enum_value != NULL);
+
+  char *retval = g_strdup (enum_value->value_nick);
+  g_type_class_unref (enum_class);
+
+  return retval;
+}

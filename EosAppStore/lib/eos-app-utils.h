@@ -79,6 +79,8 @@ int eos_compare_versions (const char *a,
 
 EosAppCategory  eos_app_category_from_id (const char *p);
 
+char * eos_storage_type_to_string (EosStorageType storage);
+
 #define EOS_APP_UTILS_ERROR        (eos_app_utils_error_quark ())
 
 GQuark eos_app_utils_error_quark (void);

@@ -1174,34 +1174,21 @@ get_bundle_artifacts (EosAppListModel *self,
 
   eos_app_log_info_message ("Completing transaction with eam");
 
-  const char *storage_type = NULL;
+  EosStorageType storage_type;
 
   if (is_upgrade)
-    {
-      /* Update to the location where the app currently is, as if the system
-       * does not have secondary storage, eos_app_info_is_on_secondary_storage() will
-       * return FALSE.
-       * In case we don't have enough space on that location, the app
-       * manager will return a failure.
-       * In the future we probably want to be smarter and move things around
-       * when an update is requested and free space is found on at least
-       * one storage.
-       */
-      if (eos_app_info_is_on_secondary_storage (info))
-        storage_type = "secondary";
-      else
-        storage_type = "primary";
-    }
+    /* Update to the location where the app currently is.
+     * In case we don't have enough space on that location, the app
+     * manager will return a failure.
+     * In the future we probably want to be smarter and move things around
+     * when an update is requested and free space is found on at least
+     * one storage.
+     */
+    storage_type = eos_app_info_get_storage_type (info);
   else
-    {
-      if (eos_has_secondary_storage () &&
-          eos_app_info_get_has_sufficient_install_space (info, eos_get_secondary_storage ()))
-        storage_type = "secondary";
-      else if (eos_app_info_get_has_sufficient_install_space (info,  eos_get_primary_storage ()))
-        storage_type = "primary";
-    }
+    storage_type = eos_app_info_get_install_storage_type (info);
 
-  if (storage_type == NULL)
+  if (storage_type == EOS_STORAGE_TYPE_UNKNOWN)
     {
       eos_app_log_error_message ("Unable to determine where the bundle should be installed");
 
@@ -1213,7 +1200,7 @@ get_bundle_artifacts (EosAppListModel *self,
 
   GVariantBuilder opts;
   g_variant_builder_init (&opts, G_VARIANT_TYPE ("a{sv}"));
-  g_variant_builder_add (&opts, "{sv}", "StorageType", g_variant_new_string (storage_type));
+  g_variant_builder_add (&opts, "{sv}", "StorageType", g_variant_new_take_string (eos_storage_type_to_string (storage_type)));
   g_variant_builder_add (&opts, "{sv}", "BundlePath", g_variant_new_string (bundle_path));
   g_variant_builder_add (&opts, "{sv}", "SignaturePath", g_variant_new_string (signature_path));
   g_variant_builder_add (&opts, "{sv}", "ChecksumPath", g_variant_new_string (sha256_path));

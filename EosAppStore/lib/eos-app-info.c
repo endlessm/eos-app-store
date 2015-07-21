@@ -186,7 +186,7 @@ eos_app_info_clear_installed_attributes (EosAppInfo *info)
 
   info->installed_size = 0;
   info->installation_time = -1;
-  info->installed_on_secondary_storage = FALSE;
+  info->storage_type = EOS_STORAGE_TYPE_PRIMARY;
 }
 
 static void
@@ -216,6 +216,7 @@ eos_app_info_finalize (GObject *gobject)
 static void
 eos_app_info_init (EosAppInfo *info)
 {
+  info->storage_type = EOS_STORAGE_TYPE_PRIMARY;
   info->shape = EOS_FLEXY_SHAPE_SMALL;
   info->installation_time = -1;
 }
@@ -384,15 +385,6 @@ eos_app_info_is_offline (const EosAppInfo *info)
   return info->is_offline;
 }
 
-gboolean
-eos_app_info_is_on_secondary_storage (const EosAppInfo *info)
-{
-  if (info->is_installed)
-    return info->installed_on_secondary_storage;
-
-  return info->for_secondary_storage;
-}
-
 gint64
 eos_app_info_get_installed_size (const EosAppInfo *info)
 {
@@ -431,7 +423,7 @@ eos_app_info_is_updatable (const EosAppInfo *info)
 gboolean
 eos_app_info_is_removable (const EosAppInfo *info)
 {
-  return !eos_app_info_is_on_secondary_storage (info);
+  return info->storage_type == EOS_STORAGE_TYPE_PRIMARY;
 }
 
 EosAppCategory
@@ -640,7 +632,7 @@ get_fs_available_space (const char *dir)
   return available_space;
 }
 
-gboolean
+static gboolean
 eos_app_info_get_has_sufficient_install_space (const EosAppInfo *info,
                                                const char       *dir)
 {
@@ -661,20 +653,26 @@ eos_app_info_get_has_sufficient_install_space (const EosAppInfo *info,
 gboolean
 eos_app_info_check_install_space (const EosAppInfo *info)
 {
-  const char *storage;
+  return eos_app_info_get_install_storage_type (info) != EOS_STORAGE_TYPE_UNKNOWN;
+}
 
-  if (eos_has_secondary_storage ())
-    {
-      storage = eos_get_secondary_storage ();
-      if (eos_app_info_get_has_sufficient_install_space (info, storage))
-        return TRUE;
-    }
+EosStorageType
+eos_app_info_get_install_storage_type (const EosAppInfo *info)
+{
+  if (eos_has_secondary_storage () &&
+      eos_app_info_get_has_sufficient_install_space (info, eos_get_secondary_storage ()))
+    return EOS_STORAGE_TYPE_SECONDARY;
 
-  storage = eos_get_primary_storage ();
-  if (eos_app_info_get_has_sufficient_install_space (info, storage))
-    return TRUE;
+  if (eos_app_info_get_has_sufficient_install_space (info,  eos_get_primary_storage ()))
+    return EOS_STORAGE_TYPE_PRIMARY;
 
-  return FALSE;
+  return EOS_STORAGE_TYPE_UNKNOWN;
+}
+
+EosStorageType
+eos_app_info_get_storage_type (const EosAppInfo *info)
+{
+  return info->storage_type;
 }
 
 /*< private >
@@ -703,7 +701,10 @@ check_info_storage (EosAppInfo *info)
   GFile *app_info_file = g_file_new_for_path (info->info_filename);
   GFile *external_storage = g_file_new_for_path (external_storage_path);
 
-  info->installed_on_secondary_storage = g_file_has_prefix (app_info_file, external_storage);
+  if (g_file_has_prefix (app_info_file, external_storage))
+    info->storage_type = EOS_STORAGE_TYPE_SECONDARY;
+  else
+    info->storage_type = EOS_STORAGE_TYPE_PRIMARY;
 
   g_object_unref (external_storage);
   g_object_unref (app_info_file);
