@@ -49,11 +49,12 @@ struct _EosAppInfo
 
   EosAppCategory category;
 
+  EosStorageType storage_type;
+
   gint64 installation_time;
 
   guint is_featured : 1;
   guint is_offline : 1;
-  guint installed_on_secondary_storage : 1;
   guint for_secondary_storage : 1;
   guint is_available : 1;
   guint is_installed : 1;

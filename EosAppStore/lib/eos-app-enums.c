@@ -57,3 +57,7 @@ EOS_DEFINE_ENUM_TYPE (EosFlexyShape, eos_flexy_shape,
                       EOS_ENUM_VALUE (EOS_FLEXY_SHAPE_MEDIUM_VERTICAL, medium-vertical)
                       EOS_ENUM_VALUE (EOS_FLEXY_SHAPE_LARGE, large))
 
+EOS_DEFINE_ENUM_TYPE (EosStorageType, eos_storage_type,
+                      EOS_ENUM_VALUE (EOS_STORAGE_TYPE_UNKNOWN, unknown)
+                      EOS_ENUM_VALUE (EOS_STORAGE_TYPE_PRIMARY, primary)
+                      EOS_ENUM_VALUE (EOS_STORAGE_TYPE_SECONDARY, secondary))

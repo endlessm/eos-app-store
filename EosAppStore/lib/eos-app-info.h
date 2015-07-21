@@ -31,7 +31,8 @@ const char *    eos_app_info_get_locale                 (const EosAppInfo *info)
 
 gboolean        eos_app_info_is_featured                (const EosAppInfo *info);
 gboolean        eos_app_info_is_offline                 (const EosAppInfo *info);
-gboolean        eos_app_info_is_on_secondary_storage    (const EosAppInfo *info);
+EosStorageType  eos_app_info_get_storage_type           (const EosAppInfo *info);
+EosStorageType  eos_app_info_get_install_storage_type   (const EosAppInfo *info);
 EosAppCategory  eos_app_info_get_category               (const EosAppInfo *info);
 
 char *          eos_app_info_get_square_img             (const EosAppInfo *info);
@@ -58,8 +59,6 @@ gboolean        eos_app_info_is_removable               (const EosAppInfo *info)
 
 gboolean        eos_app_info_get_has_launcher           (const EosAppInfo *info);
 EosAppState     eos_app_info_get_state                  (const EosAppInfo *info);
-gboolean        eos_app_info_get_has_sufficient_install_space (const EosAppInfo *info,
-                                                               const char       *dir);
 gboolean        eos_app_info_check_install_space        (const EosAppInfo *info);
 
 gint64          eos_app_info_get_installation_time      (const EosAppInfo *info);

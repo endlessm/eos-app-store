@@ -66,6 +66,17 @@ typedef enum
 
 GType eos_flexy_shape_get_type (void) G_GNUC_CONST;
 
+#define EOS_TYPE_STORAGE_TYPE (eos_storage_type_get_type ())
+
+typedef enum
+{
+  EOS_STORAGE_TYPE_UNKNOWN,
+  EOS_STORAGE_TYPE_PRIMARY,
+  EOS_STORAGE_TYPE_SECONDARY
+} EosStorageType;
+
+GType eos_storage_type_get_type (void);
+
 G_END_DECLS
 
 #endif /* __EOS_APP_ENUMS_H__ */

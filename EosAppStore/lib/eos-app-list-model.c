@@ -284,7 +284,7 @@ on_app_monitor_changed (GAppInfoMonitor *monitor,
                         EosAppListModel *self)
 {
   eos_app_load_gio_apps (self->apps);
-  eos_app_load_installed_apps (self->apps, NULL, NULL);
+  eos_app_load_installed_apps (self->apps, NULL);
 
   eos_app_list_model_emit_changed (self);
 }
@@ -665,11 +665,8 @@ reload_model (EosAppListModel *self,
 
   eos_app_load_gio_apps (self->apps);
 
-  if (!eos_app_load_installed_apps (self->apps, cancellable, &internal_error))
+  if (!eos_app_load_installed_apps (self->apps, cancellable))
     {
-      /* We eat the message */
-      g_error_free (internal_error);
-
       set_reload_error (error, FALSE);
 
       retval = FALSE;
@@ -1115,7 +1112,8 @@ static gboolean
 get_bundle_artifacts (EosAppListModel *self,
                       EosAppInfo *info,
                       char *transaction_path,
-                      gboolean use_delta,
+                      gboolean is_upgrade,
+                      gboolean allow_deltas,
                       GCancellable *cancellable,
                       GError **error_out)
 {
@@ -1125,6 +1123,9 @@ get_bundle_artifacts (EosAppListModel *self,
   char *bundle_path = NULL;
   char *signature_path = NULL;
   char *sha256_path = NULL;
+
+  gboolean use_delta = allow_deltas && is_upgrade &&
+    eos_app_info_get_has_delta_update (info);
 
   eos_app_log_info_message ("Accessing dbus transaction");
 
@@ -1173,13 +1174,21 @@ get_bundle_artifacts (EosAppListModel *self,
 
   eos_app_log_info_message ("Completing transaction with eam");
 
-  const char *storage_type = NULL;
+  EosStorageType storage_type;
 
-  if (eos_app_info_get_has_sufficient_install_space (info, eos_get_secondary_storage ()))
-    storage_type = "secondary";
-  else if (eos_app_info_get_has_sufficient_install_space (info,  eos_get_primary_storage ()))
-    storage_type = "primary";
+  if (is_upgrade)
+    /* Update to the location where the app currently is.
+     * In case we don't have enough space on that location, the app
+     * manager will return a failure.
+     * In the future we probably want to be smarter and move things around
+     * when an update is requested and free space is found on at least
+     * one storage.
+     */
+    storage_type = eos_app_info_get_storage_type (info);
   else
+    storage_type = eos_app_info_get_install_storage_type (info);
+
+  if (storage_type == EOS_STORAGE_TYPE_UNKNOWN)
     {
       eos_app_log_error_message ("Unable to determine where the bundle should be installed");
 
@@ -1191,7 +1200,7 @@ get_bundle_artifacts (EosAppListModel *self,
 
   GVariantBuilder opts;
   g_variant_builder_init (&opts, G_VARIANT_TYPE ("a{sv}"));
-  g_variant_builder_add (&opts, "{sv}", "StorageType", g_variant_new_string (storage_type));
+  g_variant_builder_add (&opts, "{sv}", "StorageType", g_variant_new_take_string (eos_storage_type_to_string (storage_type)));
   g_variant_builder_add (&opts, "{sv}", "BundlePath", g_variant_new_string (bundle_path));
   g_variant_builder_add (&opts, "{sv}", "SignaturePath", g_variant_new_string (signature_path));
   g_variant_builder_add (&opts, "{sv}", "ChecksumPath", g_variant_new_string (sha256_path));
@@ -1382,10 +1391,7 @@ install_latest_app_version (EosAppListModel *self,
 
   eos_app_log_info_message ("Got transaction path: %s", transaction_path);
 
-  gboolean use_delta = allow_deltas && is_upgrade &&
-    eos_app_info_get_has_delta_update (info);
-
-  retval = get_bundle_artifacts (self, info, transaction_path, use_delta,
+  retval = get_bundle_artifacts (self, info, transaction_path, is_upgrade, allow_deltas,
                                  cancellable, &error);
 
   if (error != NULL)
@@ -1442,24 +1448,24 @@ update_app_from_manager (EosAppListModel *self,
 {
   GError *error = NULL;
   gboolean retval = FALSE;
-  gboolean use_deltas = eos_use_delta_updates ();
+  gboolean allow_deltas = eos_use_delta_updates ();
   const char *desktop_id = eos_app_info_get_desktop_id (info);
 
-  eos_app_log_info_message ("Attempting to update '%s' (using deltas: %s)",
-                            desktop_id, use_deltas ? "true" : "false");
+  eos_app_log_info_message ("Attempting to update '%s' (deltas allowed: %s)",
+                            desktop_id, allow_deltas ? "true" : "false");
 
   retval = install_latest_app_version (self,
                                        info,
                                        TRUE, /* Is update? */
-                                       use_deltas,
+                                       allow_deltas,
                                        cancellable,
                                        &error);
 
   /* Incremental update failed */
   if (!retval)
     {
-      eos_app_log_info_message ("Update of '%s' (using deltas: %s) failed: %s",
-                                desktop_id, use_deltas ? "true" : "false",
+      eos_app_log_info_message ("Update of '%s' (deltas allowed: %s) failed: %s",
+                                desktop_id, allow_deltas ? "true" : "false",
                                 error->message);
       g_propagate_error (error_out, error);
       return FALSE;

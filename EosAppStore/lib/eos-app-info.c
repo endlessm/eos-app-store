@@ -186,7 +186,7 @@ eos_app_info_clear_installed_attributes (EosAppInfo *info)
 
   info->installed_size = 0;
   info->installation_time = -1;
-  info->installed_on_secondary_storage = FALSE;
+  info->storage_type = EOS_STORAGE_TYPE_PRIMARY;
 }
 
 static void
@@ -216,6 +216,7 @@ eos_app_info_finalize (GObject *gobject)
 static void
 eos_app_info_init (EosAppInfo *info)
 {
+  info->storage_type = EOS_STORAGE_TYPE_PRIMARY;
   info->shape = EOS_FLEXY_SHAPE_SMALL;
   info->installation_time = -1;
 }
@@ -384,15 +385,6 @@ eos_app_info_is_offline (const EosAppInfo *info)
   return info->is_offline;
 }
 
-gboolean
-eos_app_info_is_on_secondary_storage (const EosAppInfo *info)
-{
-  if (info->is_installed)
-    return info->installed_on_secondary_storage;
-
-  return info->for_secondary_storage;
-}
-
 gint64
 eos_app_info_get_installed_size (const EosAppInfo *info)
 {
@@ -431,7 +423,7 @@ eos_app_info_is_updatable (const EosAppInfo *info)
 gboolean
 eos_app_info_is_removable (const EosAppInfo *info)
 {
-  return !eos_app_info_is_on_secondary_storage (info);
+  return info->storage_type == EOS_STORAGE_TYPE_PRIMARY;
 }
 
 EosAppCategory
@@ -640,7 +632,7 @@ get_fs_available_space (const char *dir)
   return available_space;
 }
 
-gboolean
+static gboolean
 eos_app_info_get_has_sufficient_install_space (const EosAppInfo *info,
                                                const char       *dir)
 {
@@ -661,42 +653,39 @@ eos_app_info_get_has_sufficient_install_space (const EosAppInfo *info,
 gboolean
 eos_app_info_check_install_space (const EosAppInfo *info)
 {
-  const char *storage;
-
-  storage = eos_get_secondary_storage ();
-  if (eos_app_info_get_has_sufficient_install_space (info, storage))
-    return TRUE;
-
-  storage = eos_get_primary_storage ();
-  if (eos_app_info_get_has_sufficient_install_space (info, storage))
-    return TRUE;
-
-  return FALSE;
+  return eos_app_info_get_install_storage_type (info) != EOS_STORAGE_TYPE_UNKNOWN;
 }
 
-/* Keep this list updated with the locations we use for
- * installing app bundles
- */
-static const char *known_mount_points[] = {
-  "/var/endless-extra",
-};
+EosStorageType
+eos_app_info_get_install_storage_type (const EosAppInfo *info)
+{
+  if (eos_has_secondary_storage () &&
+      eos_app_info_get_has_sufficient_install_space (info, eos_get_secondary_storage ()))
+    return EOS_STORAGE_TYPE_SECONDARY;
+
+  if (eos_app_info_get_has_sufficient_install_space (info,  eos_get_primary_storage ()))
+    return EOS_STORAGE_TYPE_PRIMARY;
+
+  return EOS_STORAGE_TYPE_UNKNOWN;
+}
+
+EosStorageType
+eos_app_info_get_storage_type (const EosAppInfo *info)
+{
+  return info->storage_type;
+}
 
 /*< private >
  * check_info_storage:
  * @info: the #EosAppInfo to update
- * @filename: the full path to the bundle info file
  *
  * Updates file system related fields of @info.
  */
 static void
 check_info_storage (EosAppInfo *info)
 {
-  /* we check if the file resides on a volume mounted using overlayfs.
-   * this is a bit more convoluted; in theory, we could check if the
-   * directory in which @filename is located has the overlayfs magic
-   * bit, but that bit is not exposed by the kernel headers, so we would
-   * have to do assume that the overlayfs magic bit never changes.
-   */
+  const char *external_storage_path = "/var/endless-extra";
+
   struct stat statbuf;
   if (stat (info->info_filename, &statbuf) < 0)
     return;
@@ -706,22 +695,19 @@ check_info_storage (EosAppInfo *info)
    */
   info->installation_time = statbuf.st_ctim.tv_sec;
 
-  dev_t file_stdev = statbuf.st_dev;
-
-  /* and we compare them with the same fields of a list of known
-   * mount points
+  /* We check if the file resides on a list of location that correspond
+   * to where the extra SD card storage could be mounted.
    */
-  for (int i = 0; i < G_N_ELEMENTS (known_mount_points); i++)
-   {
-      if (stat (known_mount_points[i], &statbuf) < 0)
-        break;
+  GFile *app_info_file = g_file_new_for_path (info->info_filename);
+  GFile *external_storage = g_file_new_for_path (external_storage_path);
 
-      if (file_stdev == statbuf.st_dev)
-        {
-          info->installed_on_secondary_storage = TRUE;
-          break;
-        }
-    }
+  if (g_file_has_prefix (app_info_file, external_storage))
+    info->storage_type = EOS_STORAGE_TYPE_SECONDARY;
+  else
+    info->storage_type = EOS_STORAGE_TYPE_PRIMARY;
+
+  g_object_unref (external_storage);
+  g_object_unref (app_info_file);
 }
 
 /*< private >*/
@@ -750,10 +736,6 @@ eos_app_info_installed_changed (EosAppInfo *info)
   info->installed_size = g_key_file_get_int64 (keyfile, GROUP, FILE_KEYS[INSTALLED_SIZE], NULL);
 
   check_info_storage (info);
-
-  /* Data coming from the keyfile takes precedence */
-  if (g_key_file_has_key (keyfile, GROUP, FILE_KEYS[SECONDARY_STORAGE], NULL))
-    info->installed_on_secondary_storage = g_key_file_get_boolean (keyfile, GROUP, FILE_KEYS[SECONDARY_STORAGE], NULL);
 
   retval = TRUE;
   g_object_notify_by_pspec (G_OBJECT (info), properties[PROP_STATE]);

@@ -216,6 +216,33 @@ eos_get_bundles_dir (void)
   return apps_dir;
 }
 
+gboolean
+eos_has_secondary_storage (void)
+{
+  const char *primary_storage, *secondary_storage;
+
+  primary_storage = eos_get_primary_storage ();
+  secondary_storage = eos_get_secondary_storage ();
+
+  /* The secondary storage path does not exist */
+  struct stat secondary_statbuf;
+  if (stat (secondary_storage, &secondary_statbuf) < 0)
+    return FALSE;
+
+  /* If the primary storage path does not exist, we're screwed.
+   * Throw an assertion instead of continuing in a corrupted
+   * state.
+   */
+  struct stat primary_statbuf;
+  if (stat (primary_storage, &primary_statbuf) < 0)
+    g_assert_not_reached ();
+
+  /* We have a valid secondary storage if it's on a different
+   * device than the primary.
+   */
+  return primary_statbuf.st_dev != secondary_statbuf.st_dev;
+}
+
 const char *
 eos_get_primary_storage (void)
 {
@@ -908,20 +935,17 @@ is_app_id (const char *appid)
   return FALSE;
 }
 
-gboolean
-eos_app_load_installed_apps (GHashTable *app_info,
-                             GCancellable *cancellable,
-                             GError **error)
+static gboolean
+eos_app_load_installed_apps_for_prefix (GHashTable *app_info,
+                                        const char *prefix,
+                                        GCancellable *cancellable)
 {
-  const char *appdir = eos_get_bundles_dir ();
-  eos_app_log_info_message ("Reloading installed apps");
-
-  GError *internal_error = NULL;
-  GDir *dir = g_dir_open (appdir, 0, &internal_error);
+  GError *error = NULL;
+  GDir *dir = g_dir_open (prefix, 0, &error);
   if (dir == NULL)
     {
-      eos_app_log_error_message ("Unable to open '%s': %s", appdir, internal_error->message);
-      g_propagate_error (error, internal_error);
+      eos_app_log_error_message ("Unable to open '%s': %s", prefix, error->message);
+      g_error_free (error);
       return FALSE;
     }
 
@@ -936,11 +960,11 @@ eos_app_load_installed_apps (GHashTable *app_info,
 
       if (!is_app_id (appid))
         {
-          eos_app_log_info_message ("Skipping '%s/%s': not a valid app directory", appdir, appid);
+          eos_app_log_info_message ("Skipping '%s/%s': not a valid app directory", prefix, appid);
           continue;
         }
 
-      char *info_path = g_build_filename (appdir, appid, ".info", NULL);
+      char *info_path = g_build_filename (prefix, appid, ".info", NULL);
       eos_app_log_info_message ("Loading bundle info for '%s' from '%s'...", appid, info_path);
 
       char *desktop_id = g_strconcat (appid, ".desktop", NULL);
@@ -970,11 +994,32 @@ eos_app_load_installed_apps (GHashTable *app_info,
 
   g_dir_close (dir);
 
-  eos_app_log_debug_message ("Bundle loading: %d bundles, %.3f msecs",
+  eos_app_log_debug_message ("Bundle loading from '%s': %d bundles, %.3f msecs",
+                             prefix,
                              n_bundles,
                              (double) (g_get_monotonic_time () - start_time) / 1000);
 
   return TRUE;
+}
+
+gboolean
+eos_app_load_installed_apps (GHashTable *app_info,
+                             GCancellable *cancellable)
+{
+  gboolean retval;
+
+  eos_app_log_info_message ("Reloading installed apps");
+
+  const char *storage = eos_get_primary_storage ();
+  retval = eos_app_load_installed_apps_for_prefix (app_info, storage, cancellable);
+
+  if (eos_has_secondary_storage ())
+    {
+      storage = eos_get_secondary_storage ();
+      retval |= eos_app_load_installed_apps_for_prefix (app_info, storage, cancellable);
+    }
+
+  return retval;
 }
 
 gboolean
@@ -1893,6 +1938,20 @@ out:
 
   g_object_unref (parent);
   g_object_unref (file);
+
+  return retval;
+}
+
+char *
+eos_storage_type_to_string (EosStorageType storage)
+{
+  GEnumClass *enum_class = g_type_class_ref (EOS_TYPE_STORAGE_TYPE);
+  GEnumValue *enum_value = g_enum_get_value (enum_class, storage);
+
+  g_assert (enum_value != NULL);
+
+  char *retval = g_strdup (enum_value->value_nick);
+  g_type_class_unref (enum_class);
 
   return retval;
 }

@@ -45,12 +45,12 @@ void        eos_clear_bundle_download_dir (void);
 const char *eos_get_app_server_url (void);
 const char *eos_get_primary_storage (void);
 const char *eos_get_secondary_storage (void);
+gboolean    eos_has_secondary_storage (void);
 
 gboolean eos_use_delta_updates (void);
 
 gboolean eos_app_load_installed_apps      (GHashTable    *app_info,
-                                           GCancellable  *cancellable,
-                                           GError       **error);
+                                           GCancellable  *cancellable);
 
 gboolean eos_app_load_available_apps      (GHashTable    *app_info,
                                            const char    *data,
@@ -78,6 +78,8 @@ int eos_compare_versions (const char *a,
                           const char *b);
 
 EosAppCategory  eos_app_category_from_id (const char *p);
+
+char * eos_storage_type_to_string (EosStorageType storage);
 
 #define EOS_APP_UTILS_ERROR        (eos_app_utils_error_quark ())
 
