@@ -47,7 +47,7 @@ struct _EosAppListModel
   GHashTable *apps;
 
   guint applications_changed_id;
-  guint changed_guard_id;
+  guint refresh_guard_id;
 
   gboolean can_install;
   gboolean can_uninstall;
@@ -121,23 +121,10 @@ get_eam_dbus_proxy (EosAppListModel *self)
   return self->proxy;
 }
 
-static gboolean
-emit_queued_changed (gpointer data)
-{
-  EosAppListModel *self = data;
-
-  self->changed_guard_id = 0;
-
-  g_signal_emit (self, eos_app_list_model_signals[CHANGED], 0);
-
-  return G_SOURCE_REMOVE;
-}
-
 static void
 eos_app_list_model_emit_changed (EosAppListModel *self)
 {
-  if (self->changed_guard_id == 0)
-    self->changed_guard_id = g_idle_add (emit_queued_changed, self);
+  g_signal_emit (self, eos_app_list_model_signals[CHANGED], 0);
 }
 
 #define WEB_LINK_ID_PREFIX "eos-link-"
@@ -280,13 +267,37 @@ eos_app_list_model_get_app_info (EosAppListModel *model,
 }
 
 static void
-on_app_monitor_changed (GAppInfoMonitor *monitor,
-                        EosAppListModel *self)
+eos_app_list_model_refresh_installed (EosAppListModel *self)
 {
   eos_app_load_gio_apps (self->apps);
   eos_app_load_installed_apps (self->apps, NULL);
 
   eos_app_list_model_emit_changed (self);
+}
+
+static gboolean
+emit_queued_refresh_installed (gpointer data)
+{
+  EosAppListModel *self = data;
+
+  self->refresh_guard_id = 0;
+  eos_app_list_model_refresh_installed (self);
+
+  return G_SOURCE_REMOVE;
+}
+
+static void
+eos_app_list_model_queue_refresh_installed (EosAppListModel *self)
+{
+  if (self->refresh_guard_id == 0)
+    self->refresh_guard_id = g_idle_add (emit_queued_refresh_installed, self);
+}
+
+static void
+on_app_monitor_changed (GAppInfoMonitor *monitor,
+                        EosAppListModel *self)
+{
+  eos_app_list_model_refresh_installed (self);
 }
 
 static void
@@ -734,10 +745,10 @@ eos_app_list_model_finalize (GObject *gobject)
       self->applications_changed_id = 0;
     }
 
-  if (self->changed_guard_id != 0)
+  if (self->refresh_guard_id != 0)
     {
-      g_source_remove (self->changed_guard_id);
-      self->changed_guard_id = 0;
+      g_source_remove (self->refresh_guard_id);
+      self->refresh_guard_id = 0;
     }
 
   g_clear_object (&self->proxy);
@@ -1405,10 +1416,12 @@ install_latest_app_version (EosAppListModel *self,
     }
 
   if (is_upgrade)
-    {
-      eos_app_info_installed_changed (info);
-      eos_app_list_model_emit_changed (self);
-    }
+    /* When updating an application, GAppInfoMonitor might not send us a signal,
+     * e.g. because no desktop files changed.
+     * So we queue a refresh of the installed applications when we reach back
+     * the main thread.
+     */
+    eos_app_list_model_queue_refresh_installed (self);
 
  out:
   if (!retval && !internal_message)
