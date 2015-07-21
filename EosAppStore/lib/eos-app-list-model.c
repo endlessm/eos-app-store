@@ -121,20 +121,25 @@ get_eam_dbus_proxy (EosAppListModel *self)
   return self->proxy;
 }
 
+static void
+eos_app_list_model_emit_changed (EosAppListModel *self)
+{
+  g_signal_emit (self, eos_app_list_model_signals[CHANGED], 0);
+}
+
 static gboolean
 emit_queued_changed (gpointer data)
 {
   EosAppListModel *self = data;
 
   self->changed_guard_id = 0;
-
-  g_signal_emit (self, eos_app_list_model_signals[CHANGED], 0);
+  eos_app_list_model_emit_changed (self);
 
   return G_SOURCE_REMOVE;
 }
 
 static void
-eos_app_list_model_emit_changed (EosAppListModel *self)
+eos_app_list_model_queue_changed (EosAppListModel *self)
 {
   if (self->changed_guard_id == 0)
     self->changed_guard_id = g_idle_add (emit_queued_changed, self);
@@ -1407,7 +1412,7 @@ install_latest_app_version (EosAppListModel *self,
   if (is_upgrade)
     {
       eos_app_info_installed_changed (info);
-      eos_app_list_model_emit_changed (self);
+      eos_app_list_model_queue_changed (self);
     }
 
  out:
