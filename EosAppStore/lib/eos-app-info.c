@@ -423,7 +423,11 @@ eos_app_info_is_updatable (const EosAppInfo *info)
 gboolean
 eos_app_info_is_removable (const EosAppInfo *info)
 {
-  return info->storage_type == EOS_STORAGE_TYPE_PRIMARY;
+  /* We can remove those applications that we have loaded
+   * from the installed directories - that is those that
+   * have info->info_filename set.
+   */
+  return info->info_filename != NULL;
 }
 
 EosAppCategory
