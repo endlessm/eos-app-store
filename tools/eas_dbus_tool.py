@@ -67,12 +67,7 @@ class ShowUiEasDbusMethod(GenericEasDbusMethod):
         self.reply_format = GLib.VariantType.new ('()')
 
     def _arg_handler(self, args):
-        print('Reset: %s' % args.reset)
-        self.args = GLib.Variant('(ub)', (0, args.reset == 'true',))
-
-    def define_action_arguments(parser):
-        parser.add_argument('reset',
-                            help='Reset the store during showing')
+        self.args = GLib.Variant('(ub)', (0, True,))
 
 class ShowPageEasDbusMethod(GenericEasDbusMethod):
     def __init__(self, params):
