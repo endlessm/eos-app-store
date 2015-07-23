@@ -77,7 +77,7 @@ class ShowPageEasDbusMethod(GenericEasDbusMethod):
 
     def _arg_handler(self, args):
         print('Page: %s' % args.page)
-        self.args = GLib.Variant('(us)', (0, args.page,))
+        self.args = GLib.Variant('(us)', (0, args.page.lower(),))
 
     def define_action_arguments(parser):
         parser.add_argument('page',
