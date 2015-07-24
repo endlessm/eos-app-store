@@ -172,8 +172,10 @@ const AppStoreDBusService = new Lang.Class({
 
         this._refresh(Lang.bind(this, function(error) {
             log("Refreshing before install");
-            if (error != null)
+            if (error != null) {
                 invocation.return_value(GLib.Variant.new('(b)', [false]));
+                return;
+            }
 
             log("Installing: " + appId);
             this._app.appList.install(appId + ".desktop", Lang.bind(this, function(error) {
@@ -189,8 +191,10 @@ const AppStoreDBusService = new Lang.Class({
 
         this._refresh(Lang.bind(this, function(error) {
             log("Refreshing before install");
-            if (error != null)
+            if (error != null) {
                 invocation.return_value(GLib.Variant.new('(b)', [false]));
+                return;
+            }
 
             log("Uninstalling: " + appId);
             this._app.appList.uninstall(appId + ".desktop", Lang.bind(this, function(error) {
@@ -206,8 +210,10 @@ const AppStoreDBusService = new Lang.Class({
 
         this._refresh(Lang.bind(this, function(error) {
             log("Refreshing before install");
-            if (error != null)
+            if (error != null) {
                 invocation.return_value(GLib.Variant.new('(b)', [false]));
+                return;
+            }
 
             log("Installing: " + appId);
             this._app.appList.updateApp(appId + ".desktop", Lang.bind(this, function(error) {
