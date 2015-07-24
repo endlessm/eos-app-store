@@ -29,12 +29,14 @@ stamp-h1
 /data/eos-app-store.desktop
 /EosAppStore/*.la
 /EosAppStore/*.lo
+/EosAppStore/*.o
 /EosAppStore/lib/eos-app-manager-transaction.[ch]
 /EosAppStore/lib/eos-app-manager-service.[ch]
 /EosAppStore/config.js
 /EosAppStore/config.h
 /EosAppStore/config.h.in
 /EosAppStore/path.js
+/EosAppStore/eos-download-bundle
 /ABOUT-NLS
 /m4
 /po/Makefile.in.in

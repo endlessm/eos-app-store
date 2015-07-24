@@ -18,6 +18,7 @@ eaprivate_source_h = \
 	lib/eos-app-info-private.h \
 	lib/eos-app-info.h \
 	lib/eos-app-utils.h \
+	lib/eos-downloader.h \
 	lib/eos-flexy-grid-private.h \
 	lib/eos-flexy-grid.h \
 	lib/eos-link-info.h \
@@ -31,6 +32,7 @@ eaprivate_source_c = \
 	lib/eos-app-log.c \
 	lib/eos-app-info.c \
 	lib/eos-app-utils.c \
+	lib/eos-downloader.c \
 	lib/eos-flexy-grid-cell.c \
 	lib/eos-flexy-grid.c \
 	lib/eos-link-info.c \
@@ -93,3 +95,8 @@ EosAppStorePrivate_1_0_gir_CFLAGS = $(AM_CPPFLAGS) $(eaprivate_cflags)
 EosAppStorePrivate_1_0_gir_SCANNERFLAGS = --warn-all --symbol-prefix=eos --identifier-prefix=Eos
 EosAppStorePrivate_1_0_gir_INCLUDES = Gtk-3.0 Json-1.0 WebKit2-4.0
 EosAppStorePrivate_1_0_gir_FILES = $(addprefix $(srcdir)/,$(introspection_sources))
+
+bin_PROGRAMS = eos-download-bundle
+eos_download_bundle_SOURCES = lib/eos-download-bundle.c
+eos_download_bundle_CFLAGS = $(AM_CFLAGS) $(EOS_APP_STORE_CFLAGS) $(MAINTAINER_CFLAGS)
+eos_download_bundle_LDADD = libeaprivate-1.0.la $(EOS_APP_STORE_LIBS)
