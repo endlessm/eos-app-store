@@ -266,8 +266,9 @@
     background: none;
 
     background-image: url("btn_install_normal_middle.png");
-    border-image: url("btn_install_normal_border.png") 0 17 0 17 / 0px 17px 0px 17px;
-    border-width: 0px 17px 0px 17px;
+    background-position: -2px;
+    border-image: url("btn_install_normal_border.png") 2 17 2 17 / 2px 17px 2px 17px;
+    border-width: 2px 17px 2px 17px;
 
     /* Setting padding to 0px gets the text 4px closer to each edge */
     padding-left: 0px;
