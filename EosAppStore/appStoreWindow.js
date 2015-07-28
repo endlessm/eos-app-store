@@ -74,15 +74,11 @@ const AppStoreWindow = new Lang.Class({
         let rtl = Gtk.Widget.get_default_direction();
 
         this.parent({ application: app,
-                        type_hint: Gdk.WindowTypeHint.DOCK,
-                             type: Gtk.WindowType.TOPLEVEL,
-                             role: SIDE_COMPONENT_ROLE,
-                             gravity: rtl ? Gdk.Gravity.NORTH_EAST : Gdk.Gravity.NORTH_WEST
+                      type: Gtk.WindowType.TOPLEVEL,
+                      gravity: rtl ? Gdk.Gravity.NORTH_EAST : Gdk.Gravity.NORTH_WEST
                     });
 
         this.initTemplate({ templateRoot: 'main-frame', bindChildren: true, connectSignals: true, });
-        this.stick();
-        this.set_decorated(false);
         this.get_style_context().add_class('main-window');
 
         // do not destroy, just hide
@@ -112,8 +108,10 @@ const AppStoreWindow = new Lang.Class({
 
         // hide main window when clicking outside the store
         this._wmInspect = new WMInspect.WMInspect();
+        /*
         this._activeWindowId = this._wmInspect.connect('active-window-changed',
                                                        Lang.bind(this, this._onActiveWindowChanged));
+        */
     },
 
     vfunc_destroy: function() {
@@ -185,6 +183,8 @@ const AppStoreWindow = new Lang.Class({
     },
 
     _updateGeometry: function() {
+        return;
+
         let workArea = this._getWorkArea();
         let [width, height, sidebarWidth] = this._getSize();
         let x = workArea.x;

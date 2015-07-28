@@ -37,7 +37,6 @@ const AppStore = new Lang.Class({
 
     _init: function() {
         this.parent({ application_id: APP_STORE_NAME,
-                      flags: Gio.ApplicationFlags.IS_SERVICE,
                       inactivity_timeout: QUIT_TIMEOUT * 1000, });
 
         Environment.loadResources();
@@ -70,10 +69,13 @@ const AppStore = new Lang.Class({
 
         // No window by default
         this._mainWindow = null;
+
+        // Gtk.Settings.get_default().gtk_enable_animations = false;
     },
 
     vfunc_activate: function() {
         this._createMainWindow();
+        this.show();
     },
 
     vfunc_shutdown: function() {
