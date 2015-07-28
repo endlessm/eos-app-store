@@ -44,6 +44,10 @@ const AppStoreDBusIface = '<node><interface name="com.endlessm.AppStore">' +
     '<arg type="s" direction="in" name="app_id"/>' +
     '<arg type="b" direction="out" name="success"/>' +
   '</method>' +
+  '<method name="Update">' +
+    '<arg type="s" direction="in" name="app_id"/>' +
+    '<arg type="b" direction="out" name="success"/>' +
+  '</method>' +
   '<property name="Visible" type="b" access="read"/>' +
 '</interface></node>';
 
@@ -168,8 +172,10 @@ const AppStoreDBusService = new Lang.Class({
 
         this._refresh(Lang.bind(this, function(error) {
             log("Refreshing before install");
-            if (error != null)
+            if (error != null) {
                 invocation.return_value(GLib.Variant.new('(b)', [false]));
+                return;
+            }
 
             log("Installing: " + appId);
             this._app.appList.install(appId + ".desktop", Lang.bind(this, function(error) {
@@ -185,13 +191,34 @@ const AppStoreDBusService = new Lang.Class({
 
         this._refresh(Lang.bind(this, function(error) {
             log("Refreshing before install");
-            if (error != null)
+            if (error != null) {
                 invocation.return_value(GLib.Variant.new('(b)', [false]));
+                return;
+            }
 
             log("Uninstalling: " + appId);
             this._app.appList.uninstall(appId + ".desktop", Lang.bind(this, function(error) {
                 let success = (error == null);
                 log("Uninstall finished. Success: " + success);
+                invocation.return_value(GLib.Variant.new('(b)', [success]));
+            }));
+        }));
+    },
+
+    UpdateAsync: function(params, invocation) {
+        let [appId] = params;
+
+        this._refresh(Lang.bind(this, function(error) {
+            log("Refreshing before install");
+            if (error != null) {
+                invocation.return_value(GLib.Variant.new('(b)', [false]));
+                return;
+            }
+
+            log("Installing: " + appId);
+            this._app.appList.updateApp(appId + ".desktop", Lang.bind(this, function(error) {
+                let success = (error == null);
+                log("Update finished. Success: " + success);
                 invocation.return_value(GLib.Variant.new('(b)', [success]));
             }));
         }));
