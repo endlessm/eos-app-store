@@ -127,6 +127,9 @@ class UpdateEasDbusMethod(GenericEasDbusMethod):
     def __init__(self, params):
         super().__init__("update", "Update", params);
 
+        # Update can be a much longer operation
+        self.timeout = 20 * 60 * 1000;
+
     def _arg_handler(self, args):
         print('App ID: %s' % args.app_id)
         self.args = GLib.Variant('(s)', (args.app_id,))
