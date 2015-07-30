@@ -182,7 +182,9 @@ const AppListBoxRow = new Lang.Class({
     },
 
     _showInstallSpinner: function() {
-        this._installProgressLabel.set_text(_("Installing…"));
+        let label = (this._appState == EosAppStorePrivate.AppState.UPDATABLE) ?
+            _("Updating…") : _("Installing…");
+        this._installProgressLabel.set_text(label);
         this._installProgressSpinner.show();
         this._installProgressSpinner.start();
         this._installProgressBar.hide();
