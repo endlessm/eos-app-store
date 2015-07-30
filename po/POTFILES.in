@@ -30,5 +30,6 @@ EosAppStore/lib/eos-app-enums.c
 EosAppStore/lib/eos-app-info.c
 EosAppStore/lib/eos-app-list-model.c
 EosAppStore/lib/eos-app-utils.c
+EosAppStore/lib/eos-downloader.c
 EosAppStore/lib/eos-link-info.c
 EosAppStore/lib/eos-net-utils.c
