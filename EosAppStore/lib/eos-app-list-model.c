@@ -200,8 +200,7 @@ localized_id_from_desktop_id (const gchar *desktop_id,
 
 static EosAppInfo *
 get_localized_app_info (EosAppListModel *model,
-                        const gchar *desktop_id,
-                        gboolean language_fallback)
+                        const gchar *desktop_id)
 {
   EosAppInfo *info;
   gchar *localized_id;
@@ -225,9 +224,6 @@ get_localized_app_info (EosAppListModel *model,
     }
 
   g_strfreev (lang_ids);
-
-  if (!language_fallback)
-    return NULL;
 
   /* If app is not installed in the user's current language,
    * consider all other supported languages, starting with English.
@@ -262,7 +258,7 @@ eos_app_list_model_get_app_info (EosAppListModel *model,
   EosAppInfo *info = g_hash_table_lookup (model->apps, desktop_id);
 
   if (info == NULL)
-    info = get_localized_app_info (model, desktop_id, TRUE);
+    info = get_localized_app_info (model, desktop_id);
 
   return info;
 }
@@ -1310,7 +1306,7 @@ eos_app_list_model_get_apps_for_category (EosAppListModel *model,
           EosAppInfo *info = g_hash_table_lookup (model->apps, desktop_id);
 
           if (info == NULL)
-            info = get_localized_app_info (model, desktop_id, FALSE);
+            info = get_localized_app_info (model, desktop_id);
 
           g_free (desktop_id);
 
