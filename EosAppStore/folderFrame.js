@@ -178,6 +178,11 @@ const FolderIconGrid = new Lang.Class({
 
             this.get_style_context().add_class('grabbed');
 
+            // hide any bubble we might have previously created
+            if (this._bubble != null) {
+                this._bubble.hide();
+            }
+
             // bubble window
             this._bubble = new FolderNameBubble(this._folderModel);
             this._bubble.connect('closed', Lang.bind(this, function() {
@@ -186,6 +191,7 @@ const FolderIconGrid = new Lang.Class({
                     this._activeToggle = null;
                 }
                 this.get_style_context().remove_class('grabbed');
+                this._bubble = null;
             }));
 
             // prepare the bubble window for showing...
@@ -220,8 +226,26 @@ const FolderIconGrid = new Lang.Class({
         this._iconList = this._folderModel.getIconList();
         this._populate();
         this._activeToggle = null;
+        this._bubble = null;
 
         this.get_style_context().add_class('folder-icon-grid');
+
+        // FIXME: we need to listen for keypress events in the grid to allow
+        // switching the focus and start inserting the text automatically,
+        // when the user starts typing, WITHOUT removing the placeholder text.
+        // This won't be necessary when GTK+ allows setting the focus to a
+        // GtkEntry without removing the hint while no text has been inserted.
+        this.add_events(Gdk.EventMask.KEY_PRESS_MASK);
+        this.connect('key-press-event', Lang.bind(this, this._onKeyPress));
+    },
+
+    _onKeyPress : function(window, event) {
+        if (this._bubble != null && !this._bubble.has_focus) {
+            this._bubble.grab_focus();
+            this._bubble.event(event);
+        }
+
+        return false;
     }
 });
 
