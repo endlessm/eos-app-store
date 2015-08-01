@@ -729,11 +729,11 @@ is_app_id (const char *appid)
   return FALSE;
 }
 
-static gboolean
-eos_app_load_installed_apps_for_prefix (GHashTable *app_info,
-                                        const char *prefix,
-                                        GCancellable *cancellable)
+gboolean
+eos_app_load_installed_apps (GHashTable *app_info,
+                             GCancellable *cancellable)
 {
+  const char *prefix = eos_get_bundles_dir ();
   GError *error = NULL;
   GDir *dir = g_dir_open (prefix, 0, &error);
   if (dir == NULL)
@@ -794,26 +794,6 @@ eos_app_load_installed_apps_for_prefix (GHashTable *app_info,
                              (double) (g_get_monotonic_time () - start_time) / 1000);
 
   return TRUE;
-}
-
-gboolean
-eos_app_load_installed_apps (GHashTable *app_info,
-                             GCancellable *cancellable)
-{
-  gboolean retval;
-
-  eos_app_log_info_message ("Reloading installed apps");
-
-  const char *storage = eam_config_get_primary_storage ();
-  retval = eos_app_load_installed_apps_for_prefix (app_info, storage, cancellable);
-
-  if (eos_has_secondary_storage ())
-    {
-      storage = eam_config_get_secondary_storage ();
-      retval |= eos_app_load_installed_apps_for_prefix (app_info, storage, cancellable);
-    }
-
-  return retval;
 }
 
 gboolean
