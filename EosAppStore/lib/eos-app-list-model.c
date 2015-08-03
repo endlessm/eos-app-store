@@ -27,6 +27,8 @@
 /* The delay for the EosAppListModel::changed signal, in milliseconds */
 #define CHANGED_DELAY   500
 
+#define FALLBACK_LANG   "-en"
+
 /* HACK: This will be revisited for the next release,
  * but for now we have a limited number of app language ids,
  * with no country codes, so we can iterate through them
@@ -34,7 +36,12 @@
  * If not available in current language, English is the
  * preferred next option, so list it first.
  */
-static const char *app_lang_ids[] = { "-en", "-ar", "-es_GT", "-es", "-fr", "-pt", NULL };
+static const char *app_lang_ids[] = { FALLBACK_LANG, "-ar", "-es_GT", "-es", "-fr", "-pt", NULL };
+
+/* This list of languages will not try to include the fallback
+ * applications
+ */
+static const char *app_lang_fallback_blacklist[] = { "-es_GT", "-es", "-pt", NULL };
 
 struct _EosAppListModel
 {
@@ -183,6 +190,31 @@ get_language_ids (void)
   return (gchar **) g_ptr_array_free (lang_ids, FALSE);
 }
 
+static gboolean
+lang_fallback_allowed (void)
+{
+  gboolean fallback_allowed = TRUE;
+  gchar **lang_ids = get_language_ids ();
+
+  /* Iterate over our languages and see if our current one shouldn't
+   * fall back to English. We cannot only check first language as we
+   * might have specific and non-specific versions in the list ("pt"
+   * and "pt_BR") so we need to iterate over all to match correctly.
+   */
+  for (int idx = 0; lang_ids[idx] != NULL; idx++)
+      for (int bl_idx = 0; app_lang_fallback_blacklist[bl_idx] != NULL; bl_idx++)
+          if (g_strcmp0 (lang_ids[idx], app_lang_fallback_blacklist[bl_idx]) == 0)
+            {
+              fallback_allowed = FALSE;
+              goto out;
+            }
+
+out:
+  g_strfreev (lang_ids);
+
+  return fallback_allowed;
+}
+
 static gchar *
 localized_id_from_desktop_id (const gchar *desktop_id,
                               const gchar *lang_id)
@@ -200,7 +232,8 @@ localized_id_from_desktop_id (const gchar *desktop_id,
 
 static EosAppInfo *
 get_localized_app_info (EosAppListModel *model,
-                        const gchar *desktop_id)
+                        const gchar *desktop_id,
+                        const gboolean check_all_ids)
 {
   EosAppInfo *info;
   gchar *localized_id;
@@ -225,8 +258,25 @@ get_localized_app_info (EosAppListModel *model,
 
   g_strfreev (lang_ids);
 
-  /* If app is not installed in the user's current language,
-   * consider all other supported languages, starting with English.
+  /* If we allow a fallback for this language set,
+   * check if we have an app with that suffix
+   */
+  if (lang_fallback_allowed ())
+    {
+      localized_id = localized_id_from_desktop_id (desktop_id, FALLBACK_LANG);
+      info = g_hash_table_lookup (model->apps, localized_id);
+      g_free (localized_id);
+
+      if (info)
+        return info;
+    }
+
+  if (!check_all_ids)
+    return NULL;
+
+  /* If we are checking installed apps, we want to include all of them
+   * regardless of if they match our lang_ids but our earlier code
+   * ensures that we checked our base lang ids first.
    */
   for (idx = 0; app_lang_ids[idx] != NULL; idx++)
     {
@@ -258,7 +308,7 @@ eos_app_list_model_get_app_info (EosAppListModel *model,
   EosAppInfo *info = g_hash_table_lookup (model->apps, desktop_id);
 
   if (info == NULL)
-    info = get_localized_app_info (model, desktop_id);
+    info = get_localized_app_info (model, desktop_id, TRUE);
 
   return info;
 }
@@ -1305,8 +1355,15 @@ eos_app_list_model_get_apps_for_category (EosAppListModel *model,
 
           EosAppInfo *info = g_hash_table_lookup (model->apps, desktop_id);
 
+          /* When populating the installed app list, try all aocales but otherwise
+           * just do normal locale filtering
+           *
+           * TODO: Apps removed from desktop not available in this locale set
+           *       will not show up in the app store.
+           */
           if (info == NULL)
-            info = get_localized_app_info (model, desktop_id);
+            info = get_localized_app_info (model, desktop_id,
+                                           category == EOS_APP_CATEGORY_INSTALLED);
 
           g_free (desktop_id);
 
