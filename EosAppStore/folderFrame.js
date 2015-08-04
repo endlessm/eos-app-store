@@ -220,7 +220,8 @@ const FolderIconGrid = new Lang.Class({
         this.parent({
             row_spacing: _FOLDER_GRID_SPACING,
             column_spacing: _FOLDER_GRID_SPACING,
-            border_width: _FOLDER_GRID_BORDER });
+            border_width: _FOLDER_GRID_BORDER,
+            selection_mode: Gtk.SelectionMode.NONE });
 
         this._folderModel = folderModel;
         this._iconList = this._folderModel.getIconList();
