@@ -590,6 +590,8 @@ const AppListBoxRow = new Lang.Class({
                 else {
                     this._maybeNotify(_("'%s' was removed successfully").format(this.appTitle));
                 }
+
+                this._updateState();
             }));
         }
     },
