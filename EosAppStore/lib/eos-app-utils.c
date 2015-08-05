@@ -1349,9 +1349,8 @@ eos_app_load_available_apps (GHashTable *app_info,
 
       g_free (desktop_id);
 
-      /* If we have no availability version, just use the installed version */
-      if (stored_code_version == NULL || *stored_code_version == '\0')
-        stored_code_version = eos_app_info_get_installed_version (info);
+      /* Info shouldn't be ever null at this point */
+      g_assert (info != NULL);
 
       const int version_cmp = eos_compare_versions (code_version, stored_code_version);
       eos_app_log_debug_message (" - Version comparison: [new: %s, have: %s, diff: %d].",
