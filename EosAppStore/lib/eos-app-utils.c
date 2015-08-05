@@ -1258,14 +1258,11 @@ eos_app_load_available_apps (GHashTable *app_info,
     }
 
   eos_app_log_debug_message ("Iterating over the update list");
+
   JsonArray *array = json_node_get_array (root);
+  guint record_count = json_array_get_length (array);
 
-  guint array_length = json_array_get_length (array);
-
-  /* TODO: Calculate this correctly */
-  int n_available = array_length;
-
-  for (guint index = 0; index < array_length; index++)
+  for (guint index = 0; index < record_count; index++)
     {
       if (g_cancellable_is_cancelled (cancellable))
         {
@@ -1470,10 +1467,11 @@ eos_app_load_available_apps (GHashTable *app_info,
         }
     }
 
-  retval = TRUE;
-  eos_app_log_info_message ("Available bundles: %d bundles, %.3f msecs",
-                            n_available,
+  eos_app_log_info_message ("Processed %d records in %.0f ms",
+                            record_count,
                             (double) (g_get_monotonic_time () - start_time) / 1000);
+
+  retval = TRUE;
 
  out:
   g_hash_table_unref (newer_deltas);
