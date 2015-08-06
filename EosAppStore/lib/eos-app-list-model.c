@@ -285,7 +285,9 @@ get_localized_app_info (EosAppListModel *model,
       info = g_hash_table_lookup (model->apps, localized_id);
       g_free (localized_id);
 
-      /* Only return things that are installed */
+      /* Only return things that are installed or still on the system but not
+       * on the desktop
+       */
       if (info &&
           (eos_app_info_is_installed (info) || eos_app_info_is_removable (info)))
           return info;
