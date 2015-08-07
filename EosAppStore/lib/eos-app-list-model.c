@@ -232,8 +232,7 @@ localized_id_from_desktop_id (const gchar *desktop_id,
 
 static EosAppInfo *
 get_localized_app_info (EosAppListModel *model,
-                        const gchar *desktop_id,
-                        const gboolean check_all_ids)
+                        const gchar *desktop_id)
 {
   EosAppInfo *info;
   gchar *localized_id;
@@ -271,13 +270,7 @@ get_localized_app_info (EosAppListModel *model,
         return info;
     }
 
-  if (!check_all_ids)
-    return NULL;
-
-  /* If we are checking installed apps, we want to include all of them
-   * regardless of if they match our lang_ids but our earlier code
-   * ensures that we checked our base lang ids first.
-   */
+  /* Check any on-system apps that might not match our allowed locales */
   for (idx = 0; app_lang_ids[idx] != NULL; idx++)
     {
       const char *suffix = app_lang_ids[idx];
@@ -285,8 +278,9 @@ get_localized_app_info (EosAppListModel *model,
       info = g_hash_table_lookup (model->apps, localized_id);
       g_free (localized_id);
 
-      if (info)
-        return info;
+      /* Only return things that are installed */
+      if (info && eos_app_info_is_installed (info))
+          return info;
     }
 
   return NULL;
@@ -308,7 +302,7 @@ eos_app_list_model_get_app_info (EosAppListModel *model,
   EosAppInfo *info = g_hash_table_lookup (model->apps, desktop_id);
 
   if (info == NULL)
-    info = get_localized_app_info (model, desktop_id, TRUE);
+    info = get_localized_app_info (model, desktop_id);
 
   return info;
 }
@@ -1354,16 +1348,8 @@ eos_app_list_model_get_apps_for_category (EosAppListModel *model,
           char *desktop_id = g_strconcat (app_id, ".desktop", NULL);
 
           EosAppInfo *info = g_hash_table_lookup (model->apps, desktop_id);
-
-          /* When populating the installed app list, try all aocales but otherwise
-           * just do normal locale filtering
-           *
-           * TODO: Apps removed from desktop not available in this locale set
-           *       will not show up in the app store.
-           */
           if (info == NULL)
-            info = get_localized_app_info (model, desktop_id,
-                                           category == EOS_APP_CATEGORY_INSTALLED);
+            info = get_localized_app_info (model, desktop_id);
 
           g_free (desktop_id);
 
