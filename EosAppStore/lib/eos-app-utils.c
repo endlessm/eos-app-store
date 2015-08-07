@@ -1283,22 +1283,17 @@ eos_app_load_available_apps (GHashTable *app_info,
       const gboolean is_diff = json_object_get_boolean_member (obj, "isDiff");
       const char *code_version = json_object_get_string_member (obj, "codeVersion");
 
+      if (is_diff && !eos_use_delta_updates ())
+        {
+          eos_app_log_debug_message ("Deltas disabled. Ignoring diff for %s", app_id);
+
+          continue;
+        }
+
       /* Grab fromVersion field for deltas */
       const char *from_version = NULL;
       if (is_diff)
-        {
           from_version = json_object_get_string_member (obj, "fromVersion");
-
-          if (!eos_use_delta_updates ())
-            {
-              eos_app_log_debug_message ("Deltas disabled. Ignoring diff '%s (%s -> %s)'",
-                                         app_id,
-                                         from_version,
-                                         code_version);
-
-              continue;
-            }
-        }
 
       eos_app_log_debug_message ("Loading: '%s (diff: %s) %s -> %s'",
                                 app_id,
