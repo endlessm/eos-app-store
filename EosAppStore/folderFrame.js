@@ -54,7 +54,7 @@ const FolderNameBubble = new Lang.Class({
             no_show_all: true });
 
         this._entry.connect('changed', Lang.bind(this, function() {
-            this._addButton.set_sensitive(this._entry.get_text_length() != 0);
+            this._addButton.set_sensitive(this._entry.get_text().trim().length != 0);
         }));
 
         this._entry.connect('activate',
@@ -107,7 +107,7 @@ const FolderNameBubble = new Lang.Class({
     },
 
     _createFolderFromEntry : function() {
-        if (this._entry.get_text_length() != 0) {
+        if (this._entry.get_text().trim().length != 0) {
             this._folderModel.createFolder(this._entry.get_text(),
                                            this._iconName);
             this.setEntryVisible(false);
