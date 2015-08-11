@@ -1181,6 +1181,51 @@ free_json_object_glist (gpointer data)
   g_list_free_full (data, (GDestroyNotify) json_object_unref);
 }
 
+static gboolean
+is_server_record_valid (JsonNode *element)
+{
+  if (!JSON_NODE_HOLDS_OBJECT (element))
+    {
+      eos_app_log_error_message (" - JSON element contains unknown type of data! "
+                                 "Ignoring!");
+      return FALSE;
+    }
+
+  JsonObject *obj = json_node_get_object (element);
+  if (!json_object_has_member (obj, "appId"))
+    {
+      eos_app_log_error_message (" - JSON element doesn't contain an appId! "
+                                 "Ignoring!");
+      return FALSE;
+    }
+
+  if (!json_object_has_member (obj, "codeVersion"))
+    {
+      eos_app_log_error_message (" - JSON element doesn't contain codeVersion attribute! "
+                                 "Ignoring!");
+      return FALSE;
+    }
+
+  if (!json_object_has_member (obj, "isDiff"))
+    {
+      eos_app_log_error_message (" - JSON element doesn't contain isDiff attribute! "
+                                 "Ignoring!");
+      return FALSE;
+    }
+
+  if (json_object_get_boolean_member (obj, "isDiff"))
+    {
+      if (json_object_get_string_member (obj, "fromVersion") == NULL)
+        {
+          eos_app_log_error_message (" - JSON element doesn't contain fromVersion "
+                                     "attribute! Ignoring!");
+          return FALSE;
+        }
+    }
+
+  return TRUE;
+}
+
 gboolean
 eos_app_load_available_apps (GHashTable *app_info,
                              const char *data,
@@ -1213,14 +1258,11 @@ eos_app_load_available_apps (GHashTable *app_info,
     }
 
   eos_app_log_debug_message ("Iterating over the update list");
+
   JsonArray *array = json_node_get_array (root);
+  guint record_count = json_array_get_length (array);
 
-  guint array_length = json_array_get_length (array);
-
-  /* TODO: Calculate this correctly */
-  int n_available = array_length;
-
-  for (guint index = 0; index < array_length; index++)
+  for (guint index = 0; index < record_count; index++)
     {
       if (g_cancellable_is_cancelled (cancellable))
         {
@@ -1232,45 +1274,18 @@ eos_app_load_available_apps (GHashTable *app_info,
         }
 
       JsonNode *element = json_array_get_element (array, index);
-      if (!JSON_NODE_HOLDS_OBJECT (element))
-        {
-          eos_app_log_error_message (" - JSON element contains unknown type of data! "
-                                     "Ignoring!");
+      if (!is_server_record_valid (element))
           continue;
-        }
 
       JsonObject *obj = json_node_get_object (element);
-      if (!json_object_has_member (obj, "appId"))
-        {
-          eos_app_log_error_message (" - JSON element doesn't contain an appId! "
-                                     "Ignoring!");
-          continue;
-        }
-
-      if (!json_object_has_member (obj, "isDiff"))
-        {
-          eos_app_log_error_message (" - JSON element doesn't contain isDiff attribute! "
-                                     "Ignoring!");
-          continue;
-        }
-
-      if (!json_object_has_member (obj, "codeVersion"))
-        {
-          eos_app_log_error_message (" - JSON element doesn't contain codeVersion attribute! "
-                                     "Ignoring!");
-          continue;
-        }
 
       const char *app_id = json_object_get_string_member (obj, "appId");
       const gboolean is_diff = json_object_get_boolean_member (obj, "isDiff");
       const char *code_version = json_object_get_string_member (obj, "codeVersion");
 
-      /* Short-circuit if it's a diff and they're disabled */
-      if (is_diff && !eos_use_delta_updates())
+      if (is_diff && !eos_use_delta_updates ())
         {
-          eos_app_log_debug_message ("Deltas disabled. Ignoring '%s (diff: %s)'",
-                                     app_id,
-                                     is_diff ? "true" : "false");
+          eos_app_log_debug_message ("Deltas disabled. Ignoring diff for %s", app_id);
 
           continue;
         }
@@ -1278,15 +1293,7 @@ eos_app_load_available_apps (GHashTable *app_info,
       /* Grab fromVersion field for deltas */
       const char *from_version = NULL;
       if (is_diff)
-        {
           from_version = json_object_get_string_member (obj, "fromVersion");
-          if (from_version == NULL)
-            {
-              eos_app_log_error_message (" - JSON element doesn't contain fromVersion "
-                                         "attribute! Ignoring!");
-              continue;
-            }
-        }
 
       eos_app_log_debug_message ("Loading: '%s (diff: %s) %s -> %s'",
                                 app_id,
@@ -1337,9 +1344,8 @@ eos_app_load_available_apps (GHashTable *app_info,
 
       g_free (desktop_id);
 
-      /* If we have no availability version, just use the installed version */
-      if (stored_code_version == NULL || *stored_code_version == '\0')
-        stored_code_version = eos_app_info_get_installed_version (info);
+      /* Info shouldn't be ever null at this point */
+      g_assert (info != NULL);
 
       const int version_cmp = eos_compare_versions (code_version, stored_code_version);
       eos_app_log_debug_message (" - Version comparison: [new: %s, have: %s, diff: %d].",
@@ -1455,10 +1461,11 @@ eos_app_load_available_apps (GHashTable *app_info,
         }
     }
 
-  retval = TRUE;
-  eos_app_log_info_message ("Available bundles: %d bundles, %.3f msecs",
-                            n_available,
+  eos_app_log_info_message ("Processed %d records in %.0f ms",
+                            record_count,
                             (double) (g_get_monotonic_time () - start_time) / 1000);
+
+  retval = TRUE;
 
  out:
   g_hash_table_unref (newer_deltas);
