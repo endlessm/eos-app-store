@@ -7,6 +7,7 @@
 #include <webkit2/webkit2.h>
 #include "eos-app-enums.h"
 #include "eos-app-info.h"
+#include "eos-app-manager-service.h"
 
 G_BEGIN_DECLS
 
@@ -84,6 +85,8 @@ char * eos_storage_type_to_string (EosStorageType storage);
 #define EOS_APP_UTILS_ERROR        (eos_app_utils_error_quark ())
 
 GQuark eos_app_utils_error_quark (void);
+
+EosAppManager * eos_get_eam_dbus_proxy (void);
 
 typedef enum {
   EOS_APP_UTILS_ERROR_JSON_UNEXPECTED_STRUCTURE,

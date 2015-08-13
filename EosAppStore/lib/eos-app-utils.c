@@ -184,36 +184,7 @@ eos_get_cache_dir (void)
 const char *
 eos_get_bundles_dir (void)
 {
-  static char *apps_dir;
-
-  if (g_once_init_enter (&apps_dir))
-    {
-      char *tmp;
-
-      GKeyFile *keyfile = g_key_file_new ();
-      char *path = g_build_filename (SYSCONFDIR, "eos-app-manager", "eam-default.cfg", NULL);
-      GError *error = NULL;
-      g_key_file_load_from_file (keyfile, path, G_KEY_FILE_NONE, &error);
-      if (error == NULL)
-        tmp = g_key_file_get_string (keyfile, "Directories", "ApplicationsDir", &error);
-
-      if (error != NULL)
-        {
-          eos_app_log_error_message ("Unable to load configuration: %s",
-                                     error->message);
-          g_error_free (error);
-          tmp = g_strdup (APP_DIR_DEFAULT);
-        }
-
-      eos_app_log_info_message ("Bundles dir: %s", tmp);
-
-      g_free (path);
-      g_key_file_free (keyfile);
-
-      g_once_init_leave (&apps_dir, tmp);
-    }
-
-  return apps_dir;
+  return eos_app_manager_get_applications_dir (eos_get_eam_dbus_proxy ());
 }
 
 gboolean
@@ -246,173 +217,31 @@ eos_has_secondary_storage (void)
 const char *
 eos_get_primary_storage (void)
 {
-  static char *apps_dir;
-
-  if (g_once_init_enter (&apps_dir))
-    {
-      char *tmp;
-
-      GKeyFile *keyfile = g_key_file_new ();
-      char *path = g_build_filename (SYSCONFDIR, "eos-app-manager", "eam-default.cfg", NULL);
-      GError *error = NULL;
-      g_key_file_load_from_file (keyfile, path, G_KEY_FILE_NONE, &error);
-      if (error == NULL)
-        tmp = g_key_file_get_string (keyfile, "Directories", "PrimaryStorage", &error);
-
-      if (error != NULL)
-        {
-          eos_app_log_error_message ("Unable to load configuration: %s",
-                                     error->message);
-          g_error_free (error);
-          tmp = g_strdup (APP_DIR_DEFAULT);
-        }
-
-      eos_app_log_info_message ("Primary storage dir: %s", tmp);
-
-      g_free (path);
-      g_key_file_free (keyfile);
-
-      g_once_init_leave (&apps_dir, tmp);
-    }
-
-  return apps_dir;
+  return eos_app_manager_get_primary_storage (eos_get_eam_dbus_proxy ());
 }
 
 const char *
 eos_get_secondary_storage (void)
 {
-  static char *apps_dir;
-
-  if (g_once_init_enter (&apps_dir))
-    {
-      char *tmp;
-
-      GKeyFile *keyfile = g_key_file_new ();
-      char *path = g_build_filename (SYSCONFDIR, "eos-app-manager", "eam-default.cfg", NULL);
-      GError *error = NULL;
-      g_key_file_load_from_file (keyfile, path, G_KEY_FILE_NONE, &error);
-      if (error == NULL)
-        tmp = g_key_file_get_string (keyfile, "Directories", "SecondaryStorage", &error);
-
-      if (error != NULL)
-        {
-          eos_app_log_error_message ("Unable to load configuration: %s",
-                                     error->message);
-          g_error_free (error);
-          tmp = g_strdup (APP_DIR_DEFAULT);
-        }
-
-      eos_app_log_info_message ("Secondary storage dir: %s", tmp);
-
-      g_free (path);
-      g_key_file_free (keyfile);
-
-      g_once_init_leave (&apps_dir, tmp);
-    }
-
-  return apps_dir;
+  return eos_app_manager_get_secondary_storage (eos_get_eam_dbus_proxy ());
 }
 
 gboolean
 eos_use_delta_updates (void)
 {
-  static char *deltaupdates;
-
-  if (g_once_init_enter (&deltaupdates))
-    {
-      gboolean val = FALSE;
-      char *tmp;
-
-      GKeyFile *keyfile = g_key_file_new ();
-      char *path = g_build_filename (SYSCONFDIR, "eos-app-manager", "eam-default.cfg", NULL);
-      GError *error = NULL;
-      g_key_file_load_from_file (keyfile, path, G_KEY_FILE_NONE, &error);
-      if (error == NULL)
-        val = g_key_file_get_boolean (keyfile, "Repository", "EnableDeltaUpdates", &error);
-
-      if (error != NULL)
-        {
-          eos_app_log_error_message ("Unable to load configuration: %s",
-                                     error->message);
-          g_error_free (error);
-        }
-
-      eos_app_log_info_message ("Use delta updates: %s", val ? "yes" : "no");
-
-      /* Need this trick because g_once_init_leave() does not accept 0 */
-      tmp = val ? g_strdup ("true") : g_strdup ("false");
-
-      g_free (path);
-      g_key_file_free (keyfile);
-
-      g_once_init_leave (&deltaupdates, tmp);
-    }
-
-  return g_strcmp0 (deltaupdates, "true") == 0;
+  return eos_app_manager_get_enable_delta_updates (eos_get_eam_dbus_proxy ());
 }
 
 const char *
 eos_get_app_server_url (void)
 {
-  static char *server_url;
-
-  if (g_once_init_enter (&server_url))
-    {
-      char *tmp;
-
-      GKeyFile *keyfile = g_key_file_new ();
-      char *path = g_build_filename (SYSCONFDIR, "eos-app-manager", "eam-default.cfg", NULL);
-      GError *error = NULL;
-      g_key_file_load_from_file (keyfile, path, G_KEY_FILE_NONE, &error);
-      if (error == NULL)
-        tmp = g_key_file_get_string (keyfile, "Repository", "ServerUrl", &error);
-
-      if (error != NULL)
-        {
-          eos_app_log_error_message ("Unable to load configuration: %s",
-                                     error->message);
-          g_error_free (error);
-          tmp = g_strdup ("http://appupdates.endlessm.com/");
-        }
-
-      eos_app_log_info_message ("Server address: %s", tmp);
-
-      g_once_init_leave (&server_url, tmp);
-    }
-
-  return server_url;
+  return eos_app_manager_get_server_url (eos_get_eam_dbus_proxy ());
 }
 
 static const char *
 eos_get_app_server_api (void)
 {
-  static char *server_api;
-
-  if (g_once_init_enter (&server_api))
-    {
-      char *tmp;
-
-      GKeyFile *keyfile = g_key_file_new ();
-      char *path = g_build_filename (SYSCONFDIR, "eos-app-manager", "eam-default.cfg", NULL);
-      GError *error = NULL;
-      g_key_file_load_from_file (keyfile, path, G_KEY_FILE_NONE, &error);
-      if (error == NULL)
-        tmp = g_key_file_get_string (keyfile, "Repository", "ApiVersion", &error);
-
-      if (error != NULL)
-        {
-          eos_app_log_error_message ("Unable to load configuration: %s",
-                                     error->message);
-          g_error_free (error);
-          tmp = g_strdup ("v1");
-        }
-
-      eos_app_log_info_message ("Server API version: %s", tmp);
-
-      g_once_init_leave (&server_api, tmp);
-    }
-
-  return server_api;
+  return eos_app_manager_get_api_version (eos_get_eam_dbus_proxy ());
 }
 
 /*
@@ -1941,4 +1770,40 @@ eos_storage_type_to_string (EosStorageType storage)
   g_type_class_unref (enum_class);
 
   return retval;
+}
+
+/**
+ * eos_get_eam_dbus_proxy: (skip)
+ */
+EosAppManager *
+eos_get_eam_dbus_proxy (void)
+{
+  static EosAppManager *proxy = NULL;
+
+  eos_app_log_debug_message ("Getting dbus proxy");
+
+  /* If we already have a proxy, return it */
+  if (proxy != NULL)
+    return proxy;
+
+  /* Otherwise create it */
+  GError *error = NULL;
+
+  eos_app_log_debug_message ("No dbus proxy object yet - creating it");
+
+  proxy = eos_app_manager_proxy_new_for_bus_sync (G_BUS_TYPE_SYSTEM,
+                                                  G_DBUS_PROXY_FLAGS_NONE,
+                                                  "com.endlessm.AppManager",
+                                                  "/com/endlessm/AppManager",
+                                                  NULL, /* GCancellable* */
+                                                  &error);
+  g_dbus_proxy_set_default_timeout (G_DBUS_PROXY (proxy), G_MAXINT);
+
+  if (error != NULL)
+    {
+      eos_app_log_error_message ("Unable to create dbus proxy: %s", error->message);
+      g_error_free (error);
+    }
+
+  return proxy;
 }
