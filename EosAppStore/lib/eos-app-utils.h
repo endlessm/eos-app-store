@@ -38,10 +38,16 @@ char *  eos_get_updates_file (void);
 char *  eos_get_updates_meta_record_uri (void);
 char *  eos_get_updates_meta_record_file (void);
 
+const char *eos_get_bundles_dir (void);
 const char *eos_get_cache_dir (void);
 const char *eos_get_bundle_download_dir (void);
 void        eos_clear_bundle_download_dir (void);
+const char *eos_get_app_server_url (void);
+const char *eos_get_primary_storage (void);
+const char *eos_get_secondary_storage (void);
 gboolean    eos_has_secondary_storage (void);
+
+gboolean eos_use_delta_updates (void);
 
 gboolean eos_app_load_installed_apps      (GHashTable    *app_info,
                                            GCancellable  *cancellable);

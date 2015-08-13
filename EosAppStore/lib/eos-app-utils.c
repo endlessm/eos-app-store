@@ -6,7 +6,6 @@
 
 #include "eos-app-log.h"
 #include "eos-link-info.h"
-#include "eam-config.h"
 
 #include <locale.h>
 #include <glib/gi18n.h>
@@ -182,13 +181,48 @@ eos_get_cache_dir (void)
   return download_url;
 }
 
+const char *
+eos_get_bundles_dir (void)
+{
+  static char *apps_dir;
+
+  if (g_once_init_enter (&apps_dir))
+    {
+      char *tmp;
+
+      GKeyFile *keyfile = g_key_file_new ();
+      char *path = g_build_filename (SYSCONFDIR, "eos-app-manager", "eam-default.cfg", NULL);
+      GError *error = NULL;
+      g_key_file_load_from_file (keyfile, path, G_KEY_FILE_NONE, &error);
+      if (error == NULL)
+        tmp = g_key_file_get_string (keyfile, "Directories", "ApplicationsDir", &error);
+
+      if (error != NULL)
+        {
+          eos_app_log_error_message ("Unable to load configuration: %s",
+                                     error->message);
+          g_error_free (error);
+          tmp = g_strdup (APP_DIR_DEFAULT);
+        }
+
+      eos_app_log_info_message ("Bundles dir: %s", tmp);
+
+      g_free (path);
+      g_key_file_free (keyfile);
+
+      g_once_init_leave (&apps_dir, tmp);
+    }
+
+  return apps_dir;
+}
+
 gboolean
 eos_has_secondary_storage (void)
 {
   const char *primary_storage, *secondary_storage;
 
-  primary_storage = eam_config_get_primary_storage ();
-  secondary_storage = eam_config_get_secondary_storage ();
+  primary_storage = eos_get_primary_storage ();
+  secondary_storage = eos_get_secondary_storage ();
 
   /* The secondary storage path does not exist */
   struct stat secondary_statbuf;
@@ -207,6 +241,178 @@ eos_has_secondary_storage (void)
    * device than the primary.
    */
   return primary_statbuf.st_dev != secondary_statbuf.st_dev;
+}
+
+const char *
+eos_get_primary_storage (void)
+{
+  static char *apps_dir;
+
+  if (g_once_init_enter (&apps_dir))
+    {
+      char *tmp;
+
+      GKeyFile *keyfile = g_key_file_new ();
+      char *path = g_build_filename (SYSCONFDIR, "eos-app-manager", "eam-default.cfg", NULL);
+      GError *error = NULL;
+      g_key_file_load_from_file (keyfile, path, G_KEY_FILE_NONE, &error);
+      if (error == NULL)
+        tmp = g_key_file_get_string (keyfile, "Directories", "PrimaryStorage", &error);
+
+      if (error != NULL)
+        {
+          eos_app_log_error_message ("Unable to load configuration: %s",
+                                     error->message);
+          g_error_free (error);
+          tmp = g_strdup (APP_DIR_DEFAULT);
+        }
+
+      eos_app_log_info_message ("Primary storage dir: %s", tmp);
+
+      g_free (path);
+      g_key_file_free (keyfile);
+
+      g_once_init_leave (&apps_dir, tmp);
+    }
+
+  return apps_dir;
+}
+
+const char *
+eos_get_secondary_storage (void)
+{
+  static char *apps_dir;
+
+  if (g_once_init_enter (&apps_dir))
+    {
+      char *tmp;
+
+      GKeyFile *keyfile = g_key_file_new ();
+      char *path = g_build_filename (SYSCONFDIR, "eos-app-manager", "eam-default.cfg", NULL);
+      GError *error = NULL;
+      g_key_file_load_from_file (keyfile, path, G_KEY_FILE_NONE, &error);
+      if (error == NULL)
+        tmp = g_key_file_get_string (keyfile, "Directories", "SecondaryStorage", &error);
+
+      if (error != NULL)
+        {
+          eos_app_log_error_message ("Unable to load configuration: %s",
+                                     error->message);
+          g_error_free (error);
+          tmp = g_strdup (APP_DIR_DEFAULT);
+        }
+
+      eos_app_log_info_message ("Secondary storage dir: %s", tmp);
+
+      g_free (path);
+      g_key_file_free (keyfile);
+
+      g_once_init_leave (&apps_dir, tmp);
+    }
+
+  return apps_dir;
+}
+
+gboolean
+eos_use_delta_updates (void)
+{
+  static char *deltaupdates;
+
+  if (g_once_init_enter (&deltaupdates))
+    {
+      gboolean val = FALSE;
+      char *tmp;
+
+      GKeyFile *keyfile = g_key_file_new ();
+      char *path = g_build_filename (SYSCONFDIR, "eos-app-manager", "eam-default.cfg", NULL);
+      GError *error = NULL;
+      g_key_file_load_from_file (keyfile, path, G_KEY_FILE_NONE, &error);
+      if (error == NULL)
+        val = g_key_file_get_boolean (keyfile, "Repository", "EnableDeltaUpdates", &error);
+
+      if (error != NULL)
+        {
+          eos_app_log_error_message ("Unable to load configuration: %s",
+                                     error->message);
+          g_error_free (error);
+        }
+
+      eos_app_log_info_message ("Use delta updates: %s", val ? "yes" : "no");
+
+      /* Need this trick because g_once_init_leave() does not accept 0 */
+      tmp = val ? g_strdup ("true") : g_strdup ("false");
+
+      g_free (path);
+      g_key_file_free (keyfile);
+
+      g_once_init_leave (&deltaupdates, tmp);
+    }
+
+  return g_strcmp0 (deltaupdates, "true") == 0;
+}
+
+const char *
+eos_get_app_server_url (void)
+{
+  static char *server_url;
+
+  if (g_once_init_enter (&server_url))
+    {
+      char *tmp;
+
+      GKeyFile *keyfile = g_key_file_new ();
+      char *path = g_build_filename (SYSCONFDIR, "eos-app-manager", "eam-default.cfg", NULL);
+      GError *error = NULL;
+      g_key_file_load_from_file (keyfile, path, G_KEY_FILE_NONE, &error);
+      if (error == NULL)
+        tmp = g_key_file_get_string (keyfile, "Repository", "ServerUrl", &error);
+
+      if (error != NULL)
+        {
+          eos_app_log_error_message ("Unable to load configuration: %s",
+                                     error->message);
+          g_error_free (error);
+          tmp = g_strdup ("http://appupdates.endlessm.com/");
+        }
+
+      eos_app_log_info_message ("Server address: %s", tmp);
+
+      g_once_init_leave (&server_url, tmp);
+    }
+
+  return server_url;
+}
+
+static const char *
+eos_get_app_server_api (void)
+{
+  static char *server_api;
+
+  if (g_once_init_enter (&server_api))
+    {
+      char *tmp;
+
+      GKeyFile *keyfile = g_key_file_new ();
+      char *path = g_build_filename (SYSCONFDIR, "eos-app-manager", "eam-default.cfg", NULL);
+      GError *error = NULL;
+      g_key_file_load_from_file (keyfile, path, G_KEY_FILE_NONE, &error);
+      if (error == NULL)
+        tmp = g_key_file_get_string (keyfile, "Repository", "ApiVersion", &error);
+
+      if (error != NULL)
+        {
+          eos_app_log_error_message ("Unable to load configuration: %s",
+                                     error->message);
+          g_error_free (error);
+          tmp = g_strdup ("v1");
+        }
+
+      eos_app_log_info_message ("Server API version: %s", tmp);
+
+      g_once_init_leave (&server_api, tmp);
+    }
+
+  return server_api;
 }
 
 /*
@@ -672,9 +878,9 @@ eos_get_updates_file (void)
 char *
 eos_get_all_updates_uri (void)
 {
-  return g_strconcat (eam_config_get_server_url (),
+  return g_strconcat (eos_get_app_server_url (),
                       "/api/",
-                      eam_config_get_api_version (),
+                      eos_get_app_server_api (),
                       "/updates/",
                       get_os_version (),
                       "?arch=", get_os_arch (),
@@ -691,7 +897,7 @@ eos_get_updates_meta_record_file (void)
 char *
 eos_get_updates_meta_record_uri (void)
 {
-  return g_strconcat (eam_config_get_server_url (),
+  return g_strconcat (eos_get_app_server_url (),
                       "/api/v1/meta_records",
                       "?type=updates",
                       NULL);
@@ -1057,7 +1263,7 @@ eos_app_load_available_apps (GHashTable *app_info,
       const gboolean is_diff = json_object_get_boolean_member (obj, "isDiff");
       const char *code_version = json_object_get_string_member (obj, "codeVersion");
 
-      if (is_diff && !eam_config_get_enable_delta_updates ())
+      if (is_diff && !eos_use_delta_updates ())
         {
           eos_app_log_debug_message ("Deltas disabled. Ignoring diff for %s", app_id);
 

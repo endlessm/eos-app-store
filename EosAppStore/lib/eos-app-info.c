@@ -7,7 +7,6 @@
 #include "eos-app-log.h"
 #include "eos-app-utils.h"
 #include "eos-flexy-grid.h"
-#include "eam-config.h"
 
 #include <sys/types.h>
 #include <sys/stat.h>
@@ -665,10 +664,10 @@ EosStorageType
 eos_app_info_get_install_storage_type (const EosAppInfo *info)
 {
   if (eos_has_secondary_storage () &&
-      eos_app_info_get_has_sufficient_install_space (info, eam_config_get_secondary_storage ()))
+      eos_app_info_get_has_sufficient_install_space (info, eos_get_secondary_storage ()))
     return EOS_STORAGE_TYPE_SECONDARY;
 
-  if (eos_app_info_get_has_sufficient_install_space (info,  eam_config_get_primary_storage ()))
+  if (eos_app_info_get_has_sufficient_install_space (info,  eos_get_primary_storage ()))
     return EOS_STORAGE_TYPE_PRIMARY;
 
   return EOS_STORAGE_TYPE_UNKNOWN;

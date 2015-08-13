@@ -11,7 +11,6 @@ eaprivate_cflags = \
 	$(EOS_APP_STORE_CFLAGS)
 
 eaprivate_source_h = \
-	lib/eam-config.h \
 	lib/eos-app-cell.h \
 	lib/eos-app-enums.h \
 	lib/eos-app-list-model.h \
@@ -27,7 +26,6 @@ eaprivate_source_h = \
 	lib/eos-vertical-stack-switcher.h
 
 eaprivate_source_c = \
-	lib/eam-config.c \
 	lib/eos-app-cell.c \
 	lib/eos-app-enums.c \
 	lib/eos-app-list-model.c \
@@ -79,8 +77,7 @@ BUILT_SOURCES += lib/eos-app-manager-service.c lib/eos-app-manager-service.h
 
 pkglib_LTLIBRARIES += libeaprivate-1.0.la
 
-introspection_sources_nopriv = $(filter-out %private.h, $(eaprivate_source_h)) $(eaprivate_source_c)
-introspection_sources = $(filter lib/eos%, $(introspection_sources_nopriv))
+introspection_sources = $(filter-out %private.h, $(eaprivate_source_h)) $(eaprivate_source_c)
 
 libeaprivate_1_0_la_LIBADD = $(EOS_APP_STORE_LIBS)
 libeaprivate_1_0_la_LDFLAGS = -avoid-version
