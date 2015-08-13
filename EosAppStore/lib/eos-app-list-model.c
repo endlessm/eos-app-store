@@ -10,6 +10,7 @@
 #include "eos-app-utils.h"
 #include "eos-downloader.h"
 #include "eos-net-utils-private.h"
+#include "eam-config.h"
 
 #include <time.h>
 #include <sys/types.h>
@@ -1075,7 +1076,7 @@ install_latest_app_version (EosAppListModel *self,
    */
   EosAppManager *proxy = get_eam_dbus_proxy (self);
   if (proxy == NULL ||
-      !g_file_test (eos_get_bundles_dir (), G_FILE_TEST_EXISTS))
+      !g_file_test (eam_config_get_applications_dir (), G_FILE_TEST_EXISTS))
     {
       external_message = _("The app center has detected a fatal error and "
                            "cannot continue. Please, "
@@ -1189,7 +1190,7 @@ update_app_from_manager (EosAppListModel *self,
 {
   GError *error = NULL;
   gboolean retval = FALSE;
-  gboolean allow_deltas = eos_use_delta_updates ();
+  gboolean allow_deltas = eam_config_get_enable_delta_updates ();
   const char *desktop_id = eos_app_info_get_desktop_id (info);
 
   eos_app_log_info_message ("Attempting to update '%s' (deltas allowed: %s)",
@@ -1269,7 +1270,7 @@ remove_app_from_manager (EosAppListModel *self,
    */
   EosAppManager *proxy = get_eam_dbus_proxy (self);
   if (proxy == NULL ||
-      !g_file_test (eos_get_bundles_dir (), G_FILE_TEST_EXISTS))
+      !g_file_test (eam_config_get_applications_dir (), G_FILE_TEST_EXISTS))
     {
       external_message = _("The app center has detected a fatal error and "
                            "cannot continue. Please, "
