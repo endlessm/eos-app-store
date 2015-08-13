@@ -5,6 +5,7 @@
 # Translators:
 # Ivan G. Gonçalves <i@endlessm.com>, 2015
 # Joel Gil Leon <joel@endlessm.com>, 2013
+# Mariana Barbosa <mari@endlessm.com>, 2015
 # Nuritzi Sanchez <ns@endlessm.com>, 2013
 # Philip Chimento <philip.chimento@gmail.com>, 2014
 # Renato Peixoto Pinto <renato@endlessm.com>, 2013
@@ -15,10 +16,10 @@ msgid ""
 msgstr ""
 "Project-Id-Version: eos-app-store\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-07-30 22:06-0700\n"
-"PO-Revision-Date: 2015-07-21 17:21+0000\n"
-"Last-Translator: Roddy Shuler <roddy@endlessm.com>\n"
-"Language-Team: Portuguese (Brazil) (http://www.transifex.com/projects/p/eos-app-store/language/pt_BR/)\n"
+"POT-Creation-Date: 2015-07-31 21:15+0000\n"
+"PO-Revision-Date: 2015-08-06 20:05+0000\n"
+"Last-Translator: Mariana Barbosa <mari@endlessm.com>\n"
+"Language-Team: Portuguese (Brazil) (http://www.transifex.com/endless-mobile-inc/eos-app-store/language/pt_BR/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -143,7 +144,7 @@ msgstr "Instalar programas"
 
 #: ../EosAppStore/appFrame.js:849
 msgid "Refresh failed"
-msgstr ""
+msgstr "Falha na atualização"
 
 #: ../EosAppStore/appStoreWindow.js:229
 msgid "Websites"
@@ -207,7 +208,7 @@ msgstr "Nome da pasta"
 msgid "Folder added!"
 msgstr "Pasta adicionada!"
 
-#: ../EosAppStore/folderFrame.js:272
+#: ../EosAppStore/folderFrame.js:296
 msgid "Install folders"
 msgstr "Adicionar pastas"
 
@@ -250,7 +251,7 @@ msgstr "Mais programas detectou um erro fatal e não pode continuar. Por favor, 
 
 #: ../EosAppStore/lib/eos-app-list-model.c:459
 msgid "We are unable to load the complete list of applications"
-msgstr ""
+msgstr "Não foi possível exibir a lista completa de programas"
 
 #: ../EosAppStore/lib/eos-app-list-model.c:467
 msgid "We were unable to update the list of applications"
@@ -258,7 +259,7 @@ msgstr "Não foi possível atualizar a lista de aplicativos"
 
 #: ../EosAppStore/lib/eos-app-list-model.c:892
 msgid "No space available for installing the app"
-msgstr ""
+msgstr "Espaço insuficiente para instalar o programa"
 
 #: ../EosAppStore/lib/eos-app-list-model.c:961
 #, c-format
@@ -357,25 +358,25 @@ msgstr "Não foi possível baixar o pacote de programas '%s'"
 
 #: ../EosAppStore/lib/eos-net-utils.c:270
 msgid "The certificate of the target server is expired"
-msgstr ""
+msgstr "O certificado do servidor de destino expirou"
 
 #: ../EosAppStore/lib/eos-net-utils.c:272
 msgid "The certificate of the target server has been revoked"
-msgstr ""
+msgstr "O certificado do servidor de destino foi revogado"
 
 #: ../EosAppStore/lib/eos-net-utils.c:274
 msgid "The certificate of the target server has a bad identity"
-msgstr ""
+msgstr "O certificado do servidor de destino contém um erro de identidade"
 
 #: ../EosAppStore/lib/eos-net-utils.c:276
 msgid "The certificate of the target server is from an unknown authority"
-msgstr ""
+msgstr "O certificado do servidor de destino é desconhecido"
 
 #: ../EosAppStore/lib/eos-net-utils.c:278
 msgid "The certificate of the target server is bad or invalid"
-msgstr ""
+msgstr "O certificado do servidor de destino está errado ou é inválido"
 
 #: ../EosAppStore/lib/eos-net-utils.c:335
 #, c-format
 msgid "Could not save bundle file - canceling download (%s)"
-msgstr ""
+msgstr "Não foi possível salvar o arquivo de pacote - cancelando o download (%s)"

@@ -8,10 +8,10 @@ msgid ""
 msgstr ""
 "Project-Id-Version: eos-app-store\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-07-30 22:06-0700\n"
+"POT-Creation-Date: 2015-07-31 21:15+0000\n"
 "PO-Revision-Date: 2015-07-21 17:20+0000\n"
 "Last-Translator: Roddy Shuler <roddy@endlessm.com>\n"
-"Language-Team: French (http://www.transifex.com/projects/p/eos-app-store/language/fr/)\n"
+"Language-Team: French (http://www.transifex.com/endless-mobile-inc/eos-app-store/language/fr/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -200,7 +200,7 @@ msgstr "Nom du dossier"
 msgid "Folder added!"
 msgstr "Dossier ajouté !"
 
-#: ../EosAppStore/folderFrame.js:272
+#: ../EosAppStore/folderFrame.js:296
 msgid "Install folders"
 msgstr "Installer les dossiers"
 
