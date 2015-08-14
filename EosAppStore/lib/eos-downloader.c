@@ -210,6 +210,7 @@ check_is_app_list_current (SoupSession *soup_session,
   GError *error = NULL;
 
   eos_app_log_info_message ("Checking if app list update is needed");
+  old_monotonic_id = get_local_updates_monotonic_id ();
 
   eos_app_log_info_message ("Downloading updates meta record from: %s", url);
   if (!eos_net_utils_download_file (soup_session,
@@ -238,7 +239,6 @@ check_is_app_list_current (SoupSession *soup_session,
       goto out;
     }
 
-  old_monotonic_id = get_local_updates_monotonic_id ();
   eos_app_log_info_message ("Comparing monotonic update ID."
                             " Old: %" G_GINT64_FORMAT ","
                             " New: %" G_GINT64_FORMAT ".",
