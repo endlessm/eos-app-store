@@ -6,7 +6,6 @@
 
 #include "eos-app-log.h"
 #include "eos-link-info.h"
-#include "eam-config.h"
 
 #include <locale.h>
 #include <glib/gi18n.h>
@@ -182,13 +181,19 @@ eos_get_cache_dir (void)
   return download_url;
 }
 
+const char *
+eos_get_bundles_dir (void)
+{
+  return eos_app_manager_get_applications_dir (eos_get_eam_dbus_proxy ());
+}
+
 gboolean
 eos_has_secondary_storage (void)
 {
   const char *primary_storage, *secondary_storage;
 
-  primary_storage = eam_config_get_primary_storage ();
-  secondary_storage = eam_config_get_secondary_storage ();
+  primary_storage = eos_get_primary_storage ();
+  secondary_storage = eos_get_secondary_storage ();
 
   /* The secondary storage path does not exist */
   struct stat secondary_statbuf;
@@ -207,6 +212,36 @@ eos_has_secondary_storage (void)
    * device than the primary.
    */
   return primary_statbuf.st_dev != secondary_statbuf.st_dev;
+}
+
+const char *
+eos_get_primary_storage (void)
+{
+  return eos_app_manager_get_primary_storage (eos_get_eam_dbus_proxy ());
+}
+
+const char *
+eos_get_secondary_storage (void)
+{
+  return eos_app_manager_get_secondary_storage (eos_get_eam_dbus_proxy ());
+}
+
+gboolean
+eos_use_delta_updates (void)
+{
+  return eos_app_manager_get_enable_delta_updates (eos_get_eam_dbus_proxy ());
+}
+
+const char *
+eos_get_app_server_url (void)
+{
+  return eos_app_manager_get_server_url (eos_get_eam_dbus_proxy ());
+}
+
+static const char *
+eos_get_app_server_api (void)
+{
+  return eos_app_manager_get_api_version (eos_get_eam_dbus_proxy ());
 }
 
 /*
@@ -672,9 +707,9 @@ eos_get_updates_file (void)
 char *
 eos_get_all_updates_uri (void)
 {
-  return g_strconcat (eam_config_get_server_url (),
+  return g_strconcat (eos_get_app_server_url (),
                       "/api/",
-                      eam_config_get_api_version (),
+                      eos_get_app_server_api (),
                       "/updates/",
                       get_os_version (),
                       "?arch=", get_os_arch (),
@@ -691,7 +726,7 @@ eos_get_updates_meta_record_file (void)
 char *
 eos_get_updates_meta_record_uri (void)
 {
-  return g_strconcat (eam_config_get_server_url (),
+  return g_strconcat (eos_get_app_server_url (),
                       "/api/v1/meta_records",
                       "?type=updates",
                       NULL);
@@ -729,11 +764,11 @@ is_app_id (const char *appid)
   return FALSE;
 }
 
-static gboolean
-eos_app_load_installed_apps_for_prefix (GHashTable *app_info,
-                                        const char *prefix,
-                                        GCancellable *cancellable)
+gboolean
+eos_app_load_installed_apps (GHashTable *app_info,
+                             GCancellable *cancellable)
 {
+  const char *prefix = eos_get_bundles_dir ();
   GError *error = NULL;
   GDir *dir = g_dir_open (prefix, 0, &error);
   if (dir == NULL)
@@ -794,26 +829,6 @@ eos_app_load_installed_apps_for_prefix (GHashTable *app_info,
                              (double) (g_get_monotonic_time () - start_time) / 1000);
 
   return TRUE;
-}
-
-gboolean
-eos_app_load_installed_apps (GHashTable *app_info,
-                             GCancellable *cancellable)
-{
-  gboolean retval;
-
-  eos_app_log_info_message ("Reloading installed apps");
-
-  const char *storage = eam_config_get_primary_storage ();
-  retval = eos_app_load_installed_apps_for_prefix (app_info, storage, cancellable);
-
-  if (eos_has_secondary_storage ())
-    {
-      storage = eam_config_get_secondary_storage ();
-      retval |= eos_app_load_installed_apps_for_prefix (app_info, storage, cancellable);
-    }
-
-  return retval;
 }
 
 gboolean
@@ -1077,7 +1092,7 @@ eos_app_load_available_apps (GHashTable *app_info,
       const gboolean is_diff = json_object_get_boolean_member (obj, "isDiff");
       const char *code_version = json_object_get_string_member (obj, "codeVersion");
 
-      if (is_diff && !eam_config_get_enable_delta_updates ())
+      if (is_diff && !eos_use_delta_updates ())
         {
           eos_app_log_debug_message ("Deltas disabled. Ignoring diff for %s", app_id);
 
@@ -1755,4 +1770,40 @@ eos_storage_type_to_string (EosStorageType storage)
   g_type_class_unref (enum_class);
 
   return retval;
+}
+
+/**
+ * eos_get_eam_dbus_proxy: (skip)
+ */
+EosAppManager *
+eos_get_eam_dbus_proxy (void)
+{
+  static EosAppManager *proxy = NULL;
+
+  eos_app_log_debug_message ("Getting dbus proxy");
+
+  /* If we already have a proxy, return it */
+  if (proxy != NULL)
+    return proxy;
+
+  /* Otherwise create it */
+  GError *error = NULL;
+
+  eos_app_log_debug_message ("No dbus proxy object yet - creating it");
+
+  proxy = eos_app_manager_proxy_new_for_bus_sync (G_BUS_TYPE_SYSTEM,
+                                                  G_DBUS_PROXY_FLAGS_NONE,
+                                                  "com.endlessm.AppManager",
+                                                  "/com/endlessm/AppManager",
+                                                  NULL, /* GCancellable* */
+                                                  &error);
+  g_dbus_proxy_set_default_timeout (G_DBUS_PROXY (proxy), G_MAXINT);
+
+  if (error != NULL)
+    {
+      eos_app_log_error_message ("Unable to create dbus proxy: %s", error->message);
+      g_error_free (error);
+    }
+
+  return proxy;
 }

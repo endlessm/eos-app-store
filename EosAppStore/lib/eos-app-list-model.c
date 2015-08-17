@@ -10,7 +10,6 @@
 #include "eos-app-utils.h"
 #include "eos-downloader.h"
 #include "eos-net-utils-private.h"
-#include "eam-config.h"
 
 #include <time.h>
 #include <sys/types.h>
@@ -63,8 +62,6 @@ struct _EosAppListModel
   gboolean caps_loaded;
 
   SoupSession *soup_session;
-
-  EosAppManager *proxy;
 };
 
 struct _EosAppListModelClass
@@ -101,34 +98,6 @@ download_progress_callback_data_free (gpointer _data)
 
 G_DEFINE_TYPE (EosAppListModel, eos_app_list_model, G_TYPE_OBJECT)
 G_DEFINE_QUARK (eos-app-list-model-error-quark, eos_app_list_model_error)
-
-static EosAppManager *
-get_eam_dbus_proxy (EosAppListModel *self)
-{
-  eos_app_log_debug_message ("Getting dbus proxy");
-
-  /* If we already have a proxy, return it */
-  if (self->proxy != NULL)
-    return self->proxy;
-
-  /* Otherwise create it */
-  GError *error = NULL;
-
-  eos_app_log_debug_message ("No dbus proxy object yet - creating it");
-
-  self->proxy = eos_app_manager_proxy_new_for_bus_sync (G_BUS_TYPE_SYSTEM,
-                                                        G_DBUS_PROXY_FLAGS_NONE,
-                                                        "com.endlessm.AppManager",
-                                                        "/com/endlessm/AppManager",
-                                                        NULL, /* GCancellable* */
-                                                        &error);
-  g_dbus_proxy_set_default_timeout (G_DBUS_PROXY (self->proxy), G_MAXINT);
-
-  if (error != NULL)
-    eos_app_log_error_message ("Unable to create dbus proxy");
-
-  return self->proxy;
-}
 
 static void
 eos_app_list_model_emit_changed (EosAppListModel *self)
@@ -369,7 +338,7 @@ load_user_capabilities (EosAppListModel *self,
   if (self->caps_loaded)
     return TRUE;
 
-  EosAppManager *proxy = get_eam_dbus_proxy (self);
+  EosAppManager *proxy = eos_get_eam_dbus_proxy ();
   if (proxy == NULL)
     {
       g_set_error_literal (error_out, EOS_APP_LIST_MODEL_ERROR,
@@ -605,8 +574,6 @@ eos_app_list_model_finalize (GObject *gobject)
       g_source_remove (self->refresh_guard_id);
       self->refresh_guard_id = 0;
     }
-
-  g_clear_object (&self->proxy);
 
   g_clear_object (&self->soup_session);
 
@@ -1074,9 +1041,9 @@ install_latest_app_version (EosAppListModel *self,
    * proxy was successfully created, but the app bundles directory was
    * removed afterwards
    */
-  EosAppManager *proxy = get_eam_dbus_proxy (self);
+  EosAppManager *proxy = eos_get_eam_dbus_proxy ();
   if (proxy == NULL ||
-      !g_file_test (eam_config_get_applications_dir (), G_FILE_TEST_EXISTS))
+      !g_file_test (eos_get_bundles_dir (), G_FILE_TEST_EXISTS))
     {
       external_message = _("The app center has detected a fatal error and "
                            "cannot continue. Please, "
@@ -1190,7 +1157,7 @@ update_app_from_manager (EosAppListModel *self,
 {
   GError *error = NULL;
   gboolean retval = FALSE;
-  gboolean allow_deltas = eam_config_get_enable_delta_updates ();
+  gboolean allow_deltas = eos_use_delta_updates ();
   const char *desktop_id = eos_app_info_get_desktop_id (info);
 
   eos_app_log_info_message ("Attempting to update '%s' (deltas allowed: %s)",
@@ -1268,9 +1235,9 @@ remove_app_from_manager (EosAppListModel *self,
    * proxy was successfully created, but the app bundles directory was
    * removed afterwards
    */
-  EosAppManager *proxy = get_eam_dbus_proxy (self);
+  EosAppManager *proxy = eos_get_eam_dbus_proxy ();
   if (proxy == NULL ||
-      !g_file_test (eam_config_get_applications_dir (), G_FILE_TEST_EXISTS))
+      !g_file_test (eos_get_bundles_dir (), G_FILE_TEST_EXISTS))
     {
       external_message = _("The app center has detected a fatal error and "
                            "cannot continue. Please, "
