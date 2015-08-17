@@ -703,6 +703,7 @@
     background-repeat: no-repeat;
     background-image: url("btn_add-folder_normal.png");
     background-color: transparent;
+    box-shadow: none;
 }
 
 .folder-bubble .button:hover {
