@@ -166,6 +166,30 @@ const FolderIconGrid = new Lang.Class({
     Name: 'FolderIconGrid',
     Extends: Gtk.FlowBox,
 
+    _init: function(folderModel) {
+        this.parent({
+            row_spacing: _FOLDER_GRID_SPACING,
+            column_spacing: _FOLDER_GRID_SPACING,
+            border_width: _FOLDER_GRID_BORDER,
+            selection_mode: Gtk.SelectionMode.NONE });
+
+        this._folderModel = folderModel;
+        this._iconList = this._folderModel.getIconList();
+        this._populate();
+        this._activeToggle = null;
+        this._bubble = null;
+
+        this.get_style_context().add_class('folder-icon-grid');
+
+        // FIXME: we need to listen for keypress events in the grid to allow
+        // switching the focus and start inserting the text automatically,
+        // when the user starts typing, WITHOUT removing the placeholder text.
+        // This won't be necessary when GTK+ allows setting the focus to a
+        // GtkEntry without removing the hint while no text has been inserted.
+        this.add_events(Gdk.EventMask.KEY_PRESS_MASK);
+        this.connect('key-press-event', Lang.bind(this, this._onKeyPress));
+    },
+
     _on_button_toggled: function(toggleButton) {
         if (toggleButton.get_active()) {
             let oldToggle = this._activeToggle;
@@ -214,30 +238,6 @@ const FolderIconGrid = new Lang.Class({
             this.add(button);
         }
         this.show_all();
-    },
-
-    _init: function(folderModel) {
-        this.parent({
-            row_spacing: _FOLDER_GRID_SPACING,
-            column_spacing: _FOLDER_GRID_SPACING,
-            border_width: _FOLDER_GRID_BORDER,
-            selection_mode: Gtk.SelectionMode.NONE });
-
-        this._folderModel = folderModel;
-        this._iconList = this._folderModel.getIconList();
-        this._populate();
-        this._activeToggle = null;
-        this._bubble = null;
-
-        this.get_style_context().add_class('folder-icon-grid');
-
-        // FIXME: we need to listen for keypress events in the grid to allow
-        // switching the focus and start inserting the text automatically,
-        // when the user starts typing, WITHOUT removing the placeholder text.
-        // This won't be necessary when GTK+ allows setting the focus to a
-        // GtkEntry without removing the hint while no text has been inserted.
-        this.add_events(Gdk.EventMask.KEY_PRESS_MASK);
-        this.connect('key-press-event', Lang.bind(this, this._onKeyPress));
     },
 
     _onKeyPress : function(window, event) {
