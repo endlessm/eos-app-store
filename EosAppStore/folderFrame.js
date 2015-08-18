@@ -195,6 +195,11 @@ const FolderIconGrid = new Lang.Class({
             let oldToggle = this._activeToggle;
             this._activeToggle = toggleButton;
 
+            // ignore clicks on the same active toggle
+            if (oldToggle == toggleButton) {
+                return;
+            }
+
             // unset the previous one
             if (oldToggle && oldToggle != toggleButton && oldToggle.get_active()) {
                 oldToggle.set_active(false);
