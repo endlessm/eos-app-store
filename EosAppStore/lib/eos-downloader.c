@@ -8,6 +8,7 @@
 #include <glib/gstdio.h>
 #include <glib/gi18n-lib.h>
 
+#include "eos-app-enums.h"
 #include "eos-app-log.h"
 #include "eos-app-utils.h"
 #include "eos-net-utils-private.h"
@@ -31,8 +32,8 @@ eos_app_info_create_sha256sum (EosAppInfo *info,
 
   if (bundle_hash == NULL || *bundle_hash == '\0')
     {
-      g_set_error (error_out, EOS_APP_LIST_MODEL_ERROR,
-                   EOS_APP_LIST_MODEL_ERROR_CHECKSUM_MISSING,
+      g_set_error (error_out, EOS_APP_STORE_ERROR,
+                   EOS_APP_STORE_ERROR_CHECKSUM_MISSING,
                    _("No verification available for app '%s'"),
                    app_id);
       return NULL;
@@ -70,8 +71,8 @@ eos_app_info_download_signature (EosAppInfo *info,
 
   if (signature_uri == NULL || *signature_uri == '\0')
     {
-      g_set_error (error_out, EOS_APP_LIST_MODEL_ERROR,
-                   EOS_APP_LIST_MODEL_ERROR_SIGNATURE_MISSING,
+      g_set_error (error_out, EOS_APP_STORE_ERROR,
+                   EOS_APP_STORE_ERROR_SIGNATURE_MISSING,
                    _("No signature available for app '%s'"),
                    app_id);
       return NULL;
@@ -121,8 +122,8 @@ eos_app_info_download_bundle (EosAppInfo *info,
     {
       eos_app_log_error_message ("Bundle URI is bad. Canceling");
 
-      g_set_error (error_out, EOS_APP_LIST_MODEL_ERROR,
-                   EOS_APP_LIST_MODEL_ERROR_FAILED,
+      g_set_error (error_out, EOS_APP_STORE_ERROR,
+                   EOS_APP_STORE_ERROR_FAILED,
                    _("Application bundle '%s' could not be downloaded"),
                    app_id);
       return NULL;

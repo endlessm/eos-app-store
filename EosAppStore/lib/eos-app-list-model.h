@@ -76,25 +76,6 @@ gboolean eos_app_list_model_update_app_finish       (EosAppListModel *model,
                                                      GAsyncResult *result,
                                                      GError **error);
 
-#define EOS_APP_LIST_MODEL_ERROR        (eos_app_list_model_error_quark ())
-
-GQuark eos_app_list_model_error_quark (void);
-
-typedef enum {
-  EOS_APP_LIST_MODEL_ERROR_FAILED,
-  EOS_APP_LIST_MODEL_ERROR_INSTALLED,
-  EOS_APP_LIST_MODEL_ERROR_NOT_INSTALLED,
-  EOS_APP_LIST_MODEL_ERROR_NO_UPDATE_AVAILABLE,
-  EOS_APP_LIST_MODEL_ERROR_DISK_FULL,
-  EOS_APP_LIST_MODEL_ERROR_CANCELLED,
-  EOS_APP_LIST_MODEL_ERROR_INSTALL_FAILED,
-  EOS_APP_LIST_MODEL_ERROR_UNINSTALL_FAILED,
-  EOS_APP_LIST_MODEL_ERROR_CHECKSUM_MISSING,
-  EOS_APP_LIST_MODEL_ERROR_SIGNATURE_MISSING,
-  EOS_APP_LIST_MODEL_ERROR_APP_REFRESH_PARTIAL_FAILURE,
-  EOS_APP_LIST_MODEL_ERROR_APP_REFRESH_FAILURE,
-} EosAppListModelError;
-
 G_END_DECLS
 
 #endif /* __EOS_APP_LIST_MODEL_H__ */

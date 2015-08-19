@@ -614,8 +614,8 @@ const AppListBoxRow = new Lang.Class({
         if (error &&
             (error.matches(Gio.io_error_quark(),
                            Gio.IOErrorEnum.CANCELLED) ||
-             error.matches(EosAppStorePrivate.AppListModel.error_quark(),
-                           EosAppStorePrivate.AppListModelError.CANCELLED))) {
+             error.matches(EosAppStorePrivate.app_store.error_quark(),
+                           EosAppStorePrivate.AppStoreError.CANCELLED))) {
             return;
         }
 
@@ -842,8 +842,8 @@ const AppBroker = new Lang.Class({
 
     _onModelRefresh: function(error) {
         if (error) {
-            if (error.matches(EosAppStorePrivate.AppListModel.error_quark(),
-                              EosAppStorePrivate.AppListModelError.APP_REFRESH_FAILURE)) {
+            if (error.matches(EosAppStorePrivate.app_store_error_quark(),
+                              EosAppStorePrivate.AppStoreError.APP_REFRESH_FAILURE)) {
                 // Show the error dialog
                 let dialog = new Gtk.MessageDialog({ transient_for: this._mainWindow,
                                                      modal: true,

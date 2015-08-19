@@ -61,3 +61,5 @@ EOS_DEFINE_ENUM_TYPE (EosStorageType, eos_storage_type,
                       EOS_ENUM_VALUE (EOS_STORAGE_TYPE_UNKNOWN, unknown)
                       EOS_ENUM_VALUE (EOS_STORAGE_TYPE_PRIMARY, primary)
                       EOS_ENUM_VALUE (EOS_STORAGE_TYPE_SECONDARY, secondary))
+
+G_DEFINE_QUARK (eos-app-store-error-quark, eos_app_store_error)
