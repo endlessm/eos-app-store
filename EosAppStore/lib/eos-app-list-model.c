@@ -970,16 +970,14 @@ set_app_installation_error (const char *app_name,
     {
       g_set_error (error_out, EOS_APP_LIST_MODEL_ERROR,
                    EOS_APP_LIST_MODEL_ERROR_INSTALL_FAILED,
-                   _("Application '%s' could not be installed."),
+                   _("We encountered an internal error during the installation of the application."),
                    app_name);
     }
   else
     {
-      g_set_error (error_out, EOS_APP_LIST_MODEL_ERROR,
-                   EOS_APP_LIST_MODEL_ERROR_INSTALL_FAILED,
-                   _("Application '%s' could not be installed. %s"),
-                   app_name,
-                   external_message);
+      g_set_error_literal (error_out, EOS_APP_LIST_MODEL_ERROR,
+                           EOS_APP_LIST_MODEL_ERROR_INSTALL_FAILED,
+                           external_message);
     }
 }
 
@@ -1002,16 +1000,14 @@ set_app_uninstall_error (const char *app_name,
     {
       g_set_error (error_out, EOS_APP_LIST_MODEL_ERROR,
                    EOS_APP_LIST_MODEL_ERROR_UNINSTALL_FAILED,
-                   _("Application '%s' could not be removed."),
+                   _("We encountered an internal error during the removal of the application."),
                    app_name);
     }
   else
     {
-      g_set_error (error_out, EOS_APP_LIST_MODEL_ERROR,
-                   EOS_APP_LIST_MODEL_ERROR_UNINSTALL_FAILED,
-                   _("Application '%s' could not be removed. %s"),
-                   app_name,
-                   external_message);
+      g_set_error_literal (error_out, EOS_APP_LIST_MODEL_ERROR,
+                           EOS_APP_LIST_MODEL_ERROR_UNINSTALL_FAILED,
+                           external_message);
     }
 }
 
