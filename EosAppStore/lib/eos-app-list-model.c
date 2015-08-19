@@ -1214,7 +1214,6 @@ remove_app_from_manager (EosAppListModel *self,
   gboolean retval = FALSE;
 
   const char *app_id = eos_app_info_get_application_id (info);
-  const char *desktop_id = eos_app_info_get_desktop_id (info);
   const char *internal_message = NULL;
   const char *external_message = NULL;
 
