@@ -4,6 +4,7 @@
 
 #include "eos-app-utils.h"
 
+#include "eos-app-enums.h"
 #include "eos-app-log.h"
 #include "eos-link-info.h"
 
@@ -1712,9 +1713,9 @@ eos_check_available_space (const char    *path,
     {
       eos_app_log_error_message ("Not enough space on device for downloading app");
 
-      g_set_error (error, G_IO_ERROR,
-                   G_IO_ERROR_NO_SPACE,
-                   _("Not enough space on device for downloading app"));
+      g_set_error (error, EOS_APP_STORE_ERROR,
+                   EOS_APP_STORE_ERROR_DISK_FULL,
+                   _("Not enough space on device for downloading the app."));
       retval = FALSE;
     }
 
