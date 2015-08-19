@@ -968,10 +968,9 @@ set_app_installation_error (const char *app_name,
   /* Set user-visible error */
   if (external_message == NULL)
     {
-      g_set_error (error_out, EOS_APP_LIST_MODEL_ERROR,
-                   EOS_APP_LIST_MODEL_ERROR_INSTALL_FAILED,
-                   _("We encountered an internal error during the installation of the application."),
-                   app_name);
+      g_set_error_literal (error_out, EOS_APP_LIST_MODEL_ERROR,
+                           EOS_APP_LIST_MODEL_ERROR_INSTALL_FAILED,
+                           _("We encountered an internal error during the installation of the application."));
     }
   else
     {
@@ -998,10 +997,9 @@ set_app_uninstall_error (const char *app_name,
   /* Set user-visible error */
   if (external_message == NULL)
     {
-      g_set_error (error_out, EOS_APP_LIST_MODEL_ERROR,
-                   EOS_APP_LIST_MODEL_ERROR_UNINSTALL_FAILED,
-                   _("We encountered an internal error during the removal of the application."),
-                   app_name);
+      g_set_error_literal (error_out, EOS_APP_LIST_MODEL_ERROR,
+                           EOS_APP_LIST_MODEL_ERROR_UNINSTALL_FAILED,
+                           _("We encountered an internal error during the removal of the application."));
     }
   else
     {
@@ -1023,7 +1021,6 @@ install_latest_app_version (EosAppListModel *self,
   gboolean retval = FALSE;
 
   const char *app_id = eos_app_info_get_application_id (info);
-  const char *desktop_id = eos_app_info_get_desktop_id (info);
   const char *internal_message = NULL;
   const char *external_message = NULL;
 
