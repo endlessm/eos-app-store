@@ -698,6 +698,40 @@ const AppCategoryFrame = new Lang.Class({
         return (this._stack.visible_child_name == 'spinner');
     },
 
+    get appInfos() {
+        let appInfos = this._model.loadCategory(this._category.id);
+        let validAppInfos = [];
+
+        if (this._category.id == EosAppStorePrivate.AppCategory.INSTALLED) {
+            let sortedAppInfos = appInfos.sort(function(a, b) {
+                return b.get_installation_time() - a.get_installation_time();
+            });
+
+            // 'Installed' only shows apps available on the desktop...
+            for (let i in sortedAppInfos) {
+                let info = sortedAppInfos[i];
+
+                if (info.get_has_launcher())
+                    validAppInfos.push(info);
+            }
+        }
+        else {
+            // ... while every other category only shows apps that can be added
+            for (let i in appInfos) {
+                let info = appInfos[i];
+
+                if (!info.get_has_launcher())
+                    validAppInfos.push(info);
+            }
+        }
+
+        return validAppInfos;
+    },
+
+    updateVisibilityState: function() {
+        this._category.widget.visible = this.appInfos.length != 0;
+    },
+
     populate: function() {
         if (this._gridBox) {
             return;
@@ -720,34 +754,14 @@ const AppCategoryFrame = new Lang.Class({
                                                       cell_spacing: CELL_DEFAULT_SPACING - cellMargin });
         scrollWindow.add_with_viewport(grid);
 
-        let appInfos = this._model.loadCategory(this._category.id);
+        let appInfoList = this.appInfos;
+        for (let infoIndex in appInfoList) {
+            let info = appInfoList[infoIndex];
+            let cell = info.create_cell(info.get_icon_name());
+            grid.add(cell);
 
-        if (this._category.id == EosAppStorePrivate.AppCategory.INSTALLED) {
-            let sortedAppInfos = appInfos.sort(function(a, b) {
-                return b.get_installation_time() - a.get_installation_time();
-            });
-
-            // 'Installed' only shows apps available on the desktop...
-            for (let i in sortedAppInfos) {
-                let info = sortedAppInfos[i];
-
-                if (info.get_has_launcher()) {
-                    let cell = info.create_cell(info.get_icon_name());
-                    cell.shape = EosAppStorePrivate.FlexyShape.SMALL;
-                    grid.add(cell);
-                }
-            }
-        }
-        else {
-            // ... while every other category only shows apps that can be added
-            for (let i in appInfos) {
-                let info = appInfos[i];
-
-                if (!info.get_has_launcher()) {
-                    let cell = info.create_cell(info.get_icon_name());
-                    grid.add(cell);
-                }
-            }
+            if (this._category.id == EosAppStorePrivate.AppCategory.INSTALLED)
+                cell.shape = EosAppStorePrivate.FlexyShape.SMALL;
         }
 
         grid.connect('cell-selected', Lang.bind(this, this._onCellSelected));
@@ -832,6 +846,7 @@ const AppBroker = new Lang.Class({
         this._model = application.appList;
 
         this._model.refresh(Lang.bind(this, this._onModelRefresh));
+        this._model.connect('changed', Lang.bind(this, this._updateAllCategoryVisibilityStates));
 
         this._categories = Categories.get_app_categories();
         this._categories.forEach(Lang.bind(this, function(category) {
@@ -866,9 +881,16 @@ const AppBroker = new Lang.Class({
         this._populateAllCategories();
     },
 
+    _updateAllCategoryVisibilityStates: function() {
+        this._categories.forEach(Lang.bind(this, function(c) {
+            c.widget.updateVisibilityState();
+        }));
+    },
+
     _populateAllCategories: function() {
         this._categories.forEach(Lang.bind(this, function(c) {
             c.widget.populate();
+            c.widget.updateVisibilityState();
         }));
     },
 
