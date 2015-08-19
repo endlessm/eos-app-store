@@ -952,7 +952,7 @@ out:
 }
 
 static void
-set_app_installation_error (const char *desktop_id,
+set_app_installation_error (const char *app_name,
                             const char *internal_message,
                             const char *external_message,
                             GError **error_out)
@@ -970,21 +970,19 @@ set_app_installation_error (const char *desktop_id,
     {
       g_set_error (error_out, EOS_APP_LIST_MODEL_ERROR,
                    EOS_APP_LIST_MODEL_ERROR_INSTALL_FAILED,
-                   _("Application '%s' could not be installed"),
-                   desktop_id);
+                   _("We encountered an internal error during the installation of the application."),
+                   app_name);
     }
   else
     {
-      g_set_error (error_out, EOS_APP_LIST_MODEL_ERROR,
-                   EOS_APP_LIST_MODEL_ERROR_INSTALL_FAILED,
-                   _("Application '%s' could not be installed. %s"),
-                   desktop_id,
-                   external_message);
+      g_set_error_literal (error_out, EOS_APP_LIST_MODEL_ERROR,
+                           EOS_APP_LIST_MODEL_ERROR_INSTALL_FAILED,
+                           external_message);
     }
 }
 
 static void
-set_app_uninstall_error (const char *desktop_id,
+set_app_uninstall_error (const char *app_name,
                          const char *internal_message,
                          const char *external_message,
                          GError **error_out)
@@ -1002,16 +1000,14 @@ set_app_uninstall_error (const char *desktop_id,
     {
       g_set_error (error_out, EOS_APP_LIST_MODEL_ERROR,
                    EOS_APP_LIST_MODEL_ERROR_UNINSTALL_FAILED,
-                   _("Application '%s' could not be removed"),
-                   desktop_id);
+                   _("We encountered an internal error during the removal of the application."),
+                   app_name);
     }
   else
     {
-      g_set_error (error_out, EOS_APP_LIST_MODEL_ERROR,
-                   EOS_APP_LIST_MODEL_ERROR_UNINSTALL_FAILED,
-                   _("Application '%s' could not be removed. %s"),
-                   desktop_id,
-                   external_message);
+      g_set_error_literal (error_out, EOS_APP_LIST_MODEL_ERROR,
+                           EOS_APP_LIST_MODEL_ERROR_UNINSTALL_FAILED,
+                           external_message);
     }
 }
 
@@ -1033,7 +1029,7 @@ install_latest_app_version (EosAppListModel *self,
 
   if (!self->can_install)
     {
-      external_message = _("You must be an administrator to install applications");
+      external_message = _("You must be an administrator to install applications.");
       goto out;
     }
 
@@ -1081,7 +1077,7 @@ install_latest_app_version (EosAppListModel *self,
           char *code = g_dbus_error_get_remote_error (error);
 
           if (g_strcmp0 (code, "com.endlessm.AppManager.Error.NotAuthorized") == 0)
-            external_message = _("You must be an administrator to install applications");
+            external_message = _("You must be an administrator to install applications.");
 
           g_free (code);
         }
@@ -1124,7 +1120,7 @@ install_latest_app_version (EosAppListModel *self,
     internal_message = "Install transaction failed";
 
   if (!retval)
-    set_app_installation_error (desktop_id,
+    set_app_installation_error (eos_app_info_get_title (info),
                                 internal_message,
                                 external_message,
                                 error_out);
@@ -1227,7 +1223,7 @@ remove_app_from_manager (EosAppListModel *self,
 
   if (!self->can_uninstall)
     {
-      external_message = _("You must be an administrator to remove applications");
+      external_message = _("You must be an administrator to remove applications.");
       goto out;
     }
 
@@ -1257,7 +1253,7 @@ remove_app_from_manager (EosAppListModel *self,
           char *code = g_dbus_error_get_remote_error (error);
 
           if (g_strcmp0 (code, "com.endlessm.AppManager.Error.NotAuthorized") == 0)
-            external_message = _("You must be an administrator to remove applications");
+            external_message = _("You must be an administrator to remove applications.");
 
           g_free (code);
         }
@@ -1273,7 +1269,7 @@ remove_app_from_manager (EosAppListModel *self,
   if (retval)
     eos_app_log_info_message ("Uninstall transaction succeeded");
   else
-    set_app_uninstall_error (desktop_id,
+    set_app_uninstall_error (eos_app_info_get_title (info),
                              internal_message,
                              external_message,
                              error_out);
@@ -1389,7 +1385,7 @@ eos_app_list_model_install_app_async (EosAppListModel *model,
       g_task_return_new_error (task,
                                eos_app_list_model_error_quark (),
                                EOS_APP_LIST_MODEL_ERROR_FAILED,
-                               _("App %s not installable"),
+                               _("App %s has no candidate for installation."),
                                desktop_id);
       g_object_unref (task);
       return;
@@ -1401,7 +1397,7 @@ eos_app_list_model_install_app_async (EosAppListModel *model,
       g_task_return_new_error (task,
                                eos_app_list_model_error_quark (),
                                EOS_APP_LIST_MODEL_ERROR_INSTALLED,
-                               _("App %s already installed"),
+                               _("App %s already installed."),
                                desktop_id);
       g_object_unref (task);
       return;
