@@ -414,12 +414,12 @@ configure_style_for_subtitle_label (GtkLabel *label)
 {
   gtk_style_context_add_class (gtk_widget_get_style_context (GTK_WIDGET (label)),
                                "app-cell-subtitle");
-  gtk_misc_set_alignment (GTK_MISC (label), 0.0, 0.0);
-
-  gtk_label_set_line_wrap (GTK_LABEL (label), TRUE);
-  gtk_label_set_max_width_chars (GTK_LABEL (label), 50);
-  gtk_label_set_ellipsize (GTK_LABEL (label), PANGO_ELLIPSIZE_END);
-  gtk_label_set_lines (GTK_LABEL(label), 2);
+  gtk_label_set_xalign (label, 0.0);
+  gtk_label_set_yalign (label, 0.0);
+  gtk_label_set_line_wrap (label, TRUE);
+  gtk_label_set_max_width_chars (label, 50);
+  gtk_label_set_ellipsize (label, PANGO_ELLIPSIZE_END);
+  gtk_label_set_lines (label, 2);
 }
 
 static void
@@ -454,7 +454,7 @@ eos_app_cell_init (EosAppCell *self)
   gtk_style_context_add_class (gtk_widget_get_style_context (self->title_label),
                                "app-cell-title");
   gtk_label_set_line_wrap (GTK_LABEL (self->title_label), TRUE);
-  gtk_misc_set_alignment (GTK_MISC (self->title_label), 0.0, 0.5);
+  gtk_label_set_xalign (GTK_LABEL (self->title_label), 0.0);
   gtk_container_add (GTK_CONTAINER (box), self->title_label);
   gtk_widget_show (self->title_label);
 
@@ -530,7 +530,7 @@ eos_app_cell_init (EosAppCell *self)
   gtk_style_context_add_class (gtk_widget_get_style_context (self->title_label_selected),
                                "app-cell-title");
   gtk_label_set_line_wrap (GTK_LABEL (self->title_label_selected), TRUE);
-  gtk_misc_set_alignment (GTK_MISC (self->title_label_selected), 0.0, 0.5);
+  gtk_label_set_xalign (GTK_LABEL (self->title_label_selected), 0.0);
   gtk_container_add (GTK_CONTAINER (box_selected), self->title_label_selected);
   gtk_widget_show (self->title_label_selected);
 
