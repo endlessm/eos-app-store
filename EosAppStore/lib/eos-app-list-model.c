@@ -3,6 +3,7 @@
 
 #include "config.h"
 
+#include "eos-app-enums.h"
 #include "eos-app-log.h"
 #include "eos-app-list-model.h"
 #include "eos-app-manager-service.h"
@@ -97,7 +98,6 @@ download_progress_callback_data_free (gpointer _data)
 }
 
 G_DEFINE_TYPE (EosAppListModel, eos_app_list_model, G_TYPE_OBJECT)
-G_DEFINE_QUARK (eos-app-list-model-error-quark, eos_app_list_model_error)
 
 static void
 eos_app_list_model_emit_changed (EosAppListModel *self)
@@ -341,8 +341,8 @@ load_user_capabilities (EosAppListModel *self,
   EosAppManager *proxy = eos_get_eam_dbus_proxy ();
   if (proxy == NULL)
     {
-      g_set_error_literal (error_out, EOS_APP_LIST_MODEL_ERROR,
-                           EOS_APP_LIST_MODEL_ERROR_FAILED,
+      g_set_error_literal (error_out, EOS_APP_STORE_ERROR,
+                           EOS_APP_STORE_ERROR_FAILED,
                            _("The app center has detected a fatal error and "
                              "cannot continue with the installation. Please, "
                              "restart your system. If the problem persists, "
@@ -469,7 +469,7 @@ set_reload_error (GError **error,
 
   if (*error == NULL || is_critical)
     {
-      int error_type = EOS_APP_LIST_MODEL_ERROR_APP_REFRESH_PARTIAL_FAILURE;
+      int error_type = EOS_APP_STORE_ERROR_APP_REFRESH_PARTIAL_FAILURE;
       char *error_message = _("We are unable to load the complete list of "
                               "applications");
 
@@ -477,11 +477,11 @@ set_reload_error (GError **error,
         {
           g_clear_error (error);
 
-          error_type = EOS_APP_LIST_MODEL_ERROR_APP_REFRESH_FAILURE;
+          error_type = EOS_APP_STORE_ERROR_APP_REFRESH_FAILURE;
           error_message = _("We were unable to update the list of applications");
         }
 
-      g_set_error_literal (error, EOS_APP_LIST_MODEL_ERROR, error_type,
+      g_set_error_literal (error, EOS_APP_STORE_ERROR, error_type,
                            error_message);
     }
 }
@@ -549,7 +549,7 @@ load_all_apps (EosAppListModel *self,
       /* Sanity check */
       g_assert_nonnull (internal_error);
 
-      g_assert_true (internal_error->domain == EOS_APP_LIST_MODEL_ERROR);
+      g_assert_true (internal_error->domain == EOS_APP_STORE_ERROR);
 
       g_propagate_error (error, internal_error);
     }
@@ -899,9 +899,9 @@ get_bundle_artifacts (EosAppListModel *self,
     {
       eos_app_log_error_message ("Unable to determine where the bundle should be installed");
 
-      g_set_error_literal (&error, EOS_APP_LIST_MODEL_ERROR,
-                           EOS_APP_LIST_MODEL_ERROR_DISK_FULL,
-                           _("No space available for installing the app"));
+      g_set_error_literal (&error, EOS_APP_STORE_ERROR,
+                           EOS_APP_STORE_ERROR_DISK_FULL,
+                           _("Not enough space on device for installing the app."));
       goto out;
     }
 
@@ -968,14 +968,14 @@ set_app_installation_error (const char *app_name,
   /* Set user-visible error */
   if (external_message == NULL)
     {
-      g_set_error_literal (error_out, EOS_APP_LIST_MODEL_ERROR,
-                           EOS_APP_LIST_MODEL_ERROR_INSTALL_FAILED,
+      g_set_error_literal (error_out, EOS_APP_STORE_ERROR,
+                           EOS_APP_STORE_ERROR_INSTALL_FAILED,
                            _("We encountered an internal error during the installation of the application."));
     }
   else
     {
-      g_set_error_literal (error_out, EOS_APP_LIST_MODEL_ERROR,
-                           EOS_APP_LIST_MODEL_ERROR_INSTALL_FAILED,
+      g_set_error_literal (error_out, EOS_APP_STORE_ERROR,
+                           EOS_APP_STORE_ERROR_INSTALL_FAILED,
                            external_message);
     }
 }
@@ -997,14 +997,14 @@ set_app_uninstall_error (const char *app_name,
   /* Set user-visible error */
   if (external_message == NULL)
     {
-      g_set_error_literal (error_out, EOS_APP_LIST_MODEL_ERROR,
-                           EOS_APP_LIST_MODEL_ERROR_UNINSTALL_FAILED,
+      g_set_error_literal (error_out, EOS_APP_STORE_ERROR,
+                           EOS_APP_STORE_ERROR_UNINSTALL_FAILED,
                            _("We encountered an internal error during the removal of the application."));
     }
   else
     {
-      g_set_error_literal (error_out, EOS_APP_LIST_MODEL_ERROR,
-                           EOS_APP_LIST_MODEL_ERROR_UNINSTALL_FAILED,
+      g_set_error_literal (error_out, EOS_APP_STORE_ERROR,
+                           EOS_APP_STORE_ERROR_UNINSTALL_FAILED,
                            external_message);
     }
 }
@@ -1097,7 +1097,7 @@ install_latest_app_version (EosAppListModel *self,
   if (error != NULL)
     {
       /* propagate only the errors we generate as they are... */
-      if (error->domain == EOS_APP_LIST_MODEL_ERROR)
+      if (error->domain == EOS_APP_STORE_ERROR)
         external_message = error->message;
 
       internal_message = error->message;
@@ -1379,8 +1379,8 @@ eos_app_list_model_install_app_async (EosAppListModel *model,
   if (info == NULL)
     {
       g_task_return_new_error (task,
-                               eos_app_list_model_error_quark (),
-                               EOS_APP_LIST_MODEL_ERROR_FAILED,
+                               EOS_APP_STORE_ERROR,
+                               EOS_APP_STORE_ERROR_FAILED,
                                _("App %s has no candidate for installation."),
                                desktop_id);
       g_object_unref (task);
@@ -1391,10 +1391,10 @@ eos_app_list_model_install_app_async (EosAppListModel *model,
       eos_app_info_get_has_launcher (info))
     {
       g_task_return_new_error (task,
-                               eos_app_list_model_error_quark (),
-                               EOS_APP_LIST_MODEL_ERROR_INSTALLED,
-                               _("App %s already installed."),
-                               desktop_id);
+                               EOS_APP_STORE_ERROR,
+                               EOS_APP_STORE_ERROR_INSTALLED,
+                               _("App '%s' is already installed."),
+                               eos_app_info_get_title (info));
       g_object_unref (task);
       return;
     }
@@ -1447,9 +1447,9 @@ eos_app_list_model_update_app_async (EosAppListModel *model,
   if (info == NULL)
     {
       g_task_return_new_error (task,
-                               eos_app_list_model_error_quark (),
-                               EOS_APP_LIST_MODEL_ERROR_FAILED,
-                               _("App %s not installable"),
+                               EOS_APP_STORE_ERROR,
+                               EOS_APP_STORE_ERROR_FAILED,
+                               _("App %s not installable."),
                                desktop_id);
       g_object_unref (task);
       return;
@@ -1458,10 +1458,10 @@ eos_app_list_model_update_app_async (EosAppListModel *model,
   if (!eos_app_info_is_updatable (info))
     {
       g_task_return_new_error (task,
-                               eos_app_list_model_error_quark (),
-                               EOS_APP_LIST_MODEL_ERROR_NO_UPDATE_AVAILABLE,
-                               _("App %s is up to date"),
-                               desktop_id);
+                               EOS_APP_STORE_ERROR,
+                               EOS_APP_STORE_ERROR_NO_UPDATE_AVAILABLE,
+                               _("App %s is up to date."),
+                               eos_app_info_get_title (info));
       g_object_unref (task);
       return;
     }
@@ -1529,8 +1529,8 @@ eos_app_list_model_uninstall_app_async (EosAppListModel *model,
   if (info == NULL || !eos_app_info_is_installed (info))
     {
       g_task_return_new_error (task,
-                               eos_app_list_model_error_quark (),
-                               EOS_APP_LIST_MODEL_ERROR_NOT_INSTALLED,
+                               EOS_APP_STORE_ERROR,
+                               EOS_APP_STORE_ERROR_NOT_INSTALLED,
                                _("App %s is not installed"),
                                desktop_id);
       g_object_unref (task);
@@ -1558,13 +1558,13 @@ eos_app_list_model_launch_app (EosAppListModel *model,
 {
   EosAppInfo *info = eos_app_list_model_get_app_info (model, desktop_id);
 
-  if ((info == NULL) || !eos_app_info_is_installed (info))
+  if (info == NULL || !eos_app_info_is_installed (info))
     {
       g_set_error (error,
-                   eos_app_list_model_error_quark (),
-                   EOS_APP_LIST_MODEL_ERROR_NOT_INSTALLED,
-                   _("App %s is not installed"),
-                   desktop_id);
+                   EOS_APP_STORE_ERROR,
+                   EOS_APP_STORE_ERROR_NOT_INSTALLED,
+                   _("App '%s' is not installed."),
+                   info == NULL ? desktop_id : eos_app_info_get_title (info));
       return FALSE;
     }
 
