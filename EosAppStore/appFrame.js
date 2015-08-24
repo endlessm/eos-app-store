@@ -19,7 +19,6 @@ const Signals = imports.signals;
 
 const APP_TRANSITION_MS = 500;
 const CATEGORY_TRANSITION_MS = 500;
-const SHOW_DESKTOP_ICON_DELAY = 1;
 
 const CELL_DEFAULT_SIZE = 180;
 const CELL_DEFAULT_SPACING = 15;
@@ -66,7 +65,6 @@ const AppListBoxRow = new Lang.Class({
         '_installProgressBar',
         '_installProgressSpinner',
         '_installProgressCancel',
-        '_installedMessage',
         '_removeButton',
         '_removeButtonImage',
         '_removeButtonLabel',
@@ -344,22 +342,19 @@ const AppListBoxRow = new Lang.Class({
 
         switch (this._appState) {
             case EosAppStorePrivate.AppState.INSTALLED:
-                // wait for the message to hide
-                if (!this._installedMessage.visible) {
-                    if (this.appInfo.get_has_launcher()) {
-                        this._installButtonLabel.set_text(BUTTON_LABEL_LAUNCH);
-                    }
-                    else {
-                        this._installButtonLabel.set_text(BUTTON_LABEL_ADD);
-                    }
+                if (this.appInfo.get_has_launcher()) {
+                    this._installButtonLabel.set_text(BUTTON_LABEL_LAUNCH);
+                }
+                else {
+                    this._installButtonLabel.set_text(BUTTON_LABEL_ADD);
+                }
 
-                    this._installButton.show();
+                this._installButton.show();
 
-                    // Only apps that don't have a launcher can be
-                    // removed from the system
-                    if (!this.appInfo.get_has_launcher() && this.appInfo.is_removable()) {
-                        this._removeButton.show();
-                    }
+                // Only apps that don't have a launcher can be
+                // removed from the system
+                if (!this.appInfo.get_has_launcher() && this.appInfo.is_removable()) {
+                    this._removeButton.show();
                 }
                 break;
 
@@ -464,19 +459,12 @@ const AppListBoxRow = new Lang.Class({
 
         this._maybeNotify(_("'%s' was installed successfully").format(this.appTitle));
 
-        this._installedMessage.show();
-        Mainloop.timeout_add_seconds(SHOW_DESKTOP_ICON_DELAY,
-                                     Lang.bind(this, function() {
-            this._installedMessage.hide();
-            this._updateState();
+        this._updateState();
 
-            let appWindow = Gio.Application.get_default().mainWindow;
-            if (appWindow && appWindow.is_visible()) {
-                appWindow.hide();
-            }
-
-            return false;
-        }));
+        let appWindow = Gio.Application.get_default().mainWindow;
+        if (appWindow && appWindow.is_visible()) {
+            appWindow.hide();
+        }
     },
 
     _installOrAddToDesktop: function() {
