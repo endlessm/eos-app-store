@@ -28,6 +28,7 @@ const LIST_COLUMNS_SPACING = 10;
 const DEFAULT_ICON = 'generic-link';
 const EOS_BROWSER = 'chromium-browser ';
 const DESKTOP_KEY_SPLASH = 'X-Endless-Splash-Screen';
+const DESKTOP_KEY_MAXIMIZED = 'X-Endless-Launch-Maximized';
 
 const ICON_EXTERNAL_LINK = '/com/endlessm/appstore/icon_external-link.png';
 const ICON_BLANK = '/com/endlessm/appstore/icon_blank.png';
@@ -82,7 +83,8 @@ function createWeblink(url, title, icon) {
     desktop.set_string(GLib.KEY_FILE_DESKTOP_GROUP, GLib.KEY_FILE_DESKTOP_KEY_TYPE, 'Application');
     desktop.set_string(GLib.KEY_FILE_DESKTOP_GROUP, GLib.KEY_FILE_DESKTOP_KEY_EXEC, EOS_BROWSER + url);
     desktop.set_string(GLib.KEY_FILE_DESKTOP_GROUP, GLib.KEY_FILE_DESKTOP_KEY_ICON, icon);
-    desktop.set_boolean(GLib.KEY_FILE_DESKTOP_GROUP, DESKTOP_KEY_SPLASH, false);
+    desktop.set_boolean(GLib.KEY_FILE_DESKTOP_GROUP, DESKTOP_KEY_SPLASH, true);
+    desktop.set_boolean(GLib.KEY_FILE_DESKTOP_GROUP, DESKTOP_KEY_MAXIMIZED, true);
     desktop.set_string(GLib.KEY_FILE_DESKTOP_GROUP, GLib.KEY_FILE_DESKTOP_KEY_NAME, title);
 
     let [data, length] = desktop.to_data();
