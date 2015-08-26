@@ -111,14 +111,12 @@ const AppFrame = new Lang.Class({
     },
 });
 
-const AppCategoryFrame = new Lang.Class({
-    Name: 'AppCategoryFrame',
+const AppInstalledFrame = new Lang.Class({
+    Name: 'AppInstalledFrame',
     Extends: AppFrame,
 
-    _init: function(category, model, mainWindow) {
+    _init: function(model, mainWindow) {
         this.parent(model, mainWindow);
-
-        this._category = category;
 
         this._grid = null;
         this._lastCellSelected = null;
@@ -149,33 +147,140 @@ const AppCategoryFrame = new Lang.Class({
                                                       cell_spacing: CELL_DEFAULT_SPACING - cellMargin });
         scrollWindow.add_with_viewport(grid);
 
-        let appInfos = this.model.loadCategory(this._category.id);
+        let appInfos = this.model.loadCategory(EosAppStorePrivate.AppCategory.INSTALLED);
+        let sortedAppInfos = appInfos.sort(function(a, b) {
+            return b.get_installation_time() - a.get_installation_time();
+        });
 
-        if (this._category.id == EosAppStorePrivate.AppCategory.INSTALLED) {
-            let sortedAppInfos = appInfos.sort(function(a, b) {
-                return b.get_installation_time() - a.get_installation_time();
-            });
+        // 'Installed' only shows apps available on the desktop
+        for (let i in sortedAppInfos) {
+            let info = sortedAppInfos[i];
 
-            // 'Installed' only shows apps available on the desktop...
-            for (let i in sortedAppInfos) {
-                let info = sortedAppInfos[i];
-
-                if (info.get_has_launcher()) {
-                    let cell = info.create_cell(info.get_icon_name());
-                    cell.shape = EosAppStorePrivate.FlexyShape.SMALL;
-                    grid.add(cell);
-                }
+            if (info.get_has_launcher()) {
+                let cell = info.create_cell(info.get_icon_name());
+                cell.shape = EosAppStorePrivate.FlexyShape.SMALL;
+                grid.add(cell);
             }
         }
-        else {
-            // ... while every other category only shows apps that can be added
-            for (let i in appInfos) {
-                let info = appInfos[i];
 
-                if (!info.get_has_launcher()) {
-                    let cell = info.create_cell(info.get_icon_name());
-                    grid.add(cell);
-                }
+        grid.connect('cell-selected', Lang.bind(this, this._onCellSelected));
+        grid.connect('cell-activated', Lang.bind(this, this._onCellActivated));
+        grid.show_all();
+
+        // Keep a back reference so we can decide when to re-populate
+        this._grid = grid;
+
+        this.spinning = false;
+    },
+
+    _onCellSelected: function(grid, cell) {
+        if (this._lastCellSelected != cell) {
+            if (this._lastCellSelected) {
+                this._lastCellSelected.selected = false;
+            }
+
+            this._lastCellSelected = cell;
+
+            if (this._lastCellSelected) {
+                this._lastCellSelected.selected = true;
+            }
+        }
+    },
+
+    _onCellActivated: function(grid, cell) {
+        if (!this._stack.get_child_by_name(cell.desktop_id)) {
+            let appBox = new AppInfoBox(this.model, cell.app_info);
+            this.addContentPage(appBox, cell.desktop_id);
+            appBox.connect('destroy', Lang.bind(this, this._showGrid));
+            appBox.show();
+        }
+
+        this.showContentPage(cell.desktop_id, Gtk.StackTransitionType.SLIDE_LEFT);
+
+        this.mainWindow.titleText = cell.app_info.get_title();
+        this.mainWindow.subtitleText = cell.app_info.get_subtitle();
+        this.mainWindow.headerIcon = cell.app_info.get_icon_name();
+        this.mainWindow.headerInstalledVisible = cell.app_info.is_installed();
+        this.mainWindow.backButtonVisible = true;
+
+        this._backClickedId =
+            this.mainWindow.connect('back-clicked', Lang.bind(this, this._showGrid));
+    },
+
+    _showGrid: function() {
+        this.mainWindow.clearHeaderState();
+
+        if (this._backClickedId != 0) {
+            this.mainWindow.disconnect(this._backClickedId);
+            this._backClickedId = 0;
+        }
+
+        this.populate();
+        this.showContentPage(null, Gtk.StackTransitionType.SLIDE_RIGHT);
+    },
+
+    reset: function() {
+        if (this.spinning) {
+            return;
+        }
+
+        this._grid.destroy();
+        this._grid = null;
+        this._showGrid();
+    },
+
+    get title() {
+        return _("Installed apps");
+    }
+});
+
+const AppCategoryFrame = new Lang.Class({
+    Name: 'AppCategoryFrame',
+    Extends: AppFrame,
+
+    _init: function(categoryId, model, mainWindow) {
+        this.parent(model, mainWindow);
+
+        this._categoryId = categoryId;
+
+        this._grid = null;
+        this._lastCellSelected = null;
+        this._backClickedId = 0;
+    },
+
+    vfunc_destroy: function() {
+        if (this._backClickedId != 0) {
+            this.mainWindow.disconnect(this._backClickedId);
+            this._backClickedId = 0;
+        }
+
+        this.parent();
+    },
+
+    populate: function() {
+        if (this._grid) {
+            return;
+        }
+
+        let scrollWindow = new Gtk.ScrolledWindow({ hscrollbar_policy: Gtk.PolicyType.NEVER,
+                                                    vscrollbar_policy: Gtk.PolicyType.AUTOMATIC });
+        this.contentBox.add(scrollWindow);
+        scrollWindow.show();
+
+        let cellMargin = EosAppStorePrivate.AppInfo.get_cell_margin();
+        let grid = new EosAppStorePrivate.FlexyGrid({ cell_size: CELL_DEFAULT_SIZE + cellMargin,
+                                                      cell_spacing: CELL_DEFAULT_SPACING - cellMargin });
+        scrollWindow.add_with_viewport(grid);
+
+        let appInfos = this.model.loadCategory(this._categoryId);
+
+        // Every category only shows apps that can be added
+        for (let i in appInfos) {
+            let info = appInfos[i];
+
+            if (!info.get_has_launcher()) {
+                let cell = info.create_cell(info.get_icon_name());
+                grid.add(cell);
             }
         }
 
@@ -263,7 +368,11 @@ const AppBroker = new Lang.Class({
 
         this._categories = Categories.get_app_categories();
         this._categories.forEach(Lang.bind(this, function(category) {
-            category.widget = new AppCategoryFrame(category, this._model, mainWindow);
+            if (category == EosAppStorePrivate.AppCategory.INSTALLED) {
+                category.widget = new AppInstalledFrame(this._model, mainWindow);
+            } else {
+                category.widget = new AppCategoryFrame(category.id, this._model, mainWindow);
+            }
             category.widget.spinning = true;
         }));
     },
