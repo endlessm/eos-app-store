@@ -2,6 +2,7 @@ jsdir = $(pkgdatadir)/js/
 dist_js_DATA = \
 	$(js_built_sources) \
 	appFrame.js \
+	appInfoBox.js \
 	appListModel.js \
 	appStoreDBusService.js \
 	appStoreLauncher.js \
