@@ -23,11 +23,11 @@ const APP_TRANSITION_MS = 500;
 const CELL_DEFAULT_SIZE = 180;
 const CELL_DEFAULT_SPACING = 15;
 
-const AppCategoryFrame = new Lang.Class({
-    Name: 'AppCategoryFrame',
+const AppFrame = new Lang.Class({
+    Name: 'AppFrame',
     Extends: Gtk.Frame,
 
-    _init: function(category, model, mainWindow) {
+    _init: function(model, mainWindow) {
         this.parent();
 
         this.get_style_context().add_class('app-frame');
@@ -38,14 +38,19 @@ const AppCategoryFrame = new Lang.Class({
                                       vexpand: true });
         this.add(this._stack);
 
-        this._category = category;
         this._mainWindow = mainWindow;
         this._model = model;
 
-        this._backClickedId = 0;
-        this._lastCellSelected = null;
-        this._gridBox = null;
+        // Where the content goes once the frame is populated
+        this._contentBox = new Gtk.Box({ orientation: Gtk.Orientation.VERTICAL,
+                                         hexpand: true,
+                                         vexpand: true });
+        this._stack.add_named(this._contentBox, 'content');
 
+        let separator = new Separator.FrameSeparator();
+        this._contentBox.add(separator);
+
+        // The spinner displayed while the frame is being populated
         this._spinnerBox = new Gtk.Box({ orientation: Gtk.Orientation.VERTICAL,
                                          hexpand: true,
                                          vexpand: true });
@@ -68,7 +73,7 @@ const AppCategoryFrame = new Lang.Class({
             this._stack.set_visible_child_full('spinner', Gtk.StackTransitionType.CROSSFADE);
             this._spinner.start();
         } else {
-            this._stack.set_visible_child_full('app-frame', Gtk.StackTransitionType.CROSSFADE);
+            this._stack.set_visible_child_full('content', Gtk.StackTransitionType.CROSSFADE);
             this._spinner.stop();
         }
     },
@@ -77,29 +82,74 @@ const AppCategoryFrame = new Lang.Class({
         return (this._stack.visible_child_name == 'spinner');
     },
 
+    get mainWindow() {
+        return this._mainWindow;
+    },
+
+    get model() {
+        return this._model;
+    },
+
+    get contentBox() {
+        return this._contentBox;
+    },
+
     populate: function() {
-        if (this._gridBox) {
+        // Base class is empty
+    },
+
+    addContentPage: function(pageId, pageWidget) {
+        this._stack.add_named(pageWidget, pageId);
+    },
+
+    showContentPage: function(pageId, transition) {
+        if (pageId) {
+            this._stack.set_visible_child_full(pageId, transition);
+        } else {
+            this._stack.set_visible_child_full('content', transition);
+        }
+    },
+});
+
+const AppCategoryFrame = new Lang.Class({
+    Name: 'AppCategoryFrame',
+    Extends: AppFrame,
+
+    _init: function(category, model, mainWindow) {
+        this.parent(model, mainWindow);
+
+        this._category = category;
+
+        this._grid = null;
+        this._lastCellSelected = null;
+        this._backClickedId = 0;
+    },
+
+    vfunc_destroy: function() {
+        if (this._backClickedId != 0) {
+            this.mainWindow.disconnect(this._backClickedId);
+            this._backClickedId = 0;
+        }
+
+        this.parent();
+    },
+
+    populate: function() {
+        if (this._grid) {
             return;
         }
 
-        this._gridBox = new Gtk.Box({ orientation: Gtk.Orientation.VERTICAL,
-                                      hexpand: true,
-                                      vexpand: true });
-        this._stack.add_named(this._gridBox, 'app-frame');
-
-        let separator = new Separator.FrameSeparator();
-        this._gridBox.add(separator);
-
         let scrollWindow = new Gtk.ScrolledWindow({ hscrollbar_policy: Gtk.PolicyType.NEVER,
                                                     vscrollbar_policy: Gtk.PolicyType.AUTOMATIC });
-        this._gridBox.add(scrollWindow);
+        this.contentBox.add(scrollWindow);
+        scrollWindow.show();
 
         let cellMargin = EosAppStorePrivate.AppInfo.get_cell_margin();
         let grid = new EosAppStorePrivate.FlexyGrid({ cell_size: CELL_DEFAULT_SIZE + cellMargin,
                                                       cell_spacing: CELL_DEFAULT_SPACING - cellMargin });
         scrollWindow.add_with_viewport(grid);
 
-        let appInfos = this._model.loadCategory(this._category.id);
+        let appInfos = this.model.loadCategory(this._category.id);
 
         if (this._category.id == EosAppStorePrivate.AppCategory.INSTALLED) {
             let sortedAppInfos = appInfos.sort(function(a, b) {
@@ -131,8 +181,11 @@ const AppCategoryFrame = new Lang.Class({
 
         grid.connect('cell-selected', Lang.bind(this, this._onCellSelected));
         grid.connect('cell-activated', Lang.bind(this, this._onCellActivated));
+        grid.show_all();
 
-        this._gridBox.show_all();
+        // Keep a back reference so we can decide when to re-populate
+        this._grid = grid;
+
         this.spinning = false;
     },
 
@@ -152,37 +205,34 @@ const AppCategoryFrame = new Lang.Class({
 
     _onCellActivated: function(grid, cell) {
         if (!this._stack.get_child_by_name(cell.desktop_id)) {
-            let appBox = new AppInfoBox(this._model, cell.app_info);
-            appBox.show();
-
+            let appBox = new AppInfoBox(this.model, cell.app_info);
+            this.addContentPage(appBox, cell.desktop_id);
             appBox.connect('destroy', Lang.bind(this, this._showGrid));
-
-            this._stack.add_named(appBox, cell.desktop_id);
+            appBox.show();
         }
 
-        this._stack.set_visible_child_full(cell.desktop_id, Gtk.StackTransitionType.SLIDE_LEFT);
+        this.showContentPage(cell.desktop_id, Gtk.StackTransitionType.SLIDE_LEFT);
 
-        this._mainWindow.titleText = cell.app_info.get_title();
-        this._mainWindow.subtitleText = cell.app_info.get_subtitle();
-        this._mainWindow.headerIcon = cell.app_info.get_icon_name();
-        this._mainWindow.headerInstalledVisible = cell.app_info.is_installed();
-        this._mainWindow.backButtonVisible = true;
+        this.mainWindow.titleText = cell.app_info.get_title();
+        this.mainWindow.subtitleText = cell.app_info.get_subtitle();
+        this.mainWindow.headerIcon = cell.app_info.get_icon_name();
+        this.mainWindow.headerInstalledVisible = cell.app_info.is_installed();
+        this.mainWindow.backButtonVisible = true;
 
         this._backClickedId =
-            this._mainWindow.connect('back-clicked', Lang.bind(this, this._showGrid));
+            this.mainWindow.connect('back-clicked', Lang.bind(this, this._showGrid));
     },
 
     _showGrid: function() {
-        this._mainWindow.clearHeaderState();
+        this.mainWindow.clearHeaderState();
 
-        if (this._backClickedId > 0) {
-            this._mainWindow.disconnect(this._backClickedId);
+        if (this._backClickedId != 0) {
+            this.mainWindow.disconnect(this._backClickedId);
             this._backClickedId = 0;
         }
 
         this.populate();
-        this._stack.transition_type = Gtk.StackTransitionType.SLIDE_RIGHT;
-        this._stack.set_visible_child(this._gridBox);
+        this.showContentPage(null, Gtk.StackTransitionType.SLIDE_RIGHT);
     },
 
     reset: function() {
@@ -190,8 +240,8 @@ const AppCategoryFrame = new Lang.Class({
             return;
         }
 
-        this._gridBox.destroy();
-        this._gridBox = null;
+        this._grid.destroy();
+        this._grid = null;
         this._showGrid();
     },
 
@@ -209,7 +259,6 @@ const AppBroker = new Lang.Class({
         // initialize the applications model
         let application = Gio.Application.get_default();
         this._model = application.appList;
-
         this._model.refresh(Lang.bind(this, this._onModelRefresh));
 
         this._categories = Categories.get_app_categories();
