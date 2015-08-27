@@ -8,6 +8,7 @@ const EosAppStorePrivate = imports.gi.EosAppStorePrivate;
 const Mainloop = imports.mainloop;
 
 const AppInfoBox = imports.appInfoBox;
+const AppInstalledBox = imports.appInstalledBox;
 const AppListModel = imports.appListModel;
 const AppStoreWindow = imports.appStoreWindow;
 const Builder = imports.builder;
@@ -118,8 +119,7 @@ const AppInstalledFrame = new Lang.Class({
     _init: function(model, mainWindow) {
         this.parent(model, mainWindow);
 
-        this._grid = null;
-        this._lastCellSelected = null;
+        this._list = null;
         this._backClickedId = 0;
     },
 
@@ -133,7 +133,7 @@ const AppInstalledFrame = new Lang.Class({
     },
 
     populate: function() {
-        if (this._grid) {
+        if (this._list) {
             return;
         }
 
@@ -142,10 +142,8 @@ const AppInstalledFrame = new Lang.Class({
         this.contentBox.add(scrollWindow);
         scrollWindow.show();
 
-        let cellMargin = EosAppStorePrivate.AppInfo.get_cell_margin();
-        let grid = new EosAppStorePrivate.FlexyGrid({ cell_size: CELL_DEFAULT_SIZE + cellMargin,
-                                                      cell_spacing: CELL_DEFAULT_SPACING - cellMargin });
-        scrollWindow.add_with_viewport(grid);
+        let list = new Gtk.ListBox(); 
+        scrollWindow.add_with_viewport(list);
 
         let appInfos = this.model.loadCategory(EosAppStorePrivate.AppCategory.INSTALLED);
         let sortedAppInfos = appInfos.sort(function(a, b) {
@@ -157,66 +155,18 @@ const AppInstalledFrame = new Lang.Class({
             let info = sortedAppInfos[i];
 
             if (info.get_has_launcher()) {
-                let cell = info.create_cell(info.get_icon_name());
-                cell.shape = EosAppStorePrivate.FlexyShape.SMALL;
-                grid.add(cell);
+                let row = new AppInstalledBox(model, info);
+                list.add(row);
+                row.show();
             }
         }
 
-        grid.connect('cell-selected', Lang.bind(this, this._onCellSelected));
-        grid.connect('cell-activated', Lang.bind(this, this._onCellActivated));
-        grid.show_all();
+        list.show();
 
         // Keep a back reference so we can decide when to re-populate
-        this._grid = grid;
+        this._list = list;
 
         this.spinning = false;
-    },
-
-    _onCellSelected: function(grid, cell) {
-        if (this._lastCellSelected != cell) {
-            if (this._lastCellSelected) {
-                this._lastCellSelected.selected = false;
-            }
-
-            this._lastCellSelected = cell;
-
-            if (this._lastCellSelected) {
-                this._lastCellSelected.selected = true;
-            }
-        }
-    },
-
-    _onCellActivated: function(grid, cell) {
-        if (!this._stack.get_child_by_name(cell.desktop_id)) {
-            let appBox = new AppInfoBox(this.model, cell.app_info);
-            this.addContentPage(appBox, cell.desktop_id);
-            appBox.connect('destroy', Lang.bind(this, this._showGrid));
-            appBox.show();
-        }
-
-        this.showContentPage(cell.desktop_id, Gtk.StackTransitionType.SLIDE_LEFT);
-
-        this.mainWindow.titleText = cell.app_info.get_title();
-        this.mainWindow.subtitleText = cell.app_info.get_subtitle();
-        this.mainWindow.headerIcon = cell.app_info.get_icon_name();
-        this.mainWindow.headerInstalledVisible = cell.app_info.is_installed();
-        this.mainWindow.backButtonVisible = true;
-
-        this._backClickedId =
-            this.mainWindow.connect('back-clicked', Lang.bind(this, this._showGrid));
-    },
-
-    _showGrid: function() {
-        this.mainWindow.clearHeaderState();
-
-        if (this._backClickedId != 0) {
-            this.mainWindow.disconnect(this._backClickedId);
-            this._backClickedId = 0;
-        }
-
-        this.populate();
-        this.showContentPage(null, Gtk.StackTransitionType.SLIDE_RIGHT);
     },
 
     reset: function() {
@@ -224,9 +174,11 @@ const AppInstalledFrame = new Lang.Class({
             return;
         }
 
-        this._grid.destroy();
-        this._grid = null;
-        this._showGrid();
+        this._list.destroy();
+        this._list = null;
+
+        this.populate();
+        this.showContentPage(null, Gtk.StackTransitionType.SLIDE_RIGHT);
     },
 
     get title() {

@@ -45,6 +45,7 @@
     <file compressed="true">btn_update_pressed_icon.png</file>
     <file compressed="true">icon_installed_24x24.png</file>
     <file compressed="true">eos-app-store-app-info-box.ui</file>
+    <file compressed="true">eos-app-store-app-installed-box.ui</file>
     <file compressed="true">eos-app-store-main-window.ui</file>
     <file compressed="true">eos-app-store-weblink-frame.ui</file>
     <file compressed="true">eos-app-store-weblink-list-row.ui</file>
