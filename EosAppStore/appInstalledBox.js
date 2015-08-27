@@ -154,11 +154,11 @@ const AppInstalledBox = new Lang.Class({
             app.popRunningOperation();
 
             if (error) {
-                this._maybeNotify(_("We could not update '%s'").format(this._appInfo.get_title()), error);
+                app._maybeNotifyUser(_("We could not update '%s'").format(this._appInfo.get_title()), error);
                 return;
             }
 
-            this._maybeNotify(_("'%s' was updated successfully").format(this._appInfo.get_title()));
+            app.maybeNotifyUser(_("'%s' was updated successfully").format(this._appInfo.get_title()));
 
             this._updateControlsState();
         }));
@@ -188,61 +188,15 @@ const AppInstalledBox = new Lang.Class({
                 app.popRunningOperation();
 
                 if (error) {
-                    this._maybeNotify(_("We could not remove '%s'").format(this.appTitle), error);
+                    app.maybeNotifyUser(_("We could not remove '%s'").format(this.appTitle), error);
                     return;
                 }
 
-                this._maybeNotify(_("'%s' was removed successfully").format(this.appTitle));
+                app.maybeNotifyUser(_("'%s' was removed successfully").format(this.appTitle));
 
                 // Remove ourselves from the list
                 this.destroy();
             }));
-        }
-    },
-
-    _maybeNotify: function(message, error) {
-        let app = Gio.Application.get_default();
-        let appWindowVisible = false;
-        if (app.mainWindow) {
-            appWindowVisible = app.mainWindow.is_visible();
-        }
-        else {
-            // the app store window timeout triggered, but the
-            // app store process is still running because of the
-            // reference we hold
-            appWindowVisible = false;
-        }
-
-        // notify only if the error is not caused by a user
-        // cancellation
-        if (error &&
-            (error.matches(Gio.io_error_quark(),
-                           Gio.IOErrorEnum.CANCELLED) ||
-             error.matches(EosAppStorePrivate.app_store.error_quark(),
-                           EosAppStorePrivate.AppStoreError.CANCELLED))) {
-            return;
-        }
-
-        // if the window is not visible, we emit a notification instead
-        // of showing a dialog
-        if (!appWindowVisible) {
-            let notification = new Notify.Notification(message, '');
-            notification.show();
-            return;
-        }
-
-        // we only show the error dialog if the error is set
-        if (error) {
-            let dialog = new Gtk.MessageDialog({ transient_for: app.mainWindow,
-                                                 modal: true,
-                                                 destroy_with_parent: true,
-                                                 text: message,
-                                                 secondary_text: error.message });
-            dialog.add_button(_("Dismiss"), Gtk.ResponseType.OK);
-            dialog.show_all();
-            this._errorDialog = dialog;
-            this._errorDialog.run();
-            this._destroyErrorDialog();
         }
     },
 });
