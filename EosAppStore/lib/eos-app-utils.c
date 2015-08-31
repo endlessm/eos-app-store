@@ -737,7 +737,7 @@ static gboolean
 is_app_id (const char *appid)
 {
   static const char alsoallowed[] = "_-+.";
-  static const char *reserveddirs[] = { "bin", "share", "lost+found", "xdg", };
+  static const char *reserveddirs[] = { "bin", "games", "share", "lost+found", "xdg", };
 
   if (!appid || appid[0] == '\0')
     return FALSE;
