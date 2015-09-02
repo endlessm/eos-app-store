@@ -1,19 +1,16 @@
 // -*- mode: js; js-indent-level: 4; indent-tabs-mode: nil -*-
+const EosAppStorePrivate = imports.gi.EosAppStorePrivate;
 const Gdk = imports.gi.Gdk;
 const Gio = imports.gi.Gio;
 const GLib = imports.gi.GLib;
 const GObject = imports.gi.GObject;
 const Gtk = imports.gi.Gtk;
-const EosAppStorePrivate = imports.gi.EosAppStorePrivate;
 const Mainloop = imports.mainloop;
 
 const AppListModel = imports.appListModel;
 const AppStoreWindow = imports.appStoreWindow;
 const Builder = imports.builder;
-const Categories = imports.categories;
-const CategoryButton = imports.categoryButton;
 const Lang = imports.lang;
-const Notify = imports.notify;
 const Separator = imports.separator;
 const Signals = imports.signals;
 

@@ -15,7 +15,6 @@ const Builder = imports.builder;
 const Categories = imports.categories;
 const CategoryButton = imports.categoryButton;
 const Lang = imports.lang;
-const Notify = imports.notify;
 const Separator = imports.separator;
 const Signals = imports.signals;
 
