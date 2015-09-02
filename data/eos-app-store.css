@@ -157,6 +157,44 @@
     background-image: url("btn_back_pressed.png");
 }
 
+.controls-box .state-button {
+    border: none;
+    background-color: transparent;
+    background-image: url("btn_app_state_normal.png");
+}
+
+.controls-box .state-button:hover {
+    border: none;
+    background-color: transparent;
+    background-image: url("btn_app_state_hover.png");
+}
+
+.controls-box .state-button:active
+.controls-box .state-button:hover:active {
+    border: none;
+    background-color: transparent;
+    background-image: url("btn_app_state_pressed.png");
+}
+
+.controls-box .state-button .remove {
+    border: none;
+    background-color: transparent;
+    background-image: url("btn_remove_normal_border.png");
+}
+
+.controls-box .state-button .remove:hover {
+    border: none;
+    background-color: transparent;
+    background-image: url("btn_remove_hover_border.png");
+}
+
+.controls-box .state-button:active
+.controls-box .state-button:hover:active {
+    border: none;
+    background-color: transparent;
+    background-image: url("btn_remove_pressed_border.png");
+}
+
 .close-button {
     background: none;
     border: none;

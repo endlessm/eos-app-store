@@ -72,6 +72,9 @@
             <property name="visible">True</property>
             <property name="can_focus">False</property>
             <property name="spacing">12</property>
+            <style>
+              <class name="controls-box"/>
+            </style>
             <child>
               <object class="GtkButton" id="_updateButton">
                 <property name="visible">False</property>
