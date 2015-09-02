@@ -51,7 +51,8 @@ const AppInstalledBox = new Lang.Class({
         this.categoryText = this._appInfo.get_category();
         this.sizeText = this._appInfo.get_installed_size();
 
-        this._errorDialog = null;
+        this._removeDialog = null;
+
         this._windowHideId = mainWindow.connect('hide', Lang.bind(this, this._destroyPendingDialogs));
         this.connect('destroy', Lang.bind(this, this._onDestroy));
 
@@ -99,15 +100,15 @@ const AppInstalledBox = new Lang.Class({
         this._updateControlsState();
     },
 
-    _destroyErrorDialog: function() {
-        if (this._errorDialog != null) {
-            this._errorDialog.destroy();
-            this._errorDialog = null;
+    _destroyRemoveDialog: function() {
+        if (this._removeDialog != null) {
+            this._removeDialog.destroy();
+            this._removeDialog = null;
         }
     },
 
     _destroyPendingDialogs: function() {
-        this._destroyErrorDialog();
+        this._destroyRemoveDialog();
     },
 
     _onDestroy: function() {
@@ -165,12 +166,14 @@ const AppInstalledBox = new Lang.Class({
     },
 
     _onRemoveButtonClicked: function() {
-        let dialog = new Gtk.MessageDialog();
-        dialog.set_transient_for(app.mainWindow);
-        dialog.modal = true;
-        dialog.destroy_with_parent = true;
-        dialog.text = _("Deleting app");
-        dialog.secondary_text = _("Deleting this app will remove it from the device for all users. You will need to download it from the internet in order to reinstall it.");
+        let dialog = new Gtk.MessageDialog({ set_transient_for: app.mainWindow,
+                                             modal: true,
+                                             destroy_with_parent: true,
+                                             text: _("Deleting app"),
+                                             secondary_text: _("Deleting this app will remove it "
+                                                               "from the device for all users. You "
+                                                               "will need to download it from the "
+                                                               "internet in order to reinstall it." });
         let applyButton = dialog.add_button(_("Delete app"), Gtk.ResponseType.APPLY);
         applyButton.get_style_context().add_class('destructive-action');
         dialog.add_button(_("Cancel"), Gtk.ResponseType.CANCEL);
