@@ -142,7 +142,7 @@ const AppInstalledFrame = new Lang.Class({
         scrollWindow.show();
 
         let list = new Gtk.ListBox(); 
-        scrollWindow.add_with_viewport(list);
+        scrollWindow.add(list);
 
         let appInfos = this.model.loadCategory(EosAppStorePrivate.AppCategory.INSTALLED);
         let sortedAppInfos = appInfos.sort(function(a, b) {
@@ -221,7 +221,7 @@ const AppCategoryFrame = new Lang.Class({
         let cellMargin = EosAppStorePrivate.AppInfo.get_cell_margin();
         let grid = new EosAppStorePrivate.FlexyGrid({ cell_size: CELL_DEFAULT_SIZE + cellMargin,
                                                       cell_spacing: CELL_DEFAULT_SPACING - cellMargin });
-        scrollWindow.add_with_viewport(grid);
+        scrollWindow.add(grid);
 
         let appInfos = this.model.loadCategory(this._categoryId);
 
