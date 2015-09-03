@@ -26,11 +26,13 @@ const AppInstalledBox = new Lang.Class({
         '_appIcon',
         '_nameText',
         '_categoryText',
+        '_controlsStack',
         '_controlsBox',
         '_updateButton',
         '_updateButtonImage',
         '_removeButton',
         '_removeButtonImage',
+        '_updateSpinner',
         '_sizeText',
     ],
 
@@ -137,6 +139,8 @@ const AppInstalledBox = new Lang.Class({
         this._buttonSeparator.hide();
         this._removeButton.hide();
 
+        this._controlsStack.visible_child_name = 'controls';
+
         if (this._networkAvailable && this._appInfo.is_updatable()) {
             this._updateButton.show();
             this._buttonSeparator.show();
@@ -151,8 +155,22 @@ const AppInstalledBox = new Lang.Class({
         let app = Gio.Application.get_default();
         app.pushRunningOperation();
 
+        this._appIcon.opacity = 0.3;
+        this._nameText.opacity = 0.3;
+        this._categoryText.opacity = 0.3;
+
+        this._updateSpinner.start();
+        this._controlsStack.visible_child_name = 'spinner';
+
         this._model.updateApp(this._appId, Lang.bind(this, function(error) {
             app.popRunningOperation();
+
+            this._appInfo.opacity = 1;
+            this._nameText.opacity = 1;
+            this._categoryText.opacity = 1;
+
+            this._updateSpinner.stop();
+            this._controlsStack.visible_child_name = 'controls';
 
             if (error) {
                 app._maybeNotifyUser(_("We could not update '%s'").format(this._appInfo.get_title()), error);

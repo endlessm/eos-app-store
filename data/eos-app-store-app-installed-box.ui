@@ -84,107 +84,154 @@
           </packing>
         </child>
         <child>
-          <object class="GtkBox" id="box1">
-            <property name="visible">True</property>
-            <property name="can_focus">False</property>
+          <object class="GtkStack" id="_controlsStack">
             <child>
-              <object class="GtkBox" id="_controlsBox">
+              <object class="GtkBox" id="box1">
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
-                <property name="spacing">12</property>
                 <child>
-                  <object class="GtkButton" id="_updateButton">
-                    <property name="width_request">29</property>
-                    <property name="height_request">29</property>
-                    <property name="can_focus">True</property>
-                    <property name="receives_default">True</property>
-                    <signal name="clicked" handler="_onUpdateButtonClicked" swapped="no"/>
+                  <object class="GtkBox" id="_controlsBox">
+                    <property name="visible">True</property>
+                    <property name="can_focus">False</property>
+                    <property name="spacing">12</property>
                     <child>
-                      <object class="GtkImage" id="_updateButtonImage">
+                      <object class="GtkButton" id="_updateButton">
+                        <property name="width_request">29</property>
+                        <property name="height_request">29</property>
+                        <property name="can_focus">True</property>
+                        <property name="receives_default">True</property>
+                        <signal name="clicked" handler="_onUpdateButtonClicked" swapped="no"/>
+                        <child>
+                          <object class="GtkImage" id="_updateButtonImage">
+                            <property name="visible">True</property>
+                            <property name="can_focus">False</property>
+                            <property name="icon_name">view-refresh-symbolic</property>
+                            <property name="icon_size">1</property>
+                          </object>
+                        </child>
+                        <style>
+                          <class name="state-button"/>
+                          <class name="update"/>
+                        </style>
+                      </object>
+                      <packing>
+                        <property name="expand">False</property>
+                        <property name="fill">False</property>
+                        <property name="position">0</property>
+                      </packing>
+                    </child>
+                    <child>
+                      <object class="GtkSeparator" id="separator1">
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
-                        <property name="icon_name">view-refresh-symbolic</property>
-                        <property name="icon_size">1</property>
                       </object>
+                      <style>
+                        <class name="controls-separator"/>
+                      </style>
+                      <packing>
+                        <property name="expand">False</property>
+                        <property name="fill">True</property>
+                        <property name="position">1</property>
+                      </packing>
+                    </child>
+                    <child>
+                      <object class="GtkButton" id="_removeButton">
+                        <property name="width_request">29</property>
+                        <property name="height_request">29</property>
+                        <property name="can_focus">True</property>
+                        <property name="receives_default">True</property>
+                        <signal name="clicked" handler="_onUpdateButtonClicked" swapped="no"/>
+                        <child>
+                          <object class="GtkImage" id="_updateButtonImage1">
+                            <property name="visible">True</property>
+                            <property name="can_focus">False</property>
+                            <property name="icon_name">user-trash-symbolic</property>
+                            <property name="icon_size">1</property>
+                          </object>
+                        </child>
+                        <style>
+                          <class name="state-button"/>
+                          <class name="remove"/>
+                        </style>
+                      </object>
+                      <packing>
+                        <property name="expand">False</property>
+                        <property name="fill">False</property>
+                        <property name="position">2</property>
+                      </packing>
                     </child>
                     <style>
-                      <class name="state-button"/>
-                      <class name="update"/>
+                      <class name="controls-box"/>
                     </style>
                   </object>
                   <packing>
                     <property name="expand">False</property>
-                    <property name="fill">False</property>
+                    <property name="fill">True</property>
                     <property name="position">0</property>
                   </packing>
                 </child>
                 <child>
-                  <object class="GtkSeparator" id="separator1">
+                  <object class="GtkLabel" id="_sizeText">
                     <property name="visible">True</property>
                     <property name="can_focus">False</property>
+                    <property name="label" translatable="yes">SIZE</property>
+                    <property name="ellipsize">end</property>
+                    <property name="width_chars">10</property>
+                    <property name="max_width_chars">10</property>
                   </object>
                   <style>
-                    <class name="controls-separator"/>
+                    <class name="app-size"/>
                   </style>
                   <packing>
                     <property name="expand">False</property>
-                    <property name="fill">True</property>
+                    <property name="fill">False</property>
+                    <property name="pack_type">end</property>
                     <property name="position">1</property>
                   </packing>
                 </child>
+              </object>
+              <packing>
+                <property name="name">controls</property>
+              </packing>
+            </child>
+            <child>
+              <object class="GtkBox" id="box2">
+                <property name="visible">True</property>
+                <property name="can_focus">False</property>
+                <property name="spacing">10</spacing>
                 <child>
-                  <object class="GtkButton" id="_removeButton">
-                    <property name="width_request">29</property>
-                    <property name="height_request">29</property>
-                    <property name="can_focus">True</property>
-                    <property name="receives_default">True</property>
-                    <signal name="clicked" handler="_onUpdateButtonClicked" swapped="no"/>
-                    <child>
-                      <object class="GtkImage" id="_updateButtonImage1">
-                        <property name="visible">True</property>
-                        <property name="can_focus">False</property>
-                        <property name="icon_name">user-trash-symbolic</property>
-                        <property name="icon_size">1</property>
-                      </object>
-                    </child>
-                    <style>
-                      <class name="state-button"/>
-                      <class name="remove"/>
-                    </style>
+                  <object class="GtkSpinner" id="_updateSpinner">
+                    <property name="visible">True</property>
+                    <property name="width_request">9px</property>
+                    <property name="height_request">9px</property>
                   </object>
                   <packing>
                     <property name="expand">False</property>
                     <property name="fill">False</property>
-                    <property name="position">2</property>
+                    <property name="pack_type">start</property>
+                    <property name="position">0</property>
                   </packing>
                 </child>
-                <style>
-                  <class name="controls-box"/>
-                </style>
+                <child>
+                  <object class="GtkLabel" id="_updateLabel">
+                    <property name="visible">True</property>
+                    <property name="can_focus">False</property>
+                    <property name="label" translatable="yes">UPDATING…</property>
+                    <property name="max_width_chars">10</property>
+                  </object>
+                  <style>
+                    <class name="app-updating"/>
+                  </style>
+                  <packing>
+                    <property name="expand">False</property>
+                    <property name="fill">False</property>
+                    <property name="pack_type">end</property>
+                    <property name="position">1</property>
+                  </packing>
+                </child>
               </object>
               <packing>
-                <property name="expand">False</property>
-                <property name="fill">True</property>
-                <property name="position">0</property>
-              </packing>
-            </child>
-            <child>
-              <object class="GtkLabel" id="_sizeText">
-                <property name="visible">True</property>
-                <property name="can_focus">False</property>
-                <property name="label" translatable="yes">SIZE</property>
-                <property name="ellipsize">end</property>
-                <property name="width_chars">10</property>
-                <property name="max_width_chars">10</property>
-              </object>
-              <style>
-                <class name="app-size"/>
-              </style>
-              <packing>
-                <property name="expand">False</property>
-                <property name="fill">False</property>
-                <property name="pack_type">end</property>
-                <property name="position">1</property>
+                <property name="name">spinner</property>
               </packing>
             </child>
           </object>
