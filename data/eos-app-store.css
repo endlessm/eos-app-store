@@ -157,6 +157,39 @@
     background-image: url("btn_back_pressed.png");
 }
 
+.installed-app-box {
+    background-color: #484848;
+    opacity: 0.69;
+    border-radius: 4px;
+}
+
+.installed-app-box .app-icon {
+    padding: 7px 11px 7px 7px;
+}
+
+.installed-app-box .app-size {
+    padding-right: 10px;
+    background-color: #484848;
+    opacity: 0.69;
+    color: white;
+}
+
+.installed-app-box .app-name {
+    padding-bottom: 9px;
+
+    color: white;
+    font-size: 15px;
+}
+
+.installed-app-box .app-category {
+    color: #ccc;
+    font-size: 8px;
+}
+
+.controls-box .controls-separator {
+    color: #494949;
+}
+
 .controls-box .state-button {
     border: none;
     background-color: transparent;
