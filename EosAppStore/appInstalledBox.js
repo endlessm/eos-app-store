@@ -76,7 +76,7 @@ const AppInstalledBox = new Lang.Class({
             let category = categories[i];
 
             if (category.id == v) {
-                this._categoryText.label = category.label;
+                this._categoryText.label = category.label.toUpperCase();
                 return;
             }
         }
