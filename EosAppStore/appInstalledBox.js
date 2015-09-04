@@ -212,11 +212,11 @@ const AppInstalledBox = new Lang.Class({
                 app.popRunningOperation();
 
                 if (error) {
-                    app.maybeNotifyUser(_("We could not remove '%s'").format(this.appTitle), error);
+                    app.maybeNotifyUser(_("We could not remove '%s'").format(this._appInfo.get_title()), error);
                     return;
                 }
 
-                app.maybeNotifyUser(_("'%s' was removed successfully").format(this.appTitle));
+                app.maybeNotifyUser(_("'%s' was removed successfully").format(this._appInfo.get_title()));
 
                 // Remove ourselves from the list
                 this.destroy();
