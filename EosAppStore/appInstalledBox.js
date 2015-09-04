@@ -184,13 +184,13 @@ const AppInstalledBox = new Lang.Class({
     },
 
     _onRemoveButtonClicked: function() {
-        let dialog = new Gtk.MessageDialog({ set_transient_for: app.mainWindow,
+        let dialog = new Gtk.MessageDialog({ transient_for: app.mainWindow,
                                              modal: true,
                                              destroy_with_parent: true,
                                              text: _("Deleting app"),
-                                             secondary_text: _("Deleting this app will remove it "
-                                                               "from the device for all users. You "
-                                                               "will need to download it from the "
+                                             secondary_text: _("Deleting this app will remove it " +
+                                                               "from the device for all users. You " +
+                                                               "will need to download it from the " +
                                                                "internet in order to reinstall it." });
         let applyButton = dialog.add_button(_("Delete app"), Gtk.ResponseType.APPLY);
         applyButton.get_style_context().add_class('destructive-action');
