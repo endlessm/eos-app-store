@@ -68,7 +68,7 @@ const AppInstalledBox = new Lang.Class({
     },
 
     set appIcon(v) {
-        this._appIcon.set_icon_name(v, Gtk.IconSize.DIALOG);
+        this._appIcon.set_from_icon_name(v, Gtk.IconSize.DIALOG);
     },
 
     set nameText(v) {
