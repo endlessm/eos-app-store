@@ -308,7 +308,7 @@ const AppBroker = new Lang.Class({
 
         this._categories = Categories.get_app_categories();
         this._categories.forEach(Lang.bind(this, function(category) {
-            if (category == EosAppStorePrivate.AppCategory.INSTALLED) {
+            if (category.id == EosAppStorePrivate.AppCategory.INSTALLED) {
                 category.widget = new AppInstalledFrame(this._model, mainWindow);
             } else {
                 category.widget = new AppCategoryFrame(category.id, this._model, mainWindow);
