@@ -93,11 +93,11 @@ const AppInstalledBox = new Lang.Class({
 
     set sizeText(v) {
         if (v == 0) {
-            this._sizeText.hide();
+            this._sizeText.label = '';
         } else {
             this._sizeText.label = GLib.format_size(v);
-            this._sizeText.show();
         }
+        this._sizeText.show();
     },
 
     _onNetworkMonitorChanged: function() {
