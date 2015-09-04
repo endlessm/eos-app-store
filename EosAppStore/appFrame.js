@@ -118,16 +118,6 @@ const AppInstalledFrame = new Lang.Class({
         this.parent(model, mainWindow);
 
         this._list = null;
-        this._backClickedId = 0;
-    },
-
-    vfunc_destroy: function() {
-        if (this._backClickedId != 0) {
-            this.mainWindow.disconnect(this._backClickedId);
-            this._backClickedId = 0;
-        }
-
-        this.parent();
     },
 
     populate: function() {
