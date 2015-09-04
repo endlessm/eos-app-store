@@ -16,6 +16,9 @@ const Notify = imports.notify;
 const Separator = imports.separator;
 const Signals = imports.signals;
 
+const UPDATING_OPACITY = 0.3;
+const NORMAL_OPACITY = 1.0;
+
 const AppInstalledBox = new Lang.Class({
     Name: 'AppInstalledBox',
     Extends: Gtk.Bin,
@@ -155,9 +158,9 @@ const AppInstalledBox = new Lang.Class({
         let app = Gio.Application.get_default();
         app.pushRunningOperation();
 
-        this._appIcon.opacity = 0.3;
-        this._nameText.opacity = 0.3;
-        this._categoryText.opacity = 0.3;
+        this._appIcon.opacity = UPDATING_OPACITY;
+        this._nameText.opacity = UPDATING_OPACITY;
+        this._categoryText.opacity = UPDATING_OPACITY;
 
         this._updateSpinner.start();
         this._controlsStack.visible_child_name = 'spinner';
@@ -165,9 +168,9 @@ const AppInstalledBox = new Lang.Class({
         this._model.updateApp(this._appId, Lang.bind(this, function(error) {
             app.popRunningOperation();
 
-            this._appInfo.opacity = 1;
-            this._nameText.opacity = 1;
-            this._categoryText.opacity = 1;
+            this._appInfo.opacity = NORMAL_OPACITY;
+            this._nameText.opacity = NORMAL_OPACITY;
+            this._categoryText.opacity = NORMAL_OPACITY;
 
             this._updateSpinner.stop();
             this._controlsStack.visible_child_name = 'controls';
