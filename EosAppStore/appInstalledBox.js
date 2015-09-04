@@ -32,10 +32,8 @@ const AppInstalledBox = new Lang.Class({
         '_mainBox',
         '_nameText',
         '_removeButton',
-        '_removeButtonImage',
         '_sizeText',
         '_updateButton',
-        '_updateButtonImage',
         '_updateSpinner',
     ],
 
