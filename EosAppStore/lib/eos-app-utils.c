@@ -948,7 +948,7 @@ remove_records_version_lte (GList *deltas,
         {
           eos_app_log_debug_message (" - Deleting delta %s -> %s", from_version,
                                      code_version);
-          new_list = g_list_delete_link (deltas, iterator);
+          new_list = g_list_delete_link (new_list, iterator);
           json_object_unref (obj);
         }
     }
