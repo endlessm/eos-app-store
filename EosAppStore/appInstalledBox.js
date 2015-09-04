@@ -25,18 +25,18 @@ const AppInstalledBox = new Lang.Class({
 
     templateResource: '/com/endlessm/appstore/eos-app-store-app-installed-box.ui',
     templateChildren: [
-        '_mainBox',
         '_appIcon',
-        '_nameText',
-        '_categoryText',
-        '_controlsStack',
         '_controlsBox',
-        '_updateButton',
-        '_updateButtonImage',
+        '_controlsStack',
+        '_categoryText',
+        '_mainBox',
+        '_nameText',
         '_removeButton',
         '_removeButtonImage',
-        '_updateSpinner',
         '_sizeText',
+        '_updateButton',
+        '_updateButtonImage',
+        '_updateSpinner',
     ],
 
     _init: function(model, appInfo) {
