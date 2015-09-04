@@ -53,6 +53,10 @@ const AppFrame = new Lang.Class({
         let separator = new Separator.FrameSeparator();
         this._contentBox.add(separator);
 
+        this._scrollWindow = new Gtk.ScrolledWindow({ hscrollbar_policy: Gtk.PolicyType.NEVER,
+                                                      vscrollbar_policy: Gtk.PolicyType.AUTOMATIC });
+        this._contentBox.add(this._scrollWindow);
+
         // The spinner displayed while the frame is being populated
         this._spinnerBox = new Gtk.Box({ orientation: Gtk.Orientation.VERTICAL,
                                          hexpand: true,
@@ -97,6 +101,10 @@ const AppFrame = new Lang.Class({
         return this._contentBox;
     },
 
+    get scrollWindow() {
+        return this._scrollWindow;
+    },
+
     populate: function() {
         // Base class is empty
     },
@@ -125,13 +133,8 @@ const AppInstalledFrame = new Lang.Class({
             return;
         }
 
-        let scrollWindow = new Gtk.ScrolledWindow({ hscrollbar_policy: Gtk.PolicyType.NEVER,
-                                                    vscrollbar_policy: Gtk.PolicyType.AUTOMATIC });
-        this.contentBox.add(scrollWindow);
-        scrollWindow.show();
-
-        let list = new Gtk.ListBox(); 
-        scrollWindow.add(list);
+        let list = new Gtk.ListBox({ expand: true });
+        this.scrollWindow.add(list);
 
         let appInfos = this.model.loadCategory(EosAppStorePrivate.AppCategory.INSTALLED);
         let sortedAppInfos = appInfos.sort(function(a, b) {
@@ -162,7 +165,7 @@ const AppInstalledFrame = new Lang.Class({
             return;
         }
 
-        this._list.destroy();
+        this.scrollWindow.get_child().destroy();
         this._list = null;
 
         this.populate();
@@ -202,15 +205,10 @@ const AppCategoryFrame = new Lang.Class({
             return;
         }
 
-        let scrollWindow = new Gtk.ScrolledWindow({ hscrollbar_policy: Gtk.PolicyType.NEVER,
-                                                    vscrollbar_policy: Gtk.PolicyType.AUTOMATIC });
-        this.contentBox.add(scrollWindow);
-        scrollWindow.show();
-
         let cellMargin = EosAppStorePrivate.AppInfo.get_cell_margin();
         let grid = new EosAppStorePrivate.FlexyGrid({ cell_size: CELL_DEFAULT_SIZE + cellMargin,
                                                       cell_spacing: CELL_DEFAULT_SPACING - cellMargin });
-        scrollWindow.add(grid);
+        this.scrollWindow.add(grid);
 
         let appInfos = this.model.loadCategory(this._categoryId);
 
@@ -285,7 +283,7 @@ const AppCategoryFrame = new Lang.Class({
             return;
         }
 
-        this._grid.destroy();
+        this.scrollWindow.get_child().destroy();
         this._grid = null;
         this._showGrid();
     },
