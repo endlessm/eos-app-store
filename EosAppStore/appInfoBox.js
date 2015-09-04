@@ -123,16 +123,8 @@ const AppInfoBox = new Lang.Class({
         }
     },
 
-    _destroyErrorDialog: function() {
-        if (this._errorDialog != null) {
-            this._errorDialog.destroy();
-            this._errorDialog = null;
-        }
-    },
-
     _destroyPendingDialogs: function() {
         this._destroyRemoveDialog();
-        this._destroyErrorDialog();
     },
 
     _onDestroy: function() {
