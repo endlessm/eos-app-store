@@ -251,7 +251,7 @@ const AppCategoryFrame = new Lang.Class({
     _onCellActivated: function(grid, cell) {
         if (!this._stack.get_child_by_name(cell.desktop_id)) {
             let appBox = new AppInfoBox.AppInfoBox(this.model, cell.app_info);
-            this.addContentPage(appBox, cell.desktop_id);
+            this.addContentPage(cell.desktop_id, appBox);
             appBox.connect('destroy', Lang.bind(this, this._showGrid));
             appBox.show();
         }
