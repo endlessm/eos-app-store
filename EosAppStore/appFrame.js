@@ -23,6 +23,9 @@ const APP_TRANSITION_MS = 500;
 const CELL_DEFAULT_SIZE = 180;
 const CELL_DEFAULT_SPACING = 15;
 
+const CONTENT_PAGE = 'content';
+const SPINNER_PAGE = 'spinner';
+
 const AppFrame = new Lang.Class({
     Name: 'AppFrame',
     Extends: Gtk.Frame,
@@ -45,7 +48,7 @@ const AppFrame = new Lang.Class({
         this._contentBox = new Gtk.Box({ orientation: Gtk.Orientation.VERTICAL,
                                          hexpand: true,
                                          vexpand: true });
-        this._stack.add_named(this._contentBox, 'content');
+        this._stack.add_named(this._contentBox, CONTENT_PAGE);
 
         let separator = new Separator.FrameSeparator();
         this._contentBox.add(separator);
@@ -54,7 +57,7 @@ const AppFrame = new Lang.Class({
         this._spinnerBox = new Gtk.Box({ orientation: Gtk.Orientation.VERTICAL,
                                          hexpand: true,
                                          vexpand: true });
-        this._stack.add_named(this._spinnerBox, 'spinner');
+        this._stack.add_named(this._spinnerBox, SPINNER_PAGE);
         this._spinnerBox.show();
 
         this._spinnerBox.add(new Separator.FrameSeparator());
@@ -70,16 +73,16 @@ const AppFrame = new Lang.Class({
 
     set spinning(v) {
         if (v) {
-            this._stack.set_visible_child_full('spinner', Gtk.StackTransitionType.CROSSFADE);
+            this._stack.set_visible_child_full(SPINNER_PAGE, Gtk.StackTransitionType.CROSSFADE);
             this._spinner.start();
         } else {
-            this._stack.set_visible_child_full('content', Gtk.StackTransitionType.CROSSFADE);
+            this._stack.set_visible_child_full(CONTENT_PAGE, Gtk.StackTransitionType.CROSSFADE);
             this._spinner.stop();
         }
     },
 
     get spinning() {
-        return (this._stack.visible_child_name == 'spinner');
+        return (this._stack.visible_child_name == SPINNER_PAGE);
     },
 
     get mainWindow() {
@@ -103,11 +106,7 @@ const AppFrame = new Lang.Class({
     },
 
     showContentPage: function(pageId, transition) {
-        if (pageId) {
-            this._stack.set_visible_child_full(pageId, transition);
-        } else {
-            this._stack.set_visible_child_full('content', transition);
-        }
+        this._stack.set_visible_child_full(pageId, transition);
     },
 });
 
@@ -177,7 +176,7 @@ const AppInstalledFrame = new Lang.Class({
         this._list = null;
 
         this.populate();
-        this.showContentPage(null, Gtk.StackTransitionType.SLIDE_RIGHT);
+        this.showContentPage(CONTENT_PAGE, Gtk.StackTransitionType.SLIDE_RIGHT);
     },
 
     get title() {
@@ -288,7 +287,7 @@ const AppCategoryFrame = new Lang.Class({
         }
 
         this.populate();
-        this.showContentPage(null, Gtk.StackTransitionType.SLIDE_RIGHT);
+        this.showContentPage(CONTENT_PAGE, Gtk.StackTransitionType.SLIDE_RIGHT);
     },
 
     reset: function() {
