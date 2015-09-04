@@ -198,7 +198,7 @@
               <object class="GtkBox" id="box2">
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
-                <property name="spacing">10</spacing>
+                <property name="spacing">10</property>
                 <child>
                   <object class="GtkSpinner" id="_updateSpinner">
                     <property name="visible">True</property>
