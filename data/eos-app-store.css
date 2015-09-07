@@ -158,8 +158,7 @@
 }
 
 .installed-app-box {
-    background-color: #484848;
-    opacity: 0.69;
+    background-color: rgba(72, 72, 72, 0.69);
     border-radius: 4px;
 }
 
@@ -169,8 +168,6 @@
 
 .installed-app-box .app-size {
     padding-right: 10px;
-    background-color: #484848;
-    opacity: 0.69;
     color: white;
 }
 
@@ -187,7 +184,7 @@
 }
 
 .controls-box .controls-separator {
-    color: #494949;
+    color: rgb(73, 73, 73);
 }
 
 .controls-box .state-button {
