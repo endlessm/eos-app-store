@@ -602,7 +602,7 @@ const AppListBoxRow = new Lang.Class({
         if (error &&
             (error.matches(Gio.io_error_quark(),
                            Gio.IOErrorEnum.CANCELLED) ||
-             error.matches(EosAppStorePrivate.app_store.error_quark(),
+             error.matches(EosAppStorePrivate.app_store_error_quark(),
                            EosAppStorePrivate.AppStoreError.CANCELLED))) {
             return;
         }
