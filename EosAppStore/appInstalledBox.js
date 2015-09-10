@@ -48,6 +48,7 @@ const AppInstalledBox = new Lang.Class({
 
         this._model = model;
         this._appInfo = appInfo;
+        this._appId = this._appInfo.get_desktop_id();
 
         this.appIcon = this._appInfo.get_icon_name();
         this.nameText = this._appInfo.get_title();
