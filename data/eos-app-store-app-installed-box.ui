@@ -128,7 +128,7 @@
                       </packing>
                     </child>
                     <child>
-                      <object class="GtkSeparator" id="separator1">
+                      <object class="GtkSeparator" id="_controlsSeparator">
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
                         <property name="orientation">vertical</property>

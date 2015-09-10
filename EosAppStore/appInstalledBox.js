@@ -26,6 +26,7 @@ const AppInstalledBox = new Lang.Class({
     templateResource: '/com/endlessm/appstore/eos-app-store-app-installed-box.ui',
     templateChildren: [
         '_appIcon',
+        '_controlsSeparator',
         '_controlsStack',
         '_categoryText',
         '_mainBox',
@@ -138,11 +139,13 @@ const AppInstalledBox = new Lang.Class({
         // Hide all controls, and show only what's needed
         this._updateButton.hide();
         this._removeButton.hide();
+        this._controlsSeparator.hide();
 
         this._controlsStack.visible_child_name = 'controls';
 
         if (this._networkAvailable && this._appInfo.is_updatable()) {
             this._updateButton.show();
+            this._controlsSeparator.show();
         }
 
         if (this._appInfo.is_removable()) {
