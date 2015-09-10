@@ -184,6 +184,7 @@ const AppInstalledBox = new Lang.Class({
     },
 
     _onRemoveButtonClicked: function() {
+        let app = Gio.Application.get_default();
         let dialog = new Gtk.MessageDialog({ transient_for: app.mainWindow,
                                              modal: true,
                                              destroy_with_parent: true,
