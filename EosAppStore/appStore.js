@@ -195,7 +195,7 @@ const AppStore = new Lang.Class({
     maybeNotifyUser: function(message, error) {
         let appWindowVisible = false;
         if (this.mainWindow) {
-            appWindowVisible = app.mainWindow.is_visible();
+            appWindowVisible = this.mainWindow.is_visible();
         }
         else {
             // the app store window timeout triggered, but the
