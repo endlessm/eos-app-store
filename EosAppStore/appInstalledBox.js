@@ -32,8 +32,10 @@ const AppInstalledBox = new Lang.Class({
         '_mainBox',
         '_nameText',
         '_removeButton',
+        '_removeButtonImage',
         '_sizeText',
         '_updateButton',
+        '_updateButtonImage',
         '_updateSpinner',
     ],
 
@@ -62,6 +64,9 @@ const AppInstalledBox = new Lang.Class({
 
         this._networkAvailable = this._model.networkAvailable;
         this._networkChangeId = this._model.connect('network-changed', Lang.bind(this, this._onNetworkMonitorChanged));
+
+        this._removeButton.connect('state-flags-changed', Lang.bind(this, this._onRemoveButtonStateChanged));
+        this._updateButton.connect('state-flags-changed', Lang.bind(this, this._onUpdateButtonStateChanged));
 
         this._updateControlsState();
     },
@@ -97,6 +102,22 @@ const AppInstalledBox = new Lang.Class({
             this._sizeText.label = GLib.format_size(v);
         }
         this._sizeText.show();
+    },
+
+    _onRemoveButtonStateChanged: function() {
+        // We use the background-image of a GtkFrame to set the image,
+        // and we need to forward the state flags to it, since GtkFrame
+        // can't track hover/active alone
+        let stateFlags = this._removeButton.get_state_flags();
+        this._removeButtonImage.set_state_flags(stateFlags, true);
+    },
+
+    _onUpdateButtonStateChanged: function() {
+        // We use the background-image of a GtkFrame to set the image,
+        // and we need to forward the state flags to it, since GtkFrame
+        // can't track hover/active alone
+        let stateFlags = this._updateButton.get_state_flags();
+        this._updateButtonImage.set_state_flags(stateFlags, true);
     },
 
     _onNetworkMonitorChanged: function() {
