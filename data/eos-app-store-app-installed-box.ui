@@ -112,7 +112,7 @@
                           </object>
                         </child>
                         <style>
-                          <class name="state-button"/>
+                          <class name="installed-state-button"/>
                           <class name="update"/>
                         </style>
                       </object>
@@ -152,7 +152,7 @@
                           </object>
                         </child>
                         <style>
-                          <class name="state-button"/>
+                          <class name="installed-state-button"/>
                           <class name="remove"/>
                         </style>
                       </object>
