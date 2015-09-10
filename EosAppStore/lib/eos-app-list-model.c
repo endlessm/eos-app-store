@@ -1620,7 +1620,7 @@ eos_app_list_model_create_from_filename (EosAppListModel *model,
       info = eos_app_info_new (app_id);
       g_free (app_id);
 
-      g_hash_table_replace (model->apps, g_strdup (desktop_id), info);
+      g_hash_table_insert (model->apps, g_strdup (desktop_id), info);
     }
 
   eos_app_info_update_from_gio (info, desktop_info);

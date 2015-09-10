@@ -739,26 +739,17 @@ eos_app_load_installed_apps (GHashTable *app_info,
 
       char *desktop_id = g_strconcat (appid, ".desktop", NULL);
       EosAppInfo *info = g_hash_table_lookup (app_info, desktop_id);
-      g_free (desktop_id);
 
       if (info == NULL)
-        info = eos_app_info_new (appid);
-      else
-        g_object_ref (info);
+        {
+          info = eos_app_info_new (appid);
+          g_hash_table_insert (app_info, g_strdup (desktop_id), info);
+        }
 
       if (eos_app_info_update_from_installed (info, info_path))
-        {
-          g_hash_table_replace (app_info,
-                                g_strdup (eos_app_info_get_desktop_id (info)),
-                                info);
-          n_bundles += 1;
-        }
-      else
-        {
-          eos_app_log_error_message ("App '%s' failed to update from installed info", appid);
-          g_object_unref (info);
-        }
+        n_bundles += 1;
 
+      g_free (desktop_id);
       g_free (info_path);
     }
 
@@ -1319,7 +1310,7 @@ eos_app_load_gio_apps (GHashTable *app_info)
       if (info == NULL)
         {
           info = eos_app_info_new (app_id);
-          g_hash_table_replace (app_info, g_strdup (sanitized_desktop_id), info);
+          g_hash_table_insert (app_info, g_strdup (sanitized_desktop_id), info);
         }
 
       g_free (app_id);
