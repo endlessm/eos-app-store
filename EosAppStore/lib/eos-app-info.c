@@ -184,7 +184,7 @@ eos_app_info_clear_installed_attributes (EosAppInfo *info)
   g_clear_pointer (&info->installed_version, g_free);
   g_clear_pointer (&info->installed_locale, g_free);
 
-  info->installed_size = 0;
+  info->info_installed_size = 0;
   info->installation_time = -1;
   info->storage_type = EOS_STORAGE_TYPE_PRIMARY;
 }
@@ -389,7 +389,7 @@ gint64
 eos_app_info_get_installed_size (const EosAppInfo *info)
 {
   if (info->is_installed)
-    return info->installed_size;
+    return info->info_installed_size;
 
   return info->server_installed_size;
 }
@@ -737,7 +737,7 @@ eos_app_info_installed_changed (EosAppInfo *info)
 
   info->installed_version = g_key_file_get_string (keyfile, GROUP, FILE_KEYS[CODE_VERSION], NULL);
   info->installed_locale = g_key_file_get_string (keyfile, GROUP, FILE_KEYS[LOCALE], NULL);
-  info->installed_size = g_key_file_get_int64 (keyfile, GROUP, FILE_KEYS[INSTALLED_SIZE], NULL);
+  info->info_installed_size = g_key_file_get_int64 (keyfile, GROUP, FILE_KEYS[INSTALLED_SIZE], NULL);
 
   check_info_storage (info);
 
