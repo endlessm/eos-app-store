@@ -415,8 +415,7 @@ load_shell_apps (EosAppListModel *self,
 }
 
 static gboolean
-load_content_apps (EosAppListModel *self,
-                   GCancellable *cancellable)
+load_content_apps (EosAppListModel *self)
 {
   eos_app_log_debug_message ("Reloading content apps");
 
@@ -521,7 +520,7 @@ init_model_thread_func (GTask *task,
       return;
     }
 
-  if (!load_content_apps (self, cancellable))
+  if (!load_content_apps (self))
     {
       set_reload_error (task, TRUE);
       return;
@@ -708,7 +707,7 @@ eos_app_list_model_refresh_network_finish (EosAppListModel *model,
 
   /* Now refresh content attributes */
   if (res)
-    load_content_apps (model, NULL);
+    load_content_apps (model);
 
   return res;
 }
