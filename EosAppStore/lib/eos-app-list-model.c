@@ -363,6 +363,7 @@ load_user_capabilities (EosAppListModel *self,
                                  error->message);
       g_critical ("Unable to retrieve user capabilities: %s",
                   error->message);
+      g_propagate_error (error_out, error);
 
       return FALSE;
     }
