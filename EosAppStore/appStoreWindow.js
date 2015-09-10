@@ -73,16 +73,27 @@ const AppStoreWindow = new Lang.Class({
     _init: function(app) {
         let rtl = Gtk.Widget.get_default_direction();
 
-        this.parent({ application: app,
-                        type_hint: Gdk.WindowTypeHint.DOCK,
-                             type: Gtk.WindowType.TOPLEVEL,
-                             role: SIDE_COMPONENT_ROLE,
-                             gravity: rtl ? Gdk.Gravity.NORTH_EAST : Gdk.Gravity.NORTH_WEST
-                    });
+        let params = { application: app,
+                       type_hint: Gdk.WindowTypeHint.DOCK,
+                       type: Gtk.WindowType.TOPLEVEL,
+                       role: SIDE_COMPONENT_ROLE,
+                       gravity: rtl ? Gdk.Gravity.NORTH_EAST : Gdk.Gravity.NORTH_WEST };
+
+        if (app.debugWindow) {
+            params.role = null;
+            params.type_hint = Gdk.WindowTypeHint.NORMAL;
+            params.gravity = Gdk.Gravity.NORTH_WEST;
+        }
+
+        this.parent(params);
 
         this.initTemplate({ templateRoot: 'main-frame', bindChildren: true, connectSignals: true, });
         this.stick();
-        this.set_decorated(false);
+
+        if (!app.debugWindow) {
+            this.set_decorated(false);
+        }
+
         this.get_style_context().add_class('main-window');
 
         // do not destroy, just hide
@@ -111,9 +122,11 @@ const AppStoreWindow = new Lang.Class({
         this._createStackPages();
 
         // hide main window when clicking outside the store
-        this._wmInspect = new WMInspect.WMInspect();
-        this._activeWindowId = this._wmInspect.connect('active-window-changed',
-                                                       Lang.bind(this, this._onActiveWindowChanged));
+        if (!app.debugWindow) {
+            this._wmInspect = new WMInspect.WMInspect();
+            this._activeWindowId = this._wmInspect.connect('active-window-changed',
+                                                           Lang.bind(this, this._onActiveWindowChanged));
+        }
     },
 
     vfunc_destroy: function() {

@@ -36,6 +36,8 @@ const AppStore = new Lang.Class({
     Extends: Gtk.Application,
 
     _init: function() {
+        this._debugWindow = !!GLib.getenv('EOS_APP_STORE_DEBUG_WINDOW');
+
         this.parent({ application_id: APP_STORE_NAME,
                       flags: Gio.ApplicationFlags.IS_SERVICE,
                       inactivity_timeout: QUIT_TIMEOUT * 1000, });
@@ -74,6 +76,10 @@ const AppStore = new Lang.Class({
 
     vfunc_activate: function() {
         this._createMainWindow();
+
+        if (this.debugWindow) {
+            this._mainWindow.showPage(Gdk.CURRENT_TIME);
+        }
     },
 
     vfunc_shutdown: function() {
@@ -100,6 +106,10 @@ const AppStore = new Lang.Class({
 
     get appList() {
         return this._appList;
+    },
+
+    get debugWindow() {
+        return this._debugWindow;
     },
 
     get shellProxy() {
