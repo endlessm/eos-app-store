@@ -383,14 +383,6 @@ load_user_capabilities (EosAppListModel *self,
 }
 
 static gboolean
-load_available_apps (EosAppListModel *self,
-                     GCancellable *cancellable,
-                     GError **error_out)
-{
-  return eos_load_available_apps (self->apps, self->soup_session, cancellable, error_out);
-}
-
-static gboolean
 load_shell_apps (EosAppListModel *self,
                  GCancellable *cancellable)
 {
@@ -508,14 +500,13 @@ reload_model (EosAppListModel *self,
       retval = FALSE;
     }
 
-  if (!load_available_apps (self, cancellable, &internal_error))
+  /* This will load the (possibly stale) last cached updates.json,
+   * so we ignore errors.
+   */
+  if (!eos_app_load_available_apps (self->apps, cancellable, &internal_error))
     {
       /* We eat the message */
       g_error_free (internal_error);
-
-      set_reload_error (error, FALSE);
-
-      retval = FALSE;
     }
 
   if (!load_shell_apps (self, cancellable))

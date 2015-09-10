@@ -73,7 +73,7 @@ inited (gpointer user_data)
 {
   g_autoptr(GError) error = NULL;
 
-  if (!eos_load_available_apps (apps, soup_session, NULL, &error))
+  if (!eos_refresh_available_apps (apps, soup_session, NULL, &error))
     {
       g_printerr ("Could not load available apps: %s\n", error->message);
       exit (EXIT_FAILURE);

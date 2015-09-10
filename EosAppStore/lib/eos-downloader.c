@@ -274,10 +274,10 @@ out:
 }
 
 gboolean
-eos_load_available_apps (GHashTable *apps,
-                         SoupSession *soup_session,
-                         GCancellable *cancellable,
-                         GError **error_out)
+eos_refresh_available_apps (GHashTable *apps,
+                            SoupSession *soup_session,
+                            GCancellable *cancellable,
+                            GError **error_out)
 {
   eos_app_log_debug_message ("Reloading available apps");
 
