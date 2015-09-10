@@ -1316,10 +1316,7 @@ eos_app_list_model_get_apps_for_category (EosAppListModel *model,
           const char *app_id = json_object_get_string_member (obj, "application-id");
           char *desktop_id = g_strconcat (app_id, ".desktop", NULL);
 
-          EosAppInfo *info = g_hash_table_lookup (model->apps, desktop_id);
-          if (info == NULL)
-            info = get_localized_app_info (model, desktop_id);
-
+          EosAppInfo *info = eos_app_list_model_get_app_info (model, desktop_id);
           g_free (desktop_id);
 
           if (info != NULL)
