@@ -141,11 +141,10 @@ const AppInstalledFrame = new Lang.Class({
             return b.get_installation_time() - a.get_installation_time();
         });
 
-        // 'Installed' only shows apps available on the desktop
+        // 'Installed' only shows apps available on the system
         for (let i in sortedAppInfos) {
             let info = sortedAppInfos[i];
-
-            if (info.get_has_launcher()) {
+            if (info.is_installed()) {
                 let row = new AppInstalledBox.AppInstalledBox(this.model, info);
                 list.add(row);
                 row.show();
