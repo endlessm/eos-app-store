@@ -9,5 +9,16 @@ function start() {
     let application = new AppStore.AppStore();
     if (GLib.getenv('EOS_APP_STORE_PERSIST'))
         application.hold();
+
+    try {
+        application.register(null);
+    } catch (e) {
+        logError(e, 'Unable to register app store application');
+        return 1;
+    }
+
+    if (GLib.getenv('EOS_APP_STORE_DEBUG_WINDOW'))
+        application.activate();
+
     return application.run(ARGV);
 }

@@ -74,6 +74,9 @@ const AppStore = new Lang.Class({
 
     vfunc_activate: function() {
         this._createMainWindow();
+
+        if (GLib.getenv('EOS_APP_STORE_DEBUG_WINDOW'))
+            this._mainWindow.showPage(Gdk.CURRENT_TIME);
     },
 
     vfunc_shutdown: function() {

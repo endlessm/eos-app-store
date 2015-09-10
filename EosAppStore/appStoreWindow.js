@@ -71,18 +71,30 @@ const AppStoreWindow = new Lang.Class({
     ],
 
     _init: function(app) {
+        let debugWindow = !!GLib.getenv('EOS_APP_STORE_DEBUG_WINDOW');
         let rtl = Gtk.Widget.get_default_direction();
 
-        this.parent({ application: app,
+        let params = { application: app,
                         type_hint: Gdk.WindowTypeHint.DOCK,
                              type: Gtk.WindowType.TOPLEVEL,
                              role: SIDE_COMPONENT_ROLE,
                              gravity: rtl ? Gdk.Gravity.NORTH_EAST : Gdk.Gravity.NORTH_WEST
-                    });
+                     };
+
+        if (debugWindow) {
+            params.role = null;
+            params.type_hint = Gdk.WindowTypeHint.NORMAL;
+            params.gravity = Gdk.Gravity.NORTH_WEST;
+        }
+
+        this.parent(params);
 
         this.initTemplate({ templateRoot: 'main-frame', bindChildren: true, connectSignals: true, });
         this.stick();
-        this.set_decorated(false);
+
+        if (!debugWindow)
+            this.set_decorated(false);
+
         this.get_style_context().add_class('main-window');
 
         // do not destroy, just hide
