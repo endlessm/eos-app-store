@@ -203,7 +203,6 @@ const AppInstalledBox = new Lang.Class({
         this._destroyRemoveDialog();
 
         if (responseId == Gtk.ResponseType.APPLY) {
-            let app = Gio.Application.get_default();
             app.pushRunningOperation();
 
             this._model.uninstall(this._appId, Lang.bind(this, function(error) {
