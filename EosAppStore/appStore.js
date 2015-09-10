@@ -230,7 +230,7 @@ const AppStore = new Lang.Class({
                                                  text: message,
                                                  secondary_text: error.message });
             dialog.add_button(_("Dismiss"), Gtk.ResponseType.OK);
-            dialog.show_all();
+            dialog.run();
             dialog.destroy();
         }
     },
