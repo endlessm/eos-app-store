@@ -978,9 +978,29 @@ is_server_record_valid (JsonNode *element)
 
 gboolean
 eos_app_load_available_apps (GHashTable *app_info,
-                             const char *data,
                              GCancellable *cancellable,
                              GError **error)
+{
+  char *path;
+  char *data = NULL;
+  gboolean res = FALSE;
+
+  path = eos_get_updates_file ();
+  if (g_file_get_contents (path, &data, NULL, error))
+    res = eos_app_load_available_apps_from_data (app_info, data,
+                                                 cancellable, error);
+
+  g_free (data);
+  g_free (path);
+
+  return res;
+}
+
+gboolean
+eos_app_load_available_apps_from_data (GHashTable *app_info,
+                                       const char *data,
+                                       GCancellable *cancellable,
+                                       GError **error)
 {
   JsonParser *parser = json_parser_new ();
   gboolean retval = FALSE;
