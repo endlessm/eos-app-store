@@ -298,10 +298,8 @@ const AppBroker = new Lang.Class({
     _init: function(mainWindow) {
         this._mainWindow = mainWindow;
 
-        // initialize the applications model
         let application = Gio.Application.get_default();
-        this._model = application.appList;
-        this._model.refresh(Lang.bind(this, this._onModelRefresh));
+        this._model = application.appListModel;
 
         this._categories = Categories.get_app_categories();
         this._categories.forEach(Lang.bind(this, function(category) {
@@ -312,6 +310,17 @@ const AppBroker = new Lang.Class({
             }
             category.widget.spinning = true;
         }));
+
+        this._model.connect('loading-changed', Lang.bind(this, this._onModelLoadingChanged));
+        this._onModelLoadingChanged();
+    },
+
+    _onModelLoadingChanged: function(model) {
+        if (!this._model.loading) {
+            // populate UI with the initial apps, then trigger a network refresh
+            this._populateAllCategories();
+            this._model.refresh(Lang.bind(this, this._onModelRefresh));
+        }
     },
 
     _onModelRefresh: function(error) {
@@ -337,12 +346,18 @@ const AppBroker = new Lang.Class({
             }
         }
 
-        this._populateAllCategories();
+        this._resetAllCategories();
     },
 
     _populateAllCategories: function() {
         this._categories.forEach(Lang.bind(this, function(c) {
             c.widget.populate();
+        }));
+    },
+
+    _resetAllCategories: function() {
+        this._categories.forEach(Lang.bind(this, function(c) {
+            c.widget.reset();
         }));
     },
 

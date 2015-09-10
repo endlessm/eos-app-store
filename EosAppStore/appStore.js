@@ -65,11 +65,8 @@ const AppStore = new Lang.Class({
         // The app store shell proxy
         this._shellProxy = new ShellAppStore.ShellAppStore();
 
-        // The backing app list model
-        this._appModel = new EosAppStorePrivate.AppListModel();
-
         // Main list model
-        this._appList = new AppListModel.AppList();
+        this._appListModel = new AppListModel.AppListModel();
 
         // No window by default
         this._mainWindow = null;
@@ -101,12 +98,8 @@ const AppStore = new Lang.Class({
         }
     },
 
-    get appModel() {
-        return this._appModel;
-    },
-
-    get appList() {
-        return this._appList;
+    get appListModel() {
+        return this._appListModel;
     },
 
     get debugWindow() {
