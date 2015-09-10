@@ -104,10 +104,9 @@
                     <property name="spacing">12</property>
                     <child>
                       <object class="GtkButton" id="_updateButton">
-                        <property name="width_request">29</property>
-                        <property name="height_request">29</property>
                         <property name="can_focus">True</property>
                         <property name="receives_default">True</property>
+                        <property name="valign">center</property>
                         <signal name="clicked" handler="_onUpdateButtonClicked" swapped="no"/>
                         <child>
                           <object class="GtkImage" id="_updateButtonImage">
@@ -118,7 +117,7 @@
                           </object>
                         </child>
                         <style>
-                          <class name="installed-state-button"/>
+                          <class name="state-button"/>
                           <class name="update"/>
                         </style>
                       </object>
@@ -144,10 +143,9 @@
                     </child>
                     <child>
                       <object class="GtkButton" id="_removeButton">
-                        <property name="width_request">29</property>
-                        <property name="height_request">29</property>
                         <property name="can_focus">True</property>
                         <property name="receives_default">True</property>
+                        <property name="valign">center</property>
                         <signal name="clicked" handler="_onRemoveButtonClicked" swapped="no"/>
                         <child>
                           <object class="GtkImage" id="_removeButtonImage">
@@ -158,7 +156,7 @@
                           </object>
                         </child>
                         <style>
-                          <class name="installed-state-button"/>
+                          <class name="state-button"/>
                           <class name="remove"/>
                         </style>
                       </object>
