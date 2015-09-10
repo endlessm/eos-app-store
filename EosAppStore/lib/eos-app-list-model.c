@@ -667,9 +667,11 @@ refresh_network_thread_func (GTask *task,
 {
   EosAppListModel *self = source_object;
   GError *internal_error = NULL;
+  char *data;
 
-  if (!eos_refresh_available_apps (self->apps, self->soup_session,
-                                   cancellable, &internal_error))
+  data = eos_refresh_available_apps (self->soup_session,
+                                     cancellable, &internal_error);
+  if (internal_error != NULL)
     {
       /* We eat the message */
       g_error_free (internal_error);
@@ -678,14 +680,7 @@ refresh_network_thread_func (GTask *task,
       return;
     }
 
-  /* Now refresh content attributes */
-  if (!load_content_apps (self, cancellable))
-    {
-      set_reload_error (task, TRUE);
-      return;
-    }
-
-  g_task_return_boolean (task, TRUE);
+  g_task_return_pointer (task, data, g_free);
 }
 
 void
@@ -704,7 +699,20 @@ eos_app_list_model_refresh_network_finish (EosAppListModel *model,
                                            GAsyncResult *result,
                                            GError **error)
 {
-  return g_task_propagate_boolean (G_TASK (result), error);
+  char *data = g_task_propagate_pointer (G_TASK (result), error);
+  gboolean res;
+
+  if (data == NULL)
+    return FALSE;
+
+  res = eos_app_load_available_apps_from_data (model->apps, data, NULL, error);
+  g_free (data);
+
+  /* Now refresh content attributes */
+  if (res)
+    load_content_apps (model, NULL);
+
+  return res;
 }
 
 static gboolean
