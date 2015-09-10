@@ -332,7 +332,7 @@ eos_load_available_apps (GHashTable *apps,
         }
     }
 
-  if (!eos_app_load_available_apps (apps, data, cancellable, &error))
+  if (!eos_app_load_available_apps_from_data (apps, data, cancellable, &error))
     {
       eos_app_log_error_message ("Parsing of all updates failed!");
 
