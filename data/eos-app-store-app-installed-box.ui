@@ -131,6 +131,7 @@
                       <object class="GtkSeparator" id="separator1">
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
+                        <property name="orientation">vertical</property>
                       </object>
                       <style>
                         <class name="controls-separator"/>
