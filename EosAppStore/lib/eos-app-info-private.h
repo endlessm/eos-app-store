@@ -35,6 +35,7 @@ struct _EosAppInfo
   char *delta_signature_uri;
   char *delta_bundle_hash;
 
+  gint64 computed_installed_size;
   gint64 info_installed_size;
   gint64 server_installed_size;
 
