@@ -148,7 +148,7 @@
                         <property name="height_request">29</property>
                         <property name="can_focus">True</property>
                         <property name="receives_default">True</property>
-                        <signal name="clicked" handler="_onUpdateButtonClicked" swapped="no"/>
+                        <signal name="clicked" handler="_onRemoveButtonClicked" swapped="no"/>
                         <child>
                           <object class="GtkImage" id="_removeButtonImage">
                             <property name="visible">True</property>
