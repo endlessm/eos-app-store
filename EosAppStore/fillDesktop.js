@@ -14,8 +14,7 @@ const FillDesktop = new Lang.Class({
     Extends: Gio.Application,
 
     _init: function() {
-        this._appModel = null;
-        this._appList = null;
+        this._appListModel = null;
         this._appInfos = [];
 
         Environment.loadResources();
@@ -23,24 +22,10 @@ const FillDesktop = new Lang.Class({
         this.parent({ application_id: FILL_DESKTOP_NAME });
     },
 
-    vfunc_startup: function() {
-        this.parent();
-
-        this._appModel = new EosAppStorePrivate.AppListModel();
-    },
-
     vfunc_activate: function() {
         this.hold();
 
-        this._appList = new AppListModel.AppList();
-        this._appList.refresh(Lang.bind(this, this._onModelRefresh));
-    },
-
-    _onModelRefresh: function(error) {
-        if (error) {
-            logError(error, 'Error while refreshing the model');
-            return;
-        }
+        this._appListModel = new AppListModel.AppListModel();
 
         let categories = Categories.get_app_categories();
         for (let c in categories) {
@@ -51,7 +36,7 @@ const FillDesktop = new Lang.Class({
             if (category == EosAppStorePrivate.AppCategory.INSTALLED)
                 continue;
 
-            this._appInfos = this._appInfos.concat(this._appList.loadCategory(category));
+            this._appInfos = this._appInfos.concat(this._appListModel.loadCategory(category));
         }
 
         // Remove apps that are not installed on the device
@@ -71,13 +56,9 @@ const FillDesktop = new Lang.Class({
         }
 
         let appId = app.get_desktop_id();
-        this._appList.install(appId, Lang.bind(this, function(error) {
+        this._appListModel.install(appId, Lang.bind(this, function(error) {
             this._install();
         }));
-    },
-
-    get appModel() {
-        return this._appModel;
     }
 });
 

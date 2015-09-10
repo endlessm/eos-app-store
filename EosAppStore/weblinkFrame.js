@@ -9,7 +9,6 @@ const EosAppStorePrivate = imports.gi.EosAppStorePrivate;
 const Pango = imports.gi.Pango;
 const WebKit = imports.gi.WebKit2;
 
-const AppListModel = imports.appListModel;
 const AppStoreWindow = imports.appStoreWindow;
 const Categories = imports.categories;
 const CategoryButton = imports.categoryButton;
@@ -606,7 +605,9 @@ const WeblinkFrame = new Lang.Class({
             this._columns = 2;
         }
 
-        this._weblinkListModel = new AppListModel.WeblinkList();
+
+        let application = Gio.Application.get_default();
+        this._weblinkListModel = application.appListModel;
 
         this._newSiteBox = new NewSiteBox(this._weblinkListModel);
         this._newSiteFrame.add(this._newSiteBox);

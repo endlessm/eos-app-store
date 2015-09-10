@@ -86,7 +86,7 @@ const AppStoreDBusService = new Lang.Class({
             return;
         }
 
-        let appInfos = this._app.appList.loadCategory(category);
+        let appInfos = this._app.appListModel.loadCategory(category);
 
         let appIds = [];
         for (let index in appInfos) {
@@ -103,7 +103,7 @@ const AppStoreDBusService = new Lang.Class({
     ListInstalledAsync: function(params, invocation) {
         log("Listing installed apps");
 
-        this._app.appList.refresh(Lang.bind(this, function(error) {
+        this._app.appListModel.refresh(Lang.bind(this, function(error) {
             this._genericListing(invocation,
                                  error,
                                  EosAppStorePrivate.AppCategory.INSTALLED,
@@ -116,7 +116,7 @@ const AppStoreDBusService = new Lang.Class({
     ListUpdatableAsync: function(params, invocation) {
         log("Listing updatable apps");
 
-        this._app.appList.refresh(Lang.bind(this, function(error) {
+        this._app.appListModel.refresh(Lang.bind(this, function(error) {
             this._genericListing(invocation,
                                  error,
                                  EosAppStorePrivate.AppCategory.INSTALLED,
@@ -129,7 +129,7 @@ const AppStoreDBusService = new Lang.Class({
 
     ListUninstallableAsync: function(params, invocation) {
         log("Listing uninstallable apps");
-        this._app.appList.refresh(Lang.bind(this, function(error) {
+        this._app.appListModel.refresh(Lang.bind(this, function(error) {
             this._genericListing(invocation,
                                  error,
                                  EosAppStorePrivate.AppCategory.INSTALLED,
@@ -143,7 +143,7 @@ const AppStoreDBusService = new Lang.Class({
 
     ListAvailableAsync: function(params, invocation) {
         log("Listing available apps");
-        this._app.appList.refresh(Lang.bind(this, function(error) {
+        this._app.appListModel.refresh(Lang.bind(this, function(error) {
             this._genericListing(invocation,
                                  error,
                                  EosAppStorePrivate.AppCategory.ALL,
@@ -156,21 +156,17 @@ const AppStoreDBusService = new Lang.Class({
 
     RefreshAsync: function(params, invocation) {
         log("Refreshing apps");
-        this._app.appList.refresh(Lang.bind(this, function(error) {
+        this._app.appListModel.refresh(Lang.bind(this, function(error) {
             let success = (error == null);
             log("Refresh finished. Success: " + success);
             invocation.return_value(GLib.Variant.new('(b)', [success]));
         }));
     },
 
-    _refresh: function(callback) {
-        this._app.appList.refresh(callback);
-    },
-
     InstallAsync: function(params, invocation) {
         let [appId] = params;
 
-        this._refresh(Lang.bind(this, function(error) {
+        this._app.appListModel.refresh(Lang.bind(this, function(error) {
             log("Refreshing before install");
             if (error != null) {
                 invocation.return_value(GLib.Variant.new('(b)', [false]));
@@ -178,7 +174,7 @@ const AppStoreDBusService = new Lang.Class({
             }
 
             log("Installing: " + appId);
-            this._app.appList.install(appId + ".desktop", Lang.bind(this, function(error) {
+            this._app.appListModel.install(appId + ".desktop", Lang.bind(this, function(error) {
                 let success = (error == null);
                 log("Install finished. Success: " + success);
                 invocation.return_value(GLib.Variant.new('(b)', [success]));
@@ -189,7 +185,7 @@ const AppStoreDBusService = new Lang.Class({
     UninstallAsync: function(params, invocation) {
         let [appId] = params;
 
-        this._refresh(Lang.bind(this, function(error) {
+        this._app.appListModel.refresh(Lang.bind(this, function(error) {
             log("Refreshing before install");
             if (error != null) {
                 invocation.return_value(GLib.Variant.new('(b)', [false]));
@@ -197,7 +193,7 @@ const AppStoreDBusService = new Lang.Class({
             }
 
             log("Uninstalling: " + appId);
-            this._app.appList.uninstall(appId + ".desktop", Lang.bind(this, function(error) {
+            this._app.appListModel.uninstall(appId + ".desktop", Lang.bind(this, function(error) {
                 let success = (error == null);
                 log("Uninstall finished. Success: " + success);
                 invocation.return_value(GLib.Variant.new('(b)', [success]));
@@ -208,7 +204,7 @@ const AppStoreDBusService = new Lang.Class({
     UpdateAsync: function(params, invocation) {
         let [appId] = params;
 
-        this._refresh(Lang.bind(this, function(error) {
+        this._app.appListModel.refresh(Lang.bind(this, function(error) {
             log("Refreshing before install");
             if (error != null) {
                 invocation.return_value(GLib.Variant.new('(b)', [false]));
@@ -216,7 +212,7 @@ const AppStoreDBusService = new Lang.Class({
             }
 
             log("Installing: " + appId);
-            this._app.appList.updateApp(appId + ".desktop", Lang.bind(this, function(error) {
+            this._app.appListModel.updateApp(appId + ".desktop", Lang.bind(this, function(error) {
                 let success = (error == null);
                 log("Update finished. Success: " + success);
                 invocation.return_value(GLib.Variant.new('(b)', [success]));
