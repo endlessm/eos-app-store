@@ -173,7 +173,7 @@ const AppInstalledBox = new Lang.Class({
             this._controlsStack.visible_child_name = 'controls';
 
             if (error) {
-                app._maybeNotifyUser(_("We could not update '%s'").format(this._appInfo.get_title()), error);
+                app.maybeNotifyUser(_("We could not update '%s'").format(this._appInfo.get_title()), error);
                 return;
             }
 
