@@ -37,82 +37,27 @@ const AppPreview = new Lang.Class({
     },
 });
 
-const AppInfoBox = new Lang.Class({
-    Name: 'AppInfoBox',
+const AppBaseBox = new Lang.Class({
+    Name: 'AppBaseBox',
     Extends: Gtk.Bin,
-
-    templateResource: '/com/endlessm/appstore/eos-app-store-app-info-box.ui',
-    templateChildren: [
-        '_contentBox',
-        '_descriptionText',
-        '_installButton',
-        '_installButtonImage',
-        '_installButtonLabel',
-        '_installProgress',
-        '_installProgressBar',
-        '_installProgressCancel',
-        '_installProgressLabel',
-        '_installProgressSpinner',
-        '_mainBox',
-        '_removeButton',
-        '_removeButtonImage',
-        '_removeButtonLabel',
-        '_screenshotImage',
-        '_screenshotPreviewBox',
-    ],
 
     _init: function(model, appInfo) {
         this.parent();
 
+        this._model = model;
+        this._appInfo = appInfo;
+
         let app = Gio.Application.get_default();
         let mainWindow = app.mainWindow;
 
-        this.initTemplate({ templateRoot: '_mainBox', bindChildren: true, connectSignals: true, });
-        this.add(this._mainBox);
-
-        let width = mainWindow.getExpectedWidth();
-        width = Math.max(width, AppStoreWindow.AppStoreSizes.VGA.screenWidth);
-        let xgaWidth = AppStoreWindow.AppStoreSizes.XGA.screenWidth;
-        if (width < xgaWidth) {
-            let screenshotRatio = SCREENSHOT_SMALL / SCREENSHOT_LARGE;
-            this._screenshotLarge = SCREENSHOT_LARGE + width - xgaWidth;
-            this._screenshotSmall = this._screenshotLarge * screenshotRatio;
-        } else {
-            this._screenshotLarge = SCREENSHOT_LARGE;
-            this._screenshotSmall = SCREENSHOT_SMALL;
-        }
-
-        this.appInfo = appInfo;
-        this.appTitle = this.appInfo.get_title();
-        this.appDescription = this.appInfo.get_description();
-        this.appScreenshots = this.appInfo.get_screenshots();
-        this._appId = appInfo.get_desktop_id();
-
-        this._model = model;
-        this._stateChangedId = this.appInfo.connect('notify::state', Lang.bind(this, this._updateState));
-        this._progressId = this._model.connect('download-progress', Lang.bind(this, this._downloadProgress));
+        this._networkChangeId = this._model.connect('network-changed', Lang.bind(this, this._updateState));
+        this._progressId = this._model.connect('download-progress', Lang.bind(this, this._onDownloadProgress));
+        this._stateChangedId = this._appInfo.connect('notify::state', Lang.bind(this, this._updateState));
+        this._windowHideId = mainWindow.connect('hide', Lang.bind(this, this._destroyPendingDialogs));
 
         this._removeDialog = null;
-        this._windowHideId = mainWindow.connect('hide', Lang.bind(this, this._destroyPendingDialogs));
+
         this.connect('destroy', Lang.bind(this, this._onDestroy));
-
-        this._installButton.connect('state-flags-changed', Lang.bind(this, this._onInstallButtonStateChanged));
-        this._removeButton.connect('state-flags-changed', Lang.bind(this, this._onRemoveButtonStateChanged));
-
-        let separator = new Separator.FrameSeparator();
-        this._mainBox.add(separator);
-        this._mainBox.reorder_child(separator, 0);
-        this._mainBox.show();
-
-        this._networkAvailable = this._model.networkAvailable;
-        this._networkChangeId = this._model.connect('network-changed', Lang.bind(this, this._onNetworkMonitorChanged));
-
-        this._updateState();
-    },
-
-    _onNetworkMonitorChanged: function() {
-        this._networkAvailable = this._model.networkAvailable;
-        this._updateState();
     },
 
     _destroyRemoveDialog: function() {
@@ -141,7 +86,7 @@ const AppInfoBox = new Lang.Class({
         }
 
         if (this._stateChangedId != 0) {
-            this.appInfo.disconnect(this._stateChangedId);
+            this._appInfo.disconnect(this._stateChangedId);
             this._stateChangedId = 0;
         }
 
@@ -154,6 +99,212 @@ const AppInfoBox = new Lang.Class({
             this._model.disconnect(this._networkChangeId);
             this._networkChangeId = 0;
         }
+    },
+
+    _onDownloadProgress: function(model, contentId, progress, current, total) {
+        if (this._appInfo.get_content_id() != contentId) {
+            return;
+        }
+
+        this._downloadProgress(progress, current, total);
+    },
+
+    _downloadProgress: function() {
+        // to be overridden
+    },
+
+    _updateState: function() {
+        // to be overridden
+    },
+
+    get appInfo() {
+        return this._appInfo;
+    },
+
+    get appId() {
+        return this._appInfo.get_desktop_id();
+    },
+
+    get appTitle() {
+        return this._appInfo.get_title();
+    },
+
+    get model() {
+        return this._model;
+    },
+
+    setImageFrame: function(button, imageFrame) {
+        button.connect('state-flags-changed', function() {
+            // We use the background-image of a GtkFrame to set the image,
+            // and we need to forward the state flags to it, since GtkFrame
+            // can't track hover/active alone
+            let stateFlags = button.get_state_flags();
+            imageFrame.set_state_flags(stateFlags, true);
+        });
+    },
+
+    _pushTransaction: function() {
+        let app = Gio.Application.get_default();
+        app.pushRunningOperation();
+    },
+
+    _popTransaction: function() {
+        let app = Gio.Application.get_default();
+        app.popRunningOperation();
+    },
+
+    showRemoveDialog: function() {
+        let app = Gio.Application.get_default();
+        let dialog = new Gtk.MessageDialog({ transient_for: app.mainWindow,
+                                             modal: true,
+                                             destroy_with_parent: true,
+                                             text: _("Deleting app"),
+                                             secondary_text: _("Deleting this app will remove it " +
+                                                               "from the device for all users. You " +
+                                                               "will need to download it from the " +
+                                                               "internet in order to reinstall it.") });
+        let applyButton = dialog.add_button(_("Delete app"), Gtk.ResponseType.APPLY);
+        applyButton.get_style_context().add_class('destructive-action');
+        dialog.add_button(_("Cancel"), Gtk.ResponseType.CANCEL);
+        dialog.show_all();
+        this._removeDialog = dialog;
+
+        let responseId = this._removeDialog.run();
+        this._destroyRemoveDialog();
+
+        return responseId;
+    },
+
+    doRemove: function(callback, transactionParams) {
+        this._pushTransaction(transactionParams);
+
+        this._model.uninstall(this.appId, Lang.bind(this, function(error) {
+            this._popTransaction();
+
+            let app = Gio.Application.get_default();
+
+            if (error) {
+                app.maybeNotifyUser(_("We could not remove '%s'").format(this.appTitle), error);
+            }
+            else {
+                app.maybeNotifyUser(_("'%s' was removed successfully").format(this.appTitle));
+            }
+
+            this._updateState();
+
+            if (callback)
+                callback(error);
+        }));
+    },
+
+    doUpdate: function(callback, transactionParams) {
+        this._pushTransaction(transactionParams);
+
+        this._model.updateApp(this.appId, Lang.bind(this, function(error) {
+            this._popTransaction();
+
+            let app = Gio.Application.get_default();
+
+            if (error) {
+                app.maybeNotifyUser(_("We could not update '%s'").format(this.appTitle), error);
+            }
+            else {
+                app.maybeNotifyUser(_("'%s' was updated successfully").format(this.appTitle));
+            }
+
+            this._updateState();
+
+            if (callback)
+                callback(error);
+        }));
+    },
+
+    doInstall: function(callback, transactionParams) {
+        this._pushTransaction(transactionParams);
+
+        this.model.install(this.appId, Lang.bind(this, function(error) {
+            this._popTransaction();
+
+            let app = Gio.Application.get_default();
+
+            if (error) {
+                app.maybeNotifyUser(_("We could not install '%s'").format(this.appTitle), error);
+            }
+            else {
+                app.maybeNotifyUser(_("'%s' was installed successfully").format(this.appTitle));
+            }
+
+            this._updateState();
+
+            if (!error) {
+                let appWindow = Gio.Application.get_default().mainWindow;
+                if (appWindow && appWindow.is_visible()) {
+                    appWindow.hide();
+                }
+            }
+
+            if (callback)
+                callback(error);
+        }));
+    }
+});
+
+const AppInfoBox = new Lang.Class({
+    Name: 'AppInfoBox',
+    Extends: AppBaseBox,
+
+    templateResource: '/com/endlessm/appstore/eos-app-store-app-info-box.ui',
+    templateChildren: [
+        '_contentBox',
+        '_descriptionText',
+        '_installButton',
+        '_installButtonImage',
+        '_installButtonLabel',
+        '_installProgress',
+        '_installProgressBar',
+        '_installProgressCancel',
+        '_installProgressLabel',
+        '_installProgressSpinner',
+        '_mainBox',
+        '_removeButton',
+        '_removeButtonImage',
+        '_removeButtonLabel',
+        '_screenshotImage',
+        '_screenshotPreviewBox',
+    ],
+
+    _init: function(model, appInfo) {
+        this.parent(model, appInfo);
+
+        this.initTemplate({ templateRoot: '_mainBox', bindChildren: true, connectSignals: true, });
+        this.add(this._mainBox);
+
+        let app = Gio.Application.get_default();
+        let mainWindow = app.mainWindow;
+        let width = mainWindow.getExpectedWidth();
+        width = Math.max(width, AppStoreWindow.AppStoreSizes.VGA.screenWidth);
+        let xgaWidth = AppStoreWindow.AppStoreSizes.XGA.screenWidth;
+        if (width < xgaWidth) {
+            let screenshotRatio = SCREENSHOT_SMALL / SCREENSHOT_LARGE;
+            this._screenshotLarge = SCREENSHOT_LARGE + width - xgaWidth;
+            this._screenshotSmall = this._screenshotLarge * screenshotRatio;
+        } else {
+            this._screenshotLarge = SCREENSHOT_LARGE;
+            this._screenshotSmall = SCREENSHOT_SMALL;
+        }
+
+        this.appDescription = this.appInfo.get_description();
+        this.appScreenshots = this.appInfo.get_screenshots();
+
+        this.setImageFrame(this._installButton, this._installButtonImage);
+        this.setImageFrame(this._removeButton, this._removeButtonImage);
+
+        let separator = new Separator.FrameSeparator();
+        this._mainBox.add(separator);
+        this._mainBox.reorder_child(separator, 0);
+        this._mainBox.show();
+
+        this._updateState();
     },
 
     _updateState: function() {
@@ -169,11 +320,7 @@ const AppInfoBox = new Lang.Class({
         this._installProgressBar.hide();
     },
 
-    _downloadProgress: function(model, contentId, progress, current, total) {
-        if (this.appInfo.get_content_id() != contentId) {
-            return;
-        }
-
+    _downloadProgress: function(progress, current, total) {
         if (current == 0) {
             this._installProgressLabel.set_text(_("Downloading…"));
             this._installProgressBar.fraction = 0.0;
@@ -190,10 +337,6 @@ const AppInfoBox = new Lang.Class({
 
     get hasTransactionInProgress() {
         return this._transactionInProgress;
-    },
-
-    get appId() {
-        return this._appId;
     },
 
     set appDescription(description) {
@@ -234,22 +377,6 @@ const AppInfoBox = new Lang.Class({
     _onPreviewPress: function(widget, event) {
         EosAppStorePrivate.app_load_screenshot(this._screenshotImage, widget.path, this._screenshotLarge);
         return false;
-    },
-
-    _onRemoveButtonStateChanged: function() {
-        // We use the background-image of a GtkFrame to set the image,
-        // and we need to forward the state flags to it, since GtkFrame
-        // can't track hover/active alone
-        let stateFlags = this._removeButton.get_state_flags();
-        this._removeButtonImage.set_state_flags(stateFlags, true);
-    },
-
-    _onInstallButtonStateChanged: function() {
-        // We use the background-image of a GtkFrame to set the image,
-        // and we need to forward the state flags to it, since GtkFrame
-        // can't track hover/active alone
-        let stateFlags = this._installButton.get_state_flags();
-        this._installButtonImage.set_state_flags(stateFlags, true);
     },
 
     _setStyleClassFromState: function() {
@@ -343,7 +470,7 @@ const AppInfoBox = new Lang.Class({
                 this._installButton.set_tooltip_text("");
                 this._installButtonLabel.set_text(BUTTON_LABEL_INSTALL);
 
-                if (!this._networkAvailable) {
+                if (!this.model.networkAvailable) {
                     this._installButton.set_sensitive(false);
                     this._installButton.set_tooltip_text(BUTTON_TOOLTIP_NO_NETWORK);
                 }
@@ -361,8 +488,8 @@ const AppInfoBox = new Lang.Class({
 
             case EosAppStorePrivate.AppState.UPDATABLE:
                 if (this.appInfo.get_has_launcher()) {
-                    this._installButton.set_sensitive(this._networkAvailable);
-                    if (!this._networkAvailable)
+                    this._installButton.set_sensitive(this.model.networkAvailable);
+                    if (!this.model.networkAvailable)
                         this._installButton.set_tooltip_text(BUTTON_TOOLTIP_NO_NETWORK);
 
                     this._installButtonLabel.set_text(BUTTON_LABEL_UPDATE);
@@ -377,7 +504,7 @@ const AppInfoBox = new Lang.Class({
                 break;
 
             case EosAppStorePrivate.AppState.UNKNOWN:
-                log('The state of app "' + this._appId + '" is not known to the app store');
+                log('The state of app "' + this.appId + '" is not known to the app store');
                 break;
         }
 
@@ -390,7 +517,7 @@ const AppInfoBox = new Lang.Class({
         }
     },
 
-    _pushTransaction: function(text, showProgressBar) {
+    _pushTransaction: function(params) {
         this._transactionInProgress = true;
 
         // hide install/remove buttons
@@ -401,10 +528,10 @@ const AppInfoBox = new Lang.Class({
         this._installProgress.show();
 
         // show the label
-        this._installProgressLabel.set_text(text);
+        this._installProgressLabel.set_text(params.text);
 
         // conditionally show the progress bar and cancel button
-        if (showProgressBar) {
+        if (params.showProgressBar) {
             this._installProgressSpinner.hide();
             this._installProgressBar.fraction = 0.0;
             this._installProgressBar.show();
@@ -416,8 +543,7 @@ const AppInfoBox = new Lang.Class({
             this._installProgressCancel.hide();
         }
 
-        let app = Gio.Application.get_default();
-        app.pushRunningOperation();
+        this.parent();
     },
 
     _popTransaction: function() {
@@ -425,75 +551,30 @@ const AppInfoBox = new Lang.Class({
 
         this._installProgress.hide();
 
-        let app = Gio.Application.get_default();
-        app.popRunningOperation();
-    },
-
-    _installFinishedCallback: function(error) {
-        this._popTransaction();
-
-        let app = Gio.Application.get_default();
-
-        if (error) {
-            app.maybeNotifyUser(_("We could not install '%s'").format(this.appTitle), error);
-
-            this._updateState();
-            return;
-        }
-
-        app.maybeNotifyUser(_("'%s' was installed successfully").format(this.appTitle));
-
-        this._updateState();
-
-        let appWindow = Gio.Application.get_default().mainWindow;
-        if (appWindow && appWindow.is_visible()) {
-            appWindow.hide();
-        }
-    },
-
-    _installOrAddToDesktop: function() {
-        this._model.install(this._appId,
-                            Lang.bind(this, this._installFinishedCallback));
-    },
-
-    _installApp: function() {
-        this._pushTransaction(_("Downloading…"), true);
-        this._installOrAddToDesktop();
-    },
-
-    _updateApp: function() {
-        this._pushTransaction(_("Updating…"), true);
-
-        this._model.updateApp(this._appId, Lang.bind(this, function(error) {
-            this._popTransaction();
-
-            let app = Gio.Application.get_default();
-
-            if (error) {
-                app.maybeNotifyUser(_("We could not update '%s'").format(this.appTitle), error);
-            }
-            else {
-                app.maybeNotifyUser(_("'%s' was updated successfully").format(this.appTitle));
-            }
-        }));
+        this.parent();
     },
 
     _launchApp: function() {
         try {
-            this._model.launch(this._appId, Gtk.get_current_event_time());
+            this.model.launch(this.appId, Gtk.get_current_event_time());
 
             let appWindow = Gio.Application.get_default().mainWindow;
             if (appWindow && appWindow.is_visible()) {
                 appWindow.hide();
             }
         } catch (e) {
-            log("Failed to launch app '" + this._appId + "': " + e.message);
+            log("Failed to launch app '" + this.appId + "': " + e.message);
         }
     },
 
     _addToDesktop: function() {
-        this._pushTransaction(_("Installing…"), false);
-        this._installOrAddToDesktop();
+        this.doInstall(null, { text: _("Installing…"),
+                               showProgressBar: false });
+    },
+
+    _installApp: function() {
+        this.doInstall(null, { text: _("Downloading…"),
+                               showProgressBar: true });
     },
 
     _onInstallButtonClicked: function() {
@@ -519,7 +600,8 @@ const AppInfoBox = new Lang.Class({
             case EosAppStorePrivate.AppState.UPDATABLE:
                 // we update it, if we have a launcher on the desktop
                 if (this.appInfo.get_has_launcher()) {
-                    this._updateApp();
+                    this.doUpdate(null, { text: _("Updating…"),
+                                          showProgressBar: true });
                 }
                 // or we add a launcher on the desktop
                 else {
@@ -531,46 +613,15 @@ const AppInfoBox = new Lang.Class({
 
     _onInstallCancelButtonClicked: function() {
         // this will trigger the error handling code in the install/update paths
-        this._model.cancel(this._appId);
+        this.model.cancel(this.appId);
     },
 
     _onRemoveButtonClicked: function() {
-        let app = Gio.Application.get_default();
-
-        let dialog = new Gtk.MessageDialog({ transient_for: app.mainWindow,
-                                             modal: true,
-                                             destroy_with_parent: true,
-                                             text: _("Deleting app"),
-                                             secondary_text: _("Deleting this app will remove it " +
-                                                               "from the device for all users. You " +
-                                                               "will need to download it from the " +
-                                                               "internet in order to reinstall it.") });
-        let applyButton = dialog.add_button(_("Delete app"), Gtk.ResponseType.APPLY);
-        applyButton.get_style_context().add_class('destructive-action');
-        dialog.add_button(_("Cancel"), Gtk.ResponseType.CANCEL);
-        dialog.show_all();
-        this._removeDialog = dialog;
-
-        let responseId = this._removeDialog.run();
-        this._destroyRemoveDialog();
+        let responseId = this.showRemoveDialog();
 
         if (responseId == Gtk.ResponseType.APPLY) {
-            this._pushTransaction(_("Removing…"), false);
-
-            this._model.uninstall(this._appId, Lang.bind(this, function(error) {
-                this._popTransaction();
-
-                let app = Gio.Application.get_default();
-
-                if (error) {
-                    app.maybeNotifyUser(_("We could not remove '%s'").format(this.appTitle), error);
-                }
-                else {
-                    app.maybeNotifyUser(_("'%s' was removed successfully").format(this.appTitle));
-                }
-
-                this._updateState();
-            }));
+            this.doRemove(null, { text: _("Removing…"),
+                                  showProgressBar: false });
         }
     },
 });
