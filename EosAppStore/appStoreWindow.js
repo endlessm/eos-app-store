@@ -346,7 +346,6 @@ const AppStoreWindow = new Lang.Class({
     },
 
     showPage: function(timestamp) {
-        this._updateGeometry();
         this.show();
         this.present_with_time(timestamp);
     },
