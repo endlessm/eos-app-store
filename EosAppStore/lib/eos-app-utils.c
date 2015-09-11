@@ -358,14 +358,7 @@ eos_app_parse_resource_content (const char *content_type,
     }
 
   JsonNode *node = json_parser_get_root (parser);
-  if (!JSON_NODE_HOLDS_ARRAY (node))
-    {
-      g_set_error (error_out,
-                   JSON_READER_ERROR,
-                   JSON_READER_ERROR_NO_ARRAY,
-                   "Expected array content");
-      goto out_error;
-    }
+  g_assert (JSON_NODE_HOLDS_ARRAY (node));
 
   content_array = json_node_dup_array (node);
 
