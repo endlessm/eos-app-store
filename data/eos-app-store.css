@@ -417,7 +417,7 @@
 }
 
 .app-frame .app-installed-list .list-row:hover {
-    background: none;
+    background-color: alpha(#ccc, 0.69);
     -gtk-image-effect: none;
 }
 
