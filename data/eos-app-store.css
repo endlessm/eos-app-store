@@ -186,6 +186,27 @@
     color: #494949;
 }
 
+.update-progress-bar {
+    padding: 0;
+    box-shadow: none;
+    -GtkProgressBar-xspacing: 0;
+    -GtkProgressBar-yspacing: 0;
+    -GtkProgressBar-min-horizontal-bar-height: 3;
+}
+
+.update-progress-bar .trough {
+    border-style: none;
+    background-color: transparent;
+    box-shadow: none;
+}
+
+.update-progress-bar .progressbar {
+    background-image: none;
+    background-color: #ffffff;
+    border-style: none;
+    border-radius: 0;
+}
+
 .close-button {
     background: none;
     border: none;
