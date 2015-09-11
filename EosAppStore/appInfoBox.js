@@ -186,8 +186,9 @@ const AppBaseBox = new Lang.Class({
 
             this._updateState();
 
-            if (callback)
+            if (callback) {
                 callback(error);
+            }
         }));
     },
 
@@ -208,8 +209,9 @@ const AppBaseBox = new Lang.Class({
 
             this._updateState();
 
-            if (callback)
+            if (callback) {
                 callback(error);
+            }
         }));
     },
 
@@ -237,8 +239,9 @@ const AppBaseBox = new Lang.Class({
                 }
             }
 
-            if (callback)
+            if (callback) {
                 callback(error);
+            }
         }));
     }
 });
