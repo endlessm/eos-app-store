@@ -1,20 +1,12 @@
 // -*- mode: js; js-indent-level: 4; indent-tabs-mode: nil -*-
-const Gdk = imports.gi.Gdk;
 const Gio = imports.gi.Gio;
 const GLib = imports.gi.GLib;
-const GObject = imports.gi.GObject;
 const Gtk = imports.gi.Gtk;
-const EosAppStorePrivate = imports.gi.EosAppStorePrivate;
-const Mainloop = imports.mainloop;
 
 const AppInfoBox = imports.appInfoBox;
-const AppStoreWindow = imports.appStoreWindow;
 const Builder = imports.builder;
 const Categories = imports.categories;
 const Lang = imports.lang;
-const Notify = imports.notify;
-const Separator = imports.separator;
-const Signals = imports.signals;
 
 const UPDATING_OPACITY = 0.3;
 const NORMAL_OPACITY = 1.0;
