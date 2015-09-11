@@ -218,10 +218,10 @@ const AppInstalledFrame = new Lang.Class({
     },
 
     _prepareAppInfos: function(appInfos) {
-        return appInfos.sort(function(a, b) {
-            return b.get_installation_time() - a.get_installation_time();
-        }).filter(function(info) {
+        return appInfos.filter(function(info) {
             return info.is_installed();
+        }).sort(function(a, b) {
+            return b.get_installation_time() - a.get_installation_time();
         });
     },
 
