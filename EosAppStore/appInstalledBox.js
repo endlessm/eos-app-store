@@ -21,8 +21,8 @@ const AppInstalledBox = new Lang.Class({
         '_controlsSeparator',
         '_controlsStack',
         '_categoryText',
-        '_mainBox',
         '_nameText',
+        '_overlay',
         '_removeButton',
         '_removeButtonImage',
         '_sizeText',
@@ -38,8 +38,8 @@ const AppInstalledBox = new Lang.Class({
         let app = Gio.Application.get_default();
         let mainWindow = app.mainWindow;
 
-        this.initTemplate({ templateRoot: '_mainBox', bindChildren: true, connectSignals: true, });
-        this.add(this._mainBox);
+        this.initTemplate({ templateRoot: '_overlay', bindChildren: true, connectSignals: true, });
+        this.add(this._overlay);
 
         this.appIcon = this.appInfo.get_icon_name();
         this.nameText = this.appTitle;
@@ -113,7 +113,7 @@ const AppInstalledBox = new Lang.Class({
         this._nameText.opacity = UPDATING_OPACITY;
         this._categoryText.opacity = UPDATING_OPACITY;
 
-        this._updateProgressBar.fraction = 0.0;
+        this._updateProgressBar.show();
         this._updateSpinner.start();
         this._controlsStack.visible_child_name = 'spinner';
 
@@ -122,9 +122,7 @@ const AppInstalledBox = new Lang.Class({
             this._nameText.opacity = NORMAL_OPACITY;
             this._categoryText.opacity = NORMAL_OPACITY;
 
-            // We reset the progress bar so that it's not visible, but
-            // it still occupies the same vertical space
-            this._updateProgressBar.fraction = 0.0;
+            this._updateProgressBar.hide();
             this._updateSpinner.stop();
             this._controlsStack.visible_child_name = 'controls';
 
