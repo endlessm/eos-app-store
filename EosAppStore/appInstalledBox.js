@@ -28,6 +28,7 @@ const AppInstalledBox = new Lang.Class({
         '_sizeText',
         '_updateButton',
         '_updateButtonImage',
+        '_updateProgressBar',
         '_updateSpinner',
     ],
 
@@ -103,11 +104,16 @@ const AppInstalledBox = new Lang.Class({
         }
     },
 
+    _downloadProgress: function(progress, current, total) {
+        this._updateProgressBar.fraction = progress;
+    },
+
     _onUpdateButtonClicked: function() {
         this._appIcon.opacity = UPDATING_OPACITY;
         this._nameText.opacity = UPDATING_OPACITY;
         this._categoryText.opacity = UPDATING_OPACITY;
 
+        this._updateProgressBar.fraction = 0.0;
         this._updateSpinner.start();
         this._controlsStack.visible_child_name = 'spinner';
 
@@ -116,6 +122,9 @@ const AppInstalledBox = new Lang.Class({
             this._nameText.opacity = NORMAL_OPACITY;
             this._categoryText.opacity = NORMAL_OPACITY;
 
+            // We reset the progress bar so that it's not visible, but
+            // it still occupies the same vertical space
+            this._updateProgressBar.fraction = 0.0;
             this._updateSpinner.stop();
             this._controlsStack.visible_child_name = 'controls';
 
