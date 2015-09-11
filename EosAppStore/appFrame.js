@@ -132,7 +132,7 @@ const AppFrame = new Lang.Class({
     },
 
     _prepareAppInfos: function(appInfos) {
-        return appInfos;
+        // to be overridden
     },
 
     populate: function() {
@@ -262,7 +262,7 @@ const AppCategoryFrame = new Lang.Class({
         this.view.add(cell);
     },
 
-    _prepateAppInfos: function(appInfos) {
+    _prepareAppInfos: function(appInfos) {
         // Every category only shows apps that can be added
         return appInfos.filter(function(info) {
             return !info.get_has_launcher();
