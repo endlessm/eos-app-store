@@ -158,29 +158,28 @@
 }
 
 .installed-app-box {
-    background-color: alpha(#484848, 0.69);
+    background-color: alpha(#606060, 0.69);
     border-radius: 4px;
 }
 
-.installed-app-box .app-icon {
-    padding: 7px 11px 7px 7px;
-}
-
-.installed-app-box .app-size {
-    padding-right: 10px;
-    color: white;
-}
-
 .installed-app-box .app-name {
-    padding-bottom: 9px;
-
     color: white;
     font-size: 15px;
+    font-weight: bold;
 }
 
 .installed-app-box .app-category {
-    color: #ccc;
+    color: #cccccc;
     font-size: 8px;
+}
+
+.installed-app-box .app-size {
+    color: #9b9b9b;
+}
+
+.installed-app-box .app-updating {
+    font-size: 9px;
+    color: white;
 }
 
 .controls-box .controls-separator {
@@ -411,6 +410,15 @@
 .app-frame .state-button.cancel:hover:active {
     background-image: url("btn_remove_pressed_middle.png");
     border-image-source: url("btn_remove_pressed_border.png");
+}
+
+.app-frame .app-installed-list {
+    background: none;
+}
+
+.app-frame .app-installed-list .list-row:hover {
+    background: none;
+    -gtk-image-effect: none;
 }
 
 .controls-box .state-button {

@@ -9,6 +9,7 @@
         <property name="visible">True</property>
         <property name="can_focus">False</property>
         <property name="height_request">54</property>
+        <property name="spacing">10</property>
         <style>
           <class name="installed-app-box"/>
         </style>
@@ -19,10 +20,11 @@
             <property name="stock">gtk-about</property>
             <property name="use_fallback">True</property>
             <property name="icon_size">6</property>
+            <property name="margin_start">7</property>
+            <property name="margin_top">7</property>
+            <property name="margin_bottom">7</property>
+            <property name="margin_end">1</property>
           </object>
-          <style>
-            <class name="app-icon"/>
-          </style>
           <packing>
             <property name="expand">False</property>
             <property name="fill">True</property>
@@ -35,7 +37,8 @@
             <property name="can_focus">False</property>
             <property name="orientation">vertical</property>
             <property name="hexpand">True</property>
-            <property name="vexpand">True</property>
+            <property name="valign">center</property>
+            <property name="spacing">8</property>
             <child>
               <object class="GtkLabel" id="_nameText">
                 <property name="visible">True</property>
@@ -79,9 +82,6 @@
                 <property name="position">1</property>
               </packing>
             </child>
-            <style>
-              <class name="installed-app-description"/>
-            </style>
           </object>
           <packing>
             <property name="expand">False</property>
@@ -191,6 +191,7 @@
                     <property name="can_focus">False</property>
                     <property name="label" translatable="yes">SIZE</property>
                     <property name="ellipsize">end</property>
+                    <property name="margin_end">10</property>
                     <property name="width_chars">10</property>
                     <property name="max_width_chars">10</property>
                   </object>

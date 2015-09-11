@@ -133,7 +133,9 @@ const AppInstalledFrame = new Lang.Class({
             return;
         }
 
-        let list = new Gtk.ListBox({ expand: true });
+        let list = new Gtk.ListBox({ expand: true,
+                                     selection_mode: Gtk.SelectionMode.NONE });
+        list.get_style_context().add_class('app-installed-list');
         this.scrollWindow.add(list);
 
         let appInfos = this.model.loadCategory(EosAppStorePrivate.AppCategory.INSTALLED);
