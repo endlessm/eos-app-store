@@ -17,7 +17,7 @@ function start() {
         return 1;
     }
 
-    if (GLib.getenv('EOS_APP_STORE_DEBUG_WINDOW')) {
+    if (application.debugWindow) {
         application.activate();
     }
 
