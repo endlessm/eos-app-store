@@ -5,55 +5,29 @@
   <object class="GtkWindow" id="window1">
     <property name="can_focus">False</property>
     <child>
-      <object class="GtkBox" id="_mainBox">
+      <object class="GtkBox" id="_outerBox">
         <property name="visible">True</property>
         <property name="can_focus">False</property>
         <property name="height_request">54</property>
-        <property name="spacing">10</property>
-        <style>
-          <class name="installed-app-box"/>
-        </style>
         <child>
-          <object class="GtkImage" id="_appIcon">
+          <object class="GtkBox" id="_mainBox">
             <property name="visible">True</property>
             <property name="can_focus">False</property>
-            <property name="stock">gtk-about</property>
-            <property name="use_fallback">True</property>
-            <property name="icon_size">6</property>
-            <property name="margin_start">7</property>
-            <property name="margin_top">7</property>
-            <property name="margin_bottom">7</property>
-            <property name="margin_end">1</property>
-          </object>
-          <packing>
-            <property name="expand">False</property>
-            <property name="fill">True</property>
-            <property name="position">0</property>
-          </packing>
-        </child>
-        <child>
-          <object class="GtkBox" id="_descriptionBox">
-            <property name="visible">True</property>
-            <property name="can_focus">False</property>
-            <property name="orientation">vertical</property>
-            <property name="hexpand">True</property>
-            <property name="valign">center</property>
-            <property name="spacing">8</property>
+            <property name="spacing">10</property>
+            <style>
+              <class name="installed-app-box"/>
+            </style>
             <child>
-              <object class="GtkLabel" id="_nameText">
+              <object class="GtkImage" id="_appIcon">
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
-                <property name="label" translatable="yes">APPLICATION NAME</property>
-                <property name="ellipsize">end</property>
-                <property name="width_chars">38</property>
-                <property name="max_width_chars">40</property>
-                <property name="lines">1</property>
-                <property name="xalign">0</property>
-                <property name="hexpand">True</property>
-                <property name="vexpand">True</property>
-                <style>
-                  <class name="app-name"/>
-                </style>
+                <property name="stock">gtk-about</property>
+                <property name="use_fallback">True</property>
+                <property name="icon_size">6</property>
+                <property name="margin_start">7</property>
+                <property name="margin_top">7</property>
+                <property name="margin_bottom">7</property>
+                <property name="margin_end">1</property>
               </object>
               <packing>
                 <property name="expand">False</property>
@@ -62,121 +36,27 @@
               </packing>
             </child>
             <child>
-              <object class="GtkLabel" id="_categoryText">
+              <object class="GtkBox" id="_descriptionBox">
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
-                <property name="label" translatable="yes">APPLICATION CATEGORY</property>
-                <property name="width_chars">40</property>
-                <property name="max_width_chars">40</property>
-                <property name="lines">1</property>
-                <property name="xalign">0</property>
+                <property name="orientation">vertical</property>
                 <property name="hexpand">True</property>
-                <property name="vexpand">True</property>
-                <style>
-                  <class name="app-category"/>
-                </style>
-              </object>
-              <packing>
-                <property name="expand">False</property>
-                <property name="fill">True</property>
-                <property name="position">1</property>
-              </packing>
-            </child>
-          </object>
-          <packing>
-            <property name="expand">False</property>
-            <property name="fill">True</property>
-            <property name="position">1</property>
-          </packing>
-        </child>
-        <child>
-          <object class="GtkStack" id="_controlsStack">
-            <property name="visible">True</property>
-            <property name="can_focus">False</property>
-            <child>
-              <object class="GtkBox" id="box1">
-                <property name="visible">True</property>
-                <property name="can_focus">False</property>
+                <property name="valign">center</property>
+                <property name="spacing">8</property>
                 <child>
-                  <object class="GtkBox" id="_controlsBox">
+                  <object class="GtkLabel" id="_nameText">
                     <property name="visible">True</property>
                     <property name="can_focus">False</property>
-                    <property name="spacing">12</property>
-                    <child>
-                      <object class="GtkButton" id="_updateButton">
-                        <property name="can_focus">True</property>
-                        <property name="receives_default">True</property>
-                        <property name="valign">center</property>
-                        <signal name="clicked" handler="_onUpdateButtonClicked" swapped="no"/>
-                        <child>
-                          <object class="GtkFrame" id="_updateButtonImage">
-                            <property name="visible">True</property>
-                            <property name="can_focus">False</property>
-                            <property name="valign">center</property>
-                            <property name="width_request">16</property>
-                            <property name="height_request">16</property>
-                            <style>
-                              <class name="state-image"/>
-                            </style>
-                          </object>
-                        </child>
-                        <style>
-                          <class name="state-button"/>
-                          <class name="update"/>
-                        </style>
-                      </object>
-                      <packing>
-                        <property name="expand">False</property>
-                        <property name="fill">False</property>
-                        <property name="position">0</property>
-                      </packing>
-                    </child>
-                    <child>
-                      <object class="GtkSeparator" id="_controlsSeparator">
-                        <property name="visible">True</property>
-                        <property name="can_focus">False</property>
-                        <property name="orientation">vertical</property>
-                        <style>
-                          <class name="controls-separator"/>
-                        </style>
-                      </object>
-                      <packing>
-                        <property name="expand">False</property>
-                        <property name="fill">True</property>
-                        <property name="position">1</property>
-                      </packing>
-                    </child>
-                    <child>
-                      <object class="GtkButton" id="_removeButton">
-                        <property name="can_focus">True</property>
-                        <property name="receives_default">True</property>
-                        <property name="valign">center</property>
-                        <signal name="clicked" handler="_onRemoveButtonClicked" swapped="no"/>
-                        <child>
-                          <object class="GtkFrame" id="_removeButtonImage">
-                            <property name="visible">True</property>
-                            <property name="can_focus">False</property>
-                            <property name="valign">center</property>
-                            <property name="width_request">16</property>
-                            <property name="height_request">16</property>
-                            <style>
-                              <class name="state-image"/>
-                            </style>
-                          </object>
-                        </child>
-                        <style>
-                          <class name="state-button"/>
-                          <class name="remove"/>
-                        </style>
-                      </object>
-                      <packing>
-                        <property name="expand">False</property>
-                        <property name="fill">False</property>
-                        <property name="position">2</property>
-                      </packing>
-                    </child>
+                    <property name="label" translatable="yes">APPLICATION NAME</property>
+                    <property name="ellipsize">end</property>
+                    <property name="width_chars">38</property>
+                    <property name="max_width_chars">40</property>
+                    <property name="lines">1</property>
+                    <property name="xalign">0</property>
+                    <property name="hexpand">True</property>
+                    <property name="vexpand">True</property>
                     <style>
-                      <class name="controls-box"/>
+                      <class name="app-name"/>
                     </style>
                   </object>
                   <packing>
@@ -186,80 +66,230 @@
                   </packing>
                 </child>
                 <child>
-                  <object class="GtkLabel" id="_sizeText">
+                  <object class="GtkLabel" id="_categoryText">
                     <property name="visible">True</property>
                     <property name="can_focus">False</property>
-                    <property name="label" translatable="yes">SIZE</property>
-                    <property name="ellipsize">end</property>
-                    <property name="margin_end">10</property>
-                    <property name="width_chars">10</property>
-                    <property name="max_width_chars">10</property>
+                    <property name="label" translatable="yes">APPLICATION CATEGORY</property>
+                    <property name="width_chars">40</property>
+                    <property name="max_width_chars">40</property>
+                    <property name="lines">1</property>
+                    <property name="xalign">0</property>
+                    <property name="hexpand">True</property>
+                    <property name="vexpand">True</property>
+                    <style>
+                      <class name="app-category"/>
+                    </style>
                   </object>
-                  <style>
-                    <class name="app-size"/>
-                  </style>
                   <packing>
                     <property name="expand">False</property>
-                    <property name="fill">False</property>
-                    <property name="pack_type">end</property>
+                    <property name="fill">True</property>
                     <property name="position">1</property>
                   </packing>
                 </child>
               </object>
               <packing>
-                <property name="name">controls</property>
+                <property name="expand">False</property>
+                <property name="fill">True</property>
+                <property name="position">1</property>
               </packing>
             </child>
             <child>
-              <object class="GtkBox" id="box2">
+              <object class="GtkStack" id="_controlsStack">
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
-                <property name="spacing">10</property>
                 <child>
-                  <object class="GtkSpinner" id="_updateSpinner">
+                  <object class="GtkBox" id="box1">
                     <property name="visible">True</property>
-                    <property name="width_request">9px</property>
-                    <property name="height_request">9px</property>
+                    <property name="can_focus">False</property>
+                    <child>
+                      <object class="GtkBox" id="_controlsBox">
+                        <property name="visible">True</property>
+                        <property name="can_focus">False</property>
+                        <property name="spacing">12</property>
+                        <child>
+                          <object class="GtkButton" id="_updateButton">
+                            <property name="can_focus">True</property>
+                            <property name="receives_default">True</property>
+                            <property name="valign">center</property>
+                            <signal name="clicked" handler="_onUpdateButtonClicked" swapped="no"/>
+                            <child>
+                              <object class="GtkFrame" id="_updateButtonImage">
+                                <property name="visible">True</property>
+                                <property name="can_focus">False</property>
+                                <property name="valign">center</property>
+                                <property name="width_request">16</property>
+                                <property name="height_request">16</property>
+                                <style>
+                                  <class name="state-image"/>
+                                </style>
+                              </object>
+                            </child>
+                            <style>
+                              <class name="state-button"/>
+                              <class name="update"/>
+                            </style>
+                          </object>
+                          <packing>
+                            <property name="expand">False</property>
+                            <property name="fill">False</property>
+                            <property name="position">0</property>
+                          </packing>
+                        </child>
+                        <child>
+                          <object class="GtkSeparator" id="_controlsSeparator">
+                            <property name="visible">True</property>
+                            <property name="can_focus">False</property>
+                            <property name="orientation">vertical</property>
+                            <style>
+                              <class name="controls-separator"/>
+                            </style>
+                          </object>
+                          <packing>
+                            <property name="expand">False</property>
+                            <property name="fill">True</property>
+                            <property name="position">1</property>
+                          </packing>
+                        </child>
+                        <child>
+                          <object class="GtkButton" id="_removeButton">
+                            <property name="can_focus">True</property>
+                            <property name="receives_default">True</property>
+                            <property name="valign">center</property>
+                            <signal name="clicked" handler="_onRemoveButtonClicked" swapped="no"/>
+                            <child>
+                              <object class="GtkFrame" id="_removeButtonImage">
+                                <property name="visible">True</property>
+                                <property name="can_focus">False</property>
+                                <property name="valign">center</property>
+                                <property name="width_request">16</property>
+                                <property name="height_request">16</property>
+                                <style>
+                                  <class name="state-image"/>
+                                </style>
+                              </object>
+                            </child>
+                            <style>
+                              <class name="state-button"/>
+                              <class name="remove"/>
+                            </style>
+                          </object>
+                          <packing>
+                            <property name="expand">False</property>
+                            <property name="fill">False</property>
+                            <property name="position">2</property>
+                          </packing>
+                        </child>
+                        <style>
+                          <class name="controls-box"/>
+                        </style>
+                      </object>
+                      <packing>
+                        <property name="expand">False</property>
+                        <property name="fill">True</property>
+                        <property name="position">0</property>
+                      </packing>
+                    </child>
+                    <child>
+                      <object class="GtkLabel" id="_sizeText">
+                        <property name="visible">True</property>
+                        <property name="can_focus">False</property>
+                        <property name="label" translatable="yes">SIZE</property>
+                        <property name="ellipsize">end</property>
+                        <property name="margin_end">10</property>
+                        <property name="width_chars">10</property>
+                        <property name="max_width_chars">10</property>
+                      </object>
+                      <style>
+                        <class name="app-size"/>
+                      </style>
+                      <packing>
+                        <property name="expand">False</property>
+                        <property name="fill">False</property>
+                        <property name="pack_type">end</property>
+                        <property name="position">1</property>
+                      </packing>
+                    </child>
                   </object>
                   <packing>
-                    <property name="expand">False</property>
-                    <property name="fill">False</property>
-                    <property name="pack_type">start</property>
-                    <property name="position">0</property>
+                    <property name="name">controls</property>
                   </packing>
                 </child>
                 <child>
-                  <object class="GtkLabel" id="_updateLabel">
+                  <object class="GtkBox" id="box2">
                     <property name="visible">True</property>
                     <property name="can_focus">False</property>
-                    <property name="label" translatable="yes">UPDATING…</property>
-                    <property name="margin_end">10</property>
-                    <property name="max_width_chars">10</property>
+                    <property name="spacing">10</property>
+                    <child>
+                      <object class="GtkSpinner" id="_updateSpinner">
+                        <property name="visible">True</property>
+                        <property name="width_request">9px</property>
+                        <property name="height_request">9px</property>
+                      </object>
+                      <packing>
+                        <property name="expand">False</property>
+                        <property name="fill">False</property>
+                        <property name="pack_type">start</property>
+                        <property name="position">0</property>
+                      </packing>
+                    </child>
+                    <child>
+                      <object class="GtkLabel" id="_updateLabel">
+                        <property name="visible">True</property>
+                        <property name="can_focus">False</property>
+                        <property name="label" translatable="yes">UPDATING…</property>
+                        <property name="margin_end">10</property>
+                        <property name="max_width_chars">10</property>
+                      </object>
+                      <style>
+                        <class name="app-updating"/>
+                      </style>
+                      <packing>
+                        <property name="expand">False</property>
+                        <property name="fill">False</property>
+                        <property name="pack_type">end</property>
+                        <property name="position">1</property>
+                      </packing>
+                    </child>
                   </object>
-                  <style>
-                    <class name="app-updating"/>
-                  </style>
                   <packing>
-                    <property name="expand">False</property>
-                    <property name="fill">False</property>
-                    <property name="pack_type">end</property>
-                    <property name="position">1</property>
+                    <property name="name">spinner</property>
                   </packing>
                 </child>
               </object>
               <packing>
-                <property name="name">spinner</property>
+                <property name="expand">False</property>
+                <property name="fill">True</property>
+                <property name="pack_type">end</property>
+                <property name="position">2</property>
               </packing>
             </child>
           </object>
-          <packing>
-            <property name="expand">False</property>
-            <property name="fill">True</property>
-            <property name="pack_type">end</property>
-            <property name="position">2</property>
-          </packing>
         </child>
       </object>
+      <packing>
+        <property name="expand">False</property>
+        <property name="fill">True</property>
+        <property name="pack_type">start</property>
+        <property name="position">0</property>
+      </packing>
+    </child>
+    <child>
+      <object class="GtkProgressBar" id="_updateProgressBar">
+        <property name="visible">True</property>
+        <property name="can_focus">False</property>
+        <property name="halign">fill</property>
+        <property name="valign">center</property>
+        <property name="hexpand">True</property>
+        <style>
+          <class name="update-progress-bar"/>
+        </style>
+      </object>
+      <packing>
+        <property name="expand">False</property>
+        <property name="fill">True</property>
+        <property name="pack_type">end</property>
+        <property name="position">1</property>
+      </packing>
     </child>
   </object>
 </interface>
