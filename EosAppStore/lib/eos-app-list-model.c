@@ -63,6 +63,7 @@ struct _EosAppListModel
   gboolean caps_loaded;
 
   SoupSession *soup_session;
+  JsonArray *content_apps;
 };
 
 struct _EosAppListModelClass
@@ -414,20 +415,15 @@ load_shell_apps (EosAppListModel *self,
   return TRUE;
 }
 
-static gboolean
+static void
 load_content_apps (EosAppListModel *self)
 {
   eos_app_log_debug_message ("Reloading content apps");
 
-  JsonArray *array = eos_app_parse_resource_content ("apps", "content", NULL);
-
-  if (array == NULL)
-    return FALSE;
-
-  guint i, n_elements = json_array_get_length (array);
+  guint i, n_elements = json_array_get_length (self->content_apps);
   for (i = 0; i < n_elements; i++)
     {
-      JsonNode *element = json_array_get_element (array, i);
+      JsonNode *element = json_array_get_element (self->content_apps, i);
 
       JsonObject *obj = json_node_get_object (element);
       if (!json_object_has_member (obj, "application-id"))
@@ -448,10 +444,6 @@ load_content_apps (EosAppListModel *self)
 
       eos_app_info_update_from_content (info, obj);
     }
-
-  json_array_unref (array);
-
-  return TRUE;
 }
 
 static void
@@ -491,6 +483,13 @@ init_model_thread_func (GTask *task,
   EosAppListModel *self = source_object;
   GError *error = NULL;
 
+  self->content_apps = eos_app_parse_resource_content ("apps", "content", &error);
+  if (error != NULL)
+    {
+      g_task_return_error (task, error);
+      return;
+    }
+
   eos_app_load_gio_apps (self->apps);
 
   if (!load_user_capabilities (self, cancellable, &error))
@@ -520,11 +519,7 @@ init_model_thread_func (GTask *task,
       return;
     }
 
-  if (!load_content_apps (self))
-    {
-      set_reload_error (task, TRUE);
-      return;
-    }
+  load_content_apps (self);
 
   g_task_return_boolean (task, TRUE);
 }
@@ -559,6 +554,7 @@ eos_app_list_model_finalize (GObject *gobject)
       self->refresh_guard_id = 0;
     }
 
+  g_clear_pointer (&self->content_apps, json_array_unref);
   g_clear_object (&self->soup_session);
 
   g_clear_object (&self->app_monitor);
@@ -1309,15 +1305,11 @@ eos_app_list_model_get_apps_for_category (EosAppListModel *model,
                                           EosAppCategory category)
 {
   GList *apps = NULL;
-  JsonArray *array = eos_app_parse_resource_content ("apps", "content", NULL);
 
-  if (array == NULL)
-    return NULL;
-
-  guint i, n_elements = json_array_get_length (array);
+  guint i, n_elements = json_array_get_length (model->content_apps);
   for (i = 0; i < n_elements; i++)
     {
-      JsonNode *element = json_array_get_element (array, i);
+      JsonNode *element = json_array_get_element (model->content_apps, i);
 
       JsonObject *obj = json_node_get_object (element);
       const char *category_id = json_object_get_string_member (obj, "category");
@@ -1337,8 +1329,6 @@ eos_app_list_model_get_apps_for_category (EosAppListModel *model,
             apps = g_list_prepend (apps, info);
         }
     }
-
-  json_array_unref (array);
 
   return g_list_reverse (apps);
 }
