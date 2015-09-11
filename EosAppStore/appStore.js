@@ -17,6 +17,7 @@ const AppStoreDBusService = imports.appStoreDBusService;
 const Categories = imports.categories;
 const Config = imports.config;
 const Environment = imports.environment;
+const Notify = imports.notify;
 const Path = imports.path;
 const ShellAppStore = imports.shellAppStore;
 
@@ -198,6 +199,49 @@ const AppStore = new Lang.Class({
 
             this._clearId =
                 Mainloop.timeout_add_seconds(CLEAR_TIMEOUT, Lang.bind(this, this._clearMainWindow));
+        }
+    },
+
+    maybeNotifyUser: function(message, error) {
+        let appWindowVisible = false;
+        if (this.mainWindow) {
+            appWindowVisible = this.mainWindow.is_visible();
+        }
+        else {
+            // the app store window timeout triggered, but the
+            // app store process is still running because of the
+            // reference we hold
+            appWindowVisible = false;
+        }
+
+        // notify only if the error is not caused by a user
+        // cancellation
+        if (error &&
+            (error.matches(Gio.io_error_quark(),
+                           Gio.IOErrorEnum.CANCELLED) ||
+             error.matches(EosAppStorePrivate.app_store_error_quark(),
+                           EosAppStorePrivate.AppStoreError.CANCELLED))) {
+            return;
+        }
+
+        // if the window is not visible, we emit a notification instead
+        // of showing a dialog
+        if (!appWindowVisible) {
+            let notification = new Notify.Notification(message, '');
+            notification.show();
+            return;
+        }
+
+        // we only show the error dialog if the error is set
+        if (error) {
+            let dialog = new Gtk.MessageDialog({ transient_for: this.mainWindow,
+                                                 modal: true,
+                                                 destroy_with_parent: true,
+                                                 text: message,
+                                                 secondary_text: error.message });
+            dialog.add_button(_("Dismiss"), Gtk.ResponseType.OK);
+            dialog.run();
+            dialog.destroy();
         }
     },
 });

@@ -157,6 +157,56 @@
     background-image: url("btn_back_pressed.png");
 }
 
+.installed-app-box {
+    background-color: alpha(#606060, 0.69);
+    border-radius: 4px;
+}
+
+.installed-app-box .app-name {
+    color: white;
+    font-size: 15px;
+    font-weight: bold;
+}
+
+.installed-app-box .app-category {
+    color: #cccccc;
+    font-size: 8px;
+}
+
+.installed-app-box .app-size {
+    color: #9b9b9b;
+}
+
+.installed-app-box .app-updating {
+    font-size: 9px;
+    color: white;
+}
+
+.controls-box .controls-separator {
+    color: #494949;
+}
+
+.update-progress-bar {
+    padding: 0;
+    box-shadow: none;
+    -GtkProgressBar-xspacing: 0;
+    -GtkProgressBar-yspacing: 0;
+    -GtkProgressBar-min-horizontal-bar-height: 3;
+}
+
+.update-progress-bar .trough {
+    border-style: none;
+    background-color: transparent;
+    box-shadow: none;
+}
+
+.update-progress-bar .progressbar {
+    background-image: none;
+    background-color: #ffffff;
+    border-style: none;
+    border-radius: 0;
+}
+
 .close-button {
     background: none;
     border: none;
@@ -381,6 +431,63 @@
 .app-frame .state-button.cancel:hover:active {
     background-image: url("btn_remove_pressed_middle.png");
     border-image-source: url("btn_remove_pressed_border.png");
+}
+
+.app-frame .app-installed-list {
+    background: none;
+}
+
+.app-frame .app-installed-list .list-row:hover {
+    background-color: alpha(#ccc, 0.69);
+    -gtk-image-effect: none;
+}
+
+.controls-box .state-button {
+    border-image: none;
+    border-width: 0;
+
+    background-position: initial;
+    background-repeat: no-repeat;
+    padding: 10px 11px 11px 11px;
+}
+
+.controls-box .state-button.update {
+    background-image: url("btn_install_normal_border.png");
+}
+
+.controls-box .state-button.update:hover {
+    background-image: url("btn_install_hover_border.png");
+}
+
+.controls-box .state-button.update:active,
+.controls-box .state-button.update:hover:active {
+    background-image: url("btn_install_pressed_border.png");
+}
+
+.controls-box .state-button.remove {
+    background-image: url("btn_remove_normal_border.png");
+}
+
+.controls-box .state-button.remove:hover {
+    background-image: url("btn_remove_hover_border.png");
+}
+
+.controls-box .state-button.remove:active,
+.controls-box .state-button.remove:hover:active {
+    background-image: url("btn_remove_pressed_border.png");
+}
+
+.controls-box .state-button.cancel {
+    background-image: url("btn_remove_normal_border.png");
+}
+
+.controls-box .state-button.cancel:hover {
+    background-image: url("btn_remove_hover_border.png");
+}
+
+.controls-box .state-button.cancel:active,
+.controls-box .state-button.cancel:hover:active {
+    background-image: url("btn_remove_pressed_border.png");
 }
 
 .app-frame GtkSpinner {

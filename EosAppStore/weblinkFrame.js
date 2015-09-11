@@ -717,7 +717,7 @@ const WeblinkFrame = new Lang.Class({
         let weblinksBox = new Gtk.Box({ orientation: Gtk.Orientation.HORIZONTAL,
                                         homogeneous: true,
                                         spacing: LIST_COLUMNS_SPACING });
-        scrollWindow.add_with_viewport(weblinksBox);
+        scrollWindow.add(weblinksBox);
 
         let weblinksColumnBoxes = [];
         for (let i = 0; i < this._columns; i++) {
