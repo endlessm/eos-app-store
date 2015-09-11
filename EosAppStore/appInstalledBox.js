@@ -121,7 +121,7 @@ const AppInstalledBox = new Lang.Class({
         this._controlsStack.visible_child_name = 'spinner';
 
         this.doUpdate(Lang.bind(this, function() {
-            this.appInfo.opacity = NORMAL_OPACITY;
+            this._appIcon.opacity = NORMAL_OPACITY;
             this._nameText.opacity = NORMAL_OPACITY;
             this._categoryText.opacity = NORMAL_OPACITY;
 
