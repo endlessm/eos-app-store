@@ -21,7 +21,7 @@ const Notify = imports.notify;
 const Path = imports.path;
 const ShellAppStore = imports.shellAppStore;
 
-const APP_STORE_CSS = 'resource:///com/endlessm/appstore/eos-app-store.css';
+const APP_STORE_CSS = '/com/endlessm/appstore/eos-app-store.css';
 
 const APP_STORE_NAME = 'com.endlessm.AppStore';
 
@@ -58,7 +58,7 @@ const AppStore = new Lang.Class({
 
         // main style provider
         let provider = new Gtk.CssProvider();
-        provider.load_from_file(Gio.File.new_for_uri(APP_STORE_CSS));
+        provider.load_from_resource(APP_STORE_CSS);
         Gtk.StyleContext.add_provider_for_screen(Gdk.Screen.get_default(), provider,
                                                  Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION);
 
