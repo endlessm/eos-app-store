@@ -219,6 +219,11 @@
                     <property name="visible">True</property>
                     <property name="can_focus">False</property>
                     <property name="spacing">10</property>
+                    <property name="margin_end">10</property>
+                    <property name="halign">end</property>
+                    <style>
+                      <class name="controls-box"/>
+                    </style>
                     <child>
                       <object class="GtkSpinner" id="_updateSpinner">
                         <property name="visible">True</property>
@@ -228,7 +233,6 @@
                       <packing>
                         <property name="expand">False</property>
                         <property name="fill">False</property>
-                        <property name="pack_type">start</property>
                         <property name="position">0</property>
                       </packing>
                     </child>
@@ -237,7 +241,6 @@
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
                         <property name="label" translatable="yes">UPDATING…</property>
-                        <property name="margin_end">10</property>
                         <property name="max_width_chars">10</property>
                       </object>
                       <style>
@@ -246,8 +249,33 @@
                       <packing>
                         <property name="expand">False</property>
                         <property name="fill">False</property>
-                        <property name="pack_type">end</property>
                         <property name="position">1</property>
+                      </packing>
+                    </child>
+                    <child>
+                      <object class="GtkButton" id="_cancelButton">
+                        <property name="visible">True</property>
+                        <property name="can_focus">True</property>
+                        <property name="receives_default">True</property>
+                        <property name="valign">center</property>
+                        <signal name="clicked" handler="_onCancelButtonClicked" swapped="no"/>
+                        <child>
+                          <object class="GtkImage" id="_cancelButtonImage">
+                            <property name="visible">True</property>
+                            <property name="can_focus">False</property>
+                            <property name="icon_name">process-stop-symbolic</property>
+                            <property name="icon_size">1</property>
+                          </object>
+                        </child>
+                        <style>
+                          <class name="state-button"/>
+                          <class name="cancel"/>
+                        </style>
+                      </object>
+                      <packing>
+                        <property name="expand">False</property>
+                        <property name="fill">False</property>
+                        <property name="position">2</property>
                       </packing>
                     </child>
                   </object>

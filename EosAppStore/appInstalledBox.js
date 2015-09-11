@@ -18,6 +18,7 @@ const AppInstalledBox = new Lang.Class({
     templateResource: '/com/endlessm/appstore/eos-app-store-app-installed-box.ui',
     templateChildren: [
         '_appIcon',
+        '_cancelButton',
         '_controlsSeparator',
         '_controlsStack',
         '_categoryText',
@@ -137,5 +138,9 @@ const AppInstalledBox = new Lang.Class({
             this.doRemove(Lang.bind(this, this.destroy));
         }
     },
+
+    _onCancelButtonClicked: function() {
+        this.doCancel();
+    }
 });
 Builder.bindTemplateChildren(AppInstalledBox.prototype);

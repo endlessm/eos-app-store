@@ -243,6 +243,10 @@ const AppBaseBox = new Lang.Class({
                 callback(error);
             }
         }));
+    },
+
+    doCancel: function() {
+        this.model.cancel(this.appId);
     }
 });
 
@@ -609,8 +613,7 @@ const AppInfoBox = new Lang.Class({
     },
 
     _onInstallCancelButtonClicked: function() {
-        // this will trigger the error handling code in the install/update paths
-        this.model.cancel(this.appId);
+        this.doCancel();
     },
 
     _onRemoveButtonClicked: function() {

@@ -477,6 +477,19 @@
     background-image: url("btn_remove_pressed_border.png");
 }
 
+.controls-box .state-button.cancel {
+    background-image: url("btn_remove_normal_border.png");
+}
+
+.controls-box .state-button.cancel:hover {
+    background-image: url("btn_remove_hover_border.png");
+}
+
+.controls-box .state-button.cancel:active,
+.controls-box .state-button.cancel:hover:active {
+    background-image: url("btn_remove_pressed_border.png");
+}
+
 .app-frame GtkSpinner {
     color: alpha(white, 0.9);
     margin: 12px;
