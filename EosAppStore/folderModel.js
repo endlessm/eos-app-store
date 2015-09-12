@@ -12,6 +12,7 @@ const FolderModel = new Lang.Class({
     Name: 'FolderModel',
 
     getIconList: function() {
+        return [];
         let iconTheme = Gtk.IconTheme.get_default();
 
         // TODO specify a context?
