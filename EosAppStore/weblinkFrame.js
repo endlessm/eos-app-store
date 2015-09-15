@@ -490,10 +490,9 @@ const WeblinkListBoxRow = new Lang.Class({
         '_stateButton'
     ],
 
-    _init: function(parentFrame, model, row) {
+    _init: function(model, row) {
         this.parent();
 
-        this._parentFrame = parentFrame;
         this._model = model;
         this._row = row;
         this._info = row.linkInfo;
@@ -524,20 +523,11 @@ const WeblinkListBoxRow = new Lang.Class({
     },
 
     _onStateButtonClicked: function() {
-        this._parentFrame.setModelConnected(false);
-
         let desktopId = this._info.get_desktop_id();
         this._model.install(desktopId, function() {});
 
         this._setSensitiveState(false);
         this._setJustInstalledState();
-
-        GLib.timeout_add_seconds(GLib.PRIORITY_DEFAULT,
-                                 NEW_SITE_SUCCESS_TIMEOUT,
-                                 Lang.bind(this, function() {
-                                     this._parentFrame.setModelConnected(true);
-                                     return false;
-                                 }));
     },
 });
 Builder.bindTemplateChildren(WeblinkListBoxRow.prototype);
@@ -546,10 +536,9 @@ const WeblinkListBox = new Lang.Class({
     Name: 'WeblinkListBox',
     Extends: Gtk.ListBox,
 
-    _init: function(model) {
+    _init: function() {
         this.parent({ selection_mode: Gtk.SelectionMode.NONE });
         this.get_style_context().add_class('weblink-listbox');
-        this._model = model;
     }
 });
 
@@ -569,35 +558,22 @@ const WeblinkFrame = new Lang.Class({
 
     templateResource: '/com/endlessm/appstore/eos-app-store-weblink-frame.ui',
     templateChildren: [
-        '_mainBox',
-        '_newSiteFrame',
         '_categoriesBox',
         '_listFrame',
+        '_mainBox',
+        '_newSiteFrame'
     ],
 
     _init: function(mainWindow) {
         this.parent();
 
-        this.get_style_context().add_class('web-frame');
-
-        this._categories = Categories.get_link_categories();
-
         this.initTemplate({ templateRoot: '_mainBox', bindChildren: true, connectSignals: true, });
+        this.get_style_context().add_class('web-frame');
         this.add(this._mainBox);
 
-        let description = new Gtk.Label({ label: _("Add your favorite websites to your desktop or choose suggested ones from our list.") });
-        description.get_style_context().add_class('weblink-description');
-        description.set_alignment(0, 0.5);
-        description.set_line_wrap(true);
-        description.set_max_width_chars(60);
-        this._mainBox.add(description);
-        this._mainBox.reorder_child(description, 0);
-
-        let separator = new Separator.FrameSeparator();
-        this._mainBox.add(separator);
-        this._mainBox.reorder_child(separator, 3);
-
-        this._mainBox.show_all();
+        let app = Gio.Application.get_default();
+        this._weblinkListModel = app.appListModel;
+        this._categories = Categories.get_link_categories();
 
         if (mainWindow.getExpectedWidth() <= AppStoreWindow.AppStoreSizes.SVGA.screenWidth) {
             this._columns = 1;
@@ -605,9 +581,17 @@ const WeblinkFrame = new Lang.Class({
             this._columns = 2;
         }
 
+        let description = new Gtk.Label({ label: _("Add your favorite websites to your desktop or choose suggested ones from our list."),
+                                          max_width_chars: 60,
+                                          xalign: 0 });
+        description.get_style_context().add_class('weblink-description');
+        description.set_line_wrap(true);
+        this._mainBox.add(description);
+        this._mainBox.reorder_child(description, 0);
 
-        let application = Gio.Application.get_default();
-        this._weblinkListModel = application.appListModel;
+        let separator = new Separator.FrameSeparator();
+        this._mainBox.add(separator);
+        this._mainBox.reorder_child(separator, 3);
 
         this._newSiteBox = new NewSiteBox(this._weblinkListModel);
         this._newSiteFrame.add(this._newSiteBox);
@@ -720,8 +704,12 @@ const WeblinkFrame = new Lang.Class({
 
         let weblinksColumnBoxes = [];
         for (let i = 0; i < this._columns; i++) {
-            weblinksColumnBoxes[i] = new WeblinkListBox(this._weblinkListModel);
-            weblinksColumnBoxes[i].set_header_func(Lang.bind(this, this._updateColumnBoxHeader));
+            weblinksColumnBoxes[i] = new WeblinkListBox();
+            weblinksColumnBoxes[i].set_header_func(function(row, before) {
+                if (before) {
+                    row.set_header(new WeblinkListBoxRowSeparator());
+                }
+            });
             weblinksBox.add(weblinksColumnBoxes[i]);
         }
 
@@ -729,7 +717,7 @@ const WeblinkFrame = new Lang.Class({
         for (let link_index in category.links) {
             let info = category.links[link_index];
             let row = info.create_row();
-            let rowContent = new WeblinkListBoxRow(this, this._weblinkListModel, row);
+            let rowContent = new WeblinkListBoxRow(this._weblinkListModel, row);
             row.add(rowContent);
             weblinksColumnBoxes[(index++)%this._columns].add(row);
         }
@@ -741,12 +729,6 @@ const WeblinkFrame = new Lang.Class({
         for (let category in this._categories) {
             this._resetCategory(category);
             this._populateCategory(category);
-        }
-    },
-
-    _updateColumnBoxHeader: function(row, before) {
-        if (before) {
-            row.set_header(new WeblinkListBoxRowSeparator());
         }
     },
 
