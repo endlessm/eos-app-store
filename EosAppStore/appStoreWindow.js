@@ -97,7 +97,7 @@ const AppStoreWindow = new Lang.Class({
         this.get_style_context().add_class('main-window');
 
         // do not destroy, just hide
-        this.connect('delete-event', Lang.bind(this, function() {
+        this._deleteEventId = this.connect('delete-event', Lang.bind(this, function() {
             this.hide();
             return true;
         }));
@@ -127,11 +127,11 @@ const AppStoreWindow = new Lang.Class({
             this._activeWindowId = this._wmInspect.connect('active-window-changed',
                                                            Lang.bind(this, this._onActiveWindowChanged));
         }
+
+        this.connect('destroy', Lang.bind(this, this._onDestroy));
     },
 
-    vfunc_destroy: function() {
-        this.parent();
-
+    _onDestroy: function() {
         let screen = Gdk.Screen.get_default();
 
         if (this._monitorsChangedId > 0) {
@@ -147,6 +147,11 @@ const AppStoreWindow = new Lang.Class({
         if (this._activeWindowId > 0) {
             this._wmInspect.disconnect(this._activeWindowId);
             this._activeWindowId = 0;
+        }
+
+        if (this._deleteEventId > 0) {
+            this.disconnect(this._deleteEventId);
+            this._deleteEventId = 0;
         }
     },
 
