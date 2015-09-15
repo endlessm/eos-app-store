@@ -21,7 +21,7 @@
               <object class="GtkImage" id="_appIcon">
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
-                <property name="stock">gtk-about</property>
+                <property name="icon-name">gtk-about</property>
                 <property name="use_fallback">True</property>
                 <property name="icon_size">6</property>
                 <property name="margin_start">7</property>
