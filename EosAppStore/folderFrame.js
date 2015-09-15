@@ -275,10 +275,6 @@ const FolderFrame = new Lang.Class({
 
         this.initTemplate({ templateRoot: '_mainBox', bindChildren: true, connectSignals: true, });
         this.get_style_context().add_class('folder-frame');
-
-        this._mainBox.hexpand = true;
-        this._mainBox.vexpand = true;
-
         this.add(this._mainBox);
 
         let separator = new Separator.FrameSeparator();
