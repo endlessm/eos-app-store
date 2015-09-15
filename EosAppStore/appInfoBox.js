@@ -35,14 +35,13 @@ const AppBaseBox = new Lang.Class({
     Name: 'AppBaseBox',
     Extends: Gtk.Bin,
 
-    _init: function(model, appInfo) {
+    _init: function(appInfo) {
         this.parent();
-
-        this._model = model;
-        this._appInfo = appInfo;
 
         let app = Gio.Application.get_default();
         let mainWindow = app.mainWindow;
+        this._model = app.appListModel;
+        this._appInfo = appInfo;
 
         this._networkChangeId = this._model.connect('network-changed', Lang.bind(this, this._updateState));
         this._progressId = this._model.connect('download-progress', Lang.bind(this, this._onDownloadProgress));
@@ -274,8 +273,8 @@ const AppInfoBox = new Lang.Class({
         '_screenshotPreviewBox',
     ],
 
-    _init: function(model, appInfo) {
-        this.parent(model, appInfo);
+    _init: function(appInfo) {
+        this.parent(appInfo);
 
         this.initTemplate({ templateRoot: '_mainBox', bindChildren: true, connectSignals: true, });
         this.add(this._mainBox);

@@ -22,7 +22,7 @@ const AppFrame = new Lang.Class({
     Name: 'AppFrame',
     Extends: Gtk.Frame,
 
-    _init: function(model, mainWindow, categoryId) {
+    _init: function(categoryId) {
         this.parent();
 
         this.get_style_context().add_class('app-frame');
@@ -33,9 +33,10 @@ const AppFrame = new Lang.Class({
                                       vexpand: true });
         this.add(this._stack);
 
+        let app = Gio.Application.get_default();
         this._categoryId = categoryId;
-        this._mainWindow = mainWindow;
-        this._model = model;
+        this._mainWindow = app.mainWindow;
+        this._model = app.appListModel;
         this._view = null;
 
         // Where the content goes once the frame is populated
@@ -141,7 +142,7 @@ const AppFrame = new Lang.Class({
         }
 
         this.view = this._createView();
-        let appInfos = this._prepareAppInfos(this.model.loadCategory(this._categoryId));
+        let appInfos = this._prepareAppInfos(this._model.loadCategory(this._categoryId));
 
         // 'Installed' only shows apps available on the system
         for (let i in appInfos) {
@@ -150,10 +151,10 @@ const AppFrame = new Lang.Class({
     },
 
     _showView: function() {
-        this.mainWindow.clearHeaderState();
+        this._mainWindow.clearHeaderState();
 
         if (this._backClickedId != 0) {
-            this.mainWindow.disconnect(this._backClickedId);
+            this._mainWindow.disconnect(this._backClickedId);
             this._backClickedId = 0;
         }
 
@@ -164,7 +165,7 @@ const AppFrame = new Lang.Class({
     showAppInfoBox: function(appInfo) {
         let desktopId = appInfo.get_desktop_id();
         if (!this._stack.get_child_by_name(desktopId)) {
-            let appBox = new AppInfoBox.AppInfoBox(this._model, appInfo);
+            let appBox = new AppInfoBox.AppInfoBox(appInfo);
             this._stack.add_named(appBox, desktopId);
             appBox.show();
         }
@@ -197,8 +198,8 @@ const AppInstalledFrame = new Lang.Class({
     Name: 'AppInstalledFrame',
     Extends: AppFrame,
 
-    _init: function(model, mainWindow) {
-        this.parent(model, mainWindow, EosAppStorePrivate.AppCategory.INSTALLED);
+    _init: function() {
+        this.parent(EosAppStorePrivate.AppCategory.INSTALLED);
     },
 
     _listHeaderFunc: function(row, before) {
@@ -221,7 +222,7 @@ const AppInstalledFrame = new Lang.Class({
     },
 
     _createViewElement: function(info) {
-        let row = new AppInstalledBox.AppInstalledBox(this.model, info);
+        let row = new AppInstalledBox.AppInstalledBox(info);
         this.view.add(row);
         row.show();
     },
@@ -248,8 +249,8 @@ const AppCategoryFrame = new Lang.Class({
     Name: 'AppCategoryFrame',
     Extends: AppFrame,
 
-    _init: function(categoryId, model, mainWindow) {
-        this.parent(model, mainWindow, categoryId);
+    _init: function(categoryId) {
+        this.parent(categoryId);
 
         this._lastCellSelected = null;
     },
