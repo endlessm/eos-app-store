@@ -27,7 +27,7 @@ const LIST_COLUMNS_SPACING = 10;
 
 const DEFAULT_ICON = 'generic-link';
 const EOS_BROWSER = 'chromium-browser ';
-const DESKTOP_KEY_MAXIMIZED = 'X-Endless-Launch-Maximized';
+const DESKTOP_KEY_MAXIMIZED = 'X-Endless-LaunchMaximized';
 
 const ICON_EXTERNAL_LINK = '/com/endlessm/appstore/icon_external-link.png';
 const ICON_BLANK = '/com/endlessm/appstore/icon_blank.png';
