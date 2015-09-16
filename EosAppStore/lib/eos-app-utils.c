@@ -19,7 +19,7 @@
 #define APP_STORE_CONTENT_LINKS "links"
 
 #define BUNDLE_DIR              LOCALSTATEDIR "/tmp/eos-app-store"
-#define BUNDLE_DIR_TEMPLATE     BUNDLE_DIR "/downloadXXXXXX"
+#define DOWNLOAD_DIR_PREFIX     "download"
 #define APP_DIR_DEFAULT         "/endless"
 
 G_DEFINE_QUARK (eos-app-utils-error-quark, eos_app_utils_error)
@@ -31,27 +31,22 @@ eos_get_bundle_download_dir (const char *app_id)
 
   if (g_once_init_enter (&bundle_dir))
     {
-      /* g_mkdir* functions do not allow setting of 0777 mode as the o+w
-       * never gets set so we require a separate step to ensure that the
-       * permissions are correct. We also ignore problems here since it
-       * usually means that the folder is already created by us or someone
-       * else
-       */
-      g_mkdir_with_parents (BUNDLE_DIR, 0755);
-      g_chmod (BUNDLE_DIR, 01777);
+      char *download_dir = g_strdup_printf ("%s_%s", DOWNLOAD_DIR_PREFIX, app_id);
+      char *target_dir = g_build_filename (BUNDLE_DIR, download_dir, NULL);
+      g_free (download_dir);
 
-      char *tmp = g_strdup (BUNDLE_DIR_TEMPLATE);
-      while (g_mkdtemp_full (tmp, 0755) == NULL)
+      if (g_mkdir_with_parents (target_dir, 0755) != 0)
         {
           int saved_errno = errno;
-
           eos_app_log_error_message ("Unable to create temporary directory: %s",
                                      g_strerror (saved_errno));
         }
 
-      eos_app_log_info_message ("Bundle dir: %s", tmp);
+      g_chmod (BUNDLE_DIR, 01777);
 
-      g_once_init_leave (&bundle_dir, tmp);
+      eos_app_log_info_message ("Bundle dir: %s", target_dir);
+
+      g_once_init_leave (&bundle_dir, target_dir);
     }
 
   return bundle_dir;
