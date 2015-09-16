@@ -25,7 +25,7 @@
 G_DEFINE_QUARK (eos-app-utils-error-quark, eos_app_utils_error)
 
 const char *
-eos_get_bundle_download_dir (void)
+eos_get_bundle_download_dir (const char *app_id)
 {
   static char *bundle_dir;
 
@@ -55,60 +55,6 @@ eos_get_bundle_download_dir (void)
     }
 
   return bundle_dir;
-}
-
-void
-eos_clear_bundle_download_dir (void)
-{
-  GFile *dir = g_file_new_for_path (eos_get_bundle_download_dir ());
-
-  GError *error = NULL;
-  GFileEnumerator *enumerator = g_file_enumerate_children (dir, G_FILE_ATTRIBUTE_STANDARD_NAME,
-                                                           G_FILE_QUERY_INFO_NOFOLLOW_SYMLINKS,
-                                                           NULL,
-                                                           &error);
-  if (error != NULL)
-    {
-      eos_app_log_error_message ("Unable to enumerate bundle dir '%s': %s",
-                                 eos_get_bundle_download_dir (),
-                                 error->message);
-      g_error_free (error);
-      g_object_unref (dir);
-      return;
-    }
-
-  GFileInfo *child_info = NULL;
-  while ((child_info = g_file_enumerator_next_file (enumerator, NULL, &error)) != NULL)
-    {
-      GFile *child = g_file_get_child (dir, g_file_info_get_name (child_info));
-
-      g_file_delete (child, NULL, &error);
-      if (error != NULL)
-        {
-          eos_app_log_error_message ("Unable to delete file: %s", error->message);
-          g_clear_error (&error);
-        }
-
-      g_clear_object (&child_info);
-      g_object_unref (child);
-    }
-
-  if (error != NULL)
-    {
-      eos_app_log_error_message ("Enumeration failed: %s", error->message);
-      g_clear_error (&error);
-    }
-
-  g_object_unref (enumerator);
-
-  g_file_delete (dir, NULL, &error);
-  if (error != NULL)
-    {
-      eos_app_log_error_message ("Unable to delete download dir: %s", error->message);
-      g_clear_error (&error);
-    }
-
-  g_object_unref (dir);
 }
 
 static const char *

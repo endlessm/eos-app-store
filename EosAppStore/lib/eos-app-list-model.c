@@ -847,7 +847,7 @@ get_bundle_artifacts (EosAppListModel *self,
   eos_app_log_info_message ("Downloading bundle (use_delta: %s)",
                             use_delta ? "true" : "false");
   bundle_path = eos_app_info_download_bundle (info, self->soup_session,
-                                              eos_get_bundle_download_dir (),
+                                              eos_get_bundle_download_dir (eos_app_info_get_application_id(info)),
                                               use_delta,
                                               cancellable,
                                               emit_download_progress, data, download_progress_callback_data_free,
@@ -860,7 +860,7 @@ get_bundle_artifacts (EosAppListModel *self,
 
   eos_app_log_info_message ("Downloading signature");
   signature_path = eos_app_info_download_signature (info, self->soup_session,
-                                                    eos_get_bundle_download_dir (),
+                                                    eos_get_bundle_download_dir (eos_app_info_get_application_id(info)),
                                                     use_delta,
                                                     cancellable, &error);
   if (error != NULL)
@@ -871,7 +871,7 @@ get_bundle_artifacts (EosAppListModel *self,
 
   eos_app_log_info_message ("Persisting hash");
   sha256_path = eos_app_info_create_sha256sum (info,
-                                               eos_get_bundle_download_dir (),
+                                               eos_get_bundle_download_dir (eos_app_info_get_application_id(info)),
                                                use_delta, bundle_path,
                                                cancellable, &error);
   if (error != NULL)
