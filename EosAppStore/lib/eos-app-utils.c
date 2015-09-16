@@ -19,7 +19,7 @@
 #define APP_STORE_CONTENT_LINKS "links"
 
 #define BUNDLE_DIR              LOCALSTATEDIR "/tmp/eos-app-store"
-#define DOWNLOAD_DIR_PREFIX     "download"
+#define DOWNLOAD_DIR_PREFIX     "dl"
 #define APP_DIR_DEFAULT         "/endless"
 
 G_DEFINE_QUARK (eos-app-utils-error-quark, eos_app_utils_error)
@@ -31,7 +31,7 @@ eos_get_bundle_download_dir (const char *app_id)
 
   if (g_once_init_enter (&bundle_dir))
     {
-      char *download_dir = g_strdup_printf ("%s_%s", DOWNLOAD_DIR_PREFIX, app_id);
+      char *download_dir = g_strdup_printf ("%s%u_%s", DOWNLOAD_DIR_PREFIX, getuid(), app_id);
       char *target_dir = g_build_filename (BUNDLE_DIR, download_dir, NULL);
       g_free (download_dir);
 
