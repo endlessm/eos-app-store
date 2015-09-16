@@ -816,6 +816,7 @@ get_bundle_artifacts (EosAppListModel *self,
   GError *error = NULL;
   gboolean retval = FALSE;
 
+  char *download_dir = NULL;
   char *bundle_path = NULL;
   char *signature_path = NULL;
   char *sha256_path = NULL;
@@ -846,8 +847,12 @@ get_bundle_artifacts (EosAppListModel *self,
 
   eos_app_log_info_message ("Downloading bundle (use_delta: %s)",
                             use_delta ? "true" : "false");
+
+  download_dir = eos_get_bundle_download_dir (eos_app_info_get_application_id(info),
+                                              eos_app_info_get_available_version(info));
+
   bundle_path = eos_app_info_download_bundle (info, self->soup_session,
-                                              eos_get_bundle_download_dir (eos_app_info_get_application_id(info)),
+                                              download_dir,
                                               use_delta,
                                               cancellable,
                                               emit_download_progress, data, download_progress_callback_data_free,
@@ -860,7 +865,7 @@ get_bundle_artifacts (EosAppListModel *self,
 
   eos_app_log_info_message ("Downloading signature");
   signature_path = eos_app_info_download_signature (info, self->soup_session,
-                                                    eos_get_bundle_download_dir (eos_app_info_get_application_id(info)),
+                                                    download_dir,
                                                     use_delta,
                                                     cancellable, &error);
   if (error != NULL)
@@ -871,7 +876,7 @@ get_bundle_artifacts (EosAppListModel *self,
 
   eos_app_log_info_message ("Persisting hash");
   sha256_path = eos_app_info_create_sha256sum (info,
-                                               eos_get_bundle_download_dir (eos_app_info_get_application_id(info)),
+                                               download_dir,
                                                use_delta, bundle_path,
                                                cancellable, &error);
   if (error != NULL)
@@ -950,6 +955,8 @@ out:
   g_free (bundle_path);
   g_free (signature_path);
   g_free (sha256_path);
+
+  g_free (download_dir);
 
   return retval;
 }

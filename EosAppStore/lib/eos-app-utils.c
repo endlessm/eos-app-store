@@ -24,14 +24,20 @@
 
 G_DEFINE_QUARK (eos-app-utils-error-quark, eos_app_utils_error)
 
-const char *
-eos_get_bundle_download_dir (const char *app_id)
+char *
+eos_get_bundle_download_dir (const char *app_id,
+                             const char *version)
 {
   static char *bundle_dir;
 
   if (g_once_init_enter (&bundle_dir))
     {
-      char *download_dir = g_strdup_printf ("%s%u_%s", DOWNLOAD_DIR_PREFIX, getuid(), app_id);
+      char *download_dir = g_strdup_printf ("%s%u_%s_%s",
+                                            DOWNLOAD_DIR_PREFIX,
+                                            getuid(),
+                                            app_id,
+                                            version);
+
       char *target_dir = g_build_filename (BUNDLE_DIR, download_dir, NULL);
       g_free (download_dir);
 

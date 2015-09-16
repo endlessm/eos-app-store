@@ -41,7 +41,8 @@ char *  eos_get_updates_meta_record_file        (void);
 
 const char *eos_get_bundles_dir                 (void);
 const char *eos_get_cache_dir                   (void);
-const char *eos_get_bundle_download_dir         (const char *app_id);
+char       *eos_get_bundle_download_dir         (const char *app_id,
+                                                 const char *version);
 const char *eos_get_app_server_url              (void);
 const char *eos_get_primary_storage             (void);
 const char *eos_get_secondary_storage           (void);
