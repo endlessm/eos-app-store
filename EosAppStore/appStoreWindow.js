@@ -5,16 +5,15 @@ const Gio = imports.gi.Gio;
 const GLib = imports.gi.GLib;
 const GObject = imports.gi.GObject;
 const Gtk = imports.gi.Gtk;
+const Lang = imports.lang;
 const Pango = imports.gi.Pango;
 
-const Lang = imports.lang;
-const Signals = imports.signals;
-
 const AppFrame = imports.appFrame;
-const WeblinkFrame = imports.weblinkFrame;
+const AppStorePages = imports.appStorePages;
 const FolderFrame = imports.folderFrame;
 const Path = imports.path;
 const UIBuilder = imports.builder;
+const WeblinkFrame = imports.weblinkFrame;
 const WMInspect = imports.wmInspect;
 
 const SIDE_COMPONENT_ROLE = 'eos-side-component';
@@ -70,7 +69,7 @@ const AppStoreWindow = new Lang.Class({
         'back-button',
     ],
 
-    _init: function(app) {
+    _init: function(app, pageManager) {
         let rtl = Gtk.Widget.get_default_direction();
 
         let params = { application: app,
@@ -116,10 +115,6 @@ const AppStoreWindow = new Lang.Class({
         }
 
         this._updateGeometry();
-
-        // the stack that holds the pages
-        this._stack = null;
-        this._createStackPages();
 
         // hide main window when clicking outside the store
         if (!app.debugWindow) {
@@ -222,38 +217,6 @@ const AppStoreWindow = new Lang.Class({
         this.sidebar_frame.width_request = sidebarWidth;
     },
 
-    _createStackPages: function() {
-        if (this._stack) {
-            this.content_box.remove(this._stack);
-        }
-
-        // the stack that holds the pages
-        this._stack = new Gtk.Stack();
-        this._stack.connect('notify::visible-child-name',
-                            Lang.bind(this, this._onStorePageChanged));
-        this.side_pane_box.stack = this._stack;
-        this.content_box.add(this._stack);
-        this._stack.show();
-
-        let appFrame = new AppFrame.AppBroker(this);
-        let categories = appFrame.categories;
-
-        categories.forEach(Lang.bind(this, function(category) {
-            this._stack.add_titled(category.widget, category.name, category.label);
-            this._stack.child_set_property(category.widget, 'icon-name', category.icon);
-        }));
-
-        let weblinkFrame = new WeblinkFrame.WeblinkFrame(this);
-        this._stack.add_titled(weblinkFrame, 'web', _("Websites"));
-        this._stack.child_set_property(weblinkFrame, 'icon-name',
-                                       'resource:///com/endlessm/appstore/icon_web-symbolic.svg');
-
-        let folderFrame = new FolderFrame.FolderFrame();
-        this._stack.add_titled(folderFrame, 'folders', _("Folders"));
-        this._stack.child_set_property(folderFrame, 'icon-name',
-                                       'resource:///com/endlessm/appstore/icon_folder-symbolic.svg');
-    },
-
     _onActiveWindowChanged: function(wmInspect, activeWindow) {
         // try to match the own window first
         let activeXid = activeWindow.get_xid();
@@ -288,72 +251,20 @@ const AppStoreWindow = new Lang.Class({
     },
 
     _setDefaultTitle: function() {
-        let page = this._stack.visible_child;
-
+        let page = this._pageManager.visible_child;
         if (page) {
             let title = this.header_bar_title_label;
-            title.set_text(page.title);
+            title.set_text(page.getTitle());
         }
     },
 
     _onStorePageChanged: function() {
         this.clearHeaderState();
-
-        let page = this._stack.visible_child;
-
-        if (page) {
-            page.reset();
-        }
+        this.resetCurrentPage();
     },
 
     _onAvailableAreaChanged: function() {
         this._updateGeometry();
-        this._createStackPages();
-        this._onStorePageChanged();
-    },
-
-    vfunc_draw: function(cr) {
-        if (!this._stack.parent) {
-            // HACK: now that we are drawing the gray background,
-            // we can add the stack back to the content box
-            // to start calculating the actual content
-            this.content_box.add(this._stack);
-        }
-
-        this.parent(cr);
-        cr.$dispose();
-        return true;
-    },
-
-    show: function() {
-        if (this._stack.parent) {
-            // HACK: to avoid showing a clone of the desktop
-            // while sliding in the app store,
-            // temporarily remove the stack from the content box
-            // so that the show operation can quickly redraw
-            // a gray background
-            this.content_box.remove(this._stack);
-        }
-        this.parent();
-    },
-
-    doShow: function(timestamp, reset) {
-        let page = this._stack.get_visible_child();
-        if (page && reset) {
-            page.reset();
-        }
-
-        this.showPage(timestamp);
-    },
-
-    changePage: function(page) {
-        this._stack.visible_child_name = page;
-    },
-
-    showPage: function(timestamp) {
-        this._updateGeometry();
-        this.show();
-        this.present_with_time(timestamp);
     },
 
     getExpectedWidth: function() {
@@ -406,5 +317,29 @@ const AppStoreWindow = new Lang.Class({
             this.back_button.hide();
         }
     },
+
+    get pageManager() {
+        return this._pageManager;
+    },
+
+    populate: function() {
+        // the stack that holds the pages
+        this._pageManager = new AppStorePages.AppStorePageManager();
+        this._pageManager.connect('notify::visible-child-name',
+                                  Lang.bind(this, this._onStorePageChanged));
+        this.side_pane_box.stack = this._pageManager;
+        this.content_box.add(this._pageManager);
+
+        this._pageManager.registerProvider(new AppFrame.AppPageProvider());
+        this._pageManager.registerProvider(new WeblinkFrame.WeblinkFrame());
+        this._pageManager.registerProvider(new FolderFrame.FolderFrame());
+    },
+
+    resetCurrentPage: function() {
+        let page = this._pageManager.visible_child;
+        if (page) {
+            page.reset();
+        }
+    }
 });
 UIBuilder.bindTemplateChildren(AppStoreWindow.prototype);

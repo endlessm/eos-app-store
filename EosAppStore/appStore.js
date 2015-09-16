@@ -76,18 +76,16 @@ const AppStore = new Lang.Class({
         this._createMainWindow();
 
         if (this.debugWindow) {
-            this._mainWindow.showPage(Gdk.CURRENT_TIME);
+            this.showPage(Gdk.CURRENT_TIME, Categories.DEFAULT_APP_CATEGORY);
         }
     },
 
     _createMainWindow: function() {
         if (this._mainWindow == null) {
             this._mainWindow = new AppStoreWindow.AppStoreWindow(this);
+            this._mainWindow.populate();
             this._mainWindow.connect('notify::visible',
                                      Lang.bind(this, this._onVisibilityChanged));
-
-            // set initial page
-            this._mainWindow.changePage(Categories.DEFAULT_APP_CATEGORY);
         }
     },
 
@@ -109,7 +107,10 @@ const AppStore = new Lang.Class({
 
     show: function(timestamp, reset) {
         this._createMainWindow();
-        this._mainWindow.doShow(timestamp, reset);
+        if (reset) {
+            this._mainWindow.resetCurrentPage();
+        }
+        this._mainWindow.present_with_time(timestamp);
     },
 
     hide: function() {
@@ -123,8 +124,8 @@ const AppStore = new Lang.Class({
         if (page == 'apps')
             page = Categories.DEFAULT_APP_CATEGORY;
 
-        this._mainWindow.changePage(page);
-        this._mainWindow.showPage(timestamp);
+        this._mainWindow.pageManager.showPage(page);
+        this._mainWindow.present_with_time(timestamp);
     },
 
     _clearMainWindow: function() {

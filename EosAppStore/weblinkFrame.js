@@ -9,6 +9,7 @@ const EosAppStorePrivate = imports.gi.EosAppStorePrivate;
 const Pango = imports.gi.Pango;
 const WebKit = imports.gi.WebKit2;
 
+const AppStorePages = imports.appStorePages;
 const AppStoreWindow = imports.appStoreWindow;
 const Categories = imports.categories;
 const CategoryButton = imports.categoryButton;
@@ -555,6 +556,7 @@ const WeblinkListBoxRowSeparator = new Lang.Class({
 const WeblinkFrame = new Lang.Class({
     Name: 'WeblinkFrame',
     Extends: Gtk.Frame,
+    Implements: [AppStorePages.AppStorePageProvider],
 
     templateResource: '/com/endlessm/appstore/eos-app-store-weblink-frame.ui',
     templateChildren: [
@@ -564,8 +566,8 @@ const WeblinkFrame = new Lang.Class({
         '_newSiteFrame'
     ],
 
-    _init: function(mainWindow) {
-        this.parent();
+    _init: function() {
+        this.parent({ visible: true });
 
         this.initTemplate({ templateRoot: '_mainBox', bindChildren: true, connectSignals: true, });
         this.get_style_context().add_class('web-frame');
@@ -573,13 +575,18 @@ const WeblinkFrame = new Lang.Class({
 
         let app = Gio.Application.get_default();
         this._weblinkListModel = app.appListModel;
-        this._categories = Categories.get_link_categories();
+        this._weblinkListModel.connect('changed', Lang.bind(this, this._repopulate));
+        this._initCategories();
 
-        if (mainWindow.getExpectedWidth() <= AppStoreWindow.AppStoreSizes.SVGA.screenWidth) {
+        if (app.mainWindow.getExpectedWidth() <= AppStoreWindow.AppStoreSizes.SVGA.screenWidth) {
             this._columns = 1;
         } else {
             this._columns = 2;
         }
+
+        // We want all the links to recover their original state (screenshot and description)
+        // after hiding the store, regardless they have been recently installed or not.
+        app.mainWindow.connect('hide', Lang.bind(this, this._repopulate));
 
         let description = new Gtk.Label({ label: _("Add your favorite websites to your desktop or choose suggested ones from our list."),
                                           max_width_chars: 60,
@@ -603,96 +610,42 @@ const WeblinkFrame = new Lang.Class({
         this._listFrame.add(this._stack);
 
         this._mainBox.show_all();
+    },
 
-        this._currentCategory = this._categories[0].name;
+    _initCategories: function() {
+        let buttonGroup = null;
+        this._categories = Categories.get_link_categories();
         this._currentCategoryIdx = 0;
 
-        this._buttonGroup = null;
-        this._modelConnectionId = null;
-        this._initializeLinks();
-        this._populateCategoryHeaders();
-        this.setModelConnected(true);
-
-        // We want all the links to recover their original state (screenshot and description)
-        // after hiding the store, regardless they have been recently installed or not.
-        mainWindow.connect('hide', Lang.bind(this, this._repopulate));
-
-        this.show_all();
-    },
-
-    _repopulate: function(monitor, file, other_file, event_type) {
-        this._populateAllCategories();
-
-        this._stack.transition_type = Gtk.StackTransitionType.NONE;
-        this._stack.set_visible_child_name(this._currentCategory);
-    },
-
-    setModelConnected: function(connect) {
-        // Ensure that we don't connect to the 'changed' signal from the model more than
-        // once at the same time by always disconnecting from it first if needed.
-        if (this._modelConnectionId) {
-            this._weblinkListModel.disconnect(this._modelConnectionId);
-            this._modelConnectionId = null;
-        }
-
-        if (connect) {
-            this._modelConnectionId = this._weblinkListModel.connect('changed', Lang.bind(this, this._repopulate));
-        }
-    },
-
-    _initializeLinks: function() {
-        for (let c in this._categories) {
-            let category = this._categories[c];
-
+        for (let idx in this._categories) {
+            let category = this._categories[idx];
             category.links = EosAppStorePrivate.link_load_content(category.id);
-        }
-    },
-
-    _populateCategoryHeaders: function() {
-        for (let c in this._categories) {
-            let category = this._categories[c];
 
             // We omit empty categories
-            if (category.links.length == 0)
+            if (category.links.length == 0) {
                 continue;
-
-            if (!category.button) {
-                category.button = new CategoryButton.CategoryButton({ label: category.label,
-                                                                      category: category.name,
-                                                                      index: c,
-                                                                      draw_indicator: false,
-                                                                      group: this._buttonGroup });
-                category.button.connect('clicked', Lang.bind(this, this._onCategoryClicked));
-                category.button.show();
-                this._categoriesBox.pack_start(category.button, false, false, 0);
-
-                if (!this._buttonGroup) {
-                    this._buttonGroup = category.button;
-                }
             }
-       }
-    },
 
-    _resetCategory: function(categoryId) {
-        let category = this._categories[categoryId];
-
-        if (category.widget) {
-            category.widget.destroy();
-            category.widget = null;
+            category.button = new CategoryButton.CategoryButton({ label: category.label,
+                                                                  index: idx,
+                                                                  category: category.name,
+                                                                  draw_indicator: false,
+                                                                  group: buttonGroup,
+                                                                  visible: true });
+            category.button.connect('clicked', Lang.bind(this, this._onButtonClicked));
+            this._categoriesBox.add(category.button);
         }
     },
 
-    _populateCategory: function(categoryId) {
-        let category = this._categories[categoryId];
-
+    _populateCategory: function(idx) {
+        let category = this._categories[idx];
         if (category.widget) {
-            return;
+            return category.widget;
         }
 
-        let scrollWindow;
-        scrollWindow = new Gtk.ScrolledWindow({ hscrollbar_policy: Gtk.PolicyType.NEVER,
-                                                vscrollbar_policy: Gtk.PolicyType.AUTOMATIC,
-                                                shadow_type: Gtk.ShadowType.IN });
+        let scrollWindow = new Gtk.ScrolledWindow({ hscrollbar_policy: Gtk.PolicyType.NEVER,
+                                                    vscrollbar_policy: Gtk.PolicyType.AUTOMATIC,
+                                                    shadow_type: Gtk.ShadowType.IN });
         scrollWindow.get_style_context().add_class('weblink-scrolledwindow');
         this._stack.add_named(scrollWindow, category.name);
         category.widget = scrollWindow;
@@ -723,47 +676,71 @@ const WeblinkFrame = new Lang.Class({
         }
 
         scrollWindow.show_all();
+        return category.widget;
     },
 
-    _populateAllCategories: function() {
-        for (let category in this._categories) {
-            this._resetCategory(category);
-            this._populateCategory(category);
-        }
-    },
-
-    _onCategoryClicked: function(button) {
-        let idx = button.index;
-        let category = button.category;
+    _onButtonClicked: function(button) {
+        let widget = this._populateCategory(button.index);
 
         // Scroll to the top of the selected category
-        let widget = this._categories[idx].widget;
-        if (widget) {
-            let vscrollbar = widget.get_vscrollbar();
-            vscrollbar.set_value(0);
-        }
+        let vscrollbar = widget.get_vscrollbar();
+        vscrollbar.set_value(0);
 
-        if (idx > this._currentCategoryIdx) {
+        if (button.index > this._currentCategoryIdx) {
             this._stack.transition_type = Gtk.StackTransitionType.SLIDE_LEFT;
         } else {
             this._stack.transition_type = Gtk.StackTransitionType.SLIDE_RIGHT;
         }
 
-        this._currentCategoryIdx = idx;
-        this._currentCategory = category;
+        this._currentCategoryIdx = button.index;
+        this._stack.set_visible_child(widget);
+    },
 
-        this._populateCategory(idx);
+    _resetCategory: function(idx) {
+        let category = this._categories[idx];
+        if (category.widget) {
+            category.widget.destroy();
+            category.widget = null;
+        }
+    },
 
-        this._stack.set_visible_child_name(category);
+    _repopulate: function() {
+        for (let idx in this._categories) {
+            this._resetCategory(idx);
+        }
     },
 
     reset: function() {
         // Return to the first category
-        this._buttonGroup.clicked();
+        this._categories[0].button.clicked();
     },
 
-    get title() {
+    createPage: function(pageId) {
+        return this;
+    },
+
+    getPageIds: function() {
+        return ['web'];
+    },
+
+    getIcon: function() {
+        return 'resource:///com/endlessm/appstore/icon_web-symbolic.svg';
+    },
+
+    getName: function() {
+        return _("Websites");
+    },
+
+    getTitle: function() {
         return _("Install websites");
+    },
+
+    populate: function() {
+        let widget = this._populateCategory(this._currentCategoryIdx);
+        this._stack.transition_type = Gtk.StackTransitionType.NONE;
+        this._stack.set_visible_child(widget);
+
+        this.show_all();
     }
 });
 Builder.bindTemplateChildren(WeblinkFrame.prototype);

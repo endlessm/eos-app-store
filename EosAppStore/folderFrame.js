@@ -5,6 +5,7 @@ const Gdk = imports.gi.Gdk;
 const Gtk = imports.gi.Gtk;
 const Cairo = imports.cairo;
 
+const AppStorePages = imports.appStorePages;
 const Builder = imports.builder;
 const Lang = imports.lang;
 const FolderModel = imports.folderModel;
@@ -253,6 +254,7 @@ const FolderIconGrid = new Lang.Class({
 const FolderFrame = new Lang.Class({
     Name: 'FolderFrame',
     Extends: Gtk.Frame,
+    Implements: [AppStorePages.AppStorePageProvider],
 
     templateResource: '/com/endlessm/appstore/eos-app-store-folder-frame.ui',
     templateChildren: [
@@ -263,17 +265,44 @@ const FolderFrame = new Lang.Class({
     ],
 
     _init: function() {
-        this.parent();
-
-        this._folderModel = new FolderModel.FolderModel();
+        this.parent({ visible: true });
 
         this.initTemplate({ templateRoot: '_mainBox', bindChildren: true, connectSignals: true, });
         this.get_style_context().add_class('folder-frame');
         this.add(this._mainBox);
 
+        this._folderModel = new FolderModel.FolderModel();
+        this._grid = null;
+
         let separator = new Separator.FrameSeparator();
         this._folderBoxContent.add(separator);
         this._folderBoxContent.reorder_child(separator, 1);
+    },
+
+    createPage: function() {
+        return this;
+    },
+
+    getIcon: function() {
+        return 'resource:///com/endlessm/appstore/icon_folder-symbolic.svg';
+    },
+
+    getPageIds: function() {
+        return ['folders'];
+    },
+
+    getName: function() {
+        return _("Folders");
+    },
+
+    getTitle: function() {
+        return _("Install folders");
+    },
+
+    populate: function() {
+        if (this._grid) {
+            return;
+        }
 
         this._grid = new FolderIconGrid(this._folderModel);
         this._viewport.add(this._grid);
@@ -284,10 +313,6 @@ const FolderFrame = new Lang.Class({
     reset: function() {
         let vscrollbar = this._scrolledWindow.get_vscrollbar();
         vscrollbar.set_value(0);
-    },
-
-    get title() {
-        return _("Install folders");
     }
 });
 Builder.bindTemplateChildren(FolderFrame.prototype);
