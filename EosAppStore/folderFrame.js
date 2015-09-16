@@ -140,12 +140,13 @@ const FolderNameBubble = new Lang.Class({
 
 const FolderIconButton = new Lang.Class({
     Name: 'FolderIconButton',
-    Extends: Gtk.ToggleButton,
+    Extends: Gtk.RadioButton,
 
-    _init : function(iconName) {
+    _init : function(group, iconName) {
         this.parent({
             active: false,
             draw_indicator: false,
+            group: group,
             always_show_image: true,
             width_request: _FOLDER_BUTTON_SIZE,
             height_request: _FOLDER_BUTTON_SIZE,
@@ -192,19 +193,7 @@ const FolderIconGrid = new Lang.Class({
 
     _on_button_toggled: function(toggleButton) {
         if (toggleButton.get_active()) {
-            let oldToggle = this._activeToggle;
             this._activeToggle = toggleButton;
-
-            // ignore clicks on the same active toggle
-            if (oldToggle == toggleButton) {
-                return;
-            }
-
-            // unset the previous one
-            if (oldToggle && oldToggle != toggleButton && oldToggle.get_active()) {
-                oldToggle.set_active(false);
-            }
-
             this.get_style_context().add_class('grabbed');
 
             // hide any bubble we might have previously created
@@ -236,8 +225,14 @@ const FolderIconGrid = new Lang.Class({
     },
 
     _populate: function() {
+        // Create an additional (hidden) GtkRadioButton; this makes it so
+        // there's no initial selection in the group. Othwewise the first
+        // FolderIconButton in the group would be pre-selected and ignore
+        // clicks on it.
+        this._buttonGroup = new Gtk.RadioButton();
+
         for (let i = 0; i < this._iconList.length; i++) {
-            let button = new FolderIconButton(this._iconList[i]);
+            let button = new FolderIconButton(this._buttonGroup, this._iconList[i]);
 
             button.connect('toggled', Lang.bind(this, this._on_button_toggled));
             this.add(button);
