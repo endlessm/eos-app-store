@@ -925,7 +925,18 @@ get_bundle_artifacts (EosAppListModel *self,
                                                               &error);
 
 out:
-  if (error != NULL)
+  if (error == NULL)
+    {
+      /* Delete the downloaded bundle and signature  but only if everything
+       * went good with the download */
+      if (bundle_path)
+        g_unlink (bundle_path);
+      if (signature_path)
+        g_unlink (signature_path);
+      if (sha256_path)
+        g_unlink (sha256_path);
+    }
+  else
     {
       eos_app_log_error_message ("Completion of transaction %s failed",
                                  transaction_path);
@@ -938,16 +949,6 @@ out:
       g_propagate_error (error_out, error);
 
       retval = FALSE;
-    }
-  else
-    {
-      /* delete the downloaded bundle and signature */
-      if (bundle_path)
-        g_unlink (bundle_path);
-      if (signature_path)
-        g_unlink (signature_path);
-      if (sha256_path)
-        g_unlink (sha256_path);
     }
 
   /* We're done with the transaction now that we've called CompleteTransaction() */
