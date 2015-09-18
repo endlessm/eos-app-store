@@ -28,34 +28,27 @@ char *
 eos_get_bundle_download_dir (const char *app_id,
                              const char *version)
 {
-  static char *bundle_dir;
+  char *download_dir = g_strdup_printf ("%s%u_%s_%s",
+                                        DOWNLOAD_DIR_PREFIX,
+                                        getuid (),
+                                        app_id,
+                                        version);
 
-  if (g_once_init_enter (&bundle_dir))
+  char *target_dir = g_build_filename (BUNDLE_DIR, download_dir, NULL);
+  g_free (download_dir);
+
+  if (g_mkdir_with_parents (target_dir, 0755) != 0)
     {
-      char *download_dir = g_strdup_printf ("%s%u_%s_%s",
-                                            DOWNLOAD_DIR_PREFIX,
-                                            getuid(),
-                                            app_id,
-                                            version);
-
-      char *target_dir = g_build_filename (BUNDLE_DIR, download_dir, NULL);
-      g_free (download_dir);
-
-      if (g_mkdir_with_parents (target_dir, 0755) != 0)
-        {
-          int saved_errno = errno;
-          eos_app_log_error_message ("Unable to create temporary directory: %s",
-                                     g_strerror (saved_errno));
-        }
-
-      g_chmod (BUNDLE_DIR, 01777);
-
-      eos_app_log_info_message ("Bundle dir: %s", target_dir);
-
-      g_once_init_leave (&bundle_dir, target_dir);
+      int saved_errno = errno;
+      eos_app_log_error_message ("Unable to create temporary directory: %s",
+                                 g_strerror (saved_errno));
     }
 
-  return bundle_dir;
+  g_chmod (BUNDLE_DIR, 01777);
+
+  eos_app_log_info_message ("Target dir: %s", target_dir);
+
+  return target_dir;
 }
 
 static const char *

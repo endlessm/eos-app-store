@@ -848,8 +848,8 @@ get_bundle_artifacts (EosAppListModel *self,
   eos_app_log_info_message ("Downloading bundle (use_delta: %s)",
                             use_delta ? "true" : "false");
 
-  download_dir = eos_get_bundle_download_dir (eos_app_info_get_application_id(info),
-                                              eos_app_info_get_available_version(info));
+  download_dir = eos_get_bundle_download_dir (eos_app_info_get_application_id (info),
+                                              eos_app_info_get_available_version (info));
 
   bundle_path = eos_app_info_download_bundle (info, self->soup_session,
                                               download_dir,
