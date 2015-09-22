@@ -317,6 +317,8 @@ prepare_out_stream (const char    *target_file,
    */
   if (!is_resumed)
     {
+      eos_app_log_debug_message ("File is not resumed. Truncating");
+
       /* we don't use GFile API because the error handling is weird,
        * and we also know that the target is a local file, so there
        * is no point in going through the abstraction

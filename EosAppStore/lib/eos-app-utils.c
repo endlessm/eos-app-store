@@ -19,96 +19,36 @@
 #define APP_STORE_CONTENT_LINKS "links"
 
 #define BUNDLE_DIR              LOCALSTATEDIR "/tmp/eos-app-store"
-#define BUNDLE_DIR_TEMPLATE     BUNDLE_DIR "/downloadXXXXXX"
+#define DOWNLOAD_DIR_PREFIX     "dl"
 #define APP_DIR_DEFAULT         "/endless"
 
 G_DEFINE_QUARK (eos-app-utils-error-quark, eos_app_utils_error)
 
-const char *
-eos_get_bundle_download_dir (void)
+char *
+eos_get_bundle_download_dir (const char *app_id,
+                             const char *version)
 {
-  static char *bundle_dir;
+  char *download_dir = g_strdup_printf ("%s%u_%s_%s",
+                                        DOWNLOAD_DIR_PREFIX,
+                                        getuid (),
+                                        app_id,
+                                        version);
 
-  if (g_once_init_enter (&bundle_dir))
+  char *target_dir = g_build_filename (BUNDLE_DIR, download_dir, NULL);
+  g_free (download_dir);
+
+  if (g_mkdir_with_parents (target_dir, 0755) != 0)
     {
-      /* g_mkdir* functions do not allow setting of 0777 mode as the o+w
-       * never gets set so we require a separate step to ensure that the
-       * permissions are correct. We also ignore problems here since it
-       * usually means that the folder is already created by us or someone
-       * else
-       */
-      g_mkdir_with_parents (BUNDLE_DIR, 0755);
-      g_chmod (BUNDLE_DIR, 01777);
-
-      char *tmp = g_strdup (BUNDLE_DIR_TEMPLATE);
-      while (g_mkdtemp_full (tmp, 0755) == NULL)
-        {
-          int saved_errno = errno;
-
-          eos_app_log_error_message ("Unable to create temporary directory: %s",
-                                     g_strerror (saved_errno));
-        }
-
-      eos_app_log_info_message ("Bundle dir: %s", tmp);
-
-      g_once_init_leave (&bundle_dir, tmp);
+      int saved_errno = errno;
+      eos_app_log_error_message ("Unable to create temporary directory: %s",
+                                 g_strerror (saved_errno));
     }
 
-  return bundle_dir;
-}
+  g_chmod (BUNDLE_DIR, 01777);
 
-void
-eos_clear_bundle_download_dir (void)
-{
-  GFile *dir = g_file_new_for_path (eos_get_bundle_download_dir ());
+  eos_app_log_info_message ("Target dir: %s", target_dir);
 
-  GError *error = NULL;
-  GFileEnumerator *enumerator = g_file_enumerate_children (dir, G_FILE_ATTRIBUTE_STANDARD_NAME,
-                                                           G_FILE_QUERY_INFO_NOFOLLOW_SYMLINKS,
-                                                           NULL,
-                                                           &error);
-  if (error != NULL)
-    {
-      eos_app_log_error_message ("Unable to enumerate bundle dir '%s': %s",
-                                 eos_get_bundle_download_dir (),
-                                 error->message);
-      g_error_free (error);
-      g_object_unref (dir);
-      return;
-    }
-
-  GFileInfo *child_info = NULL;
-  while ((child_info = g_file_enumerator_next_file (enumerator, NULL, &error)) != NULL)
-    {
-      GFile *child = g_file_get_child (dir, g_file_info_get_name (child_info));
-
-      g_file_delete (child, NULL, &error);
-      if (error != NULL)
-        {
-          eos_app_log_error_message ("Unable to delete file: %s", error->message);
-          g_clear_error (&error);
-        }
-
-      g_clear_object (&child_info);
-      g_object_unref (child);
-    }
-
-  if (error != NULL)
-    {
-      eos_app_log_error_message ("Enumeration failed: %s", error->message);
-      g_clear_error (&error);
-    }
-
-  g_object_unref (enumerator);
-
-  g_file_delete (dir, NULL, &error);
-  if (error != NULL)
-    {
-      eos_app_log_error_message ("Unable to delete download dir: %s", error->message);
-      g_clear_error (&error);
-    }
-
-  g_object_unref (dir);
+  return target_dir;
 }
 
 static const char *
