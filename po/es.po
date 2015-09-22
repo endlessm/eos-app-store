@@ -24,8 +24,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: eos-app-store\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-09-02 18:39+0000\n"
-"PO-Revision-Date: 2015-09-02 18:39+0000\n"
+"POT-Creation-Date: 2015-09-22 01:22+0000\n"
+"PO-Revision-Date: 2015-09-22 01:23+0000\n"
 "Last-Translator: endlessmobile_build <philip@endlessm.com>\n"
 "Language-Team: Spanish (http://www.transifex.com/endless-mobile-inc/eos-app-store/language/es/)\n"
 "MIME-Version: 1.0\n"
@@ -34,127 +34,67 @@ msgstr ""
 "Language: es\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: ../data/eos-app-store-folder-frame.ui.h:1
-msgid "Create your own folder to organize your apps. First, choose an icon."
-msgstr "Crea tu propia carpeta para organizar tus programas. Primero, escoge un icono."
-
-#: ../data/eos-app-store-list-row.ui.h:1 ../EosAppStore/appFrame.js:336
+#: ../data/eos-app-store-app-info-box.ui.h:1
 msgid "Install app"
 msgstr "Instalar programa"
 
-#: ../data/eos-app-store-list-row.ui.h:2 ../EosAppStore/appFrame.js:562
+#: ../data/eos-app-store-app-info-box.ui.h:2
 msgid "Cancel"
 msgstr "Cancelar"
 
-#: ../data/eos-app-store-list-row.ui.h:3
+#: ../data/eos-app-store-app-info-box.ui.h:3
 msgid "Installing"
 msgstr "Instalando"
 
-#: ../data/eos-app-store-list-row.ui.h:4
+#: ../data/eos-app-store-app-info-box.ui.h:4
 msgid "Delete from device"
 msgstr "Eliminar del sistema"
+
+#: ../data/eos-app-store-app-installed-box.ui.h:1
+msgid "APPLICATION NAME"
+msgstr ""
+
+#: ../data/eos-app-store-app-installed-box.ui.h:2
+msgid "APPLICATION CATEGORY"
+msgstr ""
+
+#: ../data/eos-app-store-app-installed-box.ui.h:3
+msgid "SIZE"
+msgstr ""
+
+#: ../data/eos-app-store-app-installed-box.ui.h:4
+msgid "UPDATING…"
+msgstr ""
+
+#: ../data/eos-app-store-folder-frame.ui.h:1
+msgid "Create your own folder to organize your apps. First, choose an icon."
+msgstr "Crea tu propia carpeta para organizar tus programas. Primero, escoge un icono."
 
 #: ../data/eos-app-store-weblink-new-site-frame.ui.h:1
 msgid "e.g.: http://www.globoesporte.com"
 msgstr "ej.: http://www.globoesporte.com"
 
-#: ../EosAppStore/appFrame.js:184 ../EosAppStore/appFrame.js:481
-msgid "Updating…"
-msgstr "Actualizando…"
+#: ../EosAppStore/appFrame.js:234
+msgid "Installed apps"
+msgstr ""
 
-#: ../EosAppStore/appFrame.js:184 ../EosAppStore/appFrame.js:509
-msgid "Installing…"
-msgstr "Instalando…"
-
-#: ../EosAppStore/appFrame.js:197 ../EosAppStore/appFrame.js:476
-msgid "Downloading…"
-msgstr "Descargando…"
-
-#: ../EosAppStore/appFrame.js:337
-msgid "Update app"
-msgstr "Actualizar programa"
-
-#: ../EosAppStore/appFrame.js:338
-msgid "Open app"
-msgstr "Abrir programa"
-
-#: ../EosAppStore/appFrame.js:339
-msgid "Add to the desktop"
-msgstr "Agregar al escritorio"
-
-#: ../EosAppStore/appFrame.js:340
-msgid "No network connection is available"
-msgstr "No hay una disponible conexión a la red"
-
-#: ../EosAppStore/appFrame.js:341
-msgid "Insufficient space to install the app"
-msgstr "No hay suficiente espacio para instalar el programa"
-
-#: ../EosAppStore/appFrame.js:455
-#, javascript-format
-msgid "We could not install '%s'"
-msgstr "No pudimos instalar '%s'"
-
-#: ../EosAppStore/appFrame.js:460
-#, javascript-format
-msgid "'%s' was installed successfully"
-msgstr "'%s' fue instalado con éxito"
-
-#: ../EosAppStore/appFrame.js:487
-#, javascript-format
-msgid "We could not update '%s'"
-msgstr "No pudimos actualizar '%s'"
-
-#: ../EosAppStore/appFrame.js:490
-#, javascript-format
-msgid "'%s' was updated successfully"
-msgstr "'%s' fue actualizado con éxito"
-
-#: ../EosAppStore/appFrame.js:558
-msgid "Deleting app"
-msgstr "Eliminando el programa"
-
-#: ../EosAppStore/appFrame.js:559
-msgid ""
-"Deleting this app will remove it from the device for all users. You will "
-"need to download it from the internet in order to reinstall it."
-msgstr "Si borras este programa será eliminado del sistema, y el cambio será actualizado para todos los usuarios de esta computadora. Para reinstalar el programa, tendrás que descargarlo del internet e instalarlo de nuevo."
-
-#: ../EosAppStore/appFrame.js:560
-msgid "Delete app"
-msgstr "Eliminar programa"
-
-#: ../EosAppStore/appFrame.js:570
-msgid "Removing…"
-msgstr "Eliminando…"
-
-#: ../EosAppStore/appFrame.js:576
-#, javascript-format
-msgid "We could not remove '%s'"
-msgstr "No pudimos quitar '%s'"
-
-#: ../EosAppStore/appFrame.js:579
-#, javascript-format
-msgid "'%s' was removed successfully"
-msgstr "'%s' fue quitado con éxito"
-
-#: ../EosAppStore/appFrame.js:625 ../EosAppStore/appFrame.js:841
-msgid "Dismiss"
-msgstr "Cerrar"
-
-#: ../EosAppStore/appFrame.js:808
+#: ../EosAppStore/appFrame.js:291
 msgid "Install apps"
 msgstr "Instalar programas"
 
-#: ../EosAppStore/appFrame.js:839
+#: ../EosAppStore/appFrame.js:325
 msgid "Refresh failed"
 msgstr "Falló la recarga"
 
-#: ../EosAppStore/appStoreWindow.js:229
+#: ../EosAppStore/appFrame.js:327 ../EosAppStore/appStore.js:242
+msgid "Dismiss"
+msgstr "Cerrar"
+
+#: ../EosAppStore/appStoreWindow.js:247
 msgid "Websites"
 msgstr "Sitios web"
 
-#: ../EosAppStore/appStoreWindow.js:234
+#: ../EosAppStore/appStoreWindow.js:252
 msgid "Folders"
 msgstr "Carpetas"
 
@@ -212,37 +152,37 @@ msgstr "Nombre de carpeta"
 msgid "Folder added!"
 msgstr "¡Carpeta agregada!"
 
-#: ../EosAppStore/folderFrame.js:302
+#: ../EosAppStore/folderFrame.js:297
 msgid "Install folders"
 msgstr "Instalar carpetas"
 
-#: ../EosAppStore/weblinkFrame.js:265
+#: ../EosAppStore/weblinkFrame.js:263
 msgid "Write the website you'd like to add here and press “Enter”"
 msgstr "Escribe el sitio que quieras aquí y presiona “Enter”"
 
-#: ../EosAppStore/weblinkFrame.js:331
+#: ../EosAppStore/weblinkFrame.js:329
 msgid "e.g.: http://www.prensalibre.com.gt"
 msgstr "ej.: http://www.prensalibre.com.gt"
 
-#: ../EosAppStore/weblinkFrame.js:351
+#: ../EosAppStore/weblinkFrame.js:349
 msgid "searching"
 msgstr "buscando"
 
-#: ../EosAppStore/weblinkFrame.js:366
+#: ../EosAppStore/weblinkFrame.js:364
 msgid "The address written does not exist or is not available."
 msgstr "El sitio web que has escrito no existe, está incorrecto o no está disponible."
 
-#: ../EosAppStore/weblinkFrame.js:375 ../EosAppStore/weblinkFrame.js:522
+#: ../EosAppStore/weblinkFrame.js:373 ../EosAppStore/weblinkFrame.js:520
 msgid "Added successfully!"
 msgstr "¡Agregado exitosamente!"
 
-#: ../EosAppStore/weblinkFrame.js:591
+#: ../EosAppStore/weblinkFrame.js:589
 msgid ""
 "Add your favorite websites to your desktop or choose suggested ones from our"
 " list."
 msgstr "Agrega tus sitios favoritos a tu escritorio o escoge uno de nuestra lista."
 
-#: ../EosAppStore/weblinkFrame.js:785
+#: ../EosAppStore/weblinkFrame.js:783
 msgid "Install websites"
 msgstr "Instalar sitios web"
 
@@ -253,71 +193,71 @@ msgid ""
 "contact support."
 msgstr "El centro de programas ha detectado un error grave y no puede continuar con la instalación. Por favor, reinicia tu sistema. Si el problema persiste, ponte en contacto con soporte."
 
-#: ../EosAppStore/lib/eos-app-list-model.c:473
+#: ../EosAppStore/lib/eos-app-list-model.c:474
 msgid "We are unable to load the complete list of applications"
 msgstr "No ha sido posible cargar la lista completa de programas"
 
-#: ../EosAppStore/lib/eos-app-list-model.c:481
+#: ../EosAppStore/lib/eos-app-list-model.c:482
 msgid "We were unable to update the list of applications"
 msgstr "No pudimos actualizar la lista de programas"
 
-#: ../EosAppStore/lib/eos-app-list-model.c:904
+#: ../EosAppStore/lib/eos-app-list-model.c:905
 msgid "Not enough space on device for installing the app."
 msgstr ""
 
-#: ../EosAppStore/lib/eos-app-list-model.c:973
+#: ../EosAppStore/lib/eos-app-list-model.c:974
 msgid ""
 "We encountered an internal error during the installation of the application."
 msgstr ""
 
-#: ../EosAppStore/lib/eos-app-list-model.c:1002
+#: ../EosAppStore/lib/eos-app-list-model.c:1003
 msgid ""
 "We encountered an internal error during the removal of the application."
 msgstr ""
 
-#: ../EosAppStore/lib/eos-app-list-model.c:1029
-#: ../EosAppStore/lib/eos-app-list-model.c:1077
+#: ../EosAppStore/lib/eos-app-list-model.c:1030
+#: ../EosAppStore/lib/eos-app-list-model.c:1078
 msgid "You must be an administrator to install applications."
 msgstr ""
 
-#: ../EosAppStore/lib/eos-app-list-model.c:1041
-#: ../EosAppStore/lib/eos-app-list-model.c:1234
+#: ../EosAppStore/lib/eos-app-list-model.c:1042
+#: ../EosAppStore/lib/eos-app-list-model.c:1235
 msgid ""
 "The app center has detected a fatal error and cannot continue. Please, "
 "restart your system. If the problem persists, please contact support."
 msgstr "El centro de programas ha detectado un error fatal y no puede continuar. Por favor, reinicie su sistema. Si el problema persiste, por favor contacte a soporte técnico."
 
-#: ../EosAppStore/lib/eos-app-list-model.c:1222
-#: ../EosAppStore/lib/eos-app-list-model.c:1252
+#: ../EosAppStore/lib/eos-app-list-model.c:1223
+#: ../EosAppStore/lib/eos-app-list-model.c:1253
 msgid "You must be an administrator to remove applications."
 msgstr ""
 
-#: ../EosAppStore/lib/eos-app-list-model.c:1384
+#: ../EosAppStore/lib/eos-app-list-model.c:1385
 #, c-format
 msgid "App %s has no candidate for installation."
 msgstr ""
 
-#: ../EosAppStore/lib/eos-app-list-model.c:1396
+#: ../EosAppStore/lib/eos-app-list-model.c:1397
 #, c-format
 msgid "App '%s' is already installed."
 msgstr ""
 
-#: ../EosAppStore/lib/eos-app-list-model.c:1452
+#: ../EosAppStore/lib/eos-app-list-model.c:1453
 #, c-format
 msgid "App %s not installable."
 msgstr ""
 
-#: ../EosAppStore/lib/eos-app-list-model.c:1463
+#: ../EosAppStore/lib/eos-app-list-model.c:1464
 #, c-format
 msgid "App %s is up to date."
 msgstr ""
 
-#: ../EosAppStore/lib/eos-app-list-model.c:1534
+#: ../EosAppStore/lib/eos-app-list-model.c:1535
 #, c-format
 msgid "App %s is not installed"
 msgstr "El programa %s no está instalado"
 
-#: ../EosAppStore/lib/eos-app-list-model.c:1566
+#: ../EosAppStore/lib/eos-app-list-model.c:1567
 #, c-format
 msgid "App '%s' is not installed."
 msgstr ""

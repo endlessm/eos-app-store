@@ -8,8 +8,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: eos-app-store\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-09-02 18:39+0000\n"
-"PO-Revision-Date: 2015-09-02 18:39+0000\n"
+"POT-Creation-Date: 2015-09-22 01:22+0000\n"
+"PO-Revision-Date: 2015-09-22 01:23+0000\n"
 "Last-Translator: endlessmobile_build <philip@endlessm.com>\n"
 "Language-Team: Arabic (http://www.transifex.com/endless-mobile-inc/eos-app-store/language/ar/)\n"
 "MIME-Version: 1.0\n"
@@ -18,127 +18,67 @@ msgstr ""
 "Language: ar\n"
 "Plural-Forms: nplurals=6; plural=n==0 ? 0 : n==1 ? 1 : n==2 ? 2 : n%100>=3 && n%100<=10 ? 3 : n%100>=11 && n%100<=99 ? 4 : 5;\n"
 
-#: ../data/eos-app-store-folder-frame.ui.h:1
-msgid "Create your own folder to organize your apps. First, choose an icon."
-msgstr "قم بإنشاء مجلد خاص بك لتنظيم تطبيقاتك. اختر رمزا أولا."
-
-#: ../data/eos-app-store-list-row.ui.h:1 ../EosAppStore/appFrame.js:336
+#: ../data/eos-app-store-app-info-box.ui.h:1
 msgid "Install app"
 msgstr "تثبيت التطبيق"
 
-#: ../data/eos-app-store-list-row.ui.h:2 ../EosAppStore/appFrame.js:562
+#: ../data/eos-app-store-app-info-box.ui.h:2
 msgid "Cancel"
 msgstr "إلغاء"
 
-#: ../data/eos-app-store-list-row.ui.h:3
+#: ../data/eos-app-store-app-info-box.ui.h:3
 msgid "Installing"
 msgstr "جاري التثبيت"
 
-#: ../data/eos-app-store-list-row.ui.h:4
+#: ../data/eos-app-store-app-info-box.ui.h:4
 msgid "Delete from device"
 msgstr "احذف من الجهاز"
+
+#: ../data/eos-app-store-app-installed-box.ui.h:1
+msgid "APPLICATION NAME"
+msgstr ""
+
+#: ../data/eos-app-store-app-installed-box.ui.h:2
+msgid "APPLICATION CATEGORY"
+msgstr ""
+
+#: ../data/eos-app-store-app-installed-box.ui.h:3
+msgid "SIZE"
+msgstr ""
+
+#: ../data/eos-app-store-app-installed-box.ui.h:4
+msgid "UPDATING…"
+msgstr ""
+
+#: ../data/eos-app-store-folder-frame.ui.h:1
+msgid "Create your own folder to organize your apps. First, choose an icon."
+msgstr "قم بإنشاء مجلد خاص بك لتنظيم تطبيقاتك. اختر رمزا أولا."
 
 #: ../data/eos-app-store-weblink-new-site-frame.ui.h:1
 msgid "e.g.: http://www.globoesporte.com"
 msgstr "مثال: http://www.globoesporte.com"
 
-#: ../EosAppStore/appFrame.js:184 ../EosAppStore/appFrame.js:481
-msgid "Updating…"
-msgstr "جاري التحديث…"
-
-#: ../EosAppStore/appFrame.js:184 ../EosAppStore/appFrame.js:509
-msgid "Installing…"
-msgstr "جاري التثبيت…"
-
-#: ../EosAppStore/appFrame.js:197 ../EosAppStore/appFrame.js:476
-msgid "Downloading…"
-msgstr "جاري التنزيل..."
-
-#: ../EosAppStore/appFrame.js:337
-msgid "Update app"
-msgstr "تحديث التطبيق"
-
-#: ../EosAppStore/appFrame.js:338
-msgid "Open app"
-msgstr "فتح التطبيق"
-
-#: ../EosAppStore/appFrame.js:339
-msgid "Add to the desktop"
-msgstr "إضافة إلى سطح المكتب "
-
-#: ../EosAppStore/appFrame.js:340
-msgid "No network connection is available"
+#: ../EosAppStore/appFrame.js:234
+msgid "Installed apps"
 msgstr ""
 
-#: ../EosAppStore/appFrame.js:341
-msgid "Insufficient space to install the app"
-msgstr "مساحة غير كافية لتثبيت التطبيق"
-
-#: ../EosAppStore/appFrame.js:455
-#, javascript-format
-msgid "We could not install '%s'"
-msgstr "لم نتمكن من تثبيت '%s'"
-
-#: ../EosAppStore/appFrame.js:460
-#, javascript-format
-msgid "'%s' was installed successfully"
-msgstr "تم تثبيت '%s' بنجاح"
-
-#: ../EosAppStore/appFrame.js:487
-#, javascript-format
-msgid "We could not update '%s'"
-msgstr "لم نتمكن من تحديث '%s'"
-
-#: ../EosAppStore/appFrame.js:490
-#, javascript-format
-msgid "'%s' was updated successfully"
-msgstr "تم تحديث '%s' بنجاح"
-
-#: ../EosAppStore/appFrame.js:558
-msgid "Deleting app"
-msgstr "جاري حذف التطبيق"
-
-#: ../EosAppStore/appFrame.js:559
-msgid ""
-"Deleting this app will remove it from the device for all users. You will "
-"need to download it from the internet in order to reinstall it."
-msgstr "سيقوم حذف هذا التطبيق بإزالته من الجهاز لجميع المستخدمين. سوف تحتاج إلى تحميله من الإنترنت من أجل إعادة تثبيته."
-
-#: ../EosAppStore/appFrame.js:560
-msgid "Delete app"
-msgstr "احذف التطبيق"
-
-#: ../EosAppStore/appFrame.js:570
-msgid "Removing…"
-msgstr "جاري الحذف"
-
-#: ../EosAppStore/appFrame.js:576
-#, javascript-format
-msgid "We could not remove '%s'"
-msgstr "لم نتمكن من إزالة '%s'"
-
-#: ../EosAppStore/appFrame.js:579
-#, javascript-format
-msgid "'%s' was removed successfully"
-msgstr "تمت إزالة '%s' بنجاح"
-
-#: ../EosAppStore/appFrame.js:625 ../EosAppStore/appFrame.js:841
-msgid "Dismiss"
-msgstr "استبعاد"
-
-#: ../EosAppStore/appFrame.js:808
+#: ../EosAppStore/appFrame.js:291
 msgid "Install apps"
 msgstr "تثبيت التطبيقات"
 
-#: ../EosAppStore/appFrame.js:839
+#: ../EosAppStore/appFrame.js:325
 msgid "Refresh failed"
 msgstr ""
 
-#: ../EosAppStore/appStoreWindow.js:229
+#: ../EosAppStore/appFrame.js:327 ../EosAppStore/appStore.js:242
+msgid "Dismiss"
+msgstr "استبعاد"
+
+#: ../EosAppStore/appStoreWindow.js:247
 msgid "Websites"
 msgstr "المواقع"
 
-#: ../EosAppStore/appStoreWindow.js:234
+#: ../EosAppStore/appStoreWindow.js:252
 msgid "Folders"
 msgstr "المجلدات "
 
@@ -196,37 +136,37 @@ msgstr "اسم المجلد "
 msgid "Folder added!"
 msgstr "تمت إضافة المجلد!"
 
-#: ../EosAppStore/folderFrame.js:302
+#: ../EosAppStore/folderFrame.js:297
 msgid "Install folders"
 msgstr "تثبيت المجلدات"
 
-#: ../EosAppStore/weblinkFrame.js:265
+#: ../EosAppStore/weblinkFrame.js:263
 msgid "Write the website you'd like to add here and press “Enter”"
 msgstr "اكتب الموقع الذي تريد إضافته هنا واضغط على \"Enter\""
 
-#: ../EosAppStore/weblinkFrame.js:331
+#: ../EosAppStore/weblinkFrame.js:329
 msgid "e.g.: http://www.prensalibre.com.gt"
 msgstr "مثال: http://www.prensalibre.com.gt"
 
-#: ../EosAppStore/weblinkFrame.js:351
+#: ../EosAppStore/weblinkFrame.js:349
 msgid "searching"
 msgstr "البحث جاري"
 
-#: ../EosAppStore/weblinkFrame.js:366
+#: ../EosAppStore/weblinkFrame.js:364
 msgid "The address written does not exist or is not available."
 msgstr "العنوان المكتوب غير موجود أو غير متوفر."
 
-#: ../EosAppStore/weblinkFrame.js:375 ../EosAppStore/weblinkFrame.js:522
+#: ../EosAppStore/weblinkFrame.js:373 ../EosAppStore/weblinkFrame.js:520
 msgid "Added successfully!"
 msgstr "تمت الإضافة بنجاح!"
 
-#: ../EosAppStore/weblinkFrame.js:591
+#: ../EosAppStore/weblinkFrame.js:589
 msgid ""
 "Add your favorite websites to your desktop or choose suggested ones from our"
 " list."
 msgstr "قم بإضافة المواقع المفضلة لديك على سطح المكتب أو اختيار تلك المقترحة من قائمتنا."
 
-#: ../EosAppStore/weblinkFrame.js:785
+#: ../EosAppStore/weblinkFrame.js:783
 msgid "Install websites"
 msgstr "تثبيت المواقع"
 
@@ -237,71 +177,71 @@ msgid ""
 "contact support."
 msgstr ""
 
-#: ../EosAppStore/lib/eos-app-list-model.c:473
+#: ../EosAppStore/lib/eos-app-list-model.c:474
 msgid "We are unable to load the complete list of applications"
 msgstr ""
 
-#: ../EosAppStore/lib/eos-app-list-model.c:481
+#: ../EosAppStore/lib/eos-app-list-model.c:482
 msgid "We were unable to update the list of applications"
 msgstr "يتعذر علينا تحديث قائمة التطبيقات"
 
-#: ../EosAppStore/lib/eos-app-list-model.c:904
+#: ../EosAppStore/lib/eos-app-list-model.c:905
 msgid "Not enough space on device for installing the app."
 msgstr ""
 
-#: ../EosAppStore/lib/eos-app-list-model.c:973
+#: ../EosAppStore/lib/eos-app-list-model.c:974
 msgid ""
 "We encountered an internal error during the installation of the application."
 msgstr ""
 
-#: ../EosAppStore/lib/eos-app-list-model.c:1002
+#: ../EosAppStore/lib/eos-app-list-model.c:1003
 msgid ""
 "We encountered an internal error during the removal of the application."
 msgstr ""
 
-#: ../EosAppStore/lib/eos-app-list-model.c:1029
-#: ../EosAppStore/lib/eos-app-list-model.c:1077
+#: ../EosAppStore/lib/eos-app-list-model.c:1030
+#: ../EosAppStore/lib/eos-app-list-model.c:1078
 msgid "You must be an administrator to install applications."
 msgstr ""
 
-#: ../EosAppStore/lib/eos-app-list-model.c:1041
-#: ../EosAppStore/lib/eos-app-list-model.c:1234
+#: ../EosAppStore/lib/eos-app-list-model.c:1042
+#: ../EosAppStore/lib/eos-app-list-model.c:1235
 msgid ""
 "The app center has detected a fatal error and cannot continue. Please, "
 "restart your system. If the problem persists, please contact support."
 msgstr ""
 
-#: ../EosAppStore/lib/eos-app-list-model.c:1222
-#: ../EosAppStore/lib/eos-app-list-model.c:1252
+#: ../EosAppStore/lib/eos-app-list-model.c:1223
+#: ../EosAppStore/lib/eos-app-list-model.c:1253
 msgid "You must be an administrator to remove applications."
 msgstr ""
 
-#: ../EosAppStore/lib/eos-app-list-model.c:1384
+#: ../EosAppStore/lib/eos-app-list-model.c:1385
 #, c-format
 msgid "App %s has no candidate for installation."
 msgstr ""
 
-#: ../EosAppStore/lib/eos-app-list-model.c:1396
+#: ../EosAppStore/lib/eos-app-list-model.c:1397
 #, c-format
 msgid "App '%s' is already installed."
 msgstr ""
 
-#: ../EosAppStore/lib/eos-app-list-model.c:1452
+#: ../EosAppStore/lib/eos-app-list-model.c:1453
 #, c-format
 msgid "App %s not installable."
 msgstr ""
 
-#: ../EosAppStore/lib/eos-app-list-model.c:1463
+#: ../EosAppStore/lib/eos-app-list-model.c:1464
 #, c-format
 msgid "App %s is up to date."
 msgstr ""
 
-#: ../EosAppStore/lib/eos-app-list-model.c:1534
+#: ../EosAppStore/lib/eos-app-list-model.c:1535
 #, c-format
 msgid "App %s is not installed"
 msgstr "التطبيق %s غير مثبت"
 
-#: ../EosAppStore/lib/eos-app-list-model.c:1566
+#: ../EosAppStore/lib/eos-app-list-model.c:1567
 #, c-format
 msgid "App '%s' is not installed."
 msgstr ""
