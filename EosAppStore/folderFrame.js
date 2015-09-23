@@ -177,7 +177,6 @@ const FolderIconGrid = new Lang.Class({
         this._folderModel = folderModel;
         this._iconList = this._folderModel.getIconList();
         this._populate();
-        this._activeToggle = null;
         this._bubble = null;
 
         this.get_style_context().add_class('folder-icon-grid');
@@ -193,7 +192,6 @@ const FolderIconGrid = new Lang.Class({
 
     _on_button_toggled: function(toggleButton) {
         if (toggleButton.get_active()) {
-            this._activeToggle = toggleButton;
 
             // hide any bubble we might have previously created
             if (this._bubble != null) {
@@ -203,10 +201,6 @@ const FolderIconGrid = new Lang.Class({
             // bubble window
             this._bubble = new FolderNameBubble(this._folderModel);
             this._bubble.connect('closed', Lang.bind(this, function() {
-                if (this._activeToggle) {
-                    this._activeToggle.set_active(false);
-                    this._activeToggle = null;
-                }
                 this._bubble = null;
             }));
 
