@@ -194,7 +194,6 @@ const FolderIconGrid = new Lang.Class({
     _on_button_toggled: function(toggleButton) {
         if (toggleButton.get_active()) {
             this._activeToggle = toggleButton;
-            this.get_style_context().add_class('grabbed');
 
             // hide any bubble we might have previously created
             if (this._bubble != null) {
@@ -208,7 +207,6 @@ const FolderIconGrid = new Lang.Class({
                     this._activeToggle.set_active(false);
                     this._activeToggle = null;
                 }
-                this.get_style_context().remove_class('grabbed');
                 this._bubble = null;
             }));
 
