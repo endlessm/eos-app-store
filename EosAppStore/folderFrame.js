@@ -211,6 +211,12 @@ const FolderIconGrid = new Lang.Class({
                 }
                 this._bubble = null;
             }));
+            this._bubble.connect('notify::visible', function(bubble) {
+                // destroy when hidden
+                if (!bubble.visible) {
+                    bubble.destroy();
+                }
+            });
 
             // prepare the bubble window for showing...
             this._bubble._iconName = toggleButton._iconName;
