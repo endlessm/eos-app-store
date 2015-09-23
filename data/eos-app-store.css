@@ -784,6 +784,7 @@
     border: none;
     box-shadow: none;
     background: none;
+    transition: none;
 
     font-size: 1.12em;
     font-weight: 600; /* semibold */
