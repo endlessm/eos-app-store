@@ -1193,7 +1193,7 @@ eos_app_load_available_apps (GHashTable *app_info,
               if (eos_compare_versions (code_version,
                                         eos_app_info_get_installed_version (info)) != 0)
                 {
-                   eos_app_log_error_message (" -> Full bundle has an override. "
+                   eos_app_log_debug_message (" -> Full bundle has an override. "
                                               "Ignoring");
                    continue;
                 }

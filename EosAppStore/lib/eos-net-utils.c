@@ -58,7 +58,8 @@ set_up_download_from_request (SoupRequest   *request,
 
   if (internal_error != NULL)
     {
-      eos_app_log_error_message ("Soup request sending had an internal error");
+      eos_app_log_error_message ("Soup request sending had an internal error: %s",
+                                 internal_error->message);
 
       g_propagate_error (error, internal_error);
       return NULL;
@@ -330,7 +331,8 @@ prepare_out_stream (const char    *target_file,
                                  &internal_error);
   if (internal_error != NULL)
     {
-      eos_app_log_error_message ("Opening output file failed - canceling download");
+      eos_app_log_error_message ("Opening output file failed: %s. "
+                                 "Canceling download", internal_error->message);
 
       g_set_error (error, EOS_NET_UTILS_ERROR,
                    EOS_NET_UTILS_ERROR_FAILED,

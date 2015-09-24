@@ -361,8 +361,6 @@ load_user_capabilities (EosAppListModel *self,
     {
       eos_app_log_error_message ("Unable to list retrieve user capabilities: %s",
                                  error->message);
-      g_critical ("Unable to retrieve user capabilities: %s",
-                  error->message);
       g_propagate_error (error_out, error);
 
       return FALSE;
@@ -639,7 +637,7 @@ eos_app_list_model_init (EosAppListModel *self)
                                       g_free,
                                       (GDestroyNotify) g_object_unref);
 
-  eos_app_log_error_message ("Creating new soup session");
+  eos_app_log_debug_message ("Creating new soup session");
 
   self->soup_session = soup_session_new ();
 
@@ -837,7 +835,7 @@ get_bundle_artifacts (EosAppListModel *self,
 
   if (error != NULL)
     {
-      eos_app_log_error_message ("Getting dbus transaction failed");
+      eos_app_log_error_message ("Getting dbus transaction failed: %s", error->message);
       goto out;
     }
 
@@ -859,7 +857,7 @@ get_bundle_artifacts (EosAppListModel *self,
                                               &error);
   if (error != NULL)
     {
-      eos_app_log_info_message ("Download of bundle failed");
+      eos_app_log_error_message ("Download of bundle failed: %s", error->message);
       goto out;
     }
 
@@ -870,7 +868,7 @@ get_bundle_artifacts (EosAppListModel *self,
                                                     cancellable, &error);
   if (error != NULL)
     {
-      eos_app_log_error_message ("Signature download failed");
+      eos_app_log_error_message ("Signature download failed: %s", error->message);
       goto out;
     }
 
@@ -881,7 +879,7 @@ get_bundle_artifacts (EosAppListModel *self,
                                                cancellable, &error);
   if (error != NULL)
     {
-      eos_app_log_error_message ("Hash download failed");
+      eos_app_log_error_message ("Hash download failed: %s", error->message);
       goto out;
     }
 
@@ -1510,8 +1508,8 @@ remove_app_thread_func (GTask *task,
 
   if (!remove_app_from_shell (model, info, cancellable, &error))
     {
-      eos_app_log_error_message ("Unable to remove app '%s' from shell!",
-                                 eos_app_info_get_application_id (info));
+      eos_app_log_error_message ("Unable to remove app '%s' from shell: %s",
+                                 eos_app_info_get_application_id (info), error->message);
       g_task_return_error (task, error);
       return;
     }
