@@ -157,11 +157,6 @@
     background-image: url("btn_back_pressed.png");
 }
 
-.installed-app-box {
-    background-color: alpha(#606060, 0.69);
-    border-radius: 4px;
-}
-
 .installed-app-box .app-name {
     color: white;
     font-size: 15px;
@@ -437,9 +432,20 @@
     background: none;
 }
 
+.app-frame .app-installed-list .list-row {
+    border-radius: 4px;
+    padding: 0;
+    background-color: alpha(#606060, 0.69);
+}
+
 .app-frame .app-installed-list .list-row:hover {
-    background-color: alpha(#ccc, 0.69);
+    background-color: alpha(#ccc, 0.45);
     -gtk-image-effect: none;
+}
+
+.app-frame .app-installed-list-separator {
+    border: none;
+    padding: 2px;
 }
 
 .controls-box .state-button {
