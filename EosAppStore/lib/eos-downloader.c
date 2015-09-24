@@ -144,7 +144,7 @@ eos_app_info_download_bundle (EosAppInfo *info,
                                                progress_user_data,
                                                cancellable, &error))
     {
-      eos_app_log_error_message ("Download of bundle failed");
+      eos_app_log_error_message ("Download of bundle failed: %s", error->message);
 
       g_propagate_error (error_out, error);
     }
@@ -165,7 +165,7 @@ get_local_updates_monotonic_id (void)
 
   if (!g_file_get_contents (target, &data, NULL, &error))
     {
-      eos_app_log_error_message ("Unable to load updates meta record: %s: %s!",
+      eos_app_log_error_message ("Unable to load updates meta record: %s: %s",
                                  target,
                                  error->message);
 
@@ -174,7 +174,7 @@ get_local_updates_monotonic_id (void)
 
   if (!eos_app_load_updates_meta_record (&monotonic_id, data, NULL, &error))
     {
-      eos_app_log_error_message ("Unable to parse updates meta record: %s: %s! "
+      eos_app_log_error_message ("Unable to parse updates meta record: %s: %s. "
                                  "Removing file from system",
                                  target,
                                  error->message);
@@ -223,15 +223,16 @@ check_is_app_list_current (SoupSession *soup_session,
                                     cancellable,
                                     &error))
     {
-      eos_app_log_error_message ("Unable to get updates meta record!");
+      eos_app_log_error_message ("Unable to get updates meta record: %s",
+                                 error->message);
       goto out;
     }
 
   if (!eos_app_load_updates_meta_record (&monotonic_id, data, cancellable,
                                          &error))
     {
-      eos_app_log_error_message ("Unable to parse updates meta record! "
-                                 "Removing cached file.");
+      eos_app_log_error_message ("Unable to parse updates meta record: %s. "
+                                 "Removing cached file.", error->message);
 
       /* If we have parsing issues with the file, we want it removed from the
        * system regardless of the reasons */
@@ -288,8 +289,8 @@ eos_load_available_apps (GHashTable *apps,
       eos_app_log_info_message ("Loading cached updates.json");
       if (!g_file_get_contents (target, &data, NULL, &error))
         {
-          eos_app_log_error_message ("Loading cached updates.json failed. "
-                                     "Need to re-download it");
+          eos_app_log_error_message ("Loading cached updates.json failed: %s. "
+                                     "Need to re-download it", error->message);
 
           /* We clear the error because we want to force a re-download */
           g_clear_error (&error);
@@ -316,7 +317,8 @@ eos_load_available_apps (GHashTable *apps,
 
       if (!updates_dl_success)
         {
-          eos_app_log_error_message ("Download of all updates failed!");
+          eos_app_log_error_message ("Download of all updates failed: %s",
+                                     error->message);
 
           g_free (target);
           g_propagate_error (error_out, error);
@@ -327,7 +329,8 @@ eos_load_available_apps (GHashTable *apps,
 
   if (!eos_app_load_available_apps (apps, data, cancellable, &error))
     {
-      eos_app_log_error_message ("Parsing of all updates failed!");
+      eos_app_log_error_message ("Parsing of all updates failed: %s",
+                                 error->message);
 
       g_free (data);
       g_propagate_error (error_out, error);
