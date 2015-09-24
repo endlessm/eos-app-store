@@ -639,7 +639,7 @@ eos_app_list_model_init (EosAppListModel *self)
                                       g_free,
                                       (GDestroyNotify) g_object_unref);
 
-  eos_app_log_error_message ("Creating new soup session");
+  eos_app_log_debug_message ("Creating new soup session");
 
   self->soup_session = soup_session_new ();
 
