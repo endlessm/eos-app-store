@@ -177,8 +177,8 @@ const FolderIconGrid = new Lang.Class({
         this._folderModel = folderModel;
         this._iconList = this._folderModel.getIconList();
         this._populate();
-        this._activeToggle = null;
         this._bubble = null;
+        this._buttonToggled = false;
 
         this.get_style_context().add_class('folder-icon-grid');
 
@@ -193,24 +193,30 @@ const FolderIconGrid = new Lang.Class({
 
     _on_button_toggled: function(toggleButton) {
         if (toggleButton.get_active()) {
-            this._activeToggle = toggleButton;
-            this.get_style_context().add_class('grabbed');
-
-            // hide any bubble we might have previously created
+            // hide any bubble we might have previously created.
+            // Note that calling hide() will immediately trigger
+            // the 'closed' callback
             if (this._bubble != null) {
+                this._buttonToggled = true;
                 this._bubble.hide();
+                this._buttonToggled = false;
             }
 
             // bubble window
             this._bubble = new FolderNameBubble(this._folderModel);
             this._bubble.connect('closed', Lang.bind(this, function() {
-                if (this._activeToggle) {
-                    this._activeToggle.set_active(false);
-                    this._activeToggle = null;
+                // reset selection if we're not toggling another button
+                if (!this._buttonToggled) {
+                    this._buttonGroup.set_active(true);
                 }
-                this.get_style_context().remove_class('grabbed');
                 this._bubble = null;
             }));
+            this._bubble.connect('notify::visible', function(bubble) {
+                // destroy when hidden
+                if (!bubble.visible) {
+                    bubble.destroy();
+                }
+            });
 
             // prepare the bubble window for showing...
             this._bubble._iconName = toggleButton._iconName;
