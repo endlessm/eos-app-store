@@ -84,7 +84,7 @@ eos_app_info_download_signature (EosAppInfo *info,
 
   if (!eos_net_utils_download_file_with_retry (soup_session,
                                                signature_uri, signature_path,
-                                               NULL, NULL, NULL,
+                                               NULL, NULL,
                                                cancellable, &error))
     {
       g_propagate_error (error_out, error);
@@ -93,6 +93,19 @@ eos_app_info_download_signature (EosAppInfo *info,
   return signature_path;
 }
 
+/**
+ * eos_app_info_download_bundle:
+ * @info:
+ * @soup_session:
+ * @download_dir:
+ * @use_delta:
+ * @cancellable:
+ * @progress_callback: (scope call):
+ * @progress_user_data:
+ * @error_out: (out):
+ *
+ * Returns: (transfer full):
+ */
 char *
 eos_app_info_download_bundle (EosAppInfo *info,
                               SoupSession *soup_session,
@@ -101,7 +114,6 @@ eos_app_info_download_bundle (EosAppInfo *info,
                               GCancellable *cancellable,
                               GFileProgressCallback progress_callback,
                               gpointer progress_user_data,
-                              GDestroyNotify progress_destroy,
                               GError **error_out)
 {
   GError *error = NULL;
@@ -140,7 +152,6 @@ eos_app_info_download_bundle (EosAppInfo *info,
   if (!eos_net_utils_download_file_with_retry (soup_session, bundle_uri,
                                                bundle_path,
                                                progress_callback,
-                                               progress_destroy,
                                                progress_user_data,
                                                cancellable, &error))
     {

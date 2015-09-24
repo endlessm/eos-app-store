@@ -770,11 +770,6 @@ add_app_to_shell (EosAppListModel *self,
   return TRUE;
 }
 
-typedef void (* ProgressReportFunc) (EosAppInfo *info,
-                                     goffset current,
-                                     goffset total,
-                                     gpointer user_data);
-
 typedef struct {
   EosAppListModel *model;
   EosAppInfo *info;
@@ -783,23 +778,61 @@ typedef struct {
 } ProgressClosure;
 
 static void
-emit_download_progress (goffset current, goffset total, gpointer _data)
+progress_closure_free (ProgressClosure *closure)
 {
-  DownloadProgressCallbackData *user_data = _data;
+  g_object_unref (closure->model);
+  g_object_unref (closure->info);
+  g_slice_free (ProgressClosure, closure);
+}
+
+static ProgressClosure *
+progress_closure_new (EosAppListModel *model,
+                      EosAppInfo *info,
+                      goffset current,
+                      goffset total)
+{
+  ProgressClosure *closure = g_slice_new0 (ProgressClosure);
+  closure->model = g_object_ref (model);
+  closure->info = g_object_ref (info);
+  closure->current = current;
+  closure->total = total;
+
+  return closure;
+}
+
+static gboolean
+emit_download_progress_in_main_context (gpointer user_data)
+{
+  ProgressClosure *closure = user_data;
+  g_signal_emit (closure->model,
+                 eos_app_list_model_signals[DOWNLOAD_PROGRESS], 0,
+                 eos_app_info_get_content_id (closure->info),
+                 closure->current,
+                 closure->total);
+
+  return G_SOURCE_REMOVE;
+}
+
+static void
+emit_download_progress (goffset current,
+                        goffset total,
+                        gpointer user_data)
+{
+  DownloadProgressCallbackData *data = user_data;
 
   eos_app_log_debug_message ("Emitting download progress signal "
                              "(%" G_GOFFSET_FORMAT " "
                              "of %" G_GOFFSET_FORMAT ")",
                              current,
                              total);
+  g_assert_nonnull (data->info);
 
-  g_assert_nonnull (user_data->info);
+  ProgressClosure *closure =
+    progress_closure_new (data->model, data->info, current, total);
 
-  g_signal_emit (user_data->model,
-                 eos_app_list_model_signals[DOWNLOAD_PROGRESS], 0,
-                 eos_app_info_get_content_id (user_data->info),
-                 current,
-                 total);
+  g_main_context_invoke_full (NULL, G_PRIORITY_DEFAULT,
+                              emit_download_progress_in_main_context,
+                              closure, (GDestroyNotify) progress_closure_free);
 }
 
 static gboolean
@@ -853,8 +886,10 @@ get_bundle_artifacts (EosAppListModel *self,
                                               download_dir,
                                               use_delta,
                                               cancellable,
-                                              emit_download_progress, data, download_progress_callback_data_free,
+                                              emit_download_progress, data,
                                               &error);
+  download_progress_callback_data_free (data);
+
   if (error != NULL)
     {
       eos_app_log_error_message ("Download of bundle failed: %s", error->message);
