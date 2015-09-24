@@ -201,12 +201,21 @@ const AppInstalledFrame = new Lang.Class({
         this.parent(model, mainWindow, EosAppStorePrivate.AppCategory.INSTALLED);
     },
 
+    _listHeaderFunc: function(row, before) {
+        if (before) {
+            let frame = new Gtk.Frame();
+            frame.get_style_context().add_class('app-installed-list-separator');
+            row.set_header(frame);
+        }
+    },
+
     _createView: function() {
         let list = new Gtk.ListBox({ expand: true,
                                      selection_mode: Gtk.SelectionMode.NONE,
                                      visible: true });
         list.get_style_context().add_class('app-installed-list');
         list.connect('row-activated', Lang.bind(this, this._onRowActivated));
+        list.set_header_func(Lang.bind(this, this._listHeaderFunc));
 
         return list;
     },
