@@ -259,16 +259,9 @@ out:
   g_free (target);
   g_free (data);
 
-  if (error)
-    {
-      eos_app_log_error_message ("Failed checkng if update is needed!: %s. "
-                                 "Ignoring and assuming that update is needed",
-                                 error->message);
-
-      /* We eat the errors since we assume that it just means that
-       * we'll re-download the updates */
-      g_clear_error (&error);
-    }
+  /* We eat the errors since we assume that it just means that
+   * we'll re-download the updates */
+  g_clear_error (&error);
 
   return updates_current;
 }

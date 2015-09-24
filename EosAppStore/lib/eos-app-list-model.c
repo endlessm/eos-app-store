@@ -361,8 +361,6 @@ load_user_capabilities (EosAppListModel *self,
     {
       eos_app_log_error_message ("Unable to list retrieve user capabilities: %s",
                                  error->message);
-      g_critical ("Unable to retrieve user capabilities: %s",
-                  error->message);
       g_propagate_error (error_out, error);
 
       return FALSE;
