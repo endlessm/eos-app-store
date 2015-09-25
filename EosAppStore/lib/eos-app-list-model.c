@@ -30,6 +30,9 @@
 
 #define FALLBACK_LANG   "-en"
 
+/* gdbus-codegen does not generate autoptr macros for us */
+G_DEFINE_AUTOPTR_CLEANUP_FUNC (EosAppManagerTransaction, g_object_unref)
+
 /* HACK: This will be revisited for the next release,
  * but for now we have a limited number of app language ids,
  * with no country codes, so we can iterate through them
@@ -814,17 +817,18 @@ get_bundle_artifacts (EosAppListModel *self,
   GError *error = NULL;
   gboolean retval = FALSE;
 
-  char *download_dir = NULL;
-  char *bundle_path = NULL;
-  char *signature_path = NULL;
-  char *sha256_path = NULL;
+  gboolean use_delta = allow_deltas &&
+                       is_upgrade &&
+                       eos_app_info_get_has_delta_update (info);
 
-  gboolean use_delta = allow_deltas && is_upgrade &&
-    eos_app_info_get_has_delta_update (info);
+  g_autofree char *download_dir = NULL;
+  g_autofree char *bundle_path = NULL;
+  g_autofree char *signature_path = NULL;
+  g_autofree char *sha256_path = NULL;
 
   eos_app_log_info_message ("Accessing dbus transaction");
 
-  EosAppManagerTransaction *transaction =
+  g_autoptr(EosAppManagerTransaction) transaction =
     eos_app_manager_transaction_proxy_new_sync (self->system_bus,
                                                 G_DBUS_PROXY_FLAGS_NONE,
                                                 "com.endlessm.AppManager",
@@ -846,15 +850,17 @@ get_bundle_artifacts (EosAppListModel *self,
   eos_app_log_info_message ("Downloading bundle (use_delta: %s)",
                             use_delta ? "true" : "false");
 
-  download_dir = eos_get_bundle_download_dir (eos_app_info_get_application_id (info),
-                                              eos_app_info_get_available_version (info));
+  download_dir =
+    eos_get_bundle_download_dir (eos_app_info_get_application_id (info),
+                                 eos_app_info_get_available_version (info));
 
-  bundle_path = eos_app_info_download_bundle (info, self->soup_session,
-                                              download_dir,
-                                              use_delta,
-                                              cancellable,
-                                              emit_download_progress, data, download_progress_callback_data_free,
-                                              &error);
+  bundle_path =
+    eos_app_info_download_bundle (info, self->soup_session,
+                                  download_dir,
+                                  use_delta,
+                                  cancellable,
+                                  emit_download_progress, data, download_progress_callback_data_free,
+                                  &error);
   if (error != NULL)
     {
       eos_app_log_error_message ("Download of bundle failed: %s", error->message);
@@ -862,21 +868,24 @@ get_bundle_artifacts (EosAppListModel *self,
     }
 
   eos_app_log_info_message ("Downloading signature");
-  signature_path = eos_app_info_download_signature (info, self->soup_session,
-                                                    download_dir,
-                                                    use_delta,
-                                                    cancellable, &error);
+  signature_path =
+    eos_app_info_download_signature (info, self->soup_session,
+                                     download_dir,
+                                     use_delta,
+                                     cancellable, &error);
   if (error != NULL)
     {
       eos_app_log_error_message ("Signature download failed: %s", error->message);
       goto out;
     }
 
-  eos_app_log_info_message ("Persisting hash");
-  sha256_path = eos_app_info_create_sha256sum (info,
-                                               download_dir,
-                                               use_delta, bundle_path,
-                                               cancellable, &error);
+  eos_app_log_info_message ("Computing bundle checksum");
+  sha256_path =
+    eos_app_info_create_sha256sum (info,
+                                   download_dir,
+                                   use_delta,
+                                   bundle_path,
+                                   cancellable, &error);
   if (error != NULL)
     {
       eos_app_log_error_message ("Hash download failed: %s", error->message);
@@ -888,14 +897,16 @@ get_bundle_artifacts (EosAppListModel *self,
   EosStorageType storage_type;
 
   if (is_upgrade)
-    /* Update to the location where the app currently is.
-     * In case we don't have enough space on that location, the app
-     * manager will return a failure.
-     * In the future we probably want to be smarter and move things around
-     * when an update is requested and free space is found on at least
-     * one storage.
-     */
-    storage_type = eos_app_info_get_storage_type (info);
+    {
+      /* Update to the location where the app currently is.
+       * In case we don't have enough space on that location, the app
+       * manager will return a failure.
+       * In the future we probably want to be smarter and move things around
+       * when an update is requested and free space is found on at least
+       * one storage.
+       */
+      storage_type = eos_app_info_get_storage_type (info);
+    }
   else
     storage_type = eos_app_info_get_install_storage_type (info);
 
@@ -941,6 +952,25 @@ out:
       if (transaction != NULL)
         eos_app_manager_transaction_call_cancel_transaction_sync (transaction, NULL, NULL);
 
+      if (g_dbus_error_is_remote_error (error))
+        {
+          g_autofree char *errmsg = g_dbus_error_get_remote_error (error);
+
+          /* The app manager uses InvalidFile for errors that deal with
+           * bad input — no file, wrong checksum, or wrong signature. It
+           * is harmful to leave these files around, because they may fool
+           * the app store into not downloading them again until the next
+           * change in the app version.
+           */
+          if (g_strcmp0 (errmsg, "com.endlessm.AppManager.Error.InvalidFile") == 0)
+            {
+              if (bundle_path)
+                g_unlink (bundle_path);
+              if (signature_path)
+                g_unlink (signature_path);
+            }
+        }
+
       /* Bubble the error up */
       g_propagate_error (error_out, error);
 
@@ -953,14 +983,6 @@ out:
    */
   if (sha256_path)
     g_unlink (sha256_path);
-
-  /* We're done with the transaction now that we've called CompleteTransaction() */
-  g_clear_object (&transaction);
-  g_free (bundle_path);
-  g_free (signature_path);
-  g_free (sha256_path);
-
-  g_free (download_dir);
 
   return retval;
 }
@@ -1126,7 +1148,7 @@ install_latest_app_version (EosAppListModel *self,
      */
     eos_app_list_model_queue_refresh_installed (self);
 
- out:
+out:
   if (!retval && !internal_message)
     internal_message = "Install transaction failed";
 
