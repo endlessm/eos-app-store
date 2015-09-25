@@ -377,8 +377,7 @@ prepare_soup_resume_request (const SoupRequest *request,
       goto out;
     }
 
-  guint64 size = g_file_info_get_attribute_uint64 (info,
-                                                   G_FILE_ATTRIBUTE_STANDARD_SIZE);
+  guint64 size = g_file_info_get_attribute_uint64 (info, G_FILE_ATTRIBUTE_STANDARD_SIZE);
 
   /* No file or nothing downloaded - just get the whole file */
   if (size == 0)
@@ -404,12 +403,18 @@ prepare_soup_resume_request (const SoupRequest *request,
   soup_message_headers_set_range (message->request_headers, size, -1);
   g_object_unref (message);
 
-  *resume_offset = size;
-
   /* If we get to here, we're set on using the partial download */
   using_resume = TRUE;
 
 out:
+  if (resume_offset != NULL)
+    {
+      if (using_resume)
+        *resume_offset = size;
+      else
+        *resumt_offset = 0;
+    }
+
   g_clear_error (&error);
 
   g_clear_object (&file);
@@ -457,7 +462,6 @@ send_progress_to_main_context (GFileProgressCallback  progress_func,
   clos->progress_func = progress_func;
   clos->free_func = free_func;
 
-  /* we need to pass this to the main context */
   g_main_context_invoke_full (NULL, G_PRIORITY_DEFAULT,
                               send_progress_to_caller,
                               clos,
@@ -473,10 +477,12 @@ download_chunk_func (GByteArray *chunk,
   EosDownloadFileClosure *clos = chunk_func_user_data;
 
   if (clos->progress_func != NULL)
-    /* we need to invoke this into the main context */
-    send_progress_to_main_context (clos->progress_func, bytes_read, clos->total_len,
-                                   clos->user_data,
-                                   NULL);
+    {
+      /* we need to invoke this into the main context, as it will update the UI */
+      send_progress_to_main_context (clos->progress_func, bytes_read, clos->total_len,
+                                     clos->user_data,
+                                     NULL);
+    }
 }
 
 static void
@@ -565,8 +571,7 @@ download_from_uri (SoupSession            *session,
    * Here we also return the resuming status since the server could reject our
    * request.
    */
-  in_stream = set_up_download_from_request (request, target_file, cancellable,
-                                            error);
+  in_stream = set_up_download_from_request (request, target_file, cancellable, error);
   if (in_stream == NULL)
     goto out;
 
@@ -599,18 +604,19 @@ download_from_uri (SoupSession            *session,
 
   /* Since we got some data, we can assume that network is back online */
   if (bytes_read > 0)
-      *reset_error_counter = TRUE;
+    *reset_error_counter = TRUE;
 
   /* Emit a progress notification for the whole file if we successfully
    * downloaded it otherwise we want to free the caller's user data later
    * (if failures) due to retries in the caller.
    */
-  if (retval) {
+  if (retval)
+    {
       if (progress_func != NULL)
-          send_progress_to_main_context (progress_func, total, total, user_data,
-                                         free_func);
-      else if (free_func != NULL)
-          free_func (user_data);
+        send_progress_to_main_context (progress_func, total, total, user_data, free_func);
+
+      if (free_func != NULL)
+        free_func (user_data);
     }
 
 out:
