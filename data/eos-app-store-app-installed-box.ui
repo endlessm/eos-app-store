@@ -229,8 +229,6 @@
                     <child>
                       <object class="GtkSpinner" id="_updateSpinner">
                         <property name="visible">True</property>
-                        <property name="width_request">9px</property>
-                        <property name="height_request">9px</property>
                       </object>
                       <packing>
                         <property name="expand">False</property>
