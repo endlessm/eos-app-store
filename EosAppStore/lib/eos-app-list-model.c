@@ -931,8 +931,6 @@ out:
         g_unlink (bundle_path);
       if (signature_path)
         g_unlink (signature_path);
-      if (sha256_path)
-        g_unlink (sha256_path);
     }
   else
     {
@@ -948,6 +946,13 @@ out:
 
       retval = FALSE;
     }
+
+  /* Delete the checksum file regardless of success or failure; we recompute
+   * it locally anyway, so even if we leave the other artifacts for a future
+   * download, we'll easily rebuild the checksum.
+   */
+  if (sha256_path)
+    g_unlink (sha256_path);
 
   /* We're done with the transaction now that we've called CompleteTransaction() */
   g_clear_object (&transaction);
