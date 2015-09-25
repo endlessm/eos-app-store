@@ -166,6 +166,7 @@
 .installed-app-box .app-category {
     color: #cccccc;
     font-size: 8px;
+    font-weight: 300; /* light */
 }
 
 .installed-app-box .app-size {
@@ -173,8 +174,9 @@
 }
 
 .installed-app-box .app-updating {
-    font-size: 9px;
     color: white;
+    font-size: 9px;
+    font-weight: 300; /* light */
 }
 
 .controls-box .controls-separator {
