@@ -988,6 +988,26 @@ out:
       if (transaction != NULL)
         eos_app_manager_transaction_call_cancel_transaction_sync (transaction, NULL, NULL);
 
+      if (g_dbus_error_is_remote_error (error))
+        {
+          /* The app manager uses InvalidFile for errors that deal with
+           * bad input — invalid file, or wrong signature.
+           *
+           * It is harmful to leave these files around in the case when
+           * the transaction fails with this error, because they may fool
+           * the app store into not downloading them again until the next
+           * change in the app version.
+           */
+          g_autofree char *errmsg = g_dbus_error_get_remote_error (error);
+          if (g_strcmp0 (errmsg, "com.endlessm.AppManager.Error.InvalidFile") == 0)
+            {
+              if (bundle_path)
+                g_unlink (bundle_path);
+              if (signature_path)
+                g_unlink (signature_path);
+            }
+        }
+
       /* Bubble the error up */
       g_propagate_error (error_out, error);
 
