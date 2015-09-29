@@ -28,11 +28,15 @@
 
 G_DEFINE_QUARK (eos-net-utils-error-quark, eos_net_utils_error)
 
-/* We need these because libsoup does not come with autoptr macros */
+#if !SOUP_CHECK_VERSION (2, 52, 0)
+/* We need these because libsoup version prior to 2.52
+ * do not come with autoptr macros
+ */
 G_DEFINE_AUTOPTR_CLEANUP_FUNC (SoupSession, g_object_unref)
 G_DEFINE_AUTOPTR_CLEANUP_FUNC (SoupRequest, g_object_unref)
 G_DEFINE_AUTOPTR_CLEANUP_FUNC (SoupMessage, g_object_unref)
 G_DEFINE_AUTOPTR_CLEANUP_FUNC (SoupURI, soup_uri_free)
+#endif
 
 typedef void (* EosChunkFunc) (GByteArray *chunk,
                                goffset     chunk_len,
