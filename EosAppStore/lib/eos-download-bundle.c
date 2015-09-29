@@ -27,7 +27,7 @@ download_app (EosAppInfo *info)
 {
   g_print (" downloading...\n");
 
-  g_autofree char *bundle_path = eos_app_info_download_bundle (info, soup_session, opt_output_dir, opt_use_delta, NULL, NULL, NULL, NULL, NULL);
+  g_autofree char *bundle_path = eos_app_info_download_bundle (info, soup_session, opt_output_dir, opt_use_delta, NULL, NULL, NULL, NULL);
   g_autofree char *sig_path = eos_app_info_download_signature (info, soup_session, opt_output_dir, opt_use_delta, NULL, NULL);
   g_autofree char *hash_path = eos_app_info_create_sha256sum (info, opt_output_dir, opt_use_delta, bundle_path, NULL, NULL);
 

@@ -39,14 +39,6 @@ typedef struct {
   gpointer               user_data;
 } EosDownloadFileClosure;
 
-typedef struct {
-  goffset               current;
-  goffset               total;
-  GFileProgressCallback progress_func;
-  GDestroyNotify        free_func;
-  gpointer              user_data;
-} EosProgressClosure;
-
 static GInputStream *
 set_up_download_from_request (SoupRequest   *request,
                               const char    *target_file,
@@ -419,49 +411,13 @@ out:
 }
 
 static void
-progress_closure_free (gpointer _data)
+send_progress (GFileProgressCallback  progress_func,
+               goffset                bytes_read,
+               goffset                total_len,
+               gpointer               user_data)
 {
-  EosProgressClosure *clos = _data;
-
-  /* Free data from caller if we are on the last invocation */
-  if (clos->free_func)
-    clos->free_func (clos->user_data);
-
-  g_slice_free (EosProgressClosure, _data);
-}
-
-/* Needs to be invoked within main context */
-static gboolean
-send_progress_to_caller (gpointer _data)
-{
-  EosProgressClosure *clos = _data;
-
-  g_assert_nonnull (clos->progress_func);
-
-  clos->progress_func (clos->current, clos->total, clos->user_data);
-
-  return G_SOURCE_REMOVE;
-}
-
-static void
-send_progress_to_main_context (GFileProgressCallback  progress_func,
-                               goffset                bytes_read,
-                               goffset                total_len,
-                               gpointer               user_data,
-                               GDestroyNotify         free_func)
-{
-  EosProgressClosure *clos = g_slice_new (EosProgressClosure);
-  clos->current = bytes_read;
-  clos->total = total_len;
-  clos->user_data = user_data;
-  clos->progress_func = progress_func;
-  clos->free_func = free_func;
-
-  /* we need to pass this to the main context */
-  g_main_context_invoke_full (NULL, G_PRIORITY_DEFAULT,
-                              send_progress_to_caller,
-                              clos,
-                              progress_closure_free);
+  if (progress_func != NULL)
+    progress_func (bytes_read, total_len, user_data);
 }
 
 static void
@@ -471,12 +427,9 @@ download_chunk_func (GByteArray *chunk,
                      gpointer    chunk_func_user_data)
 {
   EosDownloadFileClosure *clos = chunk_func_user_data;
-
-  if (clos->progress_func != NULL)
-    /* we need to invoke this into the main context */
-    send_progress_to_main_context (clos->progress_func, bytes_read, clos->total_len,
-                                   clos->user_data,
-                                   NULL);
+  send_progress (clos->progress_func,
+                 bytes_read, clos->total_len,
+                 clos->user_data);
 }
 
 static void
@@ -529,7 +482,6 @@ download_from_uri (SoupSession            *session,
                    const char             *target_file,
                    const gboolean          allow_resume,
                    GFileProgressCallback   progress_func,
-                   GDestroyNotify          free_func,
                    gpointer                user_data,
                    gboolean               *reset_error_counter,
                    GCancellable           *cancellable,
@@ -581,10 +533,7 @@ download_from_uri (SoupSession            *session,
   goffset total = start_offset + soup_request_get_content_length (request);
 
   /* ensure we emit a progress notification at the beginning */
-  /* we need to invoke this into the main context */
-  if (progress_func != NULL)
-    send_progress_to_main_context (progress_func, start_offset, total,
-                                   user_data, NULL);
+  send_progress (progress_func, start_offset, total, user_data);
 
   EosDownloadFileClosure *clos = g_slice_new0 (EosDownloadFileClosure);
   clos->progress_func = progress_func;
@@ -602,16 +551,10 @@ download_from_uri (SoupSession            *session,
       *reset_error_counter = TRUE;
 
   /* Emit a progress notification for the whole file if we successfully
-   * downloaded it otherwise we want to free the caller's user data later
-   * (if failures) due to retries in the caller.
+   * downloaded it.
    */
-  if (retval) {
-      if (progress_func != NULL)
-          send_progress_to_main_context (progress_func, total, total, user_data,
-                                         free_func);
-      else if (free_func != NULL)
-          free_func (user_data);
-    }
+  if (retval)
+    send_progress (progress_func, total, total, user_data);
 
 out:
   g_clear_object (&in_stream);
@@ -626,7 +569,6 @@ eos_net_utils_download_file_with_retry (SoupSession            *session,
                                         const char             *source_uri,
                                         const char             *target_file,
                                         GFileProgressCallback   progress_func,
-                                        GDestroyNotify          free_func,
                                         gpointer                user_data,
                                         GCancellable           *cancellable,
                                         GError                **error_out)
@@ -647,7 +589,6 @@ eos_net_utils_download_file_with_retry (SoupSession            *session,
         download_success = download_from_uri (session, source_uri, target_file,
                                               TRUE, /* Allow resume */
                                               progress_func,
-                                              free_func,
                                               user_data,
                                               &reset_error_counter,
                                               cancellable,
@@ -701,10 +642,6 @@ eos_net_utils_download_file_with_retry (SoupSession            *session,
 
         eos_app_log_error_message ("Continuing download loop...");
       }
-
-    /* On failures we didn't free the caller's data yet */
-    if (!download_success && free_func)
-      free_func (user_data);
 
     return download_success;
 }

@@ -29,7 +29,6 @@ char * eos_app_info_download_bundle (EosAppInfo *info,
                                      GCancellable *cancellable,
                                      GFileProgressCallback progress_callback,
                                      gpointer progress_user_data,
-                                     GDestroyNotify progress_destroy,
                                      GError **error_out);
 
 char * eos_refresh_available_apps (SoupSession *soup_session,
