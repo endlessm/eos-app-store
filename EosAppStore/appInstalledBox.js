@@ -33,8 +33,8 @@ const AppInstalledBox = new Lang.Class({
         '_updateSpinner',
     ],
 
-    _init: function(model, appInfo) {
-        this.parent(model, appInfo);
+    _init: function(appInfo) {
+        this.parent(appInfo);
 
         let app = Gio.Application.get_default();
         let mainWindow = app.mainWindow;

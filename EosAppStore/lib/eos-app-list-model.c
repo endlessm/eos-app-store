@@ -63,6 +63,7 @@ struct _EosAppListModel
   gboolean caps_loaded;
 
   SoupSession *soup_session;
+  JsonArray *content_apps;
 };
 
 struct _EosAppListModelClass
@@ -97,7 +98,10 @@ download_progress_callback_data_free (gpointer _data)
   g_slice_free (DownloadProgressCallbackData, data);
 }
 
-G_DEFINE_TYPE (EosAppListModel, eos_app_list_model, G_TYPE_OBJECT)
+static void eos_app_list_model_async_initable_iface_init (GAsyncInitableIface *iface);
+G_DEFINE_TYPE_WITH_CODE (EosAppListModel, eos_app_list_model, G_TYPE_OBJECT,
+                         G_IMPLEMENT_INTERFACE (G_TYPE_ASYNC_INITABLE,
+                                                eos_app_list_model_async_initable_iface_init))
 
 static void
 eos_app_list_model_emit_changed (EosAppListModel *self)
@@ -381,14 +385,6 @@ load_user_capabilities (EosAppListModel *self,
 }
 
 static gboolean
-load_available_apps (EosAppListModel *self,
-                     GCancellable *cancellable,
-                     GError **error_out)
-{
-  return eos_load_available_apps (self->apps, self->soup_session, cancellable, error_out);
-}
-
-static gboolean
 load_shell_apps (EosAppListModel *self,
                  GCancellable *cancellable)
 {
@@ -419,21 +415,15 @@ load_shell_apps (EosAppListModel *self,
   return TRUE;
 }
 
-static gboolean
-load_content_apps (EosAppListModel *self,
-                   GCancellable *cancellable)
+static void
+load_content_apps (EosAppListModel *self)
 {
   eos_app_log_debug_message ("Reloading content apps");
 
-  JsonArray *array = eos_app_parse_resource_content ("apps", "content", NULL);
-
-  if (array == NULL)
-    return FALSE;
-
-  guint i, n_elements = json_array_get_length (array);
+  guint i, n_elements = json_array_get_length (self->content_apps);
   for (i = 0; i < n_elements; i++)
     {
-      JsonNode *element = json_array_get_element (array, i);
+      JsonNode *element = json_array_get_element (self->content_apps, i);
 
       JsonObject *obj = json_node_get_object (element);
       if (!json_object_has_member (obj, "application-id"))
@@ -454,106 +444,96 @@ load_content_apps (EosAppListModel *self,
 
       eos_app_info_update_from_content (info, obj);
     }
-
-  json_array_unref (array);
-
-  return TRUE;
 }
 
 static void
-set_reload_error (GError **error,
+set_reload_error (GTask *task,
                   gboolean is_critical)
 {
-  eos_app_log_error_message ("Reload error during refresh");
+  int error_type = EOS_APP_STORE_ERROR_APP_REFRESH_PARTIAL_FAILURE;
+  char *error_message = _("We are unable to load the complete list of "
+                          "applications");
 
-  if (*error == NULL || is_critical)
+  eos_app_log_error_message ("Error during refresh");
+
+  if (is_critical)
     {
-      int error_type = EOS_APP_STORE_ERROR_APP_REFRESH_PARTIAL_FAILURE;
-      char *error_message = _("We are unable to load the complete list of "
-                              "applications");
-
-      if (is_critical)
-        {
-          g_clear_error (error);
-
-          error_type = EOS_APP_STORE_ERROR_APP_REFRESH_FAILURE;
-          error_message = _("We were unable to update the list of applications");
-        }
-
-      g_set_error_literal (error, EOS_APP_STORE_ERROR, error_type,
-                           error_message);
+      error_type = EOS_APP_STORE_ERROR_APP_REFRESH_FAILURE;
+      error_message = _("We were unable to update the list of applications");
     }
+
+  g_task_return_new_error (task, EOS_APP_STORE_ERROR, error_type,
+                           "%s", error_message);
 }
 
 static gboolean
-reload_model (EosAppListModel *self,
-              GCancellable *cancellable,
-              GError **error)
+eos_app_list_model_init_finish (GAsyncInitable *initable,
+                                GAsyncResult *result,
+                                GError **error)
 {
-  /* Since each step can fail independently, we assume a success result
-   * unless any of the loading steps explicitly flips the flag
-   */
-  gboolean retval = TRUE;
+  return g_task_propagate_boolean (G_TASK (result), error);
+}
 
-  GError *internal_error = NULL;
+static void
+init_model_thread_func (GTask *task,
+                        gpointer source_object,
+                        gpointer task_data,
+                        GCancellable *cancellable)
+{
+  EosAppListModel *self = source_object;
+  GError *error = NULL;
+
+  self->content_apps = eos_app_parse_resource_content ("apps", "content", &error);
+  if (error != NULL)
+    {
+      g_task_return_error (task, error);
+      return;
+    }
 
   eos_app_load_gio_apps (self->apps);
 
-  if (!eos_app_load_installed_apps (self->apps, cancellable))
+  if (!load_user_capabilities (self, cancellable, &error))
     {
-      set_reload_error (error, FALSE);
-
-      retval = FALSE;
+      g_task_return_error (task, error);
+      return;
     }
 
-  if (!load_available_apps (self, cancellable, &internal_error))
+  if (!eos_app_load_installed_apps (self->apps, cancellable))
+    {
+      set_reload_error (task, FALSE);
+      return;
+    }
+
+  /* This will load the (possibly stale) last cached updates.json,
+   * so we ignore errors.
+   */
+  if (!eos_app_load_available_apps (self->apps, cancellable, &error))
     {
       /* We eat the message */
-      g_error_free (internal_error);
-
-      set_reload_error (error, FALSE);
-
-      retval = FALSE;
+      g_error_free (error);
     }
 
   if (!load_shell_apps (self, cancellable))
     {
-      set_reload_error (error, TRUE);
-
-      retval = FALSE;
+      set_reload_error (task, TRUE);
+      return;
     }
 
-  if (!load_content_apps (self, cancellable))
-    {
-      set_reload_error (error, TRUE);
+  load_content_apps (self);
 
-      retval = FALSE;
-    }
-
-  return retval;
+  g_task_return_boolean (task, TRUE);
 }
 
-static gboolean
-load_all_apps (EosAppListModel *self,
-               GCancellable *cancellable,
-               GError **error)
+static void
+eos_app_list_model_init_async (GAsyncInitable *initable,
+                               int io_priority,
+                               GCancellable *cancellable,
+                               GAsyncReadyCallback callback,
+                               gpointer user_data)
 {
-  GError *internal_error = NULL;
-  gboolean retval = reload_model (self, cancellable, &internal_error);
-
-  if (!retval)
-    {
-      eos_app_log_debug_message ("Model reload error. Propagating error up.");
-
-      /* Sanity check */
-      g_assert_nonnull (internal_error);
-
-      g_assert_true (internal_error->domain == EOS_APP_STORE_ERROR);
-
-      g_propagate_error (error, internal_error);
-    }
-
-  return retval;
+  GTask *task = g_task_new (initable, cancellable, callback, user_data);
+  g_task_run_in_thread (task, init_model_thread_func);
+  g_object_unref (task);
 }
 
 static void
@@ -574,6 +554,7 @@ eos_app_list_model_finalize (GObject *gobject)
       self->refresh_guard_id = 0;
     }
 
+  g_clear_pointer (&self->content_apps, json_array_unref);
   g_clear_object (&self->soup_session);
 
   g_clear_object (&self->app_monitor);
@@ -583,6 +564,13 @@ eos_app_list_model_finalize (GObject *gobject)
   g_hash_table_unref (self->apps);
 
   G_OBJECT_CLASS (eos_app_list_model_parent_class)->finalize (gobject);
+}
+
+static void
+eos_app_list_model_async_initable_iface_init (GAsyncInitableIface *iface)
+{
+  iface->init_async = eos_app_list_model_init_async;
+  iface->init_finish = eos_app_list_model_init_finish;
 }
 
 static void
@@ -646,56 +634,78 @@ eos_app_list_model_init (EosAppListModel *self)
       eos_net_utils_add_soup_logger (self->soup_session);
 }
 
-EosAppListModel *
-eos_app_list_model_new (void)
+void
+eos_app_list_model_new_async (GCancellable *cancellable,
+                              GAsyncReadyCallback callback,
+                              gpointer user_data)
 {
-  return g_object_new (EOS_TYPE_APP_LIST_MODEL, NULL);
+  g_async_initable_new_async (EOS_TYPE_APP_LIST_MODEL, G_PRIORITY_DEFAULT,
+                              cancellable, callback, user_data,
+                              NULL);
+}
+
+EosAppListModel *
+eos_app_list_model_new_finish (GAsyncResult *result,
+                               GError **error)
+{
+  GAsyncInitable *initable = G_ASYNC_INITABLE (g_async_result_get_source_object (result));
+  return EOS_APP_LIST_MODEL (g_async_initable_new_finish (initable, result, error));
 }
 
 static void
-refresh_thread_func (GTask *task,
-                     gpointer source_object,
-                     gpointer task_data,
-                     GCancellable *cancellable)
+refresh_network_thread_func (GTask *task,
+                             gpointer source_object,
+                             gpointer task_data,
+                             GCancellable *cancellable)
 {
-  EosAppListModel *model = source_object;
-  GError *error = NULL;
+  EosAppListModel *self = source_object;
+  GError *internal_error = NULL;
+  char *data;
 
-  if (!load_user_capabilities (model, cancellable, &error))
+  data = eos_refresh_available_apps (self->soup_session,
+                                     cancellable, &internal_error);
+  if (internal_error != NULL)
     {
-      g_task_return_error (task, error);
+      /* We eat the message */
+      g_error_free (internal_error);
+
+      set_reload_error (task, FALSE);
       return;
     }
 
-  if (!load_all_apps (model, cancellable, &error))
-    {
-      eos_app_log_info_message ("Failed to load apps. "
-                                "Returning error to dbus invoker");
-
-      g_task_return_error (task, error);
-      return;
-    }
-
-  g_task_return_boolean (task, TRUE);
+  g_task_return_pointer (task, data, g_free);
 }
 
 void
-eos_app_list_model_refresh_async (EosAppListModel *model,
-                                  GCancellable *cancellable,
-                                  GAsyncReadyCallback callback,
-                                  gpointer user_data)
+eos_app_list_model_refresh_network_async (EosAppListModel *model,
+                                          GCancellable *cancellable,
+                                          GAsyncReadyCallback callback,
+                                          gpointer user_data)
 {
   GTask *task = g_task_new (model, cancellable, callback, user_data);
-  g_task_run_in_thread (task, refresh_thread_func);
+  g_task_run_in_thread (task, refresh_network_thread_func);
   g_object_unref (task);
 }
 
 gboolean
-eos_app_list_model_refresh_finish (EosAppListModel *model,
-                                   GAsyncResult *result,
-                                   GError **error)
+eos_app_list_model_refresh_network_finish (EosAppListModel *model,
+                                           GAsyncResult *result,
+                                           GError **error)
 {
-  return g_task_propagate_boolean (G_TASK (result), error);
+  char *data = g_task_propagate_pointer (G_TASK (result), error);
+  gboolean res;
+
+  if (data == NULL)
+    return FALSE;
+
+  res = eos_app_load_available_apps_from_data (model->apps, data, NULL, error);
+  g_free (data);
+
+  /* Now refresh content attributes */
+  if (res)
+    load_content_apps (model);
+
+  return res;
 }
 
 static gboolean
@@ -1295,15 +1305,11 @@ eos_app_list_model_get_apps_for_category (EosAppListModel *model,
                                           EosAppCategory category)
 {
   GList *apps = NULL;
-  JsonArray *array = eos_app_parse_resource_content ("apps", "content", NULL);
 
-  if (array == NULL)
-    return NULL;
-
-  guint i, n_elements = json_array_get_length (array);
+  guint i, n_elements = json_array_get_length (model->content_apps);
   for (i = 0; i < n_elements; i++)
     {
-      JsonNode *element = json_array_get_element (array, i);
+      JsonNode *element = json_array_get_element (model->content_apps, i);
 
       JsonObject *obj = json_node_get_object (element);
       const char *category_id = json_object_get_string_member (obj, "category");
@@ -1316,18 +1322,13 @@ eos_app_list_model_get_apps_for_category (EosAppListModel *model,
           const char *app_id = json_object_get_string_member (obj, "application-id");
           char *desktop_id = g_strconcat (app_id, ".desktop", NULL);
 
-          EosAppInfo *info = g_hash_table_lookup (model->apps, desktop_id);
-          if (info == NULL)
-            info = get_localized_app_info (model, desktop_id);
-
+          EosAppInfo *info = eos_app_list_model_get_app_info (model, desktop_id);
           g_free (desktop_id);
 
           if (info != NULL)
             apps = g_list_prepend (apps, info);
         }
     }
-
-  json_array_unref (array);
 
   return g_list_reverse (apps);
 }
@@ -1608,7 +1609,7 @@ eos_app_list_model_create_from_filename (EosAppListModel *model,
       info = eos_app_info_new (app_id);
       g_free (app_id);
 
-      g_hash_table_replace (model->apps, g_strdup (desktop_id), info);
+      g_hash_table_insert (model->apps, g_strdup (desktop_id), info);
     }
 
   eos_app_info_update_from_gio (info, desktop_info);

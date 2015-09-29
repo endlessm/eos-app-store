@@ -267,11 +267,10 @@ out:
   return updates_current;
 }
 
-gboolean
-eos_load_available_apps (GHashTable *apps,
-                         SoupSession *soup_session,
-                         GCancellable *cancellable,
-                         GError **error_out)
+char *
+eos_refresh_available_apps (SoupSession *soup_session,
+                            GCancellable *cancellable,
+                            GError **error_out)
 {
   eos_app_log_debug_message ("Reloading available apps");
 
@@ -323,23 +322,10 @@ eos_load_available_apps (GHashTable *apps,
           g_free (target);
           g_propagate_error (error_out, error);
 
-          return FALSE;
+          return NULL;
         }
     }
 
-  if (!eos_app_load_available_apps (apps, data, cancellable, &error))
-    {
-      eos_app_log_error_message ("Parsing of all updates failed: %s",
-                                 error->message);
-
-      g_free (data);
-      g_propagate_error (error_out, error);
-
-      return FALSE;
-    }
-
-  g_free (data);
   g_free (target);
-
-  return TRUE;
+  return data;
 }

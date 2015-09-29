@@ -21,7 +21,7 @@ const Notify = imports.notify;
 const Path = imports.path;
 const ShellAppStore = imports.shellAppStore;
 
-const APP_STORE_CSS = 'resource:///com/endlessm/appstore/eos-app-store.css';
+const APP_STORE_CSS = '/com/endlessm/appstore/eos-app-store.css';
 
 const APP_STORE_NAME = 'com.endlessm.AppStore';
 
@@ -58,18 +58,15 @@ const AppStore = new Lang.Class({
 
         // main style provider
         let provider = new Gtk.CssProvider();
-        provider.load_from_file(Gio.File.new_for_uri(APP_STORE_CSS));
+        provider.load_from_resource(APP_STORE_CSS);
         Gtk.StyleContext.add_provider_for_screen(Gdk.Screen.get_default(), provider,
                                                  Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION);
 
         // The app store shell proxy
         this._shellProxy = new ShellAppStore.ShellAppStore();
 
-        // The backing app list model
-        this._appModel = new EosAppStorePrivate.AppListModel();
-
         // Main list model
-        this._appList = new AppListModel.AppList();
+        this._appListModel = new AppListModel.AppListModel();
 
         // No window by default
         this._mainWindow = null;
@@ -79,27 +76,21 @@ const AppStore = new Lang.Class({
         this._createMainWindow();
 
         if (this.debugWindow) {
-            this._mainWindow.showPage(Gdk.CURRENT_TIME);
+            this.showPage(Gdk.CURRENT_TIME, Categories.DEFAULT_APP_CATEGORY);
         }
     },
 
     _createMainWindow: function() {
         if (this._mainWindow == null) {
             this._mainWindow = new AppStoreWindow.AppStoreWindow(this);
+            this._mainWindow.populate();
             this._mainWindow.connect('notify::visible',
                                      Lang.bind(this, this._onVisibilityChanged));
-
-            // set initial page
-            this._mainWindow.changePage(Categories.DEFAULT_APP_CATEGORY);
         }
     },
 
-    get appModel() {
-        return this._appModel;
-    },
-
-    get appList() {
-        return this._appList;
+    get appListModel() {
+        return this._appListModel;
     },
 
     get debugWindow() {
@@ -116,7 +107,10 @@ const AppStore = new Lang.Class({
 
     show: function(timestamp, reset) {
         this._createMainWindow();
-        this._mainWindow.doShow(timestamp, reset);
+        if (reset) {
+            this._mainWindow.resetCurrentPage();
+        }
+        this._mainWindow.present_with_time(timestamp);
     },
 
     hide: function() {
@@ -130,8 +124,8 @@ const AppStore = new Lang.Class({
         if (page == 'apps')
             page = Categories.DEFAULT_APP_CATEGORY;
 
-        this._mainWindow.changePage(page);
-        this._mainWindow.showPage(timestamp);
+        this._mainWindow.pageManager.showPage(page);
+        this._mainWindow.present_with_time(timestamp);
     },
 
     _clearMainWindow: function() {

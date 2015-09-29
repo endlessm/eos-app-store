@@ -5,6 +5,7 @@ const EosAppStorePrivate = imports.gi.EosAppStorePrivate;
 
 const AppInfoBox = imports.appInfoBox;
 const AppInstalledBox = imports.appInstalledBox;
+const AppStorePages = imports.appStorePages;
 const Builder = imports.builder;
 const Categories = imports.categories;
 const Lang = imports.lang;
@@ -22,7 +23,7 @@ const AppFrame = new Lang.Class({
     Name: 'AppFrame',
     Extends: Gtk.Frame,
 
-    _init: function(model, mainWindow, categoryId) {
+    _init: function(category) {
         this.parent();
 
         this.get_style_context().add_class('app-frame');
@@ -33,9 +34,10 @@ const AppFrame = new Lang.Class({
                                       vexpand: true });
         this.add(this._stack);
 
-        this._categoryId = categoryId;
-        this._mainWindow = mainWindow;
-        this._model = model;
+        let app = Gio.Application.get_default();
+        this._category = category;
+        this._mainWindow = app.mainWindow;
+        this._model = app.appListModel;
         this._view = null;
 
         // Where the content goes once the frame is populated
@@ -65,6 +67,7 @@ const AppFrame = new Lang.Class({
                                           hexpand: true,
                                           vexpand: true });
         this._spinnerBox.add(this._spinner);
+        this.spinning = true;
 
         this._backClickedId = 0;
         this.connect('destroy', Lang.bind(this, this._onDestroy));
@@ -123,10 +126,6 @@ const AppFrame = new Lang.Class({
             this.spinning = false;
     },
 
-    get categoryId() {
-        return this._categoryId;
-    },
-
     _createView: function() {
         // to be overridden
     },
@@ -140,8 +139,12 @@ const AppFrame = new Lang.Class({
             return;
         }
 
+        if (this._model.loading) {
+            return;
+        }
+
         this.view = this._createView();
-        let appInfos = this._prepareAppInfos(this.model.loadCategory(this._categoryId));
+        let appInfos = this._prepareAppInfos(this._model.loadCategory(this._category.id));
 
         // 'Installed' only shows apps available on the system
         for (let i in appInfos) {
@@ -150,10 +153,10 @@ const AppFrame = new Lang.Class({
     },
 
     _showView: function() {
-        this.mainWindow.clearHeaderState();
+        this._mainWindow.clearHeaderState();
 
         if (this._backClickedId != 0) {
-            this.mainWindow.disconnect(this._backClickedId);
+            this._mainWindow.disconnect(this._backClickedId);
             this._backClickedId = 0;
         }
 
@@ -161,10 +164,18 @@ const AppFrame = new Lang.Class({
         this._stack.set_visible_child_full(CONTENT_PAGE, Gtk.StackTransitionType.SLIDE_RIGHT);
     },
 
+    getIcon: function() {
+        return this._category.icon;
+    },
+
+    getName: function() {
+        return this._category.label;
+    },
+
     showAppInfoBox: function(appInfo) {
         let desktopId = appInfo.get_desktop_id();
         if (!this._stack.get_child_by_name(desktopId)) {
-            let appBox = new AppInfoBox.AppInfoBox(this._model, appInfo);
+            let appBox = new AppInfoBox.AppInfoBox(appInfo);
             this._stack.add_named(appBox, desktopId);
             appBox.show();
         }
@@ -181,13 +192,18 @@ const AppFrame = new Lang.Class({
             this._mainWindow.connect('back-clicked', Lang.bind(this, this._showView));
     },
 
+    invalidate: function() {
+        let child = this.scrollWindow.get_child();
+        if (child)
+            child.destroy();
+
+        this.view = null;
+    },
+
     reset: function() {
         if (this.spinning) {
             return;
         }
-
-        this.scrollWindow.get_child().destroy();
-        this.view = null;
 
         this._showView();
     }
@@ -196,10 +212,6 @@ const AppFrame = new Lang.Class({
 const AppInstalledFrame = new Lang.Class({
     Name: 'AppInstalledFrame',
     Extends: AppFrame,
-
-    _init: function(model, mainWindow) {
-        this.parent(model, mainWindow, EosAppStorePrivate.AppCategory.INSTALLED);
-    },
 
     _listHeaderFunc: function(row, before) {
         if (before) {
@@ -221,7 +233,7 @@ const AppInstalledFrame = new Lang.Class({
     },
 
     _createViewElement: function(info) {
-        let row = new AppInstalledBox.AppInstalledBox(this.model, info);
+        let row = new AppInstalledBox.AppInstalledBox(info);
         this.view.add(row);
         row.show();
     },
@@ -239,7 +251,7 @@ const AppInstalledFrame = new Lang.Class({
         this.showAppInfoBox(installedBox.appInfo);
     },
 
-    get title() {
+    getTitle: function() {
         return _("Installed apps");
     }
 });
@@ -248,8 +260,8 @@ const AppCategoryFrame = new Lang.Class({
     Name: 'AppCategoryFrame',
     Extends: AppFrame,
 
-    _init: function(categoryId, model, mainWindow) {
-        this.parent(model, mainWindow, categoryId);
+    _init: function(category) {
+        this.parent(category);
 
         this._lastCellSelected = null;
     },
@@ -296,39 +308,50 @@ const AppCategoryFrame = new Lang.Class({
         this.showAppInfoBox(cell.app_info);
     },
 
-    get title() {
+    getTitle: function() {
         return _("Install apps");
     }
 });
 
-const AppBroker = new Lang.Class({
-    Name: 'AppBroker',
+const AppPageProvider = new Lang.Class({
+    Name: 'AppPageProvider',
+    Implements: [AppStorePages.AppStorePageProvider],
 
-    _init: function(mainWindow) {
-        this._mainWindow = mainWindow;
-
-        // initialize the applications model
-        let application = Gio.Application.get_default();
-        this._model = application.appList;
-        this._model.refresh(Lang.bind(this, this._onModelRefresh));
-
+    _init: function() {
+        let app = Gio.Application.get_default();
+        this._model = app.appListModel;
+        this._pageManager = app.mainWindow.pageManager;
         this._categories = Categories.get_app_categories();
-        this._categories.forEach(Lang.bind(this, function(category) {
-            if (category.id == EosAppStorePrivate.AppCategory.INSTALLED) {
-                category.widget = new AppInstalledFrame(this._model, mainWindow);
-            } else {
-                category.widget = new AppCategoryFrame(category.id, this._model, mainWindow);
-            }
-            category.widget.spinning = true;
-        }));
+
+        this._model.connect('loading-changed', Lang.bind(this, this._onModelLoadingChanged));
+        this._onModelLoadingChanged();
+    },
+
+    _onModelLoadingChanged: function(model) {
+        if (this._model.loading) {
+            return;
+        }
+
+        let activePageId = this._pageManager.visible_child_name;
+
+        // refresh current page if it belongs to us
+        if (this._findCategory(activePageId)) {
+            let page = this._pageManager.visible_child;
+            page.invalidate();
+            page.populate();
+        }
+
+        this._model.refresh(Lang.bind(this, this._onModelRefresh));
     },
 
     _onModelRefresh: function(error) {
         if (error) {
             if (error.matches(EosAppStorePrivate.app_store_error_quark(),
                               EosAppStorePrivate.AppStoreError.APP_REFRESH_FAILURE)) {
+                let app = Gio.Application.get_default();
+
                 // Show the error dialog
-                let dialog = new Gtk.MessageDialog({ transient_for: this._mainWindow,
+                let dialog = new Gtk.MessageDialog({ transient_for: app._mainWindow,
                                                      modal: true,
                                                      destroy_with_parent: true,
                                                      text: _("Refresh failed"),
@@ -346,16 +369,41 @@ const AppBroker = new Lang.Class({
             }
         }
 
-        this._populateAllCategories();
-    },
-
-    _populateAllCategories: function() {
+        // invalidate all the pages
+        let activePageId = this._pageManager.visible_child_name;
         this._categories.forEach(Lang.bind(this, function(c) {
-            c.widget.populate();
+            let page = this._pageManager.get_child_by_name(c.name);
+            page.invalidate();
         }));
+
+        // repopulate current page if it belongs to us
+        if (this._findCategory(activePageId)) {
+            let page = this._pageManager.visible_child;
+            page.populate();
+        }
     },
 
-    get categories() {
-        return this._categories;
+    _findCategory: function(pageId) {
+        for (let category of this._categories) {
+            if (category.name == pageId)
+                return category;
+        }
+
+        return null;
+    },
+
+    createPage: function(pageId) {
+        let category = this._findCategory(pageId);
+        if (category.id == EosAppStorePrivate.AppCategory.INSTALLED) {
+            return new AppInstalledFrame(category);
+        }
+
+        return new AppCategoryFrame(category);
+    },
+
+    getPageIds: function() {
+        return this._categories.map(function(c) {
+            return c.name;
+        });
     }
 });

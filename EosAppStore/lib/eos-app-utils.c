@@ -358,14 +358,7 @@ eos_app_parse_resource_content (const char *content_type,
     }
 
   JsonNode *node = json_parser_get_root (parser);
-  if (!JSON_NODE_HOLDS_ARRAY (node))
-    {
-      g_set_error (error_out,
-                   JSON_READER_ERROR,
-                   JSON_READER_ERROR_NO_ARRAY,
-                   "Expected array content");
-      goto out_error;
-    }
+  g_assert (JSON_NODE_HOLDS_ARRAY (node));
 
   content_array = json_node_dup_array (node);
 
@@ -421,7 +414,14 @@ eos_link_load_content (EosLinkCategory category)
   JsonObject *obj;
   const gchar *category_name;
 
-  JsonArray *categories_array = eos_app_parse_resource_content (APP_STORE_CONTENT_LINKS, get_os_personality (), NULL);
+  static gboolean content_loaded = FALSE;
+  JsonArray *categories_array = NULL;
+
+  if (!content_loaded)
+    {
+      content_loaded = TRUE;
+      categories_array = eos_app_parse_resource_content (APP_STORE_CONTENT_LINKS, get_os_personality (), NULL);
+    }
 
   if (categories_array == NULL)
     return NULL;
@@ -739,26 +739,17 @@ eos_app_load_installed_apps (GHashTable *app_info,
 
       char *desktop_id = g_strconcat (appid, ".desktop", NULL);
       EosAppInfo *info = g_hash_table_lookup (app_info, desktop_id);
-      g_free (desktop_id);
 
       if (info == NULL)
-        info = eos_app_info_new (appid);
-      else
-        g_object_ref (info);
+        {
+          info = eos_app_info_new (appid);
+          g_hash_table_insert (app_info, g_strdup (desktop_id), info);
+        }
 
       if (eos_app_info_update_from_installed (info, info_path))
-        {
-          g_hash_table_replace (app_info,
-                                g_strdup (eos_app_info_get_desktop_id (info)),
-                                info);
-          n_bundles += 1;
-        }
-      else
-        {
-          eos_app_log_error_message ("App '%s' failed to update from installed info", appid);
-          g_object_unref (info);
-        }
+        n_bundles += 1;
 
+      g_free (desktop_id);
       g_free (info_path);
     }
 
@@ -978,9 +969,29 @@ is_server_record_valid (JsonNode *element)
 
 gboolean
 eos_app_load_available_apps (GHashTable *app_info,
-                             const char *data,
                              GCancellable *cancellable,
                              GError **error)
+{
+  char *path;
+  char *data = NULL;
+  gboolean res = FALSE;
+
+  path = eos_get_updates_file ();
+  if (g_file_get_contents (path, &data, NULL, error))
+    res = eos_app_load_available_apps_from_data (app_info, data,
+                                                 cancellable, error);
+
+  g_free (data);
+  g_free (path);
+
+  return res;
+}
+
+gboolean
+eos_app_load_available_apps_from_data (GHashTable *app_info,
+                                       const char *data,
+                                       GCancellable *cancellable,
+                                       GError **error)
 {
   JsonParser *parser = json_parser_new ();
   gboolean retval = FALSE;
@@ -1299,7 +1310,7 @@ eos_app_load_gio_apps (GHashTable *app_info)
       if (info == NULL)
         {
           info = eos_app_info_new (app_id);
-          g_hash_table_replace (app_info, g_strdup (sanitized_desktop_id), info);
+          g_hash_table_insert (app_info, g_strdup (sanitized_desktop_id), info);
         }
 
       g_free (app_id);

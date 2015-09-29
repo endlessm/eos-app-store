@@ -3,6 +3,7 @@
 
 #include "config.h"
 
+#include "eos-app-utils.h"
 #include "eos-downloader.h"
 
 #include <stdlib.h>
@@ -72,8 +73,13 @@ static gboolean
 inited (gpointer user_data)
 {
   g_autoptr(GError) error = NULL;
+  g_autofree char *data;
 
-  if (!eos_load_available_apps (apps, soup_session, NULL, &error))
+  data = eos_refresh_available_apps (soup_session, NULL, &error);
+  if (data != NULL)
+    eos_app_load_available_apps_from_data (apps, data, NULL, &error);
+
+  if (error != NULL)
     {
       g_printerr ("Could not load available apps: %s\n", error->message);
       exit (EXIT_FAILURE);
