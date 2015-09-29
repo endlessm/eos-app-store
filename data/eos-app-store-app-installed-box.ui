@@ -198,8 +198,8 @@
                         <property name="label" translatable="yes">SIZE</property>
                         <property name="ellipsize">end</property>
                         <property name="margin_end">10</property>
-                        <property name="width_chars">10</property>
-                        <property name="max_width_chars">10</property>
+                        <property name="width_chars">15</property>
+                        <property name="max_width_chars">15</property>
                       </object>
                       <style>
                         <class name="app-size"/>

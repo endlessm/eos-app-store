@@ -81,7 +81,7 @@ const AppInstalledBox = new Lang.Class({
 
     set sizeText(v) {
         if (v == 0) {
-            this._sizeText.label = '';
+            this._sizeText.label = _("System App");
         } else {
             this._sizeText.label = GLib.format_size(v);
         }
