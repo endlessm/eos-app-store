@@ -30,6 +30,9 @@
 
 #define FALLBACK_LANG   "-en"
 
+/* gdbus-codegen does not generate autoptr macros for us */
+G_DEFINE_AUTOPTR_CLEANUP_FUNC (EosAppManagerTransaction, g_object_unref)
+
 /* HACK: This will be revisited for the next release,
  * but for now we have a limited number of app language ids,
  * with no country codes, so we can iterate through them
@@ -854,19 +857,18 @@ get_bundle_artifacts (EosAppListModel *self,
                       GCancellable *cancellable,
                       GError **error_out)
 {
-  GError *error = NULL;
-  gboolean retval = FALSE;
-
-  char *download_dir = NULL;
-  char *bundle_path = NULL;
-  char *signature_path = NULL;
-
-  gboolean use_delta = allow_deltas && is_upgrade &&
-    eos_app_info_get_has_delta_update (info);
+  gboolean use_delta = allow_deltas &&
+                       is_upgrade &&
+                       eos_app_info_get_has_delta_update (info);
 
   eos_app_log_info_message ("Accessing dbus transaction");
 
-  EosAppManagerTransaction *transaction =
+  g_autofree char *download_dir = NULL;
+  g_autofree char *bundle_path = NULL;
+  g_autofree char *signature_path = NULL;
+
+  GError *error = NULL;
+  g_autoptr(EosAppManagerTransaction) transaction =
     eos_app_manager_transaction_proxy_new_sync (self->system_bus,
                                                 G_DBUS_PROXY_FLAGS_NONE,
                                                 "com.endlessm.AppManager",
@@ -874,6 +876,8 @@ get_bundle_artifacts (EosAppListModel *self,
                                                 cancellable,
                                                 &error);
   g_dbus_proxy_set_default_timeout (G_DBUS_PROXY (transaction), G_MAXINT);
+
+  gboolean retval = FALSE;
 
   if (error != NULL)
     {
@@ -936,14 +940,16 @@ get_bundle_artifacts (EosAppListModel *self,
   EosStorageType storage_type;
 
   if (is_upgrade)
-    /* Update to the location where the app currently is.
-     * In case we don't have enough space on that location, the app
-     * manager will return a failure.
-     * In the future we probably want to be smarter and move things around
-     * when an update is requested and free space is found on at least
-     * one storage.
-     */
-    storage_type = eos_app_info_get_storage_type (info);
+    {
+      /* Update to the location where the app currently is.
+       * In case we don't have enough space on that location, the app
+       * manager will return a failure.
+       * In the future we probably want to be smarter and move things around
+       * when an update is requested and free space is found on at least
+       * one storage.
+       */
+      storage_type = eos_app_info_get_storage_type (info);
+    }
   else
     storage_type = eos_app_info_get_install_storage_type (info);
 
@@ -1013,12 +1019,6 @@ out:
 
       retval = FALSE;
     }
-
-  /* We're done with the transaction now that we've called CompleteTransaction() */
-  g_clear_object (&transaction);
-  g_free (bundle_path);
-  g_free (signature_path);
-  g_free (download_dir);
 
   return retval;
 }
