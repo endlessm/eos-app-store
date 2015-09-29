@@ -1802,7 +1802,16 @@ verify_checksum_hash (const char    *source_file,
 
 gboolean
 eos_app_utils_verify_checksum (const char *bundle_file,
-                               const char *checksum_str)
+                               const char *checksum_str,
+                               GError **error)
 {
-  return verify_checksum_hash (bundle_file, checksum_str, G_CHECKSUM_SHA256);
+  gboolean res = verify_checksum_hash (bundle_file, checksum_str, G_CHECKSUM_SHA256);
+
+  if (!res)
+    g_set_error_literal (error, EOS_APP_STORE_ERROR,
+                         EOS_APP_STORE_ERROR_CHECKSUM_MISSING,
+                         _("Could not verify the bundle, the download is "
+                           "perhaps incomplete or corrupted"));
+
+  return res;
 }

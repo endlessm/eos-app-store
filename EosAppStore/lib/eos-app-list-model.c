@@ -860,7 +860,6 @@ get_bundle_artifacts (EosAppListModel *self,
   char *download_dir = NULL;
   char *bundle_path = NULL;
   char *signature_path = NULL;
-  char *sha256_path = NULL;
 
   gboolean use_delta = allow_deltas && is_upgrade &&
     eos_app_info_get_has_delta_update (info);
@@ -917,14 +916,18 @@ get_bundle_artifacts (EosAppListModel *self,
       goto out;
     }
 
-  eos_app_log_info_message ("Persisting hash");
-  sha256_path = eos_app_info_create_sha256sum (info,
-                                               download_dir,
-                                               use_delta, bundle_path,
-                                               cancellable, &error);
+  g_autofree char *checksum = NULL;
+  eos_app_log_info_message ("Checking bundle checksum");
+  checksum = eos_app_info_get_checksum (info, use_delta, &error);
   if (error != NULL)
     {
-      eos_app_log_error_message ("Hash download failed: %s", error->message);
+      eos_app_log_error_message ("Checksum not available: %s", error->message);
+      goto out;
+    }
+
+  if (!eos_app_utils_verify_checksum (bundle_path, checksum, &error))
+    {
+      eos_app_log_error_message ("Checksum failed: %s", error->message);
       goto out;
     }
 
@@ -959,7 +962,6 @@ get_bundle_artifacts (EosAppListModel *self,
   g_variant_builder_add (&opts, "{sv}", "StorageType", g_variant_new_take_string (eos_storage_type_to_string (storage_type)));
   g_variant_builder_add (&opts, "{sv}", "BundlePath", g_variant_new_string (bundle_path));
   g_variant_builder_add (&opts, "{sv}", "SignaturePath", g_variant_new_string (signature_path));
-  g_variant_builder_add (&opts, "{sv}", "ChecksumPath", g_variant_new_string (sha256_path));
 
   eos_app_manager_transaction_call_complete_transaction_sync (transaction,
                                                               g_variant_builder_end (&opts),
@@ -976,8 +978,6 @@ out:
         g_unlink (bundle_path);
       if (signature_path)
         g_unlink (signature_path);
-      if (sha256_path)
-        g_unlink (sha256_path);
     }
   else
     {
@@ -998,8 +998,6 @@ out:
   g_clear_object (&transaction);
   g_free (bundle_path);
   g_free (signature_path);
-  g_free (sha256_path);
-
   g_free (download_dir);
 
   return retval;

@@ -98,7 +98,8 @@ typedef enum {
 } EosAppUtilsError;
 
 gboolean eos_app_utils_verify_checksum (const char *bundle_file,
-                                        const char *checksum_str);
+                                        const char *checksum_str,
+                                        GError **error);
 
 G_END_DECLS
 

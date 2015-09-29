@@ -8,13 +8,6 @@
 #include <libsoup/soup.h>
 #include "eos-app-info.h"
 
-char * eos_app_info_create_sha256sum (EosAppInfo *info,
-                                      const char *download_dir,
-                                      gboolean use_delta,
-                                      const char *bundle_path,
-                                      GCancellable *cancellable,
-                                      GError **error_out);
-
 char * eos_app_info_download_signature (EosAppInfo *info,
                                         SoupSession *soup_session,
                                         const char *download_dir,
