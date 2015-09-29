@@ -97,6 +97,10 @@ typedef enum {
   EOS_APP_UTILS_ERROR_JSON_UNEXPECTED_VALUE
 } EosAppUtilsError;
 
+gboolean eos_app_utils_verify_checksum (const char *bundle_file,
+                                        const char *checksum_str,
+                                        GError **error);
+
 G_END_DECLS
 
 #endif /* EOS_APP_UTILS_H */

@@ -745,6 +745,40 @@ eos_app_info_get_storage_type (const EosAppInfo *info)
   return info->storage_type;
 }
 
+/**
+ * eos_app_info_get_checksum:
+ * @info:
+ * @use_delta:
+ * @error:
+ *
+ * ...
+ *
+ * Returns: (transfer none):
+ */
+const char *
+eos_app_info_get_checksum (const EosAppInfo *info,
+                           gboolean          use_delta,
+                           GError          **error)
+{
+  const char *bundle_hash = NULL;
+
+  if (use_delta)
+    bundle_hash = eos_app_info_get_delta_bundle_hash (info);
+  else
+    bundle_hash = eos_app_info_get_bundle_hash (info);
+
+  if (bundle_hash == NULL || *bundle_hash == '\0')
+    {
+      g_set_error (error, EOS_APP_STORE_ERROR,
+                   EOS_APP_STORE_ERROR_CHECKSUM_MISSING,
+                   _("No verification available for app '%s'"),
+                   eos_app_info_get_title (info));
+      return NULL;
+    }
+
+  return bundle_hash;
+}
+
 /*< private >
  * check_info_storage:
  * @info: the #EosAppInfo to update

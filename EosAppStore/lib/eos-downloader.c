@@ -14,45 +14,6 @@
 #include "eos-net-utils-private.h"
 
 char *
-eos_app_info_create_sha256sum (EosAppInfo *info,
-                               const char *download_dir,
-                               gboolean use_delta,
-                               const char *bundle_path,
-                               GCancellable *cancellable,
-                               GError **error_out)
-{
-  GError *error = NULL;
-  const char *bundle_hash = NULL;
-  const char *app_id = eos_app_info_get_application_id (info);
-
-  if (use_delta)
-    bundle_hash = eos_app_info_get_delta_bundle_hash (info);
-  else
-    bundle_hash = eos_app_info_get_bundle_hash (info);
-
-  if (bundle_hash == NULL || *bundle_hash == '\0')
-    {
-      g_set_error (error_out, EOS_APP_STORE_ERROR,
-                   EOS_APP_STORE_ERROR_CHECKSUM_MISSING,
-                   _("No verification available for app '%s'"),
-                   app_id);
-      return NULL;
-    }
-
-  char *sha256_name = g_strconcat (app_id, ".sha256", NULL);
-  char *sha256_path = g_build_filename (download_dir, sha256_name, NULL);
-  g_free (sha256_name);
-
-  gchar *contents = g_strconcat (bundle_hash, "\t", bundle_path, "\n", NULL);
-  if (!g_file_set_contents (sha256_path, contents, -1, &error))
-    g_propagate_error (error_out, error);
-
-  g_free (contents);
-
-  return sha256_path;
-}
-
-char *
 eos_app_info_download_signature (EosAppInfo *info,
                                  SoupSession *soup_session,
                                  const char *download_dir,

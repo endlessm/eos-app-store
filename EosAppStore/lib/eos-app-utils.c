@@ -1759,3 +1759,59 @@ eos_get_eam_dbus_proxy (void)
 
   return proxy;
 }
+
+#define BLOCKSIZE 32768
+
+G_DEFINE_AUTOPTR_CLEANUP_FUNC (FILE, fclose)
+
+static gboolean
+verify_checksum_hash (const char    *source_file,
+                      const char    *checksum_str,
+                      GChecksumType  checksum_type)
+{
+  gssize checksum_len = strlen (checksum_str);
+  gssize hash_len = g_checksum_type_get_length (checksum_type);
+  if (hash_len < checksum_len)
+    return FALSE;
+
+  g_autoptr(FILE) fp = fopen (source_file, "r");
+  if (fp == NULL)
+    return FALSE;
+
+  g_autoptr(GChecksum) checksum = g_checksum_new (checksum_type);
+
+  guint8 buffer[BLOCKSIZE];
+  while (1) {
+    size_t n = fread (buffer, 1, BLOCKSIZE, fp);
+    if (n > 0) {
+      g_checksum_update (checksum, buffer, n);
+      continue;
+    }
+
+    if (feof (fp))
+      break;
+
+    if (ferror (fp))
+      return FALSE;
+  }
+
+  const char *hash = g_checksum_get_string (checksum);
+
+  return (g_ascii_strncasecmp (checksum_str, hash, hash_len) == 0);
+}
+
+gboolean
+eos_app_utils_verify_checksum (const char *bundle_file,
+                               const char *checksum_str,
+                               GError **error)
+{
+  gboolean res = verify_checksum_hash (bundle_file, checksum_str, G_CHECKSUM_SHA256);
+
+  if (!res)
+    g_set_error_literal (error, EOS_APP_STORE_ERROR,
+                         EOS_APP_STORE_ERROR_CHECKSUM_MISSING,
+                         _("Could not verify the bundle, the download is "
+                           "perhaps incomplete or corrupted"));
+
+  return res;
+}

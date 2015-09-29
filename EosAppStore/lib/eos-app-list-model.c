@@ -30,6 +30,9 @@
 
 #define FALLBACK_LANG   "-en"
 
+/* gdbus-codegen does not generate autoptr macros for us */
+G_DEFINE_AUTOPTR_CLEANUP_FUNC (EosAppManagerTransaction, g_object_unref)
+
 /* HACK: This will be revisited for the next release,
  * but for now we have a limited number of app language ids,
  * with no country codes, so we can iterate through them
@@ -854,20 +857,18 @@ get_bundle_artifacts (EosAppListModel *self,
                       GCancellable *cancellable,
                       GError **error_out)
 {
-  GError *error = NULL;
-  gboolean retval = FALSE;
-
-  char *download_dir = NULL;
-  char *bundle_path = NULL;
-  char *signature_path = NULL;
-  char *sha256_path = NULL;
-
-  gboolean use_delta = allow_deltas && is_upgrade &&
-    eos_app_info_get_has_delta_update (info);
+  gboolean use_delta = allow_deltas &&
+                       is_upgrade &&
+                       eos_app_info_get_has_delta_update (info);
 
   eos_app_log_info_message ("Accessing dbus transaction");
 
-  EosAppManagerTransaction *transaction =
+  g_autofree char *download_dir = NULL;
+  g_autofree char *bundle_path = NULL;
+  g_autofree char *signature_path = NULL;
+
+  GError *error = NULL;
+  g_autoptr(EosAppManagerTransaction) transaction =
     eos_app_manager_transaction_proxy_new_sync (self->system_bus,
                                                 G_DBUS_PROXY_FLAGS_NONE,
                                                 "com.endlessm.AppManager",
@@ -875,6 +876,8 @@ get_bundle_artifacts (EosAppListModel *self,
                                                 cancellable,
                                                 &error);
   g_dbus_proxy_set_default_timeout (G_DBUS_PROXY (transaction), G_MAXINT);
+
+  gboolean retval = FALSE;
 
   if (error != NULL)
     {
@@ -917,14 +920,17 @@ get_bundle_artifacts (EosAppListModel *self,
       goto out;
     }
 
-  eos_app_log_info_message ("Persisting hash");
-  sha256_path = eos_app_info_create_sha256sum (info,
-                                               download_dir,
-                                               use_delta, bundle_path,
-                                               cancellable, &error);
+  eos_app_log_info_message ("Checking bundle checksum");
+  const char *checksum = eos_app_info_get_checksum (info, use_delta, &error);
   if (error != NULL)
     {
-      eos_app_log_error_message ("Hash download failed: %s", error->message);
+      eos_app_log_error_message ("Checksum not available: %s", error->message);
+      goto out;
+    }
+
+  if (!eos_app_utils_verify_checksum (bundle_path, checksum, &error))
+    {
+      eos_app_log_error_message ("Checksum failed: %s", error->message);
       goto out;
     }
 
@@ -933,14 +939,16 @@ get_bundle_artifacts (EosAppListModel *self,
   EosStorageType storage_type;
 
   if (is_upgrade)
-    /* Update to the location where the app currently is.
-     * In case we don't have enough space on that location, the app
-     * manager will return a failure.
-     * In the future we probably want to be smarter and move things around
-     * when an update is requested and free space is found on at least
-     * one storage.
-     */
-    storage_type = eos_app_info_get_storage_type (info);
+    {
+      /* Update to the location where the app currently is.
+       * In case we don't have enough space on that location, the app
+       * manager will return a failure.
+       * In the future we probably want to be smarter and move things around
+       * when an update is requested and free space is found on at least
+       * one storage.
+       */
+      storage_type = eos_app_info_get_storage_type (info);
+    }
   else
     storage_type = eos_app_info_get_install_storage_type (info);
 
@@ -959,7 +967,6 @@ get_bundle_artifacts (EosAppListModel *self,
   g_variant_builder_add (&opts, "{sv}", "StorageType", g_variant_new_take_string (eos_storage_type_to_string (storage_type)));
   g_variant_builder_add (&opts, "{sv}", "BundlePath", g_variant_new_string (bundle_path));
   g_variant_builder_add (&opts, "{sv}", "SignaturePath", g_variant_new_string (signature_path));
-  g_variant_builder_add (&opts, "{sv}", "ChecksumPath", g_variant_new_string (sha256_path));
 
   eos_app_manager_transaction_call_complete_transaction_sync (transaction,
                                                               g_variant_builder_end (&opts),
@@ -976,8 +983,6 @@ out:
         g_unlink (bundle_path);
       if (signature_path)
         g_unlink (signature_path);
-      if (sha256_path)
-        g_unlink (sha256_path);
     }
   else
     {
@@ -988,19 +993,28 @@ out:
       if (transaction != NULL)
         eos_app_manager_transaction_call_cancel_transaction_sync (transaction, NULL, NULL);
 
+      /* The app manager uses InvalidFile for errors that deal with
+       * bad input — invalid file, or wrong signature.
+       *
+       * It is harmful to leave these files around in the case when
+       * the transaction fails with this error, because they may fool
+       * the app store into not downloading them again until the next
+       * change in the app version.
+       */
+      g_autofree char *errmsg = g_dbus_error_get_remote_error (error);
+      if (g_strcmp0 (errmsg, "com.endlessm.AppManager.Error.InvalidFile") == 0)
+        {
+          if (bundle_path)
+            g_unlink (bundle_path);
+          if (signature_path)
+            g_unlink (signature_path);
+        }
+
       /* Bubble the error up */
       g_propagate_error (error_out, error);
 
       retval = FALSE;
     }
-
-  /* We're done with the transaction now that we've called CompleteTransaction() */
-  g_clear_object (&transaction);
-  g_free (bundle_path);
-  g_free (signature_path);
-  g_free (sha256_path);
-
-  g_free (download_dir);
 
   return retval;
 }

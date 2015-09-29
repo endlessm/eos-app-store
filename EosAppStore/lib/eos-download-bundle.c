@@ -29,12 +29,16 @@ download_app (EosAppInfo *info)
 
   g_autofree char *bundle_path = eos_app_info_download_bundle (info, soup_session, opt_output_dir, opt_use_delta, NULL, NULL, NULL, NULL);
   g_autofree char *sig_path = eos_app_info_download_signature (info, soup_session, opt_output_dir, opt_use_delta, NULL, NULL);
-  g_autofree char *hash_path = eos_app_info_create_sha256sum (info, opt_output_dir, opt_use_delta, bundle_path, NULL, NULL);
 
-  g_print ("  bundle: %s\n"
-           "  sig   : %s\n"
-           "  hash  : %s\n",
-           bundle_path, sig_path, hash_path);
+  const char *checksum = eos_app_info_get_checksum (info, opt_use_delta, NULL);
+
+  g_print ("  bundle   : %s\n"
+           "  sig      : %s\n"
+           "  checksum : %s - %s\n",
+           bundle_path, sig_path, checksum,
+           eos_app_utils_verify_checksum (bundle_path, checksum, NULL)
+             ? "OK"
+             : "FAIL");
 }
 
 static EosAppInfo *
