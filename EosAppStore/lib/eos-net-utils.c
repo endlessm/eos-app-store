@@ -529,7 +529,7 @@ download_from_uri (SoupSession            *session,
   g_slice_free (EosDownloadFileClosure, clos);
 
   /* Since we got some data, we can assume that network is back online */
-  if (bytes_read > 0)
+  if (bytes_read > 0 && reset_error_counter != NULL)
     *reset_error_counter = TRUE;
 
   /* Emit a progress notification for the whole file if we successfully
