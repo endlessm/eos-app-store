@@ -29,7 +29,8 @@ download_app (EosAppInfo *info)
 
   g_autofree char *bundle_path = eos_app_info_download_bundle (info, soup_session, opt_output_dir, opt_use_delta, NULL, NULL, NULL, NULL);
   g_autofree char *sig_path = eos_app_info_download_signature (info, soup_session, opt_output_dir, opt_use_delta, NULL, NULL);
-  g_autofree char *checksum = eos_app_info_get_checksum (info, opt_use_delta, NULL);
+
+  const char *checksum = eos_app_info_get_checksum (info, opt_use_delta, NULL);
 
   g_print ("  bundle   : %s\n"
            "  sig      : %s\n"

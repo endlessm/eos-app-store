@@ -753,9 +753,9 @@ eos_app_info_get_storage_type (const EosAppInfo *info)
  *
  * ...
  *
- * Returns: (transfer full):
+ * Returns: (transfer none):
  */
-char *
+const char *
 eos_app_info_get_checksum (const EosAppInfo *info,
                            gboolean          use_delta,
                            GError          **error)
@@ -776,7 +776,7 @@ eos_app_info_get_checksum (const EosAppInfo *info,
       return NULL;
     }
 
-  return g_strdup (bundle_hash);
+  return bundle_hash;
 }
 
 /*< private >

@@ -866,7 +866,6 @@ get_bundle_artifacts (EosAppListModel *self,
   g_autofree char *download_dir = NULL;
   g_autofree char *bundle_path = NULL;
   g_autofree char *signature_path = NULL;
-  g_autofree char *checksum = NULL;
 
   GError *error = NULL;
   g_autoptr(EosAppManagerTransaction) transaction =
@@ -922,7 +921,7 @@ get_bundle_artifacts (EosAppListModel *self,
     }
 
   eos_app_log_info_message ("Checking bundle checksum");
-  checksum = eos_app_info_get_checksum (info, use_delta, &error);
+  const char *checksum = eos_app_info_get_checksum (info, use_delta, &error);
   if (error != NULL)
     {
       eos_app_log_error_message ("Checksum not available: %s", error->message);
