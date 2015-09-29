@@ -671,7 +671,10 @@ eos_net_utils_download_file (SoupSession     *session,
   if (!download_file_chunks (in_stream, out_stream, 0, &bytes_read,
                              download_file_chunk_func, all_content,
                              cancellable, error))
-    return FALSE;
+    {
+      g_byte_array_unref (all_content);
+      return FALSE;
+    }
 
   /* NUL-terminate the content and steal it */
   all_content->data[bytes_read] = 0;
