@@ -814,8 +814,7 @@ check_info_storage (EosAppInfo *info)
   g_object_unref (app_info_file);
 }
 
-/*< private >*/
-gboolean
+static gboolean
 eos_app_info_installed_changed (EosAppInfo *info)
 {
   GKeyFile *keyfile = g_key_file_new ();
