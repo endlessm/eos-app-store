@@ -1770,8 +1770,8 @@ verify_checksum_hash (const char    *source_file,
                       GChecksumType  checksum_type)
 {
   gssize checksum_len = strlen (checksum_str);
-  gssize hash_len = g_checksum_type_get_length (checksum_type);
-  if (hash_len < checksum_len)
+  gssize hash_len = g_checksum_type_get_length (checksum_type) * 2;
+  if (checksum_len < hash_len)
     return FALSE;
 
   g_autoptr(FILE) fp = fopen (source_file, "r");
