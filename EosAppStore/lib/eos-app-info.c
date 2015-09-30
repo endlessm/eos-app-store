@@ -463,7 +463,7 @@ eos_app_info_get_installed_size (const EosAppInfo *info)
         return info->computed_installed_size;
     }
 
-  return info->server_installed_size;
+  return 0;
 }
 
 gboolean
