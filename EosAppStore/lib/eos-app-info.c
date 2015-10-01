@@ -440,6 +440,12 @@ compute_installed_size (EosAppInfo *info)
   g_object_unref (app_dir);
 }
 
+static gint64
+eos_app_info_get_server_installed_size (const EosAppInfo *info)
+{
+  return info->server_installed_size;
+}
+
 gint64
 eos_app_info_get_installed_size (const EosAppInfo *info)
 {
@@ -457,7 +463,7 @@ eos_app_info_get_installed_size (const EosAppInfo *info)
         return info->computed_installed_size;
     }
 
-  return info->server_installed_size;
+  return 0;
 }
 
 gboolean
@@ -481,7 +487,7 @@ eos_app_info_is_available (const EosAppInfo *info)
 gboolean
 eos_app_info_is_updatable (const EosAppInfo *info)
 {
-  return info->is_installed &&
+  return info->is_installed && (info->info_filename != NULL) &&
     (eos_compare_versions (info->available_version,
                            info->installed_version) > 0);
 }
@@ -708,7 +714,7 @@ eos_app_info_get_has_sufficient_install_space (const EosAppInfo *info,
 {
   guint64 installed_size = 0;
 
-  installed_size = eos_app_info_get_installed_size (info);
+  installed_size = eos_app_info_get_server_installed_size (info);
 
   eos_app_log_debug_message ("App %s installed size: %" G_GINT64_FORMAT,
                              eos_app_info_get_desktop_id (info),
@@ -814,8 +820,7 @@ check_info_storage (EosAppInfo *info)
   g_object_unref (app_info_file);
 }
 
-/*< private >*/
-gboolean
+static gboolean
 eos_app_info_installed_changed (EosAppInfo *info)
 {
   GKeyFile *keyfile = g_key_file_new ();
