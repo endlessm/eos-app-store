@@ -7,7 +7,6 @@
 #include "eos-app-log.h"
 #include "eos-app-utils.h"
 #include "eos-flexy-grid.h"
-#include "eam-config.h"
 
 #include <sys/types.h>
 #include <sys/stat.h>
@@ -185,7 +184,8 @@ eos_app_info_clear_installed_attributes (EosAppInfo *info)
   g_clear_pointer (&info->installed_version, g_free);
   g_clear_pointer (&info->installed_locale, g_free);
 
-  info->installed_size = 0;
+  info->computed_installed_size = 0;
+  info->info_installed_size = 0;
   info->installation_time = -1;
   info->storage_type = EOS_STORAGE_TYPE_PRIMARY;
 }
@@ -386,13 +386,84 @@ eos_app_info_is_offline (const EosAppInfo *info)
   return info->is_offline;
 }
 
+static void
+compute_installed_size (EosAppInfo *info)
+{
+  if (!info->info_filename)
+    return;
+
+  if (info->computed_installed_size > 0)
+    return;
+
+  GFile *info_file = g_file_new_for_path (info->info_filename);
+  GFile *app_dir = g_file_get_parent (info_file);
+  g_object_unref (info_file);
+
+  /* Resolve symlinks, as g_file_measure_disk_usage() does not follow them */
+  GError *error = NULL;
+  GFileInfo *file_info = g_file_query_info (app_dir,
+                                            G_FILE_ATTRIBUTE_STANDARD_IS_SYMLINK ","
+                                            G_FILE_ATTRIBUTE_STANDARD_SYMLINK_TARGET,
+                                            G_FILE_QUERY_INFO_NONE,
+                                            NULL, &error);
+  if (error != NULL)
+    goto out;
+
+  GFile *target_dir;
+  if (g_file_info_get_is_symlink (file_info))
+    target_dir = g_file_resolve_relative_path
+      (app_dir, g_file_info_get_symlink_target (file_info));
+  else
+    target_dir = g_object_ref (app_dir);
+
+  guint64 disk_usage;
+  g_file_measure_disk_usage (target_dir, G_FILE_MEASURE_NONE,
+                             NULL, NULL, NULL,
+                             &disk_usage, NULL, NULL, &error);
+  g_object_unref (target_dir);
+  g_object_unref (file_info);
+
+  if (error != NULL)
+    goto out;
+
+  info->computed_installed_size = (gint64) disk_usage;
+
+ out:
+  if (error != NULL)
+    {
+      eos_app_log_error_message ("Could not retrieve disk usage for %s: %s",
+                                 eos_app_info_get_desktop_id (info),
+                                 error->message);
+      g_error_free (error);
+    }
+
+  g_object_unref (app_dir);
+}
+
+static gint64
+eos_app_info_get_server_installed_size (const EosAppInfo *info)
+{
+  return info->server_installed_size;
+}
+
 gint64
 eos_app_info_get_installed_size (const EosAppInfo *info)
 {
   if (info->is_installed)
-    return info->installed_size;
+    {
+      /* If we have this information in the keyfile, we assume it's accurate.
+       * Return it as a fast-path.
+       */
+      if (info->info_installed_size > 0)
+        return info->info_installed_size;
 
-  return info->server_installed_size;
+      /* Compute the size from the installation directory */
+      compute_installed_size ((EosAppInfo *) info);
+      if (info->computed_installed_size > 0)
+        return info->computed_installed_size;
+    }
+
+  return 0;
 }
 
 gboolean
@@ -416,7 +487,7 @@ eos_app_info_is_available (const EosAppInfo *info)
 gboolean
 eos_app_info_is_updatable (const EosAppInfo *info)
 {
-  return info->is_installed &&
+  return info->is_installed && (info->info_filename != NULL) &&
     (eos_compare_versions (info->available_version,
                            info->installed_version) > 0);
 }
@@ -643,7 +714,7 @@ eos_app_info_get_has_sufficient_install_space (const EosAppInfo *info,
 {
   guint64 installed_size = 0;
 
-  installed_size = eos_app_info_get_installed_size (info);
+  installed_size = eos_app_info_get_server_installed_size (info);
 
   eos_app_log_debug_message ("App %s installed size: %" G_GINT64_FORMAT,
                              eos_app_info_get_desktop_id (info),
@@ -665,10 +736,10 @@ EosStorageType
 eos_app_info_get_install_storage_type (const EosAppInfo *info)
 {
   if (eos_has_secondary_storage () &&
-      eos_app_info_get_has_sufficient_install_space (info, eam_config_get_secondary_storage ()))
+      eos_app_info_get_has_sufficient_install_space (info, eos_get_secondary_storage ()))
     return EOS_STORAGE_TYPE_SECONDARY;
 
-  if (eos_app_info_get_has_sufficient_install_space (info,  eam_config_get_primary_storage ()))
+  if (eos_app_info_get_has_sufficient_install_space (info,  eos_get_primary_storage ()))
     return EOS_STORAGE_TYPE_PRIMARY;
 
   return EOS_STORAGE_TYPE_UNKNOWN;
@@ -678,6 +749,40 @@ EosStorageType
 eos_app_info_get_storage_type (const EosAppInfo *info)
 {
   return info->storage_type;
+}
+
+/**
+ * eos_app_info_get_checksum:
+ * @info:
+ * @use_delta:
+ * @error:
+ *
+ * ...
+ *
+ * Returns: (transfer none):
+ */
+const char *
+eos_app_info_get_checksum (const EosAppInfo *info,
+                           gboolean          use_delta,
+                           GError          **error)
+{
+  const char *bundle_hash = NULL;
+
+  if (use_delta)
+    bundle_hash = eos_app_info_get_delta_bundle_hash (info);
+  else
+    bundle_hash = eos_app_info_get_bundle_hash (info);
+
+  if (bundle_hash == NULL || *bundle_hash == '\0')
+    {
+      g_set_error (error, EOS_APP_STORE_ERROR,
+                   EOS_APP_STORE_ERROR_CHECKSUM_MISSING,
+                   _("No verification available for app '%s'"),
+                   eos_app_info_get_title (info));
+      return NULL;
+    }
+
+  return bundle_hash;
 }
 
 /*< private >
@@ -715,8 +820,7 @@ check_info_storage (EosAppInfo *info)
   g_object_unref (app_info_file);
 }
 
-/*< private >*/
-gboolean
+static gboolean
 eos_app_info_installed_changed (EosAppInfo *info)
 {
   GKeyFile *keyfile = g_key_file_new ();
@@ -738,7 +842,7 @@ eos_app_info_installed_changed (EosAppInfo *info)
 
   info->installed_version = g_key_file_get_string (keyfile, GROUP, FILE_KEYS[CODE_VERSION], NULL);
   info->installed_locale = g_key_file_get_string (keyfile, GROUP, FILE_KEYS[LOCALE], NULL);
-  info->installed_size = g_key_file_get_int64 (keyfile, GROUP, FILE_KEYS[INSTALLED_SIZE], NULL);
+  info->info_installed_size = g_key_file_get_int64 (keyfile, GROUP, FILE_KEYS[INSTALLED_SIZE], NULL);
 
   check_info_storage (info);
 

@@ -21,14 +21,18 @@ typedef struct _EosAppListModelClass    EosAppListModelClass;
 
 GType eos_app_list_model_get_type (void);
 
-EosAppListModel *eos_app_list_model_new (void);
+void eos_app_list_model_new_async                   (GCancellable *cancellable,
+                                                     GAsyncReadyCallback callback,
+                                                     gpointer user_data);
+EosAppListModel * eos_app_list_model_new_finish     (GAsyncResult *result,
+                                                     GError **error);
 
-void eos_app_list_model_refresh_async               (EosAppListModel *model,
+void eos_app_list_model_refresh_network_async       (EosAppListModel *model,
                                                      GCancellable *cancellable,
                                                      GAsyncReadyCallback callback,
                                                      gpointer user_data);
 
-gboolean eos_app_list_model_refresh_finish          (EosAppListModel *model,
+gboolean eos_app_list_model_refresh_network_finish  (EosAppListModel *model,
                                                      GAsyncResult *result,
                                                      GError **error);
 
@@ -75,25 +79,6 @@ void eos_app_list_model_update_app_async            (EosAppListModel *model,
 gboolean eos_app_list_model_update_app_finish       (EosAppListModel *model,
                                                      GAsyncResult *result,
                                                      GError **error);
-
-#define EOS_APP_LIST_MODEL_ERROR        (eos_app_list_model_error_quark ())
-
-GQuark eos_app_list_model_error_quark (void);
-
-typedef enum {
-  EOS_APP_LIST_MODEL_ERROR_FAILED,
-  EOS_APP_LIST_MODEL_ERROR_INSTALLED,
-  EOS_APP_LIST_MODEL_ERROR_NOT_INSTALLED,
-  EOS_APP_LIST_MODEL_ERROR_NO_UPDATE_AVAILABLE,
-  EOS_APP_LIST_MODEL_ERROR_DISK_FULL,
-  EOS_APP_LIST_MODEL_ERROR_CANCELLED,
-  EOS_APP_LIST_MODEL_ERROR_INSTALL_FAILED,
-  EOS_APP_LIST_MODEL_ERROR_UNINSTALL_FAILED,
-  EOS_APP_LIST_MODEL_ERROR_CHECKSUM_MISSING,
-  EOS_APP_LIST_MODEL_ERROR_SIGNATURE_MISSING,
-  EOS_APP_LIST_MODEL_ERROR_APP_REFRESH_PARTIAL_FAILURE,
-  EOS_APP_LIST_MODEL_ERROR_APP_REFRESH_FAILURE,
-} EosAppListModelError;
 
 G_END_DECLS
 

@@ -17,10 +17,11 @@ const AppStoreDBusService = imports.appStoreDBusService;
 const Categories = imports.categories;
 const Config = imports.config;
 const Environment = imports.environment;
+const Notify = imports.notify;
 const Path = imports.path;
 const ShellAppStore = imports.shellAppStore;
 
-const APP_STORE_CSS = 'resource:///com/endlessm/appstore/eos-app-store.css';
+const APP_STORE_CSS = '/com/endlessm/appstore/eos-app-store.css';
 
 const APP_STORE_NAME = 'com.endlessm.AppStore';
 
@@ -36,6 +37,8 @@ const AppStore = new Lang.Class({
     Extends: Gtk.Application,
 
     _init: function() {
+        this._debugWindow = !!GLib.getenv('EOS_APP_STORE_DEBUG_WINDOW');
+
         this.parent({ application_id: APP_STORE_NAME,
                       flags: Gio.ApplicationFlags.IS_SERVICE,
                       inactivity_timeout: QUIT_TIMEOUT * 1000, });
@@ -55,18 +58,15 @@ const AppStore = new Lang.Class({
 
         // main style provider
         let provider = new Gtk.CssProvider();
-        provider.load_from_file(Gio.File.new_for_uri(APP_STORE_CSS));
+        provider.load_from_resource(APP_STORE_CSS);
         Gtk.StyleContext.add_provider_for_screen(Gdk.Screen.get_default(), provider,
                                                  Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION);
 
         // The app store shell proxy
         this._shellProxy = new ShellAppStore.ShellAppStore();
 
-        // The backing app list model
-        this._appModel = new EosAppStorePrivate.AppListModel();
-
         // Main list model
-        this._appList = new AppListModel.AppList();
+        this._appListModel = new AppListModel.AppListModel();
 
         // No window by default
         this._mainWindow = null;
@@ -74,32 +74,27 @@ const AppStore = new Lang.Class({
 
     vfunc_activate: function() {
         this._createMainWindow();
-    },
 
-    vfunc_shutdown: function() {
-        // Clear the directory where we download bundle artifacts when quitting
-        EosAppStorePrivate.clear_bundle_download_dir();
-
-        this.parent();
+        if (this.debugWindow) {
+            this.showPage(Gdk.CURRENT_TIME, Categories.DEFAULT_APP_CATEGORY);
+        }
     },
 
     _createMainWindow: function() {
         if (this._mainWindow == null) {
             this._mainWindow = new AppStoreWindow.AppStoreWindow(this);
+            this._mainWindow.populate();
             this._mainWindow.connect('notify::visible',
                                      Lang.bind(this, this._onVisibilityChanged));
-
-            // set initial page
-            this._mainWindow.changePage(Categories.DEFAULT_APP_CATEGORY);
         }
     },
 
-    get appModel() {
-        return this._appModel;
+    get appListModel() {
+        return this._appListModel;
     },
 
-    get appList() {
-        return this._appList;
+    get debugWindow() {
+        return this._debugWindow;
     },
 
     get shellProxy() {
@@ -112,7 +107,10 @@ const AppStore = new Lang.Class({
 
     show: function(timestamp, reset) {
         this._createMainWindow();
-        this._mainWindow.doShow(timestamp, reset);
+        if (reset) {
+            this._mainWindow.resetCurrentPage();
+        }
+        this._mainWindow.present_with_time(timestamp);
     },
 
     hide: function() {
@@ -126,8 +124,8 @@ const AppStore = new Lang.Class({
         if (page == 'apps')
             page = Categories.DEFAULT_APP_CATEGORY;
 
-        this._mainWindow.changePage(page);
-        this._mainWindow.showPage(timestamp);
+        this._mainWindow.pageManager.showPage(page);
+        this._mainWindow.present_with_time(timestamp);
     },
 
     _clearMainWindow: function() {
@@ -188,6 +186,49 @@ const AppStore = new Lang.Class({
 
             this._clearId =
                 Mainloop.timeout_add_seconds(CLEAR_TIMEOUT, Lang.bind(this, this._clearMainWindow));
+        }
+    },
+
+    maybeNotifyUser: function(message, error) {
+        let appWindowVisible = false;
+        if (this.mainWindow) {
+            appWindowVisible = this.mainWindow.is_visible();
+        }
+        else {
+            // the app store window timeout triggered, but the
+            // app store process is still running because of the
+            // reference we hold
+            appWindowVisible = false;
+        }
+
+        // notify only if the error is not caused by a user
+        // cancellation
+        if (error &&
+            (error.matches(Gio.io_error_quark(),
+                           Gio.IOErrorEnum.CANCELLED) ||
+             error.matches(EosAppStorePrivate.app_store_error_quark(),
+                           EosAppStorePrivate.AppStoreError.CANCELLED))) {
+            return;
+        }
+
+        // if the window is not visible, we emit a notification instead
+        // of showing a dialog
+        if (!appWindowVisible) {
+            let notification = new Notify.Notification(message, '');
+            notification.show();
+            return;
+        }
+
+        // we only show the error dialog if the error is set
+        if (error) {
+            let dialog = new Gtk.MessageDialog({ transient_for: this.mainWindow,
+                                                 modal: true,
+                                                 destroy_with_parent: true,
+                                                 text: message,
+                                                 secondary_text: error.message });
+            dialog.add_button(_("Dismiss"), Gtk.ResponseType.OK);
+            dialog.run();
+            dialog.destroy();
         }
     },
 });

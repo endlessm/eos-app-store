@@ -4,9 +4,9 @@
 
 #include "eos-app-utils.h"
 
+#include "eos-app-enums.h"
 #include "eos-app-log.h"
 #include "eos-link-info.h"
-#include "eam-config.h"
 
 #include <locale.h>
 #include <glib/gi18n.h>
@@ -19,96 +19,36 @@
 #define APP_STORE_CONTENT_LINKS "links"
 
 #define BUNDLE_DIR              LOCALSTATEDIR "/tmp/eos-app-store"
-#define BUNDLE_DIR_TEMPLATE     BUNDLE_DIR "/downloadXXXXXX"
+#define DOWNLOAD_DIR_PREFIX     "dl"
 #define APP_DIR_DEFAULT         "/endless"
 
 G_DEFINE_QUARK (eos-app-utils-error-quark, eos_app_utils_error)
 
-const char *
-eos_get_bundle_download_dir (void)
+char *
+eos_get_bundle_download_dir (const char *app_id,
+                             const char *version)
 {
-  static char *bundle_dir;
+  char *download_dir = g_strdup_printf ("%s%u_%s_%s",
+                                        DOWNLOAD_DIR_PREFIX,
+                                        getuid (),
+                                        app_id,
+                                        version);
 
-  if (g_once_init_enter (&bundle_dir))
+  char *target_dir = g_build_filename (BUNDLE_DIR, download_dir, NULL);
+  g_free (download_dir);
+
+  if (g_mkdir_with_parents (target_dir, 0755) != 0)
     {
-      /* g_mkdir* functions do not allow setting of 0777 mode as the o+w
-       * never gets set so we require a separate step to ensure that the
-       * permissions are correct. We also ignore problems here since it
-       * usually means that the folder is already created by us or someone
-       * else
-       */
-      g_mkdir_with_parents (BUNDLE_DIR, 0755);
-      g_chmod (BUNDLE_DIR, 01777);
-
-      char *tmp = g_strdup (BUNDLE_DIR_TEMPLATE);
-      while (g_mkdtemp_full (tmp, 0755) == NULL)
-        {
-          int saved_errno = errno;
-
-          eos_app_log_error_message ("Unable to create temporary directory: %s",
-                                     g_strerror (saved_errno));
-        }
-
-      eos_app_log_info_message ("Bundle dir: %s", tmp);
-
-      g_once_init_leave (&bundle_dir, tmp);
+      int saved_errno = errno;
+      eos_app_log_error_message ("Unable to create temporary directory: %s",
+                                 g_strerror (saved_errno));
     }
 
-  return bundle_dir;
-}
+  g_chmod (BUNDLE_DIR, 01777);
 
-void
-eos_clear_bundle_download_dir (void)
-{
-  GFile *dir = g_file_new_for_path (eos_get_bundle_download_dir ());
+  eos_app_log_info_message ("Target dir: %s", target_dir);
 
-  GError *error = NULL;
-  GFileEnumerator *enumerator = g_file_enumerate_children (dir, G_FILE_ATTRIBUTE_STANDARD_NAME,
-                                                           G_FILE_QUERY_INFO_NOFOLLOW_SYMLINKS,
-                                                           NULL,
-                                                           &error);
-  if (error != NULL)
-    {
-      eos_app_log_error_message ("Unable to enumerate bundle dir '%s': %s",
-                                 eos_get_bundle_download_dir (),
-                                 error->message);
-      g_error_free (error);
-      g_object_unref (dir);
-      return;
-    }
-
-  GFileInfo *child_info = NULL;
-  while ((child_info = g_file_enumerator_next_file (enumerator, NULL, &error)) != NULL)
-    {
-      GFile *child = g_file_get_child (dir, g_file_info_get_name (child_info));
-
-      g_file_delete (child, NULL, &error);
-      if (error != NULL)
-        {
-          eos_app_log_error_message ("Unable to delete file: %s", error->message);
-          g_clear_error (&error);
-        }
-
-      g_clear_object (&child_info);
-      g_object_unref (child);
-    }
-
-  if (error != NULL)
-    {
-      eos_app_log_error_message ("Enumeration failed: %s", error->message);
-      g_clear_error (&error);
-    }
-
-  g_object_unref (enumerator);
-
-  g_file_delete (dir, NULL, &error);
-  if (error != NULL)
-    {
-      eos_app_log_error_message ("Unable to delete download dir: %s", error->message);
-      g_clear_error (&error);
-    }
-
-  g_object_unref (dir);
+  return target_dir;
 }
 
 static const char *
@@ -182,13 +122,19 @@ eos_get_cache_dir (void)
   return download_url;
 }
 
+const char *
+eos_get_bundles_dir (void)
+{
+  return eos_app_manager_get_applications_dir (eos_get_eam_dbus_proxy ());
+}
+
 gboolean
 eos_has_secondary_storage (void)
 {
   const char *primary_storage, *secondary_storage;
 
-  primary_storage = eam_config_get_primary_storage ();
-  secondary_storage = eam_config_get_secondary_storage ();
+  primary_storage = eos_get_primary_storage ();
+  secondary_storage = eos_get_secondary_storage ();
 
   /* The secondary storage path does not exist */
   struct stat secondary_statbuf;
@@ -207,6 +153,36 @@ eos_has_secondary_storage (void)
    * device than the primary.
    */
   return primary_statbuf.st_dev != secondary_statbuf.st_dev;
+}
+
+const char *
+eos_get_primary_storage (void)
+{
+  return eos_app_manager_get_primary_storage (eos_get_eam_dbus_proxy ());
+}
+
+const char *
+eos_get_secondary_storage (void)
+{
+  return eos_app_manager_get_secondary_storage (eos_get_eam_dbus_proxy ());
+}
+
+gboolean
+eos_use_delta_updates (void)
+{
+  return eos_app_manager_get_enable_delta_updates (eos_get_eam_dbus_proxy ());
+}
+
+const char *
+eos_get_app_server_url (void)
+{
+  return eos_app_manager_get_server_url (eos_get_eam_dbus_proxy ());
+}
+
+static const char *
+eos_get_app_server_api (void)
+{
+  return eos_app_manager_get_api_version (eos_get_eam_dbus_proxy ());
 }
 
 /*
@@ -382,14 +358,7 @@ eos_app_parse_resource_content (const char *content_type,
     }
 
   JsonNode *node = json_parser_get_root (parser);
-  if (!JSON_NODE_HOLDS_ARRAY (node))
-    {
-      g_set_error (error_out,
-                   JSON_READER_ERROR,
-                   JSON_READER_ERROR_NO_ARRAY,
-                   "Expected array content");
-      goto out_error;
-    }
+  g_assert (JSON_NODE_HOLDS_ARRAY (node));
 
   content_array = json_node_dup_array (node);
 
@@ -445,7 +414,14 @@ eos_link_load_content (EosLinkCategory category)
   JsonObject *obj;
   const gchar *category_name;
 
-  JsonArray *categories_array = eos_app_parse_resource_content (APP_STORE_CONTENT_LINKS, get_os_personality (), NULL);
+  static gboolean content_loaded = FALSE;
+  JsonArray *categories_array = NULL;
+
+  if (!content_loaded)
+    {
+      content_loaded = TRUE;
+      categories_array = eos_app_parse_resource_content (APP_STORE_CONTENT_LINKS, get_os_personality (), NULL);
+    }
 
   if (categories_array == NULL)
     return NULL;
@@ -672,9 +648,9 @@ eos_get_updates_file (void)
 char *
 eos_get_all_updates_uri (void)
 {
-  return g_strconcat (eam_config_get_server_url (),
+  return g_strconcat (eos_get_app_server_url (),
                       "/api/",
-                      eam_config_get_api_version (),
+                      eos_get_app_server_api (),
                       "/updates/",
                       get_os_version (),
                       "?arch=", get_os_arch (),
@@ -691,7 +667,7 @@ eos_get_updates_meta_record_file (void)
 char *
 eos_get_updates_meta_record_uri (void)
 {
-  return g_strconcat (eam_config_get_server_url (),
+  return g_strconcat (eos_get_app_server_url (),
                       "/api/v1/meta_records",
                       "?type=updates",
                       NULL);
@@ -701,7 +677,7 @@ static gboolean
 is_app_id (const char *appid)
 {
   static const char alsoallowed[] = "_-+.";
-  static const char *reserveddirs[] = { "bin", "share", "lost+found", "xdg", };
+  static const char *reserveddirs[] = { "bin", "games", "share", "lost+found", "xdg", };
 
   if (!appid || appid[0] == '\0')
     return FALSE;
@@ -729,11 +705,11 @@ is_app_id (const char *appid)
   return FALSE;
 }
 
-static gboolean
-eos_app_load_installed_apps_for_prefix (GHashTable *app_info,
-                                        const char *prefix,
-                                        GCancellable *cancellable)
+gboolean
+eos_app_load_installed_apps (GHashTable *app_info,
+                             GCancellable *cancellable)
 {
+  const char *prefix = eos_get_bundles_dir ();
   GError *error = NULL;
   GDir *dir = g_dir_open (prefix, 0, &error);
   if (dir == NULL)
@@ -763,26 +739,17 @@ eos_app_load_installed_apps_for_prefix (GHashTable *app_info,
 
       char *desktop_id = g_strconcat (appid, ".desktop", NULL);
       EosAppInfo *info = g_hash_table_lookup (app_info, desktop_id);
-      g_free (desktop_id);
 
       if (info == NULL)
-        info = eos_app_info_new (appid);
-      else
-        g_object_ref (info);
+        {
+          info = eos_app_info_new (appid);
+          g_hash_table_insert (app_info, g_strdup (desktop_id), info);
+        }
 
       if (eos_app_info_update_from_installed (info, info_path))
-        {
-          g_hash_table_replace (app_info,
-                                g_strdup (eos_app_info_get_desktop_id (info)),
-                                info);
-          n_bundles += 1;
-        }
-      else
-        {
-          eos_app_log_error_message ("App '%s' failed to update from installed info", appid);
-          g_object_unref (info);
-        }
+        n_bundles += 1;
 
+      g_free (desktop_id);
       g_free (info_path);
     }
 
@@ -794,26 +761,6 @@ eos_app_load_installed_apps_for_prefix (GHashTable *app_info,
                              (double) (g_get_monotonic_time () - start_time) / 1000);
 
   return TRUE;
-}
-
-gboolean
-eos_app_load_installed_apps (GHashTable *app_info,
-                             GCancellable *cancellable)
-{
-  gboolean retval;
-
-  eos_app_log_info_message ("Reloading installed apps");
-
-  const char *storage = eam_config_get_primary_storage ();
-  retval = eos_app_load_installed_apps_for_prefix (app_info, storage, cancellable);
-
-  if (eos_has_secondary_storage ())
-    {
-      storage = eam_config_get_secondary_storage ();
-      retval |= eos_app_load_installed_apps_for_prefix (app_info, storage, cancellable);
-    }
-
-  return retval;
 }
 
 gboolean
@@ -1022,9 +969,29 @@ is_server_record_valid (JsonNode *element)
 
 gboolean
 eos_app_load_available_apps (GHashTable *app_info,
-                             const char *data,
                              GCancellable *cancellable,
                              GError **error)
+{
+  char *path;
+  char *data = NULL;
+  gboolean res = FALSE;
+
+  path = eos_get_updates_file ();
+  if (g_file_get_contents (path, &data, NULL, error))
+    res = eos_app_load_available_apps_from_data (app_info, data,
+                                                 cancellable, error);
+
+  g_free (data);
+  g_free (path);
+
+  return res;
+}
+
+gboolean
+eos_app_load_available_apps_from_data (GHashTable *app_info,
+                                       const char *data,
+                                       GCancellable *cancellable,
+                                       GError **error)
 {
   JsonParser *parser = json_parser_new ();
   gboolean retval = FALSE;
@@ -1077,7 +1044,7 @@ eos_app_load_available_apps (GHashTable *app_info,
       const gboolean is_diff = json_object_get_boolean_member (obj, "isDiff");
       const char *code_version = json_object_get_string_member (obj, "codeVersion");
 
-      if (is_diff && !eam_config_get_enable_delta_updates ())
+      if (is_diff && !eos_use_delta_updates ())
         {
           eos_app_log_debug_message ("Deltas disabled. Ignoring diff for %s", app_id);
 
@@ -1237,7 +1204,7 @@ eos_app_load_available_apps (GHashTable *app_info,
               if (eos_compare_versions (code_version,
                                         eos_app_info_get_installed_version (info)) != 0)
                 {
-                   eos_app_log_error_message (" -> Full bundle has an override. "
+                   eos_app_log_debug_message (" -> Full bundle has an override. "
                                               "Ignoring");
                    continue;
                 }
@@ -1343,7 +1310,7 @@ eos_app_load_gio_apps (GHashTable *app_info)
       if (info == NULL)
         {
           info = eos_app_info_new (app_id);
-          g_hash_table_replace (app_info, g_strdup (sanitized_desktop_id), info);
+          g_hash_table_insert (app_info, g_strdup (sanitized_desktop_id), info);
         }
 
       g_free (app_id);
@@ -1697,9 +1664,9 @@ eos_check_available_space (const char    *path,
     {
       eos_app_log_error_message ("Not enough space on device for downloading app");
 
-      g_set_error (error, G_IO_ERROR,
-                   G_IO_ERROR_NO_SPACE,
-                   _("Not enough space on device for downloading app"));
+      g_set_error (error, EOS_APP_STORE_ERROR,
+                   EOS_APP_STORE_ERROR_DISK_FULL,
+                   _("Not enough space on device for downloading the app."));
       retval = FALSE;
     }
 
@@ -1755,4 +1722,96 @@ eos_storage_type_to_string (EosStorageType storage)
   g_type_class_unref (enum_class);
 
   return retval;
+}
+
+/**
+ * eos_get_eam_dbus_proxy: (skip)
+ */
+EosAppManager *
+eos_get_eam_dbus_proxy (void)
+{
+  static EosAppManager *proxy = NULL;
+
+  eos_app_log_debug_message ("Getting dbus proxy");
+
+  /* If we already have a proxy, return it */
+  if (proxy != NULL)
+    return proxy;
+
+  /* Otherwise create it */
+  GError *error = NULL;
+
+  eos_app_log_debug_message ("No dbus proxy object yet - creating it");
+
+  proxy = eos_app_manager_proxy_new_for_bus_sync (G_BUS_TYPE_SYSTEM,
+                                                  G_DBUS_PROXY_FLAGS_NONE,
+                                                  "com.endlessm.AppManager",
+                                                  "/com/endlessm/AppManager",
+                                                  NULL, /* GCancellable* */
+                                                  &error);
+  g_dbus_proxy_set_default_timeout (G_DBUS_PROXY (proxy), G_MAXINT);
+
+  if (error != NULL)
+    {
+      eos_app_log_error_message ("Unable to create dbus proxy: %s", error->message);
+      g_error_free (error);
+    }
+
+  return proxy;
+}
+
+#define BLOCKSIZE 32768
+
+G_DEFINE_AUTOPTR_CLEANUP_FUNC (FILE, fclose)
+
+static gboolean
+verify_checksum_hash (const char    *source_file,
+                      const char    *checksum_str,
+                      GChecksumType  checksum_type)
+{
+  gssize checksum_len = strlen (checksum_str);
+  gssize hash_len = g_checksum_type_get_length (checksum_type) * 2;
+  if (checksum_len < hash_len)
+    return FALSE;
+
+  g_autoptr(FILE) fp = fopen (source_file, "r");
+  if (fp == NULL)
+    return FALSE;
+
+  g_autoptr(GChecksum) checksum = g_checksum_new (checksum_type);
+
+  guint8 buffer[BLOCKSIZE];
+  while (1) {
+    size_t n = fread (buffer, 1, BLOCKSIZE, fp);
+    if (n > 0) {
+      g_checksum_update (checksum, buffer, n);
+      continue;
+    }
+
+    if (feof (fp))
+      break;
+
+    if (ferror (fp))
+      return FALSE;
+  }
+
+  const char *hash = g_checksum_get_string (checksum);
+
+  return (g_ascii_strncasecmp (checksum_str, hash, hash_len) == 0);
+}
+
+gboolean
+eos_app_utils_verify_checksum (const char *bundle_file,
+                               const char *checksum_str,
+                               GError **error)
+{
+  gboolean res = verify_checksum_hash (bundle_file, checksum_str, G_CHECKSUM_SHA256);
+
+  if (!res)
+    g_set_error_literal (error, EOS_APP_STORE_ERROR,
+                         EOS_APP_STORE_ERROR_CHECKSUM_MISSING,
+                         _("Could not verify the bundle, the download is "
+                           "perhaps incomplete or corrupted"));
+
+  return res;
 }

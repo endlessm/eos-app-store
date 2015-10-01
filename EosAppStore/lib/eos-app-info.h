@@ -62,6 +62,9 @@ EosAppState     eos_app_info_get_state                  (const EosAppInfo *info)
 gboolean        eos_app_info_check_install_space        (const EosAppInfo *info);
 
 gint64          eos_app_info_get_installation_time      (const EosAppInfo *info);
+const char *    eos_app_info_get_checksum               (const EosAppInfo *info,
+                                                         gboolean          use_delta,
+                                                         GError          **error);
 
 #ifndef __GI_SCANNER__
 
@@ -87,8 +90,6 @@ void            eos_app_info_set_has_launcher           (EosAppInfo *info,
 G_GNUC_INTERNAL
 void            eos_app_info_set_is_installed           (EosAppInfo *info,
                                                          gboolean    is_installed);
-G_GNUC_INTERNAL
-gboolean        eos_app_info_installed_changed          (EosAppInfo *info);
 
 #endif
 

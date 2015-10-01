@@ -7,6 +7,7 @@
 #include <webkit2/webkit2.h>
 #include "eos-app-enums.h"
 #include "eos-app-info.h"
+#include "eos-app-manager-service.h"
 
 G_BEGIN_DECLS
 
@@ -32,24 +33,33 @@ void    eos_save_icon            (GdkPixbuf       *pixbuf,
 
 GdkNotifyType eos_get_event_notify_type (GdkEvent *event);
 
-char *  eos_get_all_updates_uri (void);
-char *  eos_get_updates_file (void);
+char *  eos_get_all_updates_uri                 (void);
+char *  eos_get_updates_file                    (void);
 
-char *  eos_get_updates_meta_record_uri (void);
-char *  eos_get_updates_meta_record_file (void);
+char *  eos_get_updates_meta_record_uri         (void);
+char *  eos_get_updates_meta_record_file        (void);
 
-const char *eos_get_cache_dir (void);
-const char *eos_get_bundle_download_dir (void);
-void        eos_clear_bundle_download_dir (void);
-gboolean    eos_has_secondary_storage (void);
+const char *eos_get_bundles_dir                 (void);
+const char *eos_get_cache_dir                   (void);
+char       *eos_get_bundle_download_dir         (const char *app_id,
+                                                 const char *version);
+const char *eos_get_app_server_url              (void);
+const char *eos_get_primary_storage             (void);
+const char *eos_get_secondary_storage           (void);
+gboolean    eos_has_secondary_storage           (void);
+
+gboolean eos_use_delta_updates                  (void);
 
 gboolean eos_app_load_installed_apps      (GHashTable    *app_info,
                                            GCancellable  *cancellable);
 
 gboolean eos_app_load_available_apps      (GHashTable    *app_info,
-                                           const char    *data,
                                            GCancellable  *cancellable,
                                            GError       **error);
+gboolean eos_app_load_available_apps_from_data (GHashTable    *app_info,
+                                                const char    *data,
+                                                GCancellable  *cancellable,
+                                                GError       **error);
 
 gboolean eos_app_load_updates_meta_record (gint64        *monotonic_update_id,
                                            const char    *data,
@@ -79,11 +89,17 @@ char * eos_storage_type_to_string (EosStorageType storage);
 
 GQuark eos_app_utils_error_quark (void);
 
+EosAppManager * eos_get_eam_dbus_proxy (void);
+
 typedef enum {
   EOS_APP_UTILS_ERROR_JSON_UNEXPECTED_STRUCTURE,
   EOS_APP_UTILS_ERROR_JSON_MISSING_ATTRIBUTE,
   EOS_APP_UTILS_ERROR_JSON_UNEXPECTED_VALUE
 } EosAppUtilsError;
+
+gboolean eos_app_utils_verify_checksum (const char *bundle_file,
+                                        const char *checksum_str,
+                                        GError **error);
 
 G_END_DECLS
 

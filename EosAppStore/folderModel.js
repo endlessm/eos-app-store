@@ -12,18 +12,12 @@ const FolderModel = new Lang.Class({
     Name: 'FolderModel',
 
     getIconList: function() {
-        let iconTheme = Gtk.IconTheme.get_default();
-
-        // TODO specify a context?
-        let allIcons = iconTheme.list_icons(null);
-
-        let folderIcons = [];
-        for (let i = 0; i < allIcons.length; i++) {
-            if (allIcons[i].indexOf(_PREFIX) == 0) {
-                folderIcons.push(allIcons[i]);
-            }
-        }
-        return folderIcons;
+        return Gtk.IconTheme.get_default()
+            .list_icons(null)
+            .filter(function(iconName) {
+                return iconName.startsWith(_PREFIX) &&
+                    iconName.endsWith('-symbolic');
+            });
     },
 
     createFolder: function(name, iconName) {

@@ -8,13 +8,6 @@
 #include <libsoup/soup.h>
 #include "eos-app-info.h"
 
-char * eos_app_info_create_sha256sum (EosAppInfo *info,
-                                      const char *download_dir,
-                                      gboolean use_delta,
-                                      const char *bundle_path,
-                                      GCancellable *cancellable,
-                                      GError **error_out);
-
 char * eos_app_info_download_signature (EosAppInfo *info,
                                         SoupSession *soup_session,
                                         const char *download_dir,
@@ -29,10 +22,8 @@ char * eos_app_info_download_bundle (EosAppInfo *info,
                                      GCancellable *cancellable,
                                      GFileProgressCallback progress_callback,
                                      gpointer progress_user_data,
-                                     GDestroyNotify progress_destroy,
                                      GError **error_out);
 
-gboolean eos_load_available_apps (GHashTable *apps,
-                                  SoupSession *soup_session,
-                                  GCancellable *cancellable,
-                                  GError **error_out);
+char * eos_refresh_available_apps (SoupSession *soup_session,
+                                   GCancellable *cancellable,
+                                   GError **error_out);

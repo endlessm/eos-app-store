@@ -9,6 +9,8 @@
         <property name="can_focus">False</property>
         <property name="label_xalign">0</property>
         <property name="shadow_type">none</property>
+        <property name="hexpand">true</property>
+        <property name="vexpand">true</property>
         <child>
           <object class="GtkBox" id="_folderBoxContent">
             <property name="visible">True</property>
