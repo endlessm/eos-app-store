@@ -45,7 +45,9 @@ const AppInstalledBox = new Lang.Class({
         this.appIcon = this.appInfo.get_icon_name();
         this.nameText = this.appTitle;
         this.categoryText = this.appInfo.get_category();
-        this.sizeText = this.appInfo.get_installed_size();
+
+        this._sizeId = this.appInfo.connect('notify::installed-size', Lang.bind(this, this._updateSize));
+        this._updateSize();
 
         this._removeDialog = null;
 
@@ -53,6 +55,15 @@ const AppInstalledBox = new Lang.Class({
         this.setImageFrame(this._updateButton, this._updateButtonImage);
 
         this._updateState();
+    },
+
+    _onDestroy: function() {
+        this.parent();
+
+        if (this._sizeId > 0) {
+            this.appInfo.disconnect(this._sizeId);
+            this._sizeId = 0;
+        }
     },
 
     set appIcon(v) {
@@ -79,13 +90,17 @@ const AppInstalledBox = new Lang.Class({
         this._categoryText.hide();
     },
 
-    set sizeText(v) {
-        if (v == 0) {
-            this._sizeText.label = _("System App");
+    _updateSize: function() {
+        if (this.appInfo.is_store_installed()) {
+            let size = this.appInfo.get_installed_size();
+            if (size == 0) {
+                this._sizeText.label = '--';
+            } else {
+                this._sizeText.label = GLib.format_size(size);
+            }
         } else {
-            this._sizeText.label = GLib.format_size(v);
+                this._sizeText.label = _("System App");
         }
-        this._sizeText.show();
     },
 
     _updateState: function() {

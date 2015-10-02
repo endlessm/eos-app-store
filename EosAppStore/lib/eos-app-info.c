@@ -20,6 +20,7 @@ G_DEFINE_TYPE (EosAppInfo, eos_app_info, G_TYPE_OBJECT)
 enum {
   PROP_0,
   PROP_APPLICATION_ID,
+  PROP_INSTALLED_SIZE,
   PROP_STATE,
   NUM_PROPS,
 };
@@ -133,6 +134,9 @@ eos_app_info_get_property (GObject    *gobject,
     case PROP_APPLICATION_ID:
       g_value_set_string (value, eos_app_info_get_application_id (info));
       break;
+    case PROP_INSTALLED_SIZE:
+      g_value_set_int64 (value, eos_app_info_get_installed_size (info));
+      break;
     case PROP_STATE:
       g_value_set_enum (value, eos_app_info_get_state (info));
       break;
@@ -185,6 +189,7 @@ eos_app_info_clear_installed_attributes (EosAppInfo *info)
   g_clear_pointer (&info->installed_locale, g_free);
 
   info->computed_installed_size = 0;
+  info->installed_size_computed = FALSE;
   info->info_installed_size = 0;
   info->installation_time = -1;
   info->storage_type = EOS_STORAGE_TYPE_PRIMARY;
@@ -203,6 +208,9 @@ eos_app_info_finalize (GObject *gobject)
   g_free (info->description);
   g_free (info->square_img);
   g_free (info->featured_img);
+
+  g_cancellable_cancel (info->size_computation_cancellable);
+  g_clear_object (&info->size_computation_cancellable);
 
   eos_app_info_clear_installed_attributes (info);
   eos_app_info_clear_server_update_attributes (info);
@@ -237,6 +245,12 @@ eos_app_info_class_init (EosAppInfoClass *klass)
                          "The application ID",
                          "",
                          G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS | G_PARAM_CONSTRUCT_ONLY);
+  properties[PROP_INSTALLED_SIZE] =
+    g_param_spec_int64 ("installed-size",
+                        "Installed size",
+                        "The application installed size",
+                        -1, G_MAXINT64, 0,
+                        G_PARAM_READABLE | G_PARAM_STATIC_STRINGS);
   properties[PROP_STATE] =
     g_param_spec_enum ("state",
                        "Application state",
@@ -387,25 +401,47 @@ eos_app_info_is_offline (const EosAppInfo *info)
 }
 
 static void
-compute_installed_size (EosAppInfo *info)
+compute_installed_size_usage_ready (GObject *source,
+                                    GAsyncResult *res,
+                                    gpointer user_data)
 {
-  if (!info->info_filename)
-    return;
-
-  if (info->computed_installed_size > 0)
-    return;
-
-  GFile *info_file = g_file_new_for_path (info->info_filename);
-  GFile *app_dir = g_file_get_parent (info_file);
-  g_object_unref (info_file);
-
-  /* Resolve symlinks, as g_file_measure_disk_usage() does not follow them */
   GError *error = NULL;
-  GFileInfo *file_info = g_file_query_info (app_dir,
-                                            G_FILE_ATTRIBUTE_STANDARD_IS_SYMLINK ","
-                                            G_FILE_ATTRIBUTE_STANDARD_SYMLINK_TARGET,
-                                            G_FILE_QUERY_INFO_NONE,
-                                            NULL, &error);
+  GFile *target_dir = G_FILE (source);
+  EosAppInfo *info = user_data;
+
+  guint64 disk_usage;
+  g_file_measure_disk_usage_finish (target_dir, res,
+                                    &disk_usage, NULL, NULL,
+                                    &error);
+
+  g_clear_object (&info->size_computation_cancellable);
+
+  if (error != NULL)
+    {
+      eos_app_log_error_message ("Could not retrieve disk usage for %s: %s",
+                                 eos_app_info_get_desktop_id (info),
+                                 error->message);
+      g_error_free (error);
+    }
+  else
+    {
+      info->computed_installed_size = (gint64) disk_usage;
+      g_object_notify_by_pspec (G_OBJECT (info), properties[PROP_INSTALLED_SIZE]);
+    }
+
+  g_object_unref (info);
+}
+
+static void
+compute_installed_size_info_ready (GObject *source,
+                                   GAsyncResult *res,
+                                   gpointer user_data)
+{
+  GError *error = NULL;
+  GFile *app_dir = G_FILE (source);
+  EosAppInfo *info = user_data;
+  GFileInfo *file_info = g_file_query_info_finish (app_dir, res, &error);
+
   if (error != NULL)
     goto out;
 
@@ -416,27 +452,58 @@ compute_installed_size (EosAppInfo *info)
   else
     target_dir = g_object_ref (app_dir);
 
-  guint64 disk_usage;
-  g_file_measure_disk_usage (target_dir, G_FILE_MEASURE_NONE,
-                             NULL, NULL, NULL,
-                             &disk_usage, NULL, NULL, &error);
+  g_file_measure_disk_usage_async (target_dir,
+                                   G_FILE_MEASURE_NONE,
+                                   G_PRIORITY_DEFAULT,
+                                   info->size_computation_cancellable,
+                                   NULL, NULL,
+                                   compute_installed_size_usage_ready,
+                                   g_object_ref (info));
   g_object_unref (target_dir);
   g_object_unref (file_info);
-
-  if (error != NULL)
-    goto out;
-
-  info->computed_installed_size = (gint64) disk_usage;
 
  out:
   if (error != NULL)
     {
+      g_clear_object (&info->size_computation_cancellable);
       eos_app_log_error_message ("Could not retrieve disk usage for %s: %s",
                                  eos_app_info_get_desktop_id (info),
                                  error->message);
       g_error_free (error);
     }
 
+  g_object_unref (info);
+}
+
+static void
+compute_installed_size (EosAppInfo *info)
+{
+  if (!eos_app_info_is_store_installed (info))
+    return;
+
+  if (info->installed_size_computed)
+    return;
+
+  if (info->size_computation_cancellable != NULL)
+    return;
+
+  info->installed_size_computed = TRUE;
+  info->size_computation_cancellable = g_cancellable_new ();
+
+  GFile *info_file = g_file_new_for_path (info->info_filename);
+  GFile *app_dir = g_file_get_parent (info_file);
+
+  /* Resolve symlinks, as g_file_measure_disk_usage() does not follow them */
+  g_file_query_info_async (app_dir,
+                           G_FILE_ATTRIBUTE_STANDARD_IS_SYMLINK ","
+                           G_FILE_ATTRIBUTE_STANDARD_SYMLINK_TARGET,
+                           G_FILE_QUERY_INFO_NONE,
+                           G_PRIORITY_DEFAULT,
+                           info->size_computation_cancellable,
+                           compute_installed_size_info_ready,
+                           g_object_ref (info));
+
+  g_object_unref (info_file);
   g_object_unref (app_dir);
 }
 
@@ -457,10 +524,12 @@ eos_app_info_get_installed_size (const EosAppInfo *info)
       if (info->info_installed_size > 0)
         return info->info_installed_size;
 
-      /* Compute the size from the installation directory */
-      compute_installed_size ((EosAppInfo *) info);
+      /* If we have a cached computed size, return that. */
       if (info->computed_installed_size > 0)
         return info->computed_installed_size;
+
+      /* Trigger size computation from the installation directory */
+      compute_installed_size ((EosAppInfo *) info);
     }
 
   return 0;
@@ -495,10 +564,13 @@ eos_app_info_is_updatable (const EosAppInfo *info)
 gboolean
 eos_app_info_is_removable (const EosAppInfo *info)
 {
-  /* We can remove those applications that we have loaded
-   * from the installed directories - that is those that
-   * have info->info_filename set.
-   */
+  /* We can remove those applications that we have installed */
+  return eos_app_info_is_store_installed (info);
+}
+
+gboolean
+eos_app_info_is_store_installed (const EosAppInfo *info)
+{
   return info->info_filename != NULL;
 }
 

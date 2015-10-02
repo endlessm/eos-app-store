@@ -39,6 +39,8 @@ struct _EosAppInfo
   gint64 info_installed_size;
   gint64 server_installed_size;
 
+  GCancellable *size_computation_cancellable;
+
   char *square_img;
   char *featured_img;
   char *icon_name;
@@ -61,6 +63,7 @@ struct _EosAppInfo
   guint is_installed : 1;
   guint has_launcher : 1;
   guint has_override : 1;
+  guint installed_size_computed : 1;
 };
 
 struct _EosAppInfoClass {
