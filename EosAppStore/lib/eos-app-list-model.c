@@ -1525,6 +1525,8 @@ eos_app_list_model_update_app_async (EosAppListModel *model,
       return;
     }
 
+  eos_app_info_set_is_updating (info, TRUE);
+
   g_task_set_task_data (task, g_object_ref (info), g_object_unref);
   g_task_run_in_thread (task, update_app_thread_func);
   g_object_unref (task);
@@ -1535,7 +1537,12 @@ eos_app_list_model_update_app_finish (EosAppListModel *model,
                                       GAsyncResult *result,
                                       GError **error)
 {
-  return g_task_propagate_boolean (G_TASK (result), error);
+  GTask *task = G_TASK (result);
+  EosAppInfo *info = g_task_get_task_data (task);
+
+  eos_app_info_set_is_updating (info, FALSE);
+
+  return g_task_propagate_boolean (task, error);
 }
 
 static void

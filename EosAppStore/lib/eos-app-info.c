@@ -562,6 +562,12 @@ eos_app_info_is_updatable (const EosAppInfo *info)
 }
 
 gboolean
+eos_app_info_is_updating (const EosAppInfo *info)
+{
+  return info->is_updating;
+}
+
+gboolean
 eos_app_info_is_removable (const EosAppInfo *info)
 {
   /* We can remove those applications that we have installed */
@@ -1150,4 +1156,12 @@ eos_app_info_update_from_content (EosAppInfo *info,
     info->n_screenshots = 0;
 
   return TRUE;
+}
+
+/*< private >*/
+void
+eos_app_info_set_is_updating (EosAppInfo *info,
+                              gboolean is_updating)
+{
+  info->is_updating = is_updating;
 }
