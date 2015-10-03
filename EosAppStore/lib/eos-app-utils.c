@@ -414,14 +414,10 @@ eos_link_load_content (EosLinkCategory category)
   JsonObject *obj;
   const gchar *category_name;
 
-  static gboolean content_loaded = FALSE;
-  JsonArray *categories_array = NULL;
+  static JsonArray *categories_array = NULL;
 
-  if (!content_loaded)
-    {
-      content_loaded = TRUE;
-      categories_array = eos_app_parse_resource_content (APP_STORE_CONTENT_LINKS, get_os_personality (), NULL);
-    }
+  if (!categories_array)
+    categories_array = eos_app_parse_resource_content (APP_STORE_CONTENT_LINKS, get_os_personality (), NULL);
 
   if (categories_array == NULL)
     return NULL;
@@ -468,8 +464,6 @@ eos_link_load_content (EosLinkCategory category)
     }
 
 out:
-  json_array_unref (categories_array);
-
   return g_list_reverse (links);
 }
 
