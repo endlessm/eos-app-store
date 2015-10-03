@@ -634,6 +634,10 @@ const WeblinkFrame = new Lang.Class({
                                                                   visible: true });
             category.button.connect('clicked', Lang.bind(this, this._onButtonClicked));
             this._categoriesBox.add(category.button);
+
+            if (!buttonGroup) {
+                buttonGroup = category.button;
+            }
         }
     },
 
