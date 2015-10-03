@@ -712,6 +712,8 @@ const WeblinkFrame = new Lang.Class({
         for (let idx in this._categories) {
             this._resetCategory(idx);
         }
+
+        this.populate();
     },
 
     reset: function() {
