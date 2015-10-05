@@ -27,8 +27,25 @@ download_app (EosAppInfo *info)
 {
   g_print (" downloading...\n");
 
-  g_autofree char *bundle_path = eos_app_info_download_bundle (info, soup_session, opt_output_dir, opt_use_delta, NULL, NULL, NULL, NULL);
-  g_autofree char *sig_path = eos_app_info_download_signature (info, soup_session, opt_output_dir, opt_use_delta, NULL, NULL);
+  g_autoptr(GError) error = NULL;
+  g_autofree char *bundle_path = eos_app_info_download_bundle (info, soup_session,
+                                                               opt_output_dir, opt_use_delta,
+                                                               NULL, NULL, NULL,
+                                                               &error);
+  if (error != NULL)
+    {
+      g_print ("downloading bundle failed: %s\n", error->message);
+      return;
+    }
+
+  g_autofree char *sig_path = eos_app_info_download_signature (info, soup_session,
+                                                               opt_output_dir, opt_use_delta,
+                                                               NULL, &error);
+  if (error != NULL)
+    {
+      g_print ("downloading signature failed: %s\n", error->message);
+      return;
+    }
 
   const char *checksum = eos_app_info_get_checksum (info, opt_use_delta, NULL);
 
