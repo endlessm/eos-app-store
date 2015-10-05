@@ -596,6 +596,14 @@ eos_net_utils_download_file_with_retry (SoupSession            *session,
       if (download_success)
         break;
 
+      /* If we're out of disk space, don't bother retrying */
+      if (g_error_matches (error, EOS_APP_STORE_ERROR,
+                           EOS_APP_STORE_ERROR_DISK_FULL))
+        {
+          g_propagate_error (error_out, error);
+          break;
+        }
+
       /* If we got canceled, also bail */
       if (g_cancellable_is_cancelled (cancellable))
         {
