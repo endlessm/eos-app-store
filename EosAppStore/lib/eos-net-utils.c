@@ -463,7 +463,6 @@ static gboolean
 download_from_uri (SoupSession            *session,
                    const char             *source_uri,
                    const char             *target_file,
-                   const gboolean          allow_resume,
                    GFileProgressCallback   progress_func,
                    gpointer                user_data,
                    gboolean               *reset_error_counter,
@@ -481,14 +480,11 @@ download_from_uri (SoupSession            *session,
   gboolean is_resumed = FALSE;
   goffset start_offset = 0;
 
-  if (allow_resume)
-    {
-      eos_app_log_debug_message ("Resume allowed. "
-                                 "Figuring out what range to request.");
-      is_resumed = prepare_soup_resume_request (request, source_uri, target_file,
-                                                &start_offset,
-                                                cancellable);
-    }
+  eos_app_log_debug_message ("Resume allowed. "
+                             "Figuring out what range to request.");
+  is_resumed = prepare_soup_resume_request (request, source_uri, target_file,
+                                            &start_offset,
+                                            cancellable);
 
   /* For app bundles artifacts we are guaranteed that the download directory
    * exists and has been successfully created by eos_get_bundle_download_dir().
@@ -564,7 +560,6 @@ eos_net_utils_download_file_with_retry (SoupSession            *session,
   while (TRUE)
     {
       download_success = download_from_uri (session, source_uri, target_file,
-                                            TRUE, /* Allow resume */
                                             progress_func,
                                             user_data,
                                             &reset_error_counter,
