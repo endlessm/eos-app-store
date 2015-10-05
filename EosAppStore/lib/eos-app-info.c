@@ -568,6 +568,18 @@ eos_app_info_is_updating (const EosAppInfo *info)
 }
 
 gboolean
+eos_app_info_is_installing (const EosAppInfo *info)
+{
+  return info->is_installing;
+}
+
+gboolean
+eos_app_info_is_removing (const EosAppInfo *info)
+{
+  return info->is_removing;
+}
+
+gboolean
 eos_app_info_is_removable (const EosAppInfo *info)
 {
   /* We can remove those applications that we have installed */
@@ -1156,6 +1168,22 @@ eos_app_info_update_from_content (EosAppInfo *info,
     info->n_screenshots = 0;
 
   return TRUE;
+}
+
+/*< private >*/
+void
+eos_app_info_set_is_installing (EosAppInfo *info,
+                                gboolean is_installing)
+{
+  info->is_installing = is_installing;
+}
+
+/*< private >*/
+void
+eos_app_info_set_is_removing (EosAppInfo *info,
+                              gboolean is_removing)
+{
+  info->is_removing = is_removing;
 }
 
 /*< private >*/

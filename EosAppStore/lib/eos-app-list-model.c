@@ -1458,6 +1458,8 @@ eos_app_list_model_install_app_async (EosAppListModel *model,
       return;
     }
 
+  eos_app_info_set_is_installing (info, TRUE);
+
   g_task_set_task_data (task, g_object_ref (info), g_object_unref);
   g_task_run_in_thread (task, add_app_thread_func);
   g_object_unref (task);
@@ -1468,7 +1470,12 @@ eos_app_list_model_install_app_finish (EosAppListModel *model,
                                        GAsyncResult *result,
                                        GError **error)
 {
-  return g_task_propagate_boolean (G_TASK (result), error);
+  GTask *task = G_TASK (result);
+  EosAppInfo *info = g_task_get_task_data (task);
+
+  eos_app_info_set_is_installing (info, FALSE);
+
+  return g_task_propagate_boolean (task, error);
 }
 
 static void
@@ -1603,6 +1610,8 @@ eos_app_list_model_uninstall_app_async (EosAppListModel *model,
       return;
     }
 
+  eos_app_info_set_is_removing (info, TRUE);
+
   g_task_set_task_data (task, g_object_ref (info), g_object_unref);
   g_task_run_in_thread (task, remove_app_thread_func);
   g_object_unref (task);
@@ -1613,7 +1622,12 @@ eos_app_list_model_uninstall_app_finish (EosAppListModel *model,
                                          GAsyncResult *result,
                                          GError **error)
 {
-  return g_task_propagate_boolean (G_TASK (result), error);
+  GTask *task = G_TASK (result);
+  EosAppInfo *info = g_task_get_task_data (task);
+
+  eos_app_info_set_is_removing (info, FALSE);
+
+  return g_task_propagate_boolean (task, error);
 }
 
 gboolean
