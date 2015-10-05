@@ -340,16 +340,20 @@ prepare_out_stream (const char    *target_file,
 }
 
 static gboolean
-prepare_soup_resume_request (const SoupRequest *request,
-                             const char        *target_file,
-                             goffset           *resume_offset,
-                             GCancellable      *cancellable)
+prepare_soup_resume_request (SoupRequest  *request,
+                             const char   *target_file,
+                             gboolean     *needs_download,
+                             goffset      *resume_offset,
+                             GCancellable *cancellable)
 {
   eos_app_log_debug_message ("Getting local file length");
 
   /* Always assume we start from 0 */
   if (resume_offset != NULL)
     *resume_offset = 0;
+
+  if (needs_download != NULL)
+    *needs_download = TRUE;
 
   g_autoptr(GError) error = NULL;
   g_autoptr(GFile) file = g_file_new_for_path (target_file);
@@ -369,8 +373,27 @@ prepare_soup_resume_request (const SoupRequest *request,
   guint64 size = g_file_info_get_attribute_uint64 (info,
                                                    G_FILE_ATTRIBUTE_STANDARD_SIZE);
 
-  /* No file or nothing downloaded - just get the whole file */
-  if (size == 0)
+  /* Get the total size of the file */
+  g_autoptr(GInputStream) stream = soup_request_send (request, cancellable, &error);
+
+  if (error != NULL)
+    {
+      eos_app_log_error_message ("Soup request sending had an internal error: %s. "
+                                 "Will proceed without resuming", error->message);
+      return FALSE;
+    }
+
+  goffset total = soup_request_get_content_length (request);
+  if (total == size)
+    {
+      /* We already downloaded this */
+      if (needs_download != NULL)
+        *needs_download = FALSE;
+      return TRUE;
+    }
+
+  /* Something is not right - download the file again */
+  if (total < size)
     return FALSE;
 
   eos_app_log_info_message ("Resuming %s from offset %" G_GUINT64_FORMAT,
@@ -478,12 +501,16 @@ download_from_uri (SoupSession            *session,
 
   gboolean is_resumed = FALSE;
   goffset start_offset = 0;
+  gboolean needs_download;
 
   eos_app_log_debug_message ("Resume allowed. "
                              "Figuring out what range to request.");
   is_resumed = prepare_soup_resume_request (request, target_file,
+                                            &needs_download,
                                             &start_offset,
                                             cancellable);
+  if (!needs_download)
+    return TRUE;
 
   /* For app bundles artifacts we are guaranteed that the download directory
    * exists and has been successfully created by eos_get_bundle_download_dir().
