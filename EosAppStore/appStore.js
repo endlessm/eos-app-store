@@ -110,6 +110,7 @@ const AppStore = new Lang.Class({
         if (reset) {
             this._mainWindow.resetCurrentPage();
         }
+        this._mainWindow.show();
         this._mainWindow.present_with_time(timestamp);
     },
 
@@ -125,6 +126,7 @@ const AppStore = new Lang.Class({
             page = Categories.DEFAULT_APP_CATEGORY;
 
         this._mainWindow.pageManager.showPage(page);
+        this._mainWindow.show();
         this._mainWindow.present_with_time(timestamp);
     },
 
