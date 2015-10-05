@@ -341,7 +341,6 @@ prepare_out_stream (const char    *target_file,
 
 static gboolean
 prepare_soup_resume_request (const SoupRequest *request,
-                             const char        *source_uri,
                              const char        *target_file,
                              goffset           *resume_offset,
                              GCancellable      *cancellable)
@@ -482,7 +481,7 @@ download_from_uri (SoupSession            *session,
 
   eos_app_log_debug_message ("Resume allowed. "
                              "Figuring out what range to request.");
-  is_resumed = prepare_soup_resume_request (request, source_uri, target_file,
+  is_resumed = prepare_soup_resume_request (request, target_file,
                                             &start_offset,
                                             cancellable);
 
