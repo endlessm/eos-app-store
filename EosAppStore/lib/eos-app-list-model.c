@@ -25,6 +25,7 @@
 #include <glib/gi18n-lib.h>
 #include <libsoup/soup.h>
 
+#define DOWNLOAD_RATE_LIMIT_MS 150
 #define FALLBACK_LANG   "-en"
 
 /* gdbus-codegen does not generate autoptr macros for us */
@@ -84,6 +85,8 @@ typedef struct
 {
   EosAppListModel *model;
   EosAppInfo *info;
+
+  gint64 last_notification;
 } DownloadProgressCallbackData;
 
 static void
@@ -97,6 +100,7 @@ download_progress_callback_data_free (gpointer _data)
 
   g_slice_free (DownloadProgressCallbackData, data);
 }
+
 
 static void eos_app_list_model_async_initable_iface_init (GAsyncInitableIface *iface);
 G_DEFINE_TYPE_WITH_CODE (EosAppListModel, eos_app_list_model, G_TYPE_OBJECT,
@@ -830,6 +834,12 @@ emit_download_progress (goffset current,
 {
   DownloadProgressCallbackData *data = user_data;
 
+  /* Rate-limit download notifications */
+  gint64 current_time = g_get_monotonic_time ();
+  if ((current_time - data->last_notification <= DOWNLOAD_RATE_LIMIT_MS * 1000) &&
+      current != total)
+    return;
+
   eos_app_log_debug_message ("Emitting download progress signal "
                              "(%" G_GOFFSET_FORMAT " "
                              "of %" G_GOFFSET_FORMAT ")",
@@ -840,6 +850,7 @@ emit_download_progress (goffset current,
   ProgressClosure *closure =
     progress_closure_new (data->model, data->info, current, total);
 
+  data->last_notification = current_time;
   g_main_context_invoke_full (NULL, G_PRIORITY_DEFAULT,
                               emit_download_progress_in_main_context,
                               closure, (GDestroyNotify) progress_closure_free);
