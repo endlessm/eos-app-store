@@ -312,7 +312,7 @@ const AppInfoBox = new Lang.Class({
     },
 
     _showInstallSpinner: function() {
-        let label = (this._appState == EosAppStorePrivate.AppState.UPDATABLE) ?
+        let label = this._appInfo.is_updating() ?
             _("Updating…") : _("Installing…");
         this._installProgressLabel.set_text(label);
         this._installProgressSpinner.show();
