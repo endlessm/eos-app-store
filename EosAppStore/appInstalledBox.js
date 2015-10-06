@@ -123,7 +123,6 @@ const AppInstalledBox = new Lang.Class({
         this._removeButton.hide();
         this._controlsSeparator.hide();
 
-        this._controlsStack.visible_child_name = 'controls';
         if (this.model.networkAvailable && this.appInfo.is_updatable()) {
             this._updateButton.show();
             this._controlsSeparator.show();
