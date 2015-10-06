@@ -167,7 +167,11 @@ const AppInstalledBox = new Lang.Class({
         let responseId = this.showRemoveDialog();
 
         if (responseId == Gtk.ResponseType.APPLY) {
-            this.doRemove(Lang.bind(this, this.destroy));
+            this.doRemove(Lang.bind(this, function(error) {
+                if (!error) {
+                    this.destroy();
+                }
+            }));
         }
     },
 
