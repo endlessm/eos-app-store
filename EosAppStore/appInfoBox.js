@@ -168,8 +168,8 @@ const AppBaseBox = new Lang.Class({
         return responseId;
     },
 
-    doRemove: function(callback, transactionParams) {
-        this._pushTransaction(transactionParams);
+    doRemove: function(callback) {
+        this._pushTransaction();
 
         this._model.uninstall(this.appId, Lang.bind(this, function(error) {
             this._popTransaction();
@@ -191,8 +191,8 @@ const AppBaseBox = new Lang.Class({
         }));
     },
 
-    doUpdate: function(callback, transactionParams) {
-        this._pushTransaction(transactionParams);
+    doUpdate: function(callback) {
+        this._pushTransaction();
 
         this._model.updateApp(this.appId, Lang.bind(this, function(error) {
             this._popTransaction();
@@ -214,8 +214,8 @@ const AppBaseBox = new Lang.Class({
         }));
     },
 
-    doInstall: function(callback, transactionParams) {
-        this._pushTransaction(transactionParams);
+    doInstall: function(callback) {
+        this._pushTransaction();
 
         this.model.install(this.appId, Lang.bind(this, function(error) {
             this._popTransaction();
@@ -321,22 +321,14 @@ const AppInfoBox = new Lang.Class({
     },
 
     _downloadProgress: function(progress, current, total) {
-        if (current == 0) {
-            this._installProgressLabel.set_text(_("Downloading…"));
-            this._installProgressBar.fraction = 0.0;
-            return;
-        }
-
         if (current == total) {
             this._showInstallSpinner();
             return;
         }
 
+        this._installProgressSpinner.hide();
+        this._installProgressBar.show();
         this._installProgressBar.fraction = progress;
-    },
-
-    get hasTransactionInProgress() {
-        return this._transactionInProgress;
     },
 
     set appDescription(description) {
@@ -508,50 +500,45 @@ const AppInfoBox = new Lang.Class({
                 break;
         }
 
-        // force buttons to be hidden if there's a transaction
-        // in progress; we still want the various checks above
-        // to happen regardless
-        if (this.hasTransactionInProgress) {
+        this._syncTransactionState();
+    },
+
+    _syncTransactionState: function() {
+        let hasLauncher = this.appInfo.get_has_launcher();
+        let isInstalling = this.appInfo.is_installing();
+        let isUpdating = this.appInfo.is_updating();
+        let isRemoving = this.appInfo.is_removing();
+
+        if (isInstalling || isRemoving || isUpdating) {
             this._installButton.hide();
             this._removeButton.hide();
-        }
-    },
 
-    _pushTransaction: function(params) {
-        this._transactionInProgress = true;
+            // show the box with the progress bar and the label
+            this._installProgress.show();
 
-        // hide install/remove buttons
-        this._installButton.hide();
-        this._removeButton.hide();
+            // conditionally show the progress bar and cancel button
+            if (isUpdating || isInstalling) {
+                if (isInstalling && hasLauncher) {
+                    this._installProgressLabel.set_text(_("Installing…"));
+                }
+                else {
+                    this._installProgressLabel.set_text(_("Downloading…"));
+                }
 
-        // show the box with the progress bar and the label
-        this._installProgress.show();
-
-        // show the label
-        this._installProgressLabel.set_text(params.text);
-
-        // conditionally show the progress bar and cancel button
-        if (params.showProgressBar) {
-            this._installProgressSpinner.hide();
-            this._installProgressBar.fraction = 0.0;
-            this._installProgressBar.show();
-            this._installProgressCancel.show();
+                this._installProgressSpinner.show();
+                this._installProgressSpinner.start();
+                this._installProgressCancel.show();
+            }
+            else {
+                this._installProgressLabel.set_text(_("Removing…"));
+                this._installProgressBar.hide();
+                this._installProgressSpinner.hide();
+                this._installProgressCancel.hide();
+            }
         }
         else {
-            this._installProgressBar.hide();
-            this._installProgressSpinner.hide();
-            this._installProgressCancel.hide();
+            this._installProgress.hide();
         }
-
-        this.parent();
-    },
-
-    _popTransaction: function() {
-        this._transactionInProgress = false;
-
-        this._installProgress.hide();
-
-        this.parent();
     },
 
     _launchApp: function() {
@@ -567,16 +554,6 @@ const AppInfoBox = new Lang.Class({
         }
     },
 
-    _addToDesktop: function() {
-        this.doInstall(null, { text: _("Installing…"),
-                               showProgressBar: false });
-    },
-
-    _installApp: function() {
-        this.doInstall(null, { text: _("Downloading…"),
-                               showProgressBar: true });
-    },
-
     _onInstallButtonClicked: function() {
         switch (this._appState) {
             // if the application is installed, we have two options
@@ -587,21 +564,20 @@ const AppInfoBox = new Lang.Class({
                 }
                 // or we add a launcher on the desktop
                 else {
-                    this._addToDesktop();
+                    this.doInstall();
                 }
                 break;
 
             // if the application is uninstalled, we install it
             case EosAppStorePrivate.AppState.AVAILABLE:
-                this._installApp();
+                this.doInstall();
                 break;
 
             // if the application can be updated, we have two options
             case EosAppStorePrivate.AppState.UPDATABLE:
                 // we update it, if we have a launcher on the desktop
                 if (this.appInfo.get_has_launcher()) {
-                    this.doUpdate(null, { text: _("Updating…"),
-                                          showProgressBar: true });
+                    this.doUpdate();
                 }
                 // or we add a launcher on the desktop
                 else {
@@ -619,8 +595,7 @@ const AppInfoBox = new Lang.Class({
         let responseId = this.showRemoveDialog();
 
         if (responseId == Gtk.ResponseType.APPLY) {
-            this.doRemove(null, { text: _("Removing…"),
-                                  showProgressBar: false });
+            this.doRemove();
         }
     },
 });
