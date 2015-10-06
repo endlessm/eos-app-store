@@ -147,11 +147,7 @@ const AppInstalledBox = new Lang.Class({
     },
 
     _onUpdateButtonClicked: function() {
-        this.doUpdate(Lang.bind(this, function() {
-            this._syncState();
-        }));
-
-        this._syncState();
+        this.doUpdate();
     },
 
     _onRemoveButtonClicked: function() {

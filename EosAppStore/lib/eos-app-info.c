@@ -1176,6 +1176,7 @@ eos_app_info_set_is_installing (EosAppInfo *info,
                                 gboolean is_installing)
 {
   info->is_installing = is_installing;
+  g_object_notify_by_pspec (G_OBJECT (info), properties[PROP_STATE]);
 }
 
 /*< private >*/
@@ -1184,6 +1185,7 @@ eos_app_info_set_is_removing (EosAppInfo *info,
                               gboolean is_removing)
 {
   info->is_removing = is_removing;
+  g_object_notify_by_pspec (G_OBJECT (info), properties[PROP_STATE]);
 }
 
 /*< private >*/
@@ -1192,4 +1194,5 @@ eos_app_info_set_is_updating (EosAppInfo *info,
                               gboolean is_updating)
 {
   info->is_updating = is_updating;
+  g_object_notify_by_pspec (G_OBJECT (info), properties[PROP_STATE]);
 }
