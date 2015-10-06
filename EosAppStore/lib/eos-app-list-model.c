@@ -25,9 +25,7 @@
 #include <glib/gi18n-lib.h>
 #include <libsoup/soup.h>
 
-/* The delay for the EosAppListModel::changed signal, in milliseconds */
-#define CHANGED_DELAY   500
-
+#define DOWNLOAD_RATE_LIMIT_MS 150
 #define FALLBACK_LANG   "-en"
 
 /* gdbus-codegen does not generate autoptr macros for us */
@@ -87,6 +85,8 @@ typedef struct
 {
   EosAppListModel *model;
   EosAppInfo *info;
+
+  gint64 last_notification;
 } DownloadProgressCallbackData;
 
 static void
@@ -100,6 +100,7 @@ download_progress_callback_data_free (gpointer _data)
 
   g_slice_free (DownloadProgressCallbackData, data);
 }
+
 
 static void eos_app_list_model_async_initable_iface_init (GAsyncInitableIface *iface);
 G_DEFINE_TYPE_WITH_CODE (EosAppListModel, eos_app_list_model, G_TYPE_OBJECT,
@@ -833,6 +834,12 @@ emit_download_progress (goffset current,
 {
   DownloadProgressCallbackData *data = user_data;
 
+  /* Rate-limit download notifications */
+  gint64 current_time = g_get_monotonic_time ();
+  if ((current_time - data->last_notification <= DOWNLOAD_RATE_LIMIT_MS * 1000) &&
+      current != total)
+    return;
+
   eos_app_log_debug_message ("Emitting download progress signal "
                              "(%" G_GOFFSET_FORMAT " "
                              "of %" G_GOFFSET_FORMAT ")",
@@ -843,6 +850,7 @@ emit_download_progress (goffset current,
   ProgressClosure *closure =
     progress_closure_new (data->model, data->info, current, total);
 
+  data->last_notification = current_time;
   g_main_context_invoke_full (NULL, G_PRIORITY_DEFAULT,
                               emit_download_progress_in_main_context,
                               closure, (GDestroyNotify) progress_closure_free);
@@ -1458,6 +1466,8 @@ eos_app_list_model_install_app_async (EosAppListModel *model,
       return;
     }
 
+  eos_app_info_set_is_installing (info, TRUE);
+
   g_task_set_task_data (task, g_object_ref (info), g_object_unref);
   g_task_run_in_thread (task, add_app_thread_func);
   g_object_unref (task);
@@ -1468,7 +1478,12 @@ eos_app_list_model_install_app_finish (EosAppListModel *model,
                                        GAsyncResult *result,
                                        GError **error)
 {
-  return g_task_propagate_boolean (G_TASK (result), error);
+  GTask *task = G_TASK (result);
+  EosAppInfo *info = g_task_get_task_data (task);
+
+  eos_app_info_set_is_installing (info, FALSE);
+
+  return g_task_propagate_boolean (task, error);
 }
 
 static void
@@ -1603,6 +1618,8 @@ eos_app_list_model_uninstall_app_async (EosAppListModel *model,
       return;
     }
 
+  eos_app_info_set_is_removing (info, TRUE);
+
   g_task_set_task_data (task, g_object_ref (info), g_object_unref);
   g_task_run_in_thread (task, remove_app_thread_func);
   g_object_unref (task);
@@ -1613,7 +1630,12 @@ eos_app_list_model_uninstall_app_finish (EosAppListModel *model,
                                          GAsyncResult *result,
                                          GError **error)
 {
-  return g_task_propagate_boolean (G_TASK (result), error);
+  GTask *task = G_TASK (result);
+  EosAppInfo *info = g_task_get_task_data (task);
+
+  eos_app_info_set_is_removing (info, FALSE);
+
+  return g_task_propagate_boolean (task, error);
 }
 
 gboolean
