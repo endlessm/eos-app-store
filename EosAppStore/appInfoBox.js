@@ -43,9 +43,9 @@ const AppBaseBox = new Lang.Class({
         this._model = app.appListModel;
         this._appInfo = appInfo;
 
-        this._networkChangeId = this._model.connect('network-changed', Lang.bind(this, this._updateState));
+        this._networkChangeId = this._model.connect('network-changed', Lang.bind(this, this._syncState));
         this._progressId = this._model.connect('download-progress', Lang.bind(this, this._onDownloadProgress));
-        this._stateChangedId = this._appInfo.connect('notify::state', Lang.bind(this, this._updateState));
+        this._stateChangedId = this._appInfo.connect('notify::state', Lang.bind(this, this._syncState));
         this._windowHideId = mainWindow.connect('hide', Lang.bind(this, this._destroyPendingDialogs));
 
         this._removeDialog = null;
@@ -106,7 +106,7 @@ const AppBaseBox = new Lang.Class({
         // to be overridden
     },
 
-    _updateState: function() {
+    _syncState: function() {
         // to be overridden
     },
 
@@ -183,7 +183,7 @@ const AppBaseBox = new Lang.Class({
                 app.maybeNotifyUser(_("'%s' was removed successfully").format(this.appTitle));
             }
 
-            this._updateState();
+            this._syncState();
 
             if (callback) {
                 callback(error);
@@ -206,7 +206,7 @@ const AppBaseBox = new Lang.Class({
                 app.maybeNotifyUser(_("'%s' was updated successfully").format(this.appTitle));
             }
 
-            this._updateState();
+            this._syncState();
 
             if (callback) {
                 callback(error);
@@ -229,7 +229,7 @@ const AppBaseBox = new Lang.Class({
                 app.maybeNotifyUser(_("'%s' was installed successfully").format(this.appTitle));
             }
 
-            this._updateState();
+            this._syncState();
 
             if (!error) {
                 let appWindow = Gio.Application.get_default().mainWindow;
@@ -304,10 +304,10 @@ const AppInfoBox = new Lang.Class({
         this._mainBox.reorder_child(separator, 0);
         this._mainBox.show();
 
-        this._updateState();
+        this._syncState();
     },
 
-    _updateState: function() {
+    _syncState: function() {
         this.appState = this.appInfo.get_state();
     },
 

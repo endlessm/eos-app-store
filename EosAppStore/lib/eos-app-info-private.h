@@ -64,6 +64,7 @@ struct _EosAppInfo
   guint has_launcher : 1;
   guint has_override : 1;
   guint installed_size_computed : 1;
+  guint is_updating : 1;
 };
 
 struct _EosAppInfoClass {

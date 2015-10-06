@@ -54,7 +54,7 @@ const AppInstalledBox = new Lang.Class({
         this.setImageFrame(this._removeButton, this._removeButtonImage);
         this.setImageFrame(this._updateButton, this._updateButtonImage);
 
-        this._updateState();
+        this._syncState();
     },
 
     _onDestroy: function() {
@@ -103,7 +103,7 @@ const AppInstalledBox = new Lang.Class({
         }
     },
 
-    _updateState: function() {
+    _syncState: function() {
         // Hide all controls, and show only what's needed
         this._updateButton.hide();
         this._removeButton.hide();
@@ -118,22 +118,20 @@ const AppInstalledBox = new Lang.Class({
         if (this.appInfo.is_removable()) {
             this._removeButton.show();
         }
+
+        this._syncUpdateState();
     },
 
-    _downloadProgress: function(progress, current, total) {
-        this._updateProgressBar.fraction = progress;
-    },
+    _syncUpdateState: function() {
+        if (this.appInfo.is_updating()) {
+            this._appIcon.opacity = UPDATING_OPACITY;
+            this._nameText.opacity = UPDATING_OPACITY;
+            this._categoryText.opacity = UPDATING_OPACITY;
 
-    _onUpdateButtonClicked: function() {
-        this._appIcon.opacity = UPDATING_OPACITY;
-        this._nameText.opacity = UPDATING_OPACITY;
-        this._categoryText.opacity = UPDATING_OPACITY;
-
-        this._updateProgressBar.show();
-        this._updateSpinner.start();
-        this._controlsStack.visible_child_name = 'spinner';
-
-        this.doUpdate(Lang.bind(this, function() {
+            this._updateProgressBar.show();
+            this._updateSpinner.start();
+            this._controlsStack.visible_child_name = 'spinner';
+        } else {
             this._appIcon.opacity = NORMAL_OPACITY;
             this._nameText.opacity = NORMAL_OPACITY;
             this._categoryText.opacity = NORMAL_OPACITY;
@@ -141,9 +139,19 @@ const AppInstalledBox = new Lang.Class({
             this._updateProgressBar.hide();
             this._updateSpinner.stop();
             this._controlsStack.visible_child_name = 'controls';
+        }
+    },
 
-            this._updateState();
+    _downloadProgress: function(progress, current, total) {
+        this._updateProgressBar.fraction = progress;
+    },
+
+    _onUpdateButtonClicked: function() {
+        this.doUpdate(Lang.bind(this, function() {
+            this._syncState();
         }));
+
+        this._syncState();
     },
 
     _onRemoveButtonClicked: function() {
