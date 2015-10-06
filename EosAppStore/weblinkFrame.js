@@ -525,7 +525,7 @@ const WeblinkListBoxRow = new Lang.Class({
 
     _onStateButtonClicked: function() {
         let desktopId = this._info.get_desktop_id();
-        this._model.install(desktopId, function() {});
+        this._model.install(desktopId);
 
         this._setSensitiveState(false);
         this._setJustInstalledState();
