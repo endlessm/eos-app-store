@@ -11,6 +11,20 @@ const Lang = imports.lang;
 const UPDATING_OPACITY = 0.3;
 const NORMAL_OPACITY = 1.0;
 
+const AppInstalledBoxRow = new Lang.Class({
+    Name: 'AppInstalledBoxRow',
+    Extends: Gtk.ListBoxRow,
+
+    _init: function(appInfo) {
+        this.parent();
+
+        let installedBox = new AppInstalledBox(appInfo);
+        installedBox.connect('destroy', Lang.bind(this, this.destroy));
+        this.add(installedBox);
+        installedBox.show();
+    }
+});
+
 const AppInstalledBox = new Lang.Class({
     Name: 'AppInstalledBox',
     Extends: AppInfoBox.AppBaseBox,
@@ -109,7 +123,6 @@ const AppInstalledBox = new Lang.Class({
         this._removeButton.hide();
         this._controlsSeparator.hide();
 
-        this._controlsStack.visible_child_name = 'controls';
         if (this.model.networkAvailable && this.appInfo.is_updatable()) {
             this._updateButton.show();
             this._controlsSeparator.show();

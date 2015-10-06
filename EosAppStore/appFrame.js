@@ -233,7 +233,7 @@ const AppInstalledFrame = new Lang.Class({
     },
 
     _createViewElement: function(info) {
-        let row = new AppInstalledBox.AppInstalledBox(info);
+        let row = new AppInstalledBox.AppInstalledBoxRow(info);
         this.view.add(row);
         row.show();
     },
