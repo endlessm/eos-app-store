@@ -525,7 +525,7 @@ const WeblinkListBoxRow = new Lang.Class({
 
     _onStateButtonClicked: function() {
         let desktopId = this._info.get_desktop_id();
-        this._model.install(desktopId, function() {});
+        this._model.install(desktopId);
 
         this._setSensitiveState(false);
         this._setJustInstalledState();
@@ -575,7 +575,6 @@ const WeblinkFrame = new Lang.Class({
 
         let app = Gio.Application.get_default();
         this._weblinkListModel = app.appListModel;
-        this._weblinkListModel.connect('changed', Lang.bind(this, this._repopulate));
         this._initCategories();
 
         if (app.mainWindow.getExpectedWidth() <= AppStoreWindow.AppStoreSizes.SVGA.screenWidth) {
