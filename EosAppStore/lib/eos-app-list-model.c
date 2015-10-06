@@ -25,9 +25,6 @@
 #include <glib/gi18n-lib.h>
 #include <libsoup/soup.h>
 
-/* The delay for the EosAppListModel::changed signal, in milliseconds */
-#define CHANGED_DELAY   500
-
 #define FALLBACK_LANG   "-en"
 
 /* gdbus-codegen does not generate autoptr macros for us */
