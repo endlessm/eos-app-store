@@ -332,16 +332,15 @@ const AppPageProvider = new Lang.Class({
             return;
         }
 
-        let activePageId = this._pageManager.visible_child_name;
-
         // refresh current page if it belongs to us
-        if (this._findCategory(activePageId)) {
-            let page = this._pageManager.visible_child;
-            page.invalidate();
-            page.populate();
-        }
+        let activePageId = this._pageManager.visible_child_name;
+        this._repopulatePage(activePageId);
 
         this._model.refresh(Lang.bind(this, this._onModelRefresh));
+    },
+
+    _onModelChanged: function() {
+        this._reloadModel();
     },
 
     _onModelRefresh: function(error) {
@@ -369,6 +368,12 @@ const AppPageProvider = new Lang.Class({
             }
         }
 
+        // now start listening to changes
+        this._model.connect('changed', Lang.bind(this, this._onModelChanged));
+        this._reloadModel();
+    },
+
+    _reloadModel: function() {
         // invalidate all the pages
         let activePageId = this._pageManager.visible_child_name;
         this._categories.forEach(Lang.bind(this, function(c) {
@@ -377,8 +382,13 @@ const AppPageProvider = new Lang.Class({
         }));
 
         // repopulate current page if it belongs to us
-        if (this._findCategory(activePageId)) {
+        this._repopulatePage(activePageId);
+    },
+
+    _repopulatePage: function(pageId) {
+        if (this._findCategory(pageId)) {
             let page = this._pageManager.visible_child;
+            page.invalidate();
             page.populate();
         }
     },
