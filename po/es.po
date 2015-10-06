@@ -24,7 +24,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: eos-app-store\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-09-22 18:33+0000\n"
+"POT-Creation-Date: 2015-09-29 01:22+0000\n"
 "PO-Revision-Date: 2015-09-22 01:23+0000\n"
 "Last-Translator: endlessmobile_build <philip@endlessm.com>\n"
 "Language-Team: Spanish (http://www.transifex.com/endless-mobile-inc/eos-app-store/language/es/)\n"
@@ -74,19 +74,19 @@ msgstr "Crea tu propia carpeta para organizar tus programas. Primero, escoge un 
 msgid "e.g.: http://www.globoesporte.com"
 msgstr "ej.: http://www.globoesporte.com"
 
-#: ../EosAppStore/appFrame.js:234
+#: ../EosAppStore/appFrame.js:243
 msgid "Installed apps"
 msgstr ""
 
-#: ../EosAppStore/appFrame.js:291
+#: ../EosAppStore/appFrame.js:300
 msgid "Install apps"
 msgstr "Instalar programas"
 
-#: ../EosAppStore/appFrame.js:325
+#: ../EosAppStore/appFrame.js:334
 msgid "Refresh failed"
 msgstr "Falló la recarga"
 
-#: ../EosAppStore/appFrame.js:327 ../EosAppStore/appStore.js:235
+#: ../EosAppStore/appFrame.js:336 ../EosAppStore/appStore.js:235
 msgid "Dismiss"
 msgstr "Cerrar"
 
@@ -152,7 +152,7 @@ msgstr "Nombre de carpeta"
 msgid "Folder added!"
 msgstr "¡Carpeta agregada!"
 
-#: ../EosAppStore/folderFrame.js:297
+#: ../EosAppStore/folderFrame.js:303
 msgid "Install folders"
 msgstr "Instalar carpetas"
 
@@ -193,71 +193,71 @@ msgid ""
 "contact support."
 msgstr "El centro de programas ha detectado un error grave y no puede continuar con la instalación. Por favor, reinicia tu sistema. Si el problema persiste, ponte en contacto con soporte."
 
-#: ../EosAppStore/lib/eos-app-list-model.c:474
+#: ../EosAppStore/lib/eos-app-list-model.c:472
 msgid "We are unable to load the complete list of applications"
 msgstr "No ha sido posible cargar la lista completa de programas"
 
-#: ../EosAppStore/lib/eos-app-list-model.c:482
+#: ../EosAppStore/lib/eos-app-list-model.c:480
 msgid "We were unable to update the list of applications"
 msgstr "No pudimos actualizar la lista de programas"
 
-#: ../EosAppStore/lib/eos-app-list-model.c:910
+#: ../EosAppStore/lib/eos-app-list-model.c:908
 msgid "Not enough space on device for installing the app."
 msgstr ""
 
-#: ../EosAppStore/lib/eos-app-list-model.c:984
+#: ../EosAppStore/lib/eos-app-list-model.c:982
 msgid ""
 "We encountered an internal error during the installation of the application."
 msgstr ""
 
-#: ../EosAppStore/lib/eos-app-list-model.c:1013
+#: ../EosAppStore/lib/eos-app-list-model.c:1011
 msgid ""
 "We encountered an internal error during the removal of the application."
 msgstr ""
 
-#: ../EosAppStore/lib/eos-app-list-model.c:1040
-#: ../EosAppStore/lib/eos-app-list-model.c:1088
+#: ../EosAppStore/lib/eos-app-list-model.c:1038
+#: ../EosAppStore/lib/eos-app-list-model.c:1086
 msgid "You must be an administrator to install applications."
 msgstr ""
 
-#: ../EosAppStore/lib/eos-app-list-model.c:1052
-#: ../EosAppStore/lib/eos-app-list-model.c:1245
+#: ../EosAppStore/lib/eos-app-list-model.c:1050
+#: ../EosAppStore/lib/eos-app-list-model.c:1243
 msgid ""
 "The app center has detected a fatal error and cannot continue. Please, "
 "restart your system. If the problem persists, please contact support."
 msgstr "El centro de programas ha detectado un error fatal y no puede continuar. Por favor, reinicie su sistema. Si el problema persiste, por favor contacte a soporte técnico."
 
-#: ../EosAppStore/lib/eos-app-list-model.c:1233
-#: ../EosAppStore/lib/eos-app-list-model.c:1263
+#: ../EosAppStore/lib/eos-app-list-model.c:1231
+#: ../EosAppStore/lib/eos-app-list-model.c:1261
 msgid "You must be an administrator to remove applications."
 msgstr ""
 
-#: ../EosAppStore/lib/eos-app-list-model.c:1395
+#: ../EosAppStore/lib/eos-app-list-model.c:1393
 #, c-format
 msgid "App %s has no candidate for installation."
 msgstr ""
 
-#: ../EosAppStore/lib/eos-app-list-model.c:1407
+#: ../EosAppStore/lib/eos-app-list-model.c:1405
 #, c-format
 msgid "App '%s' is already installed."
 msgstr ""
 
-#: ../EosAppStore/lib/eos-app-list-model.c:1463
+#: ../EosAppStore/lib/eos-app-list-model.c:1461
 #, c-format
 msgid "App %s not installable."
 msgstr ""
 
-#: ../EosAppStore/lib/eos-app-list-model.c:1474
+#: ../EosAppStore/lib/eos-app-list-model.c:1472
 #, c-format
 msgid "App %s is up to date."
 msgstr ""
 
-#: ../EosAppStore/lib/eos-app-list-model.c:1545
+#: ../EosAppStore/lib/eos-app-list-model.c:1543
 #, c-format
 msgid "App %s is not installed"
 msgstr "El programa %s no está instalado"
 
-#: ../EosAppStore/lib/eos-app-list-model.c:1577
+#: ../EosAppStore/lib/eos-app-list-model.c:1575
 #, c-format
 msgid "App '%s' is not installed."
 msgstr ""
@@ -298,27 +298,27 @@ msgstr "No hay ninguna firma disponible para el programa '%s'"
 msgid "Application bundle '%s' could not be downloaded"
 msgstr "No fue posible descargar el programa '%s'"
 
-#: ../EosAppStore/lib/eos-net-utils.c:270
+#: ../EosAppStore/lib/eos-net-utils.c:271
 msgid "The certificate of the target server is expired"
 msgstr "El certificado del servidor destino ha expirado"
 
-#: ../EosAppStore/lib/eos-net-utils.c:272
+#: ../EosAppStore/lib/eos-net-utils.c:273
 msgid "The certificate of the target server has been revoked"
 msgstr "El certificado del servidor destino ha sido revocado"
 
-#: ../EosAppStore/lib/eos-net-utils.c:274
+#: ../EosAppStore/lib/eos-net-utils.c:275
 msgid "The certificate of the target server has a bad identity"
 msgstr "El certificado del servidor destino tiene una mala identidad"
 
-#: ../EosAppStore/lib/eos-net-utils.c:276
+#: ../EosAppStore/lib/eos-net-utils.c:277
 msgid "The certificate of the target server is from an unknown authority"
 msgstr "El certificado del servidor destino es de una autoridad desconocida"
 
-#: ../EosAppStore/lib/eos-net-utils.c:278
+#: ../EosAppStore/lib/eos-net-utils.c:279
 msgid "The certificate of the target server is bad or invalid"
 msgstr "El certificado del servidor destino es malo o inválido"
 
-#: ../EosAppStore/lib/eos-net-utils.c:337
+#: ../EosAppStore/lib/eos-net-utils.c:339
 #, c-format
 msgid "Could not save bundle file - canceling download (%s)"
 msgstr "No se pudo guardar el archivo de programa - cancelando la descarga (%s)"

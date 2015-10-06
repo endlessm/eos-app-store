@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: eos-app-store\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-09-22 18:33+0000\n"
+"POT-Creation-Date: 2015-09-29 01:22+0000\n"
 "PO-Revision-Date: 2015-09-22 01:23+0000\n"
 "Last-Translator: endlessmobile_build <philip@endlessm.com>\n"
 "Language-Team: Arabic (http://www.transifex.com/endless-mobile-inc/eos-app-store/language/ar/)\n"
@@ -58,19 +58,19 @@ msgstr "قم بإنشاء مجلد خاص بك لتنظيم تطبيقاتك. ا
 msgid "e.g.: http://www.globoesporte.com"
 msgstr "مثال: http://www.globoesporte.com"
 
-#: ../EosAppStore/appFrame.js:234
+#: ../EosAppStore/appFrame.js:243
 msgid "Installed apps"
 msgstr ""
 
-#: ../EosAppStore/appFrame.js:291
+#: ../EosAppStore/appFrame.js:300
 msgid "Install apps"
 msgstr "تثبيت التطبيقات"
 
-#: ../EosAppStore/appFrame.js:325
+#: ../EosAppStore/appFrame.js:334
 msgid "Refresh failed"
 msgstr ""
 
-#: ../EosAppStore/appFrame.js:327 ../EosAppStore/appStore.js:235
+#: ../EosAppStore/appFrame.js:336 ../EosAppStore/appStore.js:235
 msgid "Dismiss"
 msgstr "استبعاد"
 
@@ -136,7 +136,7 @@ msgstr "اسم المجلد "
 msgid "Folder added!"
 msgstr "تمت إضافة المجلد!"
 
-#: ../EosAppStore/folderFrame.js:297
+#: ../EosAppStore/folderFrame.js:303
 msgid "Install folders"
 msgstr "تثبيت المجلدات"
 
@@ -177,71 +177,71 @@ msgid ""
 "contact support."
 msgstr ""
 
-#: ../EosAppStore/lib/eos-app-list-model.c:474
+#: ../EosAppStore/lib/eos-app-list-model.c:472
 msgid "We are unable to load the complete list of applications"
 msgstr ""
 
-#: ../EosAppStore/lib/eos-app-list-model.c:482
+#: ../EosAppStore/lib/eos-app-list-model.c:480
 msgid "We were unable to update the list of applications"
 msgstr "يتعذر علينا تحديث قائمة التطبيقات"
 
-#: ../EosAppStore/lib/eos-app-list-model.c:910
+#: ../EosAppStore/lib/eos-app-list-model.c:908
 msgid "Not enough space on device for installing the app."
 msgstr ""
 
-#: ../EosAppStore/lib/eos-app-list-model.c:984
+#: ../EosAppStore/lib/eos-app-list-model.c:982
 msgid ""
 "We encountered an internal error during the installation of the application."
 msgstr ""
 
-#: ../EosAppStore/lib/eos-app-list-model.c:1013
+#: ../EosAppStore/lib/eos-app-list-model.c:1011
 msgid ""
 "We encountered an internal error during the removal of the application."
 msgstr ""
 
-#: ../EosAppStore/lib/eos-app-list-model.c:1040
-#: ../EosAppStore/lib/eos-app-list-model.c:1088
+#: ../EosAppStore/lib/eos-app-list-model.c:1038
+#: ../EosAppStore/lib/eos-app-list-model.c:1086
 msgid "You must be an administrator to install applications."
 msgstr ""
 
-#: ../EosAppStore/lib/eos-app-list-model.c:1052
-#: ../EosAppStore/lib/eos-app-list-model.c:1245
+#: ../EosAppStore/lib/eos-app-list-model.c:1050
+#: ../EosAppStore/lib/eos-app-list-model.c:1243
 msgid ""
 "The app center has detected a fatal error and cannot continue. Please, "
 "restart your system. If the problem persists, please contact support."
 msgstr ""
 
-#: ../EosAppStore/lib/eos-app-list-model.c:1233
-#: ../EosAppStore/lib/eos-app-list-model.c:1263
+#: ../EosAppStore/lib/eos-app-list-model.c:1231
+#: ../EosAppStore/lib/eos-app-list-model.c:1261
 msgid "You must be an administrator to remove applications."
 msgstr ""
 
-#: ../EosAppStore/lib/eos-app-list-model.c:1395
+#: ../EosAppStore/lib/eos-app-list-model.c:1393
 #, c-format
 msgid "App %s has no candidate for installation."
 msgstr ""
 
-#: ../EosAppStore/lib/eos-app-list-model.c:1407
+#: ../EosAppStore/lib/eos-app-list-model.c:1405
 #, c-format
 msgid "App '%s' is already installed."
 msgstr ""
 
-#: ../EosAppStore/lib/eos-app-list-model.c:1463
+#: ../EosAppStore/lib/eos-app-list-model.c:1461
 #, c-format
 msgid "App %s not installable."
 msgstr ""
 
-#: ../EosAppStore/lib/eos-app-list-model.c:1474
+#: ../EosAppStore/lib/eos-app-list-model.c:1472
 #, c-format
 msgid "App %s is up to date."
 msgstr ""
 
-#: ../EosAppStore/lib/eos-app-list-model.c:1545
+#: ../EosAppStore/lib/eos-app-list-model.c:1543
 #, c-format
 msgid "App %s is not installed"
 msgstr "التطبيق %s غير مثبت"
 
-#: ../EosAppStore/lib/eos-app-list-model.c:1577
+#: ../EosAppStore/lib/eos-app-list-model.c:1575
 #, c-format
 msgid "App '%s' is not installed."
 msgstr ""
@@ -282,27 +282,27 @@ msgstr "ليس هناك توقيع متوفر من أجل '%s'"
 msgid "Application bundle '%s' could not be downloaded"
 msgstr "تعذر تنزيل حزمة التطبيق '%s'"
 
-#: ../EosAppStore/lib/eos-net-utils.c:270
+#: ../EosAppStore/lib/eos-net-utils.c:271
 msgid "The certificate of the target server is expired"
 msgstr ""
 
-#: ../EosAppStore/lib/eos-net-utils.c:272
+#: ../EosAppStore/lib/eos-net-utils.c:273
 msgid "The certificate of the target server has been revoked"
 msgstr ""
 
-#: ../EosAppStore/lib/eos-net-utils.c:274
+#: ../EosAppStore/lib/eos-net-utils.c:275
 msgid "The certificate of the target server has a bad identity"
 msgstr ""
 
-#: ../EosAppStore/lib/eos-net-utils.c:276
+#: ../EosAppStore/lib/eos-net-utils.c:277
 msgid "The certificate of the target server is from an unknown authority"
 msgstr ""
 
-#: ../EosAppStore/lib/eos-net-utils.c:278
+#: ../EosAppStore/lib/eos-net-utils.c:279
 msgid "The certificate of the target server is bad or invalid"
 msgstr ""
 
-#: ../EosAppStore/lib/eos-net-utils.c:337
+#: ../EosAppStore/lib/eos-net-utils.c:339
 #, c-format
 msgid "Could not save bundle file - canceling download (%s)"
 msgstr ""
