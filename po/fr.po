@@ -145,8 +145,8 @@ msgid "Write the website you'd like to add here and press “Enter”"
 msgstr "Écrivez le site internet que vous aimeriez ajouter ici et appuyer sur «Entrée»"
 
 #: ../EosAppStore/weblinkFrame.js:329
-msgid "e.g.: http://www.prensalibre.com.gt"
-msgstr "ex. : http://www.prensalibre.com.gt"
+msgid "e.g.: http://www.endlessm.com"
+msgstr "ex. : http://www.endlessm.com"
 
 #: ../EosAppStore/weblinkFrame.js:349
 msgid "searching"
