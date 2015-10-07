@@ -197,6 +197,7 @@ const AppFrame = new Lang.Class({
         if (child)
             child.destroy();
 
+        this._mainWindow.clearHeaderState();
         this.view = null;
     },
 
