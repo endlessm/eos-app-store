@@ -289,7 +289,7 @@
                         <property name="label" translatable="yes">STOP</property>
                         <property name="max_width_chars">6</property>
                         <style>
-                          <class name="app-updating"/>
+                          <class name="cancel-label"/>
                         </style>
                       </object>
                       <packing>
