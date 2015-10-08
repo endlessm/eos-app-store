@@ -11,10 +11,6 @@
 
 G_BEGIN_DECLS
 
-char *  eos_app_get_content_dir  (void);
-
-char *  eos_link_get_content_dir (void);
-
 JsonArray * eos_app_parse_resource_content (const char *content_type,
                                             const char *content_name,
                                             GError **error_out);

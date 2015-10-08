@@ -14,8 +14,6 @@
 #include <json-glib/json-glib.h>
 #include <errno.h>
 
-#define APP_STORE_CONTENT_DIR   "application-store"
-#define APP_STORE_CONTENT_APPS  "apps"
 #define APP_STORE_CONTENT_LINKS "links"
 
 #define BUNDLE_DIR              LOCALSTATEDIR "/tmp/eos-app-store"
@@ -276,29 +274,6 @@ get_os_arch (void)
   return EOS_ARCH;
 }
 
-static char *
-eos_get_content_dir (const gchar *content_type)
-{
-  char *res = g_build_filename (DATADIR,
-                                APP_STORE_CONTENT_DIR,
-                                get_os_personality (),
-                                content_type,
-                                NULL);
-
-  if (!g_file_test (res, G_FILE_TEST_EXISTS | G_FILE_TEST_IS_DIR))
-    {
-      g_free (res);
-
-      res = g_build_filename (DATADIR,
-                              APP_STORE_CONTENT_DIR,
-                              "Default",
-                              content_type,
-                              NULL);
-    }
-
-  return res;
-}
-
 static const char *
 eos_link_get_category_name (EosLinkCategory category)
 {
@@ -371,32 +346,6 @@ eos_app_parse_resource_content (const char *content_type,
   g_free (content_file);
 
   return content_array;
-}
-
-/**
- * eos_app_get_content_dir:
- *
- * ...
- *
- * Returns: (transfer full): ...
- */
-char *
-eos_app_get_content_dir (void)
-{
-  return eos_get_content_dir (APP_STORE_CONTENT_APPS);
-}
-
-/**
- * eos_link_get_content_dir:
- *
- * ...
- *
- * Returns: (transfer full): ...
- */
-char *
-eos_link_get_content_dir (void)
-{
-  return eos_get_content_dir (APP_STORE_CONTENT_LINKS);
 }
 
 /**
