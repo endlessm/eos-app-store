@@ -836,7 +836,10 @@ emit_download_progress (goffset current,
 
   /* Rate-limit download notifications */
   gint64 current_time = g_get_monotonic_time ();
-  if ((current_time - data->last_notification <= DOWNLOAD_RATE_LIMIT_MS * 1000) &&
+  gint64 time_elapsed = current_time - data->last_notification;
+
+  /* Always emit the last notification */
+  if ((time_elapsed <= DOWNLOAD_RATE_LIMIT_MS * 1000) &&
       current != total)
     return;
 
