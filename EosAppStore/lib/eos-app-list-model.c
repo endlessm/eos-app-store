@@ -74,7 +74,6 @@ struct _EosAppListModelClass
 
 enum {
   CHANGED,
-  DOWNLOAD_PROGRESS,
 
   LAST_SIGNAL
 };
@@ -590,18 +589,6 @@ eos_app_list_model_class_init (EosAppListModelClass *klass)
                   NULL, NULL,
                   g_cclosure_marshal_VOID__VOID,
                   G_TYPE_NONE, 0);
-
-  eos_app_list_model_signals[DOWNLOAD_PROGRESS] =
-    g_signal_new (g_intern_static_string ("download-progress"),
-                  G_OBJECT_CLASS_TYPE (klass),
-                  G_SIGNAL_RUN_LAST,
-                  0,
-                  NULL, NULL,
-                  NULL,
-                  G_TYPE_NONE, 3,
-                  G_TYPE_STRING,   // app-id
-                  G_TYPE_UINT64,   // current progress
-                  G_TYPE_UINT64);  // total size
 }
 
 static void
@@ -818,11 +805,8 @@ static gboolean
 emit_download_progress_in_main_context (gpointer user_data)
 {
   ProgressClosure *closure = user_data;
-  g_signal_emit (closure->model,
-                 eos_app_list_model_signals[DOWNLOAD_PROGRESS], 0,
-                 eos_app_info_get_content_id (closure->info),
-                 closure->current,
-                 closure->total);
+  eos_app_info_emit_download_progress (closure->info,
+                                       closure->current, closure->total);
 
   return G_SOURCE_REMOVE;
 }

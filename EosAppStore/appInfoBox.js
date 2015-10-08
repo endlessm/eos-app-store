@@ -44,7 +44,7 @@ const AppBaseBox = new Lang.Class({
         this._appInfo = appInfo;
 
         this._networkChangeId = this._model.connect('network-changed', Lang.bind(this, this._syncState));
-        this._progressId = this._model.connect('download-progress', Lang.bind(this, this._onDownloadProgress));
+        this._progressId = this._appInfo.connect('download-progress', Lang.bind(this, this._onDownloadProgress));
         this._stateChangedId = this._appInfo.connect('notify::state', Lang.bind(this, this._syncState));
         this._windowHideId = mainWindow.connect('hide', Lang.bind(this, this._destroyPendingDialogs));
 
@@ -84,7 +84,7 @@ const AppBaseBox = new Lang.Class({
         }
 
         if (this._progressId != 0) {
-            this._model.disconnect(this._progressId);
+            this._appInfo.disconnect(this._progressId);
             this._progressId = 0;
         }
 
@@ -94,9 +94,17 @@ const AppBaseBox = new Lang.Class({
         }
     },
 
-    _onDownloadProgress: function(model, contentId, progress, current, total) {
-        if (this._appInfo.get_content_id() != contentId) {
-            return;
+    _onDownloadProgress: function(appInfo, current, total) {
+        let progress;
+
+        if (current == 0) {
+            progress = 0.0;
+        }
+        else if (current == total) {
+            progress = 1.0;
+        }
+        else {
+            progress = current / total;
         }
 
         this._downloadProgress(progress, current, total);

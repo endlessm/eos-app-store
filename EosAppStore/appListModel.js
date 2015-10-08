@@ -35,28 +35,11 @@ const AppListModel = new Lang.Class({
             return;
         }
 
-        this._model.connect('download-progress', Lang.bind(this, this._onDownloadProgress));
         this._model.connect('changed', Lang.bind(this, this._onModelChanged));
 
         this._loading = false;
         this.emit('loading-changed');
         this._onModelChanged(this._model);
-    },
-
-    _onDownloadProgress: function(model, contentId, current, total) {
-        let progress;
-
-        if (current == 0) {
-            progress = 0.0;
-        }
-        else if (current == total) {
-            progress = 1.0;
-        }
-        else {
-            progress = current / total;
-        }
-
-        this.emit('download-progress', contentId, progress, current, total);
     },
 
     _onModelChanged: function(model) {
