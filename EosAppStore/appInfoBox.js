@@ -232,8 +232,9 @@ const AppBaseBox = new Lang.Class({
             this._syncState();
 
             if (!error) {
-                let appWindow = Gio.Application.get_default().mainWindow;
-                if (appWindow && appWindow.is_visible()) {
+                let app = Gio.Application.get_default();
+                let appWindow = app.mainWindow;
+                if (!app.debugWindow && appWindow && appWindow.is_visible()) {
                     appWindow.hide();
                 }
             }
