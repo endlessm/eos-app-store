@@ -1,7 +1,8 @@
 // -*- mode: js; js-indent-level: 4; indent-tabs-mode: nil -*-
 const Gio = imports.gi.Gio;
-const Gtk = imports.gi.Gtk;
 const EosAppStorePrivate = imports.gi.EosAppStorePrivate;
+const GLib = imports.gi.GLib;
+const Gtk = imports.gi.Gtk;
 
 const AppInfoBox = imports.appInfoBox;
 const AppInstalledBox = imports.appInstalledBox;
@@ -138,6 +139,18 @@ const AppFrame = new Lang.Class({
         // to be overridden
     },
 
+    _populateView: function(appInfos) {
+        for (let info of appInfos) {
+            this._createViewElement(info);
+        }
+    },
+
+    _doPopulate: function() {
+        this.view = this._createView();
+        let appInfos = this._prepareAppInfos(this._model.loadCategory(this._category.id));
+        this._populateView(appInfos);
+    },
+
     populate: function() {
         if (this.view) {
             return;
@@ -147,12 +160,7 @@ const AppFrame = new Lang.Class({
             return;
         }
 
-        this.view = this._createView();
-        let appInfos = this._prepareAppInfos(this._model.loadCategory(this._category.id));
-
-        for (let i in appInfos) {
-            this._createViewElement(appInfos[i]);
-        }
+        this._doPopulate();
     },
 
     _showView: function() {
@@ -217,6 +225,13 @@ const AppInstalledFrame = new Lang.Class({
     Name: 'AppInstalledFrame',
     Extends: AppFrame,
 
+    _POPULATE_BATCH_SIZE: 10,
+
+    _onDestroy: function() {
+        this._unschedulePopulate();
+        this.parent();
+    },
+
     _listHeaderFunc: function(row, before) {
         if (before) {
             let frame = new Gtk.Frame();
@@ -242,6 +257,34 @@ const AppInstalledFrame = new Lang.Class({
         row.show();
     },
 
+    _unschedulePopulate: function() {
+        if (this._populateId > 0) {
+            GLib.source_remove(this._populateId);
+            this._populateId = 0;
+        }
+    },
+
+    _schedulePopulate: function(appInfos) {
+        if (appInfos.length > 0) {
+            this._populateId = GLib.idle_add(
+                GLib.PRIORITY_DEFAULT_IDLE,
+                Lang.bind(this, this._populateMoreInfos, appInfos));
+        }
+    },
+
+    _populateMoreInfos: function(appInfos) {
+        for (let idx = 0; idx < this._POPULATE_BATCH_SIZE && appInfos.length > 0; idx++) {
+            let info = appInfos.shift();
+            this._createViewElement(info);
+        }
+
+        this._schedulePopulate(appInfos);
+    },
+
+    _populateView: function(appInfos) {
+        this._populateMoreInfos(appInfos);
+    },
+
     _prepareAppInfos: function(appInfos) {
         return appInfos.filter(function(info) {
             return info.is_installed();
@@ -253,6 +296,11 @@ const AppInstalledFrame = new Lang.Class({
     _onRowActivated: function(list, row) {
         let installedBox = row.get_child();
         this.showAppInfoBox(installedBox.appInfo);
+    },
+
+    _doPopulate: function() {
+        this._unschedulePopulate();
+        this.parent();
     },
 
     getTitle: function() {
