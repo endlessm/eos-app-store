@@ -1,5 +1,6 @@
 // -*- mode: js; js-indent-level: 4; indent-tabs-mode: nil -*-
 const Gio = imports.gi.Gio;
+const GLib = imports.gi.GLib;
 const Gtk = imports.gi.Gtk;
 const EosAppStorePrivate = imports.gi.EosAppStorePrivate;
 
@@ -146,10 +147,16 @@ const AppFrame = new Lang.Class({
         this.view = this._createView();
         let appInfos = this._prepareAppInfos(this._model.loadCategory(this._category.id));
 
+        let timeNow = GLib.get_monotonic_time();
+
         // 'Installed' only shows apps available on the system
         for (let i in appInfos) {
             this._createViewElement(appInfos[i]);
         }
+
+        if (this._category.id == EosAppStorePrivate.AppCategory.INSTALLED)
+            log('Elapsed: ' + ((GLib.get_monotonic_time() - timeNow) / 1000000) +
+                ' for ' + appInfos.length + ' apps');
     },
 
     _showView: function() {
@@ -234,9 +241,16 @@ const AppInstalledFrame = new Lang.Class({
     },
 
     _createViewElement: function(info) {
+        let timeStart = GLib.get_monotonic_time();
         let row = new AppInstalledBox.AppInstalledBoxRow(info);
+        let timeCreate = GLib.get_monotonic_time();
         this.view.add(row);
         row.show();
+        let timeEnd = GLib.get_monotonic_time();
+
+        log('Elapsed to create one row: ' + ((timeCreate - timeStart) / 1000000));
+        log('Elapsed to add one row: ' + ((timeEnd - timeCreate) / 1000000));
+        log('Elapsed overall for one row: ' + ((timeEnd - timeStart) / 1000000));
     },
 
     _prepareAppInfos: function(appInfos) {
