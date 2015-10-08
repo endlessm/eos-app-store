@@ -896,7 +896,7 @@ get_bundle_artifacts (EosAppListModel *self,
       goto out;
     }
 
-  DownloadProgressCallbackData *data = g_slice_new (DownloadProgressCallbackData);
+  DownloadProgressCallbackData *data = g_slice_new0 (DownloadProgressCallbackData);
   data->model = g_object_ref (self);
   data->info = g_object_ref (info);
 
