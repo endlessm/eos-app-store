@@ -103,6 +103,10 @@ void            eos_app_info_set_is_removing            (EosAppInfo *info,
 G_GNUC_INTERNAL
 void            eos_app_info_set_is_updating            (EosAppInfo *info,
                                                          gboolean    is_updating);
+G_GNUC_INTERNAL
+void            eos_app_info_emit_download_progress     (EosAppInfo *info,
+                                                         goffset     current,
+                                                         goffset     total);
 
 #endif
 

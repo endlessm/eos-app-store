@@ -27,6 +27,14 @@ enum {
 
 static GParamSpec *properties[NUM_PROPS] = { NULL, };
 
+enum {
+  DOWNLOAD_PROGRESS,
+
+  LAST_SIGNAL
+};
+
+static guint eos_app_info_signals[LAST_SIGNAL] = { 0, };
+
 /* installed keyfile keys */
 static const gchar *FILE_KEYS[] = {
   "app_id",
@@ -258,6 +266,17 @@ eos_app_info_class_init (EosAppInfoClass *klass)
                        EOS_TYPE_APP_STATE,
                        EOS_APP_STATE_UNKNOWN,
                        G_PARAM_READABLE | G_PARAM_STATIC_STRINGS);
+
+  eos_app_info_signals[DOWNLOAD_PROGRESS] =
+    g_signal_new (g_intern_static_string ("download-progress"),
+                  G_OBJECT_CLASS_TYPE (klass),
+                  G_SIGNAL_RUN_LAST,
+                  0,
+                  NULL, NULL,
+                  NULL,
+                  G_TYPE_NONE, 2,
+                  G_TYPE_INT64,   /* current progress */
+                  G_TYPE_INT64);  /* total size */
 
   g_object_class_install_properties (oclass, NUM_PROPS, properties);
 }
@@ -1195,4 +1214,14 @@ eos_app_info_set_is_updating (EosAppInfo *info,
 {
   info->is_updating = is_updating;
   g_object_notify_by_pspec (G_OBJECT (info), properties[PROP_STATE]);
+}
+
+/*< private >*/
+void
+eos_app_info_emit_download_progress (EosAppInfo *info,
+                                     goffset     current,
+                                     goffset     total)
+{
+  g_signal_emit (info, eos_app_info_signals[DOWNLOAD_PROGRESS], 0,
+                 current, total);
 }
