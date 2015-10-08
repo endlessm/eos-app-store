@@ -130,6 +130,10 @@ const AppFrame = new Lang.Class({
         // to be overridden
     },
 
+    _createViewElement: function() {
+        // to be overridden
+    },
+
     _prepareAppInfos: function(appInfos) {
         // to be overridden
     },
