@@ -38,7 +38,7 @@ G_DEFINE_TYPE (EosLinkRow, eos_link_row, GTK_TYPE_LIST_BOX_ROW)
 #define DEFAULT_LINK_ICON_NAME "generic-link"
 
 #define PROVIDER_DATA_FORMAT ".weblink-row-image { " \
-  "background-image: url(\"%s\"); "                  \
+  "background-image: url(\"resource://%s\"); "       \
   "background-repeat: no-repeat; "                   \
   "background-size: 90px 90px; }"
 
@@ -184,7 +184,7 @@ eos_link_row_draw_normal (EosLinkRow *self,
 
   if (self->image == NULL)
     self->image = get_thumbnail_surface_background (self,
-                                                    eos_link_info_get_thumbnail_filename (self->link_info),
+                                                    eos_link_info_get_thumbnail_resource_path (self->link_info),
                                                     image_width, image_height, NULL);
 
   gtk_style_context_get_margin (self->image_context,
@@ -357,7 +357,7 @@ struct _EosLinkInfo
   gchar *desktop_id;
   gchar *title;
   gchar *description;
-  gchar *thumbnail_filename;
+  gchar *thumbnail_resource_path;
   gchar *icon_name;
   gchar *url;
 };
@@ -396,7 +396,7 @@ eos_link_info_unref (EosLinkInfo *info)
       g_free (info->title);
       g_free (info->description);
       g_free (info->icon_name);
-      g_free (info->thumbnail_filename);
+      g_free (info->thumbnail_resource_path);
       g_free (info->url);
 
       g_slice_free (EosLinkInfo, info);
@@ -444,11 +444,11 @@ eos_link_info_get_icon_name (EosLinkInfo *info)
 }
 
 const gchar *
-eos_link_info_get_thumbnail_filename (EosLinkInfo *info)
+eos_link_info_get_thumbnail_resource_path (EosLinkInfo *info)
 {
   g_return_val_if_fail (info != NULL, NULL);
 
-  return info->thumbnail_filename;
+  return info->thumbnail_resource_path;
 }
 
 const gchar *
@@ -478,7 +478,6 @@ eos_link_info_create_from_json (JsonNode *node)
 {
   EosLinkInfo *info;
   JsonObject *obj;
-  gchar *path;
 
   g_return_val_if_fail (JSON_NODE_HOLDS_OBJECT (node), NULL);
 
@@ -512,14 +511,14 @@ eos_link_info_create_from_json (JsonNode *node)
 
   if (json_object_has_member (obj, "linkSmall"))
     {
-      path = eos_link_get_content_dir();
-      info->thumbnail_filename = g_build_filename (path,
-                                             json_node_get_string (json_object_get_member (obj, "linkSmall")),
-                                             NULL);
+      info->thumbnail_resource_path =
+        g_build_filename ("/com/endlessm/appstore-content/links/",
+                          json_node_get_string (json_object_get_member (obj, "linkSmall")),
+                          NULL);
     }
   else
     {
-      info->thumbnail_filename = NULL;
+      info->thumbnail_resource_path = NULL;
     }
 
   if (json_object_has_member (obj, "linkUrl"))

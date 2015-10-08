@@ -26,7 +26,7 @@ const gchar *   eos_link_info_get_id                 (EosLinkInfo *info);
 const gchar *   eos_link_info_get_title              (EosLinkInfo *info);
 const gchar *   eos_link_info_get_description        (EosLinkInfo *info);
 const gchar *   eos_link_info_get_icon_name          (EosLinkInfo *info);
-const gchar *   eos_link_info_get_thumbnail_filename (EosLinkInfo *info);
+const gchar *   eos_link_info_get_thumbnail_resource_path (EosLinkInfo *info);
 const gchar *   eos_link_info_get_url                (EosLinkInfo *info);
 
 GtkWidget   *   eos_link_info_create_row             (EosLinkInfo *info);
