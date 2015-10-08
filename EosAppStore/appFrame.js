@@ -146,7 +146,6 @@ const AppFrame = new Lang.Class({
         this.view = this._createView();
         let appInfos = this._prepareAppInfos(this._model.loadCategory(this._category.id));
 
-        // 'Installed' only shows apps available on the system
         for (let i in appInfos) {
             this._createViewElement(appInfos[i]);
         }
