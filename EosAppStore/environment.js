@@ -30,6 +30,7 @@ function loadResources() {
     let resources =
         [[Path.RESOURCE_DIR, 'eos-app-store.gresource'],
          [Path.CONTENT_DIR, 'eos-app-store-app-content.gresource'],
+         [Path.CONTENT_DIR, 'eos-app-store-app-screenshots.gresource'],
          [Path.CONTENT_DIR, 'eos-app-store-link-content.gresource']];
 
     for (let idx in resources) {
