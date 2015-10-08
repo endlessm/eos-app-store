@@ -229,8 +229,6 @@
                     <child>
                       <object class="GtkSpinner" id="_updateSpinner">
                         <property name="visible">True</property>
-                        <property name="width_request">9px</property>
-                        <property name="height_request">9px</property>
                       </object>
                       <packing>
                         <property name="expand">False</property>
@@ -244,10 +242,12 @@
                         <property name="can_focus">False</property>
                         <property name="label" translatable="yes">UPDATING…</property>
                         <property name="max_width_chars">10</property>
+                        <property name="margin_start">10</property>
+                        <property name="margin_end">10</property>
+                        <style>
+                          <class name="app-updating"/>
+                        </style>
                       </object>
-                      <style>
-                        <class name="app-updating"/>
-                      </style>
                       <packing>
                         <property name="expand">False</property>
                         <property name="fill">False</property>
@@ -260,6 +260,8 @@
                         <property name="can_focus">True</property>
                         <property name="receives_default">True</property>
                         <property name="valign">center</property>
+                        <property name="margin_start">10</property>
+                        <property name="margin_end">7</property>
                         <signal name="clicked" handler="_onCancelButtonClicked" swapped="no"/>
                         <child>
                           <object class="GtkImage" id="_cancelButtonImage">
@@ -278,6 +280,22 @@
                         <property name="expand">False</property>
                         <property name="fill">False</property>
                         <property name="position">2</property>
+                      </packing>
+                    </child>
+                    <child>
+                      <object class="GtkLabel" id="_stopLabel">
+                        <property name="visible">True</property>
+                        <property name="can_focus">False</property>
+                        <property name="label" translatable="yes">STOP</property>
+                        <property name="max_width_chars">6</property>
+                        <style>
+                          <class name="cancel-label"/>
+                        </style>
+                      </object>
+                      <packing>
+                        <property name="expand">False</property>
+                        <property name="fill">False</property>
+                        <property name="position">3</property>
                       </packing>
                     </child>
                   </object>

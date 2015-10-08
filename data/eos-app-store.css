@@ -166,15 +166,18 @@
 .installed-app-box .app-category {
     color: #cccccc;
     font-size: 8px;
+    font-weight: 300; /* light */
 }
 
-.installed-app-box .app-size {
-    color: #9b9b9b;
+.installed-app-box .app-size,
+.installed-app-box .cancel-label {
+    color: alpha(#484848, 0.69);
 }
 
 .installed-app-box .app-updating {
-    font-size: 9px;
     color: white;
+    font-size: 9px;
+    font-weight: 300; /* light */
 }
 
 .controls-box .controls-separator {
