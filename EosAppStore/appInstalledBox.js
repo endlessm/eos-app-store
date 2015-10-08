@@ -50,9 +50,6 @@ const AppInstalledBox = new Lang.Class({
     _init: function(appInfo) {
         this.parent(appInfo);
 
-        let app = Gio.Application.get_default();
-        let mainWindow = app.mainWindow;
-
         this.initTemplate({ templateRoot: '_overlay', bindChildren: true, connectSignals: true, });
         this.add(this._overlay);
 
