@@ -22,7 +22,7 @@ JsonArray * eos_app_parse_resource_content (const char *content_type,
 GList * eos_link_load_content    (EosLinkCategory  category);
 
 void    eos_app_load_screenshot  (GtkWidget       *image,
-                                  const char      *path,
+                                  const char      *resource_path,
                                   int              width);
 
 GdkPixbuf *eos_link_get_favicon  (WebKitWebView *webview);

@@ -469,16 +469,16 @@ out:
 
 void
 eos_app_load_screenshot (GtkWidget  *image,
-                         const char *path,
+                         const char *resource_path,
                          int         width)
 {
   GError *error = NULL;
   GdkPixbuf *pixbuf =
-    gdk_pixbuf_new_from_file_at_size (path, width, width, &error);
+    gdk_pixbuf_new_from_resource_at_scale (resource_path, width, -1, TRUE, &error);
 
   if (error != NULL)
     {
-      g_warning ("Cannot load image at path '%s': %s", path, error->message);
+      g_warning ("Cannot load image at path '%s': %s", resource_path, error->message);
       g_error_free (error);
       gtk_widget_hide (image);
       return;
