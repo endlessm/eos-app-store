@@ -2,9 +2,9 @@
 const Gio = imports.gi.Gio;
 const GLib = imports.gi.GLib;
 const Gtk = imports.gi.Gtk;
+const Pango = imports.gi.Pango;
 
 const AppInfoBox = imports.appInfoBox;
-const Builder = imports.builder;
 const Categories = imports.categories;
 const Lang = imports.lang;
 
@@ -29,29 +29,124 @@ const AppInstalledBox = new Lang.Class({
     Name: 'AppInstalledBox',
     Extends: AppInfoBox.AppBaseBox,
 
-    templateResource: '/com/endlessm/appstore/eos-app-store-app-installed-box.ui',
-    templateChildren: [
-        '_appIcon',
-        '_cancelButton',
-        '_controlsSeparator',
-        '_controlsStack',
-        '_categoryText',
-        '_nameText',
-        '_overlay',
-        '_removeButton',
-        '_removeButtonImage',
-        '_sizeText',
-        '_updateButton',
-        '_updateButtonImage',
-        '_updateProgressBar',
-        '_updateSpinner',
-    ],
-
     _init: function(appInfo) {
         this.parent(appInfo);
 
-        this.initTemplate({ templateRoot: '_overlay', bindChildren: true, connectSignals: true, });
+        this._overlay = new Gtk.Overlay();
         this.add(this._overlay);
+
+        let mainBox = new Gtk.Box({ spacing: 10,
+                                    height_request: 54 });
+        mainBox.get_style_context().add_class('installed-app-box');
+        this._overlay.add(mainBox);
+
+        this._appIcon = new Gtk.Image({ use_fallback: true,
+                                        icon_size: Gtk.IconSize.DIALOG,
+                                        margin_start: 7,
+                                        margin_top: 7,
+                                        margin_bottom: 7,
+                                        margin_end: 1 });
+        mainBox.add(this._appIcon);
+
+        let descriptionBox = new Gtk.Box({ orientation: Gtk.Orientation.VERTICAL,
+                                           hexpand: true,
+                                           valign: Gtk.Align.CENTER,
+                                           spacing: 8 });
+        mainBox.add(descriptionBox);
+
+        this._nameText = new Gtk.Label({ ellipsize: Pango.EllipsizeMode.END,
+                                         width_chars: 20,
+                                         max_width_chars: 40,
+                                         lines: 1,
+                                         xalign: 0,
+                                         expand: true });
+        this._nameText.get_style_context().add_class('app-name');
+        descriptionBox.add(this._nameText);
+
+        this._categoryText = new Gtk.Label({ width_chars: 20,
+                                             max_width_chars: 40,
+                                             lines: 1,
+                                             xalign: 0,
+                                             expand: true });
+        this._categoryText.get_style_context().add_class('app-category');
+        descriptionBox.add(this._categoryText);
+
+        this._controlsStack = new Gtk.Stack();
+        mainBox.add(this._controlsStack);
+
+        let box = new Gtk.Box();
+        this._controlsStack.add_named(box, 'controls');
+
+        this._controlsBox = new Gtk.Box({ spacing: 12 });
+        this._controlsBox.get_style_context().add_class('controls-box');
+        box.add(this._controlsBox);
+
+        this._updateButtonImage = new Gtk.Frame({ width_request: 16,
+                                                  height_request: 16,
+                                                  valign: Gtk.Align.CENTER });
+        this._updateButtonImage.get_style_context().add_class('state-image');
+
+        this._updateButton = new Gtk.Button({ valign: Gtk.Align.CENTER,
+                                              child: this._updateButtonImage });
+        this._updateButton.connect('clicked', Lang.bind(this, this._onUpdateButtonClicked));
+        this._updateButton.get_style_context().add_class('state-button');
+        this._updateButton.get_style_context().add_class('update');
+        this._controlsBox.add(this._updateButton);
+
+        this._controlsSeparator = new Gtk.Separator({ orientation: Gtk.Orientation.VERTICAL });
+        this._controlsSeparator.get_style_context().add_class('controls-separator');
+        this._controlsBox.add(this._controlsSeparator);
+
+        this._removeButtonImage = new Gtk.Frame({ width_request: 16,
+                                                  height_request: 16,
+                                                  valign: Gtk.Align.CENTER });
+        this._removeButtonImage.get_style_context().add_class('state-image');
+
+        this._removeButton = new Gtk.Button({ valign: Gtk.Align.CENTER,
+                                              child: this._removeButtonImage });
+        this._removeButton.connect('clicked', Lang.bind(this, this._onRemoveButtonClicked));
+        this._removeButton.get_style_context().add_class('state-button');
+        this._removeButton.get_style_context().add_class('remove');
+        this._controlsBox.add(this._removeButton);
+
+        this._sizeText = new Gtk.Label({ label: _("SIZE"),
+                                         ellipsize: Pango.EllipsizeMode.END,
+                                         margin_end: 10,
+                                         width_chars: 15,
+                                         max_width_chars: 15,
+                                         xalign: 1 });
+        this._sizeText.get_style_context().add_class('app-size');
+        box.add(this._sizeText);
+
+        let box2 = new Gtk.Box();
+        box2.get_style_context().add_class('controls-box');
+        this._controlsStack.add_named(box2, 'spinner');
+
+        this._updateSpinner = new Gtk.Spinner();
+        box2.add(this._updateSpinner);
+
+        let updateLabel = new Gtk.Label ({ label: _("UPDATING…"),
+                                           max_width_chars: 10 });
+        updateLabel.get_style_context().add_class('app-updating');
+        box2.add(updateLabel);
+
+        let cancelButtonImage = new Gtk.Image({ icon_size: Gtk.IconSize.MENU,
+                                                icon_name: 'process-stop-symbolic' });
+
+        let cancelButton = new Gtk.Button({ valign: Gtk.Align.CENTER,
+                                            child: cancelButtonImage });
+        cancelButton.connect('clicked', Lang.bind(this, this._onCancelButtonClicked));
+        cancelButton.get_style_context().add_class('state-button');
+        cancelButton.get_style_context().add_class('cancel');
+        box2.add(cancelButton);
+
+        this._updateProgressBar = new Gtk.ProgressBar({ hexpand: true,
+                                                        valign: Gtk.Align.END,
+                                                        no_show_all: true });
+        this._updateProgressBar.get_style_context().add_class('update-progress-bar');
+        this._overlay.add_overlay(this._updateProgressBar);
+
+        this.show_all();
 
         this.appIcon = this.appInfo.get_icon_name();
         this.nameText = this.appTitle;
@@ -176,4 +271,3 @@ const AppInstalledBox = new Lang.Class({
         this.doCancel();
     }
 });
-Builder.bindTemplateChildren(AppInstalledBox.prototype);
