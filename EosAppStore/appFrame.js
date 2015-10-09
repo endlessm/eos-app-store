@@ -225,8 +225,6 @@ const AppInstalledFrame = new Lang.Class({
     Name: 'AppInstalledFrame',
     Extends: AppFrame,
 
-    _POPULATE_BATCH_SIZE: 10,
-
     _onDestroy: function() {
         this._unschedulePopulate();
         this.parent();
@@ -272,10 +270,16 @@ const AppInstalledFrame = new Lang.Class({
         }
     },
 
+    _populateBatchSize: function() {
+        // assume 12 rows at 1080 screen resolution and scale it from there
+        let screenHeight = this.get_screen().get_height();
+        return Math.floor(screenHeight / 1080 * 12);
+    },
+
     _populateMoreInfos: function(appInfos) {
         this._populateId = 0;
 
-        for (let idx = 0; idx < this._POPULATE_BATCH_SIZE && appInfos.length > 0; idx++) {
+        for (let idx = 0; idx < this._populateBatchSize() && appInfos.length > 0; idx++) {
             let info = appInfos.shift();
             this._createViewElement(info);
         }
