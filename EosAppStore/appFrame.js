@@ -267,7 +267,7 @@ const AppInstalledFrame = new Lang.Class({
     _schedulePopulate: function(appInfos) {
         if (appInfos.length > 0) {
             this._populateId = GLib.idle_add(
-                GLib.PRIORITY_DEFAULT_IDLE,
+                GLib.PRIORITY_DEFAULT_IDLE + 20,
                 Lang.bind(this, this._populateMoreInfos, appInfos));
         }
     },
