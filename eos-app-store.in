@@ -23,4 +23,5 @@ if [ "$RUN_VALGRIND" != "" ]; then
 fi
 
 echo "Running $DEBUG_COMMAND @GJS_CONSOLE@..."
+export GTK_BACKDROP_STYLING=0
 exec $DEBUG_COMMAND @GJS_CONSOLE@ -I @pkgdatadir@/js -c "const Main = imports.main; Main.start();" "$@"
