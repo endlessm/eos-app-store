@@ -14,8 +14,6 @@
 #include <json-glib/json-glib.h>
 #include <errno.h>
 
-#define APP_STORE_CONTENT_DIR   "application-store"
-#define APP_STORE_CONTENT_APPS  "apps"
 #define APP_STORE_CONTENT_LINKS "links"
 
 #define BUNDLE_DIR              LOCALSTATEDIR "/tmp/eos-app-store"
@@ -276,29 +274,6 @@ get_os_arch (void)
   return EOS_ARCH;
 }
 
-static char *
-eos_get_content_dir (const gchar *content_type)
-{
-  char *res = g_build_filename (DATADIR,
-                                APP_STORE_CONTENT_DIR,
-                                get_os_personality (),
-                                content_type,
-                                NULL);
-
-  if (!g_file_test (res, G_FILE_TEST_EXISTS | G_FILE_TEST_IS_DIR))
-    {
-      g_free (res);
-
-      res = g_build_filename (DATADIR,
-                              APP_STORE_CONTENT_DIR,
-                              "Default",
-                              content_type,
-                              NULL);
-    }
-
-  return res;
-}
-
 static const char *
 eos_link_get_category_name (EosLinkCategory category)
 {
@@ -374,32 +349,6 @@ eos_app_parse_resource_content (const char *content_type,
 }
 
 /**
- * eos_app_get_content_dir:
- *
- * ...
- *
- * Returns: (transfer full): ...
- */
-char *
-eos_app_get_content_dir (void)
-{
-  return eos_get_content_dir (APP_STORE_CONTENT_APPS);
-}
-
-/**
- * eos_link_get_content_dir:
- *
- * ...
- *
- * Returns: (transfer full): ...
- */
-char *
-eos_link_get_content_dir (void)
-{
-  return eos_get_content_dir (APP_STORE_CONTENT_LINKS);
-}
-
-/**
  * eos_link_load_content:
  *
  * ...
@@ -469,16 +418,16 @@ out:
 
 void
 eos_app_load_screenshot (GtkWidget  *image,
-                         const char *path,
+                         const char *resource_path,
                          int         width)
 {
   GError *error = NULL;
   GdkPixbuf *pixbuf =
-    gdk_pixbuf_new_from_file_at_size (path, width, width, &error);
+    gdk_pixbuf_new_from_resource_at_scale (resource_path, width, -1, TRUE, &error);
 
   if (error != NULL)
     {
-      g_warning ("Cannot load image at path '%s': %s", path, error->message);
+      g_warning ("Cannot load image at path '%s': %s", resource_path, error->message);
       g_error_free (error);
       gtk_widget_hide (image);
       return;
