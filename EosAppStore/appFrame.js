@@ -273,12 +273,16 @@ const AppInstalledFrame = new Lang.Class({
     },
 
     _populateMoreInfos: function(appInfos) {
+        this._populateId = 0;
+
         for (let idx = 0; idx < this._POPULATE_BATCH_SIZE && appInfos.length > 0; idx++) {
             let info = appInfos.shift();
             this._createViewElement(info);
         }
 
         this._schedulePopulate(appInfos);
+
+        return GLib.SOURCE_REMOVE;
     },
 
     _populateView: function(appInfos) {
