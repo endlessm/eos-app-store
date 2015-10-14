@@ -414,10 +414,7 @@ const AppPageProvider = new Lang.Class({
             return;
         }
 
-        // refresh current page if it belongs to us
-        let activePageId = this._pageManager.visible_child_name;
-        this._repopulatePage(activePageId);
-
+        this._repopulateActivePage();
         this._model.refresh(Lang.bind(this, this._onModelRefresh));
     },
 
@@ -457,21 +454,21 @@ const AppPageProvider = new Lang.Class({
 
     _reloadModel: function() {
         // invalidate all the pages
-        let activePageId = this._pageManager.visible_child_name;
         this._categories.forEach(Lang.bind(this, function(c) {
             let page = this._pageManager.get_child_by_name(c.name);
             page.invalidate();
         }));
 
-        // repopulate current page if it belongs to us
-        this._repopulatePage(activePageId);
+        this._repopulateActivePage();
     },
 
-    _repopulatePage: function(pageId) {
-        if (this._findCategory(pageId)) {
-            let page = this._pageManager.visible_child;
-            page.invalidate();
-            page.populate();
+    _repopulateActivePage: function() {
+        // repopulate current page if it belongs to us
+        let activePageId = this._pageManager.visible_child_name;
+        if (this._findCategory(activePageId)) {
+            let activePage = this._pageManager.visible_child;
+            activePage.invalidate();
+            activePage.populate();
         }
     },
 
