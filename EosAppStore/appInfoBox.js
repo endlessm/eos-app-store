@@ -164,9 +164,9 @@ const AppBaseBox = new Lang.Class({
                                                                "from the device for all users. You " +
                                                                "will need to download it from the " +
                                                                "internet in order to reinstall it.") });
-        dialog.add_button(_("Cancel"), Gtk.ResponseType.CANCEL);
         let applyButton = dialog.add_button(_("Delete app"), Gtk.ResponseType.APPLY);
         applyButton.get_style_context().add_class('destructive-action');
+        dialog.add_button(_("Cancel"), Gtk.ResponseType.CANCEL);
         dialog.show_all();
         this._removeDialog = dialog;
 
