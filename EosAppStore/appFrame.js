@@ -456,7 +456,9 @@ const AppPageProvider = new Lang.Class({
         // invalidate all the pages
         this._categories.forEach(Lang.bind(this, function(c) {
             let page = this._pageManager.get_child_by_name(c.name);
-            page.invalidate();
+            if (page) {
+                page.invalidate();
+            }
         }));
 
         this._repopulateActivePage();
