@@ -297,18 +297,21 @@ const AppInstalledFrame = new Lang.Class({
         return appInfos.filter(function(info) {
             return info.is_installed();
         }).sort(function(a, b) {
+            let aUpdatable = a.is_updatable();
+            let bUpdatable = b.is_updatable();
+
             // If both apps are updatable, or both aren't, sort them
             // alphabetically, otherwise sort updatable apps first.
-            if ((a.is_updatable() && b.is_updatable()) ||
-                (!a.is_updatable() && !b.is_updatable())) {
+            if (aUpdatable == bUpdatable) {
                 return a.get_title().localeCompare(b.get_title());
             }
-            else if (a.is_updatable()) {
+
+            if (aUpdatable) {
                 return 1;
             }
-            else if (b.is_updatable()) {
-                return -1;
-            }
+
+            // bUpdatable will be true here
+            return -1;
         });
     },
 
