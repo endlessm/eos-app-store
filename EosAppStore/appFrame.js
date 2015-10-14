@@ -300,7 +300,7 @@ const AppInstalledFrame = new Lang.Class({
             // If both apps are updatable, or both aren't, sort them
             // alphabetically, otherwise sort updatable apps first.
             if ((a.is_updatable() && b.is_updatable()) ||
-                (!a.is_updatable() && !b.is_updatable()) {
+                (!a.is_updatable() && !b.is_updatable())) {
                 return a.get_title().localeCompare(b.get_title());
             }
             else if (a.is_updatable()) {
