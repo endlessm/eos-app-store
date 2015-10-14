@@ -135,6 +135,13 @@ const AppFrame = new Lang.Class({
         // to be overridden
     },
 
+    _destroyView: function() {
+        let child = this.scrollWindow.get_child();
+        if (child)
+            child.destroy();
+        this.view = null;
+    },
+
     _prepareAppInfos: function(appInfos) {
         // to be overridden
     },
@@ -204,12 +211,8 @@ const AppFrame = new Lang.Class({
     },
 
     invalidate: function() {
-        let child = this.scrollWindow.get_child();
-        if (child)
-            child.destroy();
-
+        this._destroyView();
         this._mainWindow.clearHeaderState();
-        this.view = null;
     },
 
     reset: function() {
@@ -247,6 +250,11 @@ const AppInstalledFrame = new Lang.Class({
         list.set_header_func(Lang.bind(this, this._listHeaderFunc));
 
         return list;
+    },
+
+    _destroyView: function() {
+        this._unschedulePopulate();
+        this.parent();
     },
 
     _createViewElement: function(info) {
