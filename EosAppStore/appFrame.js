@@ -477,8 +477,9 @@ const AppPageProvider = new Lang.Class({
 
     _findCategory: function(pageId) {
         for (let category of this._categories) {
-            if (category.name == pageId)
+            if (category.name == pageId) {
                 return category;
+            }
         }
 
         return null;
