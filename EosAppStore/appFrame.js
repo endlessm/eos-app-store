@@ -135,6 +135,13 @@ const AppFrame = new Lang.Class({
         // to be overridden
     },
 
+    _destroyView: function() {
+        let child = this.scrollWindow.get_child();
+        if (child)
+            child.destroy();
+        this.view = null;
+    },
+
     _prepareAppInfos: function(appInfos) {
         // to be overridden
     },
@@ -204,12 +211,8 @@ const AppFrame = new Lang.Class({
     },
 
     invalidate: function() {
-        let child = this.scrollWindow.get_child();
-        if (child)
-            child.destroy();
-
+        this._destroyView();
         this._mainWindow.clearHeaderState();
-        this.view = null;
     },
 
     reset: function() {
@@ -247,6 +250,11 @@ const AppInstalledFrame = new Lang.Class({
         list.set_header_func(Lang.bind(this, this._listHeaderFunc));
 
         return list;
+    },
+
+    _destroyView: function() {
+        this._unschedulePopulate();
+        this.parent();
     },
 
     _createViewElement: function(info) {
@@ -297,18 +305,21 @@ const AppInstalledFrame = new Lang.Class({
         return appInfos.filter(function(info) {
             return info.is_installed();
         }).sort(function(a, b) {
+            let aUpdatable = a.is_updatable();
+            let bUpdatable = b.is_updatable();
+
             // If both apps are updatable, or both aren't, sort them
             // alphabetically, otherwise sort updatable apps first.
-            if ((a.is_updatable() && b.is_updatable()) ||
-                (!a.is_updatable() && !b.is_updatable())) {
+            if (aUpdatable == bUpdatable) {
                 return a.get_title().localeCompare(b.get_title());
             }
-            else if (a.is_updatable()) {
+
+            if (aUpdatable) {
                 return 1;
             }
-            else if (b.is_updatable()) {
-                return -1;
-            }
+
+            // bUpdatable will be true here
+            return -1;
         });
     },
 
@@ -403,10 +414,7 @@ const AppPageProvider = new Lang.Class({
             return;
         }
 
-        // refresh current page if it belongs to us
-        let activePageId = this._pageManager.visible_child_name;
-        this._repopulatePage(activePageId);
-
+        this._repopulateActivePage();
         this._model.refresh(Lang.bind(this, this._onModelRefresh));
     },
 
@@ -446,28 +454,31 @@ const AppPageProvider = new Lang.Class({
 
     _reloadModel: function() {
         // invalidate all the pages
-        let activePageId = this._pageManager.visible_child_name;
         this._categories.forEach(Lang.bind(this, function(c) {
             let page = this._pageManager.get_child_by_name(c.name);
-            page.invalidate();
+            if (page) {
+                page.invalidate();
+            }
         }));
 
-        // repopulate current page if it belongs to us
-        this._repopulatePage(activePageId);
+        this._repopulateActivePage();
     },
 
-    _repopulatePage: function(pageId) {
-        if (this._findCategory(pageId)) {
-            let page = this._pageManager.visible_child;
-            page.invalidate();
-            page.populate();
+    _repopulateActivePage: function() {
+        // repopulate current page if it belongs to us
+        let activePageId = this._pageManager.visible_child_name;
+        if (this._findCategory(activePageId)) {
+            let activePage = this._pageManager.visible_child;
+            activePage.invalidate();
+            activePage.populate();
         }
     },
 
     _findCategory: function(pageId) {
         for (let category of this._categories) {
-            if (category.name == pageId)
+            if (category.name == pageId) {
                 return category;
+            }
         }
 
         return null;
