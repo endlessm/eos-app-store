@@ -590,7 +590,7 @@ const AppInfoBox = new Lang.Class({
                 }
                 // or we add a launcher on the desktop
                 else {
-                    this._addToDesktop();
+                    this.doInstall();
                 }
                 break;
         }
