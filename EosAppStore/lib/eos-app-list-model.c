@@ -995,9 +995,14 @@ out:
        * the transaction fails with this error, because they may fool
        * the app store into not downloading them again until the next
        * change in the app version.
+       *
+       * On the app store side, we want to delete the files in case of
+       * a mismatched checksum, which falls under the same category as
+       * the InvalidFile error from the app manager.
        */
       g_autofree char *errmsg = g_dbus_error_get_remote_error (error);
-      if (g_strcmp0 (errmsg, "com.endlessm.AppManager.Error.InvalidFile") == 0)
+      if (g_error_matches (error, EOS_APP_STORE_ERROR, EOS_APP_STORE_ERROR_CHECKSUM_MISSING) ||
+          g_strcmp0 (errmsg, "com.endlessm.AppManager.Error.InvalidFile") == 0)
         {
           if (bundle_path)
             g_unlink (bundle_path);
