@@ -198,8 +198,8 @@
                         <property name="label" translatable="yes">SIZE</property>
                         <property name="ellipsize">end</property>
                         <property name="margin_end">10</property>
-                        <property name="width_chars">15</property>
-                        <property name="max_width_chars">15</property>
+                        <property name="width_chars">8</property>
+                        <property name="max_width_chars">12</property>
                       </object>
                       <style>
                         <class name="app-size"/>
@@ -326,5 +326,11 @@
         </child>
       </object>
     </child>
+  </object>
+  <object class="GtkSizeGroup" id="sizegroup1">
+    <widgets>
+      <widget name="_sizeText"/>
+      <widget name="_stopLabel"/>
+    </widgets>
   </object>
 </interface>
