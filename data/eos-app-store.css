@@ -461,29 +461,29 @@
 }
 
 .controls-box .state-button.update {
-    background-image: url("btn_install_normal_border.png");
+    background-image: url("btn_installed_update_normal.png");
 }
 
 .controls-box .state-button.update:hover {
-    background-image: url("btn_install_hover_border.png");
+    background-image: url("btn_installed_update_hover.png");
 }
 
 .controls-box .state-button.update:active,
 .controls-box .state-button.update:hover:active {
-    background-image: url("btn_install_pressed_border.png");
+    background-image: url("btn_installed_update_pressed.png");
 }
 
 .controls-box .state-button.remove {
-    background-image: url("btn_remove_normal_border.png");
+    background-image: url("btn_installed_remove_normal.png");
 }
 
 .controls-box .state-button.remove:hover {
-    background-image: url("btn_remove_hover_border.png");
+    background-image: url("btn_installed_remove_hover.png");
 }
 
 .controls-box .state-button.remove:active,
 .controls-box .state-button.remove:hover:active {
-    background-image: url("btn_remove_pressed_border.png");
+    background-image: url("btn_installed_remove_pressed.png");
 }
 
 .controls-box .state-button.cancel {
