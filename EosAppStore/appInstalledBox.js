@@ -107,7 +107,11 @@ const AppInstalledBox = new Lang.Class({
             if (size == 0) {
                 this._sizeText.label = '--';
             } else {
-                this._sizeText.label = GLib.format_size(size);
+                let sizeInMb = size / 1000000;
+                /* Translators: Abbreviation for file size in megabytes;
+                   %s denotes the placement of the numeric value
+                   and can be placed before or after the abbreviation */
+                this._sizeText.label = _("%s MB").format(sizeInMb.toFixed(1));
             }
         } else {
                 this._sizeText.label = _("System App");
