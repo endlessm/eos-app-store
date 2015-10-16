@@ -1667,6 +1667,24 @@ eos_storage_type_to_string (EosStorageType storage)
   return retval;
 }
 
+static void
+on_eam_proxy_name_owner_changed (GDBusProxy *proxy,
+                                 GParamSpec *pspec,
+                                 gpointer user_data)
+{
+  EosAppManager **proxy_ptr = user_data;
+  char *name_owner = g_dbus_proxy_get_name_owner (proxy);
+
+  /* Whenever eam goes away, we invalidate our static proxy,
+   * otherwise calls that would read cached properties will all
+   * return NULL.
+   */
+  if (name_owner == NULL)
+    g_clear_object (proxy_ptr);
+
+  g_free (name_owner);
+}
+
 /**
  * eos_get_eam_dbus_proxy: (skip)
  */
@@ -1700,6 +1718,8 @@ eos_get_eam_dbus_proxy (void)
     }
 
   g_dbus_proxy_set_default_timeout (G_DBUS_PROXY (proxy), G_MAXINT);
+  g_signal_connect (proxy, "notify::g-name-owner",
+                    G_CALLBACK (on_eam_proxy_name_owner_changed), &proxy);
 
   return proxy;
 }
