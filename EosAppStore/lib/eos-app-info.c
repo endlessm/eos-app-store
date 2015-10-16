@@ -947,6 +947,15 @@ eos_app_info_installed_changed (EosAppInfo *info)
   info->installed_locale = g_key_file_get_string (keyfile, GROUP, FILE_KEYS[LOCALE], NULL);
   info->info_installed_size = g_key_file_get_int64 (keyfile, GROUP, FILE_KEYS[INSTALLED_SIZE], NULL);
 
+  /* Bundles with an External group download additional content
+   * from an external server, and thus the size of the bundle
+   * reported in the .info file does not reflect the actual
+   * installed size.  In that case, set the size here to 0
+   * to force a later check of the actual installed size.
+   */
+  if (g_key_file_has_group (keyfile, "External"))
+    info->info_installed_size = 0;
+
   check_info_storage (info);
 
   retval = TRUE;
