@@ -8,9 +8,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: eos-app-store\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-10-15 16:20-0700\n"
-"PO-Revision-Date: 2015-10-13 18:29+0000\n"
-"Last-Translator: endlessmobile_build <philip@endlessm.com>\n"
+"POT-Creation-Date: 2015-10-16 16:10-0700\n"
+"PO-Revision-Date: 2015-10-16 23:19+0000\n"
+"Last-Translator: Roddy Shuler <roddy@endlessm.com>\n"
 "Language-Team: French (http://www.transifex.com/endless-mobile-inc/eos-app-store/language/fr/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -179,78 +179,66 @@ msgstr "Installer les sites internet"
 msgid "No verification available for app '%s'"
 msgstr "Pas de vérification disponible pour l'application '%s' "
 
-#: ../EosAppStore/lib/eos-app-list-model.c:353
+#: ../EosAppStore/lib/eos-app-list-model.c:32
 msgid ""
-"The app center has detected a fatal error and cannot continue with the "
-"installation. Please, restart your system. If the problem persists, please "
-"contact support."
-msgstr "Ce centre d'applis a détecté une errer fatale et ne peut pas poursuivre l'installation. Veuillez redémarrer votre système. Si le problème persiste, veuillez contacter l'assistance."
+"The app center has detected an error and cannot continue. Please restart "
+"your system. If the problem persists, please contact support."
+msgstr "Le centre d'applis a détecté une erreur et ne peut pas poursuivre. Veuillez redémarrer votre système. Si le problème persiste, veuillez contacter l'assistance."
 
-#: ../EosAppStore/lib/eos-app-list-model.c:457
+#: ../EosAppStore/lib/eos-app-list-model.c:458
 msgid "We are unable to load the complete list of applications"
 msgstr "Impossible de charger la liste complète d'applications."
 
-#: ../EosAppStore/lib/eos-app-list-model.c:465
+#: ../EosAppStore/lib/eos-app-list-model.c:466
 msgid "We were unable to update the list of applications"
 msgstr "Nous n'avons pas été capables de mettre à jour la liste des applications"
 
-#: ../EosAppStore/lib/eos-app-list-model.c:956
+#: ../EosAppStore/lib/eos-app-list-model.c:957
 msgid "Not enough space on device for installing the app."
 msgstr "Pas assez d'espace sur l'appareil pour installer l'appli."
 
-#: ../EosAppStore/lib/eos-app-list-model.c:1041
+#: ../EosAppStore/lib/eos-app-list-model.c:1042
 msgid ""
 "We encountered an internal error during the installation of the application."
 msgstr "Nous avons rencontré une erreur interne pendant l'installation de l'application."
 
-#: ../EosAppStore/lib/eos-app-list-model.c:1070
+#: ../EosAppStore/lib/eos-app-list-model.c:1071
 msgid ""
 "We encountered an internal error during the removal of the application."
 msgstr "Nous avons rencontré une erreur interne pendant la suppression de l'application."
 
-#: ../EosAppStore/lib/eos-app-list-model.c:1097
-#: ../EosAppStore/lib/eos-app-list-model.c:1145
+#: ../EosAppStore/lib/eos-app-list-model.c:1098
+#: ../EosAppStore/lib/eos-app-list-model.c:1143
 msgid "You must be an administrator to install applications."
 msgstr "Vous devez être un administrateur pour installer des applications."
 
-#: ../EosAppStore/lib/eos-app-list-model.c:1109
-#: ../EosAppStore/lib/eos-app-list-model.c:1302
-msgid ""
-"The app center has detected a fatal error and cannot continue. Please, "
-"restart your system. If the problem persists, please contact support."
-msgstr "Le centre d'applis a détecté une erreur fatale et ne peut pas poursuivre. Veuillez redémarrer votre système. Si le problème persiste, veuillez contacter l'assistance."
-
-#: ../EosAppStore/lib/eos-app-list-model.c:1290
-#: ../EosAppStore/lib/eos-app-list-model.c:1320
+#: ../EosAppStore/lib/eos-app-list-model.c:1288
+#: ../EosAppStore/lib/eos-app-list-model.c:1315
 msgid "You must be an administrator to remove applications."
 msgstr "Vous devez être un administrateur pour supprimer les applications."
 
-#: ../EosAppStore/lib/eos-app-list-model.c:1443
+#: ../EosAppStore/lib/eos-app-list-model.c:1438
 #, c-format
 msgid "App %s has no candidate for installation."
 msgstr "L'application %s n'a pas de candidats pour l'installation"
 
-#: ../EosAppStore/lib/eos-app-list-model.c:1455
+#: ../EosAppStore/lib/eos-app-list-model.c:1450
 #, c-format
 msgid "App '%s' is already installed."
 msgstr "L'appli '%s' est déjà installée."
 
-#: ../EosAppStore/lib/eos-app-list-model.c:1518
+#: ../EosAppStore/lib/eos-app-list-model.c:1513
 #, c-format
 msgid "App %s not installable."
 msgstr "L'appli %s ne peut pas être installée."
 
-#: ../EosAppStore/lib/eos-app-list-model.c:1529
+#: ../EosAppStore/lib/eos-app-list-model.c:1524
 #, c-format
 msgid "App %s is up to date."
 msgstr "L'appli %s est à jour."
 
-#: ../EosAppStore/lib/eos-app-list-model.c:1607
-#, c-format
-msgid "App %s is not installed"
-msgstr "« %s » de l'application n'est pas installé"
-
-#: ../EosAppStore/lib/eos-app-list-model.c:1646
+#: ../EosAppStore/lib/eos-app-list-model.c:1602
+#: ../EosAppStore/lib/eos-app-list-model.c:1641
 #, c-format
 msgid "App '%s' is not installed."
 msgstr "L'appli '%s' is not installed."
@@ -277,9 +265,8 @@ msgid "Not enough space on device for downloading the app."
 msgstr "Pas assez d'espace sur l'appareil pour télécharger l'appli."
 
 #: ../EosAppStore/lib/eos-app-utils.c:1756
-msgid ""
-"Could not verify the bundle, the download is perhaps incomplete or corrupted"
-msgstr "Impossible de vérifier le bundle, le téléchargement est peut-être incomplet ou corrompu"
+msgid "There was a problem downloading the app; please try again"
+msgstr ""
 
 #: ../EosAppStore/lib/eos-downloader.c:37
 #, c-format
@@ -288,8 +275,8 @@ msgstr "Pas de signature disponible pour l'application '%s' "
 
 #: ../EosAppStore/lib/eos-downloader.c:100
 #, c-format
-msgid "Application bundle '%s' could not be downloaded"
-msgstr "Le lot d'applications « %s » n'a pas pu être téléchargé"
+msgid "App '%s' could not be downloaded"
+msgstr "L'application « %s » n'a pas pu être téléchargé"
 
 #: ../EosAppStore/lib/eos-net-utils.c:268
 msgid "The certificate of the target server is expired"
@@ -313,5 +300,5 @@ msgstr "Le certificat du serveur cible est mauvais ou invalide."
 
 #: ../EosAppStore/lib/eos-net-utils.c:332
 #, c-format
-msgid "Could not save bundle file - canceling download (%s)"
-msgstr "Impossible de sauvegarder le fichier bundle - annulation du téléchargement (%s)"
+msgid "Could not save the app - canceling download (%s)"
+msgstr ""

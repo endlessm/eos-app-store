@@ -8,9 +8,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: eos-app-store\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-10-15 16:20-0700\n"
-"PO-Revision-Date: 2015-10-15 06:00+0000\n"
-"Last-Translator: endlessmobile_build <philip@endlessm.com>\n"
+"POT-Creation-Date: 2015-10-16 16:10-0700\n"
+"PO-Revision-Date: 2015-10-16 23:21+0000\n"
+"Last-Translator: Roddy Shuler <roddy@endlessm.com>\n"
 "Language-Team: Arabic (http://www.transifex.com/endless-mobile-inc/eos-app-store/language/ar/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -179,78 +179,66 @@ msgstr "تثبيت المواقع"
 msgid "No verification available for app '%s'"
 msgstr "ليس هناك تدقيق متوفر من أجل '%s'"
 
-#: ../EosAppStore/lib/eos-app-list-model.c:353
+#: ../EosAppStore/lib/eos-app-list-model.c:32
 msgid ""
-"The app center has detected a fatal error and cannot continue with the "
-"installation. Please, restart your system. If the problem persists, please "
-"contact support."
-msgstr "اكتشف مركز التطبيقات خطأ جسيم ولا يمكنه الاستمرار في عملية التثبيت هذه. يُرجى إعادة تشغيل النظام على جهازك. إذا استمرت هذه المشكلة في الظهور، يُرجى الاتصال بفريق الدعم."
+"The app center has detected an error and cannot continue. Please restart "
+"your system. If the problem persists, please contact support."
+msgstr "اكتشف مركز التطبيقات خطأ جسيم ولا يمكنه المواصلة. يُرجى إعادة تشغيل النظام الخاص بك. إذا استمرت هذه المشكلة في الظهور، يُرجى الاتصال بفريق الدعم."
 
-#: ../EosAppStore/lib/eos-app-list-model.c:457
+#: ../EosAppStore/lib/eos-app-list-model.c:458
 msgid "We are unable to load the complete list of applications"
 msgstr "نحن غير قادرين على تحميل قائمة التطبيقات كاملة"
 
-#: ../EosAppStore/lib/eos-app-list-model.c:465
+#: ../EosAppStore/lib/eos-app-list-model.c:466
 msgid "We were unable to update the list of applications"
 msgstr "يتعذر علينا تحديث قائمة التطبيقات"
 
-#: ../EosAppStore/lib/eos-app-list-model.c:956
+#: ../EosAppStore/lib/eos-app-list-model.c:957
 msgid "Not enough space on device for installing the app."
 msgstr "لا توجد مساحة كافية على الجهاز لتثبيت التطبيق."
 
-#: ../EosAppStore/lib/eos-app-list-model.c:1041
+#: ../EosAppStore/lib/eos-app-list-model.c:1042
 msgid ""
 "We encountered an internal error during the installation of the application."
 msgstr "لقد واجهنا خطأً داخلياً أثناء تثبيت التطبيق."
 
-#: ../EosAppStore/lib/eos-app-list-model.c:1070
+#: ../EosAppStore/lib/eos-app-list-model.c:1071
 msgid ""
 "We encountered an internal error during the removal of the application."
 msgstr "لقد صادفنا خطأ داخلي أثناء إزالة التطبيق."
 
-#: ../EosAppStore/lib/eos-app-list-model.c:1097
-#: ../EosAppStore/lib/eos-app-list-model.c:1145
+#: ../EosAppStore/lib/eos-app-list-model.c:1098
+#: ../EosAppStore/lib/eos-app-list-model.c:1143
 msgid "You must be an administrator to install applications."
 msgstr "يجب أن تكون مسؤول نظام لكي تستطيع تثبيت التطبيقات."
 
-#: ../EosAppStore/lib/eos-app-list-model.c:1109
-#: ../EosAppStore/lib/eos-app-list-model.c:1302
-msgid ""
-"The app center has detected a fatal error and cannot continue. Please, "
-"restart your system. If the problem persists, please contact support."
-msgstr "اكتشف مركز التطبيقات خطأ جسيم ولا يمكنه المواصلة. يُرجى إعادة تشغيل النظام الخاص بك. إذا استمرت هذه المشكلة في الظهور، يُرجى الاتصال بفريق الدعم."
-
-#: ../EosAppStore/lib/eos-app-list-model.c:1290
-#: ../EosAppStore/lib/eos-app-list-model.c:1320
+#: ../EosAppStore/lib/eos-app-list-model.c:1288
+#: ../EosAppStore/lib/eos-app-list-model.c:1315
 msgid "You must be an administrator to remove applications."
 msgstr "يجب أن تكون مسؤول نظام لكي تتمكن من حذف التطبيقات."
 
-#: ../EosAppStore/lib/eos-app-list-model.c:1443
+#: ../EosAppStore/lib/eos-app-list-model.c:1438
 #, c-format
 msgid "App %s has no candidate for installation."
 msgstr "ليس لتطبيق %s أي مرشح للتثبيت."
 
-#: ../EosAppStore/lib/eos-app-list-model.c:1455
+#: ../EosAppStore/lib/eos-app-list-model.c:1450
 #, c-format
 msgid "App '%s' is already installed."
 msgstr "تطبيق '%s' مُثَبَتٌ بالفعل."
 
-#: ../EosAppStore/lib/eos-app-list-model.c:1518
+#: ../EosAppStore/lib/eos-app-list-model.c:1513
 #, c-format
 msgid "App %s not installable."
 msgstr "تطبيق %s غير قابل للتثبيت."
 
-#: ../EosAppStore/lib/eos-app-list-model.c:1529
+#: ../EosAppStore/lib/eos-app-list-model.c:1524
 #, c-format
 msgid "App %s is up to date."
 msgstr "تطبيق %s مُحدثٌ لآخر وضع."
 
-#: ../EosAppStore/lib/eos-app-list-model.c:1607
-#, c-format
-msgid "App %s is not installed"
-msgstr "التطبيق %s غير مثبت"
-
-#: ../EosAppStore/lib/eos-app-list-model.c:1646
+#: ../EosAppStore/lib/eos-app-list-model.c:1602
+#: ../EosAppStore/lib/eos-app-list-model.c:1641
 #, c-format
 msgid "App '%s' is not installed."
 msgstr "تطبيق '%s' غير مُثَبَتْ."
@@ -277,9 +265,8 @@ msgid "Not enough space on device for downloading the app."
 msgstr "لا توجد مساحة كافية على الجهاز لتنزيل التطبيق."
 
 #: ../EosAppStore/lib/eos-app-utils.c:1756
-msgid ""
-"Could not verify the bundle, the download is perhaps incomplete or corrupted"
-msgstr "تعذر التحقق من الحزمة، ربما يكون المحتوى تالف أو لم يكتمل تنزيله"
+msgid "There was a problem downloading the app; please try again"
+msgstr ""
 
 #: ../EosAppStore/lib/eos-downloader.c:37
 #, c-format
@@ -288,8 +275,8 @@ msgstr "ليس هناك توقيع متوفر من أجل '%s'"
 
 #: ../EosAppStore/lib/eos-downloader.c:100
 #, c-format
-msgid "Application bundle '%s' could not be downloaded"
-msgstr "تعذر تنزيل حزمة التطبيق '%s'"
+msgid "App '%s' could not be downloaded"
+msgstr ""
 
 #: ../EosAppStore/lib/eos-net-utils.c:268
 msgid "The certificate of the target server is expired"
@@ -313,5 +300,5 @@ msgstr "شهادة الخادم الوجهة سيئة أو غير صالحة"
 
 #: ../EosAppStore/lib/eos-net-utils.c:332
 #, c-format
-msgid "Could not save bundle file - canceling download (%s)"
-msgstr "تعذر حفظ ملف الحزمة - جارٍ إلغاء التنزيل (%s)"
+msgid "Could not save the app - canceling download (%s)"
+msgstr ""
