@@ -1692,13 +1692,14 @@ eos_get_eam_dbus_proxy (void)
                                                   "/com/endlessm/AppManager",
                                                   NULL, /* GCancellable* */
                                                   &error);
-  g_dbus_proxy_set_default_timeout (G_DBUS_PROXY (proxy), G_MAXINT);
-
   if (error != NULL)
     {
       eos_app_log_error_message ("Unable to create dbus proxy: %s", error->message);
       g_error_free (error);
+      return NULL;
     }
+
+  g_dbus_proxy_set_default_timeout (G_DBUS_PROXY (proxy), G_MAXINT);
 
   return proxy;
 }
