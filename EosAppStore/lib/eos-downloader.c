@@ -97,7 +97,7 @@ eos_app_info_download_bundle (EosAppInfo *info,
 
       g_set_error (error_out, EOS_APP_STORE_ERROR,
                    EOS_APP_STORE_ERROR_FAILED,
-                   _("Application bundle '%s' could not be downloaded"),
+                   _("App '%s' could not be downloaded"),
                    app_id);
       return NULL;
     }

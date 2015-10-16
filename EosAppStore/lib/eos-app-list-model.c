@@ -28,6 +28,10 @@
 #define DOWNLOAD_RATE_LIMIT_MS 150
 #define FALLBACK_LANG   "-en"
 
+#define FATAL_ERROR_MESSAGE \
+  _("The app center has detected an error and cannot continue. Please " \
+    "restart your system. If the problem persists, please contact support.")
+
 /* gdbus-codegen does not generate autoptr macros for us */
 G_DEFINE_AUTOPTR_CLEANUP_FUNC (EosAppManagerTransaction, g_object_unref)
 
@@ -350,10 +354,7 @@ load_user_capabilities (EosAppListModel *self,
     {
       g_set_error_literal (error_out, EOS_APP_STORE_ERROR,
                            EOS_APP_STORE_ERROR_FAILED,
-                           _("The app center has detected a fatal error and "
-                             "cannot continue with the installation. Please, "
-                             "restart your system. If the problem persists, "
-                             "please contact support."));
+                           FATAL_ERROR_MESSAGE);
       return FALSE;
     }
 
@@ -1106,10 +1107,7 @@ install_latest_app_version (EosAppListModel *self,
   if (proxy == NULL ||
       !g_file_test (eos_get_bundles_dir (), G_FILE_TEST_EXISTS))
     {
-      external_message = _("The app center has detected a fatal error and "
-                           "cannot continue. Please, "
-                           "restart your system. If the problem persists, "
-                           "please contact support.");
+      external_message = FATAL_ERROR_MESSAGE;
       goto out;
     }
 
@@ -1299,10 +1297,7 @@ remove_app_from_manager (EosAppListModel *self,
   if (proxy == NULL ||
       !g_file_test (eos_get_bundles_dir (), G_FILE_TEST_EXISTS))
     {
-      external_message = _("The app center has detected a fatal error and "
-                           "cannot continue. Please, "
-                           "restart your system. If the problem persists, "
-                           "please contact support.");
+      external_message = FATAL_ERROR_MESSAGE;
       goto out;
     }
 
@@ -1604,7 +1599,7 @@ eos_app_list_model_uninstall_app_async (EosAppListModel *model,
       g_task_return_new_error (task,
                                EOS_APP_STORE_ERROR,
                                EOS_APP_STORE_ERROR_NOT_INSTALLED,
-                               _("App %s is not installed"),
+                               _("App '%s' is not installed."),
                                desktop_id);
       g_object_unref (task);
       return;

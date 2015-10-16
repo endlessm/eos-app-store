@@ -329,7 +329,7 @@ prepare_out_stream (const char    *target_file,
 
       g_set_error (error, EOS_NET_UTILS_ERROR,
                    EOS_NET_UTILS_ERROR_FAILED,
-                   _("Could not save bundle file - "
+                   _("Could not save the app - "
                      "canceling download (%s)"),
                    internal_error->message);
 

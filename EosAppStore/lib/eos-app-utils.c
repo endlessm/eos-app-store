@@ -1753,8 +1753,8 @@ eos_app_utils_verify_checksum (const char *bundle_file,
   if (!res)
     g_set_error_literal (error, EOS_APP_STORE_ERROR,
                          EOS_APP_STORE_ERROR_CHECKSUM_MISSING,
-                         _("Could not verify the bundle, the download is "
-                           "perhaps incomplete or corrupted"));
+                         _("There was a problem downloading the app; "
+                           "please try again"));
 
   return res;
 }
