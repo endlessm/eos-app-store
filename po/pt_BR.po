@@ -16,8 +16,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: eos-app-store\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-10-16 16:10-0700\n"
-"PO-Revision-Date: 2015-10-16 23:16+0000\n"
+"POT-Creation-Date: 2015-10-16 16:24-0700\n"
+"PO-Revision-Date: 2015-10-16 23:37+0000\n"
 "Last-Translator: Roddy Shuler <roddy@endlessm.com>\n"
 "Language-Team: Portuguese (Brazil) (http://www.transifex.com/endless-mobile-inc/eos-app-store/language/pt_BR/)\n"
 "MIME-Version: 1.0\n"
@@ -26,11 +26,11 @@ msgstr ""
 "Language: pt_BR\n"
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
 
-#: ../data/eos-app-store-app-info-box.ui.h:1
+#: ../data/eos-app-store-app-info-box.ui.h:1 ../EosAppStore/appInfoBox.js:445
 msgid "Install app"
 msgstr "Instalar programa"
 
-#: ../data/eos-app-store-app-info-box.ui.h:2
+#: ../data/eos-app-store-app-info-box.ui.h:2 ../EosAppStore/appInfoBox.js:169
 msgid "Cancel"
 msgstr "Cancelar"
 
@@ -56,7 +56,7 @@ msgstr "TAMANHO"
 
 #: ../data/eos-app-store-app-installed-box.ui.h:4
 msgid "UPDATING…"
-msgstr "ATUALIZANDO..."
+msgstr "ATUALIZANDO…"
 
 #: ../data/eos-app-store-app-installed-box.ui.h:5
 msgid "STOP"
@@ -85,6 +85,98 @@ msgstr "Falha na atualização"
 #: ../EosAppStore/appFrame.js:437 ../EosAppStore/appStore.js:231
 msgid "Dismiss"
 msgstr "Descartar"
+
+#: ../EosAppStore/appInfoBox.js:162
+msgid "Deleting app"
+msgstr ""
+
+#: ../EosAppStore/appInfoBox.js:163
+msgid ""
+"Deleting this app will remove it from the device for all users. You will "
+"need to download it from the internet in order to reinstall it."
+msgstr ""
+
+#: ../EosAppStore/appInfoBox.js:167
+msgid "Delete app"
+msgstr ""
+
+#: ../EosAppStore/appInfoBox.js:188
+#, javascript-format
+msgid "We could not remove '%s'"
+msgstr ""
+
+#: ../EosAppStore/appInfoBox.js:191
+#, javascript-format
+msgid "'%s' was removed successfully"
+msgstr ""
+
+#: ../EosAppStore/appInfoBox.js:211
+#, javascript-format
+msgid "We could not update '%s'"
+msgstr ""
+
+#: ../EosAppStore/appInfoBox.js:214
+#, javascript-format
+msgid "'%s' was updated successfully"
+msgstr ""
+
+#: ../EosAppStore/appInfoBox.js:234
+#, javascript-format
+msgid "We could not install '%s'"
+msgstr ""
+
+#: ../EosAppStore/appInfoBox.js:237
+#, javascript-format
+msgid "'%s' was installed successfully"
+msgstr ""
+
+#: ../EosAppStore/appInfoBox.js:325
+msgid "Updating…"
+msgstr ""
+
+#: ../EosAppStore/appInfoBox.js:325 ../EosAppStore/appInfoBox.js:531
+msgid "Installing…"
+msgstr "Instalando…"
+
+#: ../EosAppStore/appInfoBox.js:446
+msgid "Update app"
+msgstr ""
+
+#: ../EosAppStore/appInfoBox.js:447
+msgid "Open app"
+msgstr ""
+
+#: ../EosAppStore/appInfoBox.js:448
+msgid "Add to the desktop"
+msgstr ""
+
+#: ../EosAppStore/appInfoBox.js:449
+msgid "No network connection is available"
+msgstr ""
+
+#: ../EosAppStore/appInfoBox.js:450
+msgid "Insufficient space to install the app"
+msgstr ""
+
+#: ../EosAppStore/appInfoBox.js:534
+msgid "Downloading…"
+msgstr ""
+
+#: ../EosAppStore/appInfoBox.js:542
+msgid "Removing…"
+msgstr ""
+
+#. Translators: Abbreviation for file size in megabytes;
+#. %s denotes the placement of the numeric value
+#. and can be placed before or after the abbreviation
+#: ../EosAppStore/appInstalledBox.js:114
+#, javascript-format
+msgid "%s MB"
+msgstr ""
+
+#: ../EosAppStore/appInstalledBox.js:117
+msgid "System App"
+msgstr ""
 
 #. Translators: use the same string used to install the app center content
 #. JSON
