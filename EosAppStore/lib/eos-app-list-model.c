@@ -69,6 +69,8 @@ struct _EosAppListModel
 
   SoupSession *soup_session;
   JsonArray *content_apps;
+
+  gint64 operations;
 };
 
 struct _EosAppListModelClass
@@ -113,7 +115,22 @@ G_DEFINE_TYPE_WITH_CODE (EosAppListModel, eos_app_list_model, G_TYPE_OBJECT,
 static void
 eos_app_list_model_emit_changed (EosAppListModel *self)
 {
-  g_signal_emit (self, eos_app_list_model_signals[CHANGED], 0);
+  if (self->operations == 0)
+    g_signal_emit (self, eos_app_list_model_signals[CHANGED], 0);
+}
+
+static void
+eos_app_list_model_push_operation (EosAppListModel *self)
+{
+  self->operations += 1;
+}
+
+static void
+eos_app_list_model_pop_operation (EosAppListModel *self)
+{
+  self->operations -= 1;
+
+  eos_app_list_model_emit_changed (self);
 }
 
 #define WEB_LINK_ID_PREFIX "eos-link-"
@@ -1455,6 +1472,8 @@ eos_app_list_model_install_app_async (EosAppListModel *model,
 
   eos_app_info_set_is_installing (info, TRUE);
 
+  eos_app_list_model_push_operation (model);
+
   g_task_set_task_data (task, g_object_ref (info), g_object_unref);
   g_task_run_in_thread (task, add_app_thread_func);
   g_object_unref (task);
@@ -1468,6 +1487,7 @@ eos_app_list_model_install_app_finish (EosAppListModel *model,
   GTask *task = G_TASK (result);
   EosAppInfo *info = g_task_get_task_data (task);
 
+  eos_app_list_model_pop_operation (model);
   eos_app_info_set_is_installing (info, FALSE);
 
   return g_task_propagate_boolean (task, error);
@@ -1542,6 +1562,7 @@ eos_app_list_model_update_app_finish (EosAppListModel *model,
   GTask *task = G_TASK (result);
   EosAppInfo *info = g_task_get_task_data (task);
 
+  eos_app_list_model_pop_operation (model);
   eos_app_info_set_is_updating (info, FALSE);
 
   return g_task_propagate_boolean (task, error);
@@ -1620,6 +1641,7 @@ eos_app_list_model_uninstall_app_finish (EosAppListModel *model,
   GTask *task = G_TASK (result);
   EosAppInfo *info = g_task_get_task_data (task);
 
+  eos_app_list_model_pop_operation (model);
   eos_app_info_set_is_removing (info, FALSE);
 
   return g_task_propagate_boolean (task, error);
