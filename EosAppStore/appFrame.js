@@ -482,9 +482,9 @@ const AppPageProvider = new Lang.Class({
                 // On critical failures we don't try to partially populate
                 // categories
                 return;
-            } else {
-                log("Loading apps anyways due to non-critical exceptions");
             }
+
+            log("Loading apps anyways due to non-critical exceptions");
         }
 
         // now start listening to changes
