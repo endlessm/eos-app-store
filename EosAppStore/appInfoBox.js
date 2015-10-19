@@ -460,9 +460,7 @@ const AppInfoBox = new Lang.Class({
 
                 this._installButton.show();
 
-                // Only apps that don't have a launcher can be
-                // removed from the system
-                if (!this.appInfo.get_has_launcher() && this.appInfo.is_removable()) {
+                if (this.appInfo.is_removable()) {
                     this._removeButton.show();
                 }
                 break;
