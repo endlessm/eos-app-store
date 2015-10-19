@@ -346,28 +346,30 @@ const AppInstalledFrame = new Lang.Class({
                     return a.get_title().localeCompare(b.get_title());
                 }
 
+                // System apps go to the bottom
                 if (aSystemApp) {
-                    return -1;
+                    return 1;
                 }
 
                 if (bSystemApp) {
-                    return 1;
+                    return -1;
                 }
 
                 // Otherwise, sort alphabetically
                 return a.get_title().localeCompare(b.get_title());
             }
 
-            // System apps are never updatable
+            // System apps are never updatable, and updatable apps go to the top
             if (aUpdatable) {
-                return 1;
-            }
-
-            if (bUpdatable) {
                 return -1;
             }
 
-            return aSystemApp ? -1 : 1;
+            if (bUpdatable) {
+                return 1;
+            }
+
+            // System apps go to the bottom
+            return aSystemApp ? 1 : -1;
         });
     },
 
