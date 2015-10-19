@@ -191,8 +191,6 @@ const AppBaseBox = new Lang.Class({
                 app.maybeNotifyUser(_("'%s' was removed successfully").format(this.appTitle));
             }
 
-            this._syncState();
-
             if (callback) {
                 callback(error);
             }
@@ -214,8 +212,6 @@ const AppBaseBox = new Lang.Class({
                 app.maybeNotifyUser(_("'%s' was updated successfully").format(this.appTitle));
             }
 
-            this._syncState();
-
             if (callback) {
                 callback(error);
             }
@@ -236,8 +232,6 @@ const AppBaseBox = new Lang.Class({
             else {
                 app.maybeNotifyUser(_("'%s' was installed successfully").format(this.appTitle));
             }
-
-            this._syncState();
 
             if (!error) {
                 let app = Gio.Application.get_default();

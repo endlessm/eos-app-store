@@ -29,16 +29,19 @@ const AppFrame = new Lang.Class({
 
         this.get_style_context().add_class('app-frame');
 
+        this._backClickedId = 0;
         this._stack = new Gtk.Stack({ transition_duration: APP_TRANSITION_MS,
                                       transition_type: Gtk.StackTransitionType.SLIDE_RIGHT,
                                       hexpand: true,
                                       vexpand: true });
+        this._stack.connect('notify::visible-child-name', Lang.bind(this, this._onPageChanged));
         this.add(this._stack);
 
         let app = Gio.Application.get_default();
         this._category = category;
         this._mainWindow = app.mainWindow;
         this._model = app.appListModel;
+        this._lastPageId = null;
         this._view = null;
 
         // Where the content goes once the frame is populated
@@ -70,16 +73,51 @@ const AppFrame = new Lang.Class({
         this._spinnerBox.add(this._spinner);
         this.spinning = true;
 
-        this._backClickedId = 0;
         this.connect('destroy', Lang.bind(this, this._onDestroy));
 
         this.show_all();
     },
 
     _onDestroy: function() {
+        this._clearBackId();
+    },
+
+    _setupPageHeader: function() {
+        let appInfo = this._stack.visible_child.appInfo;
+        if (!appInfo) {
+            return;
+        }
+
+        this._mainWindow.titleText = appInfo.get_title();
+        this._mainWindow.subtitleText = appInfo.get_subtitle();
+        this._mainWindow.headerIcon = appInfo.get_icon_name();
+        this._mainWindow.headerInstalledVisible = appInfo.is_installed();
+        this._mainWindow.backButtonVisible = true;
+
+        this._clearBackId();
+        this._backClickedId =
+            this._mainWindow.connect('back-clicked', Lang.bind(this, this._showView));
+    },
+
+    _clearBackId: function() {
         if (this._backClickedId != 0) {
             this._mainWindow.disconnect(this._backClickedId);
             this._backClickedId = 0;
+        }
+    },
+
+    _onPageChanged: function() {
+        let pageId = this._stack.visible_child_name;
+        if (pageId != SPINNER_PAGE) {
+            this._lastPageId = pageId;
+        }
+
+        if (pageId == SPINNER_PAGE ||
+            pageId == CONTENT_PAGE) {
+            this._mainWindow.clearHeaderState();
+            this._clearBackId();
+        } else {
+            this._setupPageHeader();
         }
     },
 
@@ -88,7 +126,8 @@ const AppFrame = new Lang.Class({
             this._stack.set_visible_child_full(SPINNER_PAGE, Gtk.StackTransitionType.CROSSFADE);
             this._spinner.start();
         } else {
-            this._stack.set_visible_child_full(CONTENT_PAGE, Gtk.StackTransitionType.CROSSFADE);
+            let pageId = this._lastPageId || CONTENT_PAGE;
+            this._stack.set_visible_child_full(pageId, Gtk.StackTransitionType.CROSSFADE);
             this._spinner.stop();
         }
     },
@@ -171,13 +210,6 @@ const AppFrame = new Lang.Class({
     },
 
     _showView: function() {
-        this._mainWindow.clearHeaderState();
-
-        if (this._backClickedId != 0) {
-            this._mainWindow.disconnect(this._backClickedId);
-            this._backClickedId = 0;
-        }
-
         this.populate();
         this._stack.set_visible_child_full(CONTENT_PAGE, Gtk.StackTransitionType.SLIDE_RIGHT);
     },
@@ -199,20 +231,10 @@ const AppFrame = new Lang.Class({
         }
 
         this._stack.set_visible_child_full(desktopId, Gtk.StackTransitionType.SLIDE_LEFT);
-
-        this._mainWindow.titleText = appInfo.get_title();
-        this._mainWindow.subtitleText = appInfo.get_subtitle();
-        this._mainWindow.headerIcon = appInfo.get_icon_name();
-        this._mainWindow.headerInstalledVisible = appInfo.is_installed();
-        this._mainWindow.backButtonVisible = true;
-
-        this._backClickedId =
-            this._mainWindow.connect('back-clicked', Lang.bind(this, this._showView));
     },
 
     invalidate: function() {
         this._destroyView();
-        this._mainWindow.clearHeaderState();
     },
 
     reset: function() {

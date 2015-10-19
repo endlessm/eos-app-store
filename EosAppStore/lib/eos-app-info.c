@@ -1089,6 +1089,9 @@ eos_app_info_set_is_installed (EosAppInfo *info,
       g_clear_pointer (&info->info_filename, g_free);
     }
 
+  /* Reset removing flag if we are updating after uninstall */
+  eos_app_info_set_is_removing (info, FALSE);
+
   g_object_notify_by_pspec (G_OBJECT (info), properties[PROP_STATE]);
 }
 
