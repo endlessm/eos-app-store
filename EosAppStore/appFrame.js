@@ -479,7 +479,7 @@ const AppPageProvider = new Lang.Class({
                 let app = Gio.Application.get_default();
 
                 // Show the error dialog
-                let dialog = new Gtk.MessageDialog({ transient_for: app._mainWindow,
+                let dialog = new Gtk.MessageDialog({ transient_for: app.mainWindow,
                                                      modal: true,
                                                      destroy_with_parent: true,
                                                      text: _("Refresh failed"),
