@@ -33,12 +33,14 @@ const AppFrame = new Lang.Class({
                                       transition_type: Gtk.StackTransitionType.SLIDE_RIGHT,
                                       hexpand: true,
                                       vexpand: true });
+        this._stack.connect('notify::visible-child-name', Lang.bind(this, this._onPageChanged));
         this.add(this._stack);
 
         let app = Gio.Application.get_default();
         this._category = category;
         this._mainWindow = app.mainWindow;
         this._model = app.appListModel;
+        this._lastPageId = null;
         this._view = null;
 
         // Where the content goes once the frame is populated
@@ -83,12 +85,20 @@ const AppFrame = new Lang.Class({
         }
     },
 
+    _onPageChanged: function() {
+        let pageId = this._stack.visible_child_name;
+        if (pageId != SPINNER_PAGE) {
+            this._lastPageId = pageId;
+        }
+    },
+
     set spinning(v) {
         if (v) {
             this._stack.set_visible_child_full(SPINNER_PAGE, Gtk.StackTransitionType.CROSSFADE);
             this._spinner.start();
         } else {
-            this._stack.set_visible_child_full(CONTENT_PAGE, Gtk.StackTransitionType.CROSSFADE);
+            let pageId = this._lastPageId || CONTENT_PAGE;
+            this._stack.set_visible_child_full(pageId, Gtk.StackTransitionType.CROSSFADE);
             this._spinner.stop();
         }
     },
