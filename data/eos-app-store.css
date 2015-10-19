@@ -113,7 +113,7 @@
 .web-frame,
 .folder-frame {
     border: none;
-    padding-right: 15px;
+    padding-right: 25px;
 }
 
 .app-frame:dir(rtl),
