@@ -383,8 +383,23 @@ const AppInstalledFrame = new Lang.Class({
         this.parent();
     },
 
+    invalidate: function() {
+        // Instead of destroying the view, we queue an invalidation
+        // on next page reset, as we don't want to resort while showing
+        this._invalidated = true;
+    },
+
     getTitle: function() {
         return _("Installed apps");
+    },
+
+    reset: function() {
+        if (this._invalidated) {
+            this._destroyView();
+            this._invalidated = false;
+        }
+
+        this.parent();
     }
 });
 
