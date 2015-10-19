@@ -305,21 +305,47 @@ const AppInstalledFrame = new Lang.Class({
         return appInfos.filter(function(info) {
             return info.is_installed();
         }).sort(function(a, b) {
+            // The sorting is thus defined:
+            //
+            // - updatable apps, sorted alphabetically, always go first
+            // - system apps, sorted alphabetically, always go last
+            // - everything else, it's in the middle
             let aUpdatable = a.is_updatable();
             let bUpdatable = b.is_updatable();
+            let aSystemApp = !a.is_store_installed();
+            let bSystemApp = !b.is_store_installed();
 
             // If both apps are updatable, or both aren't, sort them
-            // alphabetically, otherwise sort updatable apps first.
+            // alphabetically, otherwise sort updatable apps first. If
+            // both aren't updatable, but either is a system app, then
+            // we sort the last.
             if (aUpdatable == bUpdatable) {
+                if (aSystemApp && bSystemApp) {
+                    return a.get_title().localeCompare(b.get_title());
+                }
+
+                if (aSystemApp) {
+                    return -1;
+                }
+
+                if (bSystemApp) {
+                    return 1;
+                }
+
+                // Otherwise, sort alphabetically
                 return a.get_title().localeCompare(b.get_title());
             }
 
+            // System apps are never updatable
             if (aUpdatable) {
                 return 1;
             }
 
-            // bUpdatable will be true here
-            return -1;
+            if (bUpdatable) {
+                return -1;
+            }
+
+            return aSystemApp ? -1 : 1;
         });
     },
 
