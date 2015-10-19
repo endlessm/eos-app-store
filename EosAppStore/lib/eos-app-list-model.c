@@ -1619,10 +1619,15 @@ eos_app_list_model_uninstall_app_finish (EosAppListModel *model,
 {
   GTask *task = G_TASK (result);
   EosAppInfo *info = g_task_get_task_data (task);
+  gboolean res = g_task_propagate_boolean (task, error);
 
-  eos_app_info_set_is_removing (info, FALSE);
+  /* If we successfully removed the application, we wait for GIO
+   * to notify us before we remove the flag.
+   */
+  if (!res)
+    eos_app_info_set_is_removing (info, FALSE);
 
-  return g_task_propagate_boolean (task, error);
+  return res;
 }
 
 gboolean
