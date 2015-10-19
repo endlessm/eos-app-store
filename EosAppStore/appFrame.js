@@ -477,17 +477,7 @@ const AppPageProvider = new Lang.Class({
             if (error.matches(EosAppStorePrivate.app_store_error_quark(),
                               EosAppStorePrivate.AppStoreError.APP_REFRESH_FAILURE)) {
                 let app = Gio.Application.get_default();
-
-                // Show the error dialog
-                let dialog = new Gtk.MessageDialog({ transient_for: app.mainWindow,
-                                                     modal: true,
-                                                     destroy_with_parent: true,
-                                                     text: _("Refresh failed"),
-                                                     secondary_text: error.message });
-                dialog.add_button(_("Dismiss"), Gtk.ResponseType.OK);
-                dialog.show_all();
-                dialog.run();
-                dialog.destroy();
+                app.maybeNotifyUser(_("Refresh failed"), error);
 
                 // On critical failures we don't try to partially populate
                 // categories
