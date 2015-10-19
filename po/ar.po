@@ -9,7 +9,7 @@ msgstr ""
 "Project-Id-Version: eos-app-store\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2015-10-16 16:24-0700\n"
-"PO-Revision-Date: 2015-10-16 23:39+0000\n"
+"PO-Revision-Date: 2015-10-19 15:06+0000\n"
 "Last-Translator: Roddy Shuler <roddy@endlessm.com>\n"
 "Language-Team: Arabic (http://www.transifex.com/endless-mobile-inc/eos-app-store/language/ar/)\n"
 "MIME-Version: 1.0\n"
@@ -80,83 +80,83 @@ msgstr "استبعاد"
 
 #: ../EosAppStore/appInfoBox.js:162
 msgid "Deleting app"
-msgstr ""
+msgstr "جاري حذف التطبيق"
 
 #: ../EosAppStore/appInfoBox.js:163
 msgid ""
 "Deleting this app will remove it from the device for all users. You will "
 "need to download it from the internet in order to reinstall it."
-msgstr ""
+msgstr "حذف هذا التطبيق سيزيله من الجهاز لكل المستخدمين. ستحتاج لتزيله عبر الإنترنت لإعادة تثبيته."
 
 #: ../EosAppStore/appInfoBox.js:167
 msgid "Delete app"
-msgstr ""
+msgstr "حذف التطبيق"
 
 #: ../EosAppStore/appInfoBox.js:188
 #, javascript-format
 msgid "We could not remove '%s'"
-msgstr ""
+msgstr "لم يمكننا إزالة '%s'"
 
 #: ../EosAppStore/appInfoBox.js:191
 #, javascript-format
 msgid "'%s' was removed successfully"
-msgstr ""
+msgstr "تمت إزالة '%s' بنجاح"
 
 #: ../EosAppStore/appInfoBox.js:211
 #, javascript-format
 msgid "We could not update '%s'"
-msgstr ""
+msgstr "لم يمكننا تحديث '%s'"
 
 #: ../EosAppStore/appInfoBox.js:214
 #, javascript-format
 msgid "'%s' was updated successfully"
-msgstr ""
+msgstr "تم تحديث '%s' بنجاح"
 
 #: ../EosAppStore/appInfoBox.js:234
 #, javascript-format
 msgid "We could not install '%s'"
-msgstr ""
+msgstr "لم يمكننا تثبيت '%s'"
 
 #: ../EosAppStore/appInfoBox.js:237
 #, javascript-format
 msgid "'%s' was installed successfully"
-msgstr ""
+msgstr "تم تثبيت'%s' بنجاح"
 
 #: ../EosAppStore/appInfoBox.js:325
 msgid "Updating…"
-msgstr ""
+msgstr "جاري التحديث…"
 
 #: ../EosAppStore/appInfoBox.js:325 ../EosAppStore/appInfoBox.js:531
 msgid "Installing…"
-msgstr ""
+msgstr "جاري التثبيت…"
 
 #: ../EosAppStore/appInfoBox.js:446
 msgid "Update app"
-msgstr ""
+msgstr "تحديث التطبيق"
 
 #: ../EosAppStore/appInfoBox.js:447
 msgid "Open app"
-msgstr ""
+msgstr "فتح التطبيق"
 
 #: ../EosAppStore/appInfoBox.js:448
 msgid "Add to the desktop"
-msgstr ""
+msgstr "الإضافة إلى سطح المكتب"
 
 #: ../EosAppStore/appInfoBox.js:449
 msgid "No network connection is available"
-msgstr ""
+msgstr "ليس هناك اتصال متاح بالشبكة"
 
 #: ../EosAppStore/appInfoBox.js:450
 msgid "Insufficient space to install the app"
-msgstr ""
+msgstr "ليست هناك مساحة كافية لتثبيت التطبيق"
 
 #: ../EosAppStore/appInfoBox.js:534
 msgid "Downloading…"
-msgstr ""
+msgstr "جاري التنزيل…"
 
 #: ../EosAppStore/appInfoBox.js:542
 msgid "Removing…"
-msgstr ""
+msgstr "جاري الإزالة…"
 
 #. Translators: Abbreviation for file size in megabytes;
 #. %s denotes the placement of the numeric value
@@ -164,11 +164,11 @@ msgstr ""
 #: ../EosAppStore/appInstalledBox.js:114
 #, javascript-format
 msgid "%s MB"
-msgstr ""
+msgstr "%s ميغابايت"
 
 #: ../EosAppStore/appInstalledBox.js:117
 msgid "System App"
-msgstr ""
+msgstr "تطبيق النظام"
 
 #. Translators: use the same string used to install the app center content
 #. JSON
@@ -358,7 +358,7 @@ msgstr "لا توجد مساحة كافية على الجهاز لتنزيل ا�
 
 #: ../EosAppStore/lib/eos-app-utils.c:1756
 msgid "There was a problem downloading the app; please try again"
-msgstr ""
+msgstr "حدثت مشكلة أثناء تنزيل التطبيق، يُرجى المحاولة مرة أخرى"
 
 #: ../EosAppStore/lib/eos-downloader.c:37
 #, c-format
@@ -368,7 +368,7 @@ msgstr "ليس هناك توقيع متوفر من أجل '%s'"
 #: ../EosAppStore/lib/eos-downloader.c:100
 #, c-format
 msgid "App '%s' could not be downloaded"
-msgstr ""
+msgstr "لم يمكن تنزيل تطبيق '%s' "
 
 #: ../EosAppStore/lib/eos-net-utils.c:268
 msgid "The certificate of the target server is expired"
@@ -393,4 +393,4 @@ msgstr "شهادة الخادم الوجهة سيئة أو غير صالحة"
 #: ../EosAppStore/lib/eos-net-utils.c:332
 #, c-format
 msgid "Could not save the app - canceling download (%s)"
-msgstr ""
+msgstr "لم يمكن حفظ التطبيق - جاري إلغاء التنزيل (%s)"

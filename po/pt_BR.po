@@ -17,7 +17,7 @@ msgstr ""
 "Project-Id-Version: eos-app-store\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2015-10-16 16:24-0700\n"
-"PO-Revision-Date: 2015-10-16 23:37+0000\n"
+"PO-Revision-Date: 2015-10-19 15:05+0000\n"
 "Last-Translator: Roddy Shuler <roddy@endlessm.com>\n"
 "Language-Team: Portuguese (Brazil) (http://www.transifex.com/endless-mobile-inc/eos-app-store/language/pt_BR/)\n"
 "MIME-Version: 1.0\n"
@@ -88,51 +88,51 @@ msgstr "Descartar"
 
 #: ../EosAppStore/appInfoBox.js:162
 msgid "Deleting app"
-msgstr ""
+msgstr "Excluindo programa"
 
 #: ../EosAppStore/appInfoBox.js:163
 msgid ""
 "Deleting this app will remove it from the device for all users. You will "
 "need to download it from the internet in order to reinstall it."
-msgstr ""
+msgstr "Ao excluir este programa você o removerá de todas as contas de usuário deste computador. Caso queira reinstalar será necessário baixar pela internet."
 
 #: ../EosAppStore/appInfoBox.js:167
 msgid "Delete app"
-msgstr ""
+msgstr "Excluir programa "
 
 #: ../EosAppStore/appInfoBox.js:188
 #, javascript-format
 msgid "We could not remove '%s'"
-msgstr ""
+msgstr "Não foi possível excluir '%s'"
 
 #: ../EosAppStore/appInfoBox.js:191
 #, javascript-format
 msgid "'%s' was removed successfully"
-msgstr ""
+msgstr " '%s' foi excluído com sucesso"
 
 #: ../EosAppStore/appInfoBox.js:211
 #, javascript-format
 msgid "We could not update '%s'"
-msgstr ""
+msgstr "Não foi possível atualizar '%s'"
 
 #: ../EosAppStore/appInfoBox.js:214
 #, javascript-format
 msgid "'%s' was updated successfully"
-msgstr ""
+msgstr "'%s' foi atualizado com sucesso"
 
 #: ../EosAppStore/appInfoBox.js:234
 #, javascript-format
 msgid "We could not install '%s'"
-msgstr ""
+msgstr "Não foi possível instalar '%s'"
 
 #: ../EosAppStore/appInfoBox.js:237
 #, javascript-format
 msgid "'%s' was installed successfully"
-msgstr ""
+msgstr "'%s' instalado com sucesso"
 
 #: ../EosAppStore/appInfoBox.js:325
 msgid "Updating…"
-msgstr ""
+msgstr "Atualizando…"
 
 #: ../EosAppStore/appInfoBox.js:325 ../EosAppStore/appInfoBox.js:531
 msgid "Installing…"
@@ -140,31 +140,31 @@ msgstr "Instalando…"
 
 #: ../EosAppStore/appInfoBox.js:446
 msgid "Update app"
-msgstr ""
+msgstr "Atualizar programa"
 
 #: ../EosAppStore/appInfoBox.js:447
 msgid "Open app"
-msgstr ""
+msgstr "Abrir programa"
 
 #: ../EosAppStore/appInfoBox.js:448
 msgid "Add to the desktop"
-msgstr ""
+msgstr "Adicionar à área de trabalho"
 
 #: ../EosAppStore/appInfoBox.js:449
 msgid "No network connection is available"
-msgstr ""
+msgstr "Nenhuma conexão de rede disponível"
 
 #: ../EosAppStore/appInfoBox.js:450
 msgid "Insufficient space to install the app"
-msgstr ""
+msgstr "Espaço insuficiente para instalar o programa"
 
 #: ../EosAppStore/appInfoBox.js:534
 msgid "Downloading…"
-msgstr ""
+msgstr "Baixando…"
 
 #: ../EosAppStore/appInfoBox.js:542
 msgid "Removing…"
-msgstr ""
+msgstr "Removendo…"
 
 #. Translators: Abbreviation for file size in megabytes;
 #. %s denotes the placement of the numeric value
@@ -172,11 +172,11 @@ msgstr ""
 #: ../EosAppStore/appInstalledBox.js:114
 #, javascript-format
 msgid "%s MB"
-msgstr ""
+msgstr "%s MB"
 
 #: ../EosAppStore/appInstalledBox.js:117
 msgid "System App"
-msgstr ""
+msgstr "Programa do sistema"
 
 #. Translators: use the same string used to install the app center content
 #. JSON
@@ -218,7 +218,7 @@ msgstr "Entretenimento"
 
 #: ../EosAppStore/categories.js:76
 msgid "Local"
-msgstr "Localidade"
+msgstr "Local"
 
 #: ../EosAppStore/environment.js:22
 msgid "App Center"
@@ -366,7 +366,7 @@ msgstr "Não há espaço suficiente para baixar o programa."
 
 #: ../EosAppStore/lib/eos-app-utils.c:1756
 msgid "There was a problem downloading the app; please try again"
-msgstr ""
+msgstr "Ocorreu um problema ao baixar o programa. Favor tentar novamente"
 
 #: ../EosAppStore/lib/eos-downloader.c:37
 #, c-format
@@ -376,7 +376,7 @@ msgstr "Nenhuma assinatura disponível para o programa '%s'"
 #: ../EosAppStore/lib/eos-downloader.c:100
 #, c-format
 msgid "App '%s' could not be downloaded"
-msgstr ""
+msgstr "O programa '%s' não pode ser baixado"
 
 #: ../EosAppStore/lib/eos-net-utils.c:268
 msgid "The certificate of the target server is expired"
@@ -401,4 +401,4 @@ msgstr "O certificado do servidor de destino está errado ou é inválido"
 #: ../EosAppStore/lib/eos-net-utils.c:332
 #, c-format
 msgid "Could not save the app - canceling download (%s)"
-msgstr ""
+msgstr "Não foi possível salvar o programa - cancelando o download (%s)"
