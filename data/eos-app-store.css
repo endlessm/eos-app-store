@@ -136,7 +136,9 @@
 }
 
 .frame-separator {
-    color: alpha(white, 0.1);
+    border-bottom: 1px solid alpha(white, 0.1);
+    -GtkWidget-wide-separators: true;
+    -GtkWidget-separator-height: 11px;
 }
 
 .frame-separator-shadows .frame {

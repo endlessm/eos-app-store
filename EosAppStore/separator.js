@@ -10,8 +10,7 @@ const FrameSeparator = new Lang.Class({
     Extends: Gtk.Box,
 
     _init: function() {
-        this.parent({ orientation: Gtk.Orientation.VERTICAL,
-                      margin_top: 10 });
+        this.parent({ orientation: Gtk.Orientation.VERTICAL });
 
         this._separator = new Gtk.Separator({ orientation: Gtk.Orientation.HORIZONTAL });
         this._separator.get_style_context().add_class('frame-separator');
