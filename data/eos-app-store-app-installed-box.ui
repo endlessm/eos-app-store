@@ -270,6 +270,32 @@
                     <property name="name">spinner</property>
                   </packing>
                 </child>
+                <child>
+                  <object class="GtkBox" id="box3">
+                    <property name="visible">True</property>
+                    <property name="can_focus">False</property>
+                    <property name="halign">end</property>
+                    <child>
+                      <object class="GtkLabel" id="_systemAppLabel">
+                        <property name="visible">True</property>
+                        <property name="can_focus">False</property>
+                        <property name="label" translatable="yes">System App</property>
+                        <property name="margin_end">10</property>
+                        <style>
+                          <class name="app-size"/>
+                        </style>
+                      </object>
+                      <packing>
+                        <property name="expand">False</property>
+                        <property name="fill">False</property>
+                        <property name="position">0</property>
+                      </packing>
+                    </child>
+                  </object>
+                  <packing>
+                    <property name="name">system-app</property>
+                  </packing>
+                </child>
               </object>
               <packing>
                 <property name="expand">False</property>
