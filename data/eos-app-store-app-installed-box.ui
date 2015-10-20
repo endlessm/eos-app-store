@@ -113,18 +113,6 @@
                             <property name="receives_default">True</property>
                             <property name="valign">center</property>
                             <signal name="clicked" handler="_onUpdateButtonClicked" swapped="no"/>
-                            <child>
-                              <object class="GtkFrame" id="_updateButtonImage">
-                                <property name="visible">True</property>
-                                <property name="can_focus">False</property>
-                                <property name="valign">center</property>
-                                <property name="width_request">16</property>
-                                <property name="height_request">16</property>
-                                <style>
-                                  <class name="state-image"/>
-                                </style>
-                              </object>
-                            </child>
                             <style>
                               <class name="state-button"/>
                               <class name="update"/>
@@ -140,7 +128,6 @@
                           <object class="GtkSeparator" id="_controlsSeparator">
                             <property name="visible">True</property>
                             <property name="can_focus">False</property>
-                            <property name="orientation">vertical</property>
                             <style>
                               <class name="controls-separator"/>
                             </style>
@@ -157,18 +144,6 @@
                             <property name="receives_default">True</property>
                             <property name="valign">center</property>
                             <signal name="clicked" handler="_onRemoveButtonClicked" swapped="no"/>
-                            <child>
-                              <object class="GtkFrame" id="_removeButtonImage">
-                                <property name="visible">True</property>
-                                <property name="can_focus">False</property>
-                                <property name="valign">center</property>
-                                <property name="width_request">16</property>
-                                <property name="height_request">16</property>
-                                <style>
-                                  <class name="state-image"/>
-                                </style>
-                              </object>
-                            </child>
                             <style>
                               <class name="state-button"/>
                               <class name="remove"/>
@@ -198,8 +173,8 @@
                         <property name="label" translatable="yes">SIZE</property>
                         <property name="ellipsize">end</property>
                         <property name="margin_end">10</property>
-                        <property name="width_chars">15</property>
-                        <property name="max_width_chars">15</property>
+                        <property name="width_chars">12</property>
+                        <property name="max_width_chars">12</property>
                       </object>
                       <style>
                         <class name="app-size"/>
@@ -263,17 +238,9 @@
                         <property name="margin_start">10</property>
                         <property name="margin_end">7</property>
                         <signal name="clicked" handler="_onCancelButtonClicked" swapped="no"/>
-                        <child>
-                          <object class="GtkImage" id="_cancelButtonImage">
-                            <property name="visible">True</property>
-                            <property name="can_focus">False</property>
-                            <property name="icon_name">process-stop-symbolic</property>
-                            <property name="icon_size">1</property>
-                          </object>
-                        </child>
                         <style>
                           <class name="state-button"/>
-                          <class name="cancel"/>
+                          <class name="pause"/>
                         </style>
                       </object>
                       <packing>
@@ -326,5 +293,11 @@
         </child>
       </object>
     </child>
+  </object>
+  <object class="GtkSizeGroup" id="sizegroup1">
+    <widgets>
+      <widget name="_sizeText"/>
+      <widget name="_stopLabel"/>
+    </widgets>
   </object>
 </interface>

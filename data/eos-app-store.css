@@ -122,8 +122,23 @@
     padding-left: 15px;
 }
 
+.app-frame .app-scrolledwindow {
+    border: none;
+    -GtkScrolledWindow-scrollbars-within-bevel: false;
+}
+
+.app-installed-frame .app-scrolledwindow {
+    padding-right: 15px;
+}
+
+.app-installed-frame .app-scrolledwindow:dir(rtl) {
+    padding-left: 15px;
+}
+
 .frame-separator {
-    color: alpha(white, 0.1);
+    border-bottom: 1px solid alpha(white, 0.1);
+    -GtkWidget-wide-separators: true;
+    -GtkWidget-separator-height: 11px;
 }
 
 .frame-separator-shadows .frame {
@@ -181,7 +196,11 @@
 }
 
 .controls-box .controls-separator {
-    color: #494949;
+    border-style: solid;
+    border-width: 0 1px;
+    border-color: #9b9b9b;
+    -GtkWidget-wide-separators: true;
+    -GtkWidget-separator-height: 31px;
 }
 
 .update-progress-bar {
@@ -192,13 +211,13 @@
     -GtkProgressBar-min-horizontal-bar-height: 3;
 }
 
-.update-progress-bar .trough {
+.update-progress-bar.trough {
     border-style: none;
     background-color: transparent;
     box-shadow: none;
 }
 
-.update-progress-bar .progressbar {
+.update-progress-bar.progressbar {
     background-image: none;
     background-color: #ffffff;
     border-style: none;
@@ -457,46 +476,46 @@
 
     background-position: initial;
     background-repeat: no-repeat;
-    padding: 10px 11px 11px 11px;
+    padding: 15px;
 }
 
 .controls-box .state-button.update {
-    background-image: url("btn_install_normal_border.png");
+    background-image: url("btn_installed_update_normal.png");
 }
 
 .controls-box .state-button.update:hover {
-    background-image: url("btn_install_hover_border.png");
+    background-image: url("btn_installed_update_hover.png");
 }
 
 .controls-box .state-button.update:active,
 .controls-box .state-button.update:hover:active {
-    background-image: url("btn_install_pressed_border.png");
+    background-image: url("btn_installed_update_pressed.png");
 }
 
 .controls-box .state-button.remove {
-    background-image: url("btn_remove_normal_border.png");
+    background-image: url("btn_installed_remove_normal.png");
 }
 
 .controls-box .state-button.remove:hover {
-    background-image: url("btn_remove_hover_border.png");
+    background-image: url("btn_installed_remove_hover.png");
 }
 
 .controls-box .state-button.remove:active,
 .controls-box .state-button.remove:hover:active {
-    background-image: url("btn_remove_pressed_border.png");
+    background-image: url("btn_installed_remove_pressed.png");
 }
 
-.controls-box .state-button.cancel {
-    background-image: url("btn_remove_normal_border.png");
+.controls-box .state-button.pause {
+    background-image: url("btn_installed_pause_normal.png");
 }
 
-.controls-box .state-button.cancel:hover {
-    background-image: url("btn_remove_hover_border.png");
+.controls-box .state-button.pause:hover {
+    background-image: url("btn_installed_pause_hover.png");
 }
 
-.controls-box .state-button.cancel:active,
-.controls-box .state-button.cancel:hover:active {
-    background-image: url("btn_remove_pressed_border.png");
+.controls-box .state-button.pause:active,
+.controls-box .state-button.pause:hover:active {
+    background-image: url("btn_installed_pause_pressed.png");
 }
 
 .app-frame GtkSpinner {
@@ -744,7 +763,7 @@
 .folder-description {
     color: white;
     font-weight: 600; /* semibold */
-    padding: 10px 2px 8px;
+    padding: 10px 2px 0px;
 }
 
 .folder-icon-button {

@@ -28,6 +28,15 @@
     <file compressed="true">btn_install_pressed_border.png</file>
     <file compressed="true">btn_install_pressed_icon.png</file>
     <file compressed="true">btn_install_pressed_middle.png</file>
+    <file compressed="true">btn_installed_pause_hover.png</file>
+    <file compressed="true">btn_installed_pause_normal.png</file>
+    <file compressed="true">btn_installed_pause_pressed.png</file>
+    <file compressed="true">btn_installed_remove_hover.png</file>
+    <file compressed="true">btn_installed_remove_normal.png</file>
+    <file compressed="true">btn_installed_remove_pressed.png</file>
+    <file compressed="true">btn_installed_update_hover.png</file>
+    <file compressed="true">btn_installed_update_normal.png</file>
+    <file compressed="true">btn_installed_update_pressed.png</file>
     <file compressed="true">btn_launch_hover_icon.png</file>
     <file compressed="true">btn_launch_normal_icon.png</file>
     <file compressed="true">btn_launch_pressed_icon.png</file>
