@@ -456,7 +456,7 @@
 
 .app-frame .app-installed-list-separator {
     border: none;
-    padding: 2px;
+    padding: 10px 2px 2px 2px;
 }
 
 .controls-box .state-button {
