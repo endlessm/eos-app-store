@@ -136,29 +136,13 @@ const AppFrame = new Lang.Class({
         return (this._stack.visible_child_name == SPINNER_PAGE);
     },
 
-    get mainWindow() {
-        return this._mainWindow;
-    },
-
-    get model() {
-        return this._model;
-    },
-
-    get contentBox() {
-        return this._contentBox;
-    },
-
-    get scrollWindow() {
-        return this._scrollWindow;
-    },
-
     get view() {
         return this._view;
     },
 
     set view(v) {
         if (v)
-            this.scrollWindow.add(v);
+            this._scrollWindow.add(v);
 
         this._view = v;
 
@@ -175,7 +159,7 @@ const AppFrame = new Lang.Class({
     },
 
     _destroyView: function() {
-        let child = this.scrollWindow.get_child();
+        let child = this._scrollWindow.get_child();
         if (child)
             child.destroy();
         this.view = null;
