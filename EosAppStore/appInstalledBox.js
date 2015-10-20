@@ -108,8 +108,6 @@ const AppInstalledBox = new Lang.Class({
                    and can be placed before or after the abbreviation */
                 this._sizeText.label = _("%s MB").format(sizeInMb.toFixed(1));
             }
-        } else {
-                this._sizeText.label = _("System App");
         }
     },
 
@@ -140,14 +138,21 @@ const AppInstalledBox = new Lang.Class({
             this._updateProgressBar.show();
             this._updateSpinner.start();
             this._controlsStack.visible_child_name = 'spinner';
-        } else {
-            this._appIcon.opacity = NORMAL_OPACITY;
-            this._nameText.opacity = NORMAL_OPACITY;
-            this._categoryText.opacity = NORMAL_OPACITY;
 
-            this._updateProgressBar.hide();
-            this._updateSpinner.stop();
+            return;
+        }
+
+        this._appIcon.opacity = NORMAL_OPACITY;
+        this._nameText.opacity = NORMAL_OPACITY;
+        this._categoryText.opacity = NORMAL_OPACITY;
+
+        this._updateProgressBar.hide();
+        this._updateSpinner.stop();
+
+        if (this.appInfo.is_store_installed()) {
             this._controlsStack.visible_child_name = 'controls';
+        } else {
+            this._controlsStack.visible_child_name = 'system-app';
         }
     },
 
