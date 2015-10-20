@@ -134,6 +134,7 @@
 
 .app-installed-frame .app-scrolledwindow:dir(rtl) {
     padding-left: 15px;
+    padding-right: 0px;
 }
 
 .frame-separator {
