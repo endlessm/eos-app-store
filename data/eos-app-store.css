@@ -185,7 +185,7 @@
     border-width: 0 1px;
     border-color: #9b9b9b;
     -GtkWidget-wide-separators: true;
-    -GtkWidget-separator-width: 1px;
+    -GtkWidget-separator-height: 31px;
 }
 
 .update-progress-bar {
