@@ -39,10 +39,8 @@ const AppInstalledBox = new Lang.Class({
         '_nameText',
         '_overlay',
         '_removeButton',
-        '_removeButtonImage',
         '_sizeText',
         '_updateButton',
-        '_updateButtonImage',
         '_updateProgressBar',
         '_updateSpinner',
     ],
@@ -61,9 +59,6 @@ const AppInstalledBox = new Lang.Class({
         this._updateSize();
 
         this._removeDialog = null;
-
-        this.setImageFrame(this._removeButton, this._removeButtonImage);
-        this.setImageFrame(this._updateButton, this._updateButtonImage);
 
         this._syncState();
     },

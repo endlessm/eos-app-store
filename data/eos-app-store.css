@@ -181,7 +181,11 @@
 }
 
 .controls-box .controls-separator {
-    background-color: #494949;
+    border: none;
+    color: #494949;
+    -GtkWidget-wide-separators: true;
+    -GtkWidget-separator-width: 1px;
+    -GtkWidget-separator-height: 30px;
 }
 
 .update-progress-bar {
@@ -486,17 +490,17 @@
     background-image: url("btn_installed_remove_pressed.png");
 }
 
-.controls-box .state-button.cancel {
-    background-image: url("btn_remove_normal_border.png");
+.controls-box .state-button.pause {
+    background-image: url("btn_installed_pause_normal.png");
 }
 
-.controls-box .state-button.cancel:hover {
-    background-image: url("btn_remove_hover_border.png");
+.controls-box .state-button.pause:hover {
+    background-image: url("btn_installed_pause_hover.png");
 }
 
-.controls-box .state-button.cancel:active,
-.controls-box .state-button.cancel:hover:active {
-    background-image: url("btn_remove_pressed_border.png");
+.controls-box .state-button.pause:active,
+.controls-box .state-button.pause:hover:active {
+    background-image: url("btn_installed_pause_pressed.png");
 }
 
 .app-frame GtkSpinner {
