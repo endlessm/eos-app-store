@@ -145,17 +145,13 @@ eos_link_row_draw_with_icon (EosLinkRow *self,
                              gint width,
                              gint height)
 {
-  gint image_width, image_height;
   GtkBorder image_margin;
-
-  image_width = width - self->cell_margin;
-  image_height = height - self->cell_margin;
 
   gtk_style_context_save (self->image_context);
   gtk_style_context_add_class (self->image_context, "with-icon");
 
   if (self->icon == NULL)
-    self->icon = get_icon_surface_background (self, image_width, image_height);
+    self->icon = get_icon_surface_background (self, width, height);
 
   gtk_style_context_get_margin (self->image_context,
                                 GTK_STATE_FLAG_NORMAL,
@@ -176,16 +172,12 @@ eos_link_row_draw_normal (EosLinkRow *self,
                           gint width,
                           gint height)
 {
-  gint image_width, image_height;
   GtkBorder image_margin;
-
-  image_width = width - self->cell_margin;
-  image_height = height - self->cell_margin;
 
   if (self->image == NULL)
     self->image = get_thumbnail_surface_background (self,
                                                     eos_link_info_get_thumbnail_resource_path (self->link_info),
-                                                    image_width, image_height, NULL);
+                                                    width, height, NULL);
 
   gtk_style_context_get_margin (self->image_context,
                                 GTK_STATE_FLAG_NORMAL,
@@ -203,15 +195,15 @@ eos_link_row_draw (GtkWidget *widget,
                    cairo_t   *cr)
 {
   EosLinkRow *self = (EosLinkRow *) widget;
-  gint width, height;
+  gint available_width, available_height;
 
-  width = gtk_widget_get_allocated_width (widget);
-  height = gtk_widget_get_allocated_height (widget);
+  available_width = gtk_widget_get_allocated_width (widget) - self->cell_margin;
+  available_height = gtk_widget_get_allocated_height (widget) - self->cell_margin;
 
   if (self->show_icon)
-    eos_link_row_draw_with_icon (self, cr, width, height);
+    eos_link_row_draw_with_icon (self, cr, available_width, available_height);
   else
-    eos_link_row_draw_normal (self, cr, width, height);
+    eos_link_row_draw_normal (self, cr, available_width, available_height);
 
   GTK_WIDGET_CLASS (eos_link_row_parent_class)->draw (widget, cr);
 
