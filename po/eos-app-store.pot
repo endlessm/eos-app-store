@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-10-16 16:24-0700\n"
+"POT-Creation-Date: 2015-10-20 01:22+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -17,7 +17,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: ../data/eos-app-store-app-info-box.ui.h:1 ../EosAppStore/appInfoBox.js:445
+#: ../data/eos-app-store-app-info-box.ui.h:1 ../EosAppStore/appInfoBox.js:439
 msgid "Install app"
 msgstr ""
 
@@ -61,19 +61,19 @@ msgstr ""
 msgid "e.g.: http://www.globoesporte.com"
 msgstr ""
 
-#: ../EosAppStore/appFrame.js:337
+#: ../EosAppStore/appFrame.js:359
 msgid "Installed apps"
 msgstr ""
 
-#: ../EosAppStore/appFrame.js:394
+#: ../EosAppStore/appFrame.js:416
 msgid "Install apps"
 msgstr ""
 
-#: ../EosAppStore/appFrame.js:435
+#: ../EosAppStore/appFrame.js:457
 msgid "Refresh failed"
 msgstr ""
 
-#: ../EosAppStore/appFrame.js:437 ../EosAppStore/appStore.js:231
+#: ../EosAppStore/appFrame.js:459 ../EosAppStore/appStore.js:231
 msgid "Dismiss"
 msgstr ""
 
@@ -101,59 +101,59 @@ msgstr ""
 msgid "'%s' was removed successfully"
 msgstr ""
 
-#: ../EosAppStore/appInfoBox.js:211
+#: ../EosAppStore/appInfoBox.js:209
 #, javascript-format
 msgid "We could not update '%s'"
 msgstr ""
 
-#: ../EosAppStore/appInfoBox.js:214
+#: ../EosAppStore/appInfoBox.js:212
 #, javascript-format
 msgid "'%s' was updated successfully"
 msgstr ""
 
-#: ../EosAppStore/appInfoBox.js:234
+#: ../EosAppStore/appInfoBox.js:230
 #, javascript-format
 msgid "We could not install '%s'"
 msgstr ""
 
-#: ../EosAppStore/appInfoBox.js:237
+#: ../EosAppStore/appInfoBox.js:233
 #, javascript-format
 msgid "'%s' was installed successfully"
 msgstr ""
 
-#: ../EosAppStore/appInfoBox.js:325
+#: ../EosAppStore/appInfoBox.js:319
 msgid "Updating…"
 msgstr ""
 
-#: ../EosAppStore/appInfoBox.js:325 ../EosAppStore/appInfoBox.js:531
+#: ../EosAppStore/appInfoBox.js:319 ../EosAppStore/appInfoBox.js:523
 msgid "Installing…"
 msgstr ""
 
-#: ../EosAppStore/appInfoBox.js:446
+#: ../EosAppStore/appInfoBox.js:440
 msgid "Update app"
 msgstr ""
 
-#: ../EosAppStore/appInfoBox.js:447
+#: ../EosAppStore/appInfoBox.js:441
 msgid "Open app"
 msgstr ""
 
-#: ../EosAppStore/appInfoBox.js:448
+#: ../EosAppStore/appInfoBox.js:442
 msgid "Add to the desktop"
 msgstr ""
 
-#: ../EosAppStore/appInfoBox.js:449
+#: ../EosAppStore/appInfoBox.js:443
 msgid "No network connection is available"
 msgstr ""
 
-#: ../EosAppStore/appInfoBox.js:450
+#: ../EosAppStore/appInfoBox.js:444
 msgid "Insufficient space to install the app"
 msgstr ""
 
-#: ../EosAppStore/appInfoBox.js:534
+#: ../EosAppStore/appInfoBox.js:526
 msgid "Downloading…"
 msgstr ""
 
-#: ../EosAppStore/appInfoBox.js:542
+#: ../EosAppStore/appInfoBox.js:534
 msgid "Removing…"
 msgstr ""
 
@@ -327,7 +327,7 @@ msgid "App %s is up to date."
 msgstr ""
 
 #: ../EosAppStore/lib/eos-app-list-model.c:1602
-#: ../EosAppStore/lib/eos-app-list-model.c:1641
+#: ../EosAppStore/lib/eos-app-list-model.c:1646
 #, c-format
 msgid "App '%s' is not installed."
 msgstr ""
@@ -353,7 +353,7 @@ msgstr ""
 msgid "Not enough space on device for downloading the app."
 msgstr ""
 
-#: ../EosAppStore/lib/eos-app-utils.c:1756
+#: ../EosAppStore/lib/eos-app-utils.c:1777
 msgid "There was a problem downloading the app; please try again"
 msgstr ""
 
