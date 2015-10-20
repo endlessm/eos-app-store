@@ -120,6 +120,7 @@
 .web-frame:dir(rtl),
 .folder-frame:dir(rtl) {
     padding-left: 15px;
+    padding-right: 0px;
 }
 
 .app-frame .app-scrolledwindow {
