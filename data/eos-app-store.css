@@ -196,13 +196,13 @@
     -GtkProgressBar-min-horizontal-bar-height: 3;
 }
 
-.update-progress-bar .trough {
+.update-progress-bar.trough {
     border-style: none;
     background-color: transparent;
     box-shadow: none;
 }
 
-.update-progress-bar .progressbar {
+.update-progress-bar.progressbar {
     background-image: none;
     background-color: #ffffff;
     border-style: none;
