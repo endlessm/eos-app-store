@@ -327,21 +327,49 @@ const AppInstalledFrame = new Lang.Class({
         return appInfos.filter(function(info) {
             return info.is_installed();
         }).sort(function(a, b) {
+            // The sorting is thus defined:
+            //
+            // - updatable apps, sorted alphabetically, always go first
+            // - system apps, sorted alphabetically, always go last
+            // - everything else, it's in the middle
             let aUpdatable = a.is_updatable();
             let bUpdatable = b.is_updatable();
+            let aSystemApp = !a.is_store_installed();
+            let bSystemApp = !b.is_store_installed();
 
             // If both apps are updatable, or both aren't, sort them
-            // alphabetically, otherwise sort updatable apps first.
+            // alphabetically, otherwise sort updatable apps first. If
+            // both aren't updatable, but either is a system app, then
+            // we sort the last.
             if (aUpdatable == bUpdatable) {
+                if (aSystemApp && bSystemApp) {
+                    return a.get_title().localeCompare(b.get_title());
+                }
+
+                // System apps go to the bottom
+                if (aSystemApp) {
+                    return 1;
+                }
+
+                if (bSystemApp) {
+                    return -1;
+                }
+
+                // Otherwise, sort alphabetically
                 return a.get_title().localeCompare(b.get_title());
             }
 
+            // System apps are never updatable, and updatable apps go to the top
             if (aUpdatable) {
+                return -1;
+            }
+
+            if (bUpdatable) {
                 return 1;
             }
 
-            // bUpdatable will be true here
-            return -1;
+            // System apps go to the bottom
+            return aSystemApp ? 1 : -1;
         });
     },
 
@@ -355,8 +383,23 @@ const AppInstalledFrame = new Lang.Class({
         this.parent();
     },
 
+    invalidate: function() {
+        // Instead of destroying the view, we queue an invalidation
+        // on next page reset, as we don't want to resort while showing
+        this._invalidated = true;
+    },
+
     getTitle: function() {
         return _("Installed apps");
+    },
+
+    reset: function() {
+        if (this._invalidated) {
+            this._destroyView();
+            this._invalidated = false;
+        }
+
+        this.parent();
     }
 });
 
@@ -449,24 +492,14 @@ const AppPageProvider = new Lang.Class({
             if (error.matches(EosAppStorePrivate.app_store_error_quark(),
                               EosAppStorePrivate.AppStoreError.APP_REFRESH_FAILURE)) {
                 let app = Gio.Application.get_default();
-
-                // Show the error dialog
-                let dialog = new Gtk.MessageDialog({ transient_for: app._mainWindow,
-                                                     modal: true,
-                                                     destroy_with_parent: true,
-                                                     text: _("Refresh failed"),
-                                                     secondary_text: error.message });
-                dialog.add_button(_("Dismiss"), Gtk.ResponseType.OK);
-                dialog.show_all();
-                dialog.run();
-                dialog.destroy();
+                app.maybeNotifyUser(_("Refresh failed"), error);
 
                 // On critical failures we don't try to partially populate
                 // categories
                 return;
-            } else {
-                log("Loading apps anyways due to non-critical exceptions");
             }
+
+            log("Loading apps anyways due to non-critical exceptions");
         }
 
         // now start listening to changes
