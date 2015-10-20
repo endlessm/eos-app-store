@@ -128,6 +128,8 @@ eos_link_row_draw_normal (EosLinkRow *self,
                           gint height)
 {
   GtkBorder image_margin;
+  gboolean rtl;
+  gdouble x, y;
 
   if (self->image == NULL)
     self->image = get_thumbnail_surface_background (self);
@@ -136,11 +138,16 @@ eos_link_row_draw_normal (EosLinkRow *self,
                                 GTK_STATE_FLAG_NORMAL,
                                 &image_margin);
 
+  rtl = (gtk_widget_get_direction (GTK_WIDGET (self)) == GTK_TEXT_DIR_RTL);
+  x = MAX (image_margin.top, (gint) self->cell_margin / 2);
+  y = MAX (image_margin.left, (gint) self->cell_margin / 2);
+  if (rtl)
+    x = width - IMAGE_THUMBNAIL_SIZE - x;
+
   gtk_render_icon_surface (self->image_context,
                            cr,
                            self->image,
-                           MAX (image_margin.top, (gint) self->cell_margin / 2),
-                           MAX (image_margin.left, (gint) self->cell_margin / 2));
+                           x, y);
 }
 
 static gboolean
