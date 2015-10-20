@@ -8,8 +8,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: eos-app-store\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-10-16 16:24-0700\n"
-"PO-Revision-Date: 2015-10-19 15:06+0000\n"
+"POT-Creation-Date: 2015-10-20 16:52-0700\n"
+"PO-Revision-Date: 2015-10-20 23:52+0000\n"
 "Last-Translator: Roddy Shuler <roddy@endlessm.com>\n"
 "Language-Team: Arabic (http://www.transifex.com/endless-mobile-inc/eos-app-store/language/ar/)\n"
 "MIME-Version: 1.0\n"
@@ -18,7 +18,7 @@ msgstr ""
 "Language: ar\n"
 "Plural-Forms: nplurals=6; plural=n==0 ? 0 : n==1 ? 1 : n==2 ? 2 : n%100>=3 && n%100<=10 ? 3 : n%100>=11 && n%100<=99 ? 4 : 5;\n"
 
-#: ../data/eos-app-store-app-info-box.ui.h:1 ../EosAppStore/appInfoBox.js:445
+#: ../data/eos-app-store-app-info-box.ui.h:1 ../EosAppStore/appInfoBox.js:439
 msgid "Install app"
 msgstr "تثبيت التطبيق"
 
@@ -54,29 +54,30 @@ msgstr "جارٍ التحديث…"
 msgid "STOP"
 msgstr "إيقاف"
 
+#: ../data/eos-app-store-app-installed-box.ui.h:6
+msgid "System App"
+msgstr "تطبيق النظام"
+
 #: ../data/eos-app-store-folder-frame.ui.h:1
 msgid "Create your own folder to organize your apps. First, choose an icon."
 msgstr "قم بإنشاء مجلد خاص بك لتنظيم تطبيقاتك. اختر رمزا أولا."
 
 #: ../data/eos-app-store-weblink-new-site-frame.ui.h:1
-msgid "e.g.: http://www.globoesporte.com"
-msgstr "مثال: http://www.globoesporte.com"
+#: ../EosAppStore/weblinkFrame.js:329
+msgid "e.g.: http://www.endlessm.com"
+msgstr "مثال: http://www.endlessm.com"
 
-#: ../EosAppStore/appFrame.js:337
+#: ../EosAppStore/appFrame.js:393
 msgid "Installed apps"
 msgstr "التطبيقات المثبتة"
 
-#: ../EosAppStore/appFrame.js:394
+#: ../EosAppStore/appFrame.js:450
 msgid "Install apps"
 msgstr "تثبيت التطبيقات"
 
-#: ../EosAppStore/appFrame.js:435
+#: ../EosAppStore/appFrame.js:486
 msgid "Refresh failed"
 msgstr "تعذر التحديث"
-
-#: ../EosAppStore/appFrame.js:437 ../EosAppStore/appStore.js:231
-msgid "Dismiss"
-msgstr "استبعاد"
 
 #: ../EosAppStore/appInfoBox.js:162
 msgid "Deleting app"
@@ -102,73 +103,73 @@ msgstr "لم يمكننا إزالة '%s'"
 msgid "'%s' was removed successfully"
 msgstr "تمت إزالة '%s' بنجاح"
 
-#: ../EosAppStore/appInfoBox.js:211
+#: ../EosAppStore/appInfoBox.js:209
 #, javascript-format
 msgid "We could not update '%s'"
 msgstr "لم يمكننا تحديث '%s'"
 
-#: ../EosAppStore/appInfoBox.js:214
+#: ../EosAppStore/appInfoBox.js:212
 #, javascript-format
 msgid "'%s' was updated successfully"
 msgstr "تم تحديث '%s' بنجاح"
 
-#: ../EosAppStore/appInfoBox.js:234
+#: ../EosAppStore/appInfoBox.js:230
 #, javascript-format
 msgid "We could not install '%s'"
 msgstr "لم يمكننا تثبيت '%s'"
 
-#: ../EosAppStore/appInfoBox.js:237
+#: ../EosAppStore/appInfoBox.js:233
 #, javascript-format
 msgid "'%s' was installed successfully"
 msgstr "تم تثبيت'%s' بنجاح"
 
-#: ../EosAppStore/appInfoBox.js:325
+#: ../EosAppStore/appInfoBox.js:319
 msgid "Updating…"
 msgstr "جاري التحديث…"
 
-#: ../EosAppStore/appInfoBox.js:325 ../EosAppStore/appInfoBox.js:531
+#: ../EosAppStore/appInfoBox.js:319 ../EosAppStore/appInfoBox.js:523
 msgid "Installing…"
 msgstr "جاري التثبيت…"
 
-#: ../EosAppStore/appInfoBox.js:446
+#: ../EosAppStore/appInfoBox.js:440
 msgid "Update app"
 msgstr "تحديث التطبيق"
 
-#: ../EosAppStore/appInfoBox.js:447
+#: ../EosAppStore/appInfoBox.js:441
 msgid "Open app"
 msgstr "فتح التطبيق"
 
-#: ../EosAppStore/appInfoBox.js:448
+#: ../EosAppStore/appInfoBox.js:442
 msgid "Add to the desktop"
 msgstr "الإضافة إلى سطح المكتب"
 
-#: ../EosAppStore/appInfoBox.js:449
+#: ../EosAppStore/appInfoBox.js:443
 msgid "No network connection is available"
 msgstr "ليس هناك اتصال متاح بالشبكة"
 
-#: ../EosAppStore/appInfoBox.js:450
+#: ../EosAppStore/appInfoBox.js:444
 msgid "Insufficient space to install the app"
 msgstr "ليست هناك مساحة كافية لتثبيت التطبيق"
 
-#: ../EosAppStore/appInfoBox.js:534
+#: ../EosAppStore/appInfoBox.js:526
 msgid "Downloading…"
 msgstr "جاري التنزيل…"
 
-#: ../EosAppStore/appInfoBox.js:542
+#: ../EosAppStore/appInfoBox.js:534
 msgid "Removing…"
 msgstr "جاري الإزالة…"
 
 #. Translators: Abbreviation for file size in megabytes;
 #. %s denotes the placement of the numeric value
 #. and can be placed before or after the abbreviation
-#: ../EosAppStore/appInstalledBox.js:114
+#: ../EosAppStore/appInstalledBox.js:109
 #, javascript-format
 msgid "%s MB"
 msgstr "%s ميغابايت"
 
-#: ../EosAppStore/appInstalledBox.js:117
-msgid "System App"
-msgstr "تطبيق النظام"
+#: ../EosAppStore/appStore.js:231
+msgid "Dismiss"
+msgstr "استبعاد"
 
 #. Translators: use the same string used to install the app center content
 #. JSON
@@ -235,10 +236,6 @@ msgstr "تثبيت المجلدات"
 #: ../EosAppStore/weblinkFrame.js:263
 msgid "Write the website you'd like to add here and press “Enter”"
 msgstr "اكتب الموقع الذي تريد إضافته هنا واضغط على \"Enter\""
-
-#: ../EosAppStore/weblinkFrame.js:329
-msgid "e.g.: http://www.endlessm.com"
-msgstr "مثال: http://www.endlessm.com"
 
 #: ../EosAppStore/weblinkFrame.js:349
 msgid "searching"
@@ -330,7 +327,7 @@ msgid "App %s is up to date."
 msgstr "تطبيق %s مُحدثٌ لآخر وضع."
 
 #: ../EosAppStore/lib/eos-app-list-model.c:1602
-#: ../EosAppStore/lib/eos-app-list-model.c:1641
+#: ../EosAppStore/lib/eos-app-list-model.c:1646
 #, c-format
 msgid "App '%s' is not installed."
 msgstr "تطبيق '%s' غير مُثَبَتْ."
@@ -356,7 +353,7 @@ msgstr "سجلات ميتا الخاصة بالتحديثات لم تحتوي ع
 msgid "Not enough space on device for downloading the app."
 msgstr "لا توجد مساحة كافية على الجهاز لتنزيل التطبيق."
 
-#: ../EosAppStore/lib/eos-app-utils.c:1756
+#: ../EosAppStore/lib/eos-app-utils.c:1777
 msgid "There was a problem downloading the app; please try again"
 msgstr "حدثت مشكلة أثناء تنزيل التطبيق، يُرجى المحاولة مرة أخرى"
 

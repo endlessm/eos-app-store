@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-10-20 01:22+0000\n"
+"POT-Creation-Date: 2015-10-20 16:52-0700\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -53,28 +53,29 @@ msgstr ""
 msgid "STOP"
 msgstr ""
 
+#: ../data/eos-app-store-app-installed-box.ui.h:6
+msgid "System App"
+msgstr ""
+
 #: ../data/eos-app-store-folder-frame.ui.h:1
 msgid "Create your own folder to organize your apps. First, choose an icon."
 msgstr ""
 
 #: ../data/eos-app-store-weblink-new-site-frame.ui.h:1
-msgid "e.g.: http://www.globoesporte.com"
+#: ../EosAppStore/weblinkFrame.js:329
+msgid "e.g.: http://www.endlessm.com"
 msgstr ""
 
-#: ../EosAppStore/appFrame.js:359
+#: ../EosAppStore/appFrame.js:393
 msgid "Installed apps"
 msgstr ""
 
-#: ../EosAppStore/appFrame.js:416
+#: ../EosAppStore/appFrame.js:450
 msgid "Install apps"
 msgstr ""
 
-#: ../EosAppStore/appFrame.js:457
+#: ../EosAppStore/appFrame.js:486
 msgid "Refresh failed"
-msgstr ""
-
-#: ../EosAppStore/appFrame.js:459 ../EosAppStore/appStore.js:231
-msgid "Dismiss"
 msgstr ""
 
 #: ../EosAppStore/appInfoBox.js:162
@@ -160,13 +161,13 @@ msgstr ""
 #. Translators: Abbreviation for file size in megabytes;
 #. %s denotes the placement of the numeric value
 #. and can be placed before or after the abbreviation
-#: ../EosAppStore/appInstalledBox.js:114
+#: ../EosAppStore/appInstalledBox.js:109
 #, javascript-format
 msgid "%s MB"
 msgstr ""
 
-#: ../EosAppStore/appInstalledBox.js:117
-msgid "System App"
+#: ../EosAppStore/appStore.js:231
+msgid "Dismiss"
 msgstr ""
 
 #. Translators: use the same string used to install the app center content JSON
@@ -232,10 +233,6 @@ msgstr ""
 
 #: ../EosAppStore/weblinkFrame.js:263
 msgid "Write the website you'd like to add here and press “Enter”"
-msgstr ""
-
-#: ../EosAppStore/weblinkFrame.js:329
-msgid "e.g.: http://www.endlessm.com"
 msgstr ""
 
 #: ../EosAppStore/weblinkFrame.js:349

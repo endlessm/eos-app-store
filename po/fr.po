@@ -8,8 +8,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: eos-app-store\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-10-16 16:24-0700\n"
-"PO-Revision-Date: 2015-10-19 15:05+0000\n"
+"POT-Creation-Date: 2015-10-20 16:52-0700\n"
+"PO-Revision-Date: 2015-10-20 23:52+0000\n"
 "Last-Translator: Roddy Shuler <roddy@endlessm.com>\n"
 "Language-Team: French (http://www.transifex.com/endless-mobile-inc/eos-app-store/language/fr/)\n"
 "MIME-Version: 1.0\n"
@@ -18,7 +18,7 @@ msgstr ""
 "Language: fr\n"
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
 
-#: ../data/eos-app-store-app-info-box.ui.h:1 ../EosAppStore/appInfoBox.js:445
+#: ../data/eos-app-store-app-info-box.ui.h:1 ../EosAppStore/appInfoBox.js:439
 msgid "Install app"
 msgstr "Installer l'application"
 
@@ -54,29 +54,30 @@ msgstr "MISE À JOUR…"
 msgid "STOP"
 msgstr "STOP"
 
+#: ../data/eos-app-store-app-installed-box.ui.h:6
+msgid "System App"
+msgstr "Appli système"
+
 #: ../data/eos-app-store-folder-frame.ui.h:1
 msgid "Create your own folder to organize your apps. First, choose an icon."
 msgstr "Créez votre propre dossier pour organiser vos applications. D'abord, choisissez une icône."
 
 #: ../data/eos-app-store-weblink-new-site-frame.ui.h:1
-msgid "e.g.: http://www.globoesporte.com"
-msgstr "ex. : http://www.globoesporte.com"
+#: ../EosAppStore/weblinkFrame.js:329
+msgid "e.g.: http://www.endlessm.com"
+msgstr "ex. : http://www.endlessm.com"
 
-#: ../EosAppStore/appFrame.js:337
+#: ../EosAppStore/appFrame.js:393
 msgid "Installed apps"
 msgstr "Applis installées"
 
-#: ../EosAppStore/appFrame.js:394
+#: ../EosAppStore/appFrame.js:450
 msgid "Install apps"
 msgstr "Installer les applications"
 
-#: ../EosAppStore/appFrame.js:435
+#: ../EosAppStore/appFrame.js:486
 msgid "Refresh failed"
 msgstr "Échec de l'actualisatiio"
-
-#: ../EosAppStore/appFrame.js:437 ../EosAppStore/appStore.js:231
-msgid "Dismiss"
-msgstr "Rejeter"
 
 #: ../EosAppStore/appInfoBox.js:162
 msgid "Deleting app"
@@ -102,73 +103,73 @@ msgstr "Nous n'avons pas pu retirer '%s'"
 msgid "'%s' was removed successfully"
 msgstr "'%s' a été retiré avec succès"
 
-#: ../EosAppStore/appInfoBox.js:211
+#: ../EosAppStore/appInfoBox.js:209
 #, javascript-format
 msgid "We could not update '%s'"
 msgstr "Nous n'avons pas pu mettre à jour '%s'"
 
-#: ../EosAppStore/appInfoBox.js:214
+#: ../EosAppStore/appInfoBox.js:212
 #, javascript-format
 msgid "'%s' was updated successfully"
 msgstr "'%s' a été mis a jour avec succès"
 
-#: ../EosAppStore/appInfoBox.js:234
+#: ../EosAppStore/appInfoBox.js:230
 #, javascript-format
 msgid "We could not install '%s'"
 msgstr "Nous n'avons pas pu installer '%s'"
 
-#: ../EosAppStore/appInfoBox.js:237
+#: ../EosAppStore/appInfoBox.js:233
 #, javascript-format
 msgid "'%s' was installed successfully"
 msgstr "'%s' a été installé avec succès"
 
-#: ../EosAppStore/appInfoBox.js:325
+#: ../EosAppStore/appInfoBox.js:319
 msgid "Updating…"
 msgstr "Mise à jour…"
 
-#: ../EosAppStore/appInfoBox.js:325 ../EosAppStore/appInfoBox.js:531
+#: ../EosAppStore/appInfoBox.js:319 ../EosAppStore/appInfoBox.js:523
 msgid "Installing…"
 msgstr "En cours d'installation…"
 
-#: ../EosAppStore/appInfoBox.js:446
+#: ../EosAppStore/appInfoBox.js:440
 msgid "Update app"
 msgstr "Mettre à jour l'appli"
 
-#: ../EosAppStore/appInfoBox.js:447
+#: ../EosAppStore/appInfoBox.js:441
 msgid "Open app"
 msgstr "Ouvrir l'appli"
 
-#: ../EosAppStore/appInfoBox.js:448
+#: ../EosAppStore/appInfoBox.js:442
 msgid "Add to the desktop"
 msgstr "Ajouter au bureau"
 
-#: ../EosAppStore/appInfoBox.js:449
+#: ../EosAppStore/appInfoBox.js:443
 msgid "No network connection is available"
 msgstr "Aucune connexion réseau n'est disponible"
 
-#: ../EosAppStore/appInfoBox.js:450
+#: ../EosAppStore/appInfoBox.js:444
 msgid "Insufficient space to install the app"
 msgstr "Espace insuffisant pour installer l'appli"
 
-#: ../EosAppStore/appInfoBox.js:534
+#: ../EosAppStore/appInfoBox.js:526
 msgid "Downloading…"
 msgstr "Téléchargement en cours…"
 
-#: ../EosAppStore/appInfoBox.js:542
+#: ../EosAppStore/appInfoBox.js:534
 msgid "Removing…"
 msgstr "Retrait en cours…"
 
 #. Translators: Abbreviation for file size in megabytes;
 #. %s denotes the placement of the numeric value
 #. and can be placed before or after the abbreviation
-#: ../EosAppStore/appInstalledBox.js:114
+#: ../EosAppStore/appInstalledBox.js:109
 #, javascript-format
 msgid "%s MB"
 msgstr "%s Mo"
 
-#: ../EosAppStore/appInstalledBox.js:117
-msgid "System App"
-msgstr "Appli système"
+#: ../EosAppStore/appStore.js:231
+msgid "Dismiss"
+msgstr "Rejeter"
 
 #. Translators: use the same string used to install the app center content
 #. JSON
@@ -190,7 +191,7 @@ msgstr "Utilitaires"
 
 #: ../EosAppStore/categories.js:40
 msgid "Installed"
-msgstr "Installé(e)…"
+msgstr "Installées…"
 
 #: ../EosAppStore/categories.js:52
 msgid "News"
@@ -235,10 +236,6 @@ msgstr "Installer les dossiers"
 #: ../EosAppStore/weblinkFrame.js:263
 msgid "Write the website you'd like to add here and press “Enter”"
 msgstr "Écrivez le site internet que vous aimeriez ajouter ici et appuyer sur «Entrée»"
-
-#: ../EosAppStore/weblinkFrame.js:329
-msgid "e.g.: http://www.endlessm.com"
-msgstr "ex. : http://www.endlessm.com"
 
 #: ../EosAppStore/weblinkFrame.js:349
 msgid "searching"
@@ -330,7 +327,7 @@ msgid "App %s is up to date."
 msgstr "L'appli %s est à jour."
 
 #: ../EosAppStore/lib/eos-app-list-model.c:1602
-#: ../EosAppStore/lib/eos-app-list-model.c:1641
+#: ../EosAppStore/lib/eos-app-list-model.c:1646
 #, c-format
 msgid "App '%s' is not installed."
 msgstr "L'appli '%s' is not installed."
@@ -356,7 +353,7 @@ msgstr "Les mises à jour du méta dossier ne contenait pas de valeur de l'attri
 msgid "Not enough space on device for downloading the app."
 msgstr "Pas assez d'espace sur l'appareil pour télécharger l'appli."
 
-#: ../EosAppStore/lib/eos-app-utils.c:1756
+#: ../EosAppStore/lib/eos-app-utils.c:1777
 msgid "There was a problem downloading the app; please try again"
 msgstr "Un problème est survenu lors du téléchargement de l'appli : veuillez réessayer"
 
