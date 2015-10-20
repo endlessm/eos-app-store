@@ -112,8 +112,8 @@
                             <property name="can_focus">True</property>
                             <property name="receives_default">True</property>
                             <property name="valign">center</property>
-                            <property name="width_request">16</property>
-                            <property name="height_request">16</property>
+                            <property name="width_request">30</property>
+                            <property name="height_request">30</property>
                             <signal name="clicked" handler="_onUpdateButtonClicked" swapped="no"/>
                             <style>
                               <class name="state-button"/>
@@ -147,8 +147,8 @@
                             <property name="can_focus">True</property>
                             <property name="receives_default">True</property>
                             <property name="valign">center</property>
-                            <property name="width_request">16</property>
-                            <property name="height_request">16</property>
+                            <property name="width_request">30</property>
+                            <property name="height_request">30</property>
                             <signal name="clicked" handler="_onRemoveButtonClicked" swapped="no"/>
                             <style>
                               <class name="state-button"/>
