@@ -122,6 +122,19 @@
     padding-left: 15px;
 }
 
+.app-frame .app-scrolledwindow {
+    border: none;
+    -GtkScrolledWindow-scrollbars-within-bevel: false;
+}
+
+.app-installed-frame .app-scrolledwindow {
+    padding-right: 15px;
+}
+
+.app-installed-frame .app-scrolledwindow:dir(rtl) {
+    padding-left: 15px;
+}
+
 .frame-separator {
     color: alpha(white, 0.1);
 }

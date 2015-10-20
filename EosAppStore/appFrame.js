@@ -53,8 +53,10 @@ const AppFrame = new Lang.Class({
         let separator = new Separator.FrameSeparator();
         this._contentBox.add(separator);
 
-        this._scrollWindow = new Gtk.ScrolledWindow({ hscrollbar_policy: Gtk.PolicyType.NEVER,
+        this._scrollWindow = new Gtk.ScrolledWindow({ shadow_type: Gtk.ShadowType.IN,
+                                                      hscrollbar_policy: Gtk.PolicyType.NEVER,
                                                       vscrollbar_policy: Gtk.PolicyType.AUTOMATIC });
+        this._scrollWindow.get_style_context().add_class('app-scrolledwindow');
         this._contentBox.add(this._scrollWindow);
 
         // The spinner displayed while the frame is being populated
@@ -250,6 +252,11 @@ const AppInstalledFrame = new Lang.Class({
     Name: 'AppInstalledFrame',
     Extends: AppFrame,
 
+    _init: function(params) {
+        this.parent(params);
+        this.get_style_context().add_class('app-installed-frame');
+    },
+
     _onDestroy: function() {
         this._unschedulePopulate();
         this.parent();
@@ -266,8 +273,7 @@ const AppInstalledFrame = new Lang.Class({
     _createView: function() {
         let list = new Gtk.ListBox({ expand: true,
                                      selection_mode: Gtk.SelectionMode.NONE,
-                                     visible: true,
-                                     margin_end: 15 });
+                                     visible: true });
         list.get_style_context().add_class('app-installed-list');
         list.connect('row-activated', Lang.bind(this, this._onRowActivated));
         list.set_header_func(Lang.bind(this, this._listHeaderFunc));
