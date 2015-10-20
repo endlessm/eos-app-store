@@ -113,7 +113,6 @@
 .web-frame,
 .folder-frame {
     border: none;
-    padding-right: 25px;
 }
 
 .app-frame:dir(rtl),
@@ -437,6 +436,11 @@
 
 .app-frame .app-installed-list {
     background: none;
+    padding: 0 15px 0 0;
+}
+
+.app-frame .app-installed-list:dir(rtl) {
+    padding: 0 0 0 15px;
 }
 
 .app-frame .app-installed-list .list-row {
