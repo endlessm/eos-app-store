@@ -749,7 +749,7 @@
 .folder-description {
     color: white;
     font-weight: 600; /* semibold */
-    padding: 10px 2px 8px;
+    padding: 10px 2px 0px;
 }
 
 .folder-icon-button {
