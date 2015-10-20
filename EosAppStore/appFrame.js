@@ -266,7 +266,8 @@ const AppInstalledFrame = new Lang.Class({
     _createView: function() {
         let list = new Gtk.ListBox({ expand: true,
                                      selection_mode: Gtk.SelectionMode.NONE,
-                                     visible: true });
+                                     visible: true,
+                                     margin_end: 15 });
         list.get_style_context().add_class('app-installed-list');
         list.connect('row-activated', Lang.bind(this, this._onRowActivated));
         list.set_header_func(Lang.bind(this, this._listHeaderFunc));
