@@ -11,7 +11,6 @@ struct _EosLinkRow {
   EosLinkInfo *link_info;
 
   cairo_surface_t *image;
-  cairo_surface_t *icon;
 
   gboolean show_icon;
 
@@ -37,10 +36,11 @@ G_DEFINE_TYPE (EosLinkRow, eos_link_row, GTK_TYPE_LIST_BOX_ROW)
 
 #define DEFAULT_LINK_ICON_NAME "generic-link"
 
+#define IMAGE_THUMBNAIL_SIZE 90
 #define PROVIDER_DATA_FORMAT ".weblink-row-image { " \
   "background-image: url(\"resource://%s\"); "       \
   "background-repeat: no-repeat; "                   \
-  "background-size: 90px 90px; }"
+  "background-size: %dpx %dpx; }"
 
 static GtkStyleContext *
 eos_link_row_get_cell_style_context (void)
@@ -76,43 +76,25 @@ eos_link_row_get_cell_margin_for_context (GtkStyleContext *context)
 }
 
 static cairo_surface_t *
-get_icon_surface_background (EosLinkRow *self,
-                             gint image_width,
-                             gint image_height)
-{
-  cairo_surface_t *surface;
-  cairo_t *cr;
-
-  surface = cairo_image_surface_create (CAIRO_FORMAT_ARGB32,
-                                        image_width, image_height);
-  cr = cairo_create (surface);
-  gtk_render_background (self->image_context, cr,
-                         0, 0, image_width, image_height);
-  gtk_render_frame (self->image_context, cr,
-                    0, 0, image_width, image_height);
-
-  cairo_destroy (cr);
-
-  return surface;
-}
-
-static cairo_surface_t *
-get_thumbnail_surface_background (EosLinkRow *self,
-                                  const gchar *path,
-                                  gint image_width,
-                                  gint image_height,
-                                  GError **error)
+get_thumbnail_surface_background (EosLinkRow *self)
 {
   cairo_surface_t *surface;
   cairo_t *cr;
   GtkCssProvider *provider;
   gchar *provider_data;
+  GError *error = NULL;
+  const char *resource_path;
 
-  provider_data = g_strdup_printf (PROVIDER_DATA_FORMAT, path);
+  resource_path = eos_link_info_get_thumbnail_resource_path (self->link_info);
+  provider_data = g_strdup_printf (PROVIDER_DATA_FORMAT, resource_path,
+                                   IMAGE_THUMBNAIL_SIZE, IMAGE_THUMBNAIL_SIZE);
   provider = gtk_css_provider_new ();
 
-  if (!gtk_css_provider_load_from_data (provider, provider_data, -1, error))
+  if (!gtk_css_provider_load_from_data (provider, provider_data, -1, &error))
     {
+      g_critical ("Can't load CSS provider for '%s' weblink thumbnail: %s",
+                  eos_link_info_get_desktop_id (self->link_info), error->message);
+      g_error_free (error);
       g_free (provider_data);
       g_object_unref (provider);
 
@@ -124,10 +106,10 @@ get_thumbnail_surface_background (EosLinkRow *self,
                                   GTK_STYLE_PROVIDER_PRIORITY_APPLICATION);
 
   surface = cairo_image_surface_create (CAIRO_FORMAT_ARGB32,
-                                        image_width, image_height);
+                                        IMAGE_THUMBNAIL_SIZE, IMAGE_THUMBNAIL_SIZE);
   cr = cairo_create (surface);
   gtk_render_background (self->image_context, cr,
-                         0, 0, image_width, image_height);
+                         0, 0, IMAGE_THUMBNAIL_SIZE, IMAGE_THUMBNAIL_SIZE);
 
   cairo_destroy (cr);
   gtk_style_context_remove_provider (self->image_context,
@@ -140,62 +122,32 @@ get_thumbnail_surface_background (EosLinkRow *self,
 }
 
 static void
-eos_link_row_draw_with_icon (EosLinkRow *self,
-                             cairo_t *cr,
-                             gint width,
-                             gint height)
-{
-  gint image_width, image_height;
-  GtkBorder image_margin;
-
-  image_width = width - self->cell_margin;
-  image_height = height - self->cell_margin;
-
-  gtk_style_context_save (self->image_context);
-  gtk_style_context_add_class (self->image_context, "with-icon");
-
-  if (self->icon == NULL)
-    self->icon = get_icon_surface_background (self, image_width, image_height);
-
-  gtk_style_context_get_margin (self->image_context,
-                                GTK_STATE_FLAG_NORMAL,
-                                &image_margin);
-
-  gtk_render_icon_surface (self->image_context,
-                           cr,
-                           self->icon,
-                           MAX (image_margin.top, (gint) self->cell_margin / 2),
-                           MAX (image_margin.left, (gint) self->cell_margin / 2));
-
-  gtk_style_context_restore (self->image_context);
-}
-
-static void
 eos_link_row_draw_normal (EosLinkRow *self,
                           cairo_t *cr,
                           gint width,
                           gint height)
 {
-  gint image_width, image_height;
   GtkBorder image_margin;
-
-  image_width = width - self->cell_margin;
-  image_height = height - self->cell_margin;
+  gboolean rtl;
+  gdouble x, y;
 
   if (self->image == NULL)
-    self->image = get_thumbnail_surface_background (self,
-                                                    eos_link_info_get_thumbnail_resource_path (self->link_info),
-                                                    image_width, image_height, NULL);
+    self->image = get_thumbnail_surface_background (self);
 
   gtk_style_context_get_margin (self->image_context,
                                 GTK_STATE_FLAG_NORMAL,
                                 &image_margin);
 
+  rtl = (gtk_widget_get_direction (GTK_WIDGET (self)) == GTK_TEXT_DIR_RTL);
+  x = MAX (image_margin.top, (gint) self->cell_margin / 2);
+  y = MAX (image_margin.left, (gint) self->cell_margin / 2);
+  if (rtl)
+    x = width - IMAGE_THUMBNAIL_SIZE - x;
+
   gtk_render_icon_surface (self->image_context,
                            cr,
                            self->image,
-                           MAX (image_margin.top, (gint) self->cell_margin / 2),
-                           MAX (image_margin.left, (gint) self->cell_margin / 2));
+                           x, y);
 }
 
 static gboolean
@@ -203,15 +155,18 @@ eos_link_row_draw (GtkWidget *widget,
                    cairo_t   *cr)
 {
   EosLinkRow *self = (EosLinkRow *) widget;
-  gint width, height;
+  gint available_width, available_height;
 
-  width = gtk_widget_get_allocated_width (widget);
-  height = gtk_widget_get_allocated_height (widget);
+  available_width = gtk_widget_get_allocated_width (widget) - self->cell_margin;
+  available_height = gtk_widget_get_allocated_height (widget) - self->cell_margin;
 
-  if (self->show_icon)
-    eos_link_row_draw_with_icon (self, cr, width, height);
-  else
-    eos_link_row_draw_normal (self, cr, width, height);
+  gtk_render_background (self->image_context, cr,
+                         0, 0, available_width, available_height);
+  gtk_render_frame (self->image_context, cr,
+                    0, 0, available_width, available_height);
+
+  if (!self->show_icon)
+    eos_link_row_draw_normal (self, cr, available_width, available_height);
 
   GTK_WIDGET_CLASS (eos_link_row_parent_class)->draw (widget, cr);
 
@@ -303,7 +258,6 @@ eos_link_row_finalize (GObject *gobject)
   EosLinkRow *self = (EosLinkRow *) gobject;
 
   g_clear_pointer (&self->image, (GDestroyNotify) cairo_surface_destroy);
-  g_clear_pointer (&self->icon, (GDestroyNotify) cairo_surface_destroy);
   g_clear_object (&self->image_context);
 
   g_clear_pointer (&self->link_info, eos_link_info_unref);
