@@ -156,6 +156,14 @@
     background-image: url("btn_back_pressed.png");
 }
 
+.installed-app-box {
+    margin: 0 15px 0 0;
+}
+
+.installed-app-box:dir(rtl) {
+    margin: 0 0 0 15px;
+}
+
 .installed-app-box .app-name {
     color: white;
     font-size: 15px;
@@ -436,11 +444,7 @@
 
 .app-frame .app-installed-list {
     background: none;
-    padding: 0 15px 0 0;
-}
-
-.app-frame .app-installed-list:dir(rtl) {
-    padding: 0 0 0 15px;
+    padding: 2px;
 }
 
 .app-frame .app-installed-list .list-row {
