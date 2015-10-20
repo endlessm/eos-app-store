@@ -180,8 +180,8 @@
 }
 
 .controls-box .controls-separator {
-    border: none;
-    color: #494949;
+    border-width: 0 1px;
+    border-color: #494949;
     -GtkWidget-wide-separators: true;
     -GtkWidget-separator-width: 1px;
     -GtkWidget-separator-height: 30px;
