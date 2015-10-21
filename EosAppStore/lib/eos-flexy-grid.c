@@ -555,7 +555,6 @@ eos_flexy_grid_realize (GtkWidget *widget)
   GdkWindow *window = gdk_window_new (gtk_widget_get_parent_window (widget),
                                       &attributes,
                                       GDK_WA_X | GDK_WA_Y);
-  gtk_style_context_set_background (gtk_widget_get_style_context (widget), window);
   gdk_window_set_user_data (window, (GObject *) widget);
   gtk_widget_set_window (widget, window); /* Passes ownership */
 }
