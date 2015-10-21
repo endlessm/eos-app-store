@@ -1600,7 +1600,8 @@ eos_app_list_model_uninstall_app_async (EosAppListModel *model,
                                EOS_APP_STORE_ERROR,
                                EOS_APP_STORE_ERROR_NOT_INSTALLED,
                                _("App '%s' is not installed."),
-                               desktop_id);
+                               info != NULL ? eos_app_info_get_title (info)
+                                            : desktop_id);
       g_object_unref (task);
       return;
     }
