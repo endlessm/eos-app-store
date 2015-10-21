@@ -207,9 +207,7 @@ const AppStore = new Lang.Class({
         // cancellation
         if (error &&
             (error.matches(Gio.io_error_quark(),
-                           Gio.IOErrorEnum.CANCELLED) ||
-             error.matches(EosAppStorePrivate.app_store_error_quark(),
-                           EosAppStorePrivate.AppStoreError.CANCELLED))) {
+                           Gio.IOErrorEnum.CANCELLED))) {
             return;
         }
 
