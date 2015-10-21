@@ -1116,8 +1116,7 @@ install_latest_app_version (EosAppListModel *self,
   /* We use different DBus targets but everything else is same */
   if (is_upgrade)
     {
-      eos_app_log_info_message ("Calling update dbus method with app_id: %s",
-                                app_id);
+      eos_app_log_info_message ("Calling update dbus method with app_id: %s", app_id);
       eos_app_manager_call_update_sync (proxy, app_id,
                                         &transaction_path,
                                         NULL,
@@ -1568,7 +1567,8 @@ remove_app_thread_func (GTask *task,
   if (!remove_app_from_shell (model, info, cancellable, &error))
     {
       eos_app_log_error_message ("Unable to remove app '%s' from shell: %s",
-                                 eos_app_info_get_application_id (info), error->message);
+                                 eos_app_info_get_application_id (info),
+                                 error->message);
       g_task_return_error (task, error);
       return;
     }
@@ -1600,7 +1600,8 @@ eos_app_list_model_uninstall_app_async (EosAppListModel *model,
                                EOS_APP_STORE_ERROR,
                                EOS_APP_STORE_ERROR_NOT_INSTALLED,
                                _("App '%s' is not installed."),
-                               desktop_id);
+                               info != NULL ? eos_app_info_get_title (info)
+                                            : desktop_id);
       g_object_unref (task);
       return;
     }
