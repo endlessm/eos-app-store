@@ -607,8 +607,8 @@ eos_net_utils_download_file_with_retry (SoupSession            *session,
       /* If we got canceled, also bail */
       if (g_cancellable_is_cancelled (cancellable))
         {
-          g_set_error_literal (error_out, EOS_NET_UTILS_ERROR,
-                               EOS_NET_UTILS_ERROR_CANCELLED,
+          g_set_error_literal (error_out, G_IO_ERROR,
+                               G_IO_ERROR_CANCELLED,
                                "Download cancelled");
 
           eos_app_log_error_message ("Download cancelled. Breaking out of retry loop.");
