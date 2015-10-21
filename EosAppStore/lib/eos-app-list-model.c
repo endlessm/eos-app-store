@@ -985,8 +985,9 @@ out:
       eos_app_log_error_message ("Completion of transaction %s failed",
                                  transaction_path);
 
-      /* cancel the transaction on error */
-      if (transaction != NULL)
+      /* Cancel the remote transaction if we were cancelled */
+      if (transaction != NULL &&
+          g_error_matches (error, G_IO_ERROR, G_IO_ERROR_CANCELLED))
         eos_app_manager_transaction_call_cancel_transaction_sync (transaction, NULL, NULL);
 
       /* The app manager uses InvalidFile for errors that deal with
