@@ -315,7 +315,7 @@ eos_app_parse_resource_content (const char *content_type,
   GBytes *data = g_resources_lookup_data (content_file, 0, &error);
   if (error != NULL)
     {
-      g_critical ("Unable to load content from '%s': %s", content_file, error->message);
+      g_debug ("Unable to load content from '%s': %s", content_file, error->message);
       g_propagate_error (error_out, error);
       goto out_error;
     }
