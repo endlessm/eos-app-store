@@ -315,7 +315,7 @@ eos_app_parse_resource_content (const char *content_type,
   GBytes *data = g_resources_lookup_data (content_file, 0, &error);
   if (error != NULL)
     {
-      g_critical ("Unable to load content from '%s': %s", content_file, error->message);
+      g_debug ("Unable to load content from '%s': %s", content_file, error->message);
       g_propagate_error (error_out, error);
       goto out_error;
     }
@@ -364,9 +364,15 @@ eos_link_load_content (EosLinkCategory category)
   const gchar *category_name;
 
   static JsonArray *categories_array = NULL;
+  const char * const *language_names = g_get_language_names ();
+  int idx = 0;
 
-  if (!categories_array)
-    categories_array = eos_app_parse_resource_content (APP_STORE_CONTENT_LINKS, get_os_personality (), NULL);
+  /* Find the content that is the best match for the user's language. */
+  while (!categories_array && language_names[idx] != NULL)
+    {
+      categories_array = eos_app_parse_resource_content (APP_STORE_CONTENT_LINKS, language_names[idx], NULL);
+      idx++;
+    }
 
   if (categories_array == NULL)
     return NULL;

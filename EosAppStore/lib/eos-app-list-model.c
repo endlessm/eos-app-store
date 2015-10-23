@@ -490,6 +490,7 @@ init_model_thread_func (GTask *task,
   self->content_apps = eos_app_parse_resource_content ("apps", "content", &error);
   if (error != NULL)
     {
+      g_critical ("Unable to load apps content: %s", error->message);
       g_task_return_error (task, error);
       return;
     }
