@@ -1,11 +1,12 @@
 //-*- mode: js; js-indent-level: 4; indent-tabs-mode: nil -*-
+const Gio = imports.gi.Gio;
+const Lang = imports.lang;
 
 const AppListModel = imports.appListModel;
+const Config = imports.config;
 const Categories = imports.categories;
 const Environment = imports.environment;
 const EosAppStorePrivate = imports.gi.EosAppStorePrivate;
-const Gio = imports.gi.Gio;
-const Lang = imports.lang;
 
 const FILL_DESKTOP_NAME = 'com.endlessm.AppStore.FillDesktop';
 
@@ -13,7 +14,10 @@ const FillDesktop = new Lang.Class({
     Name: 'FillDesktop',
     Extends: Gio.Application,
 
-    _init: function() {
+    _init: function(excludeApps = false, excludeLinks = false) {
+        this._excludeApps = excludeApps;
+        this._excludeLinks = excludeLinks;
+
         this._appListModel = null;
         this._appInfos = [];
 
@@ -31,34 +35,39 @@ const FillDesktop = new Lang.Class({
     },
 
     _loadAndInstallApps: function() {
-        let appCategories = Categories.get_app_categories();
-        for (let category of appCategories) {
-            let catId = category.id;
-            // INSTALLED is just a pseudo-category; we'll get all the apps by
-            // using the other categories already, and then we'll remove from
-            // the list those that are already installed with a launcher later.
-            if (catId == EosAppStorePrivate.AppCategory.INSTALLED)
-                continue;
+        if (!this._excludeApps) {
+            let appCategories = Categories.get_app_categories();
+            for (let category of appCategories) {
+                let catId = category.id;
+                // INSTALLED is just a pseudo-category; we'll get all the apps by
+                // using the other categories already, and then we'll remove from
+                // the list those that are already installed with a launcher later.
+                if (catId == EosAppStorePrivate.AppCategory.INSTALLED)
+                    continue;
 
-            this._appInfos = this._appInfos.concat(this._appListModel.loadCategory(catId));
+                this._appInfos = this._appInfos.concat(this._appListModel.loadCategory(catId));
+            }
+
+            // Remove apps that are not installed on the device
+            // or that already have a launcher
+            this._appInfos = this._appInfos.filter(function(app) {
+                return !app.get_has_launcher() && app.is_installed();
+            });
         }
 
-        // Remove apps that are not installed on the device
-        // or that already have a launcher
-        this._appInfos = this._appInfos.filter(function(app) {
-            return !app.get_has_launcher() && app.is_installed();
-        });
+        if (!this._excludeLinks) {
+            let linkCategories = Categories.get_link_categories();
+            for (let category of linkCategories) {
+                let catId = category.id;
+                this._appInfos = this._appInfos.concat(EosAppStorePrivate.link_load_content(catId));
+            }
 
-        let linkCategories = Categories.get_link_categories();
-        for (let category of linkCategories) {
-            let catId = category.id;
-            this._appInfos = this._appInfos.concat(EosAppStorePrivate.link_load_content(catId));
+            // Remove links that already have a launcher
+            this._appInfos = this._appInfos.filter(function(app) {
+                return !this._appListModel.hasLauncher(app.get_desktop_id());
+            }, this);
         }
 
-        // Remove links that already have a launcher
-        this._appInfos = this._appInfos.filter(function(app) {
-            return !this._appListModel.hasLauncher(app.get_desktop_id());
-        }, this);
         this._install();
     },
 
@@ -79,6 +88,56 @@ const FillDesktop = new Lang.Class({
 function main() {
     Environment.init();
 
-    let app = new FillDesktop();
+    let excludeLinks = false;
+    let excludeApps = false;
+
+    let args = ARGV;
+    for (let arg of args) {
+        if (arg == '-l' || arg == '--exclude-links') {
+            if (excludeApps) {
+                log("`--exclude-apps` and `--exclude-links` are mutually exclusive!");
+                return -1;
+            }
+
+            excludeLinks = true;
+            continue;
+        }
+
+        if (arg == '-a' || arg == '--exclude-apps') {
+            if (excludeLinks) {
+                log("`--exclude-apps` and `--exclude-links` are mutually exclusive!");
+                return -1;
+            }
+
+            excludeApps = true;
+            continue;
+        }
+
+        if (arg == '-v' || arg == '--version') {
+            log("eos-fill-desktop v" + Config.PACKAGE_VERSION);
+            return 0;
+        }
+
+        // Fall-through; show help
+        log("eos-fill-desktop v" + Config.PACKAGE_VERSION + "\n" +
+            "\n" +
+            "Usage:\n" +
+            "  eos-fill-desktop [OPTION...]\n" +
+            "\n" +
+            "Help options:\n" +
+            "  -h, --help           Show help\n" +
+            "\n" +
+            "Application options:\n" +
+            "  -l, --exclude-links   Exclude links from installing on the desktop\n" +
+            "  -a, --exclude-apps    Exclude apps from installing on the desktop\n" +
+            "  -v, --version         Print version and exit");
+
+        if (arg == 'help')
+            return 0;
+        else
+            return -1;
+    }
+
+    let app = new FillDesktop(excludeApps, excludeLinks);
     return app.run(ARGV);
 }
