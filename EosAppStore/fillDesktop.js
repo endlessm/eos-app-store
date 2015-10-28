@@ -50,9 +50,9 @@ const FillDesktop = new Lang.Class({
 
             // Remove apps that are not installed on the device
             // or that already have a launcher
-            this._appInfos = this._appInfos.filter(function(app) {
-                return !app.get_has_launcher() && app.is_installed();
-            });
+            this._appInfos = this._appInfos.filter(app =>
+                !app.get_has_launcher() && app.is_installed()
+            );
         }
 
         if (!this._excludeLinks) {
@@ -63,9 +63,9 @@ const FillDesktop = new Lang.Class({
             }
 
             // Remove links that already have a launcher
-            this._appInfos = this._appInfos.filter(function(app) {
-                return !this._appListModel.hasLauncher(app.get_desktop_id());
-            }, this);
+            this._appInfos = this._appInfos.filter(a =>
+                !this._appListModel.hasLauncher(a.get_desktop_id())
+            );
         }
 
         this._install();
