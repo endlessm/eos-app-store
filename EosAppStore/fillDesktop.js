@@ -27,6 +27,10 @@ const FillDesktop = new Lang.Class({
 
         this._appListModel = new AppListModel.AppListModel();
 
+        this._appListModel.connect('loading-changed', Lang.bind(this, this._loadAndInstallApps));
+    },
+
+    _loadAndInstallApps: function() {
         let categories = Categories.get_app_categories();
         for (let c in categories) {
             let category = categories[c].id;
