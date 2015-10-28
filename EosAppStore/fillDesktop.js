@@ -31,16 +31,16 @@ const FillDesktop = new Lang.Class({
     },
 
     _loadAndInstallApps: function() {
-        let categories = Categories.get_app_categories();
-        for (let c in categories) {
-            let category = categories[c].id;
+        let appCategories = Categories.get_app_categories();
+        for (let category of appCategories) {
+            let catId = category.id;
             // INSTALLED is just a pseudo-category; we'll get all the apps by
             // using the other categories already, and then we'll remove from
             // the list those that are already installed with a launcher later.
-            if (category == EosAppStorePrivate.AppCategory.INSTALLED)
+            if (catId == EosAppStorePrivate.AppCategory.INSTALLED)
                 continue;
 
-            this._appInfos = this._appInfos.concat(this._appListModel.loadCategory(category));
+            this._appInfos = this._appInfos.concat(this._appListModel.loadCategory(catId));
         }
 
         // Remove apps that are not installed on the device
@@ -49,6 +49,16 @@ const FillDesktop = new Lang.Class({
             return !app.get_has_launcher() && app.is_installed();
         });
 
+        let linkCategories = Categories.get_link_categories();
+        for (let category of linkCategories) {
+            let catId = category.id;
+            this._appInfos = this._appInfos.concat(EosAppStorePrivate.link_load_content(catId));
+        }
+
+        // Remove links that already have a launcher
+        this._appInfos = this._appInfos.filter(function(app) {
+            return !this._appListModel.hasLauncher(app.get_desktop_id());
+        }, this);
         this._install();
     },
 
