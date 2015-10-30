@@ -1,5 +1,6 @@
 //-*- mode: js; js-indent-level: 4; indent-tabs-mode: nil -*-
 const Gio = imports.gi.Gio;
+const GLib = imports.gi.GLib;
 const Lang = imports.lang;
 
 const AppListModel = imports.appListModel;
@@ -14,16 +15,47 @@ const FillDesktop = new Lang.Class({
     Name: 'FillDesktop',
     Extends: Gio.Application,
 
-    _init: function(onlyApps = false, onlyLinks = false) {
-        this._onlyApps = onlyApps;
-        this._onlyLinks = onlyLinks;
-
+    _init: function() {
         this._appListModel = null;
         this._appInfos = [];
 
         Environment.loadResources();
 
         this.parent({ application_id: FILL_DESKTOP_NAME });
+
+        this.add_main_option('apps-only', 'a'.charCodeAt(0), GLib.OptionArg.NONE,
+                             GLib.OptionFlags.NONE,
+                             "Only install apps on the desktop",
+                             null);
+
+        this.add_main_option('links-only', 'l'.charCodeAt(0), GLib.OptionArg.NONE,
+                             GLib.OptionFlags.NONE,
+                             "Only install web links on the desktop",
+                             null);
+
+        this.add_main_option('version', 'v'.charCodeAt(0), GLib.OptionArg.NONE,
+                             GLib.OptionFlags.NONE,
+                             "Print version and exit",
+                             null);
+
+        this.connect('handle-local-options', Lang.bind(this, this._parseOptions));
+    },
+
+    _parseOptions: function(foo, options) {
+        if (options.contains('version')) {
+            print('eos-fill-desktop v' + Config.PACKAGE_VERSION);
+            return 0;
+        }
+
+        this._onlyApps = options.contains('apps-only');
+        this._onlyLinks = options.contains('links-only');
+
+        if (this._onlyApps && this._onlyLinks) {
+            print("`--apps-only` and `--links-only` are mutually exclusive!");
+            return 1;
+        }
+
+        return 0;
     },
 
     vfunc_activate: function() {
@@ -88,56 +120,13 @@ const FillDesktop = new Lang.Class({
 function main() {
     Environment.init();
 
-    let onlyLinks = false;
-    let onlyApps = false;
-
     let args = ARGV;
-    for (let arg of args) {
-        if (arg == '-l' || arg == '--links-only') {
-            if (onlyApps) {
-                log("`--apps-only` and `--links-only` are mutually exclusive!");
-                return -1;
-            }
 
-            onlyLinks = true;
-            continue;
-        }
+    // Strip `--` from calling script
+    args.shift();
+    // Add script invocation name
+    args.unshift('eos-fill-desktop');
 
-        if (arg == '-a' || arg == '--apps-only') {
-            if (onlyLinks) {
-                log("`--apps-only` and `--links-only` are mutually exclusive!");
-                return -1;
-            }
-
-            onlyApps = true;
-            continue;
-        }
-
-        if (arg == '-v' || arg == '--version') {
-            log('eos-fill-desktop v' + Config.PACKAGE_VERSION);
-            return 0;
-        }
-
-        // Fall-through; show help
-        log("eos-fill-desktop v" + Config.PACKAGE_VERSION + "\n" +
-            "\n" +
-            "Usage:\n" +
-            "  eos-fill-desktop [OPTION...]\n" +
-            "\n" +
-            "Help options:\n" +
-            "  -h, --help           Show help\n" +
-            "\n" +
-            "Application options:\n" +
-            "  -l, --links-only   Only install links on the desktop\n" +
-            "  -a, --apps-only    Only install apps on the desktop\n" +
-            "  -v, --version      Print version and exit");
-
-        if (arg == 'help')
-            return 0;
-        else
-            return -1;
-    }
-
-    let app = new FillDesktop(onlyApps, onlyLinks);
-    return app.run(ARGV);
+    let app = new FillDesktop();
+    return app.run(args);
 }
