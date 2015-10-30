@@ -1,5 +1,7 @@
 //-*- mode: js; js-indent-level: 4; indent-tabs-mode: nil -*-
 const Gio = imports.gi.Gio;
+const GLib = imports.gi.GLib;
+const GObject = imports.gi.GObject;
 const Lang = imports.lang;
 
 const AppListModel = imports.appListModel;
@@ -24,6 +26,20 @@ const FillDesktop = new Lang.Class({
         Environment.loadResources();
 
         this.parent({ application_id: FILL_DESKTOP_NAME });
+
+        this.add_main_option("foobar", 'f'.charCodeAt(0), GLib.OptionArg.NONE, GLib.OptionFlags.NONE, "desc", "arg desc");
+
+        this.connect('handle-local-options', Lang.bind(this, this._parseOptions));
+    },
+
+    _parseOptions: function(foo, options) {
+        print('options callback');
+        print(options.contains("foobar"));
+//        print(options.length);
+        print("Null testing");
+        print(options.lookup_value("foobar", null));
+        print("Boolean testing");
+        print(options.lookup_value("foobar", Boolean));
     },
 
     vfunc_activate: function() {
@@ -92,7 +108,7 @@ function main() {
     let onlyApps = false;
 
     let args = ARGV;
-    for (let arg of args) {
+    for (let arg of []) {
         if (arg == '-l' || arg == '--links-only') {
             if (onlyApps) {
                 log("`--apps-only` and `--links-only` are mutually exclusive!");
