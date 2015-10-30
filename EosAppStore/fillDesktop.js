@@ -14,9 +14,9 @@ const FillDesktop = new Lang.Class({
     Name: 'FillDesktop',
     Extends: Gio.Application,
 
-    _init: function(excludeApps = false, excludeLinks = false) {
-        this._excludeApps = excludeApps;
-        this._excludeLinks = excludeLinks;
+    _init: function(onlyApps = false, onlyLinks = false) {
+        this._onlyApps = onlyApps;
+        this._onlyLinks = onlyLinks;
 
         this._appListModel = null;
         this._appInfos = [];
@@ -35,7 +35,7 @@ const FillDesktop = new Lang.Class({
     },
 
     _loadAndInstallApps: function() {
-        if (!this._excludeApps) {
+        if (!this._onlyLinks) {
             let appCategories = Categories.get_app_categories();
             for (let category of appCategories) {
                 let catId = category.id;
@@ -55,7 +55,7 @@ const FillDesktop = new Lang.Class({
             );
         }
 
-        if (!this._excludeLinks) {
+        if (!this._onlyApps) {
             let linkCategories = Categories.get_link_categories();
             for (let category of linkCategories) {
                 let catId = category.id;
@@ -88,33 +88,33 @@ const FillDesktop = new Lang.Class({
 function main() {
     Environment.init();
 
-    let excludeLinks = false;
-    let excludeApps = false;
+    let onlyLinks = false;
+    let onlyApps = false;
 
     let args = ARGV;
     for (let arg of args) {
-        if (arg == '-l' || arg == '--exclude-links') {
-            if (excludeApps) {
-                log("`--exclude-apps` and `--exclude-links` are mutually exclusive!");
+        if (arg == '-l' || arg == '--links-only') {
+            if (onlyApps) {
+                log("`--apps-only` and `--links-only` are mutually exclusive!");
                 return -1;
             }
 
-            excludeLinks = true;
+            onlyLinks = true;
             continue;
         }
 
-        if (arg == '-a' || arg == '--exclude-apps') {
-            if (excludeLinks) {
-                log("`--exclude-apps` and `--exclude-links` are mutually exclusive!");
+        if (arg == '-a' || arg == '--apps-only') {
+            if (onlyLinks) {
+                log("`--apps-only` and `--links-only` are mutually exclusive!");
                 return -1;
             }
 
-            excludeApps = true;
+            onlyApps = true;
             continue;
         }
 
         if (arg == '-v' || arg == '--version') {
-            log("eos-fill-desktop v" + Config.PACKAGE_VERSION);
+            log('eos-fill-desktop v' + Config.PACKAGE_VERSION);
             return 0;
         }
 
@@ -128,9 +128,9 @@ function main() {
             "  -h, --help           Show help\n" +
             "\n" +
             "Application options:\n" +
-            "  -l, --exclude-links   Exclude links from installing on the desktop\n" +
-            "  -a, --exclude-apps    Exclude apps from installing on the desktop\n" +
-            "  -v, --version         Print version and exit");
+            "  -l, --links-only   Only install links on the desktop\n" +
+            "  -a, --apps-only    Only install apps on the desktop\n" +
+            "  -v, --version      Print version and exit");
 
         if (arg == 'help')
             return 0;
@@ -138,6 +138,6 @@ function main() {
             return -1;
     }
 
-    let app = new FillDesktop(excludeApps, excludeLinks);
+    let app = new FillDesktop(onlyApps, onlyLinks);
     return app.run(ARGV);
 }
