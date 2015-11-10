@@ -26,6 +26,7 @@ struct _EosAppInfo
   char *available_version;
 
   char *info_filename;
+  GFile *application_dir;
 
   char *bundle_uri;
   char *signature_uri;

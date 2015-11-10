@@ -225,6 +225,7 @@ eos_app_info_finalize (GObject *gobject)
 
   g_free (info->icon_name);
   g_free (info->info_filename);
+  g_clear_object (&info->application_dir);
   g_strfreev (info->screenshots);
 
   G_OBJECT_CLASS (eos_app_info_parent_class)->finalize (gobject);
@@ -452,49 +453,6 @@ compute_installed_size_usage_ready (GObject *source,
 }
 
 static void
-compute_installed_size_info_ready (GObject *source,
-                                   GAsyncResult *res,
-                                   gpointer user_data)
-{
-  GError *error = NULL;
-  GFile *app_dir = G_FILE (source);
-  EosAppInfo *info = user_data;
-  GFileInfo *file_info = g_file_query_info_finish (app_dir, res, &error);
-
-  if (error != NULL)
-    goto out;
-
-  GFile *target_dir;
-  if (g_file_info_get_is_symlink (file_info))
-    target_dir = g_file_resolve_relative_path
-      (app_dir, g_file_info_get_symlink_target (file_info));
-  else
-    target_dir = g_object_ref (app_dir);
-
-  g_file_measure_disk_usage_async (target_dir,
-                                   G_FILE_MEASURE_NONE,
-                                   G_PRIORITY_DEFAULT,
-                                   info->size_computation_cancellable,
-                                   NULL, NULL,
-                                   compute_installed_size_usage_ready,
-                                   g_object_ref (info));
-  g_object_unref (target_dir);
-  g_object_unref (file_info);
-
- out:
-  if (error != NULL)
-    {
-      g_clear_object (&info->size_computation_cancellable);
-      eos_app_log_error_message ("Could not retrieve disk usage for %s: %s",
-                                 eos_app_info_get_desktop_id (info),
-                                 error->message);
-      g_error_free (error);
-    }
-
-  g_object_unref (info);
-}
-
-static void
 compute_installed_size (EosAppInfo *info)
 {
   if (!eos_app_info_is_store_installed (info))
@@ -509,21 +467,13 @@ compute_installed_size (EosAppInfo *info)
   info->installed_size_computed = TRUE;
   info->size_computation_cancellable = g_cancellable_new ();
 
-  GFile *info_file = g_file_new_for_path (info->info_filename);
-  GFile *app_dir = g_file_get_parent (info_file);
-
-  /* Resolve symlinks, as g_file_measure_disk_usage() does not follow them */
-  g_file_query_info_async (app_dir,
-                           G_FILE_ATTRIBUTE_STANDARD_IS_SYMLINK ","
-                           G_FILE_ATTRIBUTE_STANDARD_SYMLINK_TARGET,
-                           G_FILE_QUERY_INFO_NONE,
-                           G_PRIORITY_DEFAULT,
-                           info->size_computation_cancellable,
-                           compute_installed_size_info_ready,
-                           g_object_ref (info));
-
-  g_object_unref (info_file);
-  g_object_unref (app_dir);
+  g_file_measure_disk_usage_async (info->application_dir,
+                                   G_FILE_MEASURE_NONE,
+                                   G_PRIORITY_DEFAULT,
+                                   info->size_computation_cancellable,
+                                   NULL, NULL,
+                                   compute_installed_size_usage_ready,
+                                   g_object_ref (info));
 }
 
 static gint64
@@ -908,19 +858,17 @@ check_info_storage (EosAppInfo *info)
    */
   info->installation_time = statbuf.st_ctim.tv_sec;
 
-  /* We check if the file resides on a list of location that correspond
+  /* We check if the application resides on a list of locations that correspond
    * to where the extra SD card storage could be mounted.
    */
-  GFile *app_info_file = g_file_new_for_path (info->info_filename);
   GFile *external_storage = g_file_new_for_path (external_storage_path);
 
-  if (g_file_has_prefix (app_info_file, external_storage))
+  if (g_file_has_prefix (info->application_dir, external_storage))
     info->storage_type = EOS_STORAGE_TYPE_SECONDARY;
   else
     info->storage_type = EOS_STORAGE_TYPE_PRIMARY;
 
   g_object_unref (external_storage);
-  g_object_unref (app_info_file);
 }
 
 static gboolean
@@ -976,6 +924,42 @@ eos_app_info_update_from_installed (EosAppInfo *info,
 {
   g_clear_pointer (&info->info_filename, g_free);
   info->info_filename = g_strdup (filename);
+
+  g_clear_object (&info->application_dir);
+
+  GFile *info_file = g_file_new_for_path (filename);
+  GFile *app_dir = g_file_get_parent (info_file);
+  g_object_unref (info_file);
+
+  GError *error = NULL;
+  GFileInfo *file_info =
+    g_file_query_info (app_dir,
+                       G_FILE_ATTRIBUTE_STANDARD_IS_SYMLINK ","
+                       G_FILE_ATTRIBUTE_STANDARD_SYMLINK_TARGET,
+                       G_FILE_QUERY_INFO_NONE,
+                       NULL, &error);
+
+  if (error != NULL)
+    {
+      eos_app_log_error_message ("Could not retrieve install information "
+                                 "for %s: %s",
+                                 eos_app_info_get_desktop_id (info),
+                                 error->message);
+      g_error_free (error);
+    }
+  else
+    {
+      if (g_file_info_get_is_symlink (file_info))
+        info->application_dir = g_file_resolve_relative_path
+          (app_dir, g_file_info_get_symlink_target (file_info));
+
+      g_object_unref (file_info);
+    }
+
+  if (info->application_dir == NULL)
+    info->application_dir = g_object_ref (app_dir);
+
+  g_object_unref (app_dir);
 
   return eos_app_info_installed_changed (info);
 }
