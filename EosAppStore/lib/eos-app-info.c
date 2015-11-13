@@ -531,6 +531,12 @@ eos_app_info_is_updatable (const EosAppInfo *info)
 }
 
 gboolean
+eos_app_info_is_downloading (const EosAppInfo *info)
+{
+  return info->is_downloading;
+}
+
+gboolean
 eos_app_info_is_updating (const EosAppInfo *info)
 {
   return info->is_updating;
@@ -1203,6 +1209,15 @@ eos_app_info_set_is_updating (EosAppInfo *info,
                               gboolean is_updating)
 {
   info->is_updating = is_updating;
+  g_object_notify_by_pspec (G_OBJECT (info), properties[PROP_STATE]);
+}
+
+/*< private >*/
+void
+eos_app_info_set_is_downloading (EosAppInfo *info,
+                                 gboolean is_downloading)
+{
+  info->is_downloading = is_downloading;
   g_object_notify_by_pspec (G_OBJECT (info), properties[PROP_STATE]);
 }
 

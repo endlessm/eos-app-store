@@ -845,6 +845,50 @@ emit_download_progress (goffset current,
                               closure, (GDestroyNotify) progress_closure_free);
 }
 
+typedef struct {
+  EosAppInfo *info;
+  gboolean is_downloading;
+} DownloadingClosure;
+
+static void
+downloading_closure_free (DownloadingClosure *closure)
+{
+  g_object_unref (closure->info);
+  g_slice_free (DownloadingClosure, closure);
+}
+
+static DownloadingClosure *
+downloading_closure_new (EosAppInfo *info,
+                         gboolean is_downloading)
+{
+  DownloadingClosure *closure = g_slice_new0 (DownloadingClosure);
+  closure->info = g_object_ref (info);
+  closure->is_downloading = is_downloading;
+
+  return closure;
+}
+
+static gboolean
+set_is_downloading_in_main_context (gpointer user_data)
+{
+  DownloadingClosure *closure = user_data;
+  eos_app_info_set_is_downloading (closure->info, closure->is_downloading);
+
+  return G_SOURCE_REMOVE;
+}
+
+static void
+set_is_downloading (EosAppInfo *info,
+                    gboolean is_downloading)
+{
+  DownloadingClosure *closure =
+    downloading_closure_new (info, is_downloading);
+
+  g_main_context_invoke_full (NULL, G_PRIORITY_DEFAULT,
+                              set_is_downloading_in_main_context,
+                              closure, (GDestroyNotify) downloading_closure_free);
+}
+
 static gboolean
 get_bundle_artifacts (EosAppListModel *self,
                       EosAppInfo *info,
@@ -892,12 +936,14 @@ get_bundle_artifacts (EosAppListModel *self,
   download_dir = eos_get_bundle_download_dir (eos_app_info_get_application_id (info),
                                               eos_app_info_get_available_version (info));
 
+  set_is_downloading (info, TRUE);
   bundle_path = eos_app_info_download_bundle (info, self->soup_session,
                                               download_dir,
                                               use_delta,
                                               cancellable,
                                               emit_download_progress, data,
                                               &error);
+  set_is_downloading (info, FALSE);
   download_progress_callback_data_free (data);
 
   if (error != NULL)

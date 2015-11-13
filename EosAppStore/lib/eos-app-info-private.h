@@ -68,6 +68,7 @@ struct _EosAppInfo
   guint is_installing : 1;
   guint is_removing : 1;
   guint is_updating : 1;
+  guint is_downloading : 1;
 };
 
 struct _EosAppInfoClass {
