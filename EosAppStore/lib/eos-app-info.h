@@ -59,6 +59,7 @@ gboolean        eos_app_info_is_updatable               (const EosAppInfo *info)
 gboolean        eos_app_info_is_installing              (const EosAppInfo *info);
 gboolean        eos_app_info_is_removing                (const EosAppInfo *info);
 gboolean        eos_app_info_is_updating                (const EosAppInfo *info);
+gboolean        eos_app_info_is_downloading             (const EosAppInfo *info);
 gboolean        eos_app_info_is_removable               (const EosAppInfo *info);
 
 gboolean        eos_app_info_get_has_launcher           (const EosAppInfo *info);
@@ -103,6 +104,9 @@ void            eos_app_info_set_is_removing            (EosAppInfo *info,
 G_GNUC_INTERNAL
 void            eos_app_info_set_is_updating            (EosAppInfo *info,
                                                          gboolean    is_updating);
+G_GNUC_INTERNAL
+void            eos_app_info_set_is_downloading         (EosAppInfo *info,
+                                                         gboolean    is_downloading);
 G_GNUC_INTERNAL
 void            eos_app_info_emit_download_progress     (EosAppInfo *info,
                                                          goffset     current,

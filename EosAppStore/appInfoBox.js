@@ -314,23 +314,7 @@ const AppInfoBox = new Lang.Class({
         this.appState = this.appInfo.get_state();
     },
 
-    _showInstallSpinner: function() {
-        let label = this._appInfo.is_updating() ?
-            _("Updating…") : _("Installing…");
-        this._installProgressLabel.set_text(label);
-        this._installProgressSpinner.show();
-        this._installProgressSpinner.start();
-        this._installProgressBar.hide();
-    },
-
     _downloadProgress: function(progress, current, total) {
-        if (current == total) {
-            this._showInstallSpinner();
-            return;
-        }
-
-        this._installProgressSpinner.hide();
-        this._installProgressBar.show();
         this._installProgressBar.fraction = progress;
     },
 
@@ -505,7 +489,7 @@ const AppInfoBox = new Lang.Class({
     },
 
     _syncTransactionState: function() {
-        let hasLauncher = this.appInfo.get_has_launcher();
+        let isDownloading = this.appInfo.is_downloading();
         let isInstalling = this.appInfo.is_installing();
         let isUpdating = this.appInfo.is_updating();
         let isRemoving = this.appInfo.is_removing();
@@ -514,31 +498,34 @@ const AppInfoBox = new Lang.Class({
             this._installButton.hide();
             this._removeButton.hide();
 
-            // show the box with the progress bar and the label
             this._installProgress.show();
-
-            // conditionally show the progress bar and cancel button
-            if (isUpdating || isInstalling) {
-                if (isInstalling && hasLauncher) {
-                    this._installProgressLabel.set_text(_("Installing…"));
-                }
-                else {
-                    this._installProgressLabel.set_text(_("Downloading…"));
-                }
-
-                this._installProgressSpinner.show();
-                this._installProgressSpinner.start();
-                this._installProgressCancel.show();
-            }
-            else {
-                this._installProgressLabel.set_text(_("Removing…"));
-                this._installProgressBar.hide();
-                this._installProgressSpinner.hide();
-                this._installProgressCancel.hide();
-            }
         }
         else {
             this._installProgress.hide();
+            return;
+        }
+
+        this._installProgressCancel.visible = !isRemoving;
+
+        if (isDownloading) {
+            this._installProgressSpinner.hide();
+            this._installProgressBar.show();
+            this._installProgressLabel.set_text(_("Downloading…"));
+        }
+        else {
+            this._installProgressSpinner.show();
+            this._installProgressSpinner.start();
+            this._installProgressBar.hide();
+
+            if (isUpdating) {
+                this._installProgressLabel.set_text(_("Updating…"));
+            }
+            else if (isInstalling) {
+                this._installProgressLabel.set_text(_("Installing…"));
+            }
+            else if (isRemoving) {
+                this._installProgressLabel.set_text(_("Removing…"));
+            }
         }
     },
 
