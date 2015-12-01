@@ -7,13 +7,13 @@ and remove applications in the Endless OS.
 
 In order to build the app center on Endless OS you should use:
 
-  $ ./autogen.sh \
-  	--prefix /usr \
-	--sysconfdir /etc \
-	--libexecdir /usr/bin \
-	--localstatedir /var
-  $ make
-  $ sudo make install
+    $ ./autogen.sh \
+      --prefix /usr \
+      --sysconfdir /etc \
+      --libexecdir /usr/bin \
+      --localstatedir /var
+    $ make
+    $ sudo make install
 
 The various configuration options ensure that the files are installed in
 the expected locations, and that the app center uses the expected paths when
