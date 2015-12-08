@@ -97,6 +97,7 @@
               <object class="GtkStack" id="_controlsStack">
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
+                <property name="hhomogeneous">False</property>
                 <child>
                   <object class="GtkBox" id="box1">
                     <property name="visible">True</property>
