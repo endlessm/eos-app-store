@@ -40,7 +40,7 @@
     -GtkRange-trough-border: 0;
     -GtkRange-trough-under-steppers: false;
 
-    -GtkScrollbar-min-slider-length: 115;
+    -GtkScrollbar-min-slider-length: 30;
     -GtkScrollbar-has-forward-stepper: true;
 }
 
