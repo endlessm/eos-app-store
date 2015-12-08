@@ -101,6 +101,8 @@ const AppStoreWindow = new Lang.Class({
             return true;
         }));
         this.add(this.main_frame);
+        this._windowVisibleChangedId = this.connect('notify::visible',
+                       Lang.bind(this, this._updateGeometry));
 
         // update position when workarea changes
         let screen = Gdk.Screen.get_default();
@@ -147,6 +149,11 @@ const AppStoreWindow = new Lang.Class({
         if (this._deleteEventId > 0) {
             this.disconnect(this._deleteEventId);
             this._deleteEventId = 0;
+        }
+
+        if (this._windowVisibleChangedId > 0) {
+            this.disconnect(this._windowVisibleChangedId);
+            this._windowVisibleChangedId = 0;
         }
     },
 
