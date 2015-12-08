@@ -104,6 +104,10 @@ const AppStoreWindow = new Lang.Class({
         this._windowVisibleChangedId = this.connect('notify::visible',
                        Lang.bind(this, this._updateGeometry));
 
+        // hide when Esc key is pressed
+        this._keyPressEventId = this.connect('key-press-event',
+                       Lang.bind(this, this._onKeyPressed));
+
         // update position when workarea changes
         let screen = Gdk.Screen.get_default();
         this._monitorsChangedId = screen.connect('monitors-changed',
@@ -154,6 +158,11 @@ const AppStoreWindow = new Lang.Class({
         if (this._windowVisibleChangedId > 0) {
             this.disconnect(this._windowVisibleChangedId);
             this._windowVisibleChangedId = 0;
+        }
+
+        if (this._keyPressEventId > 0) {
+            this.disconnect(this._keyPressEventId);
+            this._keyPressEventId = 0;
         }
     },
 
@@ -255,6 +264,16 @@ const AppStoreWindow = new Lang.Class({
 
     _onBackClicked: function() {
         this.emit('back-clicked');
+    },
+
+    _onKeyPressed: function(window, event) {
+        // Hide window when Esc is pressed
+        if(event.get_keyval()[1] == Gdk.KEY_Escape) {
+            this.hide();
+            return true;
+        }
+
+        return false;
     },
 
     _setDefaultTitle: function() {
