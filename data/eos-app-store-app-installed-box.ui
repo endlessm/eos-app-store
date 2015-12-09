@@ -49,12 +49,12 @@
                     <property name="can_focus">False</property>
                     <property name="label" translatable="yes">APPLICATION NAME</property>
                     <property name="ellipsize">end</property>
-                    <property name="width_chars">20</property>
                     <property name="max_width_chars">40</property>
                     <property name="lines">1</property>
                     <property name="xalign">0</property>
                     <property name="hexpand">True</property>
                     <property name="vexpand">True</property>
+                    <property name="ellipsize">end</property>
                     <style>
                       <class name="app-name"/>
                     </style>
@@ -70,12 +70,12 @@
                     <property name="visible">True</property>
                     <property name="can_focus">False</property>
                     <property name="label" translatable="yes">APPLICATION CATEGORY</property>
-                    <property name="width_chars">20</property>
                     <property name="max_width_chars">40</property>
                     <property name="lines">1</property>
                     <property name="xalign">0</property>
                     <property name="hexpand">True</property>
                     <property name="vexpand">True</property>
+                    <property name="ellipsize">end</property>
                     <style>
                       <class name="app-category"/>
                     </style>
@@ -174,7 +174,7 @@
                         <property name="label" translatable="yes">SIZE</property>
                         <property name="ellipsize">end</property>
                         <property name="margin_end">10</property>
-                        <property name="width_chars">12</property>
+                        <property name="width_chars">10</property>
                         <property name="max_width_chars">12</property>
                       </object>
                       <style>
