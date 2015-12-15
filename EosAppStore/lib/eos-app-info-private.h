@@ -49,6 +49,8 @@ struct _EosAppInfo
   char **screenshots;
   guint n_screenshots;
 
+  GPtrArray *search_tokens;
+
   EosFlexyShape shape;
 
   EosAppCategory category;

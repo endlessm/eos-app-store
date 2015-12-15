@@ -73,6 +73,9 @@ const char *    eos_app_info_get_checksum               (const EosAppInfo *info,
 const char *    eos_app_info_get_info_filename          (const EosAppInfo *info);
 GFile *         eos_app_info_get_application_dir        (const EosAppInfo *info);
 
+gboolean        eos_app_info_match                      (const EosAppInfo *info,
+                                                         const char * const terms[]);
+
 #ifndef __GI_SCANNER__
 
 /* private */
