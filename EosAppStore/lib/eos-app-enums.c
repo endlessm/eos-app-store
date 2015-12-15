@@ -42,6 +42,7 @@ EOS_DEFINE_ENUM_TYPE (EosAppCategory, eos_app_category,
                       EOS_ENUM_VALUE (EOS_APP_CATEGORY_RESOURCES, resources)
                       EOS_ENUM_VALUE (EOS_APP_CATEGORY_UTILITIES, utilities)
                       EOS_ENUM_VALUE (EOS_APP_CATEGORY_INSTALLED, installed)
+                      EOS_ENUM_VALUE (EOS_APP_CATEGORY_SEARCH, search)
                       EOS_ENUM_VALUE (EOS_APP_CATEGORY_ALL, all))
 
 EOS_DEFINE_ENUM_TYPE (EosLinkCategory, eos_link_category,

@@ -77,6 +77,8 @@ const AppFrame = new Lang.Class({
         this._spinnerBox.add(this._spinner);
         this.spinning = true;
 
+        this.searching = false;
+
         this.connect('destroy', Lang.bind(this, this._onDestroy));
 
         this.show_all();
@@ -154,6 +156,36 @@ const AppFrame = new Lang.Class({
             this.spinning = false;
     },
 
+    _cancelSearch: function() {
+        this.searching = false;
+    },
+
+    set searching(v) {
+        this._searching = v;
+
+        this._clearBackId();
+
+        if (this._searching) {
+            this._mainWindow.titleText = _("Search results");
+            this._mainWindow.backButtonVisible = true;
+
+            this._backClickedId =
+                this._mainWindow.connect('back-clicked', Lang.bind(this, this._cancelSearch));
+        }
+    },
+
+    get searching() {
+        return this._searching;
+    },
+
+    get categoryId() {
+        if (this.searching) {
+            return EosAppStorePrivate.AppCategory.SEARCH;
+        }
+
+        return this._category.id;
+    },
+
     _createView: function() {
         // to be overridden
     },
@@ -181,7 +213,7 @@ const AppFrame = new Lang.Class({
 
     _doPopulate: function() {
         this.view = this._createView();
-        let appInfos = this._prepareAppInfos(this._model.loadCategory(this._category.id));
+        let appInfos = this._prepareAppInfos(this._model.loadCategory(this.categoryId));
         this._populateView(appInfos);
     },
 
