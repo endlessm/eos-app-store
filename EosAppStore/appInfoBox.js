@@ -473,11 +473,13 @@ const AppInfoBox = new Lang.Class({
                 }
                 else {
                     this._installButtonLabel.set_text(BUTTON_LABEL_ADD);
-                    // like the .INSTALLED case, we only show the 'delete app'
-                    // button if the app does not have a launcher on the desktop
-                    this._removeButton.show();
                 }
                 this._installButton.show();
+
+                if (this.appInfo.is_removable()) {
+                    this._removeButton.show();
+                }
+
                 break;
 
             case EosAppStorePrivate.AppState.UNKNOWN:
