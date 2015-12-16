@@ -340,8 +340,7 @@
     border-width: 2px 17px 2px 17px;
 
     /* Setting padding to 0px gets the text 4px closer to each edge */
-    padding-left: 0px;
-    padding-right: 0px;
+    padding: 0;
 
     font-size: 1.12em;
     font-weight: 600; /* semibold */
