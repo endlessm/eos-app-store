@@ -7,6 +7,7 @@ const GObject = imports.gi.GObject;
 const Gtk = imports.gi.Gtk;
 const EosAppStorePrivate = imports.gi.EosAppStorePrivate;
 const Pango = imports.gi.Pango;
+const Soup = imports.gi.Soup;
 const WebKit = imports.gi.WebKit2;
 
 const AppStorePages = imports.appStorePages;
@@ -111,8 +112,9 @@ const NewSiteHelper = new Lang.Class({
                                               'eos-app-store', 'icondatabase']);
         context.set_favicon_database_directory(cachePath);
 
+        this._webView.connect('load-changed', Lang.bind(this, this._onLoadChanged));
         this._webView.connect('load-failed', Lang.bind(this, this._onLoadFailed));
-        this._webView.connect('notify::title', Lang.bind(this, this._onTitleLoaded));
+        this._webView.connect('notify::title', Lang.bind(this, this._onTitleChanged));
         this._webView.connect('notify::favicon', Lang.bind(this, this._onFaviconLoaded));
 
         // check if the URL that the user entered already has a valid prefix
@@ -158,10 +160,16 @@ const NewSiteHelper = new Lang.Class({
         }
     },
 
-    _onTitleLoaded: function() {
+    _onTitleChanged: function() {
         let title = this._webView.title;
         if (title) {
             this._title = title;
+            this.emit('title-changed');
+        }
+    },
+
+    _onLoadChanged: function(webView, loadEvent) {
+        if (loadEvent == WebKit.LoadEvent.FINISHED) {
             this.emit('website-loaded');
         }
     },
@@ -175,7 +183,16 @@ const NewSiteHelper = new Lang.Class({
     },
 
     get title() {
-        return this._title;
+        let title = this._title;
+        if (!title) {
+            // Some pages do not provide a title so we need to craft something
+            // ourselves in order to show something and not keep waiting forever.
+            // Let's use the 'host/path' part, at least not to show the raw URL.
+            let soupURI = new Soup.URI(this._url);
+            title = soupURI.get_host() + soupURI.get_path();
+        }
+
+        return title;
     },
 
     get url() {
@@ -443,6 +460,7 @@ const NewSiteBox = new Lang.Class({
         this._webHelper = new NewSiteHelper(this._weblinkListModel, url);
 
         this._webHelper.connect('favicon-loaded', Lang.bind(this, this._onFaviconLoaded));
+        this._webHelper.connect('title-changed', Lang.bind(this, this._onTitleChanged));
         this._webHelper.connect('website-loaded', Lang.bind(this, this._onWebsiteLoaded));
         this._webHelper.connect('website-failed', Lang.bind(this, this._onWebsiteFailed));
 
@@ -453,7 +471,16 @@ const NewSiteBox = new Lang.Class({
         this._siteIcon.set_from_pixbuf(webHelper.favicon);
     },
 
+    _onTitleChanged: function(webHelper) {
+        // We mark the site as FOUND as soon as we have a title to look
+        // more responsive, so that we don't have to wait for the full
+        // URL to finish loading in cases where a title is provided.
+        this._setState(NewSiteBoxState.FOUND);
+    },
+
     _onWebsiteLoaded: function() {
+        // We need to mark the URL as FOUND whenever a load finishes, so that
+        // we make sure we don't end up waiting forever when there's no title.
         this._setState(NewSiteBoxState.FOUND);
     },
 
