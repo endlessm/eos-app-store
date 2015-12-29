@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: eos-app-store\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-12-15 02:22+0000\n"
+"POT-Creation-Date: 2015-12-22 02:21+0000\n"
 "PO-Revision-Date: 2015-10-23 04:44+0000\n"
 "Last-Translator: Roddy Shuler <roddy@endlessm.com>\n"
 "Language-Team: French (http://www.transifex.com/endless-mobile-inc/eos-app-store/language/fr/)\n"
@@ -143,19 +143,19 @@ msgstr "Aucune connexion réseau n'est disponible"
 msgid "Insufficient space to install the app"
 msgstr "Espace insuffisant pour installer l'appli"
 
-#: ../EosAppStore/appInfoBox.js:513
+#: ../EosAppStore/appInfoBox.js:515
 msgid "Downloading…"
 msgstr "Téléchargement en cours…"
 
-#: ../EosAppStore/appInfoBox.js:521
+#: ../EosAppStore/appInfoBox.js:523
 msgid "Updating…"
 msgstr "Mise à jour…"
 
-#: ../EosAppStore/appInfoBox.js:524
+#: ../EosAppStore/appInfoBox.js:526
 msgid "Installing…"
 msgstr "En cours d'installation…"
 
-#: ../EosAppStore/appInfoBox.js:527
+#: ../EosAppStore/appInfoBox.js:529
 msgid "Removing…"
 msgstr "Retrait en cours…"
 
