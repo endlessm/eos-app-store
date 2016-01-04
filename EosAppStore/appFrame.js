@@ -33,7 +33,8 @@ const AppFrame = new Lang.Class({
         this._stack = new Gtk.Stack({ transition_duration: APP_TRANSITION_MS,
                                       transition_type: Gtk.StackTransitionType.SLIDE_RIGHT,
                                       hexpand: true,
-                                      vexpand: true });
+                                      vexpand: true,
+                                      homogeneous: false });
         this._stack.connect('notify::visible-child-name', Lang.bind(this, this._onPageChanged));
         this.add(this._stack);
 
