@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: eos-app-store\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-12-22 02:21+0000\n"
+"POT-Creation-Date: 2015-12-29 02:22+0000\n"
 "PO-Revision-Date: 2015-10-23 04:44+0000\n"
 "Last-Translator: Roddy Shuler <roddy@endlessm.com>\n"
 "Language-Team: French (http://www.transifex.com/endless-mobile-inc/eos-app-store/language/fr/)\n"
@@ -63,7 +63,7 @@ msgid "Create your own folder to organize your apps. First, choose an icon."
 msgstr "Créez votre propre dossier pour organiser vos applications. D'abord, choisissez une icône."
 
 #: ../data/eos-app-store-weblink-new-site-frame.ui.h:1
-#: ../EosAppStore/weblinkFrame.js:329
+#: ../EosAppStore/weblinkFrame.js:346
 msgid "e.g.: http://www.endlessm.com"
 msgstr "ex. : http://www.endlessm.com"
 
@@ -233,33 +233,33 @@ msgstr "Dossiers"
 msgid "Install folders"
 msgstr "Installer les dossiers"
 
-#: ../EosAppStore/weblinkFrame.js:263
+#: ../EosAppStore/weblinkFrame.js:280
 msgid "Write the website you'd like to add here and press “Enter”"
 msgstr "Écrivez le site internet que vous aimeriez ajouter ici et appuyer sur «Entrée»"
 
-#: ../EosAppStore/weblinkFrame.js:349
+#: ../EosAppStore/weblinkFrame.js:366
 msgid "searching"
 msgstr "recherche en cours"
 
-#: ../EosAppStore/weblinkFrame.js:364
+#: ../EosAppStore/weblinkFrame.js:381
 msgid "The address written does not exist or is not available."
 msgstr "L'adresse écrite n'existe pas ou n'est pas disponible."
 
-#: ../EosAppStore/weblinkFrame.js:373 ../EosAppStore/weblinkFrame.js:519
+#: ../EosAppStore/weblinkFrame.js:390 ../EosAppStore/weblinkFrame.js:546
 msgid "Added successfully!"
 msgstr "Ajouté avec succès !"
 
-#: ../EosAppStore/weblinkFrame.js:590
+#: ../EosAppStore/weblinkFrame.js:617
 msgid ""
 "Add your favorite websites to your desktop or choose suggested ones from our"
 " list."
 msgstr "Ajouter vos sites internet préférés à votre bureau ou choisissez parmi les suggestions de notre liste. "
 
-#: ../EosAppStore/weblinkFrame.js:736
+#: ../EosAppStore/weblinkFrame.js:763
 msgid "Websites"
 msgstr "Sites internet"
 
-#: ../EosAppStore/weblinkFrame.js:740
+#: ../EosAppStore/weblinkFrame.js:767
 msgid "Install websites"
 msgstr "Installer les sites internet"
 
