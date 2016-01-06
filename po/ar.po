@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: eos-app-store\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-12-29 02:22+0000\n"
+"POT-Creation-Date: 2016-01-05 02:22+0000\n"
 "PO-Revision-Date: 2015-10-20 23:52+0000\n"
 "Last-Translator: Roddy Shuler <roddy@endlessm.com>\n"
 "Language-Team: Arabic (http://www.transifex.com/endless-mobile-inc/eos-app-store/language/ar/)\n"
@@ -67,15 +67,15 @@ msgstr "قم بإنشاء مجلد خاص بك لتنظيم تطبيقاتك. ا
 msgid "e.g.: http://www.endlessm.com"
 msgstr "مثال: http://www.endlessm.com"
 
-#: ../EosAppStore/appFrame.js:393
+#: ../EosAppStore/appFrame.js:394
 msgid "Installed apps"
 msgstr "التطبيقات المثبتة"
 
-#: ../EosAppStore/appFrame.js:450
+#: ../EosAppStore/appFrame.js:451
 msgid "Install apps"
 msgstr "تثبيت التطبيقات"
 
-#: ../EosAppStore/appFrame.js:486
+#: ../EosAppStore/appFrame.js:487
 msgid "Refresh failed"
 msgstr "تعذر التحديث"
 

@@ -16,7 +16,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: eos-app-store\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-12-29 02:22+0000\n"
+"POT-Creation-Date: 2016-01-05 02:22+0000\n"
 "PO-Revision-Date: 2015-10-20 23:52+0000\n"
 "Last-Translator: Roddy Shuler <roddy@endlessm.com>\n"
 "Language-Team: Portuguese (Brazil) (http://www.transifex.com/endless-mobile-inc/eos-app-store/language/pt_BR/)\n"
@@ -75,15 +75,15 @@ msgstr "Crie a sua própria pasta para organizar seus programas. Primeiro, escol
 msgid "e.g.: http://www.endlessm.com"
 msgstr "ex.: http://www.endlessm.com"
 
-#: ../EosAppStore/appFrame.js:393
+#: ../EosAppStore/appFrame.js:394
 msgid "Installed apps"
 msgstr "Programas instalados"
 
-#: ../EosAppStore/appFrame.js:450
+#: ../EosAppStore/appFrame.js:451
 msgid "Install apps"
 msgstr "Instalar programas"
 
-#: ../EosAppStore/appFrame.js:486
+#: ../EosAppStore/appFrame.js:487
 msgid "Refresh failed"
 msgstr "Falha na atualização"
 
