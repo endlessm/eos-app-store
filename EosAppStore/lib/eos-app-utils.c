@@ -165,6 +165,26 @@ eos_get_secondary_storage (void)
   return eos_app_manager_get_secondary_storage (eos_get_eam_dbus_proxy ());
 }
 
+const char *
+eos_get_storage_path_for_type (EosStorageType storage_type)
+{
+  switch (storage_type)
+    {
+    case EOS_STORAGE_TYPE_UNKNOWN:
+      return NULL;
+
+    case EOS_STORAGE_TYPE_PRIMARY:
+      return eos_get_primary_storage ();
+
+    case EOS_STORAGE_TYPE_SECONDARY:
+      return eos_get_secondary_storage ();
+    }
+
+  g_assert_not_reached ();
+
+  return NULL;
+}
+
 gboolean
 eos_use_delta_updates (void)
 {
