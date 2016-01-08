@@ -979,7 +979,8 @@ get_bundle_artifacts (EosAppListModel *self,
 
   eos_app_log_info_message ("Completing transaction with eam");
 
-  EosStorageType storage_type;
+  EosStorageType source_storage_type = EOS_STORAGE_TYPE_UNKNOWN;
+  EosStorageType target_storage_type = EOS_STORAGE_TYPE_UNKNOWN;
 
   if (is_upgrade)
     {
@@ -988,23 +989,25 @@ get_bundle_artifacts (EosAppListModel *self,
        * the app manager does for rolling back in case of error, then we need
        * to move the app elsewhere.
        */
-      storage_type = eos_app_info_get_storage_type (info);
+      source_storage_type = eos_app_info_get_storage_type (info);
+      target_storage_type = source_storage_type;
 
-      const char *path = eos_get_storage_path_for_type (storage_type);
+      const char *path = eos_get_storage_path_for_type (target_storage_type);
       gint64 min_size = eos_app_info_get_installed_size (info) * 2;
       if (!eos_check_available_space (path, min_size, cancellable, NULL))
         {
-          eos_app_log_error_message ("Not enough available space on the %s storage.",
-                                     eos_storage_type_to_string (storage_type));
-          storage_type = storage_type == EOS_STORAGE_TYPE_PRIMARY
-                       ? EOS_STORAGE_TYPE_SECONDARY
-                       : EOS_STORAGE_TYPE_PRIMARY;
+          target_storage_type = source_storage_type == EOS_STORAGE_TYPE_PRIMARY
+                              ? EOS_STORAGE_TYPE_SECONDARY
+                              : EOS_STORAGE_TYPE_PRIMARY;
+          eos_app_log_error_message ("Not enough available space on the %s storage, changing to %s.",
+                                     eos_storage_type_to_string (source_storage_type),
+                                     eos_storage_type_to_string (target_storage_type));
         }
     }
   else
-    storage_type = eos_app_info_get_install_storage_type (info);
+    target_storage_type = eos_app_info_get_install_storage_type (info);
 
-  if (storage_type == EOS_STORAGE_TYPE_UNKNOWN)
+  if (target_storage_type == EOS_STORAGE_TYPE_UNKNOWN)
     {
       eos_app_log_error_message ("Unable to determine where the bundle should be installed");
 
@@ -1016,7 +1019,8 @@ get_bundle_artifacts (EosAppListModel *self,
 
   GVariantBuilder opts;
   g_variant_builder_init (&opts, G_VARIANT_TYPE ("a{sv}"));
-  g_variant_builder_add (&opts, "{sv}", "StorageType", g_variant_new_take_string (eos_storage_type_to_string (storage_type)));
+  g_variant_builder_add (&opts, "{sv}", "SourceStorageType", g_variant_new_take_string (eos_storage_type_to_string (source_storage_type)));
+  g_variant_builder_add (&opts, "{sv}", "TargetStorageType", g_variant_new_take_string (eos_storage_type_to_string (target_storage_type)));
   g_variant_builder_add (&opts, "{sv}", "BundlePath", g_variant_new_string (bundle_path));
   g_variant_builder_add (&opts, "{sv}", "SignaturePath", g_variant_new_string (signature_path));
 
