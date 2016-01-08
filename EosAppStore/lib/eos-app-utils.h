@@ -44,6 +44,8 @@ const char *eos_get_primary_storage             (void);
 const char *eos_get_secondary_storage           (void);
 gboolean    eos_has_secondary_storage           (void);
 
+const char *eos_get_storage_path_for_type       (EosStorageType storage_type);
+
 gboolean eos_use_delta_updates                  (void);
 
 gboolean eos_app_load_installed_apps      (GHashTable    *app_info,
