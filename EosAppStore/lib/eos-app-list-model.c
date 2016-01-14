@@ -992,8 +992,9 @@ get_bundle_artifacts (EosAppListModel *self,
       source_storage_type = eos_app_info_get_storage_type (info);
       target_storage_type = source_storage_type;
 
-      const char *path = eos_get_storage_path_for_type (target_storage_type);
+      GFile *path = eos_app_info_get_application_dir (info);
       gint64 min_size = eos_app_info_get_installed_size (info) * 2;
+
       if (!eos_check_available_space (path, min_size, cancellable, NULL))
         {
           target_storage_type = source_storage_type == EOS_STORAGE_TYPE_PRIMARY

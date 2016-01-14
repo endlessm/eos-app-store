@@ -1581,34 +1581,20 @@ eos_compare_versions (const char *a,
 }
 
 gboolean
-eos_check_available_space (const char    *path,
+eos_check_available_space (GFile         *path,
                            goffset        min_size,
                            GCancellable  *cancellable,
                            GError       **error)
 {
-  GFile *file;
-  GFile *parent;
+  g_return_val_if_fail (G_IS_FILE (path), FALSE);
+
   GFileInfo *info;
   gboolean retval = TRUE;
 
-  file = g_file_new_for_path (path);
-  parent = g_file_get_parent (file);
-  g_object_unref (file);
-
-  eos_app_log_info_message ("Trying to get filesystem info from %s", path);
-
-  if (parent == NULL)
-    {
-      eos_app_log_error_message ("Can't get parent GFile for %s", path);
-
-      return FALSE;
-    }
-
-  info = g_file_query_filesystem_info (parent,
+  info = g_file_query_filesystem_info (path,
                                        G_FILE_ATTRIBUTE_FILESYSTEM_FREE,
                                        cancellable,
                                        error);
-  g_object_unref (parent);
 
   if (info == NULL)
     {
@@ -1619,17 +1605,12 @@ eos_check_available_space (const char    *path,
 
   guint64 free_space = g_file_info_get_attribute_uint64 (info, G_FILE_ATTRIBUTE_FILESYSTEM_FREE);
 
-  /* we try to be conservative, and reserve twice the requested size, like
-   * eos-app-manager does.
-   */
-  guint64 req_space = min_size * 2;
-
   eos_app_log_info_message ("Space required: %lld KB",
-                            (long long) (req_space / 1024));
+                            (long long) (min_size / 1024));
   eos_app_log_info_message ("Space left on FS: %lld KB",
-                            (long long) (free_space / 1024));
+                            (long long) (min_size / 1024));
 
-  if (free_space < req_space)
+  if (free_space < min_size)
     {
       eos_app_log_error_message ("Not enough space on device for downloading app");
 
