@@ -844,6 +844,14 @@ eos_app_info_get_checksum (const EosAppInfo *info,
   return bundle_hash;
 }
 
+const char *
+eos_app_info_get_info_filename (const EosAppInfo *info)
+{
+  g_return_val_if_fail (info != NULL, NULL);
+
+  return info->info_filename;
+}
+
 /*< private >
  * check_info_storage:
  * @info: the #EosAppInfo to update

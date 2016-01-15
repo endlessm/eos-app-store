@@ -70,6 +70,7 @@ gint64          eos_app_info_get_installation_time      (const EosAppInfo *info)
 const char *    eos_app_info_get_checksum               (const EosAppInfo *info,
                                                          gboolean          use_delta,
                                                          GError          **error);
+const char *    eos_app_info_get_info_filename          (const EosAppInfo *info);
 
 #ifndef __GI_SCANNER__
 
