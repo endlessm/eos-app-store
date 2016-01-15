@@ -64,7 +64,7 @@ gboolean eos_app_load_updates_meta_record (gint64        *monotonic_update_id,
                                            GCancellable  *cancellable,
                                            GError       **error);
 
-gboolean eos_check_available_space        (const char    *path,
+gboolean eos_check_available_space        (GFile         *path,
                                            goffset        min_size,
                                            GCancellable  *cancellable,
                                            GError       **error);
