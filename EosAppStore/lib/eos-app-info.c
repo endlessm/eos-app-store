@@ -852,6 +852,22 @@ eos_app_info_get_info_filename (const EosAppInfo *info)
   return info->info_filename;
 }
 
+/**
+ * eos_app_info_get_application_dir:
+ * @info: ...
+ *
+ * ...
+ *
+ * Returns: (transfer none): ...
+ */
+GFile *
+eos_app_info_get_application_dir (const EosAppInfo *info)
+{
+  g_return_val_if_fail (info != NULL, NULL);
+
+  return info->application_dir;
+}
+
 /*< private >
  * check_info_storage:
  * @info: the #EosAppInfo to update
