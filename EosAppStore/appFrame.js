@@ -56,7 +56,8 @@ const AppFrame = new Lang.Class({
 
         this._scrollWindow = new Gtk.ScrolledWindow({ shadow_type: Gtk.ShadowType.IN,
                                                       hscrollbar_policy: Gtk.PolicyType.NEVER,
-                                                      vscrollbar_policy: Gtk.PolicyType.AUTOMATIC });
+                                                      vscrollbar_policy: Gtk.PolicyType.AUTOMATIC,
+                                                      margin_bottom: 15 });
         this._scrollWindow.get_style_context().add_class('app-scrolledwindow');
         this._contentBox.add(this._scrollWindow);
 
