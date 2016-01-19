@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: eos-app-store\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-01-06 19:27+0000\n"
+"POT-Creation-Date: 2016-01-12 02:22+0000\n"
 "PO-Revision-Date: 2015-10-23 04:44+0000\n"
 "Last-Translator: Roddy Shuler <roddy@endlessm.com>\n"
 "Language-Team: French (http://www.transifex.com/endless-mobile-inc/eos-app-store/language/fr/)\n"
@@ -173,19 +173,19 @@ msgstr "Rejeter"
 
 #. Translators: use the same string used to install the app center content
 #. JSON
-#: ../EosAppStore/categories.js:12 ../EosAppStore/lib/eos-app-utils.c:1326
+#: ../EosAppStore/categories.js:12 ../EosAppStore/lib/eos-app-utils.c:1346
 msgid "Education"
 msgstr "Formation"
 
-#: ../EosAppStore/categories.js:19 ../EosAppStore/lib/eos-app-utils.c:1327
+#: ../EosAppStore/categories.js:19 ../EosAppStore/lib/eos-app-utils.c:1347
 msgid "Games"
 msgstr "Jeux"
 
-#: ../EosAppStore/categories.js:26 ../EosAppStore/lib/eos-app-utils.c:1328
+#: ../EosAppStore/categories.js:26 ../EosAppStore/lib/eos-app-utils.c:1348
 msgid "Resources"
 msgstr "Ressources"
 
-#: ../EosAppStore/categories.js:33 ../EosAppStore/lib/eos-app-utils.c:1329
+#: ../EosAppStore/categories.js:33 ../EosAppStore/lib/eos-app-utils.c:1349
 msgid "Utilities"
 msgstr "Utilitaires"
 
@@ -282,78 +282,78 @@ msgstr "Impossible de charger la liste complète d'applications."
 msgid "We were unable to update the list of applications"
 msgstr "Nous n'avons pas été capables de mettre à jour la liste des applications"
 
-#: ../EosAppStore/lib/eos-app-list-model.c:1004
+#: ../EosAppStore/lib/eos-app-list-model.c:1016
 msgid "Not enough space on device for installing the app."
 msgstr "Pas assez d'espace sur l'appareil pour installer l'appli."
 
-#: ../EosAppStore/lib/eos-app-list-model.c:1090
+#: ../EosAppStore/lib/eos-app-list-model.c:1103
 msgid ""
 "We encountered an internal error during the installation of the application."
 msgstr "Nous avons rencontré une erreur interne pendant l'installation de l'application."
 
-#: ../EosAppStore/lib/eos-app-list-model.c:1119
+#: ../EosAppStore/lib/eos-app-list-model.c:1132
 msgid ""
 "We encountered an internal error during the removal of the application."
 msgstr "Nous avons rencontré une erreur interne pendant la suppression de l'application."
 
-#: ../EosAppStore/lib/eos-app-list-model.c:1146
-#: ../EosAppStore/lib/eos-app-list-model.c:1190
+#: ../EosAppStore/lib/eos-app-list-model.c:1159
+#: ../EosAppStore/lib/eos-app-list-model.c:1203
 msgid "You must be an administrator to install applications."
 msgstr "Vous devez être un administrateur pour installer des applications."
 
-#: ../EosAppStore/lib/eos-app-list-model.c:1335
-#: ../EosAppStore/lib/eos-app-list-model.c:1362
+#: ../EosAppStore/lib/eos-app-list-model.c:1348
+#: ../EosAppStore/lib/eos-app-list-model.c:1375
 msgid "You must be an administrator to remove applications."
 msgstr "Vous devez être un administrateur pour supprimer les applications."
 
-#: ../EosAppStore/lib/eos-app-list-model.c:1485
+#: ../EosAppStore/lib/eos-app-list-model.c:1498
 #, c-format
 msgid "App %s has no candidate for installation."
 msgstr "L'application %s n'a pas de candidats pour l'installation"
 
-#: ../EosAppStore/lib/eos-app-list-model.c:1497
+#: ../EosAppStore/lib/eos-app-list-model.c:1510
 #, c-format
 msgid "App '%s' is already installed."
 msgstr "L'appli '%s' est déjà installée."
 
-#: ../EosAppStore/lib/eos-app-list-model.c:1561
+#: ../EosAppStore/lib/eos-app-list-model.c:1574
 #, c-format
 msgid "App %s not installable."
 msgstr "L'appli %s ne peut pas être installée."
 
-#: ../EosAppStore/lib/eos-app-list-model.c:1572
+#: ../EosAppStore/lib/eos-app-list-model.c:1585
 #, c-format
 msgid "App %s is up to date."
 msgstr "L'appli %s est à jour."
 
-#: ../EosAppStore/lib/eos-app-list-model.c:1652
-#: ../EosAppStore/lib/eos-app-list-model.c:1697
+#: ../EosAppStore/lib/eos-app-list-model.c:1665
+#: ../EosAppStore/lib/eos-app-list-model.c:1710
 #, c-format
 msgid "App '%s' is not installed."
 msgstr "L'appli '%s' is not installed."
 
-#: ../EosAppStore/lib/eos-app-utils.c:726
+#: ../EosAppStore/lib/eos-app-utils.c:746
 msgid "Operation cancelled"
 msgstr "Opération annulée"
 
-#: ../EosAppStore/lib/eos-app-utils.c:748
+#: ../EosAppStore/lib/eos-app-utils.c:768
 msgid "Updates meta record did not contain expected structure"
 msgstr "Les mises à jour du méta dossier ne contenaient pas la structure attendue"
 
-#: ../EosAppStore/lib/eos-app-utils.c:763
+#: ../EosAppStore/lib/eos-app-utils.c:783
 msgid "Updates meta record did not contain expected attributes"
 msgstr "Les mises à jour du méta dossier ne contenaient pas les attributs attendus"
 
-#: ../EosAppStore/lib/eos-app-utils.c:779
+#: ../EosAppStore/lib/eos-app-utils.c:799
 msgid "Updates meta record did not contain valid monotonic_id attribute value"
 msgstr "Les mises à jour du méta dossier ne contenait pas de valeur de l'attribut monotonic_id valide"
 
-#: ../EosAppStore/lib/eos-app-utils.c:1618
+#: ../EosAppStore/lib/eos-app-utils.c:1638
 #, c-format
 msgid "Not enough space on device for downloading the app."
 msgstr "Pas assez d'espace sur l'appareil pour télécharger l'appli."
 
-#: ../EosAppStore/lib/eos-app-utils.c:1783
+#: ../EosAppStore/lib/eos-app-utils.c:1803
 msgid "There was a problem downloading the app; please try again"
 msgstr "Un problème est survenu lors du téléchargement de l'appli : veuillez réessayer"
 

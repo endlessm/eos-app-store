@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-01-12 02:22+0000\n"
+"POT-Creation-Date: 2016-01-19 02:22+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -280,51 +280,51 @@ msgstr ""
 msgid "We were unable to update the list of applications"
 msgstr ""
 
-#: ../EosAppStore/lib/eos-app-list-model.c:1016
+#: ../EosAppStore/lib/eos-app-list-model.c:1017
 msgid "Not enough space on device for installing the app."
 msgstr ""
 
-#: ../EosAppStore/lib/eos-app-list-model.c:1103
+#: ../EosAppStore/lib/eos-app-list-model.c:1104
 msgid ""
 "We encountered an internal error during the installation of the application."
 msgstr ""
 
-#: ../EosAppStore/lib/eos-app-list-model.c:1132
+#: ../EosAppStore/lib/eos-app-list-model.c:1133
 msgid "We encountered an internal error during the removal of the application."
 msgstr ""
 
-#: ../EosAppStore/lib/eos-app-list-model.c:1159
-#: ../EosAppStore/lib/eos-app-list-model.c:1203
+#: ../EosAppStore/lib/eos-app-list-model.c:1160
+#: ../EosAppStore/lib/eos-app-list-model.c:1204
 msgid "You must be an administrator to install applications."
 msgstr ""
 
-#: ../EosAppStore/lib/eos-app-list-model.c:1348
-#: ../EosAppStore/lib/eos-app-list-model.c:1375
+#: ../EosAppStore/lib/eos-app-list-model.c:1349
+#: ../EosAppStore/lib/eos-app-list-model.c:1376
 msgid "You must be an administrator to remove applications."
 msgstr ""
 
-#: ../EosAppStore/lib/eos-app-list-model.c:1498
+#: ../EosAppStore/lib/eos-app-list-model.c:1499
 #, c-format
 msgid "App %s has no candidate for installation."
 msgstr ""
 
-#: ../EosAppStore/lib/eos-app-list-model.c:1510
+#: ../EosAppStore/lib/eos-app-list-model.c:1511
 #, c-format
 msgid "App '%s' is already installed."
 msgstr ""
 
-#: ../EosAppStore/lib/eos-app-list-model.c:1574
+#: ../EosAppStore/lib/eos-app-list-model.c:1575
 #, c-format
 msgid "App %s not installable."
 msgstr ""
 
-#: ../EosAppStore/lib/eos-app-list-model.c:1585
+#: ../EosAppStore/lib/eos-app-list-model.c:1586
 #, c-format
 msgid "App %s is up to date."
 msgstr ""
 
-#: ../EosAppStore/lib/eos-app-list-model.c:1665
-#: ../EosAppStore/lib/eos-app-list-model.c:1710
+#: ../EosAppStore/lib/eos-app-list-model.c:1666
+#: ../EosAppStore/lib/eos-app-list-model.c:1711
 #, c-format
 msgid "App '%s' is not installed."
 msgstr ""
@@ -345,12 +345,12 @@ msgstr ""
 msgid "Updates meta record did not contain valid monotonic_id attribute value"
 msgstr ""
 
-#: ../EosAppStore/lib/eos-app-utils.c:1638
+#: ../EosAppStore/lib/eos-app-utils.c:1619
 #, c-format
 msgid "Not enough space on device for downloading the app."
 msgstr ""
 
-#: ../EosAppStore/lib/eos-app-utils.c:1803
+#: ../EosAppStore/lib/eos-app-utils.c:1784
 msgid "There was a problem downloading the app; please try again"
 msgstr ""
 
@@ -364,27 +364,27 @@ msgstr ""
 msgid "App '%s' could not be downloaded"
 msgstr ""
 
-#: ../EosAppStore/lib/eos-net-utils.c:268
+#: ../EosAppStore/lib/eos-net-utils.c:273
 msgid "The certificate of the target server is expired"
 msgstr ""
 
-#: ../EosAppStore/lib/eos-net-utils.c:270
+#: ../EosAppStore/lib/eos-net-utils.c:275
 msgid "The certificate of the target server has been revoked"
 msgstr ""
 
-#: ../EosAppStore/lib/eos-net-utils.c:272
+#: ../EosAppStore/lib/eos-net-utils.c:277
 msgid "The certificate of the target server has a bad identity"
 msgstr ""
 
-#: ../EosAppStore/lib/eos-net-utils.c:274
+#: ../EosAppStore/lib/eos-net-utils.c:279
 msgid "The certificate of the target server is from an unknown authority"
 msgstr ""
 
-#: ../EosAppStore/lib/eos-net-utils.c:276
+#: ../EosAppStore/lib/eos-net-utils.c:281
 msgid "The certificate of the target server is bad or invalid"
 msgstr ""
 
-#: ../EosAppStore/lib/eos-net-utils.c:332
+#: ../EosAppStore/lib/eos-net-utils.c:337
 #, c-format
 msgid "Could not save the app - canceling download (%s)"
 msgstr ""
