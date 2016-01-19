@@ -40,6 +40,7 @@
                 <property name="can_focus">True</property>
                 <property name="hscrollbar-policy">never</property>
                 <property name="margin_top">4</property>
+                <property name="margin_bottom">15</property>
                 <child>
                   <object class="GtkViewport" id="_viewport">
                     <property name="visible">True</property>
