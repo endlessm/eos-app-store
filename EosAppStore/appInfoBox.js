@@ -534,11 +534,6 @@ const AppInfoBox = new Lang.Class({
     _launchApp: function() {
         try {
             this.model.launch(this.appId, Gtk.get_current_event_time());
-
-            let appWindow = Gio.Application.get_default().mainWindow;
-            if (appWindow && appWindow.is_visible()) {
-                appWindow.hide();
-            }
         } catch (e) {
             log("Failed to launch app '" + this.appId + "': " + e.message);
         }
