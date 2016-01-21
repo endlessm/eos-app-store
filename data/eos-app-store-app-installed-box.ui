@@ -176,10 +176,10 @@
                         <property name="margin_end">10</property>
                         <property name="width_chars">10</property>
                         <property name="max_width_chars">12</property>
+                        <style>
+                          <class name="app-size"/>
+                        </style>
                       </object>
-                      <style>
-                        <class name="app-size"/>
-                      </style>
                       <packing>
                         <property name="expand">False</property>
                         <property name="fill">False</property>
