@@ -1,0 +1,395 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# 
+# Translators:
+# chenzibing <chenzibing_endless@126.com>, 2016
+# liuxuejiao <liuxuejiao_endless@126.com>, 2016
+# zhoushumin <zhoushumin_endless@126.com>, 2016
+msgid ""
+msgstr ""
+"Project-Id-Version: eos-app-store\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2016-01-19 02:22+0000\n"
+"PO-Revision-Date: 2016-01-21 09:26+0000\n"
+"Last-Translator: liuxuejiao <liuxuejiao_endless@126.com>\n"
+"Language-Team: Chinese (China) (http://www.transifex.com/endless-mobile-inc/eos-app-store/language/zh_CN/)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: zh_CN\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+
+#: ../data/eos-app-store-app-info-box.ui.h:1 ../EosAppStore/appInfoBox.js:423
+msgid "Install app"
+msgstr "安装App"
+
+#: ../data/eos-app-store-app-info-box.ui.h:2 ../EosAppStore/appInfoBox.js:169
+msgid "Cancel"
+msgstr "取消"
+
+#: ../data/eos-app-store-app-info-box.ui.h:3
+msgid "Installing"
+msgstr "正在安装"
+
+#: ../data/eos-app-store-app-info-box.ui.h:4
+msgid "Delete from device"
+msgstr "从设备中删除"
+
+#: ../data/eos-app-store-app-installed-box.ui.h:1
+msgid "APPLICATION NAME"
+msgstr "应用名称"
+
+#: ../data/eos-app-store-app-installed-box.ui.h:2
+msgid "APPLICATION CATEGORY"
+msgstr "应用类别"
+
+#: ../data/eos-app-store-app-installed-box.ui.h:3
+msgid "SIZE"
+msgstr "大小"
+
+#: ../data/eos-app-store-app-installed-box.ui.h:4
+msgid "UPDATING…"
+msgstr "正在更新…"
+
+#: ../data/eos-app-store-app-installed-box.ui.h:5
+msgid "STOP"
+msgstr "停止"
+
+#: ../data/eos-app-store-app-installed-box.ui.h:6
+msgid "System App"
+msgstr "系统App"
+
+#: ../data/eos-app-store-folder-frame.ui.h:1
+msgid "Create your own folder to organize your apps. First, choose an icon."
+msgstr "创建自定义文件夹来组建您的App。首先,请选择一个图标。"
+
+#: ../data/eos-app-store-weblink-new-site-frame.ui.h:1
+#: ../EosAppStore/weblinkFrame.js:346
+msgid "e.g.: http://www.endlessm.com"
+msgstr "如：http://www.endlessm.com"
+
+#: ../EosAppStore/appFrame.js:394
+msgid "Installed apps"
+msgstr "已安装的App"
+
+#: ../EosAppStore/appFrame.js:451
+msgid "Install apps"
+msgstr "安装 App"
+
+#: ../EosAppStore/appFrame.js:487
+msgid "Refresh failed"
+msgstr "刷新失败"
+
+#: ../EosAppStore/appInfoBox.js:162
+msgid "Deleting app"
+msgstr "正在删除app"
+
+#: ../EosAppStore/appInfoBox.js:163
+msgid ""
+"Deleting this app will remove it from the device for all users. You will "
+"need to download it from the internet in order to reinstall it."
+msgstr "删除此App，所有用户将无法在本设备中使用。如需再次安装，请您登陆网站重新下载。"
+
+#: ../EosAppStore/appInfoBox.js:167
+msgid "Delete app"
+msgstr "删除App"
+
+#: ../EosAppStore/appInfoBox.js:188
+#, javascript-format
+msgid "We could not remove '%s'"
+msgstr "'%s'移除失败"
+
+#: ../EosAppStore/appInfoBox.js:191
+#, javascript-format
+msgid "'%s' was removed successfully"
+msgstr "'%s'已成功移除"
+
+#: ../EosAppStore/appInfoBox.js:209
+#, javascript-format
+msgid "We could not update '%s'"
+msgstr "'%s'更新失败"
+
+#: ../EosAppStore/appInfoBox.js:212
+#, javascript-format
+msgid "'%s' was updated successfully"
+msgstr "'%s'已成功更新"
+
+#: ../EosAppStore/appInfoBox.js:230
+#, javascript-format
+msgid "We could not install '%s'"
+msgstr "'%s'安装失败"
+
+#: ../EosAppStore/appInfoBox.js:233
+#, javascript-format
+msgid "'%s' was installed successfully"
+msgstr "'%s'已成功安装"
+
+#: ../EosAppStore/appInfoBox.js:424
+msgid "Update app"
+msgstr "更新app"
+
+#: ../EosAppStore/appInfoBox.js:425
+msgid "Open app"
+msgstr "打开app"
+
+#: ../EosAppStore/appInfoBox.js:426
+msgid "Add to the desktop"
+msgstr "添加到桌面"
+
+#: ../EosAppStore/appInfoBox.js:427
+msgid "No network connection is available"
+msgstr "无可用的网络连接"
+
+#: ../EosAppStore/appInfoBox.js:428
+msgid "Insufficient space to install the app"
+msgstr "存储空间不足，无法安装此App"
+
+#: ../EosAppStore/appInfoBox.js:515
+msgid "Downloading…"
+msgstr "正在下载…"
+
+#: ../EosAppStore/appInfoBox.js:523
+msgid "Updating…"
+msgstr "正在更新…"
+
+#: ../EosAppStore/appInfoBox.js:526
+msgid "Installing…"
+msgstr "正在安装…"
+
+#: ../EosAppStore/appInfoBox.js:529
+msgid "Removing…"
+msgstr "正在移除…"
+
+#. Translators: Abbreviation for file size in megabytes;
+#. %s denotes the placement of the numeric value
+#. and can be placed before or after the abbreviation
+#: ../EosAppStore/appInstalledBox.js:109
+#, javascript-format
+msgid "%s MB"
+msgstr "%s MB"
+
+#: ../EosAppStore/appStore.js:229
+msgid "Dismiss"
+msgstr "消除"
+
+#. Translators: use the same string used to install the app center content
+#. JSON
+#: ../EosAppStore/categories.js:12 ../EosAppStore/lib/eos-app-utils.c:1346
+msgid "Education"
+msgstr "教育"
+
+#: ../EosAppStore/categories.js:19 ../EosAppStore/lib/eos-app-utils.c:1347
+msgid "Games"
+msgstr "游戏"
+
+#: ../EosAppStore/categories.js:26 ../EosAppStore/lib/eos-app-utils.c:1348
+msgid "Resources"
+msgstr "资源"
+
+#: ../EosAppStore/categories.js:33 ../EosAppStore/lib/eos-app-utils.c:1349
+msgid "Utilities"
+msgstr "工具"
+
+#: ../EosAppStore/categories.js:40
+msgid "Installed"
+msgstr "已安装"
+
+#: ../EosAppStore/categories.js:52
+msgid "News"
+msgstr "新闻"
+
+#: ../EosAppStore/categories.js:58
+msgid "Sports"
+msgstr "运动"
+
+#: ../EosAppStore/categories.js:64
+msgid "Education and Health"
+msgstr "教育与健康"
+
+#: ../EosAppStore/categories.js:70
+msgid "Entertainment"
+msgstr "娱乐"
+
+#: ../EosAppStore/categories.js:76
+msgid "Local"
+msgstr "本地"
+
+#: ../EosAppStore/environment.js:22
+msgid "App Center"
+msgstr "APP中心"
+
+#: ../EosAppStore/folderFrame.js:42
+msgid "Name of folder"
+msgstr "文件夹名称"
+
+#: ../EosAppStore/folderFrame.js:70
+msgid "Folder added!"
+msgstr "添加文件夹！"
+
+#: ../EosAppStore/folderFrame.js:295
+msgid "Folders"
+msgstr "文件夹"
+
+#: ../EosAppStore/folderFrame.js:299
+msgid "Install folders"
+msgstr "安装文件夹"
+
+#: ../EosAppStore/weblinkFrame.js:280
+msgid "Write the website you'd like to add here and press “Enter”"
+msgstr "输入您想添加在此的网址并点击”确定“"
+
+#: ../EosAppStore/weblinkFrame.js:366
+msgid "searching"
+msgstr "搜索中"
+
+#: ../EosAppStore/weblinkFrame.js:381
+msgid "The address written does not exist or is not available."
+msgstr "输入的网址不存在或无法获取"
+
+#: ../EosAppStore/weblinkFrame.js:390 ../EosAppStore/weblinkFrame.js:546
+msgid "Added successfully!"
+msgstr "添加成功！"
+
+#: ../EosAppStore/weblinkFrame.js:617
+msgid ""
+"Add your favorite websites to your desktop or choose suggested ones from our"
+" list."
+msgstr "将您喜爱的网站添加到桌面上或从我们的列表中选择推荐网站。"
+
+#: ../EosAppStore/weblinkFrame.js:763
+msgid "Websites"
+msgstr "网站"
+
+#: ../EosAppStore/weblinkFrame.js:767
+msgid "Install websites"
+msgstr "安装网站"
+
+#: ../EosAppStore/lib/eos-app-info.c:839
+#, c-format
+msgid "No verification available for app '%s'"
+msgstr "无法验证app '%s'"
+
+#: ../EosAppStore/lib/eos-app-list-model.c:32
+msgid ""
+"The app center has detected an error and cannot continue. Please restart "
+"your system. If the problem persists, please contact support."
+msgstr "APP中心检测到一个错误，无法继续运作。请重启您的系统。如果问题仍存在请寻求帮助。"
+
+#: ../EosAppStore/lib/eos-app-list-model.c:458
+msgid "We are unable to load the complete list of applications"
+msgstr "我们无法加载应用程序完整列表"
+
+#: ../EosAppStore/lib/eos-app-list-model.c:466
+msgid "We were unable to update the list of applications"
+msgstr "我们无法更新应用程序列表"
+
+#: ../EosAppStore/lib/eos-app-list-model.c:1017
+msgid "Not enough space on device for installing the app."
+msgstr "空间不足，无法在该设备上安装此应用程序。"
+
+#: ../EosAppStore/lib/eos-app-list-model.c:1104
+msgid ""
+"We encountered an internal error during the installation of the application."
+msgstr "应用程序安装过程中我们发现了一个内部错误。"
+
+#: ../EosAppStore/lib/eos-app-list-model.c:1133
+msgid ""
+"We encountered an internal error during the removal of the application."
+msgstr "应用程序移除过程中我们发现了一个内部错误。"
+
+#: ../EosAppStore/lib/eos-app-list-model.c:1160
+#: ../EosAppStore/lib/eos-app-list-model.c:1204
+msgid "You must be an administrator to install applications."
+msgstr "您必须以管理员身份来安装应用程序。"
+
+#: ../EosAppStore/lib/eos-app-list-model.c:1349
+#: ../EosAppStore/lib/eos-app-list-model.c:1376
+msgid "You must be an administrator to remove applications."
+msgstr "您必须以管理员身份来移除应用程序。"
+
+#: ../EosAppStore/lib/eos-app-list-model.c:1499
+#, c-format
+msgid "App %s has no candidate for installation."
+msgstr "App%s无备选安装。"
+
+#: ../EosAppStore/lib/eos-app-list-model.c:1511
+#, c-format
+msgid "App '%s' is already installed."
+msgstr "App%s已安装。"
+
+#: ../EosAppStore/lib/eos-app-list-model.c:1575
+#, c-format
+msgid "App %s not installable."
+msgstr "App%s无法安装。"
+
+#: ../EosAppStore/lib/eos-app-list-model.c:1586
+#, c-format
+msgid "App %s is up to date."
+msgstr "App%s已更新。"
+
+#: ../EosAppStore/lib/eos-app-list-model.c:1666
+#: ../EosAppStore/lib/eos-app-list-model.c:1711
+#, c-format
+msgid "App '%s' is not installed."
+msgstr "App'%s'安装不成功"
+
+#: ../EosAppStore/lib/eos-app-utils.c:746
+msgid "Operation cancelled"
+msgstr "取消操作"
+
+#: ../EosAppStore/lib/eos-app-utils.c:768
+msgid "Updates meta record did not contain expected structure"
+msgstr "升级元数据不包含预期结构"
+
+#: ../EosAppStore/lib/eos-app-utils.c:783
+msgid "Updates meta record did not contain expected attributes"
+msgstr "升级元数据不包含预期属性"
+
+#: ../EosAppStore/lib/eos-app-utils.c:799
+msgid "Updates meta record did not contain valid monotonic_id attribute value"
+msgstr "升级元数据不包含有效的monotonic_id 属性值"
+
+#: ../EosAppStore/lib/eos-app-utils.c:1619
+#, c-format
+msgid "Not enough space on device for downloading the app."
+msgstr "下载此app时设备空间不足"
+
+#: ../EosAppStore/lib/eos-app-utils.c:1784
+msgid "There was a problem downloading the app; please try again"
+msgstr "下载此app时出现了问题，请重试"
+
+#: ../EosAppStore/lib/eos-downloader.c:37
+#, c-format
+msgid "No signature available for app '%s'"
+msgstr "app '%s'无可用信号"
+
+#: ../EosAppStore/lib/eos-downloader.c:100
+#, c-format
+msgid "App '%s' could not be downloaded"
+msgstr "无法下载app'%s'"
+
+#: ../EosAppStore/lib/eos-net-utils.c:273
+msgid "The certificate of the target server is expired"
+msgstr "目标服务器的证书已过期"
+
+#: ../EosAppStore/lib/eos-net-utils.c:275
+msgid "The certificate of the target server has been revoked"
+msgstr "目标服务器的证书已被撤销"
+
+#: ../EosAppStore/lib/eos-net-utils.c:277
+msgid "The certificate of the target server has a bad identity"
+msgstr "目标服务器证书身份认证错误。"
+
+#: ../EosAppStore/lib/eos-net-utils.c:279
+msgid "The certificate of the target server is from an unknown authority"
+msgstr "目标服务器证书来自未知许可。"
+
+#: ../EosAppStore/lib/eos-net-utils.c:281
+msgid "The certificate of the target server is bad or invalid"
+msgstr "目标服务器证书错误或无效。"
+
+#: ../EosAppStore/lib/eos-net-utils.c:337
+#, c-format
+msgid "Could not save the app - canceling download (%s)"
+msgstr "无法保存应用程序取消下载(%s)"
