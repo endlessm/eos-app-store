@@ -984,25 +984,22 @@ get_bundle_artifacts (EosAppListModel *self,
 
   if (is_upgrade)
     {
-      /* By default, we try to keep the app where it is, but if the available
-       * space left on the storage won't fit the update and the backup that
-       * the app manager does for rolling back in case of error, then we need
-       * to move the app elsewhere.
+      /* By default, we always update applications from the primary
+       * storage to the secondary storage, as it frees up space for
+       * user data, and moves large apps out of the way.
        */
       source_storage_type = eos_app_info_get_storage_type (info);
-      target_storage_type = source_storage_type;
+      target_storage_type = EOS_STORAGE_TYPE_SECONDARY;
 
       GFile *path = eos_app_info_get_application_dir (info);
       gint64 min_size = eos_app_info_get_installed_size (info) * 2;
 
       if (!eos_check_available_space (path, min_size, cancellable, NULL))
         {
-          target_storage_type = source_storage_type == EOS_STORAGE_TYPE_PRIMARY
-                              ? EOS_STORAGE_TYPE_SECONDARY
-                              : EOS_STORAGE_TYPE_PRIMARY;
+          target_storage_type = EOS_STORAGE_TYPE_PRIMARY;
           eos_app_log_error_message ("Not enough available space on the %s storage, changing to %s.",
-                                     eos_storage_type_to_string (source_storage_type),
-                                     eos_storage_type_to_string (target_storage_type));
+                                     eos_storage_type_to_string (EOS_STORAGE_TYPE_SECONDARY),
+                                     eos_storage_type_to_string (EOS_STORAGE_TYPE_PRIMARY));
         }
     }
   else
