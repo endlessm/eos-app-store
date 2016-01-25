@@ -77,15 +77,21 @@ const AppFrame = new Lang.Class({
         this._spinnerBox.add(this._spinner);
         this.spinning = true;
 
-        this.searching = false;
+        this._searching = false;
 
         this.connect('destroy', Lang.bind(this, this._onDestroy));
+
+        this._searchChangedId =
+            this._mainWindow.connect('search-changed', Lang.bind(this, this._onSearchChanged));
+        this._searchStoppedId =
+            this._mainWindow.connect('search-stopped', Lang.bind(this, this._onSearchStopped));
 
         this.show_all();
     },
 
     _onDestroy: function() {
         this._clearBackId();
+        this._clearSearchId();
     },
 
     _setupPageHeader: function() {
@@ -109,6 +115,15 @@ const AppFrame = new Lang.Class({
         if (this._backClickedId != 0) {
             this._mainWindow.disconnect(this._backClickedId);
             this._backClickedId = 0;
+        }
+    },
+
+    _clearSearchId: function() {
+        if (this._searchChangedId != 0) {
+            this._mainWindow.disconnect(this._searchChangedId);
+            this._mainWindow.disconnect(this._searchStoppedId);
+            this._searchChangedId = 0;
+            this._searchStoppedId = 0;
         }
     },
 
@@ -156,26 +171,40 @@ const AppFrame = new Lang.Class({
             this.spinning = false;
     },
 
-    _cancelSearch: function() {
-        this.searching = false;
-    },
-
     set searching(v) {
+        if (this._searching == v)
+            return;
+
         this._searching = v;
 
+        this.invalidate();
+
         this._clearBackId();
+        this._mainWindow.backButtonVisible = false;
 
         if (this._searching) {
-            this._mainWindow.titleText = _("Search results");
-            this._mainWindow.backButtonVisible = true;
 
-            this._backClickedId =
-                this._mainWindow.connect('back-clicked', Lang.bind(this, this._cancelSearch));
+            this._mainWindow.titleText = _("Search results");
+            this._mainWindow.subtitleText = _("Press Escape to cancel");
+        }
+        else {
+            this._mainWindow.titleText = this.getTitle();
+            this._mainWindow.subtitleText = '';
         }
     },
 
     get searching() {
         return this._searching;
+    },
+
+    _onSearchChanged: function() {
+        this.searching = true;
+        this._model.searchTerms(this._mainWindow.searchTerms);
+    },
+
+    _onSearchStopped: function() {
+        this.searching = false;
+        this.populate();
     },
 
     get categoryId() {
@@ -399,6 +428,7 @@ const AppInstalledFrame = new Lang.Class({
     },
 
     _onRowActivated: function(list, row) {
+        this.searching = false;
         let installedBox = row.get_child();
         this.showAppInfoBox(installedBox.appInfo);
     },
@@ -477,6 +507,7 @@ const AppCategoryFrame = new Lang.Class({
     },
 
     _onCellActivated: function(grid, cell) {
+        this.searching = false;
         this.showAppInfoBox(cell.app_info);
     },
 

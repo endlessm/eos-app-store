@@ -52,6 +52,8 @@ const AppStoreWindow = new Lang.Class({
     Signals: {
         'visibility-changed': { param_types: [GObject.TYPE_BOOLEAN] },
         'back-clicked': { },
+        'search-changed': { },
+        'search-stopped': { },
     },
 
     templateResource: '/com/endlessm/appstore/eos-app-store-main-window.ui',
@@ -67,6 +69,8 @@ const AppStoreWindow = new Lang.Class({
         'header-icon',
         'close-button',
         'back-button',
+        'search-bar',
+        'search-entry',
     ],
 
     _init: function(app, pageManager) {
@@ -266,14 +270,34 @@ const AppStoreWindow = new Lang.Class({
         this.emit('back-clicked');
     },
 
+    _onSearchChanged: function() {
+        this.emit('search-changed');
+    },
+
+    _onSearchStopped: function() {
+        this.search_bar.hide();
+        this.emit('search-stopped');
+    },
+
     _onKeyPressed: function(window, event) {
-        // Hide window when Esc is pressed
-        if(event.get_keyval()[1] == Gdk.KEY_Escape) {
-            this.hide();
+        if (event.get_keyval()[1] == Gdk.KEY_Escape) {
+            // If a search is in progress, stop it; otherwise
+            // hide the window
+            if (this.search_bar.search_mode_enabled) {
+                this.search_bar.search_mode_enabled = false;
+                this.emit('search-stopped');
+            }
+            else {
+                this.hide();
+            }
+
             return true;
         }
 
-        return false;
+        // Otherwise start searching
+        this.search_bar.show();
+        this.search_bar.search_mode_enabled = true;
+        return this.search_bar.handle_event(event);
     },
 
     _setDefaultTitle: function() {
@@ -346,6 +370,10 @@ const AppStoreWindow = new Lang.Class({
 
     get pageManager() {
         return this._pageManager;
+    },
+
+    get searchTerms() {
+        return this.search_entry.get_text();
     },
 
     populate: function() {
