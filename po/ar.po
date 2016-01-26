@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: eos-app-store\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-01-12 02:22+0000\n"
+"POT-Creation-Date: 2016-01-19 02:22+0000\n"
 "PO-Revision-Date: 2015-10-20 23:52+0000\n"
 "Last-Translator: Roddy Shuler <roddy@endlessm.com>\n"
 "Language-Team: Arabic (http://www.transifex.com/endless-mobile-inc/eos-app-store/language/ar/)\n"
@@ -282,52 +282,52 @@ msgstr "نحن غير قادرين على تحميل قائمة التطبيقا
 msgid "We were unable to update the list of applications"
 msgstr "يتعذر علينا تحديث قائمة التطبيقات"
 
-#: ../EosAppStore/lib/eos-app-list-model.c:1016
+#: ../EosAppStore/lib/eos-app-list-model.c:1017
 msgid "Not enough space on device for installing the app."
 msgstr "لا توجد مساحة كافية على الجهاز لتثبيت التطبيق."
 
-#: ../EosAppStore/lib/eos-app-list-model.c:1103
+#: ../EosAppStore/lib/eos-app-list-model.c:1104
 msgid ""
 "We encountered an internal error during the installation of the application."
 msgstr "لقد واجهنا خطأً داخلياً أثناء تثبيت التطبيق."
 
-#: ../EosAppStore/lib/eos-app-list-model.c:1132
+#: ../EosAppStore/lib/eos-app-list-model.c:1133
 msgid ""
 "We encountered an internal error during the removal of the application."
 msgstr "لقد صادفنا خطأ داخلي أثناء إزالة التطبيق."
 
-#: ../EosAppStore/lib/eos-app-list-model.c:1159
-#: ../EosAppStore/lib/eos-app-list-model.c:1203
+#: ../EosAppStore/lib/eos-app-list-model.c:1160
+#: ../EosAppStore/lib/eos-app-list-model.c:1204
 msgid "You must be an administrator to install applications."
 msgstr "يجب أن تكون مسؤول نظام لكي تستطيع تثبيت التطبيقات."
 
-#: ../EosAppStore/lib/eos-app-list-model.c:1348
-#: ../EosAppStore/lib/eos-app-list-model.c:1375
+#: ../EosAppStore/lib/eos-app-list-model.c:1349
+#: ../EosAppStore/lib/eos-app-list-model.c:1376
 msgid "You must be an administrator to remove applications."
 msgstr "يجب أن تكون مسؤول نظام لكي تتمكن من حذف التطبيقات."
 
-#: ../EosAppStore/lib/eos-app-list-model.c:1498
+#: ../EosAppStore/lib/eos-app-list-model.c:1499
 #, c-format
 msgid "App %s has no candidate for installation."
 msgstr "ليس لتطبيق %s أي مرشح للتثبيت."
 
-#: ../EosAppStore/lib/eos-app-list-model.c:1510
+#: ../EosAppStore/lib/eos-app-list-model.c:1511
 #, c-format
 msgid "App '%s' is already installed."
 msgstr "تطبيق '%s' مُثَبَتٌ بالفعل."
 
-#: ../EosAppStore/lib/eos-app-list-model.c:1574
+#: ../EosAppStore/lib/eos-app-list-model.c:1575
 #, c-format
 msgid "App %s not installable."
 msgstr "تطبيق %s غير قابل للتثبيت."
 
-#: ../EosAppStore/lib/eos-app-list-model.c:1585
+#: ../EosAppStore/lib/eos-app-list-model.c:1586
 #, c-format
 msgid "App %s is up to date."
 msgstr "تطبيق %s مُحدثٌ لآخر وضع."
 
-#: ../EosAppStore/lib/eos-app-list-model.c:1665
-#: ../EosAppStore/lib/eos-app-list-model.c:1710
+#: ../EosAppStore/lib/eos-app-list-model.c:1666
+#: ../EosAppStore/lib/eos-app-list-model.c:1711
 #, c-format
 msgid "App '%s' is not installed."
 msgstr "تطبيق '%s' غير مُثَبَتْ."
@@ -348,12 +348,12 @@ msgstr "سجلات ميتا الخاصة بالتحديثات لم يكن بها
 msgid "Updates meta record did not contain valid monotonic_id attribute value"
 msgstr "سجلات ميتا الخاصة بالتحديثات لم تحتوي على قيمة سمة monotonic_id صالحة"
 
-#: ../EosAppStore/lib/eos-app-utils.c:1638
+#: ../EosAppStore/lib/eos-app-utils.c:1619
 #, c-format
 msgid "Not enough space on device for downloading the app."
 msgstr "لا توجد مساحة كافية على الجهاز لتنزيل التطبيق."
 
-#: ../EosAppStore/lib/eos-app-utils.c:1803
+#: ../EosAppStore/lib/eos-app-utils.c:1784
 msgid "There was a problem downloading the app; please try again"
 msgstr "حدثت مشكلة أثناء تنزيل التطبيق، يُرجى المحاولة مرة أخرى"
 
@@ -367,27 +367,27 @@ msgstr "ليس هناك توقيع متوفر من أجل '%s'"
 msgid "App '%s' could not be downloaded"
 msgstr "لم يمكن تنزيل تطبيق '%s' "
 
-#: ../EosAppStore/lib/eos-net-utils.c:268
+#: ../EosAppStore/lib/eos-net-utils.c:273
 msgid "The certificate of the target server is expired"
 msgstr "انتهت صلاحية شهادة الخادم الوجهة"
 
-#: ../EosAppStore/lib/eos-net-utils.c:270
+#: ../EosAppStore/lib/eos-net-utils.c:275
 msgid "The certificate of the target server has been revoked"
 msgstr "شهادة الخادم الوجهة، مُلغاة"
 
-#: ../EosAppStore/lib/eos-net-utils.c:272
+#: ../EosAppStore/lib/eos-net-utils.c:277
 msgid "The certificate of the target server has a bad identity"
 msgstr "هوية شهادة الخادم الوجهة سيئة"
 
-#: ../EosAppStore/lib/eos-net-utils.c:274
+#: ../EosAppStore/lib/eos-net-utils.c:279
 msgid "The certificate of the target server is from an unknown authority"
 msgstr "شهادة الخادم الوجهة صادرة عن سلطة غير معروفة"
 
-#: ../EosAppStore/lib/eos-net-utils.c:276
+#: ../EosAppStore/lib/eos-net-utils.c:281
 msgid "The certificate of the target server is bad or invalid"
 msgstr "شهادة الخادم الوجهة سيئة أو غير صالحة"
 
-#: ../EosAppStore/lib/eos-net-utils.c:332
+#: ../EosAppStore/lib/eos-net-utils.c:337
 #, c-format
 msgid "Could not save the app - canceling download (%s)"
 msgstr "لم يمكن حفظ التطبيق - جاري إلغاء التنزيل (%s)"

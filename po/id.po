@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: eos-app-store\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2016-01-19 02:22+0000\n"
-"PO-Revision-Date: 2016-01-22 18:57+0000\n"
+"PO-Revision-Date: 2016-01-24 21:25+0000\n"
 "Last-Translator: Roddy Shuler <roddy@endlessm.com>\n"
 "Language-Team: Indonesian (http://www.transifex.com/endless-mobile-inc/eos-app-store/language/id/)\n"
 "MIME-Version: 1.0\n"
@@ -19,144 +19,144 @@ msgstr ""
 
 #: ../data/eos-app-store-app-info-box.ui.h:1 ../EosAppStore/appInfoBox.js:423
 msgid "Install app"
-msgstr ""
+msgstr "Pasang aplikasi"
 
 #: ../data/eos-app-store-app-info-box.ui.h:2 ../EosAppStore/appInfoBox.js:169
 msgid "Cancel"
-msgstr ""
+msgstr "Batalkan"
 
 #: ../data/eos-app-store-app-info-box.ui.h:3
 msgid "Installing"
-msgstr ""
+msgstr "Memasang"
 
 #: ../data/eos-app-store-app-info-box.ui.h:4
 msgid "Delete from device"
-msgstr ""
+msgstr "Hapus dari perangkat"
 
 #: ../data/eos-app-store-app-installed-box.ui.h:1
 msgid "APPLICATION NAME"
-msgstr ""
+msgstr "NAMA APLIKASI"
 
 #: ../data/eos-app-store-app-installed-box.ui.h:2
 msgid "APPLICATION CATEGORY"
-msgstr ""
+msgstr "KATEGORI APLIKASI"
 
 #: ../data/eos-app-store-app-installed-box.ui.h:3
 msgid "SIZE"
-msgstr ""
+msgstr "UKURAN"
 
 #: ../data/eos-app-store-app-installed-box.ui.h:4
 msgid "UPDATING…"
-msgstr ""
+msgstr "MEMPERBARUI..."
 
 #: ../data/eos-app-store-app-installed-box.ui.h:5
 msgid "STOP"
-msgstr ""
+msgstr "BERHENTI"
 
 #: ../data/eos-app-store-app-installed-box.ui.h:6
 msgid "System App"
-msgstr ""
+msgstr "Aplikasi Sistem"
 
 #: ../data/eos-app-store-folder-frame.ui.h:1
 msgid "Create your own folder to organize your apps. First, choose an icon."
-msgstr ""
+msgstr "Ciptakan folder sendiri untuk mengelola aplikasi. Pertama, pilih sebuah ikon."
 
 #: ../data/eos-app-store-weblink-new-site-frame.ui.h:1
 #: ../EosAppStore/weblinkFrame.js:346
 msgid "e.g.: http://www.endlessm.com"
-msgstr ""
+msgstr "cth.: http://www.endlessm.com"
 
 #: ../EosAppStore/appFrame.js:394
 msgid "Installed apps"
-msgstr ""
+msgstr "Aplikasi terpasang"
 
 #: ../EosAppStore/appFrame.js:451
 msgid "Install apps"
-msgstr ""
+msgstr "Pasang aplikasi"
 
 #: ../EosAppStore/appFrame.js:487
 msgid "Refresh failed"
-msgstr ""
+msgstr "Gagal menampilkan yang terbaru"
 
 #: ../EosAppStore/appInfoBox.js:162
 msgid "Deleting app"
-msgstr ""
+msgstr "Menghapus aplikasi"
 
 #: ../EosAppStore/appInfoBox.js:163
 msgid ""
 "Deleting this app will remove it from the device for all users. You will "
 "need to download it from the internet in order to reinstall it."
-msgstr ""
+msgstr "Menghapus aplikasi ini akan menghilangkannya dari peranti ini bagi seluruh pengguna. Anda harus mengunduh dari internet untuk memasangnya kembali."
 
 #: ../EosAppStore/appInfoBox.js:167
 msgid "Delete app"
-msgstr ""
+msgstr "Hapus aplikasi"
 
 #: ../EosAppStore/appInfoBox.js:188
 #, javascript-format
 msgid "We could not remove '%s'"
-msgstr ""
+msgstr "Kami tidak dapat menghapus '%s'"
 
 #: ../EosAppStore/appInfoBox.js:191
 #, javascript-format
 msgid "'%s' was removed successfully"
-msgstr ""
+msgstr "'%s' berhasil dihapus"
 
 #: ../EosAppStore/appInfoBox.js:209
 #, javascript-format
 msgid "We could not update '%s'"
-msgstr ""
+msgstr "Kami tidak dapat memperbarui '%s'"
 
 #: ../EosAppStore/appInfoBox.js:212
 #, javascript-format
 msgid "'%s' was updated successfully"
-msgstr ""
+msgstr "'%s' telah berhasil diperbarui"
 
 #: ../EosAppStore/appInfoBox.js:230
 #, javascript-format
 msgid "We could not install '%s'"
-msgstr ""
+msgstr "Kami tidak dapat memasang '%s'"
 
 #: ../EosAppStore/appInfoBox.js:233
 #, javascript-format
 msgid "'%s' was installed successfully"
-msgstr ""
+msgstr "'%s' berhasil dipasang"
 
 #: ../EosAppStore/appInfoBox.js:424
 msgid "Update app"
-msgstr ""
+msgstr "Perbarui aplikasi"
 
 #: ../EosAppStore/appInfoBox.js:425
 msgid "Open app"
-msgstr ""
+msgstr "Buka aplikasi"
 
 #: ../EosAppStore/appInfoBox.js:426
 msgid "Add to the desktop"
-msgstr ""
+msgstr "Tambahkan ke desktop"
 
 #: ../EosAppStore/appInfoBox.js:427
 msgid "No network connection is available"
-msgstr ""
+msgstr "Tidak ada koneksi jaringan yang tersedia"
 
 #: ../EosAppStore/appInfoBox.js:428
 msgid "Insufficient space to install the app"
-msgstr ""
+msgstr "Ruang tidak cukup untuk memasang aplikasi"
 
 #: ../EosAppStore/appInfoBox.js:515
 msgid "Downloading…"
-msgstr ""
+msgstr "Mengunduh..."
 
 #: ../EosAppStore/appInfoBox.js:523
 msgid "Updating…"
-msgstr ""
+msgstr "Memperbarui..."
 
 #: ../EosAppStore/appInfoBox.js:526
 msgid "Installing…"
-msgstr ""
+msgstr "Memasang..."
 
 #: ../EosAppStore/appInfoBox.js:529
 msgid "Removing…"
-msgstr ""
+msgstr "Menghapus..."
 
 #. Translators: Abbreviation for file size in megabytes;
 #. %s denotes the placement of the numeric value
@@ -164,229 +164,229 @@ msgstr ""
 #: ../EosAppStore/appInstalledBox.js:109
 #, javascript-format
 msgid "%s MB"
-msgstr ""
+msgstr "%s MB"
 
 #: ../EosAppStore/appStore.js:229
 msgid "Dismiss"
-msgstr ""
+msgstr "Batalkan"
 
 #. Translators: use the same string used to install the app center content
 #. JSON
 #: ../EosAppStore/categories.js:12 ../EosAppStore/lib/eos-app-utils.c:1346
 msgid "Education"
-msgstr ""
+msgstr "Edukasi"
 
 #: ../EosAppStore/categories.js:19 ../EosAppStore/lib/eos-app-utils.c:1347
 msgid "Games"
-msgstr ""
+msgstr "Permainan"
 
 #: ../EosAppStore/categories.js:26 ../EosAppStore/lib/eos-app-utils.c:1348
 msgid "Resources"
-msgstr ""
+msgstr "Sumber Daya"
 
 #: ../EosAppStore/categories.js:33 ../EosAppStore/lib/eos-app-utils.c:1349
 msgid "Utilities"
-msgstr ""
+msgstr "Utilitas"
 
 #: ../EosAppStore/categories.js:40
 msgid "Installed"
-msgstr ""
+msgstr "Terpasang"
 
 #: ../EosAppStore/categories.js:52
 msgid "News"
-msgstr ""
+msgstr "Berita"
 
 #: ../EosAppStore/categories.js:58
 msgid "Sports"
-msgstr ""
+msgstr "Olahraga"
 
 #: ../EosAppStore/categories.js:64
 msgid "Education and Health"
-msgstr ""
+msgstr "Pendidikan dan Kesehatan"
 
 #: ../EosAppStore/categories.js:70
 msgid "Entertainment"
-msgstr ""
+msgstr "Hiburan"
 
 #: ../EosAppStore/categories.js:76
 msgid "Local"
-msgstr ""
+msgstr "Lokal"
 
 #: ../EosAppStore/environment.js:22
 msgid "App Center"
-msgstr ""
+msgstr "Pusat Aplikasi"
 
 #: ../EosAppStore/folderFrame.js:42
 msgid "Name of folder"
-msgstr ""
+msgstr "Nama folder"
 
 #: ../EosAppStore/folderFrame.js:70
 msgid "Folder added!"
-msgstr ""
+msgstr "Folder ditambahkan!"
 
 #: ../EosAppStore/folderFrame.js:295
 msgid "Folders"
-msgstr ""
+msgstr "Folder"
 
 #: ../EosAppStore/folderFrame.js:299
 msgid "Install folders"
-msgstr ""
+msgstr "Pasang folder"
 
 #: ../EosAppStore/weblinkFrame.js:280
 msgid "Write the website you'd like to add here and press “Enter”"
-msgstr ""
+msgstr "Tulis situs web yang ingin Anda tambahkan di sini dan tekan \"Enter\""
 
 #: ../EosAppStore/weblinkFrame.js:366
 msgid "searching"
-msgstr ""
+msgstr "mencari"
 
 #: ../EosAppStore/weblinkFrame.js:381
 msgid "The address written does not exist or is not available."
-msgstr ""
+msgstr "Alamat yang dituliskan tidak ditemukan atau tidak tersedia."
 
 #: ../EosAppStore/weblinkFrame.js:390 ../EosAppStore/weblinkFrame.js:546
 msgid "Added successfully!"
-msgstr ""
+msgstr "Berhasil ditambahkan!"
 
 #: ../EosAppStore/weblinkFrame.js:617
 msgid ""
 "Add your favorite websites to your desktop or choose suggested ones from our"
 " list."
-msgstr ""
+msgstr "Tambahkan situs web favorit Anda ke desktop atau pilih situs-situs rekomendasi dari daftar kami."
 
 #: ../EosAppStore/weblinkFrame.js:763
 msgid "Websites"
-msgstr ""
+msgstr "Situs Web"
 
 #: ../EosAppStore/weblinkFrame.js:767
 msgid "Install websites"
-msgstr ""
+msgstr "Pasang situs-situs web"
 
 #: ../EosAppStore/lib/eos-app-info.c:839
 #, c-format
 msgid "No verification available for app '%s'"
-msgstr ""
+msgstr "Tidak tersedia verifikasi untuk aplikasi '%s'"
 
 #: ../EosAppStore/lib/eos-app-list-model.c:32
 msgid ""
 "The app center has detected an error and cannot continue. Please restart "
 "your system. If the problem persists, please contact support."
-msgstr ""
+msgstr "Pusat aplikasi telah mendeteksi kesalahan dan tidak dapat melanjutkan. Jalankan ulang sistem. Jika masalah terus berlanjut, hubungi dukungan."
 
 #: ../EosAppStore/lib/eos-app-list-model.c:458
 msgid "We are unable to load the complete list of applications"
-msgstr ""
+msgstr "Kami tidak dapat memuat daftar aplikasi secara lengkap"
 
 #: ../EosAppStore/lib/eos-app-list-model.c:466
 msgid "We were unable to update the list of applications"
-msgstr ""
+msgstr "Kami tidak dapat memperbarui daftar aplikasi"
 
 #: ../EosAppStore/lib/eos-app-list-model.c:1017
 msgid "Not enough space on device for installing the app."
-msgstr ""
+msgstr "Ruang pada perangkat tidak cukup untuk memasang aplikasi"
 
 #: ../EosAppStore/lib/eos-app-list-model.c:1104
 msgid ""
 "We encountered an internal error during the installation of the application."
-msgstr ""
+msgstr "Terjadi kesalahan internal pada saat pemasangan aplikasi."
 
 #: ../EosAppStore/lib/eos-app-list-model.c:1133
 msgid ""
 "We encountered an internal error during the removal of the application."
-msgstr ""
+msgstr "Kami mengalami kesalahan internal selama menghapus aplikasi."
 
 #: ../EosAppStore/lib/eos-app-list-model.c:1160
 #: ../EosAppStore/lib/eos-app-list-model.c:1204
 msgid "You must be an administrator to install applications."
-msgstr ""
+msgstr "Anda harus administrator untuk memasang aplikasi."
 
 #: ../EosAppStore/lib/eos-app-list-model.c:1349
 #: ../EosAppStore/lib/eos-app-list-model.c:1376
 msgid "You must be an administrator to remove applications."
-msgstr ""
+msgstr "Anda harus menjadi administrator untuk dapat menghapus aplikasi."
 
 #: ../EosAppStore/lib/eos-app-list-model.c:1499
 #, c-format
 msgid "App %s has no candidate for installation."
-msgstr ""
+msgstr "Aplikasi %s tidak punya kandidat untuk instalasi."
 
 #: ../EosAppStore/lib/eos-app-list-model.c:1511
 #, c-format
 msgid "App '%s' is already installed."
-msgstr ""
+msgstr "Aplikasi '%s' telah terpasang."
 
 #: ../EosAppStore/lib/eos-app-list-model.c:1575
 #, c-format
 msgid "App %s not installable."
-msgstr ""
+msgstr "Aplikasi %s tidak dapat dipasang."
 
 #: ../EosAppStore/lib/eos-app-list-model.c:1586
 #, c-format
 msgid "App %s is up to date."
-msgstr ""
+msgstr "Versi aplikasi %s sudah yang terbaru."
 
 #: ../EosAppStore/lib/eos-app-list-model.c:1666
 #: ../EosAppStore/lib/eos-app-list-model.c:1711
 #, c-format
 msgid "App '%s' is not installed."
-msgstr ""
+msgstr "Aplikasi '%s' tidak dipasang."
 
 #: ../EosAppStore/lib/eos-app-utils.c:746
 msgid "Operation cancelled"
-msgstr ""
+msgstr "Operasi dibatalkan"
 
 #: ../EosAppStore/lib/eos-app-utils.c:768
 msgid "Updates meta record did not contain expected structure"
-msgstr ""
+msgstr "Catatan pembaruan meta tidak mengandung struktur yang diminta"
 
 #: ../EosAppStore/lib/eos-app-utils.c:783
 msgid "Updates meta record did not contain expected attributes"
-msgstr ""
+msgstr "Catatan pembaruan meta tidak mengandung atribut yang diminta"
 
 #: ../EosAppStore/lib/eos-app-utils.c:799
 msgid "Updates meta record did not contain valid monotonic_id attribute value"
-msgstr ""
+msgstr "Pembaruan catatan meta tidak disertai nilai atribut monotonic_id yang valid"
 
 #: ../EosAppStore/lib/eos-app-utils.c:1619
 #, c-format
 msgid "Not enough space on device for downloading the app."
-msgstr ""
+msgstr "Ruang pada perangkat tidak cukup untuk mengunduh aplikasi."
 
 #: ../EosAppStore/lib/eos-app-utils.c:1784
 msgid "There was a problem downloading the app; please try again"
-msgstr ""
+msgstr "Terdapat masalah saat mengunduh aplikasi; silakan coba lagi"
 
 #: ../EosAppStore/lib/eos-downloader.c:37
 #, c-format
 msgid "No signature available for app '%s'"
-msgstr ""
+msgstr "Tidak tersedia penanda untuk aplikasi '%s'"
 
 #: ../EosAppStore/lib/eos-downloader.c:100
 #, c-format
 msgid "App '%s' could not be downloaded"
-msgstr ""
+msgstr "Aplikasi '%s' tidak dapat diunduh"
 
 #: ../EosAppStore/lib/eos-net-utils.c:273
 msgid "The certificate of the target server is expired"
-msgstr ""
+msgstr "Sertifikat server target kedaluwarsa"
 
 #: ../EosAppStore/lib/eos-net-utils.c:275
 msgid "The certificate of the target server has been revoked"
-msgstr ""
+msgstr "Sertifikat server target telah dicabut"
 
 #: ../EosAppStore/lib/eos-net-utils.c:277
 msgid "The certificate of the target server has a bad identity"
-msgstr ""
+msgstr "Sertifikat server target memiliki identitas buruk"
 
 #: ../EosAppStore/lib/eos-net-utils.c:279
 msgid "The certificate of the target server is from an unknown authority"
-msgstr ""
+msgstr "Sertifikat server sasaran berasal dari otoritas tak dikenal"
 
 #: ../EosAppStore/lib/eos-net-utils.c:281
 msgid "The certificate of the target server is bad or invalid"
-msgstr ""
+msgstr "Sertifikat server sasaran rusak atau tidak sah"
 
 #: ../EosAppStore/lib/eos-net-utils.c:337
 #, c-format
 msgid "Could not save the app - canceling download (%s)"
-msgstr ""
+msgstr "Tak dapat menyimpan aplikasi - membatalkan pengunduhan (%s)"
