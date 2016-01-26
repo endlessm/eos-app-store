@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: eos-app-store\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-01-12 02:22+0000\n"
+"POT-Creation-Date: 2016-01-19 02:22+0000\n"
 "PO-Revision-Date: 2015-10-23 04:44+0000\n"
 "Last-Translator: Roddy Shuler <roddy@endlessm.com>\n"
 "Language-Team: French (http://www.transifex.com/endless-mobile-inc/eos-app-store/language/fr/)\n"
@@ -282,52 +282,52 @@ msgstr "Impossible de charger la liste complète d'applications."
 msgid "We were unable to update the list of applications"
 msgstr "Nous n'avons pas été capables de mettre à jour la liste des applications"
 
-#: ../EosAppStore/lib/eos-app-list-model.c:1016
+#: ../EosAppStore/lib/eos-app-list-model.c:1017
 msgid "Not enough space on device for installing the app."
 msgstr "Pas assez d'espace sur l'appareil pour installer l'appli."
 
-#: ../EosAppStore/lib/eos-app-list-model.c:1103
+#: ../EosAppStore/lib/eos-app-list-model.c:1104
 msgid ""
 "We encountered an internal error during the installation of the application."
 msgstr "Nous avons rencontré une erreur interne pendant l'installation de l'application."
 
-#: ../EosAppStore/lib/eos-app-list-model.c:1132
+#: ../EosAppStore/lib/eos-app-list-model.c:1133
 msgid ""
 "We encountered an internal error during the removal of the application."
 msgstr "Nous avons rencontré une erreur interne pendant la suppression de l'application."
 
-#: ../EosAppStore/lib/eos-app-list-model.c:1159
-#: ../EosAppStore/lib/eos-app-list-model.c:1203
+#: ../EosAppStore/lib/eos-app-list-model.c:1160
+#: ../EosAppStore/lib/eos-app-list-model.c:1204
 msgid "You must be an administrator to install applications."
 msgstr "Vous devez être un administrateur pour installer des applications."
 
-#: ../EosAppStore/lib/eos-app-list-model.c:1348
-#: ../EosAppStore/lib/eos-app-list-model.c:1375
+#: ../EosAppStore/lib/eos-app-list-model.c:1349
+#: ../EosAppStore/lib/eos-app-list-model.c:1376
 msgid "You must be an administrator to remove applications."
 msgstr "Vous devez être un administrateur pour supprimer les applications."
 
-#: ../EosAppStore/lib/eos-app-list-model.c:1498
+#: ../EosAppStore/lib/eos-app-list-model.c:1499
 #, c-format
 msgid "App %s has no candidate for installation."
 msgstr "L'application %s n'a pas de candidats pour l'installation"
 
-#: ../EosAppStore/lib/eos-app-list-model.c:1510
+#: ../EosAppStore/lib/eos-app-list-model.c:1511
 #, c-format
 msgid "App '%s' is already installed."
 msgstr "L'appli '%s' est déjà installée."
 
-#: ../EosAppStore/lib/eos-app-list-model.c:1574
+#: ../EosAppStore/lib/eos-app-list-model.c:1575
 #, c-format
 msgid "App %s not installable."
 msgstr "L'appli %s ne peut pas être installée."
 
-#: ../EosAppStore/lib/eos-app-list-model.c:1585
+#: ../EosAppStore/lib/eos-app-list-model.c:1586
 #, c-format
 msgid "App %s is up to date."
 msgstr "L'appli %s est à jour."
 
-#: ../EosAppStore/lib/eos-app-list-model.c:1665
-#: ../EosAppStore/lib/eos-app-list-model.c:1710
+#: ../EosAppStore/lib/eos-app-list-model.c:1666
+#: ../EosAppStore/lib/eos-app-list-model.c:1711
 #, c-format
 msgid "App '%s' is not installed."
 msgstr "L'appli '%s' is not installed."
@@ -348,12 +348,12 @@ msgstr "Les mises à jour du méta dossier ne contenaient pas les attributs atte
 msgid "Updates meta record did not contain valid monotonic_id attribute value"
 msgstr "Les mises à jour du méta dossier ne contenait pas de valeur de l'attribut monotonic_id valide"
 
-#: ../EosAppStore/lib/eos-app-utils.c:1638
+#: ../EosAppStore/lib/eos-app-utils.c:1619
 #, c-format
 msgid "Not enough space on device for downloading the app."
 msgstr "Pas assez d'espace sur l'appareil pour télécharger l'appli."
 
-#: ../EosAppStore/lib/eos-app-utils.c:1803
+#: ../EosAppStore/lib/eos-app-utils.c:1784
 msgid "There was a problem downloading the app; please try again"
 msgstr "Un problème est survenu lors du téléchargement de l'appli : veuillez réessayer"
 
@@ -367,27 +367,27 @@ msgstr "Pas de signature disponible pour l'application '%s' "
 msgid "App '%s' could not be downloaded"
 msgstr "L'application « %s » n'a pas pu être téléchargé"
 
-#: ../EosAppStore/lib/eos-net-utils.c:268
+#: ../EosAppStore/lib/eos-net-utils.c:273
 msgid "The certificate of the target server is expired"
 msgstr "Le certificat du serveur cible a expiré"
 
-#: ../EosAppStore/lib/eos-net-utils.c:270
+#: ../EosAppStore/lib/eos-net-utils.c:275
 msgid "The certificate of the target server has been revoked"
 msgstr "Le certificat du serveur cible a été révoqué"
 
-#: ../EosAppStore/lib/eos-net-utils.c:272
+#: ../EosAppStore/lib/eos-net-utils.c:277
 msgid "The certificate of the target server has a bad identity"
 msgstr "Le certificat du serveur cible a une mauvaise identité."
 
-#: ../EosAppStore/lib/eos-net-utils.c:274
+#: ../EosAppStore/lib/eos-net-utils.c:279
 msgid "The certificate of the target server is from an unknown authority"
 msgstr "Le certificat du serveur cible vient d'une autorité inconnue"
 
-#: ../EosAppStore/lib/eos-net-utils.c:276
+#: ../EosAppStore/lib/eos-net-utils.c:281
 msgid "The certificate of the target server is bad or invalid"
 msgstr "Le certificat du serveur cible est mauvais ou invalide."
 
-#: ../EosAppStore/lib/eos-net-utils.c:332
+#: ../EosAppStore/lib/eos-net-utils.c:337
 #, c-format
 msgid "Could not save the app - canceling download (%s)"
 msgstr "Impossible d'enregistrer l'appli - annulation du téléchargement (%s)"
