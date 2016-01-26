@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: eos-app-store\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-01-19 02:22+0000\n"
+"POT-Creation-Date: 2016-01-26 02:21+0000\n"
 "PO-Revision-Date: 2015-10-23 04:44+0000\n"
 "Last-Translator: Roddy Shuler <roddy@endlessm.com>\n"
 "Language-Team: French (http://www.transifex.com/endless-mobile-inc/eos-app-store/language/fr/)\n"
@@ -67,15 +67,15 @@ msgstr "Créez votre propre dossier pour organiser vos applications. D'abord, ch
 msgid "e.g.: http://www.endlessm.com"
 msgstr "ex. : http://www.endlessm.com"
 
-#: ../EosAppStore/appFrame.js:394
+#: ../EosAppStore/appFrame.js:395
 msgid "Installed apps"
 msgstr "Applis installées"
 
-#: ../EosAppStore/appFrame.js:451
+#: ../EosAppStore/appFrame.js:452
 msgid "Install apps"
 msgstr "Installer les applications"
 
-#: ../EosAppStore/appFrame.js:487
+#: ../EosAppStore/appFrame.js:488
 msgid "Refresh failed"
 msgstr "Échec de l'actualisatiio"
 
@@ -282,52 +282,52 @@ msgstr "Impossible de charger la liste complète d'applications."
 msgid "We were unable to update the list of applications"
 msgstr "Nous n'avons pas été capables de mettre à jour la liste des applications"
 
-#: ../EosAppStore/lib/eos-app-list-model.c:1017
+#: ../EosAppStore/lib/eos-app-list-model.c:1014
 msgid "Not enough space on device for installing the app."
 msgstr "Pas assez d'espace sur l'appareil pour installer l'appli."
 
-#: ../EosAppStore/lib/eos-app-list-model.c:1104
+#: ../EosAppStore/lib/eos-app-list-model.c:1101
 msgid ""
 "We encountered an internal error during the installation of the application."
 msgstr "Nous avons rencontré une erreur interne pendant l'installation de l'application."
 
-#: ../EosAppStore/lib/eos-app-list-model.c:1133
+#: ../EosAppStore/lib/eos-app-list-model.c:1130
 msgid ""
 "We encountered an internal error during the removal of the application."
 msgstr "Nous avons rencontré une erreur interne pendant la suppression de l'application."
 
-#: ../EosAppStore/lib/eos-app-list-model.c:1160
-#: ../EosAppStore/lib/eos-app-list-model.c:1204
+#: ../EosAppStore/lib/eos-app-list-model.c:1157
+#: ../EosAppStore/lib/eos-app-list-model.c:1201
 msgid "You must be an administrator to install applications."
 msgstr "Vous devez être un administrateur pour installer des applications."
 
-#: ../EosAppStore/lib/eos-app-list-model.c:1349
-#: ../EosAppStore/lib/eos-app-list-model.c:1376
+#: ../EosAppStore/lib/eos-app-list-model.c:1346
+#: ../EosAppStore/lib/eos-app-list-model.c:1373
 msgid "You must be an administrator to remove applications."
 msgstr "Vous devez être un administrateur pour supprimer les applications."
 
-#: ../EosAppStore/lib/eos-app-list-model.c:1499
+#: ../EosAppStore/lib/eos-app-list-model.c:1496
 #, c-format
 msgid "App %s has no candidate for installation."
 msgstr "L'application %s n'a pas de candidats pour l'installation"
 
-#: ../EosAppStore/lib/eos-app-list-model.c:1511
+#: ../EosAppStore/lib/eos-app-list-model.c:1508
 #, c-format
 msgid "App '%s' is already installed."
 msgstr "L'appli '%s' est déjà installée."
 
-#: ../EosAppStore/lib/eos-app-list-model.c:1575
+#: ../EosAppStore/lib/eos-app-list-model.c:1572
 #, c-format
 msgid "App %s not installable."
 msgstr "L'appli %s ne peut pas être installée."
 
-#: ../EosAppStore/lib/eos-app-list-model.c:1586
+#: ../EosAppStore/lib/eos-app-list-model.c:1583
 #, c-format
 msgid "App %s is up to date."
 msgstr "L'appli %s est à jour."
 
-#: ../EosAppStore/lib/eos-app-list-model.c:1666
-#: ../EosAppStore/lib/eos-app-list-model.c:1711
+#: ../EosAppStore/lib/eos-app-list-model.c:1663
+#: ../EosAppStore/lib/eos-app-list-model.c:1708
 #, c-format
 msgid "App '%s' is not installed."
 msgstr "L'appli '%s' is not installed."

@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: eos-app-store\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-01-19 02:22+0000\n"
+"POT-Creation-Date: 2016-01-26 02:21+0000\n"
 "PO-Revision-Date: 2015-10-20 23:52+0000\n"
 "Last-Translator: Roddy Shuler <roddy@endlessm.com>\n"
 "Language-Team: Arabic (http://www.transifex.com/endless-mobile-inc/eos-app-store/language/ar/)\n"
@@ -67,15 +67,15 @@ msgstr "قم بإنشاء مجلد خاص بك لتنظيم تطبيقاتك. ا
 msgid "e.g.: http://www.endlessm.com"
 msgstr "مثال: http://www.endlessm.com"
 
-#: ../EosAppStore/appFrame.js:394
+#: ../EosAppStore/appFrame.js:395
 msgid "Installed apps"
 msgstr "التطبيقات المثبتة"
 
-#: ../EosAppStore/appFrame.js:451
+#: ../EosAppStore/appFrame.js:452
 msgid "Install apps"
 msgstr "تثبيت التطبيقات"
 
-#: ../EosAppStore/appFrame.js:487
+#: ../EosAppStore/appFrame.js:488
 msgid "Refresh failed"
 msgstr "تعذر التحديث"
 
@@ -282,52 +282,52 @@ msgstr "نحن غير قادرين على تحميل قائمة التطبيقا
 msgid "We were unable to update the list of applications"
 msgstr "يتعذر علينا تحديث قائمة التطبيقات"
 
-#: ../EosAppStore/lib/eos-app-list-model.c:1017
+#: ../EosAppStore/lib/eos-app-list-model.c:1014
 msgid "Not enough space on device for installing the app."
 msgstr "لا توجد مساحة كافية على الجهاز لتثبيت التطبيق."
 
-#: ../EosAppStore/lib/eos-app-list-model.c:1104
+#: ../EosAppStore/lib/eos-app-list-model.c:1101
 msgid ""
 "We encountered an internal error during the installation of the application."
 msgstr "لقد واجهنا خطأً داخلياً أثناء تثبيت التطبيق."
 
-#: ../EosAppStore/lib/eos-app-list-model.c:1133
+#: ../EosAppStore/lib/eos-app-list-model.c:1130
 msgid ""
 "We encountered an internal error during the removal of the application."
 msgstr "لقد صادفنا خطأ داخلي أثناء إزالة التطبيق."
 
-#: ../EosAppStore/lib/eos-app-list-model.c:1160
-#: ../EosAppStore/lib/eos-app-list-model.c:1204
+#: ../EosAppStore/lib/eos-app-list-model.c:1157
+#: ../EosAppStore/lib/eos-app-list-model.c:1201
 msgid "You must be an administrator to install applications."
 msgstr "يجب أن تكون مسؤول نظام لكي تستطيع تثبيت التطبيقات."
 
-#: ../EosAppStore/lib/eos-app-list-model.c:1349
-#: ../EosAppStore/lib/eos-app-list-model.c:1376
+#: ../EosAppStore/lib/eos-app-list-model.c:1346
+#: ../EosAppStore/lib/eos-app-list-model.c:1373
 msgid "You must be an administrator to remove applications."
 msgstr "يجب أن تكون مسؤول نظام لكي تتمكن من حذف التطبيقات."
 
-#: ../EosAppStore/lib/eos-app-list-model.c:1499
+#: ../EosAppStore/lib/eos-app-list-model.c:1496
 #, c-format
 msgid "App %s has no candidate for installation."
 msgstr "ليس لتطبيق %s أي مرشح للتثبيت."
 
-#: ../EosAppStore/lib/eos-app-list-model.c:1511
+#: ../EosAppStore/lib/eos-app-list-model.c:1508
 #, c-format
 msgid "App '%s' is already installed."
 msgstr "تطبيق '%s' مُثَبَتٌ بالفعل."
 
-#: ../EosAppStore/lib/eos-app-list-model.c:1575
+#: ../EosAppStore/lib/eos-app-list-model.c:1572
 #, c-format
 msgid "App %s not installable."
 msgstr "تطبيق %s غير قابل للتثبيت."
 
-#: ../EosAppStore/lib/eos-app-list-model.c:1586
+#: ../EosAppStore/lib/eos-app-list-model.c:1583
 #, c-format
 msgid "App %s is up to date."
 msgstr "تطبيق %s مُحدثٌ لآخر وضع."
 
-#: ../EosAppStore/lib/eos-app-list-model.c:1666
-#: ../EosAppStore/lib/eos-app-list-model.c:1711
+#: ../EosAppStore/lib/eos-app-list-model.c:1663
+#: ../EosAppStore/lib/eos-app-list-model.c:1708
 #, c-format
 msgid "App '%s' is not installed."
 msgstr "تطبيق '%s' غير مُثَبَتْ."
