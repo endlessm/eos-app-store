@@ -65,6 +65,7 @@ gboolean        eos_app_info_is_removable               (const EosAppInfo *info)
 gboolean        eos_app_info_get_has_launcher           (const EosAppInfo *info);
 EosAppState     eos_app_info_get_state                  (const EosAppInfo *info);
 gboolean        eos_app_info_check_install_space        (const EosAppInfo *info);
+gboolean        eos_app_info_check_update_space         (const EosAppInfo *info);
 
 gint64          eos_app_info_get_installation_time      (const EosAppInfo *info);
 const char *    eos_app_info_get_checksum               (const EosAppInfo *info,
