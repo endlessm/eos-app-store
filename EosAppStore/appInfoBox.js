@@ -47,6 +47,9 @@ const AppBaseBox = new Lang.Class({
         this._progressId = this._appInfo.connect('download-progress', Lang.bind(this, this._onDownloadProgress));
         this._stateChangedId = this._appInfo.connect('notify::state', Lang.bind(this, this._syncState));
         this._windowHideId = mainWindow.connect('hide', Lang.bind(this, this._destroyPendingDialogs));
+        mainWindow.connect('show', Lang.bind(this, function() {
+            this._syncState();
+        }));
 
         this._removeDialog = null;
 
@@ -532,14 +535,17 @@ const AppInfoBox = new Lang.Class({
     },
 
     _launchApp: function() {
+        this._installProgressSpinner.show();
+        this._installProgressSpinner.start();
+        this._installButton.hide();
+        this._installProgress.show();
+        this._installProgressLabel.set_text(_("Opening…"));
+        this._removeButton.hide();
+
         try {
             this.model.launch(this.appId, Gtk.get_current_event_time());
-
-            let appWindow = Gio.Application.get_default().mainWindow;
-            if (appWindow && appWindow.is_visible()) {
-                appWindow.hide();
-            }
         } catch (e) {
+            this._syncState();
             log("Failed to launch app '" + this.appId + "': " + e.message);
         }
     },
