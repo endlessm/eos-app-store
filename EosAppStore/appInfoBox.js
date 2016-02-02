@@ -235,10 +235,7 @@ const AppBaseBox = new Lang.Class({
 
             if (!error) {
                 let app = Gio.Application.get_default();
-                let appWindow = app.mainWindow;
-                if (!app.debugWindow && appWindow && appWindow.is_visible()) {
-                    appWindow.hide();
-                }
+                app.hideIfVisible();
             }
 
             if (callback) {
@@ -535,10 +532,8 @@ const AppInfoBox = new Lang.Class({
         try {
             this.model.launch(this.appId, Gtk.get_current_event_time());
 
-            let appWindow = Gio.Application.get_default().mainWindow;
-            if (appWindow && appWindow.is_visible()) {
-                appWindow.hide();
-            }
+            let app = Gio.Application.get_default();
+            app.hideIfVisible();
         } catch (e) {
             log("Failed to launch app '" + this.appId + "': " + e.message);
         }

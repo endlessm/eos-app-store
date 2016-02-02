@@ -444,7 +444,7 @@ const NewSiteBox = new Lang.Class({
 
         // UX here is pretty bad if we leave the app store on top
         let application = Gio.Application.get_default();
-        application.hide();
+        application.hideIfVisible();
     },
 
     _onUrlEntryChanged: function() {
