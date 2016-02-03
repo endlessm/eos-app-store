@@ -291,6 +291,7 @@ const AppFrame = new Lang.Class({
             return;
         }
 
+        this.searching = false;
         this._showView();
     }
 });
