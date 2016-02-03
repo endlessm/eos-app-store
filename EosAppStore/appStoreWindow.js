@@ -285,9 +285,7 @@ const AppStoreWindow = new Lang.Class({
             // If a search is in progress, stop it; otherwise
             // hide the window
             if (this.search_bar.search_mode_enabled) {
-                this.search_bar.search_mode_enabled = false;
-                this.search_bar.hide();
-                this.emit('search-stopped');
+                this.searchBarVisible = false;
             }
             else {
                 this.hide();
@@ -297,8 +295,7 @@ const AppStoreWindow = new Lang.Class({
         }
 
         // Otherwise start searching
-        this.search_bar.show();
-        this.search_bar.search_mode_enabled = true;
+        this.searchBarVisible = true;
         return this.search_bar.handle_event(event);
     },
 
@@ -367,6 +364,18 @@ const AppStoreWindow = new Lang.Class({
         }
         else {
             this.back_button.hide();
+        }
+    },
+
+    set searchBarVisible(isVisible) {
+        if (isVisible) {
+            this.search_bar.show();
+            this.search_bar.search_mode_enabled = true;
+        }
+        else {
+            this.search_bar.search_mode_enabled = false;
+            this.search_bar.hide();
+            this.emit('search-stopped');
         }
     },
 

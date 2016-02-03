@@ -183,13 +183,14 @@ const AppFrame = new Lang.Class({
         this._mainWindow.backButtonVisible = false;
 
         if (this._searching) {
-
             this._mainWindow.titleText = _("Search results");
             this._mainWindow.subtitleText = _("Press Escape to cancel");
+            this._mainWindow.searchBarVisible = true;
         }
         else {
             this._mainWindow.titleText = this.getTitle();
             this._mainWindow.subtitleText = '';
+            this._mainWindow.searchBarVisible = false;
         }
     },
 
