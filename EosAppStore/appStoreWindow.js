@@ -271,6 +271,7 @@ const AppStoreWindow = new Lang.Class({
     },
 
     _onSearchChanged: function() {
+        this.search_bar.show();
         this.emit('search-changed');
     },
 
@@ -285,6 +286,7 @@ const AppStoreWindow = new Lang.Class({
             // hide the window
             if (this.search_bar.search_mode_enabled) {
                 this.search_bar.search_mode_enabled = false;
+                this.search_bar.hide();
                 this.emit('search-stopped');
             }
             else {
