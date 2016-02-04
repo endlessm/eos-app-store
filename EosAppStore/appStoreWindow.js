@@ -280,14 +280,11 @@ const AppStoreWindow = new Lang.Class({
 
     _onKeyPressed: function(window, event) {
         if (event.get_keyval()[1] == Gdk.KEY_Escape) {
-            // If a search is in progress, stop it; otherwise
-            // hide the window
+            // If a search is not in progress, hide the window
             if (!this.search_bar.search_mode_enabled) {
                 this.hide();
                 return true;
             }
-
-            return false;
         }
 
         // If the page supports searching, start one
