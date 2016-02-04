@@ -1864,6 +1864,13 @@ search_app_completed (GObject *gobject,
   eos_app_list_model_emit_changed (model);
 }
 
+/**
+ * eos_app_list_model_search:
+ * @model:
+ * @terms: (allow-none):
+ * @cancellable:
+ *
+ */
 void
 eos_app_list_model_search (EosAppListModel *model,
                            const char *terms,
