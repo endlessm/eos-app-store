@@ -366,12 +366,10 @@ const AppStoreWindow = new Lang.Class({
 
     set searchBarVisible(isVisible) {
         if (isVisible) {
-            this.search_bar.show();
             this.search_bar.search_mode_enabled = true;
         }
         else {
             this.search_bar.search_mode_enabled = false;
-            this.search_bar.hide();
             this.emit('search-stopped');
         }
     },
