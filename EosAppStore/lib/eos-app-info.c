@@ -785,6 +785,67 @@ eos_app_info_get_has_sufficient_install_space (const EosAppInfo *info,
   return FALSE;
 }
 
+static gboolean
+eos_app_info_backup_is_move (const EosAppInfo *info,
+                             const gchar      *dir_path)
+{
+  GFile    *app_dir;
+  GFile    *backup_dir;
+  gboolean  is_move;
+
+  app_dir = eos_app_info_get_application_dir (info);
+  backup_dir = g_file_new_for_path (dir_path);
+
+  is_move = g_file_has_prefix (app_dir, backup_dir);
+
+  g_object_unref (backup_dir);
+
+  return is_move;
+}
+
+static gboolean
+eos_app_info_get_has_sufficient_update_space (const EosAppInfo *info,
+                                              const char       *dir)
+{
+  guint64 update_installed_size = 0;
+  guint64 download_size = 0;
+  guint64 total_update_size = 0;
+
+  update_installed_size = eos_app_info_get_server_installed_size (info);
+
+  /* For now we use the update installed size as the download size as it's
+   * a good enough upper bound; in the future, this should reflect the real
+   * download size. */
+  download_size = update_installed_size;
+
+  total_update_size = update_installed_size + download_size;
+
+  if (!eos_app_info_backup_is_move (info, dir))
+    total_update_size += eos_app_info_get_installed_size (info);
+
+  eos_app_log_debug_message ("App %s update size: %" G_GINT64_FORMAT,
+                             eos_app_info_get_desktop_id (info),
+                             total_update_size);
+
+  if (total_update_size <= get_fs_available_space (dir))
+    return TRUE;
+
+  return FALSE;
+}
+
+static EosStorageType
+eos_app_info_get_update_storage_type (const EosAppInfo *info)
+{
+  if (eos_has_secondary_storage () &&
+      eos_app_info_get_has_sufficient_update_space (info, eos_get_secondary_storage ()))
+    return EOS_STORAGE_TYPE_SECONDARY;
+
+  if (eos_app_info_get_has_sufficient_update_space (info,  eos_get_primary_storage ()))
+    return EOS_STORAGE_TYPE_PRIMARY;
+
+  return EOS_STORAGE_TYPE_UNKNOWN;
+}
+
 gboolean
 eos_app_info_check_install_space (const EosAppInfo *info)
 {
@@ -808,6 +869,12 @@ EosStorageType
 eos_app_info_get_storage_type (const EosAppInfo *info)
 {
   return info->storage_type;
+}
+
+gboolean
+eos_app_info_check_update_space (const EosAppInfo *info)
+{
+  return eos_app_info_get_update_storage_type (info) != EOS_STORAGE_TYPE_UNKNOWN;
 }
 
 /**

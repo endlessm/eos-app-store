@@ -117,7 +117,8 @@ const AppInstalledBox = new Lang.Class({
         this._removeButton.hide();
         this._controlsSeparator.hide();
 
-        if (this.model.networkAvailable && this.appInfo.is_updatable()) {
+        if (this.model.networkAvailable && this.appInfo.is_updatable() &&
+            this.appInfo.check_update_space()) {
             this._updateButton.show();
             this._controlsSeparator.show();
         }
