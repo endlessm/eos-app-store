@@ -202,7 +202,7 @@
                               <object class="GtkSearchBar" id="search-bar">
                                 <property name="can_focus">True</property>
                                 <property name="hexpand">True</property>
-                                <property name="visible">True</property>
+                                <property name="visible">False</property>
                                 <child>
                                   <object class="GtkSearchEntry" id="search-entry">
                                     <property name="visible">True</property>
