@@ -188,8 +188,7 @@ const AppFrame = new Lang.Class({
             this._mainWindow.searchBarVisible = true;
         }
         else {
-            this._mainWindow.titleText = this.getTitle();
-            this._mainWindow.subtitleText = '';
+            this._mainWindow.clearHeaderState();
             this._mainWindow.searchBarVisible = false;
         }
     },
