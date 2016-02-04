@@ -773,6 +773,10 @@ const WeblinkFrame = new Lang.Class({
         this._stack.set_visible_child(widget);
 
         this.show_all();
+    },
+
+    get canSearch() {
+        return false;
     }
 });
 Builder.bindTemplateChildren(WeblinkFrame.prototype);

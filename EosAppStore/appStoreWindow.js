@@ -294,9 +294,14 @@ const AppStoreWindow = new Lang.Class({
             return true;
         }
 
-        // Otherwise start searching
-        this.searchBarVisible = true;
-        return this.search_bar.handle_event(event);
+        // If the page supports searching, start one
+        let page = this._pageManager.visible_child;
+        if (page && page.canSearch) {
+            this.searchBarVisible = true;
+            return this.search_bar.handle_event(event);
+        }
+
+        return false;
     },
 
     _setDefaultTitle: function() {

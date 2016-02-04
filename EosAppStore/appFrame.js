@@ -294,6 +294,10 @@ const AppFrame = new Lang.Class({
 
         this.searching = false;
         this._showView();
+    },
+
+    get canSearch() {
+        return true;
     }
 });
 
