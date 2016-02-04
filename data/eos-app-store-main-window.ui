@@ -206,7 +206,7 @@
                                 <child>
                                   <object class="GtkSearchEntry" id="search-entry">
                                     <property name="visible">True</property>
-                                    <property name="width-chars">25</property>
+                                    <property name="width-chars">30</property>
                                     <signal name="search-changed" handler="_onSearchChanged"/>
                                     <signal name="stop-search" handler="_onSearchStopped"/>
                                   </object>
