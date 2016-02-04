@@ -282,14 +282,12 @@ const AppStoreWindow = new Lang.Class({
         if (event.get_keyval()[1] == Gdk.KEY_Escape) {
             // If a search is in progress, stop it; otherwise
             // hide the window
-            if (this.search_bar.search_mode_enabled) {
-                this.searchBarVisible = false;
-            }
-            else {
+            if (!this.search_bar.search_mode_enabled) {
                 this.hide();
+                return true;
             }
 
-            return true;
+            return false;
         }
 
         // If the page supports searching, start one
