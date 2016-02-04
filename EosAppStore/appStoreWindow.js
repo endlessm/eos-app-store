@@ -271,12 +271,10 @@ const AppStoreWindow = new Lang.Class({
     },
 
     _onSearchChanged: function() {
-        this.search_bar.show();
         this.emit('search-changed');
     },
 
     _onSearchStopped: function() {
-        this.search_bar.hide();
         this.emit('search-stopped');
     },
 
