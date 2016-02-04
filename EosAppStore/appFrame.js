@@ -191,6 +191,8 @@ const AppFrame = new Lang.Class({
             this._mainWindow.clearHeaderState();
             this._mainWindow.searchBarVisible = false;
         }
+
+        this._model.searchTerms(this._mainWindow.searchTerms);
     },
 
     get searching() {
@@ -199,12 +201,10 @@ const AppFrame = new Lang.Class({
 
     _onSearchChanged: function() {
         this.searching = true;
-        this._model.searchTerms(this._mainWindow.searchTerms);
     },
 
     _onSearchStopped: function() {
         this.searching = false;
-        this.populate();
     },
 
     get categoryId() {
