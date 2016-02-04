@@ -119,6 +119,12 @@ const AppStore = new Lang.Class({
             this._mainWindow.hide();
     },
 
+    hideIfVisible: function() {
+        if (!this._debugWindow && this._mainWindow && this._mainWindow.is_visible()) {
+            this._mainWindow.hide();
+        }
+    },
+
     showPage: function(timestamp, page) {
         this._createMainWindow();
 

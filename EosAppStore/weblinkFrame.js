@@ -22,7 +22,7 @@ const Signals = imports.signals;
 
 const NEW_SITE_SUCCESS_TIMEOUT = 3;
 
-const CATEGORY_TRANSITION_MS = 500;
+const CATEGORY_TRANSITION_MS = 250;
 
 const LIST_COLUMNS_SPACING = 10;
 
@@ -32,6 +32,8 @@ const DESKTOP_KEY_MAXIMIZED = 'X-Endless-LaunchMaximized';
 
 const ICON_EXTERNAL_LINK = '/com/endlessm/appstore/icon_external-link.png';
 const ICON_BLANK = '/com/endlessm/appstore/icon_blank.png';
+
+const JUST_INSTALLED_TIMEOUT = 500; // ms
 
 function getAvailableFilename(path, prefix, name, suffix) {
     let filename = prefix + name;
@@ -442,7 +444,7 @@ const NewSiteBox = new Lang.Class({
 
         // UX here is pretty bad if we leave the app store on top
         let application = Gio.Application.get_default();
-        application.hide();
+        application.hideIfVisible();
     },
 
     _onUrlEntryChanged: function() {
@@ -556,6 +558,16 @@ const WeblinkListBoxRow = new Lang.Class({
 
         this._setSensitiveState(false);
         this._setJustInstalledState();
+
+        // We hide the AppStore after a small delay so the user
+        // sees the just installed state
+        GLib.timeout_add(GLib.PRIORITY_DEFAULT,
+                         JUST_INSTALLED_TIMEOUT,
+                         Lang.bind(this, function() {
+                             let app = Gio.Application.get_default();
+                             app.hideIfVisible();
+                             return false;
+                         }));
     },
 });
 Builder.bindTemplateChildren(WeblinkListBoxRow.prototype);
