@@ -297,7 +297,8 @@ const AppFrame = new Lang.Class({
     },
 
     get canSearch() {
-        return true;
+        // We cannot search while we're populating the model
+        return !this.spinning;
     }
 });
 
