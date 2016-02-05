@@ -10,6 +10,7 @@ const Pango = imports.gi.Pango;
 
 const AppFrame = imports.appFrame;
 const AppStorePages = imports.appStorePages;
+const Categories = imports.categories;
 const FolderFrame = imports.folderFrame;
 const Path = imports.path;
 const UIBuilder = imports.builder;
@@ -52,8 +53,6 @@ const AppStoreWindow = new Lang.Class({
     Signals: {
         'visibility-changed': { param_types: [GObject.TYPE_BOOLEAN] },
         'back-clicked': { },
-        'search-changed': { },
-        'search-stopped': { },
     },
 
     templateResource: '/com/endlessm/appstore/eos-app-store-main-window.ui',
@@ -134,6 +133,8 @@ const AppStoreWindow = new Lang.Class({
         }
 
         this.connect('destroy', Lang.bind(this, this._onDestroy));
+
+        this._searchPrevPage = Categories.DEFAULT_APP_CATEGORY;
     },
 
     _onDestroy: function() {
@@ -271,11 +272,24 @@ const AppStoreWindow = new Lang.Class({
     },
 
     _onSearchChanged: function() {
-        this.emit('search-changed');
+        this.search_bar.search_mode_enabled = true;
     },
 
     _onSearchStopped: function() {
-        this.emit('search-stopped');
+        this.search_bar.search_mode_enabled = false;
+    },
+
+    _onSearchEnabledChanged: function() {
+        let searching = this.search_bar.search_mode_enabled;
+
+        if (searching) {
+            this._searchPrevPage = this._pageManager.visible_child_name;
+            this._pageManager.showPage('search');
+            this.subtitleText = _("Press Escape to cancel");
+        }
+        else {
+            this._pageManager.showPage(this._searchPrevPage);
+        }
     },
 
     _onKeyPressed: function(window, event) {
@@ -361,16 +375,6 @@ const AppStoreWindow = new Lang.Class({
         }
         else {
             this.back_button.hide();
-        }
-    },
-
-    set searchBarVisible(isVisible) {
-        if (isVisible) {
-            this.search_bar.search_mode_enabled = true;
-        }
-        else {
-            this.search_bar.search_mode_enabled = false;
-            this.emit('search-stopped');
         }
     },
 

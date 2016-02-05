@@ -77,21 +77,13 @@ const AppFrame = new Lang.Class({
         this._spinnerBox.add(this._spinner);
         this.spinning = true;
 
-        this._searching = false;
-
         this.connect('destroy', Lang.bind(this, this._onDestroy));
-
-        this._searchChangedId =
-            this._mainWindow.connect('search-changed', Lang.bind(this, this._onSearchChanged));
-        this._searchStoppedId =
-            this._mainWindow.connect('search-stopped', Lang.bind(this, this._onSearchStopped));
 
         this.show_all();
     },
 
     _onDestroy: function() {
         this._clearBackId();
-        this._clearSearchId();
     },
 
     _setupPageHeader: function() {
@@ -115,15 +107,6 @@ const AppFrame = new Lang.Class({
         if (this._backClickedId != 0) {
             this._mainWindow.disconnect(this._backClickedId);
             this._backClickedId = 0;
-        }
-    },
-
-    _clearSearchId: function() {
-        if (this._searchChangedId != 0) {
-            this._mainWindow.disconnect(this._searchChangedId);
-            this._mainWindow.disconnect(this._searchStoppedId);
-            this._searchChangedId = 0;
-            this._searchStoppedId = 0;
         }
     },
 
@@ -171,50 +154,6 @@ const AppFrame = new Lang.Class({
             this.spinning = false;
     },
 
-    set searching(v) {
-        if (this._searching == v)
-            return;
-
-        this._searching = v;
-
-        this.invalidate();
-
-        this._clearBackId();
-        this._mainWindow.backButtonVisible = false;
-
-        if (this._searching) {
-            this._mainWindow.titleText = _("Search results");
-            this._mainWindow.subtitleText = _("Press Escape to cancel");
-            this._mainWindow.searchBarVisible = true;
-        }
-        else {
-            this._mainWindow.clearHeaderState();
-            this._mainWindow.searchBarVisible = false;
-        }
-
-        this._model.searchTerms(this._mainWindow.searchTerms);
-    },
-
-    get searching() {
-        return this._searching;
-    },
-
-    _onSearchChanged: function() {
-        this.searching = true;
-    },
-
-    _onSearchStopped: function() {
-        this.searching = false;
-    },
-
-    get categoryId() {
-        if (this.searching) {
-            return EosAppStorePrivate.AppCategory.SEARCH;
-        }
-
-        return this._category.id;
-    },
-
     _createView: function() {
         // to be overridden
     },
@@ -242,7 +181,7 @@ const AppFrame = new Lang.Class({
 
     _doPopulate: function() {
         this.view = this._createView();
-        let appInfos = this._prepareAppInfos(this._model.loadCategory(this.categoryId));
+        let appInfos = this._prepareAppInfos(this._model.loadCategory(this._category.id));
         this._populateView(appInfos);
     },
 
@@ -291,7 +230,6 @@ const AppFrame = new Lang.Class({
             return;
         }
 
-        this.searching = false;
         this._showView();
     },
 
@@ -434,7 +372,6 @@ const AppInstalledFrame = new Lang.Class({
     },
 
     _onRowActivated: function(list, row) {
-        this.searching = false;
         let installedBox = row.get_child();
         this.showAppInfoBox(installedBox.appInfo);
     },
@@ -513,12 +450,34 @@ const AppCategoryFrame = new Lang.Class({
     },
 
     _onCellActivated: function(grid, cell) {
-        this.searching = false;
         this.showAppInfoBox(cell.app_info);
     },
 
     getTitle: function() {
         return _("Install apps");
+    }
+});
+
+const AppSearchFrame = new Lang.Class({
+    Name: 'AppSearchFrame',
+    Extends: AppCategoryFrame,
+
+    _init: function(category) {
+        this.parent(category);
+
+        this._mainWindow.search_entry.connect('search-changed', Lang.bind(this, this._onSearchChanged));
+    },
+
+    _onSearchChanged: function() {
+        this._model.searchTerms(this._mainWindow.searchTerms);
+    },
+
+    getTitle: function() {
+        return _("Search results");
+    },
+
+    getName: function() {
+        return null;
     }
 });
 
@@ -605,6 +564,10 @@ const AppPageProvider = new Lang.Class({
         let category = this._findCategory(pageId);
         if (category.id == EosAppStorePrivate.AppCategory.INSTALLED) {
             return new AppInstalledFrame(category);
+        }
+
+        if (category.id == EosAppStorePrivate.AppCategory.SEARCH) {
+            return new AppSearchFrame(category);
         }
 
         return new AppCategoryFrame(category);

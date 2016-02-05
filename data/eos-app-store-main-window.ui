@@ -203,6 +203,7 @@
                                 <property name="can_focus">True</property>
                                 <property name="hexpand">True</property>
                                 <property name="visible">True</property>
+                                <signal name="notify::search-mode-enabled" handler="_onSearchEnabledChanged"/>
                                 <child>
                                   <object class="GtkSearchEntry" id="search-entry">
                                     <property name="visible">True</property>
