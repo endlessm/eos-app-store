@@ -158,6 +158,7 @@ const NewSiteHelper = new Lang.Class({
             if (this._savedKeyfile) {
                 this._saveFavicon();
                 this._updateFavicon();
+                this._model.updateAppIcon(this._savedKeyfilePath);
             }
         }
     },

@@ -213,6 +213,10 @@ const AppListModel = new Lang.Class({
 
     createLink: function(filename) {
         return this._model.create_from_filename(filename);
+    },
+
+    updateAppIcon: function(filename) {
+        return this._model.update_app_icon_from_filename(filename);
     }
 });
 Signals.addSignalMethods(AppListModel.prototype);

@@ -1749,3 +1749,39 @@ eos_app_list_model_create_from_filename (EosAppListModel *model,
 
   return info;
 }
+
+gboolean
+eos_app_list_model_update_app_icon_from_filename (EosAppListModel *self,
+                                                  const char *filename,
+                                                  GError **error_out)
+{
+  GError *error = NULL;
+  EosAppInfo *info;
+  GDesktopAppInfo *desktop_info;
+  const char *desktop_id;
+
+  desktop_info = g_desktop_app_info_new_from_filename (filename);
+  if (!desktop_info)
+    return FALSE;
+
+  desktop_id = g_app_info_get_id (G_APP_INFO (desktop_info));
+
+  g_dbus_connection_call_sync (self->session_bus,
+                               "org.gnome.Shell",
+                               "/org/gnome/Shell",
+                               "org.gnome.Shell.AppStore", "UpdateApplication",
+                               g_variant_new ("(s)", desktop_id),
+                               NULL,
+                               G_DBUS_CALL_FLAGS_NONE,
+                               -1,
+                               NULL,
+                               &error);
+
+  if (error != NULL)
+    {
+      g_propagate_error (error_out, error);
+      return FALSE;
+    }
+
+  return TRUE;
+}
