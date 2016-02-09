@@ -428,6 +428,11 @@ const AppCategoryFrame = new Lang.Class({
         this.view.add(cell);
     },
 
+    _destroyView: function() {
+        this._lastCellSelected = null;
+        this.parent();
+    },
+
     _prepareAppInfos: function(appInfos) {
         // Every category only shows apps that can be added
         return appInfos.filter(function(info) {
