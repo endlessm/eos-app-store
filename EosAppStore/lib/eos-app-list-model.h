@@ -80,6 +80,10 @@ gboolean eos_app_list_model_update_app_finish       (EosAppListModel *model,
                                                      GAsyncResult *result,
                                                      GError **error);
 
+gboolean eos_app_list_model_update_app_icon_from_filename (EosAppListModel *self,
+                                                           const char *filename,
+                                                           GError **error_out);
+
 G_END_DECLS
 
 #endif /* __EOS_APP_LIST_MODEL_H__ */
