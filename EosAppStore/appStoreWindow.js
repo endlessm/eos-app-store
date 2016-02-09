@@ -317,8 +317,7 @@ const AppStoreWindow = new Lang.Class({
         // If we switched away from the search page while
         // still searching we cancel the search
         let pageId = this._pageManager.visible_child_name;
-        if (pageId && pageId != 'search' &&
-            this.search_bar.search_mode_enabled && this._searchPrevPage) {
+        if (pageId != 'search' && this.search_bar.search_mode_enabled) {
             // We unset this here to ensure that _onSearchEnabledChanged
             // does not switch page again
             this._searchPrevPage = null;
