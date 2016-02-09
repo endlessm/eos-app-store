@@ -471,6 +471,22 @@ const AppSearchFrame = new Lang.Class({
         this.parent(category);
 
         this._mainWindow.search_entry.connect('search-changed', Lang.bind(this, this._onSearchChanged));
+        this._searchTerms = null;
+    },
+
+    _onPageChanged: function() {
+        this.parent();
+
+        if (this._lastPageId != CONTENT_PAGE) {
+            // save search terms to go back to later
+            this._searchTerms = this._mainWindow.searchTerms;
+            this._mainWindow.clearSearchState();
+        }
+        else if (this._searchTerms) {
+            // resume search
+            this._mainWindow.searchTerms = this._searchTerms;
+            this._searchTerms = null;
+        }
     },
 
     _onSearchChanged: function() {

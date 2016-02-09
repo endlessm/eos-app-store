@@ -318,10 +318,7 @@ const AppStoreWindow = new Lang.Class({
         // still searching we cancel the search
         let pageId = this._pageManager.visible_child_name;
         if (pageId != 'search' && this.search_bar.search_mode_enabled) {
-            // We unset this here to ensure that _onSearchEnabledChanged
-            // does not switch page again
-            this._searchPrevPage = null;
-            this.search_bar.search_mode_enabled = false;
+            this.clearSearchState();
         }
 
         this.clearHeaderState();
@@ -336,6 +333,13 @@ const AppStoreWindow = new Lang.Class({
         let [width, height, sidebarWidth] = this._getSize();
 
         return width;
+    },
+
+    clearSearchState: function(switchBack) {
+        // We unset this here to ensure that _onSearchEnabledChanged
+        // does not switch page again
+        this._searchPrevPage = null;
+        this.search_bar.search_mode_enabled = false;
     },
 
     clearHeaderState: function() {
@@ -389,6 +393,11 @@ const AppStoreWindow = new Lang.Class({
 
     get searchTerms() {
         return this.search_entry.get_text();
+    },
+
+    set searchTerms(v) {
+        this.search_entry.set_text(v);
+        this.search_bar.search_mode_enabled = true;
     },
 
     populate: function() {
