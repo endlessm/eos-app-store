@@ -280,7 +280,10 @@ const AppStoreWindow = new Lang.Class({
             this.subtitleText = _("Press Escape to cancel");
         }
         else {
-            this._pageManager.showPage(this._searchPrevPage);
+            if (this._searchPrevPage) {
+                this._pageManager.showPage(this._searchPrevPage);
+                this._searchPrevPage = null;
+            }
         }
     },
 
@@ -311,6 +314,17 @@ const AppStoreWindow = new Lang.Class({
     },
 
     _onStorePageChanged: function() {
+        // If we switched away from the search page while
+        // still searching we cancel the search
+        let pageId = this._pageManager.visible_child_name;
+        if (pageId && pageId != 'search' &&
+            this.search_bar.search_mode_enabled && this._searchPrevPage) {
+            // We unset this here to ensure that _onSearchEnabledChanged
+            // does not switch page again
+            this._searchPrevPage = null;
+            this.search_bar.search_mode_enabled = false;
+        }
+
         this.clearHeaderState();
         this.resetCurrentPage();
     },
