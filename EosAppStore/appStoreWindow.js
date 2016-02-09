@@ -271,14 +271,6 @@ const AppStoreWindow = new Lang.Class({
         this.emit('back-clicked');
     },
 
-    _onSearchChanged: function() {
-        this.search_bar.search_mode_enabled = true;
-    },
-
-    _onSearchStopped: function() {
-        this.search_bar.search_mode_enabled = false;
-    },
-
     _onSearchEnabledChanged: function() {
         let searching = this.search_bar.search_mode_enabled;
 
