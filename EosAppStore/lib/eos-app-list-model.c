@@ -1844,6 +1844,8 @@ search_app_completed (GObject *gobject,
   if (!result)
     {
       eos_app_log_info_message ("No matches found");
+      g_clear_pointer (&model->search_results, g_list_free);
+      eos_app_list_model_emit_changed (model);
       return;
     }
 
