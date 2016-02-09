@@ -4,7 +4,7 @@
 # 
 # Translators:
 # Ivan G. Gonçalves <i@endlessm.com>, 2015
-# Joel Gil Leon <joel@endlessm.com>, 2013
+# Joel Gil <joel@endlessm.com>, 2013
 # Mariana Barbosa <mari@endlessm.com>, 2015
 # Nuritzi Sanchez <ns@endlessm.com>, 2013
 # Philip Chimento <philip.chimento@gmail.com>, 2014
@@ -16,7 +16,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: eos-app-store\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-01-26 05:30+0000\n"
+"POT-Creation-Date: 2016-02-02 02:21+0000\n"
 "PO-Revision-Date: 2015-10-20 23:52+0000\n"
 "Last-Translator: Roddy Shuler <roddy@endlessm.com>\n"
 "Language-Team: Portuguese (Brazil) (http://www.transifex.com/endless-mobile-inc/eos-app-store/language/pt_BR/)\n"
