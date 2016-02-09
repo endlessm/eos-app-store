@@ -33,7 +33,7 @@ const AppListModel = new Lang.Class({
         } catch (e) {
             logError(e, 'Error while creating app store model');
             return;
-        }
+       }
 
         this._model.connect('changed', Lang.bind(this, this._onModelChanged));
 
@@ -213,6 +213,16 @@ const AppListModel = new Lang.Class({
 
     createLink: function(filename) {
         return this._model.create_from_filename(filename);
+    },
+
+    searchTerms: function(text) {
+        if (this._searchCancellable) {
+            this._searchCancellable.cancel();
+            this._searchCancellable = null;
+        }
+
+        this._searchCancellable = new Gio.Cancellable();
+        this._model.search(text, this._searchCancellable);
     }
 });
 Signals.addSignalMethods(AppListModel.prototype);

@@ -33,7 +33,9 @@ const AppStorePageManager = new Lang.Class({
         }
 
         page = provider.createPage(pageId);
-        this.add_titled(page, pageId, page.getName());
+        this.add_named(page, pageId);
+
+        this.child_set_property(page, 'title', page.getName());
         this.child_set_property(page, 'icon-name', page.getIcon());
 
         return page;

@@ -227,6 +227,7 @@ eos_app_info_finalize (GObject *gobject)
   g_free (info->info_filename);
   g_clear_object (&info->application_dir);
   g_strfreev (info->screenshots);
+  g_clear_pointer (&info->search_tokens, g_ptr_array_unref);
 
   G_OBJECT_CLASS (eos_app_info_parent_class)->finalize (gobject);
 }
@@ -935,6 +936,97 @@ eos_app_info_get_application_dir (const EosAppInfo *info)
   return info->application_dir;
 }
 
+gboolean
+eos_app_info_match (const EosAppInfo *info,
+                    const char * const terms[])
+{
+  if (info->search_tokens == NULL)
+    return FALSE;
+
+  for (int i = 0; terms[i] != NULL; i++)
+    {
+      for (int j = 0; j < info->search_tokens->len; j++)
+        {
+          const char *hit = g_ptr_array_index (info->search_tokens, j);
+          if (g_str_has_prefix (hit, terms[i]))
+            return TRUE;
+        }
+    }
+
+  return FALSE;
+}
+
+static void
+merge_search_tokens (GPtrArray  *search_tokens,
+                     const char *str)
+{
+  char **tokens, **alternates;
+
+  tokens = g_str_tokenize_and_fold (str, NULL, &alternates);
+
+  for (int i = 0; tokens[i] != NULL; i++)
+    {
+      gboolean found = FALSE;
+
+      for (int j = 0; j < search_tokens->len; j++)
+        {
+          const char *t = g_ptr_array_index (search_tokens, j);
+          if (strcmp (tokens[i], t) == 0)
+            {
+              found = TRUE;
+              break;
+            }
+        }
+
+      if (!found)
+        g_ptr_array_add (search_tokens, g_strdup (tokens[i]));
+    }
+
+  for (int i = 0; alternates[i] != NULL; i++)
+    {
+      gboolean found = FALSE;
+
+      for (int j = 0; j < search_tokens->len; j++)
+        {
+          const char *t = g_ptr_array_index (search_tokens, j);
+          if (strcmp (alternates[i], t) == 0)
+            {
+              found = TRUE;
+              break;
+            }
+        }
+
+      if (!found)
+        g_ptr_array_add (search_tokens, g_strdup (alternates[i]));
+    }
+
+  g_strfreev (tokens);
+  g_strfreev (alternates);
+}
+
+static void
+eos_app_info_update_search_tokens (EosAppInfo *info)
+{
+  if (info->search_tokens == NULL)
+    {
+      info->search_tokens = g_ptr_array_new ();
+      g_ptr_array_set_free_func (info->search_tokens, g_free);
+    }
+
+  if (info->title != NULL && info->title[0] != '\0')
+    merge_search_tokens (info->search_tokens, info->title);
+
+  if (info->subtitle != NULL && info->subtitle[0] != '\0')
+    merge_search_tokens (info->search_tokens, info->subtitle);
+
+  if (info->description != NULL && info->description[0] != '\0')
+    merge_search_tokens (info->search_tokens, info->description);
+
+  eos_app_log_info_message ("Found %d search tokens for app %s",
+                            info->search_tokens->len,
+                            info->application_id);
+}
+
 /*< private >
  * check_info_storage:
  * @info: the #EosAppInfo to update
@@ -1272,6 +1364,8 @@ eos_app_info_update_from_content (EosAppInfo *info,
     }
   else
     info->n_screenshots = 0;
+
+  eos_app_info_update_search_tokens (info);
 
   return TRUE;
 }

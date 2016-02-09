@@ -41,6 +41,13 @@ function get_app_categories() {
             id: EosAppStorePrivate.AppCategory.INSTALLED,
             icon: 'resource:///com/endlessm/appstore/icon_installed-symbolic.svg'
         },
+        {
+            name: 'search',
+            widget: null,
+            label: _("Search"),
+            id: EosAppStorePrivate.AppCategory.SEARCH,
+            icon: null
+        }
     ];
 }
 

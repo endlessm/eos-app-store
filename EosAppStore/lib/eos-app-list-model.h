@@ -80,6 +80,11 @@ gboolean eos_app_list_model_update_app_finish       (EosAppListModel *model,
                                                      GAsyncResult *result,
                                                      GError **error);
 
+
+void eos_app_list_model_search                      (EosAppListModel *model,
+                                                     const char *terms,
+                                                     GCancellable *cancellable);
+
 G_END_DECLS
 
 #endif /* __EOS_APP_LIST_MODEL_H__ */

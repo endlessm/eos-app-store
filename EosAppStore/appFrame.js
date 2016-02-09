@@ -231,6 +231,11 @@ const AppFrame = new Lang.Class({
         }
 
         this._showView();
+    },
+
+    get canSearch() {
+        // We cannot search while we're populating the model
+        return !this.spinning;
     }
 });
 
@@ -423,6 +428,11 @@ const AppCategoryFrame = new Lang.Class({
         this.view.add(cell);
     },
 
+    _destroyView: function() {
+        this._lastCellSelected = null;
+        this.parent();
+    },
+
     _prepareAppInfos: function(appInfos) {
         // Every category only shows apps that can be added
         return appInfos.filter(function(info) {
@@ -450,6 +460,29 @@ const AppCategoryFrame = new Lang.Class({
 
     getTitle: function() {
         return _("Install apps");
+    }
+});
+
+const AppSearchFrame = new Lang.Class({
+    Name: 'AppSearchFrame',
+    Extends: AppCategoryFrame,
+
+    _init: function(category) {
+        this.parent(category);
+
+        this._mainWindow.search_entry.connect('search-changed', Lang.bind(this, this._onSearchChanged));
+    },
+
+    _onSearchChanged: function() {
+        this._model.searchTerms(this._mainWindow.searchTerms);
+    },
+
+    getTitle: function() {
+        return _("Search results");
+    },
+
+    getName: function() {
+        return null;
     }
 });
 
@@ -536,6 +569,10 @@ const AppPageProvider = new Lang.Class({
         let category = this._findCategory(pageId);
         if (category.id == EosAppStorePrivate.AppCategory.INSTALLED) {
             return new AppInstalledFrame(category);
+        }
+
+        if (category.id == EosAppStorePrivate.AppCategory.SEARCH) {
+            return new AppSearchFrame(category);
         }
 
         return new AppCategoryFrame(category);

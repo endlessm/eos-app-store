@@ -69,6 +69,8 @@ struct _EosAppListModel
 
   SoupSession *soup_session;
   JsonArray *content_apps;
+
+  GList *search_results;
 };
 
 struct _EosAppListModelClass
@@ -559,6 +561,7 @@ eos_app_list_model_finalize (GObject *gobject)
       self->refresh_guard_id = 0;
     }
 
+  g_clear_pointer (&self->search_results, g_list_free);
   g_clear_pointer (&self->content_apps, json_array_unref);
   g_clear_object (&self->soup_session);
 
@@ -1406,6 +1409,9 @@ GList *
 eos_app_list_model_get_apps_for_category (EosAppListModel *model,
                                           EosAppCategory category)
 {
+  if (category == EOS_APP_CATEGORY_SEARCH)
+    return g_list_copy (model->search_results);
+
   GList *apps = NULL;
 
   guint i, n_elements = json_array_get_length (model->content_apps);
@@ -1748,4 +1754,146 @@ eos_app_list_model_create_from_filename (EosAppListModel *model,
   g_object_unref (desktop_info);
 
   return info;
+}
+
+typedef struct {
+  /* Search string */
+  char *str;
+
+  /* Tokenized search terms */
+  char **search_terms;
+
+  /* Array of matching EosAppInfo */
+  GPtrArray *results;
+} SearchData;
+
+static void
+search_data_free (gpointer data)
+{
+  SearchData *search_data = data;
+
+  if (data == NULL)
+    return;
+
+  g_ptr_array_unref (search_data->results);
+  g_strfreev (search_data->search_terms);
+  g_free (search_data->str);
+
+  g_free (search_data);
+}
+
+static void
+search_app_thread_func (GTask *task,
+                        gpointer source_object,
+                        gpointer task_data,
+                        GCancellable *cancellable)
+{
+  GError *error = NULL;
+  EosAppListModel *model = source_object;
+  SearchData *search_data = task_data;
+
+  /* We iterate over the hash table to match the search terms; if
+   * something modifies the hash table during this then the iterator
+   * won't be valid any more, and thus the search will be stopped.
+   */
+  GHashTableIter iter;
+  gpointer key, value;
+  g_hash_table_iter_init (&iter, model->apps);
+  while (g_hash_table_iter_next (&iter, &key, &value))
+    {
+      if (g_cancellable_is_cancelled (cancellable))
+        {
+          g_set_error_literal (&error, G_IO_ERROR, G_IO_ERROR_CANCELLED, "Search was cancelled");
+          g_task_return_error (task, error);
+          return;
+        }
+
+      EosAppInfo *info = value;
+      if (eos_app_info_match (info, (const char * const *) search_data->search_terms))
+        {
+          eos_app_log_info_message ("Found app '%s' matching '%s'\n",
+                                    eos_app_info_get_application_id (info),
+                                    search_data->str);
+          g_ptr_array_add (search_data->results, info);
+        }
+    }
+
+  g_task_return_boolean (task, search_data->results->len > 0);
+}
+
+static void
+search_app_completed (GObject *gobject,
+                      GAsyncResult *res,
+                      gpointer data)
+{
+  EosAppListModel *model = EOS_APP_LIST_MODEL (gobject);
+  GTask *task = G_TASK (res);
+  GError *error = NULL;
+
+  /* No results */
+  gboolean result = g_task_propagate_boolean (task, &error);
+  if (error != NULL)
+    {
+      if (!g_error_matches (error, G_IO_ERROR, G_IO_ERROR_CANCELLED))
+        eos_app_log_error_message ("Error while searching: %s", error->message);
+
+      g_error_free (error);
+      return;
+    }
+
+  if (!result)
+    {
+      eos_app_log_info_message ("No matches found");
+      g_clear_pointer (&model->search_results, g_list_free);
+      eos_app_list_model_emit_changed (model);
+      return;
+    }
+
+  GList *retval = NULL;
+  SearchData *search_data = g_task_get_task_data (task);
+  eos_app_log_info_message ("Found %d results matching '%s'",
+                            search_data->results->len,
+                            search_data->str);
+  for (int i = 0; i < search_data->results->len; i++)
+    {
+      EosAppInfo *info = g_ptr_array_index (search_data->results, i);
+      retval = g_list_prepend (retval, info);
+    }
+
+  g_clear_pointer (&model->search_results, g_list_free);
+  model->search_results = g_list_reverse (retval);
+
+  eos_app_list_model_emit_changed (model);
+}
+
+/**
+ * eos_app_list_model_search:
+ * @model:
+ * @terms: (allow-none):
+ * @cancellable:
+ *
+ */
+void
+eos_app_list_model_search (EosAppListModel *model,
+                           const char *terms,
+                           GCancellable *cancellable)
+{
+  /* Empty search */
+  if (terms == NULL || terms[0] == '\0')
+    {
+      g_clear_pointer (&model->search_results, g_list_free);
+      eos_app_list_model_emit_changed (model);
+      return;
+    }
+
+  GTask *task = g_task_new (model, cancellable, search_app_completed, NULL);
+
+  SearchData *search_data = g_new (SearchData, 1);
+  search_data->str = g_strdup (terms);
+  search_data->search_terms = g_str_tokenize_and_fold (terms, NULL, NULL);
+  search_data->results = g_ptr_array_new ();
+
+  g_task_set_task_data (task, search_data, search_data_free);
+  g_task_run_in_thread (task, search_app_thread_func);
+  g_object_unref (task);
 }

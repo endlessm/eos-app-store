@@ -313,6 +313,10 @@ const FolderFrame = new Lang.Class({
     reset: function() {
         let vscrollbar = this._scrolledWindow.get_vscrollbar();
         vscrollbar.set_value(0);
+    },
+
+    get canSearch() {
+        return false;
     }
 });
 Builder.bindTemplateChildren(FolderFrame.prototype);

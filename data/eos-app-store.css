@@ -61,6 +61,12 @@
     box-shadow: inset 0 0 2px 0 alpha(black, 0.25);
 }
 
+.search-bar {
+    border: none;
+    background: none;
+    box-shadow: none;
+}
+
 .sidebar-frame {
     padding: 0 15px;
 }
@@ -571,7 +577,8 @@
     background: transparent;
 }
 
-.new-site-frame .url-entry {
+.new-site-frame .url-entry,
+.search-bar .entry {
     font-size: 11px;
     font-weight: 600; /* semibold */
 
@@ -580,14 +587,21 @@
 
     background: #d8d8d8;
     box-shadow: inset 0px 2px 3px 0px alpha(black, 0.25);
-    padding: 7px 4px 7px 20px;
 
     border: 1px solid alpha(black, 0.50);
     border-radius: 26px;
 }
 
+.new-site-frame .url-entry {
+    padding: 7px 4px 7px 20px;
+}
+
 .new-site-frame .url-entry:dir(rtl) {
     padding: 7px 20px 7px 4px;
+}
+
+.search-bar .entry {
+    padding: 6px;
 }
 
 .new-site-frame .url-entry-error {
@@ -595,11 +609,14 @@
 }
 
 .new-site-frame .url-entry:focused,
-.new-site-frame .url-entry:prelight {
+.new-site-frame .url-entry:prelight,
+.search-bar .entry:focused,
+.search-bar .entry:prelight {
     background: white;
 }
 
-.new-site-frame .url-entry:selected {
+.new-site-frame .url-entry:selected,
+.search-bar .entry:selected {
     background-color: @app_store_selected_bg;
     color: white;
 }

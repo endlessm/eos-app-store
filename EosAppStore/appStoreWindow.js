@@ -10,6 +10,7 @@ const Pango = imports.gi.Pango;
 
 const AppFrame = imports.appFrame;
 const AppStorePages = imports.appStorePages;
+const Categories = imports.categories;
 const FolderFrame = imports.folderFrame;
 const Path = imports.path;
 const UIBuilder = imports.builder;
@@ -67,6 +68,8 @@ const AppStoreWindow = new Lang.Class({
         'header-icon',
         'close-button',
         'back-button',
+        'search-bar',
+        'search-entry',
     ],
 
     _init: function(app, pageManager) {
@@ -130,6 +133,8 @@ const AppStoreWindow = new Lang.Class({
         }
 
         this.connect('destroy', Lang.bind(this, this._onDestroy));
+
+        this._searchPrevPage = Categories.DEFAULT_APP_CATEGORY;
     },
 
     _onDestroy: function() {
@@ -266,11 +271,35 @@ const AppStoreWindow = new Lang.Class({
         this.emit('back-clicked');
     },
 
+    _onSearchEnabledChanged: function() {
+        let searching = this.search_bar.search_mode_enabled;
+
+        if (searching) {
+            this._searchPrevPage = this._pageManager.visible_child_name;
+            this._pageManager.showPage('search');
+            this.subtitleText = _("Press Escape to cancel");
+        }
+        else {
+            if (this._searchPrevPage) {
+                this._pageManager.showPage(this._searchPrevPage);
+                this._searchPrevPage = null;
+            }
+        }
+    },
+
     _onKeyPressed: function(window, event) {
-        // Hide window when Esc is pressed
-        if(event.get_keyval()[1] == Gdk.KEY_Escape) {
-            this.hide();
-            return true;
+        if (event.get_keyval()[1] == Gdk.KEY_Escape) {
+            // If a search is not in progress, hide the window
+            if (!this.search_bar.search_mode_enabled) {
+                this.hide();
+                return true;
+            }
+        }
+
+        // If the page supports searching, start one
+        let page = this._pageManager.visible_child;
+        if (page && page.canSearch) {
+            return this.search_bar.handle_event(event);
         }
 
         return false;
@@ -285,6 +314,16 @@ const AppStoreWindow = new Lang.Class({
     },
 
     _onStorePageChanged: function() {
+        // If we switched away from the search page while
+        // still searching we cancel the search
+        let pageId = this._pageManager.visible_child_name;
+        if (pageId != 'search' && this.search_bar.search_mode_enabled) {
+            // We unset this here to ensure that _onSearchEnabledChanged
+            // does not switch page again
+            this._searchPrevPage = null;
+            this.search_bar.search_mode_enabled = false;
+        }
+
         this.clearHeaderState();
         this.resetCurrentPage();
     },
@@ -346,6 +385,10 @@ const AppStoreWindow = new Lang.Class({
 
     get pageManager() {
         return this._pageManager;
+    },
+
+    get searchTerms() {
+        return this.search_entry.get_text();
     },
 
     populate: function() {
