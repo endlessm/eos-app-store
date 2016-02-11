@@ -493,6 +493,11 @@ const AppSearchFrame = new Lang.Class({
         this._model.searchTerms(this._mainWindow.searchTerms);
     },
 
+    _prepareAppInfos: function(appInfos) {
+        // No filtering applied to searches
+        return appInfos;
+    },
+
     getTitle: function() {
         return _("Search results");
     },
