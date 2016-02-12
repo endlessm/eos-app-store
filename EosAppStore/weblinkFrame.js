@@ -303,6 +303,7 @@ const NewSiteBox = new Lang.Class({
 
         this._urlLabel = new Gtk.Label();
         this._urlLabel.get_style_context().add_class('url-label');
+        this._urlLabel.set_ellipsize(Pango.EllipsizeMode.END);
         this._urlLabel.set_alignment(0, 0);
         this._urlLabel.show();
 
