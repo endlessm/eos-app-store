@@ -8,9 +8,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: eos-app-store\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-02-02 02:21+0000\n"
-"PO-Revision-Date: 2015-10-23 04:44+0000\n"
-"Last-Translator: Roddy Shuler <roddy@endlessm.com>\n"
+"POT-Creation-Date: 2016-02-09 02:21+0000\n"
+"PO-Revision-Date: 2016-02-09 02:22+0000\n"
+"Last-Translator: endlessmobile_build <philip@endlessm.com>\n"
 "Language-Team: French (http://www.transifex.com/endless-mobile-inc/eos-app-store/language/fr/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -18,7 +18,7 @@ msgstr ""
 "Language: fr\n"
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
 
-#: ../data/eos-app-store-app-info-box.ui.h:1 ../EosAppStore/appInfoBox.js:423
+#: ../data/eos-app-store-app-info-box.ui.h:1 ../EosAppStore/appInfoBox.js:420
 msgid "Install app"
 msgstr "Installer l'application"
 
@@ -63,7 +63,7 @@ msgid "Create your own folder to organize your apps. First, choose an icon."
 msgstr "Créez votre propre dossier pour organiser vos applications. D'abord, choisissez une icône."
 
 #: ../data/eos-app-store-weblink-new-site-frame.ui.h:1
-#: ../EosAppStore/weblinkFrame.js:346
+#: ../EosAppStore/weblinkFrame.js:348
 msgid "e.g.: http://www.endlessm.com"
 msgstr "ex. : http://www.endlessm.com"
 
@@ -123,39 +123,43 @@ msgstr "Nous n'avons pas pu installer '%s'"
 msgid "'%s' was installed successfully"
 msgstr "'%s' a été installé avec succès"
 
-#: ../EosAppStore/appInfoBox.js:424
+#: ../EosAppStore/appInfoBox.js:421
 msgid "Update app"
 msgstr "Mettre à jour l'appli"
 
-#: ../EosAppStore/appInfoBox.js:425
+#: ../EosAppStore/appInfoBox.js:422
 msgid "Open app"
 msgstr "Ouvrir l'appli"
 
-#: ../EosAppStore/appInfoBox.js:426
+#: ../EosAppStore/appInfoBox.js:423
 msgid "Add to the desktop"
 msgstr "Ajouter au bureau"
 
-#: ../EosAppStore/appInfoBox.js:427
+#: ../EosAppStore/appInfoBox.js:424
 msgid "No network connection is available"
 msgstr "Aucune connexion réseau n'est disponible"
 
-#: ../EosAppStore/appInfoBox.js:428
+#: ../EosAppStore/appInfoBox.js:425
 msgid "Insufficient space to install the app"
 msgstr "Espace insuffisant pour installer l'appli"
 
-#: ../EosAppStore/appInfoBox.js:515
+#: ../EosAppStore/appInfoBox.js:426
+msgid "Insufficient space to update the app"
+msgstr ""
+
+#: ../EosAppStore/appInfoBox.js:518
 msgid "Downloading…"
 msgstr "Téléchargement en cours…"
 
-#: ../EosAppStore/appInfoBox.js:523
+#: ../EosAppStore/appInfoBox.js:526
 msgid "Updating…"
 msgstr "Mise à jour…"
 
-#: ../EosAppStore/appInfoBox.js:526
+#: ../EosAppStore/appInfoBox.js:529
 msgid "Installing…"
 msgstr "En cours d'installation…"
 
-#: ../EosAppStore/appInfoBox.js:529
+#: ../EosAppStore/appInfoBox.js:532
 msgid "Removing…"
 msgstr "Retrait en cours…"
 
@@ -167,7 +171,7 @@ msgstr "Retrait en cours…"
 msgid "%s MB"
 msgstr "%s Mo"
 
-#: ../EosAppStore/appStore.js:229
+#: ../EosAppStore/appStore.js:235
 msgid "Dismiss"
 msgstr "Rejeter"
 
@@ -233,37 +237,37 @@ msgstr "Dossiers"
 msgid "Install folders"
 msgstr "Installer les dossiers"
 
-#: ../EosAppStore/weblinkFrame.js:280
+#: ../EosAppStore/weblinkFrame.js:282
 msgid "Write the website you'd like to add here and press “Enter”"
 msgstr "Écrivez le site internet que vous aimeriez ajouter ici et appuyer sur «Entrée»"
 
-#: ../EosAppStore/weblinkFrame.js:366
+#: ../EosAppStore/weblinkFrame.js:368
 msgid "searching"
 msgstr "recherche en cours"
 
-#: ../EosAppStore/weblinkFrame.js:381
+#: ../EosAppStore/weblinkFrame.js:383
 msgid "The address written does not exist or is not available."
 msgstr "L'adresse écrite n'existe pas ou n'est pas disponible."
 
-#: ../EosAppStore/weblinkFrame.js:390 ../EosAppStore/weblinkFrame.js:546
+#: ../EosAppStore/weblinkFrame.js:392 ../EosAppStore/weblinkFrame.js:548
 msgid "Added successfully!"
 msgstr "Ajouté avec succès !"
 
-#: ../EosAppStore/weblinkFrame.js:617
+#: ../EosAppStore/weblinkFrame.js:629
 msgid ""
 "Add your favorite websites to your desktop or choose suggested ones from our"
 " list."
 msgstr "Ajouter vos sites internet préférés à votre bureau ou choisissez parmi les suggestions de notre liste. "
 
-#: ../EosAppStore/weblinkFrame.js:763
+#: ../EosAppStore/weblinkFrame.js:775
 msgid "Websites"
 msgstr "Sites internet"
 
-#: ../EosAppStore/weblinkFrame.js:767
+#: ../EosAppStore/weblinkFrame.js:779
 msgid "Install websites"
 msgstr "Installer les sites internet"
 
-#: ../EosAppStore/lib/eos-app-info.c:839
+#: ../EosAppStore/lib/eos-app-info.c:906
 #, c-format
 msgid "No verification available for app '%s'"
 msgstr "Pas de vérification disponible pour l'application '%s' "
