@@ -5,14 +5,15 @@
 # Translators:
 # chenzibing <chenzibing_endless@126.com>, 2016
 # liuxuejiao <liuxuejiao_endless@126.com>, 2016
+# zhifeng peng <jnufeng@126.com>, 2016
 # zhoushumin <zhoushumin_endless@126.com>, 2016
 msgid ""
 msgstr ""
 "Project-Id-Version: eos-app-store\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-02-09 02:21+0000\n"
-"PO-Revision-Date: 2016-02-09 02:22+0000\n"
-"Last-Translator: endlessmobile_build <philip@endlessm.com>\n"
+"POT-Creation-Date: 2016-02-16 02:24+0000\n"
+"PO-Revision-Date: 2016-02-21 07:01+0000\n"
+"Last-Translator: zhifeng peng <jnufeng@126.com>\n"
 "Language-Team: Chinese (China) (http://www.transifex.com/endless-mobile-inc/eos-app-store/language/zh_CN/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -26,7 +27,7 @@ msgstr "安装App"
 
 #: ../data/eos-app-store-app-info-box.ui.h:2 ../EosAppStore/appInfoBox.js:169
 msgid "Cancel"
-msgstr "取消"
+msgstr "取消"
 
 #: ../data/eos-app-store-app-info-box.ui.h:3
 msgid "Installing"
@@ -50,7 +51,7 @@ msgstr "大小"
 
 #: ../data/eos-app-store-app-installed-box.ui.h:4
 msgid "UPDATING…"
-msgstr "正在更新…"
+msgstr "正在更新……"
 
 #: ../data/eos-app-store-app-installed-box.ui.h:5
 msgid "STOP"
@@ -62,22 +63,26 @@ msgstr "系统App"
 
 #: ../data/eos-app-store-folder-frame.ui.h:1
 msgid "Create your own folder to organize your apps. First, choose an icon."
-msgstr "创建自定义文件夹来组建您的App。首先,请选择一个图标。"
+msgstr "创建自定义文件夹来组建您的App。首先，请选择一个图标。"
 
 #: ../data/eos-app-store-weblink-new-site-frame.ui.h:1
-#: ../EosAppStore/weblinkFrame.js:348
+#: ../EosAppStore/weblinkFrame.js:349
 msgid "e.g.: http://www.endlessm.com"
 msgstr "如：http://www.endlessm.com"
 
-#: ../EosAppStore/appFrame.js:395
+#: ../EosAppStore/appFrame.js:400
 msgid "Installed apps"
 msgstr "已安装的App"
 
-#: ../EosAppStore/appFrame.js:452
+#: ../EosAppStore/appFrame.js:462
 msgid "Install apps"
 msgstr "安装 App"
 
-#: ../EosAppStore/appFrame.js:488
+#: ../EosAppStore/appFrame.js:502
+msgid "Search results"
+msgstr "搜索结果"
+
+#: ../EosAppStore/appFrame.js:542
 msgid "Refresh failed"
 msgstr "刷新失败"
 
@@ -147,23 +152,23 @@ msgstr "存储空间不足，无法安装此App"
 
 #: ../EosAppStore/appInfoBox.js:426
 msgid "Insufficient space to update the app"
-msgstr ""
+msgstr "空间不足够以更新app"
 
 #: ../EosAppStore/appInfoBox.js:518
 msgid "Downloading…"
-msgstr "正在下载…"
+msgstr "正在下载……"
 
 #: ../EosAppStore/appInfoBox.js:526
 msgid "Updating…"
-msgstr "正在更新…"
+msgstr "正在更新……"
 
 #: ../EosAppStore/appInfoBox.js:529
 msgid "Installing…"
-msgstr "正在安装…"
+msgstr "正在安装……"
 
 #: ../EosAppStore/appInfoBox.js:532
 msgid "Removing…"
-msgstr "正在移除…"
+msgstr "正在移除……"
 
 #. Translators: Abbreviation for file size in megabytes;
 #. %s denotes the placement of the numeric value
@@ -176,6 +181,10 @@ msgstr "%s MB"
 #: ../EosAppStore/appStore.js:235
 msgid "Dismiss"
 msgstr "消除"
+
+#: ../EosAppStore/appStoreWindow.js:280
+msgid "Press Escape to cancel"
+msgstr "按Escape退出"
 
 #. Translators: use the same string used to install the app center content
 #. JSON
@@ -199,23 +208,27 @@ msgstr "工具"
 msgid "Installed"
 msgstr "已安装"
 
-#: ../EosAppStore/categories.js:52
+#: ../EosAppStore/categories.js:47
+msgid "Search"
+msgstr "搜索"
+
+#: ../EosAppStore/categories.js:59
 msgid "News"
 msgstr "新闻"
 
-#: ../EosAppStore/categories.js:58
+#: ../EosAppStore/categories.js:65
 msgid "Sports"
 msgstr "运动"
 
-#: ../EosAppStore/categories.js:64
+#: ../EosAppStore/categories.js:71
 msgid "Education and Health"
 msgstr "教育与健康"
 
-#: ../EosAppStore/categories.js:70
+#: ../EosAppStore/categories.js:77
 msgid "Entertainment"
 msgstr "娱乐"
 
-#: ../EosAppStore/categories.js:76
+#: ../EosAppStore/categories.js:83
 msgid "Local"
 msgstr "本地"
 
@@ -229,7 +242,7 @@ msgstr "文件夹名称"
 
 #: ../EosAppStore/folderFrame.js:70
 msgid "Folder added!"
-msgstr "添加文件夹！"
+msgstr "文件夹添加成功！"
 
 #: ../EosAppStore/folderFrame.js:295
 msgid "Folders"
@@ -243,33 +256,33 @@ msgstr "安装文件夹"
 msgid "Write the website you'd like to add here and press “Enter”"
 msgstr "输入您想添加在此的网址并点击”确定“"
 
-#: ../EosAppStore/weblinkFrame.js:368
+#: ../EosAppStore/weblinkFrame.js:369
 msgid "searching"
 msgstr "搜索中"
 
-#: ../EosAppStore/weblinkFrame.js:383
+#: ../EosAppStore/weblinkFrame.js:384
 msgid "The address written does not exist or is not available."
 msgstr "输入的网址不存在或无法获取"
 
-#: ../EosAppStore/weblinkFrame.js:392 ../EosAppStore/weblinkFrame.js:548
+#: ../EosAppStore/weblinkFrame.js:393 ../EosAppStore/weblinkFrame.js:549
 msgid "Added successfully!"
 msgstr "添加成功！"
 
-#: ../EosAppStore/weblinkFrame.js:629
+#: ../EosAppStore/weblinkFrame.js:630
 msgid ""
 "Add your favorite websites to your desktop or choose suggested ones from our"
 " list."
 msgstr "将您喜爱的网站添加到桌面上或从我们的列表中选择推荐网站。"
 
-#: ../EosAppStore/weblinkFrame.js:775
+#: ../EosAppStore/weblinkFrame.js:776
 msgid "Websites"
 msgstr "网站"
 
-#: ../EosAppStore/weblinkFrame.js:779
+#: ../EosAppStore/weblinkFrame.js:780
 msgid "Install websites"
 msgstr "安装网站"
 
-#: ../EosAppStore/lib/eos-app-info.c:906
+#: ../EosAppStore/lib/eos-app-info.c:907
 #, c-format
 msgid "No verification available for app '%s'"
 msgstr "无法验证app '%s'"
@@ -280,60 +293,60 @@ msgid ""
 "your system. If the problem persists, please contact support."
 msgstr "APP中心检测到一个错误，无法继续运作。请重启您的系统。如果问题仍存在请寻求帮助。"
 
-#: ../EosAppStore/lib/eos-app-list-model.c:458
+#: ../EosAppStore/lib/eos-app-list-model.c:460
 msgid "We are unable to load the complete list of applications"
 msgstr "我们无法加载应用程序完整列表"
 
-#: ../EosAppStore/lib/eos-app-list-model.c:466
+#: ../EosAppStore/lib/eos-app-list-model.c:468
 msgid "We were unable to update the list of applications"
 msgstr "我们无法更新应用程序列表"
 
-#: ../EosAppStore/lib/eos-app-list-model.c:1014
+#: ../EosAppStore/lib/eos-app-list-model.c:1017
 msgid "Not enough space on device for installing the app."
 msgstr "空间不足，无法在该设备上安装此应用程序。"
 
-#: ../EosAppStore/lib/eos-app-list-model.c:1101
+#: ../EosAppStore/lib/eos-app-list-model.c:1104
 msgid ""
 "We encountered an internal error during the installation of the application."
 msgstr "应用程序安装过程中我们发现了一个内部错误。"
 
-#: ../EosAppStore/lib/eos-app-list-model.c:1130
+#: ../EosAppStore/lib/eos-app-list-model.c:1133
 msgid ""
 "We encountered an internal error during the removal of the application."
 msgstr "应用程序移除过程中我们发现了一个内部错误。"
 
-#: ../EosAppStore/lib/eos-app-list-model.c:1157
-#: ../EosAppStore/lib/eos-app-list-model.c:1201
+#: ../EosAppStore/lib/eos-app-list-model.c:1160
+#: ../EosAppStore/lib/eos-app-list-model.c:1204
 msgid "You must be an administrator to install applications."
 msgstr "您必须以管理员身份来安装应用程序。"
 
-#: ../EosAppStore/lib/eos-app-list-model.c:1346
-#: ../EosAppStore/lib/eos-app-list-model.c:1373
+#: ../EosAppStore/lib/eos-app-list-model.c:1349
+#: ../EosAppStore/lib/eos-app-list-model.c:1376
 msgid "You must be an administrator to remove applications."
 msgstr "您必须以管理员身份来移除应用程序。"
 
-#: ../EosAppStore/lib/eos-app-list-model.c:1496
+#: ../EosAppStore/lib/eos-app-list-model.c:1502
 #, c-format
 msgid "App %s has no candidate for installation."
 msgstr "App%s无备选安装。"
 
-#: ../EosAppStore/lib/eos-app-list-model.c:1508
+#: ../EosAppStore/lib/eos-app-list-model.c:1514
 #, c-format
 msgid "App '%s' is already installed."
 msgstr "App%s已安装。"
 
-#: ../EosAppStore/lib/eos-app-list-model.c:1572
+#: ../EosAppStore/lib/eos-app-list-model.c:1578
 #, c-format
 msgid "App %s not installable."
 msgstr "App%s无法安装。"
 
-#: ../EosAppStore/lib/eos-app-list-model.c:1583
+#: ../EosAppStore/lib/eos-app-list-model.c:1589
 #, c-format
 msgid "App %s is up to date."
 msgstr "App%s已更新。"
 
-#: ../EosAppStore/lib/eos-app-list-model.c:1663
-#: ../EosAppStore/lib/eos-app-list-model.c:1708
+#: ../EosAppStore/lib/eos-app-list-model.c:1669
+#: ../EosAppStore/lib/eos-app-list-model.c:1714
 #, c-format
 msgid "App '%s' is not installed."
 msgstr "App'%s'安装不成功"
