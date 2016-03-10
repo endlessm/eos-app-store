@@ -15,6 +15,7 @@ struct _EosAppInfo
   char *application_id;
   char *desktop_id;
   char *content_id;
+  char *alias_id;
 
   char *title;
   char *subtitle;

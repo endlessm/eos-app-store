@@ -15,6 +15,8 @@
 #include <locale.h>
 #include <glib/gi18n.h>
 
+#define X_ENDLESS_KEY_ALIAS     "X-Endless-Alias"
+
 G_DEFINE_TYPE (EosAppInfo, eos_app_info, G_TYPE_OBJECT)
 
 enum {
@@ -211,6 +213,7 @@ eos_app_info_finalize (GObject *gobject)
   g_free (info->application_id);
   g_free (info->desktop_id);
   g_free (info->content_id);
+  g_free (info->alias_id);
   g_free (info->title);
   g_free (info->subtitle);
   g_free (info->description);
@@ -1013,6 +1016,9 @@ eos_app_info_update_search_tokens (EosAppInfo *info)
       g_ptr_array_set_free_func (info->search_tokens, g_free);
     }
 
+  if (info->alias_id != NULL && info->alias_id != '\0')
+    g_ptr_array_add (info->search_tokens, g_strdup (info->alias_id));
+
   if (info->title != NULL && info->title[0] != '\0')
     merge_search_tokens (info->search_tokens, info->title);
 
@@ -1235,6 +1241,9 @@ eos_app_info_update_from_gio (EosAppInfo *info,
 
   g_free (info->icon_name);
   info->icon_name = g_desktop_app_info_get_string (desktop_info, G_KEY_FILE_DESKTOP_KEY_ICON);
+
+  g_free (info->alias_id);
+  info->alias_id = g_desktop_app_info_get_string (desktop_info, X_ENDLESS_KEY_ALIAS);
 }
 
 /*< private >*/
@@ -1414,4 +1423,18 @@ eos_app_info_emit_download_progress (EosAppInfo *info,
 {
   g_signal_emit (info, eos_app_info_signals[DOWNLOAD_PROGRESS], 0,
                  current, total);
+}
+
+/*< private >*/
+gboolean
+eos_app_info_has_alias (const EosAppInfo *info)
+{
+  return info->alias_id != NULL;
+}
+
+/*< private >*/
+const char *
+eos_app_info_get_alias (const EosAppInfo *info)
+{
+  return info->alias_id;
 }

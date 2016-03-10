@@ -269,6 +269,26 @@ get_localized_app_info (EosAppListModel *model,
   return NULL;
 }
 
+static gboolean
+find_by_alias (gpointer key,
+               gpointer value,
+               gpointer data)
+{
+  const char *desktop_id = data;
+  const EosAppInfo *info = value;
+
+  if (!eos_app_info_has_alias (info))
+    return FALSE;
+
+  char *alias_id = g_strconcat (eos_app_info_get_alias (info), ".desktop", NULL);
+
+  gboolean res = g_str_equal (alias_id, desktop_id);
+
+  g_free (alias_id);
+
+  return res;
+}
+
 /**
  * eos_app_list_model_get_app_info:
  * @model: the app list model
@@ -283,6 +303,9 @@ eos_app_list_model_get_app_info (EosAppListModel *model,
                                  const char *desktop_id)
 {
   EosAppInfo *info = g_hash_table_lookup (model->apps, desktop_id);
+
+  if (info == NULL)
+    info = g_hash_table_find (model->apps, find_by_alias, (gpointer) desktop_id);
 
   if (info == NULL)
     info = get_localized_app_info (model, desktop_id);
