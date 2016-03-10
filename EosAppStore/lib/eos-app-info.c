@@ -1424,3 +1424,17 @@ eos_app_info_emit_download_progress (EosAppInfo *info,
   g_signal_emit (info, eos_app_info_signals[DOWNLOAD_PROGRESS], 0,
                  current, total);
 }
+
+/*< private >*/
+gboolean
+eos_app_info_has_alias (const EosAppInfo *info)
+{
+  return info->alias_id != NULL;
+}
+
+/*< private >*/
+const char *
+eos_app_info_get_alias (const EosAppInfo *info)
+{
+  return info->alias_id;
+}

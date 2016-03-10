@@ -118,6 +118,12 @@ void            eos_app_info_emit_download_progress     (EosAppInfo *info,
                                                          goffset     current,
                                                          goffset     total);
 
+G_GNUC_INTERNAL
+gboolean        eos_app_info_has_alias                  (const EosAppInfo *info);
+
+G_GNUC_INTERNAL
+const char *    eos_app_info_get_alias                  (const EosAppInfo *info);
+
 #endif
 
 G_END_DECLS
