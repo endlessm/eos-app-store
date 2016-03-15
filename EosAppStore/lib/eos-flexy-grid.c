@@ -327,6 +327,8 @@ distribute_layout (GSequence *children,
       EosFlexyShape shape = eos_flexy_grid_cell_get_shape (cell);
       GtkAllocation request = { 0, };
       GtkTextDirection text_dir = gtk_widget_get_direction (GTK_WIDGET (cell));
+      int min_w, nat_w;
+      int min_h, nat_h;
 
       switch (shape)
         {
@@ -362,6 +364,14 @@ distribute_layout (GSequence *children,
         }
 
       max_height = MAX (max_height, request.y + request.height + spacing);
+
+      gtk_widget_get_preferred_height_for_width (GTK_WIDGET (cell), request.width, &min_h, &nat_h);
+      if (request.height < min_h)
+        request.height = min_h;
+
+      gtk_widget_get_preferred_width_for_height (GTK_WIDGET (cell), request.height, &min_w, &nat_w);
+      if (request.width < min_w)
+        request.width = min_w;
 
       /* Flip horizontal allocation for RTL */
       if (text_dir == GTK_TEXT_DIR_RTL)
@@ -452,7 +462,7 @@ out:
   if (minimum_width_out)
     *minimum_width_out = minimum_width;
   if (natural_width_out)
-    * natural_width_out = MAX (natural_width, minimum_width);
+    *natural_width_out = MAX (natural_width, minimum_width);
 }
 
 static void
