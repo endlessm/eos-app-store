@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: eos-app-store\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2016-03-08 02:22+0000\n"
-"PO-Revision-Date: 2016-02-16 02:24+0000\n"
+"PO-Revision-Date: 2016-03-15 23:38+0000\n"
 "Last-Translator: endlessmobile_build <philip@endlessm.com>\n"
 "Language-Team: Indonesian (http://www.transifex.com/endless-mobile-inc/eos-app-store/language/id/)\n"
 "MIME-Version: 1.0\n"
@@ -76,7 +76,7 @@ msgstr "Pasang aplikasi"
 
 #: ../EosAppStore/appFrame.js:502
 msgid "Search results"
-msgstr ""
+msgstr "Hasil pencarian"
 
 #: ../EosAppStore/appFrame.js:542
 msgid "Refresh failed"
@@ -148,7 +148,7 @@ msgstr "Ruang tidak cukup untuk memasang aplikasi"
 
 #: ../EosAppStore/appInfoBox.js:426
 msgid "Insufficient space to update the app"
-msgstr ""
+msgstr "Ruang tak cukup untuk memperbarui aplikasi"
 
 #: ../EosAppStore/appInfoBox.js:518
 msgid "Downloading…"
@@ -180,7 +180,7 @@ msgstr "Batalkan"
 
 #: ../EosAppStore/appStoreWindow.js:280
 msgid "Press Escape to cancel"
-msgstr ""
+msgstr "Tekan Escape untuk membatalkan"
 
 #. Translators: use the same string used to install the app center content
 #. JSON
@@ -206,7 +206,7 @@ msgstr "Terpasang"
 
 #: ../EosAppStore/categories.js:47
 msgid "Search"
-msgstr ""
+msgstr "Pencarian"
 
 #: ../EosAppStore/categories.js:59
 msgid "News"

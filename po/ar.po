@@ -9,7 +9,7 @@ msgstr ""
 "Project-Id-Version: eos-app-store\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2016-03-08 02:22+0000\n"
-"PO-Revision-Date: 2016-02-16 02:24+0000\n"
+"PO-Revision-Date: 2016-03-17 06:00+0000\n"
 "Last-Translator: endlessmobile_build <philip@endlessm.com>\n"
 "Language-Team: Arabic (http://www.transifex.com/endless-mobile-inc/eos-app-store/language/ar/)\n"
 "MIME-Version: 1.0\n"
@@ -77,7 +77,7 @@ msgstr "تثبيت التطبيقات"
 
 #: ../EosAppStore/appFrame.js:502
 msgid "Search results"
-msgstr ""
+msgstr "بحث النتائج"
 
 #: ../EosAppStore/appFrame.js:542
 msgid "Refresh failed"
@@ -149,7 +149,7 @@ msgstr "ليست هناك مساحة كافية لتثبيت التطبيق"
 
 #: ../EosAppStore/appInfoBox.js:426
 msgid "Insufficient space to update the app"
-msgstr ""
+msgstr "إن المساحة غير كافية لتحديث التطبيق"
 
 #: ../EosAppStore/appInfoBox.js:518
 msgid "Downloading…"
@@ -181,7 +181,7 @@ msgstr "استبعاد"
 
 #: ../EosAppStore/appStoreWindow.js:280
 msgid "Press Escape to cancel"
-msgstr ""
+msgstr "قُم بالضغط على زر الإفلات للإلغاء"
 
 #. Translators: use the same string used to install the app center content
 #. JSON
@@ -207,7 +207,7 @@ msgstr "مثبت"
 
 #: ../EosAppStore/categories.js:47
 msgid "Search"
-msgstr ""
+msgstr "البحث"
 
 #: ../EosAppStore/categories.js:59
 msgid "News"

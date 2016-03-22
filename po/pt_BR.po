@@ -5,7 +5,7 @@
 # Translators:
 # Ivan G. Gonçalves <i@endlessm.com>, 2015
 # Joel Gil <joel@endlessm.com>, 2013
-# Mariana Barbosa <mari@endlessm.com>, 2015
+# Mariana Barbosa <mari@endlessm.com>, 2015-2016
 # Nuritzi Sanchez <ns@endlessm.com>, 2013
 # Philip Chimento <philip.chimento@gmail.com>, 2014
 # Renato Peixoto Pinto <renato@endlessm.com>, 2013
@@ -17,8 +17,8 @@ msgstr ""
 "Project-Id-Version: eos-app-store\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2016-03-08 02:22+0000\n"
-"PO-Revision-Date: 2016-02-16 02:24+0000\n"
-"Last-Translator: endlessmobile_build <philip@endlessm.com>\n"
+"PO-Revision-Date: 2016-03-21 16:12+0000\n"
+"Last-Translator: Mariana Barbosa <mari@endlessm.com>\n"
 "Language-Team: Portuguese (Brazil) (http://www.transifex.com/endless-mobile-inc/eos-app-store/language/pt_BR/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -85,7 +85,7 @@ msgstr "Instalar programas"
 
 #: ../EosAppStore/appFrame.js:502
 msgid "Search results"
-msgstr ""
+msgstr "Resultados da busca"
 
 #: ../EosAppStore/appFrame.js:542
 msgid "Refresh failed"
@@ -157,7 +157,7 @@ msgstr "Espaço insuficiente para instalar o programa"
 
 #: ../EosAppStore/appInfoBox.js:426
 msgid "Insufficient space to update the app"
-msgstr ""
+msgstr "Espaço insuficiente para atualizar o programa"
 
 #: ../EosAppStore/appInfoBox.js:518
 msgid "Downloading…"
@@ -189,7 +189,7 @@ msgstr "Descartar"
 
 #: ../EosAppStore/appStoreWindow.js:280
 msgid "Press Escape to cancel"
-msgstr ""
+msgstr "Pressione Esc para cancelar"
 
 #. Translators: use the same string used to install the app center content
 #. JSON
@@ -215,7 +215,7 @@ msgstr "Instalado"
 
 #: ../EosAppStore/categories.js:47
 msgid "Search"
-msgstr ""
+msgstr "Pesquisar"
 
 #: ../EosAppStore/categories.js:59
 msgid "News"
