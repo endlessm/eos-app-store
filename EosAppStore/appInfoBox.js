@@ -417,6 +417,9 @@ const AppInfoBox = new Lang.Class({
         this._installButton.hide();
         this._removeButton.hide();
 
+        // reset install button as sensitive
+        this._installButton.set_sensitive(true);
+
         const BUTTON_LABEL_INSTALL = _("Install app");
         const BUTTON_LABEL_UPDATE = _("Update app");
         const BUTTON_LABEL_LAUNCH = _("Open app");
