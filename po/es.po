@@ -13,8 +13,8 @@
 # Fernando Farfan <fernando@endlessm.com>, 2015
 # goizueta <goizueta@endlessm.com>, 2014
 # goizueta <goizueta@endlessm.com>, 2014
-# Joel Gil <joel@endlessm.com>, 2013-2014
-# Joel Gil <joel@endlessm.com>, 2013
+# Joel Gil León <joel@endlessm.com>, 2013-2014
+# Joel Gil León <joel@endlessm.com>, 2013
 # Nuritzi Sanchez <ns@endlessm.com>, 2014,2016
 # Philip Chimento <philip.chimento@gmail.com>, 2014
 # Renato Peixoto Pinto <renato@endlessm.com>, 2014
