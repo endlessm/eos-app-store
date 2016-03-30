@@ -42,7 +42,7 @@ PKG_CHECK_MODULES(EOS_APP_STORE,
                   libsoup-2.4 >= 2.44.0
                   webkit2gtk-4.0
                   systemd
-                  libsystemd-journal)
+                  libsystemd)
 AC_SUBST(EOS_APP_STORE_CFLAGS)
 AC_SUBST(EOS_APP_STORE_LIBS)
 
