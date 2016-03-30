@@ -15,7 +15,7 @@ Build-Depends: cdbs (>= 0.4.90~),
                libjson-glib-dev,
                libsoup2.4-dev,
                libwebkit2gtk-4.0-dev,
-               libsystemd-journal-dev,
+               libsystemd-dev,
                systemd
 Standards-Version: 3.9.2
 Homepage: http://www.endlessm.com
