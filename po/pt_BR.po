@@ -16,7 +16,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: eos-app-store\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-03-08 02:22+0000\n"
+"POT-Creation-Date: 2016-03-29 01:21+0000\n"
 "PO-Revision-Date: 2016-03-21 16:12+0000\n"
 "Last-Translator: Mariana Barbosa <mari@endlessm.com>\n"
 "Language-Team: Portuguese (Brazil) (http://www.transifex.com/endless-mobile-inc/eos-app-store/language/pt_BR/)\n"
@@ -26,7 +26,7 @@ msgstr ""
 "Language: pt_BR\n"
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
 
-#: ../data/eos-app-store-app-info-box.ui.h:1 ../EosAppStore/appInfoBox.js:420
+#: ../data/eos-app-store-app-info-box.ui.h:1 ../EosAppStore/appInfoBox.js:423
 msgid "Install app"
 msgstr "Instalar programa"
 
@@ -135,43 +135,43 @@ msgstr "Não foi possível instalar '%s'"
 msgid "'%s' was installed successfully"
 msgstr "'%s' instalado com sucesso"
 
-#: ../EosAppStore/appInfoBox.js:421
+#: ../EosAppStore/appInfoBox.js:424
 msgid "Update app"
 msgstr "Atualizar programa"
 
-#: ../EosAppStore/appInfoBox.js:422
+#: ../EosAppStore/appInfoBox.js:425
 msgid "Open app"
 msgstr "Abrir programa"
 
-#: ../EosAppStore/appInfoBox.js:423
+#: ../EosAppStore/appInfoBox.js:426
 msgid "Add to the desktop"
 msgstr "Adicionar à área de trabalho"
 
-#: ../EosAppStore/appInfoBox.js:424
+#: ../EosAppStore/appInfoBox.js:427
 msgid "No network connection is available"
 msgstr "Nenhuma conexão de rede disponível"
 
-#: ../EosAppStore/appInfoBox.js:425
+#: ../EosAppStore/appInfoBox.js:428
 msgid "Insufficient space to install the app"
 msgstr "Espaço insuficiente para instalar o programa"
 
-#: ../EosAppStore/appInfoBox.js:426
+#: ../EosAppStore/appInfoBox.js:429
 msgid "Insufficient space to update the app"
 msgstr "Espaço insuficiente para atualizar o programa"
 
-#: ../EosAppStore/appInfoBox.js:518
+#: ../EosAppStore/appInfoBox.js:521
 msgid "Downloading…"
 msgstr "Baixando…"
 
-#: ../EosAppStore/appInfoBox.js:526
+#: ../EosAppStore/appInfoBox.js:529
 msgid "Updating…"
 msgstr "Atualizando…"
 
-#: ../EosAppStore/appInfoBox.js:529
+#: ../EosAppStore/appInfoBox.js:532
 msgid "Installing…"
 msgstr "Instalando…"
 
-#: ../EosAppStore/appInfoBox.js:532
+#: ../EosAppStore/appInfoBox.js:535
 msgid "Removing…"
 msgstr "Removendo…"
 
@@ -287,7 +287,7 @@ msgstr "Sites"
 msgid "Install websites"
 msgstr "Adicionar atalhos para sites"
 
-#: ../EosAppStore/lib/eos-app-info.c:907
+#: ../EosAppStore/lib/eos-app-info.c:910
 #, c-format
 msgid "No verification available for app '%s'"
 msgstr "Nenhuma verificação disponível para o programa '%s'"
@@ -298,60 +298,60 @@ msgid ""
 "your system. If the problem persists, please contact support."
 msgstr "Mais programas detectou um erro e não pode continuar. Por favor, reinicie o sistema. Se o problema persistir, por favor entre em contato com o suporte."
 
-#: ../EosAppStore/lib/eos-app-list-model.c:460
+#: ../EosAppStore/lib/eos-app-list-model.c:483
 msgid "We are unable to load the complete list of applications"
 msgstr "Não foi possível exibir a lista completa de programas"
 
-#: ../EosAppStore/lib/eos-app-list-model.c:468
+#: ../EosAppStore/lib/eos-app-list-model.c:491
 msgid "We were unable to update the list of applications"
 msgstr "Não foi possível atualizar a lista de aplicativos"
 
-#: ../EosAppStore/lib/eos-app-list-model.c:1017
+#: ../EosAppStore/lib/eos-app-list-model.c:1040
 msgid "Not enough space on device for installing the app."
 msgstr "Não há espaço suficiente para instalar o programa."
 
-#: ../EosAppStore/lib/eos-app-list-model.c:1104
+#: ../EosAppStore/lib/eos-app-list-model.c:1127
 msgid ""
 "We encountered an internal error during the installation of the application."
 msgstr "Encontramos um erro interno durante a instalação do programa."
 
-#: ../EosAppStore/lib/eos-app-list-model.c:1133
+#: ../EosAppStore/lib/eos-app-list-model.c:1156
 msgid ""
 "We encountered an internal error during the removal of the application."
 msgstr "Encontramos um erro interno durante a remoção do programa."
 
-#: ../EosAppStore/lib/eos-app-list-model.c:1160
-#: ../EosAppStore/lib/eos-app-list-model.c:1204
+#: ../EosAppStore/lib/eos-app-list-model.c:1183
+#: ../EosAppStore/lib/eos-app-list-model.c:1227
 msgid "You must be an administrator to install applications."
 msgstr "Você precisa ser o administrador para instalar programas."
 
-#: ../EosAppStore/lib/eos-app-list-model.c:1349
-#: ../EosAppStore/lib/eos-app-list-model.c:1376
+#: ../EosAppStore/lib/eos-app-list-model.c:1372
+#: ../EosAppStore/lib/eos-app-list-model.c:1399
 msgid "You must be an administrator to remove applications."
 msgstr "Você precisa ser o administrador para remover programas."
 
-#: ../EosAppStore/lib/eos-app-list-model.c:1502
+#: ../EosAppStore/lib/eos-app-list-model.c:1525
 #, c-format
 msgid "App %s has no candidate for installation."
 msgstr "O programa %s não possui uma versão que possa ser instalada."
 
-#: ../EosAppStore/lib/eos-app-list-model.c:1514
+#: ../EosAppStore/lib/eos-app-list-model.c:1537
 #, c-format
 msgid "App '%s' is already installed."
 msgstr "O programa '%s' já está instalado."
 
-#: ../EosAppStore/lib/eos-app-list-model.c:1578
+#: ../EosAppStore/lib/eos-app-list-model.c:1601
 #, c-format
 msgid "App %s not installable."
 msgstr "Não é possível instalar o programa %s. "
 
-#: ../EosAppStore/lib/eos-app-list-model.c:1589
+#: ../EosAppStore/lib/eos-app-list-model.c:1612
 #, c-format
 msgid "App %s is up to date."
 msgstr "O programa %s está atualizado."
 
-#: ../EosAppStore/lib/eos-app-list-model.c:1669
-#: ../EosAppStore/lib/eos-app-list-model.c:1714
+#: ../EosAppStore/lib/eos-app-list-model.c:1692
+#: ../EosAppStore/lib/eos-app-list-model.c:1737
 #, c-format
 msgid "App '%s' is not installed."
 msgstr " O programa '%s' não está instalado."

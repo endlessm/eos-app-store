@@ -11,7 +11,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: eos-app-store\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-03-08 02:22+0000\n"
+"POT-Creation-Date: 2016-03-29 01:21+0000\n"
 "PO-Revision-Date: 2016-02-21 07:01+0000\n"
 "Last-Translator: zhifeng peng <jnufeng@126.com>\n"
 "Language-Team: Chinese (China) (http://www.transifex.com/endless-mobile-inc/eos-app-store/language/zh_CN/)\n"
@@ -21,7 +21,7 @@ msgstr ""
 "Language: zh_CN\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
 
-#: ../data/eos-app-store-app-info-box.ui.h:1 ../EosAppStore/appInfoBox.js:420
+#: ../data/eos-app-store-app-info-box.ui.h:1 ../EosAppStore/appInfoBox.js:423
 msgid "Install app"
 msgstr "安装App"
 
@@ -130,43 +130,43 @@ msgstr "'%s'安装失败"
 msgid "'%s' was installed successfully"
 msgstr "'%s'已成功安装"
 
-#: ../EosAppStore/appInfoBox.js:421
+#: ../EosAppStore/appInfoBox.js:424
 msgid "Update app"
 msgstr "更新app"
 
-#: ../EosAppStore/appInfoBox.js:422
+#: ../EosAppStore/appInfoBox.js:425
 msgid "Open app"
 msgstr "打开app"
 
-#: ../EosAppStore/appInfoBox.js:423
+#: ../EosAppStore/appInfoBox.js:426
 msgid "Add to the desktop"
 msgstr "添加到桌面"
 
-#: ../EosAppStore/appInfoBox.js:424
+#: ../EosAppStore/appInfoBox.js:427
 msgid "No network connection is available"
 msgstr "无可用的网络连接"
 
-#: ../EosAppStore/appInfoBox.js:425
+#: ../EosAppStore/appInfoBox.js:428
 msgid "Insufficient space to install the app"
 msgstr "存储空间不足，无法安装此App"
 
-#: ../EosAppStore/appInfoBox.js:426
+#: ../EosAppStore/appInfoBox.js:429
 msgid "Insufficient space to update the app"
 msgstr "空间不足够以更新app"
 
-#: ../EosAppStore/appInfoBox.js:518
+#: ../EosAppStore/appInfoBox.js:521
 msgid "Downloading…"
 msgstr "正在下载……"
 
-#: ../EosAppStore/appInfoBox.js:526
+#: ../EosAppStore/appInfoBox.js:529
 msgid "Updating…"
 msgstr "正在更新……"
 
-#: ../EosAppStore/appInfoBox.js:529
+#: ../EosAppStore/appInfoBox.js:532
 msgid "Installing…"
 msgstr "正在安装……"
 
-#: ../EosAppStore/appInfoBox.js:532
+#: ../EosAppStore/appInfoBox.js:535
 msgid "Removing…"
 msgstr "正在移除……"
 
@@ -282,7 +282,7 @@ msgstr "网站"
 msgid "Install websites"
 msgstr "安装网站"
 
-#: ../EosAppStore/lib/eos-app-info.c:907
+#: ../EosAppStore/lib/eos-app-info.c:910
 #, c-format
 msgid "No verification available for app '%s'"
 msgstr "无法验证app '%s'"
@@ -293,60 +293,60 @@ msgid ""
 "your system. If the problem persists, please contact support."
 msgstr "APP中心检测到一个错误，无法继续运作。请重启您的系统。如果问题仍存在请寻求帮助。"
 
-#: ../EosAppStore/lib/eos-app-list-model.c:460
+#: ../EosAppStore/lib/eos-app-list-model.c:483
 msgid "We are unable to load the complete list of applications"
 msgstr "我们无法加载应用程序完整列表"
 
-#: ../EosAppStore/lib/eos-app-list-model.c:468
+#: ../EosAppStore/lib/eos-app-list-model.c:491
 msgid "We were unable to update the list of applications"
 msgstr "我们无法更新应用程序列表"
 
-#: ../EosAppStore/lib/eos-app-list-model.c:1017
+#: ../EosAppStore/lib/eos-app-list-model.c:1040
 msgid "Not enough space on device for installing the app."
 msgstr "空间不足，无法在该设备上安装此应用程序。"
 
-#: ../EosAppStore/lib/eos-app-list-model.c:1104
+#: ../EosAppStore/lib/eos-app-list-model.c:1127
 msgid ""
 "We encountered an internal error during the installation of the application."
 msgstr "应用程序安装过程中我们发现了一个内部错误。"
 
-#: ../EosAppStore/lib/eos-app-list-model.c:1133
+#: ../EosAppStore/lib/eos-app-list-model.c:1156
 msgid ""
 "We encountered an internal error during the removal of the application."
 msgstr "应用程序移除过程中我们发现了一个内部错误。"
 
-#: ../EosAppStore/lib/eos-app-list-model.c:1160
-#: ../EosAppStore/lib/eos-app-list-model.c:1204
+#: ../EosAppStore/lib/eos-app-list-model.c:1183
+#: ../EosAppStore/lib/eos-app-list-model.c:1227
 msgid "You must be an administrator to install applications."
 msgstr "您必须以管理员身份来安装应用程序。"
 
-#: ../EosAppStore/lib/eos-app-list-model.c:1349
-#: ../EosAppStore/lib/eos-app-list-model.c:1376
+#: ../EosAppStore/lib/eos-app-list-model.c:1372
+#: ../EosAppStore/lib/eos-app-list-model.c:1399
 msgid "You must be an administrator to remove applications."
 msgstr "您必须以管理员身份来移除应用程序。"
 
-#: ../EosAppStore/lib/eos-app-list-model.c:1502
+#: ../EosAppStore/lib/eos-app-list-model.c:1525
 #, c-format
 msgid "App %s has no candidate for installation."
 msgstr "App%s无备选安装。"
 
-#: ../EosAppStore/lib/eos-app-list-model.c:1514
+#: ../EosAppStore/lib/eos-app-list-model.c:1537
 #, c-format
 msgid "App '%s' is already installed."
 msgstr "App%s已安装。"
 
-#: ../EosAppStore/lib/eos-app-list-model.c:1578
+#: ../EosAppStore/lib/eos-app-list-model.c:1601
 #, c-format
 msgid "App %s not installable."
 msgstr "App%s无法安装。"
 
-#: ../EosAppStore/lib/eos-app-list-model.c:1589
+#: ../EosAppStore/lib/eos-app-list-model.c:1612
 #, c-format
 msgid "App %s is up to date."
 msgstr "App%s已更新。"
 
-#: ../EosAppStore/lib/eos-app-list-model.c:1669
-#: ../EosAppStore/lib/eos-app-list-model.c:1714
+#: ../EosAppStore/lib/eos-app-list-model.c:1692
+#: ../EosAppStore/lib/eos-app-list-model.c:1737
 #, c-format
 msgid "App '%s' is not installed."
 msgstr "App'%s'安装不成功"

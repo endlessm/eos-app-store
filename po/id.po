@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: eos-app-store\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-03-08 02:22+0000\n"
+"POT-Creation-Date: 2016-03-29 01:21+0000\n"
 "PO-Revision-Date: 2016-03-15 23:38+0000\n"
 "Last-Translator: endlessmobile_build <philip@endlessm.com>\n"
 "Language-Team: Indonesian (http://www.transifex.com/endless-mobile-inc/eos-app-store/language/id/)\n"
@@ -17,7 +17,7 @@ msgstr ""
 "Language: id\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
 
-#: ../data/eos-app-store-app-info-box.ui.h:1 ../EosAppStore/appInfoBox.js:420
+#: ../data/eos-app-store-app-info-box.ui.h:1 ../EosAppStore/appInfoBox.js:423
 msgid "Install app"
 msgstr "Pasang aplikasi"
 
@@ -126,43 +126,43 @@ msgstr "Kami tidak dapat memasang '%s'"
 msgid "'%s' was installed successfully"
 msgstr "'%s' berhasil dipasang"
 
-#: ../EosAppStore/appInfoBox.js:421
+#: ../EosAppStore/appInfoBox.js:424
 msgid "Update app"
 msgstr "Perbarui aplikasi"
 
-#: ../EosAppStore/appInfoBox.js:422
+#: ../EosAppStore/appInfoBox.js:425
 msgid "Open app"
 msgstr "Buka aplikasi"
 
-#: ../EosAppStore/appInfoBox.js:423
+#: ../EosAppStore/appInfoBox.js:426
 msgid "Add to the desktop"
 msgstr "Tambahkan ke desktop"
 
-#: ../EosAppStore/appInfoBox.js:424
+#: ../EosAppStore/appInfoBox.js:427
 msgid "No network connection is available"
 msgstr "Tidak ada koneksi jaringan yang tersedia"
 
-#: ../EosAppStore/appInfoBox.js:425
+#: ../EosAppStore/appInfoBox.js:428
 msgid "Insufficient space to install the app"
 msgstr "Ruang tidak cukup untuk memasang aplikasi"
 
-#: ../EosAppStore/appInfoBox.js:426
+#: ../EosAppStore/appInfoBox.js:429
 msgid "Insufficient space to update the app"
 msgstr "Ruang tak cukup untuk memperbarui aplikasi"
 
-#: ../EosAppStore/appInfoBox.js:518
+#: ../EosAppStore/appInfoBox.js:521
 msgid "Downloading…"
 msgstr "Mengunduh..."
 
-#: ../EosAppStore/appInfoBox.js:526
+#: ../EosAppStore/appInfoBox.js:529
 msgid "Updating…"
 msgstr "Memperbarui..."
 
-#: ../EosAppStore/appInfoBox.js:529
+#: ../EosAppStore/appInfoBox.js:532
 msgid "Installing…"
 msgstr "Memasang..."
 
-#: ../EosAppStore/appInfoBox.js:532
+#: ../EosAppStore/appInfoBox.js:535
 msgid "Removing…"
 msgstr "Menghapus..."
 
@@ -278,7 +278,7 @@ msgstr "Situs Web"
 msgid "Install websites"
 msgstr "Pasang situs-situs web"
 
-#: ../EosAppStore/lib/eos-app-info.c:907
+#: ../EosAppStore/lib/eos-app-info.c:910
 #, c-format
 msgid "No verification available for app '%s'"
 msgstr "Tidak tersedia verifikasi untuk aplikasi '%s'"
@@ -289,60 +289,60 @@ msgid ""
 "your system. If the problem persists, please contact support."
 msgstr "Pusat aplikasi telah mendeteksi kesalahan dan tidak dapat melanjutkan. Jalankan ulang sistem. Jika masalah terus berlanjut, hubungi dukungan."
 
-#: ../EosAppStore/lib/eos-app-list-model.c:460
+#: ../EosAppStore/lib/eos-app-list-model.c:483
 msgid "We are unable to load the complete list of applications"
 msgstr "Kami tidak dapat memuat daftar aplikasi secara lengkap"
 
-#: ../EosAppStore/lib/eos-app-list-model.c:468
+#: ../EosAppStore/lib/eos-app-list-model.c:491
 msgid "We were unable to update the list of applications"
 msgstr "Kami tidak dapat memperbarui daftar aplikasi"
 
-#: ../EosAppStore/lib/eos-app-list-model.c:1017
+#: ../EosAppStore/lib/eos-app-list-model.c:1040
 msgid "Not enough space on device for installing the app."
 msgstr "Ruang pada perangkat tidak cukup untuk memasang aplikasi"
 
-#: ../EosAppStore/lib/eos-app-list-model.c:1104
+#: ../EosAppStore/lib/eos-app-list-model.c:1127
 msgid ""
 "We encountered an internal error during the installation of the application."
 msgstr "Terjadi kesalahan internal pada saat pemasangan aplikasi."
 
-#: ../EosAppStore/lib/eos-app-list-model.c:1133
+#: ../EosAppStore/lib/eos-app-list-model.c:1156
 msgid ""
 "We encountered an internal error during the removal of the application."
 msgstr "Kami mengalami kesalahan internal selama menghapus aplikasi."
 
-#: ../EosAppStore/lib/eos-app-list-model.c:1160
-#: ../EosAppStore/lib/eos-app-list-model.c:1204
+#: ../EosAppStore/lib/eos-app-list-model.c:1183
+#: ../EosAppStore/lib/eos-app-list-model.c:1227
 msgid "You must be an administrator to install applications."
 msgstr "Anda harus administrator untuk memasang aplikasi."
 
-#: ../EosAppStore/lib/eos-app-list-model.c:1349
-#: ../EosAppStore/lib/eos-app-list-model.c:1376
+#: ../EosAppStore/lib/eos-app-list-model.c:1372
+#: ../EosAppStore/lib/eos-app-list-model.c:1399
 msgid "You must be an administrator to remove applications."
 msgstr "Anda harus menjadi administrator untuk dapat menghapus aplikasi."
 
-#: ../EosAppStore/lib/eos-app-list-model.c:1502
+#: ../EosAppStore/lib/eos-app-list-model.c:1525
 #, c-format
 msgid "App %s has no candidate for installation."
 msgstr "Aplikasi %s tidak punya kandidat untuk instalasi."
 
-#: ../EosAppStore/lib/eos-app-list-model.c:1514
+#: ../EosAppStore/lib/eos-app-list-model.c:1537
 #, c-format
 msgid "App '%s' is already installed."
 msgstr "Aplikasi '%s' telah terpasang."
 
-#: ../EosAppStore/lib/eos-app-list-model.c:1578
+#: ../EosAppStore/lib/eos-app-list-model.c:1601
 #, c-format
 msgid "App %s not installable."
 msgstr "Aplikasi %s tidak dapat dipasang."
 
-#: ../EosAppStore/lib/eos-app-list-model.c:1589
+#: ../EosAppStore/lib/eos-app-list-model.c:1612
 #, c-format
 msgid "App %s is up to date."
 msgstr "Versi aplikasi %s sudah yang terbaru."
 
-#: ../EosAppStore/lib/eos-app-list-model.c:1669
-#: ../EosAppStore/lib/eos-app-list-model.c:1714
+#: ../EosAppStore/lib/eos-app-list-model.c:1692
+#: ../EosAppStore/lib/eos-app-list-model.c:1737
 #, c-format
 msgid "App '%s' is not installed."
 msgstr "Aplikasi '%s' tidak dipasang."
