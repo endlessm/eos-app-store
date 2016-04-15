@@ -55,7 +55,7 @@ const FillDesktop = new Lang.Class({
             return 1;
         }
 
-        return 0;
+        return -1;
     },
 
     vfunc_activate: function() {
