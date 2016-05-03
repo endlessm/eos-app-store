@@ -1,0 +1,408 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# 
+# Translators:
+msgid ""
+msgstr ""
+"Project-Id-Version: eos-app-store\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2016-05-03 01:22+0000\n"
+"PO-Revision-Date: 2016-05-03 22:03+0000\n"
+"Last-Translator: Roddy Shuler <roddy@endlessm.com>\n"
+"Language-Team: Vietnamese (http://www.transifex.com/endless-mobile-inc/eos-app-store/language/vi/)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: vi\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+
+#: ../data/eos-app-store-app-info-box.ui.h:1 ../EosAppStore/appInfoBox.js:423
+msgid "Install app"
+msgstr ""
+
+#: ../data/eos-app-store-app-info-box.ui.h:2 ../EosAppStore/appInfoBox.js:169
+msgid "Cancel"
+msgstr ""
+
+#: ../data/eos-app-store-app-info-box.ui.h:3
+msgid "Installing"
+msgstr ""
+
+#: ../data/eos-app-store-app-info-box.ui.h:4
+msgid "Delete from device"
+msgstr ""
+
+#: ../data/eos-app-store-app-installed-box.ui.h:1
+msgid "APPLICATION NAME"
+msgstr ""
+
+#: ../data/eos-app-store-app-installed-box.ui.h:2
+msgid "APPLICATION CATEGORY"
+msgstr ""
+
+#: ../data/eos-app-store-app-installed-box.ui.h:3
+msgid "SIZE"
+msgstr ""
+
+#: ../data/eos-app-store-app-installed-box.ui.h:4
+msgid "UPDATING…"
+msgstr ""
+
+#: ../data/eos-app-store-app-installed-box.ui.h:5
+msgid "STOP"
+msgstr ""
+
+#: ../data/eos-app-store-app-installed-box.ui.h:6
+msgid "System App"
+msgstr ""
+
+#: ../data/eos-app-store-folder-frame.ui.h:1
+msgid "Create your own folder to organize your apps. First, choose an icon."
+msgstr ""
+
+#: ../data/eos-app-store-weblink-new-site-frame.ui.h:1
+#: ../EosAppStore/weblinkFrame.js:349
+msgid "e.g.: http://www.endlessm.com"
+msgstr ""
+
+#: ../EosAppStore/appFrame.js:400
+msgid "Installed apps"
+msgstr ""
+
+#: ../EosAppStore/appFrame.js:462
+msgid "Install apps"
+msgstr ""
+
+#: ../EosAppStore/appFrame.js:502
+msgid "Search results"
+msgstr ""
+
+#: ../EosAppStore/appFrame.js:542
+msgid "Refresh failed"
+msgstr ""
+
+#: ../EosAppStore/appInfoBox.js:162
+msgid "Deleting app"
+msgstr ""
+
+#: ../EosAppStore/appInfoBox.js:163
+msgid ""
+"Deleting this app will remove it from the device for all users. You will "
+"need to download it from the internet in order to reinstall it."
+msgstr ""
+
+#: ../EosAppStore/appInfoBox.js:167
+msgid "Delete app"
+msgstr ""
+
+#: ../EosAppStore/appInfoBox.js:188
+#, javascript-format
+msgid "We could not remove '%s'"
+msgstr ""
+
+#: ../EosAppStore/appInfoBox.js:191
+#, javascript-format
+msgid "'%s' was removed successfully"
+msgstr ""
+
+#: ../EosAppStore/appInfoBox.js:209
+#, javascript-format
+msgid "We could not update '%s'"
+msgstr ""
+
+#: ../EosAppStore/appInfoBox.js:212
+#, javascript-format
+msgid "'%s' was updated successfully"
+msgstr ""
+
+#: ../EosAppStore/appInfoBox.js:230
+#, javascript-format
+msgid "We could not install '%s'"
+msgstr ""
+
+#: ../EosAppStore/appInfoBox.js:233
+#, javascript-format
+msgid "'%s' was installed successfully"
+msgstr ""
+
+#: ../EosAppStore/appInfoBox.js:424
+msgid "Update app"
+msgstr ""
+
+#: ../EosAppStore/appInfoBox.js:425
+msgid "Open app"
+msgstr ""
+
+#: ../EosAppStore/appInfoBox.js:426
+msgid "Add to the desktop"
+msgstr ""
+
+#: ../EosAppStore/appInfoBox.js:427
+msgid "No network connection is available"
+msgstr ""
+
+#: ../EosAppStore/appInfoBox.js:428
+msgid "Insufficient space to install the app"
+msgstr ""
+
+#: ../EosAppStore/appInfoBox.js:429
+msgid "Insufficient space to update the app"
+msgstr ""
+
+#: ../EosAppStore/appInfoBox.js:521
+msgid "Downloading…"
+msgstr ""
+
+#: ../EosAppStore/appInfoBox.js:529
+msgid "Updating…"
+msgstr ""
+
+#: ../EosAppStore/appInfoBox.js:532
+msgid "Installing…"
+msgstr ""
+
+#: ../EosAppStore/appInfoBox.js:535
+msgid "Removing…"
+msgstr ""
+
+#. Translators: Abbreviation for file size in megabytes;
+#. %s denotes the placement of the numeric value
+#. and can be placed before or after the abbreviation
+#: ../EosAppStore/appInstalledBox.js:109
+#, javascript-format
+msgid "%s MB"
+msgstr ""
+
+#: ../EosAppStore/appStore.js:235
+msgid "Dismiss"
+msgstr ""
+
+#: ../EosAppStore/appStoreWindow.js:280
+msgid "Press Escape to cancel"
+msgstr ""
+
+#. Translators: use the same string used to install the app center content
+#. JSON
+#: ../EosAppStore/categories.js:12 ../EosAppStore/lib/eos-app-utils.c:1346
+msgid "Education"
+msgstr ""
+
+#: ../EosAppStore/categories.js:19 ../EosAppStore/lib/eos-app-utils.c:1347
+msgid "Games"
+msgstr ""
+
+#: ../EosAppStore/categories.js:26 ../EosAppStore/lib/eos-app-utils.c:1348
+msgid "Resources"
+msgstr ""
+
+#: ../EosAppStore/categories.js:33 ../EosAppStore/lib/eos-app-utils.c:1349
+msgid "Utilities"
+msgstr ""
+
+#: ../EosAppStore/categories.js:40
+msgid "Installed"
+msgstr ""
+
+#: ../EosAppStore/categories.js:47
+msgid "Search"
+msgstr ""
+
+#: ../EosAppStore/categories.js:59
+msgid "News"
+msgstr ""
+
+#: ../EosAppStore/categories.js:65
+msgid "Sports"
+msgstr ""
+
+#: ../EosAppStore/categories.js:71
+msgid "Education and Health"
+msgstr ""
+
+#: ../EosAppStore/categories.js:77
+msgid "Entertainment"
+msgstr ""
+
+#: ../EosAppStore/categories.js:83
+msgid "Local"
+msgstr ""
+
+#: ../EosAppStore/environment.js:22
+msgid "App Center"
+msgstr ""
+
+#: ../EosAppStore/folderFrame.js:42
+msgid "Name of folder"
+msgstr ""
+
+#: ../EosAppStore/folderFrame.js:70
+msgid "Folder added!"
+msgstr ""
+
+#: ../EosAppStore/folderFrame.js:295
+msgid "Folders"
+msgstr ""
+
+#: ../EosAppStore/folderFrame.js:299
+msgid "Install folders"
+msgstr ""
+
+#: ../EosAppStore/weblinkFrame.js:282
+msgid "Write the website you'd like to add here and press “Enter”"
+msgstr ""
+
+#: ../EosAppStore/weblinkFrame.js:369
+msgid "searching"
+msgstr ""
+
+#: ../EosAppStore/weblinkFrame.js:384
+msgid "The address written does not exist or is not available."
+msgstr ""
+
+#: ../EosAppStore/weblinkFrame.js:393 ../EosAppStore/weblinkFrame.js:549
+msgid "Added successfully!"
+msgstr ""
+
+#: ../EosAppStore/weblinkFrame.js:630
+msgid ""
+"Add your favorite websites to your desktop or choose suggested ones from our"
+" list."
+msgstr ""
+
+#: ../EosAppStore/weblinkFrame.js:776
+msgid "Websites"
+msgstr ""
+
+#: ../EosAppStore/weblinkFrame.js:780
+msgid "Install websites"
+msgstr ""
+
+#: ../EosAppStore/lib/eos-app-info.c:910
+#, c-format
+msgid "No verification available for app '%s'"
+msgstr ""
+
+#: ../EosAppStore/lib/eos-app-list-model.c:32
+msgid ""
+"The app center has detected an error and cannot continue. Please restart "
+"your system. If the problem persists, please contact support."
+msgstr ""
+
+#: ../EosAppStore/lib/eos-app-list-model.c:483
+msgid "We are unable to load the complete list of applications"
+msgstr ""
+
+#: ../EosAppStore/lib/eos-app-list-model.c:491
+msgid "We were unable to update the list of applications"
+msgstr ""
+
+#: ../EosAppStore/lib/eos-app-list-model.c:1040
+msgid "Not enough space on device for installing the app."
+msgstr ""
+
+#: ../EosAppStore/lib/eos-app-list-model.c:1127
+msgid ""
+"We encountered an internal error during the installation of the application."
+msgstr ""
+
+#: ../EosAppStore/lib/eos-app-list-model.c:1156
+msgid ""
+"We encountered an internal error during the removal of the application."
+msgstr ""
+
+#: ../EosAppStore/lib/eos-app-list-model.c:1183
+#: ../EosAppStore/lib/eos-app-list-model.c:1227
+msgid "You must be an administrator to install applications."
+msgstr ""
+
+#: ../EosAppStore/lib/eos-app-list-model.c:1372
+#: ../EosAppStore/lib/eos-app-list-model.c:1399
+msgid "You must be an administrator to remove applications."
+msgstr ""
+
+#: ../EosAppStore/lib/eos-app-list-model.c:1525
+#, c-format
+msgid "App %s has no candidate for installation."
+msgstr ""
+
+#: ../EosAppStore/lib/eos-app-list-model.c:1537
+#, c-format
+msgid "App '%s' is already installed."
+msgstr ""
+
+#: ../EosAppStore/lib/eos-app-list-model.c:1601
+#, c-format
+msgid "App %s not installable."
+msgstr ""
+
+#: ../EosAppStore/lib/eos-app-list-model.c:1612
+#, c-format
+msgid "App %s is up to date."
+msgstr ""
+
+#: ../EosAppStore/lib/eos-app-list-model.c:1692
+#: ../EosAppStore/lib/eos-app-list-model.c:1737
+#, c-format
+msgid "App '%s' is not installed."
+msgstr ""
+
+#: ../EosAppStore/lib/eos-app-utils.c:746
+msgid "Operation cancelled"
+msgstr ""
+
+#: ../EosAppStore/lib/eos-app-utils.c:768
+msgid "Updates meta record did not contain expected structure"
+msgstr ""
+
+#: ../EosAppStore/lib/eos-app-utils.c:783
+msgid "Updates meta record did not contain expected attributes"
+msgstr ""
+
+#: ../EosAppStore/lib/eos-app-utils.c:799
+msgid "Updates meta record did not contain valid monotonic_id attribute value"
+msgstr ""
+
+#: ../EosAppStore/lib/eos-app-utils.c:1619
+#, c-format
+msgid "Not enough space on device for downloading the app."
+msgstr ""
+
+#: ../EosAppStore/lib/eos-app-utils.c:1784
+msgid "There was a problem downloading the app; please try again"
+msgstr ""
+
+#: ../EosAppStore/lib/eos-downloader.c:37
+#, c-format
+msgid "No signature available for app '%s'"
+msgstr ""
+
+#: ../EosAppStore/lib/eos-downloader.c:100
+#, c-format
+msgid "App '%s' could not be downloaded"
+msgstr ""
+
+#: ../EosAppStore/lib/eos-net-utils.c:273
+msgid "The certificate of the target server is expired"
+msgstr ""
+
+#: ../EosAppStore/lib/eos-net-utils.c:275
+msgid "The certificate of the target server has been revoked"
+msgstr ""
+
+#: ../EosAppStore/lib/eos-net-utils.c:277
+msgid "The certificate of the target server has a bad identity"
+msgstr ""
+
+#: ../EosAppStore/lib/eos-net-utils.c:279
+msgid "The certificate of the target server is from an unknown authority"
+msgstr ""
+
+#: ../EosAppStore/lib/eos-net-utils.c:281
+msgid "The certificate of the target server is bad or invalid"
+msgstr ""
+
+#: ../EosAppStore/lib/eos-net-utils.c:337
+#, c-format
+msgid "Could not save the app - canceling download (%s)"
+msgstr ""
