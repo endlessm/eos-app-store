@@ -4,11 +4,15 @@
 @define-color app_store_selected_bg alpha(@app_store_bg, 0.80);
 @define-color placeholder_text_color #333333;
 
+frame border {
+    border-width: 0px;
+}
+
 .main-window.background {
     background-color: transparent;
 }
 
-.main-frame.frame {
+.main-frame {
     background-image: url("bg_gray_noise.png");
     border-width: 0 6px 0 0;
     border-color: transparent;
@@ -21,7 +25,7 @@
                                   transparent 6px) 6 / 6px stretch;
 }
 
-.main-frame.frame:dir(rtl) {
+.main-frame:dir(rtl) {
     border-width: 0 0 0 6px;
     border-color: transparent;
     border-radius: 0;
@@ -33,17 +37,25 @@
                                   transparent 6px) 6 / 6px stretch;
 }
 
-.scrollbar {
+scrollbar {
+    background-color: transparent;
+    border-width: 0px;
+
     -GtkRange-slider-width: 8;
     -GtkRange-stepper-size: 0;
     -GtkRange-trough-border: 0;
     -GtkRange-trough-under-steppers: false;
 
     -GtkScrollbar-min-slider-length: 30;
-    -GtkScrollbar-has-forward-stepper: true;
 }
 
-.scrollbar.slider {
+scrollbar contents trough {
+    border-radius: 20px;
+    background-color: alpha(black, 0.20);
+    box-shadow: inset 0 0 2px 0 alpha(black, 0.25);
+}
+
+scrollbar contents trough slider {
     background-color: #d6d6d6;
     background-image: url("scrollbar_notch.png");
     background-repeat: no-repeat;
@@ -54,29 +66,22 @@
     box-shadow: inset 0 0 2px 0 alpha(black, 0.25);
 }
 
-.scrollbar.trough {
-    border-width: 0;
-    border-radius: 20px;
-    background-color: alpha(black, 0.20);
-    box-shadow: inset 0 0 2px 0 alpha(black, 0.25);
-}
-
-.search-bar {
+searchbar {
     border: none;
     background: none;
     box-shadow: none;
 }
 
-.sidebar-frame {
+frame.sidebar-frame {
     padding: 0 15px;
 }
 
-.sidebar-frame .button {
+frame.sidebar-frame button {
     font-size: 12px;
 }
 
 .category-button,
-.sidebar-frame .button {
+frame.sidebar-frame button {
     background: none;
     border: none;
     border-radius: 0;
@@ -86,23 +91,23 @@
 
     color: @app_store_button_fg;
     text-shadow: 0 1px alpha(black, 0.5);
-    icon-shadow: 0 1px alpha(black, 0.5);
+    -gtk-icon-shadow: 0 1px alpha(black, 0.5);
 }
 
 .category-button:checked,
-.sidebar-frame .button:checked {
+frame.sidebar-frame button:checked {
     font-weight: bold;
 }
 
 .category-button:hover,
-.sidebar-frame .button:hover {
+.sidebar-frame button:hover {
     color: @app_store_button_hover_fg;
 }
 
 .category-button:checked,
 .category-button:hover:active,
-.sidebar-frame .button:checked,
-.sidebar-frame .button:hover:active {
+frame.sidebar-frame button:checked,
+frame.sidebar-frame button:hover:active {
     color: white;
 }
 
@@ -148,7 +153,7 @@
     -GtkWidget-separator-height: 11px;
 }
 
-.frame-separator-shadows .frame {
+.frame-separator-shadows frame {
     border: none;
 }
 
@@ -156,7 +161,7 @@
     background-image: url("separator_shadow_left-edge.png");
 }
 
-.frame-separator-shadows .center-line {
+.frame-separator-shadows .center-line.border {
     background-image: url("separator_shadow_body.png");
 }
 
@@ -237,7 +242,7 @@
     padding: 7px 8px 0 0;
 
     color: @app_store_button_fg;
-    icon-shadow: 0 1px black;
+    -gtk-icon-shadow: 0 1px black;
     box-shadow: none;
 }
 
@@ -315,19 +320,23 @@
 
 .app-frame-description {
     background-color: transparent;
+}
+
+.app-frame-description text {
+    background-color: transparent;
     color: white;
     font-size: 13px;
 }
 
 .app-cell-image {
     border-radius: 3px;
-    icon-shadow: 1px 2px alpha(black, 0.2);
+    -gtk-icon-shadow: 1px 2px alpha(black, 0.2);
     margin-bottom: 3px;
 }
 
 .app-cell-icon {
     padding: 0 10px 4px;
-    icon-shadow: 1px 2px alpha(black, 0.2);
+    -gtk-icon-shadow: 1px 2px alpha(black, 0.2);
 }
 
 .select .app-cell-title,
@@ -399,7 +408,7 @@
     background-image: url("btn_install_pressed_icon.png");
 }
 
-.app-frame .state-button .state-image:insensitive {
+.app-frame .state-button .state-image:disabled {
     background-color: rgba(0, 0, 0, 0.0);
     background-image: url("btn_install_pressed_icon.png");
 }
@@ -460,15 +469,15 @@
     background: none;
 }
 
-.app-frame .app-installed-list .list-row {
+.app-frame .app-installed-list row {
     border-radius: 4px;
     padding: 0;
     background-color: alpha(#606060, 0.69);
 }
 
-.app-frame .app-installed-list .list-row:hover {
+.app-frame .app-installed-list row:hover {
     background-color: alpha(#ccc, 0.45);
-    -gtk-image-effect: none;
+    -gtk-icon-effect: none;
 }
 
 .app-frame .app-installed-list-separator {
@@ -524,7 +533,7 @@
     background-image: url("btn_installed_pause_pressed.png");
 }
 
-.app-frame GtkSpinner {
+.app-frame spinner {
     color: alpha(white, 0.9);
     margin: 12px;
 }
@@ -578,7 +587,7 @@
 }
 
 .new-site-frame .url-entry,
-.search-bar .entry {
+searchbar entry {
     font-size: 11px;
     font-weight: 600; /* semibold */
 
@@ -600,7 +609,7 @@
     padding: 7px 20px 7px 4px;
 }
 
-.search-bar .entry {
+searchbar entry {
     padding: 6px;
 }
 
@@ -608,15 +617,15 @@
     box-shadow: inset 0px 0px 3px 3px #ffc000;
 }
 
-.new-site-frame .url-entry:focused,
-.new-site-frame .url-entry:prelight,
-.search-bar .entry:focused,
-.search-bar .entry:prelight {
+.new-site-frame .url-entry:focus,
+.new-site-frame .url-entry:hover,
+searchbar entry:focus,
+searchbar entry:hover {
     background: white;
 }
 
 .new-site-frame .url-entry:selected,
-.search-bar .entry:selected {
+searchbar entry:selected {
     background-color: @app_store_selected_bg;
     color: white;
 }
@@ -689,7 +698,7 @@
     background-image: url("btn_add-website_hover.png");
 }
 
-.new-site-frame .add-button:insensitive {
+.new-site-frame .add-button:disabled {
     background-image: url("icon_installed_43x43.png");
     background-color: transparent;
 }
@@ -704,10 +713,7 @@
     background-color: transparent;
 }
 
-.weblink-listbox .list-row {
-    -GtkWidget-focus-padding: 0;
-    -GtkWidget-focus-line-width: 0;
-
+.weblink-listbox row {
     background-color: transparent;
 }
 
@@ -731,11 +737,11 @@
 .weblink-row-image {
     background-color: #2a2a2a;
     border-radius: 4px;
-    icon-shadow: 0 2px 2px black;
+    -gtk-icon-shadow: 0 2px 2px black;
     margin-bottom: 4px;
 }
 
-.weblink-listbox .list-row .state-button {
+.weblink-listbox row .state-button {
     background-color: transparent;
     background-image: url("btn_add-website_disabled.png");
     background-size: 49px;
@@ -743,31 +749,31 @@
     box-shadow: none;
 }
 
-.weblink-listbox .list-row .state-button:hover {
+.weblink-listbox row .state-button:hover {
     background-image: url("btn_add-website_hover.png");
 }
 
-.weblink-listbox .list-row .state-button:active {
+.weblink-listbox row .state-button:active {
     background-image: url("btn_add-website_pressed.png");
 }
 
-.weblink-listbox .list-row .state-button:insensitive {
+.weblink-listbox row .state-button:disabled {
     background-image: url("icon_installed_43x43.png");
     background-color: transparent;
 }
 
-.weblink-listbox .list-row .title {
+.weblink-listbox row .title {
     font-size: 12px;
     font-weight: bold;
     color: white;
 }
 
-.weblink-listbox .list-row .description {
+.weblink-listbox row .description {
     color: #b4b4b4;
     font-size: 10px;
 }
 
-.weblink-listbox .list-row .url {
+.weblink-listbox row .url {
     color: #ffa84d;
 }
 
@@ -819,7 +825,7 @@
     background: transparent;
 }
 
-.folder-bubble .entry {
+.folder-bubble entry {
     border: none;
     box-shadow: none;
     background: none;
@@ -831,15 +837,15 @@
     padding-left: 10px;
 }
 
-.folder-bubble .entry:dir(rtl) {
+.folder-bubble entry:dir(rtl) {
     padding-right: 10px;
 }
 
-.folder-bubble .entry:selected {
+.folder-bubble entry:selected {
     background-color: @app_store_selected_bg;
 }
 
-.folder-bubble .button {
+.folder-bubble button {
     border: none;
     background-repeat: no-repeat;
     background-image: url("btn_add-folder_normal.png");
@@ -847,15 +853,15 @@
     box-shadow: none;
 }
 
-.folder-bubble .button:hover {
+.folder-bubble button:hover {
     background-image: url("btn_add-folder_hover.png");
 }
 
-.folder-bubble .button:checked {
+.folder-bubble button:checked {
     background-image: url("btn_add-folder_pressed.png");
 }
 
-.folder-bubble .button:insensitive {
+.folder-bubble button:disabled {
     background-image: url("btn_add-folder_disabled.png");
 }
 
