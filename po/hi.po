@@ -3,13 +3,14 @@
 # This file is distributed under the same license as the PACKAGE package.
 # 
 # Translators:
+# e2f_in_c3 <e2f_in_c3@outlook.com>, 2016
 msgid ""
 msgstr ""
 "Project-Id-Version: eos-app-store\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-04-05 01:21+0000\n"
-"PO-Revision-Date: 2016-02-16 02:24+0000\n"
-"Last-Translator: endlessmobile_build <philip@endlessm.com>\n"
+"POT-Creation-Date: 2016-05-03 01:22+0000\n"
+"PO-Revision-Date: 2016-05-05 10:29+0000\n"
+"Last-Translator: e2f_in_c3 <e2f_in_c3@outlook.com>\n"
 "Language-Team: Hindi (http://www.transifex.com/endless-mobile-inc/eos-app-store/language/hi/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -19,152 +20,152 @@ msgstr ""
 
 #: ../data/eos-app-store-app-info-box.ui.h:1 ../EosAppStore/appInfoBox.js:423
 msgid "Install app"
-msgstr ""
+msgstr "ऐप इंस्टॉल करें"
 
 #: ../data/eos-app-store-app-info-box.ui.h:2 ../EosAppStore/appInfoBox.js:169
 msgid "Cancel"
-msgstr ""
+msgstr "रद्द करें "
 
 #: ../data/eos-app-store-app-info-box.ui.h:3
 msgid "Installing"
-msgstr ""
+msgstr "इंस्टॉल हो रहा है "
 
 #: ../data/eos-app-store-app-info-box.ui.h:4
 msgid "Delete from device"
-msgstr ""
+msgstr "डिवाइस से हटाएं"
 
 #: ../data/eos-app-store-app-installed-box.ui.h:1
 msgid "APPLICATION NAME"
-msgstr ""
+msgstr "ऐप्लिकेशन का नाम"
 
 #: ../data/eos-app-store-app-installed-box.ui.h:2
 msgid "APPLICATION CATEGORY"
-msgstr ""
+msgstr "ऐप्लिकेशन कैटगरी"
 
 #: ../data/eos-app-store-app-installed-box.ui.h:3
 msgid "SIZE"
-msgstr ""
+msgstr "आकार"
 
 #: ../data/eos-app-store-app-installed-box.ui.h:4
 msgid "UPDATING…"
-msgstr ""
+msgstr "अपडेट कर रहा है"
 
 #: ../data/eos-app-store-app-installed-box.ui.h:5
 msgid "STOP"
-msgstr ""
+msgstr "रुकिए"
 
 #: ../data/eos-app-store-app-installed-box.ui.h:6
 msgid "System App"
-msgstr ""
+msgstr "सिस्टम ऐप "
 
 #: ../data/eos-app-store-folder-frame.ui.h:1
 msgid "Create your own folder to organize your apps. First, choose an icon."
-msgstr ""
+msgstr "अपने ऐप को व्यवस्थित करने के लिए अपने फोल्डर बनाएं। पहले, एक आयकन चुनें।"
 
 #: ../data/eos-app-store-weblink-new-site-frame.ui.h:1
 #: ../EosAppStore/weblinkFrame.js:349
 msgid "e.g.: http://www.endlessm.com"
-msgstr ""
+msgstr "जैसे: http://www.endlessm.com"
 
 #: ../EosAppStore/appFrame.js:400
 msgid "Installed apps"
-msgstr ""
+msgstr "ऐप्स इंस्टॉल किए गए "
 
 #: ../EosAppStore/appFrame.js:462
 msgid "Install apps"
-msgstr ""
+msgstr "ऐप्स इंस्टॉल करें "
 
 #: ../EosAppStore/appFrame.js:502
 msgid "Search results"
-msgstr ""
+msgstr "खोज नतीजे "
 
 #: ../EosAppStore/appFrame.js:542
 msgid "Refresh failed"
-msgstr ""
+msgstr "रीफ्रेश विफल रहा "
 
 #: ../EosAppStore/appInfoBox.js:162
 msgid "Deleting app"
-msgstr ""
+msgstr "ऐप डिलीट हो रहा है"
 
 #: ../EosAppStore/appInfoBox.js:163
 msgid ""
 "Deleting this app will remove it from the device for all users. You will "
 "need to download it from the internet in order to reinstall it."
-msgstr ""
+msgstr "इस ऐप को डिलीट करने से यह सभी प्रयोक्ताओं के डिवाइसों से हट जाएगा। इसे इंस्टॉल करने के लिए आपको इंटरनेट से डाउनलोड करना होगा।"
 
 #: ../EosAppStore/appInfoBox.js:167
 msgid "Delete app"
-msgstr ""
+msgstr "ऐप डिलीट करें"
 
 #: ../EosAppStore/appInfoBox.js:188
 #, javascript-format
 msgid "We could not remove '%s'"
-msgstr ""
+msgstr "हम '%s' को नहीं हटा सके"
 
 #: ../EosAppStore/appInfoBox.js:191
 #, javascript-format
 msgid "'%s' was removed successfully"
-msgstr ""
+msgstr "'%s' को सफलतापूर्वक हटाया गया"
 
 #: ../EosAppStore/appInfoBox.js:209
 #, javascript-format
 msgid "We could not update '%s'"
-msgstr ""
+msgstr "हम '%s' को अपडेट नहीं कर सके"
 
 #: ../EosAppStore/appInfoBox.js:212
 #, javascript-format
 msgid "'%s' was updated successfully"
-msgstr ""
+msgstr "'%s' को सफलतापूर्वक अपडेट किया गया"
 
 #: ../EosAppStore/appInfoBox.js:230
 #, javascript-format
 msgid "We could not install '%s'"
-msgstr ""
+msgstr "हम '%s' को इंस्टॉल नहीं कर सके"
 
 #: ../EosAppStore/appInfoBox.js:233
 #, javascript-format
 msgid "'%s' was installed successfully"
-msgstr ""
+msgstr "'%s' को सफलतापूर्वक इंस्टॉल किया गया"
 
 #: ../EosAppStore/appInfoBox.js:424
 msgid "Update app"
-msgstr ""
+msgstr "ऐप अपडेट करें"
 
 #: ../EosAppStore/appInfoBox.js:425
 msgid "Open app"
-msgstr ""
+msgstr "ऐप ओपन करें "
 
 #: ../EosAppStore/appInfoBox.js:426
 msgid "Add to the desktop"
-msgstr ""
+msgstr "डेस्कटॉप में शामिल करें"
 
 #: ../EosAppStore/appInfoBox.js:427
 msgid "No network connection is available"
-msgstr ""
+msgstr "कोई नेटवर्क कनेक्शन उपलब्ध नहीं है"
 
 #: ../EosAppStore/appInfoBox.js:428
 msgid "Insufficient space to install the app"
-msgstr ""
+msgstr "ऐप इंस्टॉल करने के लिए अपर्याप्त स्पेस"
 
 #: ../EosAppStore/appInfoBox.js:429
 msgid "Insufficient space to update the app"
-msgstr ""
+msgstr "ऐप अपडेट करने के लिए अपर्याप्त स्पेस"
 
 #: ../EosAppStore/appInfoBox.js:521
 msgid "Downloading…"
-msgstr ""
+msgstr "डाउनलोड हो रहा है..."
 
 #: ../EosAppStore/appInfoBox.js:529
 msgid "Updating…"
-msgstr ""
+msgstr "अपडेट हो रहा है..."
 
 #: ../EosAppStore/appInfoBox.js:532
 msgid "Installing…"
-msgstr ""
+msgstr "इंस्टॉल हो रहा है... "
 
 #: ../EosAppStore/appInfoBox.js:535
 msgid "Removing…"
-msgstr ""
+msgstr "हटाया जा रहा है..."
 
 #. Translators: Abbreviation for file size in megabytes;
 #. %s denotes the placement of the numeric value
@@ -172,237 +173,237 @@ msgstr ""
 #: ../EosAppStore/appInstalledBox.js:109
 #, javascript-format
 msgid "%s MB"
-msgstr ""
+msgstr "%s MB"
 
 #: ../EosAppStore/appStore.js:235
 msgid "Dismiss"
-msgstr ""
+msgstr "खारिज करें "
 
 #: ../EosAppStore/appStoreWindow.js:280
 msgid "Press Escape to cancel"
-msgstr ""
+msgstr "रद्द करने के लिए एस्केप पर दबाएं"
 
 #. Translators: use the same string used to install the app center content
 #. JSON
 #: ../EosAppStore/categories.js:12 ../EosAppStore/lib/eos-app-utils.c:1346
 msgid "Education"
-msgstr ""
+msgstr "शिक्षा"
 
 #: ../EosAppStore/categories.js:19 ../EosAppStore/lib/eos-app-utils.c:1347
 msgid "Games"
-msgstr ""
+msgstr "खेल"
 
 #: ../EosAppStore/categories.js:26 ../EosAppStore/lib/eos-app-utils.c:1348
 msgid "Resources"
-msgstr ""
+msgstr "संसाधन"
 
 #: ../EosAppStore/categories.js:33 ../EosAppStore/lib/eos-app-utils.c:1349
 msgid "Utilities"
-msgstr ""
+msgstr "यूटीलिटीज"
 
 #: ../EosAppStore/categories.js:40
 msgid "Installed"
-msgstr ""
+msgstr "इंस्टॉल किया गया"
 
 #: ../EosAppStore/categories.js:47
 msgid "Search"
-msgstr ""
+msgstr "खोजें"
 
 #: ../EosAppStore/categories.js:59
 msgid "News"
-msgstr ""
+msgstr "समाचार"
 
 #: ../EosAppStore/categories.js:65
 msgid "Sports"
-msgstr ""
+msgstr "स्पोर्ट्स"
 
 #: ../EosAppStore/categories.js:71
 msgid "Education and Health"
-msgstr ""
+msgstr "शिक्षा व स्वास्थ्य"
 
 #: ../EosAppStore/categories.js:77
 msgid "Entertainment"
-msgstr ""
+msgstr "मनोरंजन"
 
 #: ../EosAppStore/categories.js:83
 msgid "Local"
-msgstr ""
+msgstr "स्थानीय "
 
 #: ../EosAppStore/environment.js:22
 msgid "App Center"
-msgstr ""
+msgstr "ऐप सेंटर "
 
 #: ../EosAppStore/folderFrame.js:42
 msgid "Name of folder"
-msgstr ""
+msgstr "फोल्डर का नाम"
 
 #: ../EosAppStore/folderFrame.js:70
 msgid "Folder added!"
-msgstr ""
+msgstr "फोल्डर शामिल किया"
 
 #: ../EosAppStore/folderFrame.js:295
 msgid "Folders"
-msgstr ""
+msgstr "फोल्डर्स"
 
 #: ../EosAppStore/folderFrame.js:299
 msgid "Install folders"
-msgstr ""
+msgstr "फोल्डरों को इंस्टॉल करें"
 
 #: ../EosAppStore/weblinkFrame.js:282
 msgid "Write the website you'd like to add here and press “Enter”"
-msgstr ""
+msgstr "आप जिस वेबसाइट को यहां शामिल करना चाहते हैं उसे लिखे और \"एंंटर\" दबाएं"
 
 #: ../EosAppStore/weblinkFrame.js:369
 msgid "searching"
-msgstr ""
+msgstr "खोज की जा रही है "
 
 #: ../EosAppStore/weblinkFrame.js:384
 msgid "The address written does not exist or is not available."
-msgstr ""
+msgstr "लिखा गया ऐड्रेस मौजूद नहीं है या उपलब्ध नहीं है।"
 
 #: ../EosAppStore/weblinkFrame.js:393 ../EosAppStore/weblinkFrame.js:549
 msgid "Added successfully!"
-msgstr ""
+msgstr "सफलतापूर्वक शामिल किया गया!"
 
 #: ../EosAppStore/weblinkFrame.js:630
 msgid ""
 "Add your favorite websites to your desktop or choose suggested ones from our"
 " list."
-msgstr ""
+msgstr "अपने डेस्कटॉप पर अपनी पसंदीदा वेबसाइट्स जोड़ें या हमारी सूची में सुझाई गई कोई चुनें। "
 
 #: ../EosAppStore/weblinkFrame.js:776
 msgid "Websites"
-msgstr ""
+msgstr "वेबसाइट्स"
 
 #: ../EosAppStore/weblinkFrame.js:780
 msgid "Install websites"
-msgstr ""
+msgstr "वेबसाइट्स इंस्टॉल करें"
 
 #: ../EosAppStore/lib/eos-app-info.c:910
 #, c-format
 msgid "No verification available for app '%s'"
-msgstr ""
+msgstr "ऐप '%s' के लिए कोई वेरिफिकेशन उपलब्ध नहीं"
 
 #: ../EosAppStore/lib/eos-app-list-model.c:32
 msgid ""
 "The app center has detected an error and cannot continue. Please restart "
 "your system. If the problem persists, please contact support."
-msgstr ""
+msgstr "ऐप सेंटर ने एक त्रुटि की पहचान की और यह आगे जारी नहीं रख रखता। कृपया अपने सिस्टम को पुनः स्टार्ट करें। समस्या यदि तब भी बनी रहे, तो कृपया सपोर्ट से संपर्क करें।"
 
 #: ../EosAppStore/lib/eos-app-list-model.c:483
 msgid "We are unable to load the complete list of applications"
-msgstr ""
+msgstr "हम ऐप्लिकेशनोंं की समूची सूची को लोड करने में सक्षम नहीं हैंं"
 
 #: ../EosAppStore/lib/eos-app-list-model.c:491
 msgid "We were unable to update the list of applications"
-msgstr ""
+msgstr "हम ऐप्लिकेशनोंं की सूची को अपलोड करने में सक्षम नहीं थे"
 
 #: ../EosAppStore/lib/eos-app-list-model.c:1040
 msgid "Not enough space on device for installing the app."
-msgstr ""
+msgstr "ऐप इंस्टॉल करने के लिए डिवाइस पर पर्याप्त स्पेस नहीं।"
 
 #: ../EosAppStore/lib/eos-app-list-model.c:1127
 msgid ""
 "We encountered an internal error during the installation of the application."
-msgstr ""
+msgstr "ऐप्लिकेशन के इंंस्टॉलेशन के दौरान हमें एक आंतरिक त्रुटि मिली।"
 
 #: ../EosAppStore/lib/eos-app-list-model.c:1156
 msgid ""
 "We encountered an internal error during the removal of the application."
-msgstr ""
+msgstr "ऐप्लिकेशन को हटाने के दौरान हमें एक आंतरिक त्रुटि मिली।"
 
 #: ../EosAppStore/lib/eos-app-list-model.c:1183
 #: ../EosAppStore/lib/eos-app-list-model.c:1227
 msgid "You must be an administrator to install applications."
-msgstr ""
+msgstr "ऐप्लिकेशंंस इंस्टॉल करने के लिए आपको एक ऐडमिनिस्ट्रेटर होना होगा।"
 
 #: ../EosAppStore/lib/eos-app-list-model.c:1372
 #: ../EosAppStore/lib/eos-app-list-model.c:1399
 msgid "You must be an administrator to remove applications."
-msgstr ""
+msgstr "ऐप्लिकेशंंस हटाने के लिए आपको एक ऐडमिनिस्ट्रेटर होना होगा।"
 
 #: ../EosAppStore/lib/eos-app-list-model.c:1525
 #, c-format
 msgid "App %s has no candidate for installation."
-msgstr ""
+msgstr "ऐप %s के पास इंस्टॉल करने के लिए कोई कैंडिडेट नहीं है।"
 
 #: ../EosAppStore/lib/eos-app-list-model.c:1537
 #, c-format
 msgid "App '%s' is already installed."
-msgstr ""
+msgstr "ऐप '%s' इंस्टॉल हो चुका है।"
 
 #: ../EosAppStore/lib/eos-app-list-model.c:1601
 #, c-format
 msgid "App %s not installable."
-msgstr ""
+msgstr "ऐप '%s' इंस्टॉल किए जाने लायक नहीं है।"
 
 #: ../EosAppStore/lib/eos-app-list-model.c:1612
 #, c-format
 msgid "App %s is up to date."
-msgstr ""
+msgstr "ऐप %s अद्यतन है।"
 
 #: ../EosAppStore/lib/eos-app-list-model.c:1692
 #: ../EosAppStore/lib/eos-app-list-model.c:1737
 #, c-format
 msgid "App '%s' is not installed."
-msgstr ""
+msgstr "ऐप '%s' इंस्टॉल नहीं किया गया।"
 
 #: ../EosAppStore/lib/eos-app-utils.c:746
 msgid "Operation cancelled"
-msgstr ""
+msgstr "ऑपरेशन रद्द हुआ"
 
 #: ../EosAppStore/lib/eos-app-utils.c:768
 msgid "Updates meta record did not contain expected structure"
-msgstr ""
+msgstr "अपडेट्स मेटा रिकॉर्ड में अपेक्षित संरचना नहींं है"
 
 #: ../EosAppStore/lib/eos-app-utils.c:783
 msgid "Updates meta record did not contain expected attributes"
-msgstr ""
+msgstr "अपडेट्स मेटा रिकॉर्ड में अपेक्षित ऐट्रिब्यूट्स नहींं हैंं"
 
 #: ../EosAppStore/lib/eos-app-utils.c:799
 msgid "Updates meta record did not contain valid monotonic_id attribute value"
-msgstr ""
+msgstr "अपडेट्स मेटा रिकॉर्ड में वैध मोनोटोनिक‌‌_आइडी ऐट्रिब्यूट वैल्यू नहींं है"
 
 #: ../EosAppStore/lib/eos-app-utils.c:1619
 #, c-format
 msgid "Not enough space on device for downloading the app."
-msgstr ""
+msgstr "ऐप डाउनलोड करने के लिए डिवाइस पर पर्याप्त स्पेस नहीं।"
 
 #: ../EosAppStore/lib/eos-app-utils.c:1784
 msgid "There was a problem downloading the app; please try again"
-msgstr ""
+msgstr "ऐप डाउनलोड करने में एक समस्या पैदा हुई; कृपया पुनः प्रयास करें"
 
 #: ../EosAppStore/lib/eos-downloader.c:37
 #, c-format
 msgid "No signature available for app '%s'"
-msgstr ""
+msgstr "ऐप  '%s' के लिए कोई सिग्नेचर उपलब्ध नहीं है"
 
 #: ../EosAppStore/lib/eos-downloader.c:100
 #, c-format
 msgid "App '%s' could not be downloaded"
-msgstr ""
+msgstr "ऐप '%s' को डाउनलोड नहीं किया जा सका"
 
 #: ../EosAppStore/lib/eos-net-utils.c:273
 msgid "The certificate of the target server is expired"
-msgstr ""
+msgstr "टार्गेट सर्वर का सर्टिफिकेट समाप्त हो चुका है"
 
 #: ../EosAppStore/lib/eos-net-utils.c:275
 msgid "The certificate of the target server has been revoked"
-msgstr ""
+msgstr "टार्गेट सर्वर का सर्टिफिकेट रद्द किया जा चुका है"
 
 #: ../EosAppStore/lib/eos-net-utils.c:277
 msgid "The certificate of the target server has a bad identity"
-msgstr ""
+msgstr "टार्गेट सर्वर के सर्टिफिकेट में एक बैड आइडेंटिटी है"
 
 #: ../EosAppStore/lib/eos-net-utils.c:279
 msgid "The certificate of the target server is from an unknown authority"
-msgstr ""
+msgstr "टार्गेट सर्वर का सर्टिफिकेट एक अज्ञात प्राधिकरण से है"
 
 #: ../EosAppStore/lib/eos-net-utils.c:281
 msgid "The certificate of the target server is bad or invalid"
-msgstr ""
+msgstr "टार्गेट सर्वर के सर्टिफिकेट बैड या अवैध है"
 
 #: ../EosAppStore/lib/eos-net-utils.c:337
 #, c-format
 msgid "Could not save the app - canceling download (%s)"
-msgstr ""
+msgstr "ऐप को सहेजा नहीं जा सका - डाउलोड रद्द हो रहा है (%s)"
