@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: eos-app-store\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2016-05-03 01:22+0000\n"
-"PO-Revision-Date: 2016-05-03 22:03+0000\n"
+"PO-Revision-Date: 2016-05-06 04:48+0000\n"
 "Last-Translator: Roddy Shuler <roddy@endlessm.com>\n"
 "Language-Team: Vietnamese (http://www.transifex.com/endless-mobile-inc/eos-app-store/language/vi/)\n"
 "MIME-Version: 1.0\n"
@@ -19,152 +19,152 @@ msgstr ""
 
 #: ../data/eos-app-store-app-info-box.ui.h:1 ../EosAppStore/appInfoBox.js:423
 msgid "Install app"
-msgstr ""
+msgstr "Cài đặt ứng dụng"
 
 #: ../data/eos-app-store-app-info-box.ui.h:2 ../EosAppStore/appInfoBox.js:169
 msgid "Cancel"
-msgstr ""
+msgstr "Hủy"
 
 #: ../data/eos-app-store-app-info-box.ui.h:3
 msgid "Installing"
-msgstr ""
+msgstr "Đang cài đặt"
 
 #: ../data/eos-app-store-app-info-box.ui.h:4
 msgid "Delete from device"
-msgstr ""
+msgstr "Xóa từ thiết bị"
 
 #: ../data/eos-app-store-app-installed-box.ui.h:1
 msgid "APPLICATION NAME"
-msgstr ""
+msgstr "TÊN ỨNG DỤNG"
 
 #: ../data/eos-app-store-app-installed-box.ui.h:2
 msgid "APPLICATION CATEGORY"
-msgstr ""
+msgstr "DANH MỤC ỨNG DỤNG"
 
 #: ../data/eos-app-store-app-installed-box.ui.h:3
 msgid "SIZE"
-msgstr ""
+msgstr "KÍCH CỠ"
 
 #: ../data/eos-app-store-app-installed-box.ui.h:4
 msgid "UPDATING…"
-msgstr ""
+msgstr "ĐANG CẬP NHẬT..."
 
 #: ../data/eos-app-store-app-installed-box.ui.h:5
 msgid "STOP"
-msgstr ""
+msgstr "DỪNG"
 
 #: ../data/eos-app-store-app-installed-box.ui.h:6
 msgid "System App"
-msgstr ""
+msgstr "Ứng dụng Hệ thống"
 
 #: ../data/eos-app-store-folder-frame.ui.h:1
 msgid "Create your own folder to organize your apps. First, choose an icon."
-msgstr ""
+msgstr "Tạo thư mục của riêng bạn để tổ chức các ứng dụng của bạn. Đầu tiên, hãy chọn một biểu tượng."
 
 #: ../data/eos-app-store-weblink-new-site-frame.ui.h:1
 #: ../EosAppStore/weblinkFrame.js:349
 msgid "e.g.: http://www.endlessm.com"
-msgstr ""
+msgstr "vd: http://www.endlessm.com"
 
 #: ../EosAppStore/appFrame.js:400
 msgid "Installed apps"
-msgstr ""
+msgstr "Các ứng dụng đã cài đặt"
 
 #: ../EosAppStore/appFrame.js:462
 msgid "Install apps"
-msgstr ""
+msgstr "Cài đặt ứng dụng"
 
 #: ../EosAppStore/appFrame.js:502
 msgid "Search results"
-msgstr ""
+msgstr "Kết quả tìm kiếm"
 
 #: ../EosAppStore/appFrame.js:542
 msgid "Refresh failed"
-msgstr ""
+msgstr "Làm mới thất bại"
 
 #: ../EosAppStore/appInfoBox.js:162
 msgid "Deleting app"
-msgstr ""
+msgstr "Đang xóa ứng dụng"
 
 #: ../EosAppStore/appInfoBox.js:163
 msgid ""
 "Deleting this app will remove it from the device for all users. You will "
 "need to download it from the internet in order to reinstall it."
-msgstr ""
+msgstr "Khi xóa ứng dụng này, nó sẽ được gỡ bỏ trên thiết bị của tất cả người dùng. Bạn sẽ cần phải tải ứng dụng về từ internet để cài đặt lại nó."
 
 #: ../EosAppStore/appInfoBox.js:167
 msgid "Delete app"
-msgstr ""
+msgstr "Xóa ứng dụng"
 
 #: ../EosAppStore/appInfoBox.js:188
 #, javascript-format
 msgid "We could not remove '%s'"
-msgstr ""
+msgstr "Chúng tôi không thể gỡ '%s'"
 
 #: ../EosAppStore/appInfoBox.js:191
 #, javascript-format
 msgid "'%s' was removed successfully"
-msgstr ""
+msgstr "'%s' đã được gỡ bỏ thành công"
 
 #: ../EosAppStore/appInfoBox.js:209
 #, javascript-format
 msgid "We could not update '%s'"
-msgstr ""
+msgstr "Chúng tôi không thể cập nhật '%s'"
 
 #: ../EosAppStore/appInfoBox.js:212
 #, javascript-format
 msgid "'%s' was updated successfully"
-msgstr ""
+msgstr "'%s' được cài đặt thành công"
 
 #: ../EosAppStore/appInfoBox.js:230
 #, javascript-format
 msgid "We could not install '%s'"
-msgstr ""
+msgstr "Chúng tôi không thể cài đặt '%s'"
 
 #: ../EosAppStore/appInfoBox.js:233
 #, javascript-format
 msgid "'%s' was installed successfully"
-msgstr ""
+msgstr "'%s' được cài đặt thành công"
 
 #: ../EosAppStore/appInfoBox.js:424
 msgid "Update app"
-msgstr ""
+msgstr "Cập nhật ứng dụng"
 
 #: ../EosAppStore/appInfoBox.js:425
 msgid "Open app"
-msgstr ""
+msgstr "Mở ứng dụng"
 
 #: ../EosAppStore/appInfoBox.js:426
 msgid "Add to the desktop"
-msgstr ""
+msgstr "Thêm vào màn hình nền"
 
 #: ../EosAppStore/appInfoBox.js:427
 msgid "No network connection is available"
-msgstr ""
+msgstr "Không có kết nối mạng"
 
 #: ../EosAppStore/appInfoBox.js:428
 msgid "Insufficient space to install the app"
-msgstr ""
+msgstr "Không đủ dung lượng để cài đặt ứng dụng"
 
 #: ../EosAppStore/appInfoBox.js:429
 msgid "Insufficient space to update the app"
-msgstr ""
+msgstr "Không đủ dung lượng để cập nhật ứng dụng"
 
 #: ../EosAppStore/appInfoBox.js:521
 msgid "Downloading…"
-msgstr ""
+msgstr "Đang tải về..."
 
 #: ../EosAppStore/appInfoBox.js:529
 msgid "Updating…"
-msgstr ""
+msgstr "Đang cập nhật..."
 
 #: ../EosAppStore/appInfoBox.js:532
 msgid "Installing…"
-msgstr ""
+msgstr "Đang cài đặt..."
 
 #: ../EosAppStore/appInfoBox.js:535
 msgid "Removing…"
-msgstr ""
+msgstr "Đang gỡ bỏ..."
 
 #. Translators: Abbreviation for file size in megabytes;
 #. %s denotes the placement of the numeric value
@@ -172,237 +172,237 @@ msgstr ""
 #: ../EosAppStore/appInstalledBox.js:109
 #, javascript-format
 msgid "%s MB"
-msgstr ""
+msgstr "%s MB"
 
 #: ../EosAppStore/appStore.js:235
 msgid "Dismiss"
-msgstr ""
+msgstr "Gạt bỏ"
 
 #: ../EosAppStore/appStoreWindow.js:280
 msgid "Press Escape to cancel"
-msgstr ""
+msgstr "Nhấn Escape để hủy"
 
 #. Translators: use the same string used to install the app center content
 #. JSON
 #: ../EosAppStore/categories.js:12 ../EosAppStore/lib/eos-app-utils.c:1346
 msgid "Education"
-msgstr ""
+msgstr "Giáo dục"
 
 #: ../EosAppStore/categories.js:19 ../EosAppStore/lib/eos-app-utils.c:1347
 msgid "Games"
-msgstr ""
+msgstr "Các trò chơi"
 
 #: ../EosAppStore/categories.js:26 ../EosAppStore/lib/eos-app-utils.c:1348
 msgid "Resources"
-msgstr ""
+msgstr "Nguồn lực"
 
 #: ../EosAppStore/categories.js:33 ../EosAppStore/lib/eos-app-utils.c:1349
 msgid "Utilities"
-msgstr ""
+msgstr "Tiện ích"
 
 #: ../EosAppStore/categories.js:40
 msgid "Installed"
-msgstr ""
+msgstr "Đã cài đặt"
 
 #: ../EosAppStore/categories.js:47
 msgid "Search"
-msgstr ""
+msgstr "Tìm kiếm"
 
 #: ../EosAppStore/categories.js:59
 msgid "News"
-msgstr ""
+msgstr "Tin tức"
 
 #: ../EosAppStore/categories.js:65
 msgid "Sports"
-msgstr ""
+msgstr "Thể thao"
 
 #: ../EosAppStore/categories.js:71
 msgid "Education and Health"
-msgstr ""
+msgstr "Giáo dục và Sức khỏe"
 
 #: ../EosAppStore/categories.js:77
 msgid "Entertainment"
-msgstr ""
+msgstr "Giải trí"
 
 #: ../EosAppStore/categories.js:83
 msgid "Local"
-msgstr ""
+msgstr "Địa phương"
 
 #: ../EosAppStore/environment.js:22
 msgid "App Center"
-msgstr ""
+msgstr "Trung tâm Ứng dụng"
 
 #: ../EosAppStore/folderFrame.js:42
 msgid "Name of folder"
-msgstr ""
+msgstr "Tên thư mục"
 
 #: ../EosAppStore/folderFrame.js:70
 msgid "Folder added!"
-msgstr ""
+msgstr "Đã thêm thư mục!"
 
 #: ../EosAppStore/folderFrame.js:295
 msgid "Folders"
-msgstr ""
+msgstr "Thư mục"
 
 #: ../EosAppStore/folderFrame.js:299
 msgid "Install folders"
-msgstr ""
+msgstr "Cài đặt thư mục"
 
 #: ../EosAppStore/weblinkFrame.js:282
 msgid "Write the website you'd like to add here and press “Enter”"
-msgstr ""
+msgstr "Viết ra các trang web bạn muốn thêm vào ở đây và nhấn \"Enter\""
 
 #: ../EosAppStore/weblinkFrame.js:369
 msgid "searching"
-msgstr ""
+msgstr "đang tìm kiếm"
 
 #: ../EosAppStore/weblinkFrame.js:384
 msgid "The address written does not exist or is not available."
-msgstr ""
+msgstr "Địa chỉ được viết không tồn tại hoặc không khả dụng."
 
 #: ../EosAppStore/weblinkFrame.js:393 ../EosAppStore/weblinkFrame.js:549
 msgid "Added successfully!"
-msgstr ""
+msgstr "Đã thêm thành công!"
 
 #: ../EosAppStore/weblinkFrame.js:630
 msgid ""
 "Add your favorite websites to your desktop or choose suggested ones from our"
 " list."
-msgstr ""
+msgstr "Thêm các trang web yêu thích của bạn vào màn hình nền hoặc chọn các trang web được đề xuất từ danh sách của chúng tôi."
 
 #: ../EosAppStore/weblinkFrame.js:776
 msgid "Websites"
-msgstr ""
+msgstr "Trang web"
 
 #: ../EosAppStore/weblinkFrame.js:780
 msgid "Install websites"
-msgstr ""
+msgstr "Cài đặt các trang web"
 
 #: ../EosAppStore/lib/eos-app-info.c:910
 #, c-format
 msgid "No verification available for app '%s'"
-msgstr ""
+msgstr "Không có xác nhận nào đối với ứng dụng '%s'"
 
 #: ../EosAppStore/lib/eos-app-list-model.c:32
 msgid ""
 "The app center has detected an error and cannot continue. Please restart "
 "your system. If the problem persists, please contact support."
-msgstr ""
+msgstr "Trung tâm ứng dụng đã dò được một lỗi và không thể tiếp tục. Vui lòng khởi động lại hệ thống của bạn. Nếu vấn đề này vẫn tiếp diễn, vui lòng liên hệ bộ phận hỗ trợ."
 
 #: ../EosAppStore/lib/eos-app-list-model.c:483
 msgid "We are unable to load the complete list of applications"
-msgstr ""
+msgstr "Chúng tôi không thể tải toàn bộ danh sách ứng dụng"
 
 #: ../EosAppStore/lib/eos-app-list-model.c:491
 msgid "We were unable to update the list of applications"
-msgstr ""
+msgstr "Chúng tôi không thể cập nhật danh sách ứng dụng"
 
 #: ../EosAppStore/lib/eos-app-list-model.c:1040
 msgid "Not enough space on device for installing the app."
-msgstr ""
+msgstr "Không đủ dung lượng trên thiết bị để cài đặt ứng dụng."
 
 #: ../EosAppStore/lib/eos-app-list-model.c:1127
 msgid ""
 "We encountered an internal error during the installation of the application."
-msgstr ""
+msgstr "Chúng tôi gặp phải một vấn đề nội bộ trong quá trình cài đặt ứng dụng."
 
 #: ../EosAppStore/lib/eos-app-list-model.c:1156
 msgid ""
 "We encountered an internal error during the removal of the application."
-msgstr ""
+msgstr "Chúng tôi đã gặp phải một lỗi nội bộ trong quá trình gỡ bỏ ứng dụng."
 
 #: ../EosAppStore/lib/eos-app-list-model.c:1183
 #: ../EosAppStore/lib/eos-app-list-model.c:1227
 msgid "You must be an administrator to install applications."
-msgstr ""
+msgstr "Bạn phải là một quản trị viên mới có thể cài đặt các ứng dụng."
 
 #: ../EosAppStore/lib/eos-app-list-model.c:1372
 #: ../EosAppStore/lib/eos-app-list-model.c:1399
 msgid "You must be an administrator to remove applications."
-msgstr ""
+msgstr "Bạn phải là một quản trị viên mới có thể gỡ bỏ các ứng dụng"
 
 #: ../EosAppStore/lib/eos-app-list-model.c:1525
 #, c-format
 msgid "App %s has no candidate for installation."
-msgstr ""
+msgstr "Ứng dụng %s không có thành phần nào cần cài đặt."
 
 #: ../EosAppStore/lib/eos-app-list-model.c:1537
 #, c-format
 msgid "App '%s' is already installed."
-msgstr ""
+msgstr "Ứng dụng '%s' đã được cài đặt."
 
 #: ../EosAppStore/lib/eos-app-list-model.c:1601
 #, c-format
 msgid "App %s not installable."
-msgstr ""
+msgstr "Ứng dụng %s không cài đặt được"
 
 #: ../EosAppStore/lib/eos-app-list-model.c:1612
 #, c-format
 msgid "App %s is up to date."
-msgstr ""
+msgstr "Ứng dụng %s được cập nhật."
 
 #: ../EosAppStore/lib/eos-app-list-model.c:1692
 #: ../EosAppStore/lib/eos-app-list-model.c:1737
 #, c-format
 msgid "App '%s' is not installed."
-msgstr ""
+msgstr "Ứng dụng '%s' không được cài đặt."
 
 #: ../EosAppStore/lib/eos-app-utils.c:746
 msgid "Operation cancelled"
-msgstr ""
+msgstr "Hủy vận hành"
 
 #: ../EosAppStore/lib/eos-app-utils.c:768
 msgid "Updates meta record did not contain expected structure"
-msgstr ""
+msgstr "Biểu ghi siêu dữ liệu cập nhật không có cấu trúc như mong đợi"
 
 #: ../EosAppStore/lib/eos-app-utils.c:783
 msgid "Updates meta record did not contain expected attributes"
-msgstr ""
+msgstr "Biểu ghi siêu dữ liệu cập nhật không chứa các thuộc tính như mong đợi"
 
 #: ../EosAppStore/lib/eos-app-utils.c:799
 msgid "Updates meta record did not contain valid monotonic_id attribute value"
-msgstr ""
+msgstr "Biểu ghi siêu dữ liệu cập nhật không chứa giá trị thuộc tính id đơn điệu hợp lệ"
 
 #: ../EosAppStore/lib/eos-app-utils.c:1619
 #, c-format
 msgid "Not enough space on device for downloading the app."
-msgstr ""
+msgstr "Không đủ dung lượng trên thiết bị để tải về ứng dụng."
 
 #: ../EosAppStore/lib/eos-app-utils.c:1784
 msgid "There was a problem downloading the app; please try again"
-msgstr ""
+msgstr "Có vấn đề khi tải xuống ứng dụng; vui lòng thử lại"
 
 #: ../EosAppStore/lib/eos-downloader.c:37
 #, c-format
 msgid "No signature available for app '%s'"
-msgstr ""
+msgstr "Không có chữ ký cho ứng dụng '%s'"
 
 #: ../EosAppStore/lib/eos-downloader.c:100
 #, c-format
 msgid "App '%s' could not be downloaded"
-msgstr ""
+msgstr "Ứng dụng '%s' không thể được tải về"
 
 #: ../EosAppStore/lib/eos-net-utils.c:273
 msgid "The certificate of the target server is expired"
-msgstr ""
+msgstr "Chứng nhận của máy chủ mục tiêu đã hết hạn"
 
 #: ../EosAppStore/lib/eos-net-utils.c:275
 msgid "The certificate of the target server has been revoked"
-msgstr ""
+msgstr "Chứng nhận của máy chủ mục tiêu đã bị thu hồi"
 
 #: ../EosAppStore/lib/eos-net-utils.c:277
 msgid "The certificate of the target server has a bad identity"
-msgstr ""
+msgstr "Chứng nhận của máy chủ mục tiêu có đặc tính xấu"
 
 #: ../EosAppStore/lib/eos-net-utils.c:279
 msgid "The certificate of the target server is from an unknown authority"
-msgstr ""
+msgstr "Chứng nhận của máy chủ mục tiêu được cấp từ một cơ quan thẩm quyền vô danh"
 
 #: ../EosAppStore/lib/eos-net-utils.c:281
 msgid "The certificate of the target server is bad or invalid"
-msgstr ""
+msgstr "Chứng nhận của máy chủ mục tiêu là xấu hoặc không hợp lệ"
 
 #: ../EosAppStore/lib/eos-net-utils.c:337
 #, c-format
 msgid "Could not save the app - canceling download (%s)"
-msgstr ""
+msgstr "Không thể lưu ứng dụng - đang hủy tải về (%s)"
