@@ -2,7 +2,9 @@
 const EosAppStorePrivate = imports.gi.EosAppStorePrivate;
 const Lang = imports.lang;
 
-const DEFAULT_APP_CATEGORY = 'education';
+// Originally 'education'. Changed to 'web' to default to the weblink page, as
+// the app store no longer supports viewing or installing apps.
+const DEFAULT_APP_CATEGORY = 'web';
 
 function get_app_categories() {
     return [

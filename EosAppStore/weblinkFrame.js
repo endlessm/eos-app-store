@@ -534,6 +534,15 @@ const WeblinkListBoxRow = new Lang.Class({
         this._nameLabel.set_text(this._info.get_title());
         this._descriptionLabel.set_text(this._info.get_description());
 
+        this._model.connect('loading-changed', Lang.bind(this, this._onModelLoadingChanged));
+        this._onModelLoadingChanged();
+    },
+
+    _onModelLoadingChanged: function(model) {
+        if (this._model.loading) {
+            return;
+        }
+
         let installedSensitive = (!this._model.hasLauncher(this._info.get_desktop_id()));
         this._setSensitiveState(installedSensitive);
         this._mainBox.show();
