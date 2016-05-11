@@ -408,7 +408,13 @@ const AppStoreWindow = new Lang.Class({
         this.side_pane_box.stack = this._pageManager;
         this.content_box.add(this._pageManager);
 
-        this._pageManager.registerProvider(new AppFrame.AppPageProvider());
+        // Sabotage!
+        //
+        // As part of our transition from eos-app-store to GNOME Software, we no
+        // longer register the AppPageProvider here. The app store will be used
+        // only to handle weblinks and desktop folders until it is retired.
+        //
+        //this._pageManager.registerProvider(new AppFrame.AppPageProvider());
         this._pageManager.registerProvider(new WeblinkFrame.WeblinkFrame());
         this._pageManager.registerProvider(new FolderFrame.FolderFrame());
     },
