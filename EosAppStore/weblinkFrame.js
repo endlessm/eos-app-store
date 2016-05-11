@@ -484,7 +484,9 @@ const NewSiteBox = new Lang.Class({
     _onWebsiteLoaded: function() {
         // We need to mark the URL as FOUND whenever a load finishes, so that
         // we make sure we don't end up waiting forever when there's no title.
-        this._setState(NewSiteBoxState.FOUND);
+        if (this._state != NewSiteBoxState.ERROR) {
+            this._setState(NewSiteBoxState.FOUND);
+        }
     },
 
     _onSiteAlertEnterEvent: function() {
