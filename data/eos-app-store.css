@@ -14,39 +14,26 @@ frame border {
 
 .main-frame {
     background-image: url("bg_gray_noise.png");
-    border-width: 0 6px 0 0;
     border-color: transparent;
     border-radius: 0;
+}
 
-    border-image: linear-gradient(to left,
-                                  transparent,
-                                  alpha(black, 0.1) 2px,
-                                  alpha(black, 0.55) 6px,
-                                  transparent 6px) 6 / 6px stretch;
+.main-frame:dir(ltr) {
+    border-width: 0 6px 0 0;
+    box-shadow: 0 1px 4px black;
+    margin-right: 6px;
 }
 
 .main-frame:dir(rtl) {
     border-width: 0 0 0 6px;
-    border-color: transparent;
-    border-radius: 0;
-
-    border-image: linear-gradient(to right,
-                                  transparent,
-                                  alpha(black, 0.1) 2px,
-                                  alpha(black, 0.55) 6px,
-                                  transparent 6px) 6 / 6px stretch;
+    box-shadow: 0 -1px 4px black;
+    margin-left: 6px;
 }
 
 scrollbar {
     background-color: transparent;
     border-width: 0px;
-
-    -GtkRange-slider-width: 8;
-    -GtkRange-stepper-size: 0;
-    -GtkRange-trough-border: 0;
-    -GtkRange-trough-under-steppers: false;
-
-    -GtkScrollbar-min-slider-length: 30;
+    min-width: 8px;
 }
 
 scrollbar contents trough {
@@ -60,6 +47,8 @@ scrollbar contents trough slider {
     background-image: url("scrollbar_notch.png");
     background-repeat: no-repeat;
     background-position: 50%;
+
+    min-height: 30px;
 
     margin: 0;
     border-width: 0;
@@ -76,8 +65,8 @@ frame.sidebar-frame {
     padding: 0 15px;
 }
 
-frame.sidebar-frame button {
-    font-size: 12px;
+frame.sidebar-frame button label {
+    font-size: 16px;
 }
 
 .category-button,
@@ -135,7 +124,6 @@ frame.sidebar-frame button:hover:active {
 
 .app-frame .app-scrolledwindow {
     border: none;
-    -GtkScrolledWindow-scrollbars-within-bevel: false;
 }
 
 .app-installed-frame .app-scrolledwindow {
@@ -149,8 +137,6 @@ frame.sidebar-frame button:hover:active {
 
 .frame-separator {
     border-bottom: 1px solid alpha(white, 0.1);
-    -GtkWidget-wide-separators: true;
-    -GtkWidget-separator-height: 11px;
 }
 
 .frame-separator-shadows frame {
@@ -211,16 +197,13 @@ frame.sidebar-frame button:hover:active {
     border-style: solid;
     border-width: 0 1px;
     border-color: #9b9b9b;
-    -GtkWidget-wide-separators: true;
-    -GtkWidget-separator-height: 31px;
 }
 
 .update-progress-bar {
     padding: 0;
     box-shadow: none;
-    -GtkProgressBar-xspacing: 0;
-    -GtkProgressBar-yspacing: 0;
-    -GtkProgressBar-min-horizontal-bar-height: 3;
+    padding: 0;
+    min-height: 3px;
 }
 
 .update-progress-bar.trough {
@@ -274,7 +257,7 @@ frame.sidebar-frame button:hover:active {
 }
 
 .header-title {
-    font-size: 32px;
+    font-size: 36px;
     font-weight: bold;
     color: white;
 }
@@ -588,7 +571,7 @@ frame.sidebar-frame button:hover:active {
 
 .new-site-frame .url-entry,
 searchbar entry {
-    font-size: 11px;
+    font-size: 16px;
     font-weight: 600; /* semibold */
 
     color: #333333;
@@ -602,11 +585,11 @@ searchbar entry {
 }
 
 .new-site-frame .url-entry {
-    padding: 7px 4px 7px 20px;
+    padding: 0 2px 0 16px;
 }
 
 .new-site-frame .url-entry:dir(rtl) {
-    padding: 7px 20px 7px 4px;
+    padding: 0 16px 0 2px;
 }
 
 searchbar entry {
@@ -642,7 +625,7 @@ searchbar entry:selected {
 }
 
 .new-site-frame .alert-label {
-    font-size: 11px;
+    font-size: 14px;
     color: #999999;
 }
 
@@ -726,8 +709,6 @@ searchbar entry:selected {
 .weblink-scrolledwindow {
     border: none;
     padding-right: 15px;
-
-    -GtkScrolledWindow-scrollbars-within-bevel: false;
 }
 
 .weblink-scrolledwindow:dir(rtl) {
@@ -763,14 +744,14 @@ searchbar entry:selected {
 }
 
 .weblink-listbox row .title {
-    font-size: 12px;
+    font-size: 16px;
     font-weight: bold;
     color: white;
 }
 
 .weblink-listbox row .description {
     color: #b4b4b4;
-    font-size: 10px;
+    font-size: 14px;
 }
 
 .weblink-listbox row .url {
@@ -791,8 +772,8 @@ searchbar entry:selected {
     box-shadow: none;
     transition: none;
 
-    -GtkWidget-focus-line-width: 0;
-    -GtkWidget-focus-line-padding: 0;
+    outline-width: 0;
+    outline-offset: 0;
 }
 
 .folder-icon-button:hover {
