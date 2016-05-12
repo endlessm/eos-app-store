@@ -14,27 +14,20 @@ frame border {
 
 .main-frame {
     background-image: url("bg_gray_noise.png");
-    border-width: 0 6px 0 0;
     border-color: transparent;
     border-radius: 0;
+}
 
-    border-image: linear-gradient(to left,
-                                  transparent,
-                                  alpha(black, 0.1) 2px,
-                                  alpha(black, 0.55) 6px,
-                                  transparent 6px) 6 / 6px stretch;
+.main-frame:dir(ltr) {
+    border-width: 0 6px 0 0;
+    box-shadow: 0 1px 4px black;
+    margin-right: 6px;
 }
 
 .main-frame:dir(rtl) {
     border-width: 0 0 0 6px;
-    border-color: transparent;
-    border-radius: 0;
-
-    border-image: linear-gradient(to right,
-                                  transparent,
-                                  alpha(black, 0.1) 2px,
-                                  alpha(black, 0.55) 6px,
-                                  transparent 6px) 6 / 6px stretch;
+    box-shadow: 0 -1px 4px black;
+    margin-left: 6px;
 }
 
 scrollbar {
@@ -76,8 +69,8 @@ frame.sidebar-frame {
     padding: 0 15px;
 }
 
-frame.sidebar-frame button {
-    font-size: 12px;
+frame.sidebar-frame button label {
+    font-size: 16px;
 }
 
 .category-button,
@@ -274,7 +267,7 @@ frame.sidebar-frame button:hover:active {
 }
 
 .header-title {
-    font-size: 32px;
+    font-size: 36px;
     font-weight: bold;
     color: white;
 }
@@ -588,7 +581,7 @@ frame.sidebar-frame button:hover:active {
 
 .new-site-frame .url-entry,
 searchbar entry {
-    font-size: 11px;
+    font-size: 16px;
     font-weight: 600; /* semibold */
 
     color: #333333;
@@ -602,11 +595,11 @@ searchbar entry {
 }
 
 .new-site-frame .url-entry {
-    padding: 7px 4px 7px 20px;
+    padding: 0 2px 0 16px;
 }
 
 .new-site-frame .url-entry:dir(rtl) {
-    padding: 7px 20px 7px 4px;
+    padding: 0 16px 0 2px;
 }
 
 searchbar entry {
@@ -642,7 +635,7 @@ searchbar entry:selected {
 }
 
 .new-site-frame .alert-label {
-    font-size: 11px;
+    font-size: 14px;
     color: #999999;
 }
 
@@ -763,14 +756,14 @@ searchbar entry:selected {
 }
 
 .weblink-listbox row .title {
-    font-size: 12px;
+    font-size: 16px;
     font-weight: bold;
     color: white;
 }
 
 .weblink-listbox row .description {
     color: #b4b4b4;
-    font-size: 10px;
+    font-size: 14px;
 }
 
 .weblink-listbox row .url {
