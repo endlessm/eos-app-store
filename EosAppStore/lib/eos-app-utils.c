@@ -732,6 +732,47 @@ eos_app_load_installed_apps (GHashTable *app_info,
   return TRUE;
 }
 
+static gboolean
+eos_app_get_monotonic_id_from_json (JsonObject *obj,
+                                    gint64 *monotonic_id,
+                                    GError **error)
+{
+  if (!json_object_has_member (obj, "monotonic_id"))
+    {
+      g_set_error_literal (error, EOS_APP_UTILS_ERROR,
+                           EOS_APP_UTILS_ERROR_JSON_MISSING_ATTRIBUTE,
+                           _("Updates meta record did not contain "
+                             "expected attributes"));
+
+      eos_app_log_error_message ("Updates meta record did not contain "
+                                 "expected attributes");
+
+      return FALSE;
+    }
+
+  eos_app_log_debug_message ("Loading JSON update meta record monotonic id");
+
+  if (json_object_get_null_member (obj, "monotonic_id"))
+    {
+      g_set_error_literal (error, EOS_APP_UTILS_ERROR,
+                           EOS_APP_UTILS_ERROR_JSON_UNEXPECTED_VALUE,
+                           _("Updates meta record did not contain "
+                             "valid monotonic_id attribute value"));
+
+      eos_app_log_error_message ("Updates meta record did not contain "
+                                 "valid monotonic_id attribute value");
+
+      return FALSE;
+    }
+
+  *monotonic_id = json_object_get_int_member (obj, "monotonic_id");
+
+  eos_app_log_debug_message ("Update meta record monotonic id: %" G_GINT64_FORMAT,
+                             *monotonic_id);
+
+  return TRUE;
+}
+
 gboolean
 eos_app_load_updates_meta_record (gint64 *monotonic_update_id,
                                   const char *data,
@@ -776,44 +817,12 @@ eos_app_load_updates_meta_record (gint64 *monotonic_update_id,
     }
 
   JsonObject *obj = json_node_get_object (root);
-  if (!json_object_has_member (obj, "monotonic_id"))
-    {
-      g_set_error_literal (error, EOS_APP_UTILS_ERROR,
-                           EOS_APP_UTILS_ERROR_JSON_MISSING_ATTRIBUTE,
-                           _("Updates meta record did not contain "
-                             "expected attributes"));
-
-      eos_app_log_error_message ("Updates meta record did not contain "
-                                 "expected attributes");
-
-      g_object_unref (parser);
-      return FALSE;
-    }
-
-  eos_app_log_debug_message ("Loading JSON update meta record monotonic id");
-
-  if (json_object_get_null_member (obj, "monotonic_id"))
-    {
-      g_set_error_literal (error, EOS_APP_UTILS_ERROR,
-                           EOS_APP_UTILS_ERROR_JSON_UNEXPECTED_VALUE,
-                           _("Updates meta record did not contain "
-                             "valid monotonic_id attribute value"));
-
-      eos_app_log_error_message ("Updates meta record did not contain "
-                                 "valid monotonic_id attribute value");
-
-      g_object_unref (parser);
-      return FALSE;
-    }
-
-  *monotonic_update_id = json_object_get_int_member (obj, "monotonic_id");
-
-  eos_app_log_debug_message ("Update meta record monotonic id: %" G_GINT64_FORMAT,
-                             *monotonic_update_id);
+  gboolean ret = eos_app_get_monotonic_id_from_json (obj, monotonic_update_id,
+                                                     error);
 
   g_object_unref (parser);
 
-  return TRUE;
+  return ret;
 }
 
 gboolean
