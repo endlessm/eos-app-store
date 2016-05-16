@@ -44,15 +44,22 @@ scrollbar contents trough {
 
 scrollbar contents trough slider {
     background-color: #d6d6d6;
-    background-image: url("scrollbar_notch.png");
     background-repeat: no-repeat;
     background-position: 50%;
-
-    min-height: 30px;
 
     margin: 0;
     border-width: 0;
     box-shadow: inset 0 0 2px 0 alpha(black, 0.25);
+}
+
+scrollbar.vertical contents trough slider {
+    background-image: url("scrollbar_notch.png");
+    min-height: 30px;
+}
+
+scrollbar.horizontal contents trough slider {
+    background-image: url("scrollbar_notch_horizontal.png");
+    min-width: 30px;
 }
 
 searchbar {
