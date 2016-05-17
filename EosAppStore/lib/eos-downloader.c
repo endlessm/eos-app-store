@@ -144,7 +144,8 @@ get_local_updates_monotonic_id (void)
       goto out;
     }
 
-  if (!eos_app_load_updates_meta_record (&monotonic_id, data, NULL, &error))
+  if (!eos_app_load_updates_meta_record (&monotonic_id, NULL, NULL, data, NULL,
+                                         &error))
     {
       eos_app_log_error_message ("Unable to parse updates meta record: %s: %s. "
                                  "Removing file from system",
@@ -175,10 +176,16 @@ check_is_app_list_current (SoupSession *soup_session,
   char *url = eos_get_updates_meta_record_uri ();
   char *target = eos_get_updates_meta_record_file ();
   char *data = NULL;
+  const char *os_version = eos_get_os_version ();
+  const char *os_personality = eos_get_os_personality ();
+  g_autofree char *update_os_version = NULL;
+  g_autofree char *update_os_personality = NULL;
 
   gint64 old_monotonic_id = 0;
   gint64 monotonic_id = 0;
   gboolean updates_current = FALSE;
+
+  gboolean file_was_cached = FALSE;
 
   GError *error = NULL;
 
@@ -190,8 +197,9 @@ check_is_app_list_current (SoupSession *soup_session,
                                     "application/json",
                                     url,
                                     target,
-                                    &data,
+                                    NULL,
                                     TRUE, /* Use cached copy if we have it */
+                                    &file_was_cached,
                                     cancellable,
                                     &error))
     {
@@ -200,7 +208,30 @@ check_is_app_list_current (SoupSession *soup_session,
       goto out;
     }
 
-  if (!eos_app_load_updates_meta_record (&monotonic_id, data, cancellable,
+  if (!file_was_cached &&
+      !eos_app_set_os_details_in_updates_meta_record (&error))
+    {
+      eos_app_log_error_message ("Failed to update OS version and OS"
+                                 "personality in the meta record: %s",
+                                 error->message);
+    }
+
+  if (!g_file_get_contents (target, &data, NULL, &error))
+    {
+      eos_app_log_error_message ("Unable to load updates meta record: %s: %s",
+                                 target,
+                                 error->message);
+
+      goto out;
+    }
+
+  /* we retrieve the os version and personality for which the updates record was
+   * stored to ensure it is still up to date if the file was cached */
+  if (!eos_app_load_updates_meta_record (&monotonic_id,
+                                         &update_os_version,
+                                         &update_os_personality,
+                                         data,
+                                         cancellable,
                                          &error))
     {
       eos_app_log_error_message ("Unable to parse updates meta record: %s. "
@@ -219,8 +250,22 @@ check_is_app_list_current (SoupSession *soup_session,
                             old_monotonic_id,
                             monotonic_id);
 
-  /* If monotonic IDs don't match, we need to update our app list */
-  if (monotonic_id == old_monotonic_id)
+  eos_app_log_info_message ("Comparing OS versions."
+                            " System: %s,"
+                            " Update: %s.",
+                            os_version,
+                            update_os_version);
+
+  eos_app_log_info_message ("Comparing OS personalities."
+                            " System: %s,"
+                            " Update: %s.",
+                            os_personality,
+                            update_os_personality);
+
+  /* If monotonic IDs, OS versions or OS personalities don't match,
+   * we need to update our app list */
+  if (monotonic_id == old_monotonic_id && update_os_version == os_version &&
+      update_os_personality == os_personality)
     updates_current = TRUE;
 
 out:
@@ -281,6 +326,7 @@ eos_refresh_available_apps (SoupSession *soup_session,
                                                         target,
                                                         &data,
                                                         FALSE, /* Don't use a cache if we have it */
+                                                        NULL,
                                                         cancellable,
                                                         &error);
 
