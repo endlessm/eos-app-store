@@ -19,6 +19,7 @@ gboolean  eos_net_utils_download_file (SoupSession   *session,
                                        const char    *target_file,
                                        char         **buffer,
                                        gboolean       use_cache,
+                                       gboolean      *cache_hit,
                                        GCancellable  *cancellable,
                                        GError       **error);
 

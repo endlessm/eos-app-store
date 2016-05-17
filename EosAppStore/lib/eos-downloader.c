@@ -180,6 +180,8 @@ check_is_app_list_current (SoupSession *soup_session,
   gint64 monotonic_id = 0;
   gboolean updates_current = FALSE;
 
+  gboolean file_was_cached = FALSE;
+
   GError *error = NULL;
 
   eos_app_log_info_message ("Checking if app list update is needed");
@@ -190,13 +192,31 @@ check_is_app_list_current (SoupSession *soup_session,
                                     "application/json",
                                     url,
                                     target,
-                                    &data,
+                                    NULL,
                                     TRUE, /* Use cached copy if we have it */
+                                    &file_was_cached,
                                     cancellable,
                                     &error))
     {
       eos_app_log_error_message ("Unable to get updates meta record: %s",
                                  error->message);
+      goto out;
+    }
+
+  if (!file_was_cached &&
+      !eos_app_set_os_details_in_updates_meta_record (&error))
+    {
+      eos_app_log_error_message ("Failed to update OS version and OS"
+                                 "personality in the meta record: %s",
+                                 error->message);
+    }
+
+  if (!g_file_get_contents (target, &data, NULL, &error))
+    {
+      eos_app_log_error_message ("Unable to load updates meta record: %s: %s",
+                                 target,
+                                 error->message);
+
       goto out;
     }
 
@@ -281,6 +301,7 @@ eos_refresh_available_apps (SoupSession *soup_session,
                                                         target,
                                                         &data,
                                                         FALSE, /* Don't use a cache if we have it */
+                                                        NULL,
                                                         cancellable,
                                                         &error);
 
