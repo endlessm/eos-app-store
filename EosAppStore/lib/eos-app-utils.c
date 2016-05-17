@@ -49,8 +49,8 @@ eos_get_bundle_download_dir (const char *app_id,
   return target_dir;
 }
 
-static const char *
-get_os_personality (void)
+const char *
+eos_get_os_personality (void)
 {
   static char *personality;
 
@@ -260,8 +260,8 @@ parse_os_release_file (gchar  **version_id,
   return ret;
 }
 
-static const char *
-get_os_version (void)
+const char *
+eos_get_os_version (void)
 {
   static char *os_version;
 
@@ -621,9 +621,9 @@ eos_get_all_updates_uri (void)
                       "/api/",
                       eos_get_app_server_api (),
                       "/updates/",
-                      get_os_version (),
+                      eos_get_os_version (),
                       "?arch=", get_os_arch (),
-                      "&personality=", get_os_personality (),
+                      "&personality=", eos_get_os_personality (),
                       NULL);
 }
 
@@ -732,8 +732,82 @@ eos_app_load_installed_apps (GHashTable *app_info,
   return TRUE;
 }
 
+static gboolean
+eos_app_get_monotonic_id_from_json (JsonObject *obj,
+                                    gint64 *monotonic_id,
+                                    GError **error)
+{
+  if (!json_object_has_member (obj, "monotonic_id"))
+    {
+      g_set_error_literal (error, EOS_APP_UTILS_ERROR,
+                           EOS_APP_UTILS_ERROR_JSON_MISSING_ATTRIBUTE,
+                           _("Updates meta record did not contain "
+                             "expected attributes"));
+
+      eos_app_log_error_message ("Updates meta record did not contain "
+                                 "expected attributes");
+
+      return FALSE;
+    }
+
+  eos_app_log_debug_message ("Loading JSON update meta record monotonic id");
+
+  if (json_object_get_null_member (obj, "monotonic_id"))
+    {
+      g_set_error_literal (error, EOS_APP_UTILS_ERROR,
+                           EOS_APP_UTILS_ERROR_JSON_UNEXPECTED_VALUE,
+                           _("Updates meta record did not contain "
+                             "valid monotonic_id attribute value"));
+
+      eos_app_log_error_message ("Updates meta record did not contain "
+                                 "valid monotonic_id attribute value");
+
+      return FALSE;
+    }
+
+  *monotonic_id = json_object_get_int_member (obj, "monotonic_id");
+
+  eos_app_log_debug_message ("Update meta record monotonic id: %" G_GINT64_FORMAT,
+                             *monotonic_id);
+
+  return TRUE;
+}
+
+static gboolean
+eos_app_get_string_member_from_json (JsonObject *obj,
+                                     const char *member,
+                                     char **member_text,
+                                     GError **error)
+{
+  g_assert_nonnull (member_text);
+
+  eos_app_log_debug_message ("Loading string member '%s' from updates "
+                             "meta record", member);
+
+  if (!json_object_has_member (obj, member))
+    {
+      g_set_error_literal (error, EOS_APP_UTILS_ERROR,
+                           EOS_APP_UTILS_ERROR_JSON_MISSING_ATTRIBUTE,
+                           _("Updates meta record did not contain "
+                             "expected string attributes"));
+
+      eos_app_log_error_message ("Updates meta record did not contain "
+                                 "expected string attribute '%s'", member);
+
+      return FALSE;
+    }
+
+  *member_text = g_strdup (json_object_get_string_member (obj, member));
+
+  eos_app_log_debug_message ("Update meta record %s: %s", member, *member_text);
+
+  return TRUE;
+}
+
 gboolean
 eos_app_load_updates_meta_record (gint64 *monotonic_update_id,
+                                  char **os_version,
+                                  char **os_personality,
                                   const char *data,
                                   GCancellable *cancellable,
                                   GError **error)
@@ -776,44 +850,85 @@ eos_app_load_updates_meta_record (gint64 *monotonic_update_id,
     }
 
   JsonObject *obj = json_node_get_object (root);
-  if (!json_object_has_member (obj, "monotonic_id"))
+  gboolean ret = eos_app_get_monotonic_id_from_json (obj, monotonic_update_id,
+                                                     error);
+
+  if (ret && os_version)
     {
-      g_set_error_literal (error, EOS_APP_UTILS_ERROR,
-                           EOS_APP_UTILS_ERROR_JSON_MISSING_ATTRIBUTE,
-                           _("Updates meta record did not contain "
-                             "expected attributes"));
-
-      eos_app_log_error_message ("Updates meta record did not contain "
-                                 "expected attributes");
-
-      g_object_unref (parser);
-      return FALSE;
+      ret = eos_app_get_string_member_from_json (obj, "os-version", os_version,
+                                                 error);
     }
 
-  eos_app_log_debug_message ("Loading JSON update meta record monotonic id");
-
-  if (json_object_get_null_member (obj, "monotonic_id"))
+  if (ret && os_personality)
     {
-      g_set_error_literal (error, EOS_APP_UTILS_ERROR,
-                           EOS_APP_UTILS_ERROR_JSON_UNEXPECTED_VALUE,
-                           _("Updates meta record did not contain "
-                             "valid monotonic_id attribute value"));
-
-      eos_app_log_error_message ("Updates meta record did not contain "
-                                 "valid monotonic_id attribute value");
-
-      g_object_unref (parser);
-      return FALSE;
+      ret = eos_app_get_string_member_from_json (obj, "os-personality",
+                                                 os_personality, error);
     }
-
-  *monotonic_update_id = json_object_get_int_member (obj, "monotonic_id");
-
-  eos_app_log_debug_message ("Update meta record monotonic id: %" G_GINT64_FORMAT,
-                             *monotonic_update_id);
 
   g_object_unref (parser);
 
-  return TRUE;
+  return ret;
+}
+
+gboolean
+eos_app_set_os_details_in_updates_meta_record (GError **error_out)
+{
+  const char *record_file = eos_get_updates_meta_record_file ();
+  g_autoptr (JsonParser) parser = json_parser_new ();
+  g_autoptr (JsonGenerator) generator = NULL;
+  g_autoptr (JsonNode) node = NULL;
+  GError *error = NULL;
+  JsonNode *root;
+  JsonObject *obj;
+  gboolean changed = FALSE;
+
+  eos_app_log_info_message ("Setting OS version and personality in updates "
+                            "meta record: %s", record_file);
+
+  if (!json_parser_load_from_file (parser, record_file, &error))
+    {
+      eos_app_log_error_message ("Error loading json from meta record file: %s",
+                                 error->message);
+      g_propagate_error (error_out, error);
+
+      return FALSE;
+    }
+
+  root = json_parser_get_root (parser);
+
+  /* copying the root node as docs say it should never be modified */
+  node = json_node_copy (root);
+  obj = json_node_get_object (node);
+
+  if (!json_object_has_member (obj, "os-version"))
+    {
+      json_object_set_string_member (obj, "os-version", eos_get_os_version ());
+      changed = TRUE;
+    }
+
+  if (!json_object_has_member (obj, "os-personality"))
+    {
+      json_object_set_string_member (obj,
+                                     "os-personality",
+                                     eos_get_os_personality ());
+      changed = TRUE;
+    }
+
+  if (!changed)
+    {
+      eos_app_log_debug_message ("Updates meta record already has OS version "
+                                 "and personality. Nothing to be done.");
+
+      return TRUE;
+    }
+
+  generator = json_generator_new ();
+  json_generator_set_root (generator, node);
+
+  eos_app_log_debug_message ("Saving OS version and personality in "
+                             "updates meta record file.");
+
+  return json_generator_to_file (generator, record_file, error_out);
 }
 
 static JsonObject *
