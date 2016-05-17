@@ -89,8 +89,6 @@ static gboolean
 check_cached_file (const char *target_file,
                    char      **buffer)
 {
-  g_assert_nonnull (buffer);
-
   struct stat buf;
   if (stat (target_file, &buf) != 0)
     return FALSE;
@@ -129,15 +127,18 @@ check_cached_file (const char *target_file,
   else
     eos_app_log_info_message ("No network available, using cached file");
 
-  GError *internal_error = NULL;
-  if (!g_file_get_contents (target_file, buffer, NULL, &internal_error))
+  if (buffer)
     {
-      /* Fall through, and re-download the file */
-      eos_app_log_error_message ("Could not read cached file '%s': %s",
-                                 target_file,
-                                 internal_error->message);
-      g_clear_error (&internal_error);
-      return FALSE;
+      GError *internal_error = NULL;
+      if (!g_file_get_contents (target_file, buffer, NULL, &internal_error))
+        {
+          /* Fall through, and re-download the file */
+          eos_app_log_error_message ("Could not read cached file '%s': %s",
+                                     target_file,
+                                     internal_error->message);
+          g_clear_error (&internal_error);
+          return FALSE;
+        }
     }
 
   return TRUE;
@@ -664,6 +665,7 @@ eos_net_utils_download_file (SoupSession     *session,
                              const char      *target_file,
                              char           **buffer,
                              gboolean         use_cache,
+                             gboolean        *cache_hit,
                              GCancellable    *cancellable,
                              GError         **error)
 {
@@ -673,7 +675,12 @@ eos_net_utils_download_file (SoupSession     *session,
                              use_cache ? "true" : "false");
 
   if (use_cache && check_cached_file (target_file, buffer))
-    return TRUE;
+    {
+      if (cache_hit)
+        *cache_hit = TRUE;
+
+      return TRUE;
+    }
 
   g_autoptr(SoupRequest) request = prepare_soup_request (session, source_uri, content_type, error);
   if (request == NULL)
@@ -712,7 +719,14 @@ eos_net_utils_download_file (SoupSession     *session,
 
   /* NUL-terminate the content and steal it */
   all_content->data[bytes_read] = 0;
-  *buffer = (char *) g_byte_array_free (all_content, FALSE);
+
+  if (buffer)
+    *buffer = (char *) g_byte_array_free (all_content, FALSE);
+  else
+    g_byte_array_unref (all_content);
+
+  if (cache_hit)
+    *cache_hit = FALSE;
 
   return TRUE;
 }

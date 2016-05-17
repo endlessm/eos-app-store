@@ -816,6 +816,67 @@ eos_app_load_updates_meta_record (gint64 *monotonic_update_id,
   return TRUE;
 }
 
+gboolean
+eos_app_set_os_details_in_updates_meta_record (GError **error_out)
+{
+  const char *record_file = eos_get_updates_meta_record_file ();
+  g_autoptr (JsonParser) parser = json_parser_new ();
+  g_autoptr (JsonGenerator) generator = NULL;
+  g_autoptr (JsonNode) node = NULL;
+  GError *error = NULL;
+  JsonNode *root;
+  JsonObject *obj;
+  gboolean changed = FALSE;
+
+  eos_app_log_info_message ("Setting OS version and personality in updates "
+                            "meta record: %s", record_file);
+
+  if (!json_parser_load_from_file (parser, record_file, &error))
+    {
+      eos_app_log_error_message ("Error loading json from meta record file: %s",
+                                 error->message);
+      g_propagate_error (error_out, error);
+
+      return FALSE;
+    }
+
+  root = json_parser_get_root (parser);
+
+  /* copying the root node as docs say it should never be modified */
+  node = json_node_copy (root);
+  obj = json_node_get_object (node);
+
+  if (!json_object_has_member (obj, "os-version"))
+    {
+      json_object_set_string_member (obj, "os-version", get_os_version ());
+      changed = TRUE;
+    }
+
+  if (!json_object_has_member (obj, "os-personality"))
+    {
+      json_object_set_string_member (obj,
+                                     "os-personality",
+                                     get_os_personality ());
+      changed = TRUE;
+    }
+
+  if (!changed)
+    {
+      eos_app_log_debug_message ("Updates meta record already has OS version "
+                                 "and personality. Nothing to be done.");
+
+      return TRUE;
+    }
+
+  generator = json_generator_new ();
+  json_generator_set_root (generator, node);
+
+  eos_app_log_debug_message ("Saving OS version and personality in "
+                             "updates meta record file.");
+
+  return json_generator_to_file (generator, record_file, error_out);
+}
+
 static JsonObject *
 get_matching_version_delta (GList *deltas,
                             const char *version,
