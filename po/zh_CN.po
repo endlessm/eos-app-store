@@ -11,7 +11,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: eos-app-store\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-05-03 01:22+0000\n"
+"POT-Creation-Date: 2016-05-17 01:21+0000\n"
 "PO-Revision-Date: 2016-02-21 07:01+0000\n"
 "Last-Translator: zhifeng peng <jnufeng@126.com>\n"
 "Language-Team: Chinese (China) (http://www.transifex.com/endless-mobile-inc/eos-app-store/language/zh_CN/)\n"
@@ -188,47 +188,47 @@ msgstr "按Escape退出"
 
 #. Translators: use the same string used to install the app center content
 #. JSON
-#: ../EosAppStore/categories.js:12 ../EosAppStore/lib/eos-app-utils.c:1346
+#: ../EosAppStore/categories.js:14 ../EosAppStore/lib/eos-app-utils.c:1346
 msgid "Education"
 msgstr "教育"
 
-#: ../EosAppStore/categories.js:19 ../EosAppStore/lib/eos-app-utils.c:1347
+#: ../EosAppStore/categories.js:21 ../EosAppStore/lib/eos-app-utils.c:1347
 msgid "Games"
 msgstr "游戏"
 
-#: ../EosAppStore/categories.js:26 ../EosAppStore/lib/eos-app-utils.c:1348
+#: ../EosAppStore/categories.js:28 ../EosAppStore/lib/eos-app-utils.c:1348
 msgid "Resources"
 msgstr "资源"
 
-#: ../EosAppStore/categories.js:33 ../EosAppStore/lib/eos-app-utils.c:1349
+#: ../EosAppStore/categories.js:35 ../EosAppStore/lib/eos-app-utils.c:1349
 msgid "Utilities"
 msgstr "工具"
 
-#: ../EosAppStore/categories.js:40
+#: ../EosAppStore/categories.js:42
 msgid "Installed"
 msgstr "已安装"
 
-#: ../EosAppStore/categories.js:47
+#: ../EosAppStore/categories.js:49
 msgid "Search"
 msgstr "搜索"
 
-#: ../EosAppStore/categories.js:59
+#: ../EosAppStore/categories.js:61
 msgid "News"
 msgstr "新闻"
 
-#: ../EosAppStore/categories.js:65
+#: ../EosAppStore/categories.js:67
 msgid "Sports"
 msgstr "运动"
 
-#: ../EosAppStore/categories.js:71
+#: ../EosAppStore/categories.js:73
 msgid "Education and Health"
 msgstr "教育与健康"
 
-#: ../EosAppStore/categories.js:77
+#: ../EosAppStore/categories.js:79
 msgid "Entertainment"
 msgstr "娱乐"
 
-#: ../EosAppStore/categories.js:83
+#: ../EosAppStore/categories.js:85
 msgid "Local"
 msgstr "本地"
 
@@ -264,21 +264,21 @@ msgstr "搜索中"
 msgid "The address written does not exist or is not available."
 msgstr "输入的网址不存在或无法获取"
 
-#: ../EosAppStore/weblinkFrame.js:393 ../EosAppStore/weblinkFrame.js:549
+#: ../EosAppStore/weblinkFrame.js:393 ../EosAppStore/weblinkFrame.js:560
 msgid "Added successfully!"
 msgstr "添加成功！"
 
-#: ../EosAppStore/weblinkFrame.js:630
+#: ../EosAppStore/weblinkFrame.js:641
 msgid ""
 "Add your favorite websites to your desktop or choose suggested ones from our"
 " list."
 msgstr "将您喜爱的网站添加到桌面上或从我们的列表中选择推荐网站。"
 
-#: ../EosAppStore/weblinkFrame.js:776
+#: ../EosAppStore/weblinkFrame.js:787
 msgid "Websites"
 msgstr "网站"
 
-#: ../EosAppStore/weblinkFrame.js:780
+#: ../EosAppStore/weblinkFrame.js:791
 msgid "Install websites"
 msgstr "安装网站"
 

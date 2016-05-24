@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: eos-app-store\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-05-03 01:22+0000\n"
+"POT-Creation-Date: 2016-05-17 01:21+0000\n"
 "PO-Revision-Date: 2016-03-16 00:45+0000\n"
 "Last-Translator: endlessmobile_build <philip@endlessm.com>\n"
 "Language-Team: French (http://www.transifex.com/endless-mobile-inc/eos-app-store/language/fr/)\n"
@@ -185,47 +185,47 @@ msgstr "Appuyer sur la touche Échap pour annuler"
 
 #. Translators: use the same string used to install the app center content
 #. JSON
-#: ../EosAppStore/categories.js:12 ../EosAppStore/lib/eos-app-utils.c:1346
+#: ../EosAppStore/categories.js:14 ../EosAppStore/lib/eos-app-utils.c:1346
 msgid "Education"
 msgstr "Formation"
 
-#: ../EosAppStore/categories.js:19 ../EosAppStore/lib/eos-app-utils.c:1347
+#: ../EosAppStore/categories.js:21 ../EosAppStore/lib/eos-app-utils.c:1347
 msgid "Games"
 msgstr "Jeux"
 
-#: ../EosAppStore/categories.js:26 ../EosAppStore/lib/eos-app-utils.c:1348
+#: ../EosAppStore/categories.js:28 ../EosAppStore/lib/eos-app-utils.c:1348
 msgid "Resources"
 msgstr "Ressources"
 
-#: ../EosAppStore/categories.js:33 ../EosAppStore/lib/eos-app-utils.c:1349
+#: ../EosAppStore/categories.js:35 ../EosAppStore/lib/eos-app-utils.c:1349
 msgid "Utilities"
 msgstr "Utilitaires"
 
-#: ../EosAppStore/categories.js:40
+#: ../EosAppStore/categories.js:42
 msgid "Installed"
 msgstr "Installées"
 
-#: ../EosAppStore/categories.js:47
+#: ../EosAppStore/categories.js:49
 msgid "Search"
 msgstr "Recherche"
 
-#: ../EosAppStore/categories.js:59
+#: ../EosAppStore/categories.js:61
 msgid "News"
 msgstr "Nouveautés"
 
-#: ../EosAppStore/categories.js:65
+#: ../EosAppStore/categories.js:67
 msgid "Sports"
 msgstr "Sports"
 
-#: ../EosAppStore/categories.js:71
+#: ../EosAppStore/categories.js:73
 msgid "Education and Health"
 msgstr "Éducation et Santé"
 
-#: ../EosAppStore/categories.js:77
+#: ../EosAppStore/categories.js:79
 msgid "Entertainment"
 msgstr "Divertissement "
 
-#: ../EosAppStore/categories.js:83
+#: ../EosAppStore/categories.js:85
 msgid "Local"
 msgstr "Régional"
 
@@ -261,21 +261,21 @@ msgstr "recherche en cours"
 msgid "The address written does not exist or is not available."
 msgstr "L'adresse écrite n'existe pas ou n'est pas disponible."
 
-#: ../EosAppStore/weblinkFrame.js:393 ../EosAppStore/weblinkFrame.js:549
+#: ../EosAppStore/weblinkFrame.js:393 ../EosAppStore/weblinkFrame.js:560
 msgid "Added successfully!"
 msgstr "Ajouté avec succès !"
 
-#: ../EosAppStore/weblinkFrame.js:630
+#: ../EosAppStore/weblinkFrame.js:641
 msgid ""
 "Add your favorite websites to your desktop or choose suggested ones from our"
 " list."
 msgstr "Ajouter vos sites internet préférés à votre bureau ou choisissez parmi les suggestions de notre liste. "
 
-#: ../EosAppStore/weblinkFrame.js:776
+#: ../EosAppStore/weblinkFrame.js:787
 msgid "Websites"
 msgstr "Sites internet"
 
-#: ../EosAppStore/weblinkFrame.js:780
+#: ../EosAppStore/weblinkFrame.js:791
 msgid "Install websites"
 msgstr "Installer les sites internet"
 

@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-05-10 01:21+0000\n"
+"POT-Creation-Date: 2016-05-24 01:22+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -183,47 +183,47 @@ msgid "Press Escape to cancel"
 msgstr ""
 
 #. Translators: use the same string used to install the app center content JSON
-#: ../EosAppStore/categories.js:12 ../EosAppStore/lib/eos-app-utils.c:1346
+#: ../EosAppStore/categories.js:14 ../EosAppStore/lib/eos-app-utils.c:1461
 msgid "Education"
 msgstr ""
 
-#: ../EosAppStore/categories.js:19 ../EosAppStore/lib/eos-app-utils.c:1347
+#: ../EosAppStore/categories.js:21 ../EosAppStore/lib/eos-app-utils.c:1462
 msgid "Games"
 msgstr ""
 
-#: ../EosAppStore/categories.js:26 ../EosAppStore/lib/eos-app-utils.c:1348
+#: ../EosAppStore/categories.js:28 ../EosAppStore/lib/eos-app-utils.c:1463
 msgid "Resources"
 msgstr ""
 
-#: ../EosAppStore/categories.js:33 ../EosAppStore/lib/eos-app-utils.c:1349
+#: ../EosAppStore/categories.js:35 ../EosAppStore/lib/eos-app-utils.c:1464
 msgid "Utilities"
 msgstr ""
 
-#: ../EosAppStore/categories.js:40
+#: ../EosAppStore/categories.js:42
 msgid "Installed"
 msgstr ""
 
-#: ../EosAppStore/categories.js:47
+#: ../EosAppStore/categories.js:49
 msgid "Search"
 msgstr ""
 
-#: ../EosAppStore/categories.js:59
+#: ../EosAppStore/categories.js:61
 msgid "News"
 msgstr ""
 
-#: ../EosAppStore/categories.js:65
+#: ../EosAppStore/categories.js:67
 msgid "Sports"
 msgstr ""
 
-#: ../EosAppStore/categories.js:71
+#: ../EosAppStore/categories.js:73
 msgid "Education and Health"
 msgstr ""
 
-#: ../EosAppStore/categories.js:77
+#: ../EosAppStore/categories.js:79
 msgid "Entertainment"
 msgstr ""
 
-#: ../EosAppStore/categories.js:83
+#: ../EosAppStore/categories.js:85
 msgid "Local"
 msgstr ""
 
@@ -259,21 +259,21 @@ msgstr ""
 msgid "The address written does not exist or is not available."
 msgstr ""
 
-#: ../EosAppStore/weblinkFrame.js:393 ../EosAppStore/weblinkFrame.js:549
+#: ../EosAppStore/weblinkFrame.js:393 ../EosAppStore/weblinkFrame.js:560
 msgid "Added successfully!"
 msgstr ""
 
-#: ../EosAppStore/weblinkFrame.js:630
+#: ../EosAppStore/weblinkFrame.js:641
 msgid ""
 "Add your favorite websites to your desktop or choose suggested ones from our "
 "list."
 msgstr ""
 
-#: ../EosAppStore/weblinkFrame.js:776
+#: ../EosAppStore/weblinkFrame.js:787
 msgid "Websites"
 msgstr ""
 
-#: ../EosAppStore/weblinkFrame.js:780
+#: ../EosAppStore/weblinkFrame.js:791
 msgid "Install websites"
 msgstr ""
 
@@ -345,28 +345,32 @@ msgstr ""
 msgid "App '%s' is not installed."
 msgstr ""
 
-#: ../EosAppStore/lib/eos-app-utils.c:746
-msgid "Operation cancelled"
-msgstr ""
-
-#: ../EosAppStore/lib/eos-app-utils.c:768
-msgid "Updates meta record did not contain expected structure"
-msgstr ""
-
-#: ../EosAppStore/lib/eos-app-utils.c:783
+#: ../EosAppStore/lib/eos-app-utils.c:744
 msgid "Updates meta record did not contain expected attributes"
 msgstr ""
 
-#: ../EosAppStore/lib/eos-app-utils.c:799
+#: ../EosAppStore/lib/eos-app-utils.c:759
 msgid "Updates meta record did not contain valid monotonic_id attribute value"
 msgstr ""
 
-#: ../EosAppStore/lib/eos-app-utils.c:1619
+#: ../EosAppStore/lib/eos-app-utils.c:791
+msgid "Updates meta record did not contain expected string attributes"
+msgstr ""
+
+#: ../EosAppStore/lib/eos-app-utils.c:820
+msgid "Operation cancelled"
+msgstr ""
+
+#: ../EosAppStore/lib/eos-app-utils.c:842
+msgid "Updates meta record did not contain expected structure"
+msgstr ""
+
+#: ../EosAppStore/lib/eos-app-utils.c:1734
 #, c-format
 msgid "Not enough space on device for downloading the app."
 msgstr ""
 
-#: ../EosAppStore/lib/eos-app-utils.c:1784
+#: ../EosAppStore/lib/eos-app-utils.c:1899
 msgid "There was a problem downloading the app; please try again"
 msgstr ""
 
@@ -380,27 +384,27 @@ msgstr ""
 msgid "App '%s' could not be downloaded"
 msgstr ""
 
-#: ../EosAppStore/lib/eos-net-utils.c:273
+#: ../EosAppStore/lib/eos-net-utils.c:274
 msgid "The certificate of the target server is expired"
 msgstr ""
 
-#: ../EosAppStore/lib/eos-net-utils.c:275
+#: ../EosAppStore/lib/eos-net-utils.c:276
 msgid "The certificate of the target server has been revoked"
 msgstr ""
 
-#: ../EosAppStore/lib/eos-net-utils.c:277
+#: ../EosAppStore/lib/eos-net-utils.c:278
 msgid "The certificate of the target server has a bad identity"
 msgstr ""
 
-#: ../EosAppStore/lib/eos-net-utils.c:279
+#: ../EosAppStore/lib/eos-net-utils.c:280
 msgid "The certificate of the target server is from an unknown authority"
 msgstr ""
 
-#: ../EosAppStore/lib/eos-net-utils.c:281
+#: ../EosAppStore/lib/eos-net-utils.c:282
 msgid "The certificate of the target server is bad or invalid"
 msgstr ""
 
-#: ../EosAppStore/lib/eos-net-utils.c:337
+#: ../EosAppStore/lib/eos-net-utils.c:338
 #, c-format
 msgid "Could not save the app - canceling download (%s)"
 msgstr ""

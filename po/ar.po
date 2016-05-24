@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: eos-app-store\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-05-03 01:22+0000\n"
+"POT-Creation-Date: 2016-05-17 01:21+0000\n"
 "PO-Revision-Date: 2016-03-17 06:00+0000\n"
 "Last-Translator: endlessmobile_build <philip@endlessm.com>\n"
 "Language-Team: Arabic (http://www.transifex.com/endless-mobile-inc/eos-app-store/language/ar/)\n"
@@ -185,47 +185,47 @@ msgstr "قُم بالضغط على زر الإفلات للإلغاء"
 
 #. Translators: use the same string used to install the app center content
 #. JSON
-#: ../EosAppStore/categories.js:12 ../EosAppStore/lib/eos-app-utils.c:1346
+#: ../EosAppStore/categories.js:14 ../EosAppStore/lib/eos-app-utils.c:1346
 msgid "Education"
 msgstr "التعليم "
 
-#: ../EosAppStore/categories.js:19 ../EosAppStore/lib/eos-app-utils.c:1347
+#: ../EosAppStore/categories.js:21 ../EosAppStore/lib/eos-app-utils.c:1347
 msgid "Games"
 msgstr "ألعاب"
 
-#: ../EosAppStore/categories.js:26 ../EosAppStore/lib/eos-app-utils.c:1348
+#: ../EosAppStore/categories.js:28 ../EosAppStore/lib/eos-app-utils.c:1348
 msgid "Resources"
 msgstr "الموارد"
 
-#: ../EosAppStore/categories.js:33 ../EosAppStore/lib/eos-app-utils.c:1349
+#: ../EosAppStore/categories.js:35 ../EosAppStore/lib/eos-app-utils.c:1349
 msgid "Utilities"
 msgstr "المرافق"
 
-#: ../EosAppStore/categories.js:40
+#: ../EosAppStore/categories.js:42
 msgid "Installed"
 msgstr "مثبت"
 
-#: ../EosAppStore/categories.js:47
+#: ../EosAppStore/categories.js:49
 msgid "Search"
 msgstr "البحث"
 
-#: ../EosAppStore/categories.js:59
+#: ../EosAppStore/categories.js:61
 msgid "News"
 msgstr "الأخبار"
 
-#: ../EosAppStore/categories.js:65
+#: ../EosAppStore/categories.js:67
 msgid "Sports"
 msgstr "الرياضة "
 
-#: ../EosAppStore/categories.js:71
+#: ../EosAppStore/categories.js:73
 msgid "Education and Health"
 msgstr "التعليم و الصحة "
 
-#: ../EosAppStore/categories.js:77
+#: ../EosAppStore/categories.js:79
 msgid "Entertainment"
 msgstr "الترفيه"
 
-#: ../EosAppStore/categories.js:83
+#: ../EosAppStore/categories.js:85
 msgid "Local"
 msgstr "محلي"
 
@@ -261,21 +261,21 @@ msgstr "البحث جاري"
 msgid "The address written does not exist or is not available."
 msgstr "العنوان المكتوب غير موجود أو غير متوفر."
 
-#: ../EosAppStore/weblinkFrame.js:393 ../EosAppStore/weblinkFrame.js:549
+#: ../EosAppStore/weblinkFrame.js:393 ../EosAppStore/weblinkFrame.js:560
 msgid "Added successfully!"
 msgstr "تمت الإضافة بنجاح!"
 
-#: ../EosAppStore/weblinkFrame.js:630
+#: ../EosAppStore/weblinkFrame.js:641
 msgid ""
 "Add your favorite websites to your desktop or choose suggested ones from our"
 " list."
 msgstr "قم بإضافة المواقع المفضلة لديك على سطح المكتب أو اختيار تلك المقترحة من قائمتنا."
 
-#: ../EosAppStore/weblinkFrame.js:776
+#: ../EosAppStore/weblinkFrame.js:787
 msgid "Websites"
 msgstr "المواقع"
 
-#: ../EosAppStore/weblinkFrame.js:780
+#: ../EosAppStore/weblinkFrame.js:791
 msgid "Install websites"
 msgstr "تثبيت المواقع"
 
