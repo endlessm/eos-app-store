@@ -124,16 +124,17 @@ eos_app_info_download_bundle (EosAppInfo *info,
   return bundle_path;
 }
 
-static gint64
-get_local_updates_monotonic_id (void)
+static gboolean
+get_local_updates_details (gint64 *monotonic_id,
+                           char **os_version,
+                           char **os_personality)
 {
   char *url = eos_get_updates_meta_record_uri ();
   char *target = eos_get_updates_meta_record_file ();
   char *data = NULL;
+  gboolean all_read = FALSE;
 
   GError *error = NULL;
-
-  gint64 monotonic_id = -1;
 
   if (!g_file_get_contents (target, &data, NULL, &error))
     {
@@ -144,8 +145,8 @@ get_local_updates_monotonic_id (void)
       goto out;
     }
 
-  if (!eos_app_load_updates_meta_record (&monotonic_id, NULL, NULL, data, NULL,
-                                         &error))
+  if (!eos_app_load_updates_meta_record (monotonic_id, os_version,
+                                         os_personality, data, NULL, &error))
     {
       eos_app_log_error_message ("Unable to parse updates meta record: %s: %s. "
                                  "Removing file from system",
@@ -159,6 +160,8 @@ get_local_updates_monotonic_id (void)
       goto out;
     }
 
+  all_read = TRUE;
+
 out:
   g_free (url);
   g_free (target);
@@ -166,7 +169,7 @@ out:
 
   g_clear_error (&error);
 
-  return monotonic_id;
+  return all_read;
 }
 
 static gboolean
@@ -178,8 +181,8 @@ check_is_app_list_current (SoupSession *soup_session,
   char *data = NULL;
   const char *os_version = eos_get_os_version ();
   const char *os_personality = eos_get_os_personality ();
-  g_autofree char *update_os_version = NULL;
-  g_autofree char *update_os_personality = NULL;
+  g_autofree char *old_os_version = NULL;
+  g_autofree char *old_os_personality = NULL;
 
   gint64 old_monotonic_id = 0;
   gint64 monotonic_id = 0;
@@ -190,7 +193,8 @@ check_is_app_list_current (SoupSession *soup_session,
   GError *error = NULL;
 
   eos_app_log_info_message ("Checking if app list update is needed");
-  old_monotonic_id = get_local_updates_monotonic_id ();
+  get_local_updates_details (&old_monotonic_id, &old_os_version,
+                             &old_os_personality);
 
   eos_app_log_info_message ("Downloading updates meta record from: %s", url);
   if (!eos_net_utils_download_file (soup_session,
@@ -217,30 +221,11 @@ check_is_app_list_current (SoupSession *soup_session,
       g_clear_error (&error);
     }
 
-  if (!g_file_get_contents (target, &data, NULL, &error))
+  /* we do not get the os version and personality from the file since we compare
+   * them with the current ones assigned above from dedicated functions */
+  if (!get_local_updates_details (&monotonic_id, NULL, NULL))
     {
-      eos_app_log_error_message ("Unable to load updates meta record: %s: %s",
-                                 target,
-                                 error->message);
-
-      goto out;
-    }
-
-  /* we retrieve the os version and personality for which the updates record was
-   * stored to ensure it is still up to date if the file was cached */
-  if (!eos_app_load_updates_meta_record (&monotonic_id,
-                                         &update_os_version,
-                                         &update_os_personality,
-                                         data,
-                                         cancellable,
-                                         &error))
-    {
-      eos_app_log_error_message ("Unable to parse updates meta record: %s. "
-                                 "Removing cached file.", error->message);
-
-      /* If we have parsing issues with the file, we want it removed from the
-       * system regardless of the reasons */
-      g_unlink (target);
+      eos_app_log_error_message ("Unable to get the current monotonic id");
 
       goto out;
     }
@@ -252,22 +237,22 @@ check_is_app_list_current (SoupSession *soup_session,
                             monotonic_id);
 
   eos_app_log_info_message ("Comparing OS versions."
-                            " System: %s,"
-                            " Update: %s.",
-                            os_version,
-                            update_os_version);
+                            " Old: %s,"
+                            " New: %s.",
+                            old_os_version,
+                            os_version);
 
   eos_app_log_info_message ("Comparing OS personalities."
-                            " System: %s,"
-                            " Update: %s.",
-                            os_personality,
-                            update_os_personality);
+                            " Old: %s,"
+                            " New: %s.",
+                            old_os_personality,
+                            os_personality);
 
   /* If monotonic IDs, OS versions or OS personalities don't match,
    * we need to update our app list */
   if (monotonic_id == old_monotonic_id &&
-      g_strcmp0 (update_os_version, os_version) == 0 &&
-      g_strcmp0 (update_os_personality, os_personality) == 0)
+      g_strcmp0 (old_os_version, os_version) == 0 &&
+      g_strcmp0 (old_os_personality, os_personality) == 0)
     {
       updates_current = TRUE;
     }
