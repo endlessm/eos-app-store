@@ -8,8 +8,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: eos-app-store\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-05-17 01:21+0000\n"
-"PO-Revision-Date: 2016-03-17 06:00+0000\n"
+"POT-Creation-Date: 2016-05-24 01:22+0000\n"
+"PO-Revision-Date: 2016-05-24 01:22+0000\n"
 "Last-Translator: endlessmobile_build <philip@endlessm.com>\n"
 "Language-Team: Arabic (http://www.transifex.com/endless-mobile-inc/eos-app-store/language/ar/)\n"
 "MIME-Version: 1.0\n"
@@ -185,19 +185,19 @@ msgstr "قُم بالضغط على زر الإفلات للإلغاء"
 
 #. Translators: use the same string used to install the app center content
 #. JSON
-#: ../EosAppStore/categories.js:14 ../EosAppStore/lib/eos-app-utils.c:1346
+#: ../EosAppStore/categories.js:14 ../EosAppStore/lib/eos-app-utils.c:1461
 msgid "Education"
 msgstr "التعليم "
 
-#: ../EosAppStore/categories.js:21 ../EosAppStore/lib/eos-app-utils.c:1347
+#: ../EosAppStore/categories.js:21 ../EosAppStore/lib/eos-app-utils.c:1462
 msgid "Games"
 msgstr "ألعاب"
 
-#: ../EosAppStore/categories.js:28 ../EosAppStore/lib/eos-app-utils.c:1348
+#: ../EosAppStore/categories.js:28 ../EosAppStore/lib/eos-app-utils.c:1463
 msgid "Resources"
 msgstr "الموارد"
 
-#: ../EosAppStore/categories.js:35 ../EosAppStore/lib/eos-app-utils.c:1349
+#: ../EosAppStore/categories.js:35 ../EosAppStore/lib/eos-app-utils.c:1464
 msgid "Utilities"
 msgstr "المرافق"
 
@@ -348,28 +348,32 @@ msgstr "تطبيق %s مُحدثٌ لآخر وضع."
 msgid "App '%s' is not installed."
 msgstr "تطبيق '%s' غير مُثَبَتْ."
 
-#: ../EosAppStore/lib/eos-app-utils.c:746
-msgid "Operation cancelled"
-msgstr "ألغيت العملية"
-
-#: ../EosAppStore/lib/eos-app-utils.c:768
-msgid "Updates meta record did not contain expected structure"
-msgstr "سجل ميتا الخاص بالتحديثات لم يكن يحتوي على الهيكل البنائي المتوقع"
-
-#: ../EosAppStore/lib/eos-app-utils.c:783
+#: ../EosAppStore/lib/eos-app-utils.c:744
 msgid "Updates meta record did not contain expected attributes"
 msgstr "سجلات ميتا الخاصة بالتحديثات لم يكن بها السمات المتوقعة"
 
-#: ../EosAppStore/lib/eos-app-utils.c:799
+#: ../EosAppStore/lib/eos-app-utils.c:759
 msgid "Updates meta record did not contain valid monotonic_id attribute value"
 msgstr "سجلات ميتا الخاصة بالتحديثات لم تحتوي على قيمة سمة monotonic_id صالحة"
 
-#: ../EosAppStore/lib/eos-app-utils.c:1619
+#: ../EosAppStore/lib/eos-app-utils.c:791
+msgid "Updates meta record did not contain expected string attributes"
+msgstr ""
+
+#: ../EosAppStore/lib/eos-app-utils.c:820
+msgid "Operation cancelled"
+msgstr "ألغيت العملية"
+
+#: ../EosAppStore/lib/eos-app-utils.c:842
+msgid "Updates meta record did not contain expected structure"
+msgstr "سجل ميتا الخاص بالتحديثات لم يكن يحتوي على الهيكل البنائي المتوقع"
+
+#: ../EosAppStore/lib/eos-app-utils.c:1734
 #, c-format
 msgid "Not enough space on device for downloading the app."
 msgstr "لا توجد مساحة كافية على الجهاز لتنزيل التطبيق."
 
-#: ../EosAppStore/lib/eos-app-utils.c:1784
+#: ../EosAppStore/lib/eos-app-utils.c:1899
 msgid "There was a problem downloading the app; please try again"
 msgstr "حدثت مشكلة أثناء تنزيل التطبيق، يُرجى المحاولة مرة أخرى"
 
@@ -383,27 +387,27 @@ msgstr "ليس هناك توقيع متوفر من أجل '%s'"
 msgid "App '%s' could not be downloaded"
 msgstr "لم يمكن تنزيل تطبيق '%s' "
 
-#: ../EosAppStore/lib/eos-net-utils.c:273
+#: ../EosAppStore/lib/eos-net-utils.c:274
 msgid "The certificate of the target server is expired"
 msgstr "انتهت صلاحية شهادة الخادم الوجهة"
 
-#: ../EosAppStore/lib/eos-net-utils.c:275
+#: ../EosAppStore/lib/eos-net-utils.c:276
 msgid "The certificate of the target server has been revoked"
 msgstr "شهادة الخادم الوجهة، مُلغاة"
 
-#: ../EosAppStore/lib/eos-net-utils.c:277
+#: ../EosAppStore/lib/eos-net-utils.c:278
 msgid "The certificate of the target server has a bad identity"
 msgstr "هوية شهادة الخادم الوجهة سيئة"
 
-#: ../EosAppStore/lib/eos-net-utils.c:279
+#: ../EosAppStore/lib/eos-net-utils.c:280
 msgid "The certificate of the target server is from an unknown authority"
 msgstr "شهادة الخادم الوجهة صادرة عن سلطة غير معروفة"
 
-#: ../EosAppStore/lib/eos-net-utils.c:281
+#: ../EosAppStore/lib/eos-net-utils.c:282
 msgid "The certificate of the target server is bad or invalid"
 msgstr "شهادة الخادم الوجهة سيئة أو غير صالحة"
 
-#: ../EosAppStore/lib/eos-net-utils.c:337
+#: ../EosAppStore/lib/eos-net-utils.c:338
 #, c-format
 msgid "Could not save the app - canceling download (%s)"
 msgstr "لم يمكن حفظ التطبيق - جاري إلغاء التنزيل (%s)"

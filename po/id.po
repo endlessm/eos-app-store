@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: eos-app-store\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-05-17 01:21+0000\n"
-"PO-Revision-Date: 2016-03-15 23:38+0000\n"
+"POT-Creation-Date: 2016-05-24 01:22+0000\n"
+"PO-Revision-Date: 2016-05-24 01:22+0000\n"
 "Last-Translator: endlessmobile_build <philip@endlessm.com>\n"
 "Language-Team: Indonesian (http://www.transifex.com/endless-mobile-inc/eos-app-store/language/id/)\n"
 "MIME-Version: 1.0\n"
@@ -184,19 +184,19 @@ msgstr "Tekan Escape untuk membatalkan"
 
 #. Translators: use the same string used to install the app center content
 #. JSON
-#: ../EosAppStore/categories.js:14 ../EosAppStore/lib/eos-app-utils.c:1346
+#: ../EosAppStore/categories.js:14 ../EosAppStore/lib/eos-app-utils.c:1461
 msgid "Education"
 msgstr "Edukasi"
 
-#: ../EosAppStore/categories.js:21 ../EosAppStore/lib/eos-app-utils.c:1347
+#: ../EosAppStore/categories.js:21 ../EosAppStore/lib/eos-app-utils.c:1462
 msgid "Games"
 msgstr "Permainan"
 
-#: ../EosAppStore/categories.js:28 ../EosAppStore/lib/eos-app-utils.c:1348
+#: ../EosAppStore/categories.js:28 ../EosAppStore/lib/eos-app-utils.c:1463
 msgid "Resources"
 msgstr "Sumber Daya"
 
-#: ../EosAppStore/categories.js:35 ../EosAppStore/lib/eos-app-utils.c:1349
+#: ../EosAppStore/categories.js:35 ../EosAppStore/lib/eos-app-utils.c:1464
 msgid "Utilities"
 msgstr "Utilitas"
 
@@ -347,28 +347,32 @@ msgstr "Versi aplikasi %s sudah yang terbaru."
 msgid "App '%s' is not installed."
 msgstr "Aplikasi '%s' tidak dipasang."
 
-#: ../EosAppStore/lib/eos-app-utils.c:746
-msgid "Operation cancelled"
-msgstr "Operasi dibatalkan"
-
-#: ../EosAppStore/lib/eos-app-utils.c:768
-msgid "Updates meta record did not contain expected structure"
-msgstr "Catatan pembaruan meta tidak mengandung struktur yang diminta"
-
-#: ../EosAppStore/lib/eos-app-utils.c:783
+#: ../EosAppStore/lib/eos-app-utils.c:744
 msgid "Updates meta record did not contain expected attributes"
 msgstr "Catatan pembaruan meta tidak mengandung atribut yang diminta"
 
-#: ../EosAppStore/lib/eos-app-utils.c:799
+#: ../EosAppStore/lib/eos-app-utils.c:759
 msgid "Updates meta record did not contain valid monotonic_id attribute value"
 msgstr "Pembaruan catatan meta tidak disertai nilai atribut monotonic_id yang valid"
 
-#: ../EosAppStore/lib/eos-app-utils.c:1619
+#: ../EosAppStore/lib/eos-app-utils.c:791
+msgid "Updates meta record did not contain expected string attributes"
+msgstr ""
+
+#: ../EosAppStore/lib/eos-app-utils.c:820
+msgid "Operation cancelled"
+msgstr "Operasi dibatalkan"
+
+#: ../EosAppStore/lib/eos-app-utils.c:842
+msgid "Updates meta record did not contain expected structure"
+msgstr "Catatan pembaruan meta tidak mengandung struktur yang diminta"
+
+#: ../EosAppStore/lib/eos-app-utils.c:1734
 #, c-format
 msgid "Not enough space on device for downloading the app."
 msgstr "Ruang pada perangkat tidak cukup untuk mengunduh aplikasi."
 
-#: ../EosAppStore/lib/eos-app-utils.c:1784
+#: ../EosAppStore/lib/eos-app-utils.c:1899
 msgid "There was a problem downloading the app; please try again"
 msgstr "Terdapat masalah saat mengunduh aplikasi; silakan coba lagi"
 
@@ -382,27 +386,27 @@ msgstr "Tidak tersedia penanda untuk aplikasi '%s'"
 msgid "App '%s' could not be downloaded"
 msgstr "Aplikasi '%s' tidak dapat diunduh"
 
-#: ../EosAppStore/lib/eos-net-utils.c:273
+#: ../EosAppStore/lib/eos-net-utils.c:274
 msgid "The certificate of the target server is expired"
 msgstr "Sertifikat server target kedaluwarsa"
 
-#: ../EosAppStore/lib/eos-net-utils.c:275
+#: ../EosAppStore/lib/eos-net-utils.c:276
 msgid "The certificate of the target server has been revoked"
 msgstr "Sertifikat server target telah dicabut"
 
-#: ../EosAppStore/lib/eos-net-utils.c:277
+#: ../EosAppStore/lib/eos-net-utils.c:278
 msgid "The certificate of the target server has a bad identity"
 msgstr "Sertifikat server target memiliki identitas buruk"
 
-#: ../EosAppStore/lib/eos-net-utils.c:279
+#: ../EosAppStore/lib/eos-net-utils.c:280
 msgid "The certificate of the target server is from an unknown authority"
 msgstr "Sertifikat server sasaran berasal dari otoritas tak dikenal"
 
-#: ../EosAppStore/lib/eos-net-utils.c:281
+#: ../EosAppStore/lib/eos-net-utils.c:282
 msgid "The certificate of the target server is bad or invalid"
 msgstr "Sertifikat server sasaran rusak atau tidak sah"
 
-#: ../EosAppStore/lib/eos-net-utils.c:337
+#: ../EosAppStore/lib/eos-net-utils.c:338
 #, c-format
 msgid "Could not save the app - canceling download (%s)"
 msgstr "Tak dapat menyimpan aplikasi - membatalkan pengunduhan (%s)"

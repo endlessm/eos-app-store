@@ -7,9 +7,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: eos-app-store\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-05-17 01:21+0000\n"
-"PO-Revision-Date: 2016-05-06 04:48+0000\n"
-"Last-Translator: Roddy Shuler <roddy@endlessm.com>\n"
+"POT-Creation-Date: 2016-05-24 01:22+0000\n"
+"PO-Revision-Date: 2016-05-24 01:22+0000\n"
+"Last-Translator: endlessmobile_build <philip@endlessm.com>\n"
 "Language-Team: Vietnamese (http://www.transifex.com/endless-mobile-inc/eos-app-store/language/vi/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -184,19 +184,19 @@ msgstr "Nhấn Escape để hủy"
 
 #. Translators: use the same string used to install the app center content
 #. JSON
-#: ../EosAppStore/categories.js:14 ../EosAppStore/lib/eos-app-utils.c:1346
+#: ../EosAppStore/categories.js:14 ../EosAppStore/lib/eos-app-utils.c:1461
 msgid "Education"
 msgstr "Giáo dục"
 
-#: ../EosAppStore/categories.js:21 ../EosAppStore/lib/eos-app-utils.c:1347
+#: ../EosAppStore/categories.js:21 ../EosAppStore/lib/eos-app-utils.c:1462
 msgid "Games"
 msgstr "Các trò chơi"
 
-#: ../EosAppStore/categories.js:28 ../EosAppStore/lib/eos-app-utils.c:1348
+#: ../EosAppStore/categories.js:28 ../EosAppStore/lib/eos-app-utils.c:1463
 msgid "Resources"
 msgstr "Nguồn lực"
 
-#: ../EosAppStore/categories.js:35 ../EosAppStore/lib/eos-app-utils.c:1349
+#: ../EosAppStore/categories.js:35 ../EosAppStore/lib/eos-app-utils.c:1464
 msgid "Utilities"
 msgstr "Tiện ích"
 
@@ -347,28 +347,32 @@ msgstr "Ứng dụng %s được cập nhật."
 msgid "App '%s' is not installed."
 msgstr "Ứng dụng '%s' không được cài đặt."
 
-#: ../EosAppStore/lib/eos-app-utils.c:746
-msgid "Operation cancelled"
-msgstr "Hủy vận hành"
-
-#: ../EosAppStore/lib/eos-app-utils.c:768
-msgid "Updates meta record did not contain expected structure"
-msgstr "Biểu ghi siêu dữ liệu cập nhật không có cấu trúc như mong đợi"
-
-#: ../EosAppStore/lib/eos-app-utils.c:783
+#: ../EosAppStore/lib/eos-app-utils.c:744
 msgid "Updates meta record did not contain expected attributes"
 msgstr "Biểu ghi siêu dữ liệu cập nhật không chứa các thuộc tính như mong đợi"
 
-#: ../EosAppStore/lib/eos-app-utils.c:799
+#: ../EosAppStore/lib/eos-app-utils.c:759
 msgid "Updates meta record did not contain valid monotonic_id attribute value"
 msgstr "Biểu ghi siêu dữ liệu cập nhật không chứa giá trị thuộc tính id đơn điệu hợp lệ"
 
-#: ../EosAppStore/lib/eos-app-utils.c:1619
+#: ../EosAppStore/lib/eos-app-utils.c:791
+msgid "Updates meta record did not contain expected string attributes"
+msgstr ""
+
+#: ../EosAppStore/lib/eos-app-utils.c:820
+msgid "Operation cancelled"
+msgstr "Hủy vận hành"
+
+#: ../EosAppStore/lib/eos-app-utils.c:842
+msgid "Updates meta record did not contain expected structure"
+msgstr "Biểu ghi siêu dữ liệu cập nhật không có cấu trúc như mong đợi"
+
+#: ../EosAppStore/lib/eos-app-utils.c:1734
 #, c-format
 msgid "Not enough space on device for downloading the app."
 msgstr "Không đủ dung lượng trên thiết bị để tải về ứng dụng."
 
-#: ../EosAppStore/lib/eos-app-utils.c:1784
+#: ../EosAppStore/lib/eos-app-utils.c:1899
 msgid "There was a problem downloading the app; please try again"
 msgstr "Có vấn đề khi tải xuống ứng dụng; vui lòng thử lại"
 
@@ -382,27 +386,27 @@ msgstr "Không có chữ ký cho ứng dụng '%s'"
 msgid "App '%s' could not be downloaded"
 msgstr "Ứng dụng '%s' không thể được tải về"
 
-#: ../EosAppStore/lib/eos-net-utils.c:273
+#: ../EosAppStore/lib/eos-net-utils.c:274
 msgid "The certificate of the target server is expired"
 msgstr "Chứng nhận của máy chủ mục tiêu đã hết hạn"
 
-#: ../EosAppStore/lib/eos-net-utils.c:275
+#: ../EosAppStore/lib/eos-net-utils.c:276
 msgid "The certificate of the target server has been revoked"
 msgstr "Chứng nhận của máy chủ mục tiêu đã bị thu hồi"
 
-#: ../EosAppStore/lib/eos-net-utils.c:277
+#: ../EosAppStore/lib/eos-net-utils.c:278
 msgid "The certificate of the target server has a bad identity"
 msgstr "Chứng nhận của máy chủ mục tiêu có đặc tính xấu"
 
-#: ../EosAppStore/lib/eos-net-utils.c:279
+#: ../EosAppStore/lib/eos-net-utils.c:280
 msgid "The certificate of the target server is from an unknown authority"
 msgstr "Chứng nhận của máy chủ mục tiêu được cấp từ một cơ quan thẩm quyền vô danh"
 
-#: ../EosAppStore/lib/eos-net-utils.c:281
+#: ../EosAppStore/lib/eos-net-utils.c:282
 msgid "The certificate of the target server is bad or invalid"
 msgstr "Chứng nhận của máy chủ mục tiêu là xấu hoặc không hợp lệ"
 
-#: ../EosAppStore/lib/eos-net-utils.c:337
+#: ../EosAppStore/lib/eos-net-utils.c:338
 #, c-format
 msgid "Could not save the app - canceling download (%s)"
 msgstr "Không thể lưu ứng dụng - đang hủy tải về (%s)"

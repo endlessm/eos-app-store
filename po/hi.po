@@ -8,9 +8,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: eos-app-store\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-05-17 01:21+0000\n"
-"PO-Revision-Date: 2016-05-11 15:53+0000\n"
-"Last-Translator: e2f_in_c3 <e2f_in_c3@outlook.com>\n"
+"POT-Creation-Date: 2016-05-24 01:22+0000\n"
+"PO-Revision-Date: 2016-05-24 01:22+0000\n"
+"Last-Translator: endlessmobile_build <philip@endlessm.com>\n"
 "Language-Team: Hindi (http://www.transifex.com/endless-mobile-inc/eos-app-store/language/hi/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -185,19 +185,19 @@ msgstr "रद्द करने के लिए एस्केप पर द
 
 #. Translators: use the same string used to install the app center content
 #. JSON
-#: ../EosAppStore/categories.js:14 ../EosAppStore/lib/eos-app-utils.c:1346
+#: ../EosAppStore/categories.js:14 ../EosAppStore/lib/eos-app-utils.c:1461
 msgid "Education"
 msgstr "शिक्षा"
 
-#: ../EosAppStore/categories.js:21 ../EosAppStore/lib/eos-app-utils.c:1347
+#: ../EosAppStore/categories.js:21 ../EosAppStore/lib/eos-app-utils.c:1462
 msgid "Games"
 msgstr "खेल"
 
-#: ../EosAppStore/categories.js:28 ../EosAppStore/lib/eos-app-utils.c:1348
+#: ../EosAppStore/categories.js:28 ../EosAppStore/lib/eos-app-utils.c:1463
 msgid "Resources"
 msgstr "संसाधन"
 
-#: ../EosAppStore/categories.js:35 ../EosAppStore/lib/eos-app-utils.c:1349
+#: ../EosAppStore/categories.js:35 ../EosAppStore/lib/eos-app-utils.c:1464
 msgid "Utilities"
 msgstr "यूटीलिटीज"
 
@@ -348,28 +348,32 @@ msgstr "ऐप %s अद्यतन है।"
 msgid "App '%s' is not installed."
 msgstr "ऐप '%s' इंस्टॉल नहीं किया गया।"
 
-#: ../EosAppStore/lib/eos-app-utils.c:746
-msgid "Operation cancelled"
-msgstr "ऑपरेशन रद्द हुआ"
-
-#: ../EosAppStore/lib/eos-app-utils.c:768
-msgid "Updates meta record did not contain expected structure"
-msgstr "अपडेट्स मेटा रिकॉर्ड में अपेक्षित संरचना नहींं है"
-
-#: ../EosAppStore/lib/eos-app-utils.c:783
+#: ../EosAppStore/lib/eos-app-utils.c:744
 msgid "Updates meta record did not contain expected attributes"
 msgstr "अपडेट्स मेटा रिकॉर्ड में अपेक्षित ऐट्रिब्यूट्स नहींं हैंं"
 
-#: ../EosAppStore/lib/eos-app-utils.c:799
+#: ../EosAppStore/lib/eos-app-utils.c:759
 msgid "Updates meta record did not contain valid monotonic_id attribute value"
 msgstr "अपडेट्स मेटा रिकॉर्ड में वैध मोनोटोनिक‌‌_आइडी ऐट्रिब्यूट वैल्यू नहींं है"
 
-#: ../EosAppStore/lib/eos-app-utils.c:1619
+#: ../EosAppStore/lib/eos-app-utils.c:791
+msgid "Updates meta record did not contain expected string attributes"
+msgstr ""
+
+#: ../EosAppStore/lib/eos-app-utils.c:820
+msgid "Operation cancelled"
+msgstr "ऑपरेशन रद्द हुआ"
+
+#: ../EosAppStore/lib/eos-app-utils.c:842
+msgid "Updates meta record did not contain expected structure"
+msgstr "अपडेट्स मेटा रिकॉर्ड में अपेक्षित संरचना नहींं है"
+
+#: ../EosAppStore/lib/eos-app-utils.c:1734
 #, c-format
 msgid "Not enough space on device for downloading the app."
 msgstr "ऐप डाउनलोड करने के लिए डिवाइस पर पर्याप्त स्पेस नहीं।"
 
-#: ../EosAppStore/lib/eos-app-utils.c:1784
+#: ../EosAppStore/lib/eos-app-utils.c:1899
 msgid "There was a problem downloading the app; please try again"
 msgstr "ऐप डाउनलोड करने में एक समस्या पैदा हुई; कृपया पुनः प्रयास करें"
 
@@ -383,27 +387,27 @@ msgstr "ऐप  '%s' के लिए कोई सिग्नेचर उप�
 msgid "App '%s' could not be downloaded"
 msgstr "ऐप '%s' को डाउनलोड नहीं किया जा सका"
 
-#: ../EosAppStore/lib/eos-net-utils.c:273
+#: ../EosAppStore/lib/eos-net-utils.c:274
 msgid "The certificate of the target server is expired"
 msgstr "टार्गेट सर्वर का सर्टिफिकेट समाप्त हो चुका है"
 
-#: ../EosAppStore/lib/eos-net-utils.c:275
+#: ../EosAppStore/lib/eos-net-utils.c:276
 msgid "The certificate of the target server has been revoked"
 msgstr "टार्गेट सर्वर का सर्टिफिकेट रद्द किया जा चुका है"
 
-#: ../EosAppStore/lib/eos-net-utils.c:277
+#: ../EosAppStore/lib/eos-net-utils.c:278
 msgid "The certificate of the target server has a bad identity"
 msgstr "टार्गेट सर्वर के सर्टिफिकेट में एक बैड आइडेंटिटी है"
 
-#: ../EosAppStore/lib/eos-net-utils.c:279
+#: ../EosAppStore/lib/eos-net-utils.c:280
 msgid "The certificate of the target server is from an unknown authority"
 msgstr "टार्गेट सर्वर का सर्टिफिकेट एक अज्ञात प्राधिकरण से है"
 
-#: ../EosAppStore/lib/eos-net-utils.c:281
+#: ../EosAppStore/lib/eos-net-utils.c:282
 msgid "The certificate of the target server is bad or invalid"
 msgstr "टार्गेट सर्वर के सर्टिफिकेट बैड या अवैध है"
 
-#: ../EosAppStore/lib/eos-net-utils.c:337
+#: ../EosAppStore/lib/eos-net-utils.c:338
 #, c-format
 msgid "Could not save the app - canceling download (%s)"
 msgstr "ऐप को सहेजा नहीं जा सका - डाउलोड रद्द हो रहा है (%s)"
