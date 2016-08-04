@@ -1,14 +1,9 @@
 [encoding: UTF-8]
-[type: gettext/glade]data/eos-app-store-app-info-box.ui
-[type: gettext/glade]data/eos-app-store-app-installed-box.ui
 [type: gettext/glade]data/eos-app-store-folder-frame.ui
 [type: gettext/glade]data/eos-app-store-main-window.ui
 [type: gettext/glade]data/eos-app-store-weblink-frame.ui
 [type: gettext/glade]data/eos-app-store-weblink-list-row.ui
 [type: gettext/glade]data/eos-app-store-weblink-new-site-frame.ui
-EosAppStore/appFrame.js
-EosAppStore/appInfoBox.js
-EosAppStore/appInstalledBox.js
 EosAppStore/appListModel.js
 EosAppStore/appStoreDBusService.js
 EosAppStore/appStore.js
@@ -31,18 +26,3 @@ EosAppStore/separator.js
 EosAppStore/shellAppStore.js
 EosAppStore/weblinkFrame.js
 EosAppStore/wmInspect.js
-EosAppStore/lib/eos-app-cell.c
-EosAppStore/lib/eos-app-enums.c
-EosAppStore/lib/eos-app-info.c
-EosAppStore/lib/eos-app-list-model.c
-EosAppStore/lib/eos-app-log.c
-EosAppStore/lib/eos-app-manager-service.c
-EosAppStore/lib/eos-app-manager-transaction.c
-EosAppStore/lib/eos-app-utils.c
-EosAppStore/lib/eos-download-bundle.c
-EosAppStore/lib/eos-downloader.c
-EosAppStore/lib/eos-flexy-grid.c
-EosAppStore/lib/eos-flexy-grid-cell.c
-EosAppStore/lib/eos-link-info.c
-EosAppStore/lib/eos-net-utils.c
-EosAppStore/lib/eos-vertical-stack-switcher.c
