@@ -8,55 +8,15 @@ msgid ""
 msgstr ""
 "Project-Id-Version: eos-app-store\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-05-24 01:22+0000\n"
-"PO-Revision-Date: 2016-05-24 01:22+0000\n"
-"Last-Translator: endlessmobile_build <philip@endlessm.com>\n"
+"POT-Creation-Date: 2016-08-04 13:15-0700\n"
+"PO-Revision-Date: 2016-08-04 20:19+0000\n"
+"Last-Translator: Roddy Shuler <roddy@endlessm.com>\n"
 "Language-Team: Hindi (http://www.transifex.com/endless-mobile-inc/eos-app-store/language/hi/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Language: hi\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
-
-#: ../data/eos-app-store-app-info-box.ui.h:1 ../EosAppStore/appInfoBox.js:423
-msgid "Install app"
-msgstr "ऐप इंस्टॉल करें"
-
-#: ../data/eos-app-store-app-info-box.ui.h:2 ../EosAppStore/appInfoBox.js:169
-msgid "Cancel"
-msgstr "रद्द करें "
-
-#: ../data/eos-app-store-app-info-box.ui.h:3
-msgid "Installing"
-msgstr "इंस्टॉल हो रहा है "
-
-#: ../data/eos-app-store-app-info-box.ui.h:4
-msgid "Delete from device"
-msgstr "डिवाइस से हटाएं"
-
-#: ../data/eos-app-store-app-installed-box.ui.h:1
-msgid "APPLICATION NAME"
-msgstr "ऐप्लिकेशन का नाम"
-
-#: ../data/eos-app-store-app-installed-box.ui.h:2
-msgid "APPLICATION CATEGORY"
-msgstr "ऐप्लिकेशन कैटगरी"
-
-#: ../data/eos-app-store-app-installed-box.ui.h:3
-msgid "SIZE"
-msgstr "आकार"
-
-#: ../data/eos-app-store-app-installed-box.ui.h:4
-msgid "UPDATING…"
-msgstr "अपडेट कर रहा है"
-
-#: ../data/eos-app-store-app-installed-box.ui.h:5
-msgid "STOP"
-msgstr "रुकिए"
-
-#: ../data/eos-app-store-app-installed-box.ui.h:6
-msgid "System App"
-msgstr "सिस्टम ऐप "
 
 #: ../data/eos-app-store-folder-frame.ui.h:1
 msgid "Create your own folder to organize your apps. First, choose an icon."
@@ -67,114 +27,6 @@ msgstr "अपने ऐप को व्यवस्थित करने क�
 msgid "e.g.: http://www.endlessm.com"
 msgstr "जैसे: http://www.endlessm.com"
 
-#: ../EosAppStore/appFrame.js:400
-msgid "Installed apps"
-msgstr "ऐप्स इंस्टॉल किए गए "
-
-#: ../EosAppStore/appFrame.js:462
-msgid "Install apps"
-msgstr "ऐप्स इंस्टॉल करें "
-
-#: ../EosAppStore/appFrame.js:502
-msgid "Search results"
-msgstr "खोज नतीजे "
-
-#: ../EosAppStore/appFrame.js:542
-msgid "Refresh failed"
-msgstr "रीफ्रेश विफल रहा "
-
-#: ../EosAppStore/appInfoBox.js:162
-msgid "Deleting app"
-msgstr "ऐप डिलीट हो रहा है"
-
-#: ../EosAppStore/appInfoBox.js:163
-msgid ""
-"Deleting this app will remove it from the device for all users. You will "
-"need to download it from the internet in order to reinstall it."
-msgstr "इस ऐप को डिलीट करने से यह सभी प्रयोक्ताओं के डिवाइसों से हट जाएगा। इसे इंस्टॉल करने के लिए आपको इंटरनेट से डाउनलोड करना होगा।"
-
-#: ../EosAppStore/appInfoBox.js:167
-msgid "Delete app"
-msgstr "ऐप डिलीट करें"
-
-#: ../EosAppStore/appInfoBox.js:188
-#, javascript-format
-msgid "We could not remove '%s'"
-msgstr "हम '%s' को नहीं हटा सके"
-
-#: ../EosAppStore/appInfoBox.js:191
-#, javascript-format
-msgid "'%s' was removed successfully"
-msgstr "'%s' को सफलतापूर्वक हटाया गया"
-
-#: ../EosAppStore/appInfoBox.js:209
-#, javascript-format
-msgid "We could not update '%s'"
-msgstr "हम '%s' को अपडेट नहीं कर सके"
-
-#: ../EosAppStore/appInfoBox.js:212
-#, javascript-format
-msgid "'%s' was updated successfully"
-msgstr "'%s' को सफलतापूर्वक अपडेट किया गया"
-
-#: ../EosAppStore/appInfoBox.js:230
-#, javascript-format
-msgid "We could not install '%s'"
-msgstr "हम '%s' को इंस्टॉल नहीं कर सके"
-
-#: ../EosAppStore/appInfoBox.js:233
-#, javascript-format
-msgid "'%s' was installed successfully"
-msgstr "'%s' को सफलतापूर्वक इंस्टॉल किया गया"
-
-#: ../EosAppStore/appInfoBox.js:424
-msgid "Update app"
-msgstr "ऐप अपडेट करें"
-
-#: ../EosAppStore/appInfoBox.js:425
-msgid "Open app"
-msgstr "ऐप ओपन करें "
-
-#: ../EosAppStore/appInfoBox.js:426
-msgid "Add to the desktop"
-msgstr "डेस्कटॉप में शामिल करें"
-
-#: ../EosAppStore/appInfoBox.js:427
-msgid "No network connection is available"
-msgstr "कोई नेटवर्क कनेक्शन उपलब्ध नहीं है"
-
-#: ../EosAppStore/appInfoBox.js:428
-msgid "Insufficient space to install the app"
-msgstr "ऐप इंस्टॉल करने के लिए अपर्याप्त स्पेस"
-
-#: ../EosAppStore/appInfoBox.js:429
-msgid "Insufficient space to update the app"
-msgstr "ऐप अपडेट करने के लिए अपर्याप्त स्पेस"
-
-#: ../EosAppStore/appInfoBox.js:521
-msgid "Downloading…"
-msgstr "डाउनलोड हो रहा है..."
-
-#: ../EosAppStore/appInfoBox.js:529
-msgid "Updating…"
-msgstr "अपडेट हो रहा है..."
-
-#: ../EosAppStore/appInfoBox.js:532
-msgid "Installing…"
-msgstr "इंस्टॉल हो रहा है... "
-
-#: ../EosAppStore/appInfoBox.js:535
-msgid "Removing…"
-msgstr "हटाया जा रहा है..."
-
-#. Translators: Abbreviation for file size in megabytes;
-#. %s denotes the placement of the numeric value
-#. and can be placed before or after the abbreviation
-#: ../EosAppStore/appInstalledBox.js:109
-#, javascript-format
-msgid "%s MB"
-msgstr "%s MB"
-
 #: ../EosAppStore/appStore.js:235
 msgid "Dismiss"
 msgstr "खारिज करें "
@@ -183,21 +35,19 @@ msgstr "खारिज करें "
 msgid "Press Escape to cancel"
 msgstr "रद्द करने के लिए एस्केप पर दबाएं"
 
-#. Translators: use the same string used to install the app center content
-#. JSON
-#: ../EosAppStore/categories.js:14 ../EosAppStore/lib/eos-app-utils.c:1461
+#: ../EosAppStore/categories.js:14
 msgid "Education"
 msgstr "शिक्षा"
 
-#: ../EosAppStore/categories.js:21 ../EosAppStore/lib/eos-app-utils.c:1462
+#: ../EosAppStore/categories.js:21
 msgid "Games"
 msgstr "खेल"
 
-#: ../EosAppStore/categories.js:28 ../EosAppStore/lib/eos-app-utils.c:1463
+#: ../EosAppStore/categories.js:28
 msgid "Resources"
 msgstr "संसाधन"
 
-#: ../EosAppStore/categories.js:35 ../EosAppStore/lib/eos-app-utils.c:1464
+#: ../EosAppStore/categories.js:35
 msgid "Utilities"
 msgstr "यूटीलिटीज"
 
@@ -278,136 +128,3 @@ msgstr "वेबसाइट्स"
 #: ../EosAppStore/weblinkFrame.js:791
 msgid "Install websites"
 msgstr "वेबसाइट्स इंस्टॉल करें"
-
-#: ../EosAppStore/lib/eos-app-info.c:910
-#, c-format
-msgid "No verification available for app '%s'"
-msgstr "ऐप '%s' के लिए कोई वेरिफिकेशन उपलब्ध नहीं"
-
-#: ../EosAppStore/lib/eos-app-list-model.c:32
-msgid ""
-"The app center has detected an error and cannot continue. Please restart "
-"your system. If the problem persists, please contact support."
-msgstr "ऐप सेंटर ने एक त्रुटि की पहचान की और यह आगे जारी नहीं रख रखता। कृपया अपने सिस्टम को पुनः स्टार्ट करें। समस्या यदि तब भी बनी रहे, तो कृपया सपोर्ट से संपर्क करें।"
-
-#: ../EosAppStore/lib/eos-app-list-model.c:483
-msgid "We are unable to load the complete list of applications"
-msgstr "हम ऐप्लिकेशनोंं की समूची सूची को लोड करने में सक्षम नहीं हैंं"
-
-#: ../EosAppStore/lib/eos-app-list-model.c:491
-msgid "We were unable to update the list of applications"
-msgstr "हम ऐप्लिकेशनोंं की सूची को अपलोड करने में सक्षम नहीं थे"
-
-#: ../EosAppStore/lib/eos-app-list-model.c:1040
-msgid "Not enough space on device for installing the app."
-msgstr "ऐप इंस्टॉल करने के लिए डिवाइस पर पर्याप्त स्पेस नहीं।"
-
-#: ../EosAppStore/lib/eos-app-list-model.c:1127
-msgid ""
-"We encountered an internal error during the installation of the application."
-msgstr "ऐप्लिकेशन के इंंस्टॉलेशन के दौरान हमें एक आंतरिक त्रुटि मिली।"
-
-#: ../EosAppStore/lib/eos-app-list-model.c:1156
-msgid ""
-"We encountered an internal error during the removal of the application."
-msgstr "ऐप्लिकेशन को हटाने के दौरान हमें एक आंतरिक त्रुटि मिली।"
-
-#: ../EosAppStore/lib/eos-app-list-model.c:1183
-#: ../EosAppStore/lib/eos-app-list-model.c:1227
-msgid "You must be an administrator to install applications."
-msgstr "ऐप्लिकेशंंस इंस्टॉल करने के लिए आपको एक ऐडमिनिस्ट्रेटर होना होगा।"
-
-#: ../EosAppStore/lib/eos-app-list-model.c:1372
-#: ../EosAppStore/lib/eos-app-list-model.c:1399
-msgid "You must be an administrator to remove applications."
-msgstr "ऐप्लिकेशंंस हटाने के लिए आपको एक ऐडमिनिस्ट्रेटर होना होगा।"
-
-#: ../EosAppStore/lib/eos-app-list-model.c:1525
-#, c-format
-msgid "App %s has no candidate for installation."
-msgstr "ऐप %s के पास इंस्टॉल करने के लिए कोई कैंडिडेट नहीं है।"
-
-#: ../EosAppStore/lib/eos-app-list-model.c:1537
-#, c-format
-msgid "App '%s' is already installed."
-msgstr "ऐप '%s' इंस्टॉल हो चुका है।"
-
-#: ../EosAppStore/lib/eos-app-list-model.c:1601
-#, c-format
-msgid "App %s not installable."
-msgstr "ऐप '%s' इंस्टॉल किए जाने लायक नहीं है।"
-
-#: ../EosAppStore/lib/eos-app-list-model.c:1612
-#, c-format
-msgid "App %s is up to date."
-msgstr "ऐप %s अद्यतन है।"
-
-#: ../EosAppStore/lib/eos-app-list-model.c:1692
-#: ../EosAppStore/lib/eos-app-list-model.c:1737
-#, c-format
-msgid "App '%s' is not installed."
-msgstr "ऐप '%s' इंस्टॉल नहीं किया गया।"
-
-#: ../EosAppStore/lib/eos-app-utils.c:744
-msgid "Updates meta record did not contain expected attributes"
-msgstr "अपडेट्स मेटा रिकॉर्ड में अपेक्षित ऐट्रिब्यूट्स नहींं हैंं"
-
-#: ../EosAppStore/lib/eos-app-utils.c:759
-msgid "Updates meta record did not contain valid monotonic_id attribute value"
-msgstr "अपडेट्स मेटा रिकॉर्ड में वैध मोनोटोनिक‌‌_आइडी ऐट्रिब्यूट वैल्यू नहींं है"
-
-#: ../EosAppStore/lib/eos-app-utils.c:791
-msgid "Updates meta record did not contain expected string attributes"
-msgstr ""
-
-#: ../EosAppStore/lib/eos-app-utils.c:820
-msgid "Operation cancelled"
-msgstr "ऑपरेशन रद्द हुआ"
-
-#: ../EosAppStore/lib/eos-app-utils.c:842
-msgid "Updates meta record did not contain expected structure"
-msgstr "अपडेट्स मेटा रिकॉर्ड में अपेक्षित संरचना नहींं है"
-
-#: ../EosAppStore/lib/eos-app-utils.c:1734
-#, c-format
-msgid "Not enough space on device for downloading the app."
-msgstr "ऐप डाउनलोड करने के लिए डिवाइस पर पर्याप्त स्पेस नहीं।"
-
-#: ../EosAppStore/lib/eos-app-utils.c:1899
-msgid "There was a problem downloading the app; please try again"
-msgstr "ऐप डाउनलोड करने में एक समस्या पैदा हुई; कृपया पुनः प्रयास करें"
-
-#: ../EosAppStore/lib/eos-downloader.c:37
-#, c-format
-msgid "No signature available for app '%s'"
-msgstr "ऐप  '%s' के लिए कोई सिग्नेचर उपलब्ध नहीं है"
-
-#: ../EosAppStore/lib/eos-downloader.c:100
-#, c-format
-msgid "App '%s' could not be downloaded"
-msgstr "ऐप '%s' को डाउनलोड नहीं किया जा सका"
-
-#: ../EosAppStore/lib/eos-net-utils.c:274
-msgid "The certificate of the target server is expired"
-msgstr "टार्गेट सर्वर का सर्टिफिकेट समाप्त हो चुका है"
-
-#: ../EosAppStore/lib/eos-net-utils.c:276
-msgid "The certificate of the target server has been revoked"
-msgstr "टार्गेट सर्वर का सर्टिफिकेट रद्द किया जा चुका है"
-
-#: ../EosAppStore/lib/eos-net-utils.c:278
-msgid "The certificate of the target server has a bad identity"
-msgstr "टार्गेट सर्वर के सर्टिफिकेट में एक बैड आइडेंटिटी है"
-
-#: ../EosAppStore/lib/eos-net-utils.c:280
-msgid "The certificate of the target server is from an unknown authority"
-msgstr "टार्गेट सर्वर का सर्टिफिकेट एक अज्ञात प्राधिकरण से है"
-
-#: ../EosAppStore/lib/eos-net-utils.c:282
-msgid "The certificate of the target server is bad or invalid"
-msgstr "टार्गेट सर्वर के सर्टिफिकेट बैड या अवैध है"
-
-#: ../EosAppStore/lib/eos-net-utils.c:338
-#, c-format
-msgid "Could not save the app - canceling download (%s)"
-msgstr "ऐप को सहेजा नहीं जा सका - डाउलोड रद्द हो रहा है (%s)"
