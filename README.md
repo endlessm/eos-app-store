@@ -1,7 +1,8 @@
 # Endless App Center
 
-The Endless App Center is the user-facing component used to install, update,
-and remove applications in the Endless OS.
+The Endless App Center is the user-facing component used to install and remove
+desktop weblinks and folders. In the past, it was also an application installer;
+however, it has been replaced in this capacity by GNOME Software.
 
 ## Building and installing
 
@@ -18,34 +19,6 @@ In order to build the app center on Endless OS you should use:
 The various configuration options ensure that the files are installed in
 the expected locations, and that the app center uses the expected paths when
 checking system configuration and downloading files.
-
-## Design
-
-The app center is split in three parts:
-
- * the app manager system daemon
- * a backend library
- * the GUI
-
-### App manager daemon
-
-The app manager system daemon (`eam`) is hosted in a separate
-[repository][eam] and is responsible for manipulating the file system when
-installing, updating, and removing applications. The app center uses DBus
-to communicate with the app manager.
-
-### Backend library
-
-The backend library is used to implement low level operations, from the
-remote procedure calls to the app manager to downloading data from the app
-server; it also implements the global model object which holds all the
-available applications metadata; and it implements some of the widgets used
-by the GUI layer for efficiency.
-
-### GUI
-
-The GUI layer glues together the backend library with the user-facing UI,
-and it's responsible for handling the main application window.
 
 ## Developing and debugging
 
@@ -73,11 +46,5 @@ the app center.
 
 ### Tools
 
-The app center provides small utilities aimed at QA and development.
-
-  * `eos-fill-desktop` - Adds all installed applications to the desktop
-  * `eos-reset-desktop` - Resets the desktop to its default state
-  * `eos-reset-app-store` - Resets the various cached state and ensures
-    that the app center is restarted
-
-[eam]: https://github.com/endlessm/eos-app-manager
+The app center provides an `eos-reset-desktop` tool that resets the desktop to
+its default state.

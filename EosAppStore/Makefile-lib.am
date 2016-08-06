@@ -11,69 +11,18 @@ eaprivate_cflags = \
 	$(EOS_APP_STORE_CFLAGS)
 
 eaprivate_source_h = \
-	lib/eos-app-cell.h \
 	lib/eos-app-enums.h \
-	lib/eos-app-list-model.h \
 	lib/eos-app-log.h \
-	lib/eos-app-info-private.h \
-	lib/eos-app-info.h \
 	lib/eos-app-utils.h \
-	lib/eos-downloader.h \
-	lib/eos-flexy-grid-private.h \
-	lib/eos-flexy-grid.h \
 	lib/eos-link-info.h \
-	lib/eos-net-utils-private.h \
 	lib/eos-vertical-stack-switcher.h
 
 eaprivate_source_c = \
-	lib/eos-app-cell.c \
 	lib/eos-app-enums.c \
-	lib/eos-app-list-model.c \
 	lib/eos-app-log.c \
-	lib/eos-app-info.c \
 	lib/eos-app-utils.c \
-	lib/eos-downloader.c \
-	lib/eos-flexy-grid-cell.c \
-	lib/eos-flexy-grid.c \
 	lib/eos-link-info.c \
-	lib/eos-net-utils.c \
 	lib/eos-vertical-stack-switcher.c
-
-eaprivate_built_source = \
-	lib/eos-app-manager-service.c \
-	lib/eos-app-manager-service.h \
-	lib/eos-app-manager-transaction.c \
-	lib/eos-app-manager-transaction.h
-
-lib/eos-app-manager-transaction.h: Makefile $(top_srcdir)/data/eam-transaction-interface.xml
-	$(AM_V_GEN) $(MKDIR_P) lib && \
-	$(GDBUS_CODEGEN) \
-		--interface-prefix com.endlessm. \
-		--generate-c-code lib/eos-app-manager-transaction \
-		--c-namespace Eos \
-		$(top_srcdir)/data/eam-transaction-interface.xml
-lib/eos-app-manager-transaction.c: lib/eos-app-manager-service.h \
-		lib/eos-app-manager-transaction.h
-	@: # generated as a side-effect
-
-EXTRA_DIST += $(top_srcdir)/data/eam-transaction-interface.xml
-CLEANFILES += lib/eos-app-manager-transaction.c lib/eos-app-manager-transaction.h
-BUILT_SOURCES += lib/eos-app-manager-transaction.c lib/eos-app-manager-transaction.h
-
-lib/eos-app-manager-service.h: Makefile $(top_srcdir)/data/eam-service-interface.xml
-	$(AM_V_GEN) $(MKDIR_P) lib && \
-	$(GDBUS_CODEGEN) \
-		--interface-prefix com.endlessm. \
-		--generate-c-code lib/eos-app-manager-service \
-		--c-generate-object-manager \
-		--c-namespace Eos \
-		$(top_srcdir)/data/eam-service-interface.xml
-lib/eos-app-manager-service.c: lib/eos-app-manager-service.h
-	@: # generated as a side-effect
-
-EXTRA_DIST += $(top_srcdir)/data/eam-service-interface.xml
-CLEANFILES += lib/eos-app-manager-service.c lib/eos-app-manager-service.h
-BUILT_SOURCES += lib/eos-app-manager-service.c lib/eos-app-manager-service.h
 
 pkglib_LTLIBRARIES += libeaprivate-1.0.la
 
@@ -95,8 +44,3 @@ EosAppStorePrivate_1_0_gir_CFLAGS = $(AM_CPPFLAGS) $(eaprivate_cflags)
 EosAppStorePrivate_1_0_gir_SCANNERFLAGS = --warn-all --symbol-prefix=eos --identifier-prefix=Eos
 EosAppStorePrivate_1_0_gir_INCLUDES = Gtk-3.0 Json-1.0 WebKit2-4.0
 EosAppStorePrivate_1_0_gir_FILES = $(addprefix $(srcdir)/,$(introspection_sources))
-
-bin_PROGRAMS = eos-download-bundle
-eos_download_bundle_SOURCES = lib/eos-download-bundle.c
-eos_download_bundle_CFLAGS = $(AM_CFLAGS) $(EOS_APP_STORE_CFLAGS) $(MAINTAINER_CFLAGS)
-eos_download_bundle_LDADD = libeaprivate-1.0.la $(EOS_APP_STORE_LIBS)

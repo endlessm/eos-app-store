@@ -11,7 +11,6 @@ const Mainloop = imports.mainloop;
 const Signals = imports.signals;
 const _ = imports.gettext.gettext;
 
-const AppListModel = imports.appListModel;
 const AppStoreWindow = imports.appStoreWindow;
 const AppStoreDBusService = imports.appStoreDBusService;
 const Categories = imports.categories;
@@ -65,9 +64,6 @@ const AppStore = new Lang.Class({
         // The app store shell proxy
         this._shellProxy = new ShellAppStore.ShellAppStore();
 
-        // Main list model
-        this._appListModel = new AppListModel.AppListModel();
-
         // No window by default
         this._mainWindow = null;
     },
@@ -87,10 +83,6 @@ const AppStore = new Lang.Class({
             this._mainWindow.connect('notify::visible',
                                      Lang.bind(this, this._onVisibilityChanged));
         }
-    },
-
-    get appListModel() {
-        return this._appListModel;
     },
 
     get debugWindow() {
