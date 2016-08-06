@@ -523,7 +523,7 @@ const WeblinkListBoxRow = new Lang.Class({
         '_stateButton'
     ],
 
-    _init: function(row, shellProxy) {
+    _init: function(row, shellProxy, appsOnDesktop) {
         this.parent();
 
         this._row = row;
@@ -537,7 +537,7 @@ const WeblinkListBoxRow = new Lang.Class({
         this._nameLabel.set_text(this._info.get_title());
         this._descriptionLabel.set_text(this._info.get_description());
 
-        this._setSensitiveState(!this._applicationIsOnDesktop());
+        this._setSensitiveState(!this._isOnDesktop(appsOnDesktop));
         this._mainBox.show();
     },
 
@@ -545,19 +545,10 @@ const WeblinkListBoxRow = new Lang.Class({
         this._stateButton.sensitive = isSensitive;
     },
 
-    _applicationIsOnDesktop: function() {
-        // Sync since we shouldn't show UI before our state is ready.
-        // FIXME: Do one D-Bus call for all rows, instead of one for each row.
-        // FIXME: Connect to ApplicationsChanged so we notice if something gets removed.
-        let [apps] = this._shellProxy.ListApplicationsSync();
-        for (let i = 0; i < apps.length; i++) {
-            if (apps[i] == this._info.get_desktop_id()) {
-                // Now we know the weblink is in the shell's IconGridLayout, but
-                // it might not actually be installed. Check this as well.
-                let info = Gio.DesktopAppInfo.new(this._info.get_desktop_id());
-                if (info != null)
-                    return true;
-            }
+    _isOnDesktop: function(appsOnDesktop) {
+        for (let i = 0; i < appsOnDesktop.length; i++) {
+            if (appsOnDesktop[i] == this._info.get_desktop_id())
+                return true;
         }
         return false;
     },
@@ -636,6 +627,7 @@ const WeblinkFrame = new Lang.Class({
         this._shellProxy = app.shellProxy.proxy;
 
         this._initCategories();
+        this._updateAppsOnDesktop();
 
         if (app.mainWindow.getExpectedWidth() <= AppStoreWindow.AppStoreSizes.SVGA.screenWidth) {
             this._columns = 1;
@@ -669,6 +661,19 @@ const WeblinkFrame = new Lang.Class({
         this._listFrame.add(this._stack);
 
         this._mainBox.show_all();
+    },
+
+    // FIXME: Connect to ApplicationsChanged so we notice if something gets removed.
+    _updateAppsOnDesktop: function() {
+        this._appsOnDesktop = [];
+        let [apps] = this._shellProxy.ListApplicationsSync();
+        for (let i = 0; i < apps.length; i++) {
+            // ListApplications returns apps in the shell's IconGridLayout,
+            // but they might not actually be installed. Check.
+            let info = Gio.DesktopAppInfo.new(apps[i]);
+            if (info != null)
+                this._appsOnDesktop.push(apps[i]);
+        }
     },
 
     _initCategories: function() {
@@ -733,7 +738,7 @@ const WeblinkFrame = new Lang.Class({
         for (let link_index in category.links) {
             let info = category.links[link_index];
             let row = info.create_row();
-            let rowContent = new WeblinkListBoxRow(row, this._shellProxy);
+            let rowContent = new WeblinkListBoxRow(row, this._shellProxy, this._appsOnDesktop);
             row.add(rowContent);
             weblinksColumnBoxes[(index++)%this._columns].add(row);
         }
