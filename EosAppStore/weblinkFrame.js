@@ -625,9 +625,12 @@ const WeblinkFrame = new Lang.Class({
 
         let app = Gio.Application.get_default();
         this._shellProxy = app.shellProxy.proxy;
+        this._shellProxy.connectSignal('ApplicationsChanged', Lang.bind(this, this._onApplicationsChanged));
+
+        let [apps] = this._shellProxy.ListApplicationsSync();
+        this._updateAppsOnDesktop(apps);
 
         this._initCategories();
-        this._updateAppsOnDesktop();
 
         if (app.mainWindow.getExpectedWidth() <= AppStoreWindow.AppStoreSizes.SVGA.screenWidth) {
             this._columns = 1;
@@ -663,17 +666,21 @@ const WeblinkFrame = new Lang.Class({
         this._mainBox.show_all();
     },
 
-    // FIXME: Connect to ApplicationsChanged so we notice if something gets removed.
-    _updateAppsOnDesktop: function() {
+    _updateAppsOnDesktop: function(shellApps) {
         this._appsOnDesktop = [];
-        let [apps] = this._shellProxy.ListApplicationsSync();
-        for (let i = 0; i < apps.length; i++) {
-            // ListApplications returns apps in the shell's IconGridLayout,
+        for (let i = 0; i < shellApps.length; i++) {
+            // The shell returns all apps in the shell's IconGridLayout,
             // but they might not actually be installed. Check.
-            let info = Gio.DesktopAppInfo.new(apps[i]);
+            let info = Gio.DesktopAppInfo.new(shellApps[i]);
             if (info != null)
-                this._appsOnDesktop.push(apps[i]);
+                this._appsOnDesktop.push(shellApps[i]);
         }
+    },
+
+    _onApplicationsChanged: function(emitter, senderName, parameters) {
+        let [apps] = parameters;
+        this._updateAppsOnDesktop(apps);
+        this._repopulate();
     },
 
     _initCategories: function() {
