@@ -4,7 +4,6 @@
 [type: gettext/glade]data/eos-app-store-weblink-frame.ui
 [type: gettext/glade]data/eos-app-store-weblink-list-row.ui
 [type: gettext/glade]data/eos-app-store-weblink-new-site-frame.ui
-EosAppStore/appListModel.js
 EosAppStore/appStoreDBusService.js
 EosAppStore/appStore.js
 EosAppStore/appStoreLauncher.js
@@ -15,7 +14,6 @@ EosAppStore/categories.js
 EosAppStore/categoryButton.js
 EosAppStore/config.js
 EosAppStore/environment.js
-EosAppStore/fillDesktop.js
 EosAppStore/folderFrame.js
 EosAppStore/folderModel.js
 EosAppStore/main.js

@@ -1,10 +1,6 @@
 jsdir = $(pkgdatadir)/js/
 dist_js_DATA = \
 	$(js_built_sources) \
-	appFrame.js \
-	appInfoBox.js \
-	appInstalledBox.js \
-	appListModel.js \
 	appStoreDBusService.js \
 	appStoreLauncher.js \
 	appStorePages.js \
@@ -14,7 +10,6 @@ dist_js_DATA = \
 	categories.js \
 	categoryButton.js \
 	environment.js \
-	fillDesktop.js \
 	folderFrame.js \
 	folderModel.js \
 	main.js \

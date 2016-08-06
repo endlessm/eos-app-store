@@ -97,8 +97,7 @@ function createWeblink(url, title, icon) {
 const NewSiteHelper = new Lang.Class({
     Name: 'NewSiteHelper',
 
-    _init: function(model, url) {
-        this._model = model;
+    _init: function(url) {
         this._url = url;
         this._title = null;
 
@@ -214,7 +213,8 @@ const NewSiteHelper = new Lang.Class({
         this._savedKeyfile = keyfile;
         this._savedKeyfilePath = keyfilePath;
 
-        return this._model.createLink(this._savedKeyfilePath);
+        // Return the desktop ID
+        return GLib.basename(this._savedKeyfilePath);
     }
 });
 Signals.addSignalMethods(NewSiteHelper.prototype);
@@ -243,11 +243,11 @@ const NewSiteBox = new Lang.Class({
         '_siteAddButton'
     ],
 
-    _init: function(weblinkListModel) {
+    _init: function(shellProxy) {
         this.parent();
 
         this._webHelper = null;
-        this._weblinkListModel = weblinkListModel;
+        this._shellProxy = shellProxy;
 
         this.initTemplate({ templateRoot: '_mainBox',
                             bindChildren: true,
@@ -438,8 +438,8 @@ const NewSiteBox = new Lang.Class({
     _onSiteAdd: function() {
         let title = this._urlLabel.get_label();
 
-        let appInfo = this._webHelper.save(title);
-        this._weblinkListModel.install(appInfo.get_desktop_id(), function() {});
+        let desktopID = this._webHelper.save(title);
+        this._shellProxy.AddApplicationRemote(desktopID);
 
         this._setState(NewSiteBoxState.INSTALLED);
 
@@ -460,7 +460,7 @@ const NewSiteBox = new Lang.Class({
 
     _onUrlEntryActivated: function() {
         let url = this._urlEntry.get_text();
-        this._webHelper = new NewSiteHelper(this._weblinkListModel, url);
+        this._webHelper = new NewSiteHelper(url);
 
         this._webHelper.connect('favicon-loaded', Lang.bind(this, this._onFaviconLoaded));
         this._webHelper.connect('title-changed', Lang.bind(this, this._onTitleChanged));
@@ -523,12 +523,13 @@ const WeblinkListBoxRow = new Lang.Class({
         '_stateButton'
     ],
 
-    _init: function(model, row) {
+    _init: function(row, shellProxy, appsOnDesktop) {
         this.parent();
 
-        this._model = model;
         this._row = row;
         this._info = row.linkInfo;
+
+        this._shellProxy = shellProxy;
 
         this.initTemplate({ templateRoot: '_mainBox', bindChildren: true, connectSignals: true, });
         this.add(this._mainBox);
@@ -536,22 +537,20 @@ const WeblinkListBoxRow = new Lang.Class({
         this._nameLabel.set_text(this._info.get_title());
         this._descriptionLabel.set_text(this._info.get_description());
 
-        this._model.connect('loading-changed', Lang.bind(this, this._onModelLoadingChanged));
-        this._onModelLoadingChanged();
-    },
-
-    _onModelLoadingChanged: function(model) {
-        if (this._model.loading) {
-            return;
-        }
-
-        let installedSensitive = (!this._model.hasLauncher(this._info.get_desktop_id()));
-        this._setSensitiveState(installedSensitive);
+        this._setSensitiveState(!this._isOnDesktop(appsOnDesktop));
         this._mainBox.show();
     },
 
     _setSensitiveState: function(isSensitive) {
         this._stateButton.sensitive = isSensitive;
+    },
+
+    _isOnDesktop: function(appsOnDesktop) {
+        for (let i = 0; i < appsOnDesktop.length; i++) {
+            if (appsOnDesktop[i] == this._info.get_desktop_id())
+                return true;
+        }
+        return false;
     },
 
     // This 'just installed' state should go away after closing the store and
@@ -566,7 +565,7 @@ const WeblinkListBoxRow = new Lang.Class({
 
     _onStateButtonClicked: function() {
         let desktopId = this._info.get_desktop_id();
-        this._model.install(desktopId);
+        this._shellProxy.AddApplicationRemote(desktopId);
 
         this._setSensitiveState(false);
         this._setJustInstalledState();
@@ -625,7 +624,12 @@ const WeblinkFrame = new Lang.Class({
         this.add(this._mainBox);
 
         let app = Gio.Application.get_default();
-        this._weblinkListModel = app.appListModel;
+        this._shellProxy = app.shellProxy.proxy;
+        this._shellProxy.connectSignal('ApplicationsChanged', Lang.bind(this, this._onApplicationsChanged));
+
+        let [apps] = this._shellProxy.ListApplicationsSync();
+        this._updateAppsOnDesktop(apps);
+
         this._initCategories();
 
         if (app.mainWindow.getExpectedWidth() <= AppStoreWindow.AppStoreSizes.SVGA.screenWidth) {
@@ -650,7 +654,7 @@ const WeblinkFrame = new Lang.Class({
         this._mainBox.add(separator);
         this._mainBox.reorder_child(separator, 3);
 
-        this._newSiteBox = new NewSiteBox(this._weblinkListModel);
+        this._newSiteBox = new NewSiteBox(this._shellProxy);
         this._newSiteFrame.add(this._newSiteBox);
 
         this._stack = new Gtk.Stack({ transition_duration: CATEGORY_TRANSITION_MS,
@@ -660,6 +664,23 @@ const WeblinkFrame = new Lang.Class({
         this._listFrame.add(this._stack);
 
         this._mainBox.show_all();
+    },
+
+    _updateAppsOnDesktop: function(shellApps) {
+        this._appsOnDesktop = [];
+        for (let i = 0; i < shellApps.length; i++) {
+            // The shell returns all apps in the shell's IconGridLayout,
+            // but they might not actually be installed. Check.
+            let info = Gio.DesktopAppInfo.new(shellApps[i]);
+            if (info != null)
+                this._appsOnDesktop.push(shellApps[i]);
+        }
+    },
+
+    _onApplicationsChanged: function(emitter, senderName, parameters) {
+        let [apps] = parameters;
+        this._updateAppsOnDesktop(apps);
+        this._repopulate();
     },
 
     _initCategories: function() {
@@ -724,7 +745,7 @@ const WeblinkFrame = new Lang.Class({
         for (let link_index in category.links) {
             let info = category.links[link_index];
             let row = info.create_row();
-            let rowContent = new WeblinkListBoxRow(this._weblinkListModel, row);
+            let rowContent = new WeblinkListBoxRow(row, this._shellProxy, this._appsOnDesktop);
             row.add(rowContent);
             weblinksColumnBoxes[(index++)%this._columns].add(row);
         }
