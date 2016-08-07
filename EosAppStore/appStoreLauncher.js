@@ -11,7 +11,7 @@ const APP_STORE_NAME = 'com.endlessm.AppStore';
 const APP_STORE_PATH = '/com/endlessm/AppStore';
 const APP_STORE_IFACE = 'com.endlessm.AppStore';
 
-/* We lauch the page remotely but we only need a subset of it's DBus API */
+/* We launch the page remotely but we only need a subset of its DBus API */
 const AppStoreIface = '<node><interface name="com.endlessm.AppStore">' +
   '<method name="showPage">' +
     '<arg type="u" direction="in" name="timestamp"/>' +
@@ -45,12 +45,6 @@ function main() {
     for (let i in args) {
         let arg = args[i];
 
-        if (arg == '-a' || arg == '--apps') {
-            initialPage = 'apps';
-            args.splice(i, 1);
-            continue;
-        }
-
         if (arg == '-f' || arg == '--folders') {
             initialPage = 'folders';
             args.splice(i, 1);
@@ -78,7 +72,6 @@ function main() {
                 "  -h, --help           Show help\n" +
                 "\n" +
                 "Application options:\n" +
-                "  -a, --apps           Show the 'Apps' page\n" +
                 "  -f, --folders        Show the 'Folders' page\n" +
                 "  -w, --web-links      Show the 'Web Links' page\n" +
                 "  -v, --version        Print version and exit");
