@@ -120,9 +120,6 @@ const AppStore = new Lang.Class({
     showPage: function(timestamp, page) {
         this._createMainWindow();
 
-        if (page == 'apps')
-            page = Categories.DEFAULT_APP_CATEGORY;
-
         this._mainWindow.pageManager.showPage(page);
         this._mainWindow.show();
         this._mainWindow.present_with_time(timestamp);

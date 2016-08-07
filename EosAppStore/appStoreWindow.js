@@ -8,7 +8,6 @@ const Gtk = imports.gi.Gtk;
 const Lang = imports.lang;
 const Pango = imports.gi.Pango;
 
-const AppFrame = imports.appFrame;
 const AppStorePages = imports.appStorePages;
 const Categories = imports.categories;
 const FolderFrame = imports.folderFrame;
