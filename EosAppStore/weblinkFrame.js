@@ -523,8 +523,10 @@ const WeblinkListBoxRow = new Lang.Class({
         '_stateButton'
     ],
 
-    _init: function(row, shellProxy, appsOnDesktop) {
+    _init: function(weblinkFrame, row, shellProxy, appsOnDesktop) {
         this.parent();
+
+        this._weblinkFrame = weblinkFrame;
 
         this._row = row;
         this._info = row.linkInfo;
@@ -565,6 +567,7 @@ const WeblinkListBoxRow = new Lang.Class({
 
     _onStateButtonClicked: function() {
         let desktopId = this._info.get_desktop_id();
+        this._weblinkFrame.setAutomaticRepopulationEnabled(false);
         this._shellProxy.AddApplicationRemote(desktopId);
 
         this._setSensitiveState(false);
@@ -577,6 +580,7 @@ const WeblinkListBoxRow = new Lang.Class({
                          Lang.bind(this, function() {
                              let app = Gio.Application.get_default();
                              app.hideIfVisible();
+                             this._weblinkFrame.setAutomaticRepopulationEnabled(true);
                              return false;
                          }));
     },
@@ -626,6 +630,7 @@ const WeblinkFrame = new Lang.Class({
         let app = Gio.Application.get_default();
         this._shellProxy = app.shellProxy.proxy;
         this._shellProxy.connectSignal('ApplicationsChanged', Lang.bind(this, this._onApplicationsChanged));
+        this._automaticRepopulationEnabled = true;
 
         let [apps] = this._shellProxy.ListApplicationsSync();
         this._updateAppsOnDesktop(apps);
@@ -680,7 +685,8 @@ const WeblinkFrame = new Lang.Class({
     _onApplicationsChanged: function(emitter, senderName, parameters) {
         let [apps] = parameters;
         this._updateAppsOnDesktop(apps);
-        this._repopulate();
+        if (this._automaticRepopulationEnabled)
+            this._repopulate();
     },
 
     _initCategories: function() {
@@ -745,7 +751,7 @@ const WeblinkFrame = new Lang.Class({
         for (let link_index in category.links) {
             let info = category.links[link_index];
             let row = info.create_row();
-            let rowContent = new WeblinkListBoxRow(row, this._shellProxy, this._appsOnDesktop);
+            let rowContent = new WeblinkListBoxRow(this, row, this._shellProxy, this._appsOnDesktop);
             row.add(rowContent);
             weblinksColumnBoxes[(index++)%this._columns].add(row);
         }
@@ -785,6 +791,10 @@ const WeblinkFrame = new Lang.Class({
         }
 
         this.populate();
+    },
+
+    setAutomaticRepopulationEnabled: function(enabled) {
+        this._automaticRepopulationEnabled = enabled;
     },
 
     reset: function() {
