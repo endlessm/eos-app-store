@@ -17,7 +17,6 @@ EosAppStore/environment.js
 EosAppStore/folderFrame.js
 EosAppStore/folderModel.js
 EosAppStore/main.js
-EosAppStore/notify.js
 EosAppStore/path.js
 EosAppStore/resetDesktop.js
 EosAppStore/separator.js
