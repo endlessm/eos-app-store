@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-08-04 13:15-0700\n"
+"POT-Creation-Date: 2016-12-13 02:23+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -26,55 +26,27 @@ msgstr ""
 msgid "e.g.: http://www.endlessm.com"
 msgstr ""
 
-#: ../EosAppStore/appStore.js:235
-msgid "Dismiss"
-msgstr ""
-
-#: ../EosAppStore/appStoreWindow.js:280
+#: ../EosAppStore/appStoreWindow.js:279
 msgid "Press Escape to cancel"
 msgstr ""
 
-#: ../EosAppStore/categories.js:14
-msgid "Education"
-msgstr ""
-
-#: ../EosAppStore/categories.js:21
-msgid "Games"
-msgstr ""
-
-#: ../EosAppStore/categories.js:28
-msgid "Resources"
-msgstr ""
-
-#: ../EosAppStore/categories.js:35
-msgid "Utilities"
-msgstr ""
-
-#: ../EosAppStore/categories.js:42
-msgid "Installed"
-msgstr ""
-
-#: ../EosAppStore/categories.js:49
-msgid "Search"
-msgstr ""
-
-#: ../EosAppStore/categories.js:61
+#: ../EosAppStore/categories.js:12
 msgid "News"
 msgstr ""
 
-#: ../EosAppStore/categories.js:67
+#: ../EosAppStore/categories.js:18
 msgid "Sports"
 msgstr ""
 
-#: ../EosAppStore/categories.js:73
+#: ../EosAppStore/categories.js:24
 msgid "Education and Health"
 msgstr ""
 
-#: ../EosAppStore/categories.js:79
+#: ../EosAppStore/categories.js:30
 msgid "Entertainment"
 msgstr ""
 
-#: ../EosAppStore/categories.js:85
+#: ../EosAppStore/categories.js:36
 msgid "Local"
 msgstr ""
 
@@ -110,20 +82,20 @@ msgstr ""
 msgid "The address written does not exist or is not available."
 msgstr ""
 
-#: ../EosAppStore/weblinkFrame.js:393 ../EosAppStore/weblinkFrame.js:560
+#: ../EosAppStore/weblinkFrame.js:393 ../EosAppStore/weblinkFrame.js:561
 msgid "Added successfully!"
 msgstr ""
 
-#: ../EosAppStore/weblinkFrame.js:641
+#: ../EosAppStore/weblinkFrame.js:650
 msgid ""
 "Add your favorite websites to your desktop or choose suggested ones from our "
 "list."
 msgstr ""
 
-#: ../EosAppStore/weblinkFrame.js:787
+#: ../EosAppStore/weblinkFrame.js:818
 msgid "Websites"
 msgstr ""
 
-#: ../EosAppStore/weblinkFrame.js:791
+#: ../EosAppStore/weblinkFrame.js:822
 msgid "Install websites"
 msgstr ""
