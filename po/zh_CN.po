@@ -11,9 +11,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: eos-app-store\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-08-04 13:15-0700\n"
-"PO-Revision-Date: 2016-08-04 20:19+0000\n"
-"Last-Translator: Roddy Shuler <roddy@endlessm.com>\n"
+"POT-Creation-Date: 2016-12-13 02:23+0000\n"
+"PO-Revision-Date: 2016-12-13 02:23+0000\n"
+"Last-Translator: endlessmobile_build <philip@endlessm.com>\n"
 "Language-Team: Chinese (China) (http://www.transifex.com/endless-mobile-inc/eos-app-store/language/zh_CN/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -30,55 +30,27 @@ msgstr "创建自定义文件夹来组建您的App。首先，请选择一个图
 msgid "e.g.: http://www.endlessm.com"
 msgstr "如：http://www.endlessm.com"
 
-#: ../EosAppStore/appStore.js:235
-msgid "Dismiss"
-msgstr "消除"
-
-#: ../EosAppStore/appStoreWindow.js:280
+#: ../EosAppStore/appStoreWindow.js:279
 msgid "Press Escape to cancel"
 msgstr "按Escape退出"
 
-#: ../EosAppStore/categories.js:14
-msgid "Education"
-msgstr "教育"
-
-#: ../EosAppStore/categories.js:21
-msgid "Games"
-msgstr "游戏"
-
-#: ../EosAppStore/categories.js:28
-msgid "Resources"
-msgstr "资源"
-
-#: ../EosAppStore/categories.js:35
-msgid "Utilities"
-msgstr "工具"
-
-#: ../EosAppStore/categories.js:42
-msgid "Installed"
-msgstr "已安装"
-
-#: ../EosAppStore/categories.js:49
-msgid "Search"
-msgstr "搜索"
-
-#: ../EosAppStore/categories.js:61
+#: ../EosAppStore/categories.js:12
 msgid "News"
 msgstr "新闻"
 
-#: ../EosAppStore/categories.js:67
+#: ../EosAppStore/categories.js:18
 msgid "Sports"
 msgstr "运动"
 
-#: ../EosAppStore/categories.js:73
+#: ../EosAppStore/categories.js:24
 msgid "Education and Health"
 msgstr "教育与健康"
 
-#: ../EosAppStore/categories.js:79
+#: ../EosAppStore/categories.js:30
 msgid "Entertainment"
 msgstr "娱乐"
 
-#: ../EosAppStore/categories.js:85
+#: ../EosAppStore/categories.js:36
 msgid "Local"
 msgstr "本地"
 
@@ -114,20 +86,20 @@ msgstr "搜索中"
 msgid "The address written does not exist or is not available."
 msgstr "输入的网址不存在或无法获取"
 
-#: ../EosAppStore/weblinkFrame.js:393 ../EosAppStore/weblinkFrame.js:560
+#: ../EosAppStore/weblinkFrame.js:393 ../EosAppStore/weblinkFrame.js:561
 msgid "Added successfully!"
 msgstr "添加成功！"
 
-#: ../EosAppStore/weblinkFrame.js:641
+#: ../EosAppStore/weblinkFrame.js:650
 msgid ""
 "Add your favorite websites to your desktop or choose suggested ones from our"
 " list."
 msgstr "将您喜爱的网站添加到桌面上或从我们的列表中选择推荐网站。"
 
-#: ../EosAppStore/weblinkFrame.js:787
+#: ../EosAppStore/weblinkFrame.js:818
 msgid "Websites"
 msgstr "网站"
 
-#: ../EosAppStore/weblinkFrame.js:791
+#: ../EosAppStore/weblinkFrame.js:822
 msgid "Install websites"
 msgstr "安装网站"

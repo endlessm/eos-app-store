@@ -24,9 +24,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: eos-app-store\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-08-04 13:15-0700\n"
-"PO-Revision-Date: 2016-08-04 20:19+0000\n"
-"Last-Translator: Roddy Shuler <roddy@endlessm.com>\n"
+"POT-Creation-Date: 2016-12-13 02:23+0000\n"
+"PO-Revision-Date: 2016-12-13 02:23+0000\n"
+"Last-Translator: endlessmobile_build <philip@endlessm.com>\n"
 "Language-Team: Spanish (http://www.transifex.com/endless-mobile-inc/eos-app-store/language/es/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -43,55 +43,27 @@ msgstr "Crea tu propia carpeta para organizar tus programas. Primero, escoge un 
 msgid "e.g.: http://www.endlessm.com"
 msgstr "ej.: http://www.endlessm.com"
 
-#: ../EosAppStore/appStore.js:235
-msgid "Dismiss"
-msgstr "Cerrar"
-
-#: ../EosAppStore/appStoreWindow.js:280
+#: ../EosAppStore/appStoreWindow.js:279
 msgid "Press Escape to cancel"
 msgstr "Oprime la tecla de Escape para cancelar"
 
-#: ../EosAppStore/categories.js:14
-msgid "Education"
-msgstr "Educación"
-
-#: ../EosAppStore/categories.js:21
-msgid "Games"
-msgstr "Juegos"
-
-#: ../EosAppStore/categories.js:28
-msgid "Resources"
-msgstr "Recursos"
-
-#: ../EosAppStore/categories.js:35
-msgid "Utilities"
-msgstr "Herramientas"
-
-#: ../EosAppStore/categories.js:42
-msgid "Installed"
-msgstr "Instalados"
-
-#: ../EosAppStore/categories.js:49
-msgid "Search"
-msgstr "Buscar"
-
-#: ../EosAppStore/categories.js:61
+#: ../EosAppStore/categories.js:12
 msgid "News"
 msgstr "Noticias"
 
-#: ../EosAppStore/categories.js:67
+#: ../EosAppStore/categories.js:18
 msgid "Sports"
 msgstr "Deportes"
 
-#: ../EosAppStore/categories.js:73
+#: ../EosAppStore/categories.js:24
 msgid "Education and Health"
 msgstr "Educación y salud"
 
-#: ../EosAppStore/categories.js:79
+#: ../EosAppStore/categories.js:30
 msgid "Entertainment"
 msgstr "Entretenimiento"
 
-#: ../EosAppStore/categories.js:85
+#: ../EosAppStore/categories.js:36
 msgid "Local"
 msgstr "Local"
 
@@ -127,20 +99,20 @@ msgstr "buscando"
 msgid "The address written does not exist or is not available."
 msgstr "El sitio web que has escrito no existe, está incorrecto o no está disponible."
 
-#: ../EosAppStore/weblinkFrame.js:393 ../EosAppStore/weblinkFrame.js:560
+#: ../EosAppStore/weblinkFrame.js:393 ../EosAppStore/weblinkFrame.js:561
 msgid "Added successfully!"
 msgstr "¡Agregado exitosamente!"
 
-#: ../EosAppStore/weblinkFrame.js:641
+#: ../EosAppStore/weblinkFrame.js:650
 msgid ""
 "Add your favorite websites to your desktop or choose suggested ones from our"
 " list."
 msgstr "Agrega tus sitios favoritos a tu escritorio o escoge uno de nuestra lista."
 
-#: ../EosAppStore/weblinkFrame.js:787
+#: ../EosAppStore/weblinkFrame.js:818
 msgid "Websites"
 msgstr "Sitios web"
 
-#: ../EosAppStore/weblinkFrame.js:791
+#: ../EosAppStore/weblinkFrame.js:822
 msgid "Install websites"
 msgstr "Instalar sitios web"
