@@ -3,14 +3,15 @@
 # This file is distributed under the same license as the PACKAGE package.
 # 
 # Translators:
+# cyrus adhikari <adhikari@mpower-social.com>, 2017
 # Shimon Sharmin <oparthib@gmail.com>, 2016
 msgid ""
 msgstr ""
 "Project-Id-Version: eos-app-store\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-03-07 02:23+0000\n"
-"PO-Revision-Date: 2016-12-13 02:23+0000\n"
-"Last-Translator: endlessmobile_build <philip@endlessm.com>\n"
+"POT-Creation-Date: 2017-03-14 01:22+0000\n"
+"PO-Revision-Date: 2017-03-15 10:34+0000\n"
+"Last-Translator: cyrus adhikari <adhikari@mpower-social.com>\n"
 "Language-Team: Bengali (http://www.transifex.com/endless-mobile-inc/eos-app-store/language/bn/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -20,12 +21,12 @@ msgstr ""
 
 #: ../data/eos-app-store-folder-frame.ui.h:1
 msgid "Create your own folder to organize your apps. First, choose an icon."
-msgstr "আপনার এ্যাপসমূহ সাজিয়ে রাখতে নিজের ফোল্ডার তৈরি করুন। প্রথমে, একটি চিত্র বেছে নিন।"
+msgstr "আপনার অ্যাপস সাজিয়ে রাখতে আপনার নিজস্ব ফোল্ডার তৈরি করুন. প্রথমত, একটি আইকন বেছে নিন।"
 
 #: ../data/eos-app-store-weblink-new-site-frame.ui.h:1
 #: ../EosAppStore/weblinkFrame.js:349
 msgid "e.g.: http://www.endlessm.com"
-msgstr "e.g.: http://www.endlessm.com"
+msgstr "e.g.: http://www.endlessm.com "
 
 #: ../EosAppStore/appStoreWindow.js:279
 msgid "Press Escape to cancel"
@@ -37,7 +38,7 @@ msgstr "খবর"
 
 #: ../EosAppStore/categories.js:18
 msgid "Sports"
-msgstr "খেলাধূলা"
+msgstr "খেলাধুলা "
 
 #: ../EosAppStore/categories.js:24
 msgid "Education and Health"
@@ -45,7 +46,7 @@ msgstr "শিক্ষা ও স্বাস্থ্য"
 
 #: ../EosAppStore/categories.js:30
 msgid "Entertainment"
-msgstr "বিনোদন"
+msgstr "বিনোদন   "
 
 #: ../EosAppStore/categories.js:36
 msgid "Local"
@@ -65,11 +66,11 @@ msgstr "ফোল্ডার সংযোজিত!"
 
 #: ../EosAppStore/folderFrame.js:295
 msgid "Folders"
-msgstr "ফোল্ডার"
+msgstr "ফোল্ডার সমূহ"
 
 #: ../EosAppStore/folderFrame.js:299
 msgid "Install folders"
-msgstr "ফোল্ডার সংস্থাপন"
+msgstr "ফোল্ডার ইনস্টল"
 
 #: ../EosAppStore/weblinkFrame.js:282
 msgid "Write the website you'd like to add here and press “Enter”"
@@ -77,7 +78,7 @@ msgstr "যে ওয়েবসাইট এখানে সংযোজন ক�
 
 #: ../EosAppStore/weblinkFrame.js:369
 msgid "searching"
-msgstr "অনুসন্ধান চলছে"
+msgstr "অনুসন্ধান চলছে "
 
 #: ../EosAppStore/weblinkFrame.js:384
 msgid "The address written does not exist or is not available."
@@ -85,18 +86,18 @@ msgstr "লিখিত ঠিকানাটি অনুপস্থিত অ
 
 #: ../EosAppStore/weblinkFrame.js:393 ../EosAppStore/weblinkFrame.js:561
 msgid "Added successfully!"
-msgstr "সফলভাবে সংযোজিত!"
+msgstr "সফলভাবে সংযোজিত! "
 
 #: ../EosAppStore/weblinkFrame.js:650
 msgid ""
 "Add your favorite websites to your desktop or choose suggested ones from our"
 " list."
-msgstr "ডেস্কটপে আপনার প্রিয় ওয়েবসাইটগুলো সংযোজন করুন অথবা আমাদের তালিকা থেকে প্রস্তাবিতগুলো বেছে নিন।"
+msgstr "ডেস্কটপে আপনার প্রিয় ওয়েবসাইটগুলো সংযোজন করুন অথবা আমাদের তালিকা থেকে প্রস্তাবিতগুলো বেছে নিন। "
 
 #: ../EosAppStore/weblinkFrame.js:818
 msgid "Websites"
-msgstr "ওয়েবসাইটগুলো"
+msgstr "ওয়েবসাইটগুলো  "
 
 #: ../EosAppStore/weblinkFrame.js:822
 msgid "Install websites"
-msgstr "ওয়েবসাইট সংস্থাপন"
+msgstr "ওয়েবসাইট সমূহ ইনস্টল"
