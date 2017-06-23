@@ -118,12 +118,7 @@ frame.sidebar-frame button:hover:active {
 .web-frame {
     border: none;
     padding-right: 15px;
-}
-
-.web-frame:dir(rtl),
-.folder-frame:dir(rtl) {
     padding-left: 15px;
-    padding-right: 0px;
 }
 
 .frame-separator {
@@ -202,6 +197,8 @@ frame.sidebar-frame button:hover:active {
     font-size: 36px;
     font-weight: bold;
     color: white;
+    margin-right: 15px;
+    margin-left: 15px;
 }
 
 .header-subtitle {
@@ -384,9 +381,6 @@ searchbar entry:selected {
 .weblink-scrolledwindow {
     border: none;
     padding-right: 15px;
-}
-
-.weblink-scrolledwindow:dir(rtl) {
     padding-left: 15px;
 }
 
