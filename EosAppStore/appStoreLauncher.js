@@ -45,12 +45,6 @@ function main() {
     for (let i in args) {
         let arg = args[i];
 
-        if (arg == '-f' || arg == '--folders') {
-            initialPage = 'folders';
-            args.splice(i, 1);
-            continue;
-        }
-
         if (arg == '-w' || arg == '--web-links') {
             initialPage = 'web';
             args.splice(i, 1);
@@ -72,7 +66,6 @@ function main() {
                 "  -h, --help           Show help\n" +
                 "\n" +
                 "Application options:\n" +
-                "  -f, --folders        Show the 'Folders' page\n" +
                 "  -w, --web-links      Show the 'Web Links' page\n" +
                 "  -v, --version        Print version and exit");
             return 0;

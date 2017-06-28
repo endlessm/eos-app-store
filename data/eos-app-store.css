@@ -115,16 +115,10 @@ frame.sidebar-frame button:hover:active {
     background-image: linear-gradient(to top, white, white 3px, transparent 3px);
 }
 
-.web-frame,
-.folder-frame {
+.web-frame {
     border: none;
     padding-right: 15px;
-}
-
-.web-frame:dir(rtl),
-.folder-frame:dir(rtl) {
     padding-left: 15px;
-    padding-right: 0px;
 }
 
 .frame-separator {
@@ -203,6 +197,8 @@ frame.sidebar-frame button:hover:active {
     font-size: 36px;
     font-weight: bold;
     color: white;
+    margin-right: 15px;
+    margin-left: 15px;
 }
 
 .header-subtitle {
@@ -385,9 +381,6 @@ searchbar entry:selected {
 .weblink-scrolledwindow {
     border: none;
     padding-right: 15px;
-}
-
-.weblink-scrolledwindow:dir(rtl) {
     padding-left: 15px;
 }
 
@@ -432,99 +425,4 @@ searchbar entry:selected {
 
 .weblink-listbox row .url {
     color: #ffa84d;
-}
-
-.folder-description {
-    color: white;
-    font-weight: 600; /* semibold */
-    padding: 10px 2px 0px;
-}
-
-.folder-icon-button {
-    border-radius: 3px;
-    border: none;
-    background: none;
-    color: #e8e8e8;
-    box-shadow: none;
-    transition: none;
-
-    outline-width: 0;
-    outline-offset: 0;
-}
-
-.folder-icon-button:hover {
-    background: url("btn_folder-glow_hover.png");
-}
-
-.folder-icon-button:checked {
-    color: #646464;
-    background: url("btn_folder-glow_pressed.png");
-}
-
-.folder-bubble {
-    background-color: @app_store_bg;
-    border: none;
-    border-radius: 20px;
-}
-
-.folder-bubble .bubble-border {
-    border: none;
-    border-radius: 20px;
-    padding: 2px;
-}
-
-.folder-bubble.entering .bubble-border {
-    background: white;
-    box-shadow: inset 0px 2px 3px 0px alpha(black, 0.25);
-}
-
-.folder-bubble.done .bubble-border {
-    background: transparent;
-}
-
-.folder-bubble entry {
-    border: none;
-    box-shadow: none;
-    background: none;
-    transition: none;
-
-    font-size: 1.12em;
-    font-weight: 600; /* semibold */
-
-    padding-left: 10px;
-}
-
-.folder-bubble entry:dir(rtl) {
-    padding-right: 10px;
-}
-
-.folder-bubble entry:selected {
-    background-color: @app_store_selected_bg;
-}
-
-.folder-bubble button {
-    border: none;
-    background-repeat: no-repeat;
-    background-image: url("btn_add-folder_normal.png");
-    background-color: transparent;
-    box-shadow: none;
-}
-
-.folder-bubble button:hover {
-    background-image: url("btn_add-folder_hover.png");
-}
-
-.folder-bubble button:checked {
-    background-image: url("btn_add-folder_pressed.png");
-}
-
-.folder-bubble button:disabled {
-    background-image: url("btn_add-folder_disabled.png");
-}
-
-.folder-bubble #doneLabel {
-    color: white;
-
-    font-size: 1.12em;
-    font-weight: 600; /* semibold */
 }

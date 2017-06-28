@@ -10,8 +10,6 @@ dist_js_DATA = \
 	categories.js \
 	categoryButton.js \
 	environment.js \
-	folderFrame.js \
-	folderModel.js \
 	main.js \
 	resetDesktop.js \
 	separator.js \

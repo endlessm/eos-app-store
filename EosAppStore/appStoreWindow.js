@@ -10,7 +10,6 @@ const Pango = imports.gi.Pango;
 
 const AppStorePages = imports.appStorePages;
 const Categories = imports.categories;
-const FolderFrame = imports.folderFrame;
 const Path = imports.path;
 const UIBuilder = imports.builder;
 const WeblinkFrame = imports.weblinkFrame;
@@ -408,7 +407,6 @@ const AppStoreWindow = new Lang.Class({
         this.content_box.add(this._pageManager);
 
         this._pageManager.registerProvider(new WeblinkFrame.WeblinkFrame());
-        this._pageManager.registerProvider(new FolderFrame.FolderFrame());
     },
 
     resetCurrentPage: function() {
