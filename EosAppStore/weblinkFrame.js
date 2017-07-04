@@ -122,10 +122,10 @@ const NewSiteHelper = new Lang.Class({
         if (url.indexOf('http://') != 0 && url.indexOf('https://') != 0 &&
             url.indexOf('ftp://')  != 0 && url.indexOf('file://')  != 0) {
             // if it does not start with a valid prefix, prepend http://
-            url = 'http://' + url;
+            this._url = 'http://' + url;
         }
 
-        this._webView.load_uri(url);
+        this._webView.load_uri(this._url);
     },
 
     _saveFavicon: function() {
