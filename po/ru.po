@@ -7,26 +7,22 @@ msgid ""
 msgstr ""
 "Project-Id-Version: eos-app-store\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-05-30 01:23+0000\n"
-"PO-Revision-Date: 2017-08-03 16:21+0000\n"
+"POT-Creation-Date: 2018-04-16 15:16-0700\n"
+"PO-Revision-Date: 2018-04-16 22:16+0000\n"
 "Last-Translator: Roddy Shuler <roddy@endlessm.com>\n"
-"Language-Team: Russian (http://www.transifex.com/endless-mobile-inc/eos-app-store/language/ru/)\n"
+"Language-Team: Russian (http://www.transifex.com/endless-os/eos-app-store/language/ru/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Language: ru\n"
 "Plural-Forms: nplurals=4; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<12 || n%100>14) ? 1 : n%10==0 || (n%10>=5 && n%10<=9) || (n%100>=11 && n%100<=14)? 2 : 3);\n"
 
-#: ../data/eos-app-store-folder-frame.ui.h:1
-msgid "Create your own folder to organize your apps. First, choose an icon."
-msgstr ""
-
 #: ../data/eos-app-store-weblink-new-site-frame.ui.h:1
 #: ../EosAppStore/weblinkFrame.js:349
 msgid "e.g.: http://www.endlessm.com"
 msgstr ""
 
-#: ../EosAppStore/appStoreWindow.js:279
+#: ../EosAppStore/appStoreWindow.js:278
 msgid "Press Escape to cancel"
 msgstr ""
 
@@ -52,22 +48,6 @@ msgstr ""
 
 #: ../EosAppStore/environment.js:22
 msgid "App Center"
-msgstr ""
-
-#: ../EosAppStore/folderFrame.js:42
-msgid "Name of folder"
-msgstr ""
-
-#: ../EosAppStore/folderFrame.js:70
-msgid "Folder added!"
-msgstr ""
-
-#: ../EosAppStore/folderFrame.js:295
-msgid "Folders"
-msgstr ""
-
-#: ../EosAppStore/folderFrame.js:299
-msgid "Install folders"
 msgstr ""
 
 #: ../EosAppStore/weblinkFrame.js:282

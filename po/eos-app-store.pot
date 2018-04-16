@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-04-18 01:23+0000\n"
+"POT-Creation-Date: 2018-04-16 15:16-0700\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -17,16 +17,12 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: ../data/eos-app-store-folder-frame.ui.h:1
-msgid "Create your own folder to organize your apps. First, choose an icon."
-msgstr ""
-
 #: ../data/eos-app-store-weblink-new-site-frame.ui.h:1
 #: ../EosAppStore/weblinkFrame.js:349
 msgid "e.g.: http://www.endlessm.com"
 msgstr ""
 
-#: ../EosAppStore/appStoreWindow.js:279
+#: ../EosAppStore/appStoreWindow.js:278
 msgid "Press Escape to cancel"
 msgstr ""
 
@@ -52,22 +48,6 @@ msgstr ""
 
 #: ../EosAppStore/environment.js:22
 msgid "App Center"
-msgstr ""
-
-#: ../EosAppStore/folderFrame.js:42
-msgid "Name of folder"
-msgstr ""
-
-#: ../EosAppStore/folderFrame.js:70
-msgid "Folder added!"
-msgstr ""
-
-#: ../EosAppStore/folderFrame.js:295
-msgid "Folders"
-msgstr ""
-
-#: ../EosAppStore/folderFrame.js:299
-msgid "Install folders"
 msgstr ""
 
 #: ../EosAppStore/weblinkFrame.js:282

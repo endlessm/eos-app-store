@@ -7,26 +7,22 @@ msgid ""
 msgstr ""
 "Project-Id-Version: eos-app-store\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-05-30 01:23+0000\n"
-"PO-Revision-Date: 2017-09-22 23:03+0000\n"
-"Last-Translator: endlessmobile_build <philip@endlessm.com>\n"
-"Language-Team: Vietnamese (http://www.transifex.com/endless-mobile-inc/eos-app-store/language/vi/)\n"
+"POT-Creation-Date: 2018-04-16 15:16-0700\n"
+"PO-Revision-Date: 2018-04-16 22:16+0000\n"
+"Last-Translator: Roddy Shuler <roddy@endlessm.com>\n"
+"Language-Team: Vietnamese (http://www.transifex.com/endless-os/eos-app-store/language/vi/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Language: vi\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
 
-#: ../data/eos-app-store-folder-frame.ui.h:1
-msgid "Create your own folder to organize your apps. First, choose an icon."
-msgstr "Tạo thư mục của riêng bạn để tổ chức các ứng dụng của bạn. Đầu tiên, hãy chọn một biểu tượng."
-
 #: ../data/eos-app-store-weblink-new-site-frame.ui.h:1
 #: ../EosAppStore/weblinkFrame.js:349
 msgid "e.g.: http://www.endlessm.com"
 msgstr "vd: http://www.endlessm.com"
 
-#: ../EosAppStore/appStoreWindow.js:279
+#: ../EosAppStore/appStoreWindow.js:278
 msgid "Press Escape to cancel"
 msgstr "Nhấn Escape để hủy"
 
@@ -53,22 +49,6 @@ msgstr "Địa phương"
 #: ../EosAppStore/environment.js:22
 msgid "App Center"
 msgstr "Trung tâm Ứng dụng"
-
-#: ../EosAppStore/folderFrame.js:42
-msgid "Name of folder"
-msgstr "Tên thư mục"
-
-#: ../EosAppStore/folderFrame.js:70
-msgid "Folder added!"
-msgstr "Đã thêm thư mục!"
-
-#: ../EosAppStore/folderFrame.js:295
-msgid "Folders"
-msgstr "Thư mục"
-
-#: ../EosAppStore/folderFrame.js:299
-msgid "Install folders"
-msgstr "Cài đặt thư mục"
 
 #: ../EosAppStore/weblinkFrame.js:282
 msgid "Write the website you'd like to add here and press “Enter”"

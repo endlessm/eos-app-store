@@ -3,99 +3,80 @@
 # This file is distributed under the same license as the PACKAGE package.
 # 
 # Translators:
+# Martin Jelen <marty.jelen@seznam.cz>, 2018
 msgid ""
 msgstr ""
 "Project-Id-Version: eos-app-store\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-05-30 01:23+0000\n"
-"PO-Revision-Date: 2013-10-02 22:48+0000\n"
-"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
-"Language-Team: Czech (http://www.transifex.com/endless-mobile-inc/eos-app-store/language/cs/)\n"
+"POT-Creation-Date: 2018-04-16 15:16-0700\n"
+"PO-Revision-Date: 2018-04-16 22:16+0000\n"
+"Last-Translator: Roddy Shuler <roddy@endlessm.com>\n"
+"Language-Team: Czech (http://www.transifex.com/endless-os/eos-app-store/language/cs/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Language: cs\n"
 "Plural-Forms: nplurals=3; plural=(n==1) ? 0 : (n>=2 && n<=4) ? 1 : 2;\n"
 
-#: ../data/eos-app-store-folder-frame.ui.h:1
-msgid "Create your own folder to organize your apps. First, choose an icon."
-msgstr ""
-
 #: ../data/eos-app-store-weblink-new-site-frame.ui.h:1
 #: ../EosAppStore/weblinkFrame.js:349
 msgid "e.g.: http://www.endlessm.com"
-msgstr ""
+msgstr "např.: http://www.endlessm.com"
 
-#: ../EosAppStore/appStoreWindow.js:279
+#: ../EosAppStore/appStoreWindow.js:278
 msgid "Press Escape to cancel"
-msgstr ""
+msgstr "Stiskněte Escape pro zrušení"
 
 #: ../EosAppStore/categories.js:12
 msgid "News"
-msgstr ""
+msgstr "Zprávy"
 
 #: ../EosAppStore/categories.js:18
 msgid "Sports"
-msgstr ""
+msgstr "Sport"
 
 #: ../EosAppStore/categories.js:24
 msgid "Education and Health"
-msgstr ""
+msgstr "Vzdělávání a Zdraví"
 
 #: ../EosAppStore/categories.js:30
 msgid "Entertainment"
-msgstr ""
+msgstr "Zábava"
 
 #: ../EosAppStore/categories.js:36
 msgid "Local"
-msgstr ""
+msgstr "Místní"
 
 #: ../EosAppStore/environment.js:22
 msgid "App Center"
-msgstr ""
-
-#: ../EosAppStore/folderFrame.js:42
-msgid "Name of folder"
-msgstr ""
-
-#: ../EosAppStore/folderFrame.js:70
-msgid "Folder added!"
-msgstr ""
-
-#: ../EosAppStore/folderFrame.js:295
-msgid "Folders"
-msgstr ""
-
-#: ../EosAppStore/folderFrame.js:299
-msgid "Install folders"
-msgstr ""
+msgstr "Centrum aplikací"
 
 #: ../EosAppStore/weblinkFrame.js:282
 msgid "Write the website you'd like to add here and press “Enter”"
-msgstr ""
+msgstr "Napište název webové stránky, kterou sem chcete přidat a stiskněte \"Enter.\""
 
 #: ../EosAppStore/weblinkFrame.js:369
 msgid "searching"
-msgstr ""
+msgstr "vyhledávání"
 
 #: ../EosAppStore/weblinkFrame.js:384
 msgid "The address written does not exist or is not available."
-msgstr ""
+msgstr "Napsaná adresa neexistuje, nebo je nedostupná."
 
 #: ../EosAppStore/weblinkFrame.js:393 ../EosAppStore/weblinkFrame.js:561
 msgid "Added successfully!"
-msgstr ""
+msgstr "Úspěšně přidáno!"
 
 #: ../EosAppStore/weblinkFrame.js:650
 msgid ""
 "Add your favorite websites to your desktop or choose suggested ones from our"
 " list."
-msgstr ""
+msgstr "Přidejte svoji oblíbenou webovou stránku na plochu, nebo si vyberte z navrhovaných stránek z našeho seznamu."
 
 #: ../EosAppStore/weblinkFrame.js:818
 msgid "Websites"
-msgstr ""
+msgstr "Webové stránky"
 
 #: ../EosAppStore/weblinkFrame.js:822
 msgid "Install websites"
-msgstr ""
+msgstr "Nainstalovat webové stránky"

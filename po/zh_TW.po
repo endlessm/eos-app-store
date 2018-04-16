@@ -3,36 +3,33 @@
 # This file is distributed under the same license as the PACKAGE package.
 # 
 # Translators:
+# Cheng-Chia Tseng <pswo10680@gmail.com>, 2017
 msgid ""
 msgstr ""
 "Project-Id-Version: eos-app-store\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-05-30 01:23+0000\n"
-"PO-Revision-Date: 2017-09-23 12:01+0000\n"
+"POT-Creation-Date: 2018-04-16 15:16-0700\n"
+"PO-Revision-Date: 2018-04-16 22:16+0000\n"
 "Last-Translator: Roddy Shuler <roddy@endlessm.com>\n"
-"Language-Team: Chinese (Taiwan) (http://www.transifex.com/endless-mobile-inc/eos-app-store/language/zh_TW/)\n"
+"Language-Team: Chinese (Taiwan) (http://www.transifex.com/endless-os/eos-app-store/language/zh_TW/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Language: zh_TW\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
 
-#: ../data/eos-app-store-folder-frame.ui.h:1
-msgid "Create your own folder to organize your apps. First, choose an icon."
-msgstr "建立你自己的資料夾以組織你的應用程式。首先，選擇一個圖標。"
-
 #: ../data/eos-app-store-weblink-new-site-frame.ui.h:1
 #: ../EosAppStore/weblinkFrame.js:349
 msgid "e.g.: http://www.endlessm.com"
 msgstr "例如：http://www.endlessm.com"
 
-#: ../EosAppStore/appStoreWindow.js:279
+#: ../EosAppStore/appStoreWindow.js:278
 msgid "Press Escape to cancel"
 msgstr "按「ESC 鍵」取消"
 
 #: ../EosAppStore/categories.js:12
 msgid "News"
-msgstr "最新消息"
+msgstr "新聞"
 
 #: ../EosAppStore/categories.js:18
 msgid "Sports"
@@ -48,31 +45,15 @@ msgstr "娛樂"
 
 #: ../EosAppStore/categories.js:36
 msgid "Local"
-msgstr "本地"
+msgstr "在地"
 
 #: ../EosAppStore/environment.js:22
 msgid "App Center"
 msgstr "應用程式中心"
 
-#: ../EosAppStore/folderFrame.js:42
-msgid "Name of folder"
-msgstr "資料夾名稱"
-
-#: ../EosAppStore/folderFrame.js:70
-msgid "Folder added!"
-msgstr "資料夾已新增！"
-
-#: ../EosAppStore/folderFrame.js:295
-msgid "Folders"
-msgstr "資料夾"
-
-#: ../EosAppStore/folderFrame.js:299
-msgid "Install folders"
-msgstr "安裝資料夾"
-
 #: ../EosAppStore/weblinkFrame.js:282
 msgid "Write the website you'd like to add here and press “Enter”"
-msgstr "在這裡寫想要新增的網站，按下 “Enter”"
+msgstr "在這裡寫想要新增的網站，按下「Enter」"
 
 #: ../EosAppStore/weblinkFrame.js:369
 msgid "searching"
