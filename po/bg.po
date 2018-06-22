@@ -3,13 +3,14 @@
 # This file is distributed under the same license as the PACKAGE package.
 # 
 # Translators:
+# Jordan Nenov <alabalistic@gmail.com>, 2018
 msgid ""
 msgstr ""
 "Project-Id-Version: eos-app-store\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2018-04-16 15:16-0700\n"
-"PO-Revision-Date: 2018-04-16 22:16+0000\n"
-"Last-Translator: Roddy Shuler <roddy@endlessm.com>\n"
+"PO-Revision-Date: 2018-05-25 12:00+0000\n"
+"Last-Translator: Jordan Nenov <alabalistic@gmail.com>\n"
 "Language-Team: Bulgarian (http://www.transifex.com/endless-os/eos-app-store/language/bg/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -20,62 +21,62 @@ msgstr ""
 #: ../data/eos-app-store-weblink-new-site-frame.ui.h:1
 #: ../EosAppStore/weblinkFrame.js:349
 msgid "e.g.: http://www.endlessm.com"
-msgstr ""
+msgstr "на пример http://www.endlessm.com"
 
 #: ../EosAppStore/appStoreWindow.js:278
 msgid "Press Escape to cancel"
-msgstr ""
+msgstr "За отказ натисни Esc"
 
 #: ../EosAppStore/categories.js:12
 msgid "News"
-msgstr ""
+msgstr "Новини"
 
 #: ../EosAppStore/categories.js:18
 msgid "Sports"
-msgstr ""
+msgstr "Спорт"
 
 #: ../EosAppStore/categories.js:24
 msgid "Education and Health"
-msgstr ""
+msgstr "Наука и Здраве"
 
 #: ../EosAppStore/categories.js:30
 msgid "Entertainment"
-msgstr ""
+msgstr "Забавления"
 
 #: ../EosAppStore/categories.js:36
 msgid "Local"
-msgstr ""
+msgstr "Локални"
 
 #: ../EosAppStore/environment.js:22
 msgid "App Center"
-msgstr ""
+msgstr "Каталог"
 
 #: ../EosAppStore/weblinkFrame.js:282
 msgid "Write the website you'd like to add here and press “Enter”"
-msgstr ""
+msgstr "Напишете името на страницата която искате да добавите и натиснете \"Enter\""
 
 #: ../EosAppStore/weblinkFrame.js:369
 msgid "searching"
-msgstr ""
+msgstr "Търсене"
 
 #: ../EosAppStore/weblinkFrame.js:384
 msgid "The address written does not exist or is not available."
-msgstr ""
+msgstr "Избрания адрес не съществува или не е на линия."
 
 #: ../EosAppStore/weblinkFrame.js:393 ../EosAppStore/weblinkFrame.js:561
 msgid "Added successfully!"
-msgstr ""
+msgstr "Успешно добавен"
 
 #: ../EosAppStore/weblinkFrame.js:650
 msgid ""
 "Add your favorite websites to your desktop or choose suggested ones from our"
 " list."
-msgstr ""
+msgstr "Добавете любимите си страници на Работния плот или изберете препоръчани от нашия листинг"
 
 #: ../EosAppStore/weblinkFrame.js:818
 msgid "Websites"
-msgstr ""
+msgstr "Страници"
 
 #: ../EosAppStore/weblinkFrame.js:822
 msgid "Install websites"
-msgstr ""
+msgstr "Инсталирай страници"

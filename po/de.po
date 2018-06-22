@@ -4,13 +4,14 @@
 # 
 # Translators:
 # Stefan Schroeder <ondekoza@gmail.com>, 2016
+# XorgMC <xorgmc@gmail.com>, 2018
 msgid ""
 msgstr ""
 "Project-Id-Version: eos-app-store\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2018-04-16 15:16-0700\n"
-"PO-Revision-Date: 2018-04-16 22:16+0000\n"
-"Last-Translator: Roddy Shuler <roddy@endlessm.com>\n"
+"PO-Revision-Date: 2018-05-20 15:07+0000\n"
+"Last-Translator: XorgMC <xorgmc@gmail.com>\n"
 "Language-Team: German (http://www.transifex.com/endless-os/eos-app-store/language/de/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -25,7 +26,7 @@ msgstr "z.B.: http://www.endlessm.com"
 
 #: ../EosAppStore/appStoreWindow.js:278
 msgid "Press Escape to cancel"
-msgstr "Drücke Escape zum Beenden"
+msgstr "Drücke Escape zum Abbrechen"
 
 #: ../EosAppStore/categories.js:12
 msgid "News"
