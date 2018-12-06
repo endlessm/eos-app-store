@@ -152,7 +152,7 @@ var NewSiteHelper = new Lang.Class({
             this._favicon = favicon;
             this.emit('favicon-loaded');
 
-            // if we saved the desktop file already, update it 
+            // if we saved the desktop file already, update it
             // with the new icon
             if (this._savedKeyfile) {
                 this._saveFavicon();
