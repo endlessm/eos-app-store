@@ -24,7 +24,7 @@ const AppStoreDBusIface = '<node><interface name="com.endlessm.AppStore">' +
   '<property name="Visible" type="b" access="read"/>' +
 '</interface></node>';
 
-const AppStoreDBusService = new Lang.Class({
+var AppStoreDBusService = new Lang.Class({
     Name: 'AppStoreDBusService',
 
     _init: function(app) {

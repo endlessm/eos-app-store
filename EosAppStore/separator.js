@@ -5,7 +5,7 @@ const Lang = imports.lang;
 const EDGE_WIDTH = 55;
 const SHADOW_HEIGHT = 11;
 
-const FrameSeparator = new Lang.Class({
+var FrameSeparator = new Lang.Class({
     Name: 'FrameSeparator',
     Extends: Gtk.Box,
 

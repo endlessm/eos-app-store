@@ -3,7 +3,7 @@ const Gtk = imports.gi.Gtk;
 const Lang = imports.lang;
 const Signals = imports.signals;
 
-const AppStorePageManager = new Lang.Class({
+var AppStorePageManager = new Lang.Class({
     Name: 'AppStorePageManager',
     Extends: Gtk.Stack,
 
@@ -54,7 +54,7 @@ const AppStorePageManager = new Lang.Class({
     }
 });
 
-const AppStorePageProvider = new Lang.Interface({
+var AppStorePageProvider = new Lang.Interface({
     Name: 'AppStorePageProvider',
 
     createPage: Lang.Interface.UNIMPLEMENTED,

@@ -31,7 +31,7 @@ const SHELL_APP_STORE_IFACE = 'org.gnome.Shell.AppStore';
 
 const ShellAppStoreProxy = Gio.DBusProxy.makeProxyWrapper(AppStoreIface);
 
-const ShellAppStore = new Lang.Class({
+var ShellAppStore = new Lang.Class({
     Name: 'ShellAppStore',
 
     _init: function() {

@@ -30,7 +30,7 @@ const CLEAR_TIMEOUT = 300;
 // many seconds
 const QUIT_TIMEOUT = 15;
 
-const AppStore = new Lang.Class({
+var AppStore = new Lang.Class({
     Name: 'AppStore',
     Extends: Gtk.Application,
 

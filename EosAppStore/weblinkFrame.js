@@ -94,7 +94,7 @@ function createWeblink(url, title, icon) {
     return [availablePath, desktop];
 };
 
-const NewSiteHelper = new Lang.Class({
+var NewSiteHelper = new Lang.Class({
     Name: 'NewSiteHelper',
 
     _init: function(url) {
@@ -228,7 +228,7 @@ const NewSiteBoxState = {
     INSTALLED: 5
 };
 
-const NewSiteBox = new Lang.Class({
+var NewSiteBox = new Lang.Class({
     Name: 'NewSiteBox',
     Extends: Gtk.Bin,
 
@@ -509,7 +509,7 @@ const NewSiteBox = new Lang.Class({
 });
 Builder.bindTemplateChildren(NewSiteBox.prototype);
 
-const WeblinkListBoxRow = new Lang.Class({
+var WeblinkListBoxRow = new Lang.Class({
     Name: 'WeblinkListBoxRow',
     Extends: Gtk.EventBox,
 
@@ -587,7 +587,7 @@ const WeblinkListBoxRow = new Lang.Class({
 });
 Builder.bindTemplateChildren(WeblinkListBoxRow.prototype);
 
-const WeblinkListBox = new Lang.Class({
+var WeblinkListBox = new Lang.Class({
     Name: 'WeblinkListBox',
     Extends: Gtk.ListBox,
 
@@ -597,7 +597,7 @@ const WeblinkListBox = new Lang.Class({
     }
 });
 
-const WeblinkListBoxRowSeparator = new Lang.Class({
+var WeblinkListBoxRowSeparator = new Lang.Class({
     Name: 'WeblinkListBoxRowSeparator',
     Extends: Gtk.Frame,
 
@@ -607,7 +607,7 @@ const WeblinkListBoxRowSeparator = new Lang.Class({
     }
 });
 
-const WeblinkFrame = new Lang.Class({
+var WeblinkFrame = new Lang.Class({
     Name: 'WeblinkFrame',
     Extends: Gtk.Frame,
     Implements: [AppStorePages.AppStorePageProvider],
