@@ -5,7 +5,7 @@ const Gtk = imports.gi.Gtk;
 
 const Lang = imports.lang;
 
-const CategoryButton = new Lang.Class({
+var CategoryButton = new Lang.Class({
     Name: 'CategoryButton',
     Extends: Gtk.RadioButton,
     Properties: { 'category': GObject.ParamSpec.string('category',

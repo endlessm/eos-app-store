@@ -2,7 +2,7 @@
 const EosAppStorePrivate = imports.gi.EosAppStorePrivate;
 const Lang = imports.lang;
 
-const DEFAULT_APP_CATEGORY = 'web';
+var DEFAULT_APP_CATEGORY = 'web';
 
 function get_link_categories() {
     return [

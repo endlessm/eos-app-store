@@ -21,7 +21,7 @@ const AppStoreIface = '<node><interface name="com.endlessm.AppStore">' +
 
 const AppStoreProxy = Gio.DBusProxy.makeProxyWrapper(AppStoreIface);
 
-const AppStoreLauncher = new Lang.Class({
+var AppStoreLauncher = new Lang.Class({
     Name: 'AppStoreLauncher',
 
     _init: function() {

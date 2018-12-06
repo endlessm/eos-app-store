@@ -17,7 +17,7 @@ const WMInspect = imports.wmInspect;
 
 const SIDE_COMPONENT_ROLE = 'eos-side-component';
 
-const AppStoreSizes = {
+var AppStoreSizes = {
     // Note: must be listed in order of increasing screenWidth.
     // Window widths are chosen by design to match a specific
     // number of columns of tiles on the application grid.
@@ -45,7 +45,7 @@ const AppStoreSizes = {
             sidebarWidth: 215 }
 };
 
-const AppStoreWindow = new Lang.Class({
+var AppStoreWindow = new Lang.Class({
     Name: 'AppStoreWindow',
     Extends: Gtk.ApplicationWindow,
     Signals: {

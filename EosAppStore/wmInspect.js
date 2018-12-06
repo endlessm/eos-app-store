@@ -2,7 +2,7 @@ const Lang = imports.lang;
 const Signals = imports.signals;
 const Wnck = imports.gi.Wnck;
 
-const WMInspect = new Lang.Class({
+var WMInspect = new Lang.Class({
     Name: 'WMInspect',
 
     _init: function() {
