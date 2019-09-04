@@ -3,13 +3,14 @@
 # This file is distributed under the same license as the PACKAGE package.
 # 
 # Translators:
+# Heimen Stoffels <vistausss@outlook.com>, 2018
 msgid ""
 msgstr ""
 "Project-Id-Version: eos-app-store\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2018-04-16 15:16-0700\n"
-"PO-Revision-Date: 2018-04-16 22:16+0000\n"
-"Last-Translator: Roddy Shuler <roddy@endlessm.com>\n"
+"PO-Revision-Date: 2018-11-12 19:25+0000\n"
+"Last-Translator: Heimen Stoffels <vistausss@outlook.com>\n"
 "Language-Team: Dutch (http://www.transifex.com/endless-os/eos-app-store/language/nl/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -20,62 +21,62 @@ msgstr ""
 #: ../data/eos-app-store-weblink-new-site-frame.ui.h:1
 #: ../EosAppStore/weblinkFrame.js:349
 msgid "e.g.: http://www.endlessm.com"
-msgstr ""
+msgstr "bijv.: http://www.endlessm.com"
 
 #: ../EosAppStore/appStoreWindow.js:278
 msgid "Press Escape to cancel"
-msgstr ""
+msgstr "Druk op Escape om te annuleren"
 
 #: ../EosAppStore/categories.js:12
 msgid "News"
-msgstr ""
+msgstr "Nieuws"
 
 #: ../EosAppStore/categories.js:18
 msgid "Sports"
-msgstr ""
+msgstr "Sport"
 
 #: ../EosAppStore/categories.js:24
 msgid "Education and Health"
-msgstr ""
+msgstr "Educatie en gezondheid"
 
 #: ../EosAppStore/categories.js:30
 msgid "Entertainment"
-msgstr ""
+msgstr "Amusement"
 
 #: ../EosAppStore/categories.js:36
 msgid "Local"
-msgstr ""
+msgstr "Lokaal"
 
 #: ../EosAppStore/environment.js:22
 msgid "App Center"
-msgstr ""
+msgstr "App-winkel"
 
 #: ../EosAppStore/weblinkFrame.js:282
 msgid "Write the website you'd like to add here and press “Enter”"
-msgstr ""
+msgstr "Noteer hier de website die je wilt toevoegen en druk dan op “Enter”"
 
 #: ../EosAppStore/weblinkFrame.js:369
 msgid "searching"
-msgstr ""
+msgstr "bezig met zoeken"
 
 #: ../EosAppStore/weblinkFrame.js:384
 msgid "The address written does not exist or is not available."
-msgstr ""
+msgstr "Het opgegeven adres bestaat niet of is niet beschikbaar."
 
 #: ../EosAppStore/weblinkFrame.js:393 ../EosAppStore/weblinkFrame.js:561
 msgid "Added successfully!"
-msgstr ""
+msgstr "Toegevoegd!"
 
 #: ../EosAppStore/weblinkFrame.js:650
 msgid ""
 "Add your favorite websites to your desktop or choose suggested ones from our"
 " list."
-msgstr ""
+msgstr "Voeg je favoriete websites toe aan je bureaublad of kies websites uit de suggestielijst."
 
 #: ../EosAppStore/weblinkFrame.js:818
 msgid "Websites"
-msgstr ""
+msgstr "Websites"
 
 #: ../EosAppStore/weblinkFrame.js:822
 msgid "Install websites"
-msgstr ""
+msgstr "Websites installeren"

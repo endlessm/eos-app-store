@@ -4,13 +4,14 @@
 # 
 # Translators:
 # Matic Gradiser <0micky@gmail.com>, 2018
+# Shaddai, 2019
 msgid ""
 msgstr ""
 "Project-Id-Version: eos-app-store\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2018-04-16 15:16-0700\n"
-"PO-Revision-Date: 2018-04-23 17:58+0000\n"
-"Last-Translator: Matic Gradiser <0micky@gmail.com>\n"
+"PO-Revision-Date: 2019-01-12 02:10+0000\n"
+"Last-Translator: Shaddai\n"
 "Language-Team: Slovenian (http://www.transifex.com/endless-os/eos-app-store/language/sl/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -49,34 +50,34 @@ msgstr "Lokalno"
 
 #: ../EosAppStore/environment.js:22
 msgid "App Center"
-msgstr ""
+msgstr "Center Aplikacij"
 
 #: ../EosAppStore/weblinkFrame.js:282
 msgid "Write the website you'd like to add here and press “Enter”"
-msgstr ""
+msgstr "Napišite spletno mesto tukaj, katero želite dodati in pritisnite »Enter«"
 
 #: ../EosAppStore/weblinkFrame.js:369
 msgid "searching"
-msgstr ""
+msgstr "iščem"
 
 #: ../EosAppStore/weblinkFrame.js:384
 msgid "The address written does not exist or is not available."
-msgstr ""
+msgstr "Vpisan naslov ne obstaja ali ni na voljo."
 
 #: ../EosAppStore/weblinkFrame.js:393 ../EosAppStore/weblinkFrame.js:561
 msgid "Added successfully!"
-msgstr ""
+msgstr "Uspešno dodano!"
 
 #: ../EosAppStore/weblinkFrame.js:650
 msgid ""
 "Add your favorite websites to your desktop or choose suggested ones from our"
 " list."
-msgstr ""
+msgstr "Dodajte priljubljena spletna mesta na namizje ali izberite predlagane na našem seznamu."
 
 #: ../EosAppStore/weblinkFrame.js:818
 msgid "Websites"
-msgstr ""
+msgstr "Spletna stran"
 
 #: ../EosAppStore/weblinkFrame.js:822
 msgid "Install websites"
-msgstr ""
+msgstr "Dodajte spletno stran"
