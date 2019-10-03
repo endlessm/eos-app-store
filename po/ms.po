@@ -3,13 +3,14 @@
 # This file is distributed under the same license as the PACKAGE package.
 # 
 # Translators:
+# abuyop <abuyop@gmail.com>, 2019
 msgid ""
 msgstr ""
 "Project-Id-Version: eos-app-store\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2018-04-16 15:16-0700\n"
-"PO-Revision-Date: 2018-04-16 22:16+0000\n"
-"Last-Translator: Roddy Shuler <roddy@stanfordalumni.org>\n"
+"PO-Revision-Date: 2019-09-19 04:14+0000\n"
+"Last-Translator: abuyop <abuyop@gmail.com>\n"
 "Language-Team: Malay (http://www.transifex.com/endless-os/eos-app-store/language/ms/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -20,62 +21,62 @@ msgstr ""
 #: ../data/eos-app-store-weblink-new-site-frame.ui.h:1
 #: ../EosAppStore/weblinkFrame.js:349
 msgid "e.g.: http://www.endlessm.com"
-msgstr ""
+msgstr "cth.: http://www.endlessm.com"
 
 #: ../EosAppStore/appStoreWindow.js:278
 msgid "Press Escape to cancel"
-msgstr ""
+msgstr "Tekan Escape untuk batalkan"
 
 #: ../EosAppStore/categories.js:12
 msgid "News"
-msgstr ""
+msgstr "Berita"
 
 #: ../EosAppStore/categories.js:18
 msgid "Sports"
-msgstr ""
+msgstr "Sukan"
 
 #: ../EosAppStore/categories.js:24
 msgid "Education and Health"
-msgstr ""
+msgstr "Pendidikan dan Kesihatan"
 
 #: ../EosAppStore/categories.js:30
 msgid "Entertainment"
-msgstr ""
+msgstr "Hiburan"
 
 #: ../EosAppStore/categories.js:36
 msgid "Local"
-msgstr ""
+msgstr "Setempat"
 
 #: ../EosAppStore/environment.js:22
 msgid "App Center"
-msgstr ""
+msgstr "Pusat Apl"
 
 #: ../EosAppStore/weblinkFrame.js:282
 msgid "Write the website you'd like to add here and press “Enter”"
-msgstr ""
+msgstr "Tulis alamat laman sesawang yang anda mahu tambahkan di sini kemudian tekan \"Enter\""
 
 #: ../EosAppStore/weblinkFrame.js:369
 msgid "searching"
-msgstr ""
+msgstr "menggelintar"
 
 #: ../EosAppStore/weblinkFrame.js:384
 msgid "The address written does not exist or is not available."
-msgstr ""
+msgstr "Alamat bertulis tidak wujud atau tidak tersedia."
 
 #: ../EosAppStore/weblinkFrame.js:393 ../EosAppStore/weblinkFrame.js:561
 msgid "Added successfully!"
-msgstr ""
+msgstr "Berjaya ditambah!"
 
 #: ../EosAppStore/weblinkFrame.js:650
 msgid ""
 "Add your favorite websites to your desktop or choose suggested ones from our"
 " list."
-msgstr ""
+msgstr "Tambah laman sesawang kegemaran anda di Atas Meja anda atau pilih cadangan yang tersedia di dalam senarai kami."
 
 #: ../EosAppStore/weblinkFrame.js:818
 msgid "Websites"
-msgstr ""
+msgstr "Laman Sesawang"
 
 #: ../EosAppStore/weblinkFrame.js:822
 msgid "Install websites"
-msgstr ""
+msgstr "Pasang laman sesawang"
