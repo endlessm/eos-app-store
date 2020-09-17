@@ -27,7 +27,7 @@ const CATEGORY_TRANSITION_MS = 250;
 const LIST_COLUMNS_SPACING = 10;
 
 const DEFAULT_ICON = 'generic-link';
-const LAUNCH_URL_COMMAND = 'gvfs-open ';
+const LAUNCH_URL_COMMAND = 'gio open ';
 const DESKTOP_KEY_MAXIMIZED = 'X-Endless-LaunchMaximized';
 
 const ICON_EXTERNAL_LINK = '/com/endlessm/appstore/icon_external-link.png';
